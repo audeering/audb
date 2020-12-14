@@ -28,7 +28,9 @@ def check_channels(
 
 
 class Flavor(audobject.Object):
-    r"""Represents a specific flavor of a database.
+    r"""Represent database flavor.
+
+    Use :meth:`audb2.Flavor.__call__`` to convert a file to the flavor.
 
     Args:
         only_metadata: only metadata is stored
@@ -132,6 +134,7 @@ class Flavor(audobject.Object):
             self,
             file: str,
     ) -> bool:
+        r"""Convert signal to flavor."""
 
         # format change
         if file != self.destination(file):
@@ -175,6 +178,7 @@ class Flavor(audobject.Object):
             self,
             signal: np.ndarray,
     ) -> np.ndarray:
+        r"""Remix signal to flavor."""
 
         if self.mix is None:
             return signal
@@ -206,6 +210,8 @@ class Flavor(audobject.Object):
             signal: np.ndarray,
             sampling_rate: int,
     ) -> (np.ndarray, int):
+        r"""Resample signal to flavor."""
+
         if (self.sampling_rate is not None) and \
                 (sampling_rate != self.sampling_rate):
             signal = audresample.resample(
@@ -222,7 +228,7 @@ class Flavor(audobject.Object):
 
         Depending on the type of conversion,
         the input file will be replaced or deleted.
-        
+
         Args:
             file: path to input file
 
