@@ -1,0 +1,5 @@
+pytest
+pytest-cov
+pytest-console-scripts
+pytest-doctestplus
+pytest-flake8
