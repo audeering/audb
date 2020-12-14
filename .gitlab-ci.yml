@@ -1,0 +1,101 @@
+stages:
+  - test
+  - doc
+  - token
+  - pypi
+
+.pytest:
+  before_script:
+    - apt-get update
+    - apt-get install -y curl jq pandoc graphviz libsndfile1 sox
+    - python -V
+  script:
+    - pip install -r requirements.txt
+    - pip install -r tests/requirements.txt
+    - python -m pytest
+
+test-3.6:
+  extends: .pytest
+  stage: test
+  image: docker.audeering.com/python:3.6
+
+test-3.7:
+  extends: .pytest
+  stage: test
+  image: docker.audeering.com/python:3.7
+
+#test-windows-general:
+#  # Based on Python 3.8 by default
+#  stage: test
+#  tags:
+#    - windows
+#  script:
+#    - pip install -r requirements.txt
+#    - pip install -r tests/requirements.txt
+#    - python -m pytest
+
+docs:
+  extends: .pytest
+  stage: test
+  image: docker.audeering.com/python:3.6
+  script:
+    - pip install -r requirements.txt
+    - pip install -r docs/requirements.txt
+    - python -m sphinx -W docs/ build/html -b html
+    - python -m sphinx -W docs/ build/linkcheck -b linkcheck
+  artifacts:
+    paths:
+      - build/
+
+pages:
+  stage: doc
+  image: docker.audeering.com/alpine
+  variables:
+    GIT_STRATEGY: none  # disable git fetch
+  script:
+    - cp -r build/html public
+  dependencies:
+    - docs
+  artifacts:
+    paths:
+      - public
+  only:
+    refs:
+      - tags
+
+generate-token:
+  stage: token
+  image: docker.audeering.com/alpine
+  before_script:
+    - apk --no-cache add git curl bash
+  script:
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${GITLAB_USER_LOGIN}/artifactory-tokenizer.git
+    - cd artifactory-tokenizer
+    - bash get_token.sh "deployers" > ../token.json
+  artifacts:
+    paths:
+      - token.json
+    expire_in: 10 mins
+  only:
+    refs:
+      - tags
+
+pypi:
+  stage: pypi
+  image: docker.audeering.com/python:3.6
+  variables:
+    TWINE_REPOSITORY_URL: https://artifactory.audeering.com/artifactory/api/pypi/pypi
+  before_script:
+    - apt-get update
+    - apt-get install -y jq
+    - export TWINE_USERNAME=${GITLAB_USER_LOGIN}
+    - export TWINE_PASSWORD=$(cat token.json | jq -r '.access_token')
+    - pip install twine
+  script:
+    - python setup.py sdist bdist_wheel
+    - python -m twine upload --repository local dist/*
+  dependencies:
+    - generate-token
+  only:
+    refs:
+      - tags
