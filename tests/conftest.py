@@ -7,8 +7,6 @@ import pytest
 import audeer
 import audfactory
 
-import audb2
-
 
 pytest.ROOT = audeer.safe_path(
     os.path.join(
@@ -27,7 +25,7 @@ pytest.REPOSITORY_PUBLIC = 'unittests-public-local'
 pytest.SHARED_CACHE_ROOT = audeer.mkdir(
     os.path.join(pytest.ROOT, 'shared')
 )
-pytest.GROUP_ID = 'audb2'
+pytest.GROUP_ID = f'audb2.{audeer.uid()}'
 
 
 @pytest.fixture(scope='session', autouse=True)
