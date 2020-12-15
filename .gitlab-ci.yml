@@ -46,15 +46,15 @@ python-3.7:
   stage: test
   image: docker.audeering.com/python:3.7
 
-test-windows-general:
-  # Based on Python 3.8 by default
-  stage: test
-  tags:
-    - windows
-  script:
-    - pip install -r requirements.txt
-    - pip install -r tests/requirements.txt
-    - python -m pytest
+#test-windows-general:
+#  # Based on Python 3.8 by default
+#  stage: test
+#  tags:
+#    - windows
+#  script:
+#    - pip install -r requirements.txt
+#    - pip install -r tests/requirements.txt
+#    - python -m pytest
 
 docs:
   extends: .pytest

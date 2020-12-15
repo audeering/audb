@@ -23,7 +23,6 @@ pytest.CACHE_ROOT = audeer.mkdir(
 pytest.HOST = audeer.mkdir(
     os.path.join(pytest.ROOT, 'repo')
 )
-pytest.REPOSITORY_PRIVATE = 'unittests-private-local'
 pytest.REPOSITORY_PUBLIC = 'unittests-public-local'
 pytest.SHARED_CACHE_ROOT = audeer.mkdir(
     os.path.join(pytest.ROOT, 'shared')
@@ -44,7 +43,6 @@ def cleanup_session():
     if os.path.exists(pytest.ROOT):
         shutil.rmtree(pytest.ROOT)
     for repository in (
-            pytest.REPOSITORY_PRIVATE,
             pytest.REPOSITORY_PUBLIC,
     ):
         url = audfactory.artifactory_path(
