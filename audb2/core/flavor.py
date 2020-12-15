@@ -28,9 +28,9 @@ def check_channels(
 
 
 class Flavor(audobject.Object):
-    r"""Represent database flavor.
+    r"""Database flavor.
 
-    Use :meth:`audb2.Flavor.__call__`` to convert a file to the flavor.
+    Use :meth:`audb2.Flavor.__call__` to convert a file to the flavor.
 
     Args:
         only_metadata: only metadata is stored

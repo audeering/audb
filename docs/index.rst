@@ -17,6 +17,7 @@
     :hidden:
 
     api
+    api-backend
     api-define
     genindex
 

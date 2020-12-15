@@ -1,4 +1,8 @@
+from audb2 import backend
 from audb2 import define
+from audb2.core.api import (
+    default_cache_root,
+)
 from audb2.core.config import config
 from audb2.core.flavor import Flavor
 

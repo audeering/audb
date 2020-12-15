@@ -12,9 +12,18 @@ class config:
     """Cache folder."""
 
     GROUP_ID = 'com.audeering.data'
-    """Beginning of group IDs for stored internal databases."""
+    """Default group ID."""
 
     REPOSITORY_PRIVATE = 'data-private-local'
     r"""Default private repository."""
+
     REPOSITORY_PUBLIC = 'data-public-local'
     r"""Default public repository."""
+
+    SHARED_CACHE_ROOT = '/data/audb2'
+    """Shared cache folder.
+
+    This will be checked for data loading
+    before :attr:`audb2.config.CACHE_ROOT`.
+
+    """
