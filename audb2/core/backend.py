@@ -3,37 +3,12 @@ import os
 import shutil
 import tempfile
 import typing
-import zipfile
 
 import audfactory
 import audeer
 
-from audb2.core import define
+from audb2.core import utils
 from audb2.core.config import config
-
-
-# replace once https://github.com/audeering/audeer/issues/19 is solved
-def create_archive(
-        root: str,
-        files: typing.Sequence[str],
-        out_file: str,
-):
-    r"""Create archive."""
-    out_file = audeer.safe_path(out_file)
-    audeer.mkdir(os.path.dirname(out_file))
-    with zipfile.ZipFile(out_file, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for file in files:
-            full_file = audeer.safe_path(os.path.join(root, file))
-            if not os.path.exists(full_file):
-                raise FileNotFoundError(
-                    errno.ENOENT, os.strerror(errno.ENOENT), full_file,
-                )
-            zf.write(full_file, arcname=file)
-
-
-def sort_versions(versions: typing.List[str]):
-    r"""Sort versions inplace."""
-    versions.sort(key=lambda s: list(map(int, s.split('.'))))
 
 
 class Backend:
@@ -177,7 +152,7 @@ class Backend:
 
         """
         v = self.versions()
-        sort_versions(v)
+        utils.sort_versions(v)
         if not v:
             raise RuntimeError(
                 f"There is no published version for "
@@ -217,7 +192,7 @@ class Backend:
         with tempfile.TemporaryDirectory() as tmp:
             file = f'{name}-{version}.zip'
             outfile = os.path.join(tmp, file)
-            create_archive(root, files, outfile)
+            utils.create_archive(root, files, outfile)
             return self.put_file(
                 tmp, file, version, name=name, group=group, force=force,
             )

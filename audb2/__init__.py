@@ -2,6 +2,12 @@ from audb2 import backend
 from audb2 import define
 from audb2.core.api import (
     default_cache_root,
+    latest_version,
+    load,
+    load_raw,
+    publish,
+    remove_media,
+    versions,
 )
 from audb2.core.config import config
 from audb2.core.flavor import Flavor
