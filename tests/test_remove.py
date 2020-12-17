@@ -31,7 +31,7 @@ DB_FILES = {
         os.path.join('audio', 'new.wav'),
     ],
 }
-BACKEND = audb2.backend.FileSystem(DB_NAME, pytest.HOST)
+BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 
 def clear_root(root: str):

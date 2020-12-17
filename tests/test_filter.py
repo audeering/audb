@@ -17,7 +17,7 @@ audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 DB_NAME = 'test_filter'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
-BACKEND = audb2.backend.FileSystem(DB_NAME, pytest.HOST)
+BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 
 def clear_root(root: str):

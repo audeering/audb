@@ -17,7 +17,7 @@ audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 DB_NAME = 'test_publish'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
-BACKEND = audb2.backend.FileSystem(DB_NAME, pytest.HOST)
+BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 
 def clear_root(root: str):
@@ -102,6 +102,7 @@ def test_publish(version):
             DB_ROOT,
             file,
             version,
+            pytest.REPOSITORY_PUBLIC,
+            f'{pytest.GROUP_ID}.{db.name}.media',
             name=archives[file] if file in archives else None,
-            group='media',
         )

@@ -24,7 +24,7 @@ DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
     ['1.0.0', '1.1.0', '1.1.1', '2.0.0']
 }
-BACKEND = audb2.backend.FileSystem(DB_NAME, pytest.HOST)
+BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 
 def clear_root(root: str):

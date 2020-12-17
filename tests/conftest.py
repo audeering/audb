@@ -4,7 +4,6 @@ import shutil
 
 import pytest
 
-import audata.testing
 import audeer
 import audfactory
 
@@ -21,29 +20,6 @@ pytest.GROUP_ID = f'audb2.{audeer.uid()}'
 pytest.HOST = os.path.join(pytest.ROOT, 'repo')
 pytest.SHARED_CACHE_ROOT = os.path.join(pytest.ROOT, 'shared')
 pytest.REPOSITORY_PUBLIC = 'unittests-public-local'
-
-
-db = audata.testing.create_db(minimal=True)
-db.schemes['scheme'] = audata.Scheme(
-    labels=['positive', 'neutral', 'negative']
-)
-audata.testing.add_table(
-    db,
-    'emotion',
-    audata.define.TableType.SEGMENTED,
-    num_files=5,
-    columns={'emotion': ('scheme', None)}
-)
-db.schemes['speaker'] = audata.Scheme(
-    labels=['adam', 'eve']
-)
-db['files'] = audata.Table(db.files)
-db['files']['speaker'] = audata.Column(scheme_id='speaker')
-db['files']['speaker'].set(
-    ['adam', 'adam', 'eva', 'eva'],
-    files=db.files[:4],
-)
-pytest.DATABASE = db
 
 
 @pytest.fixture(scope='session', autouse=True)

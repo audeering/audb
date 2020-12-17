@@ -12,6 +12,7 @@ import audiofile
 from audb2.core import define
 from audb2.core import utils
 from audb2.core.backend import Backend
+from audb2.core.config import config
 from audb2.core.flavor import Flavor
 
 
@@ -29,6 +30,8 @@ class Dependencies:
             self,
             dep_path: str,
             db_root: str,
+            repository: str,
+            group_id: str,
             backend: Backend,
             *,
             verbose: bool = False,
@@ -37,6 +40,10 @@ class Dependencies:
         r"""Path to dependencies file."""
         self.db_root = audeer.safe_path(db_root)
         r"""Root directory of database."""
+        self.repository = repository
+        r"""Repository path."""
+        self.group_id = group_id
+        r"""Group ID."""
         self.backend = backend
         r"""Backend object."""
         self.verbose = verbose
@@ -217,7 +224,8 @@ class Dependencies:
                 self.db_root,
                 self.archive(file),
                 self.version(file),
-                group=define.TYPE_NAMES[define.Type.META],
+                self.repository,
+                f'{self.group_id}.{define.TYPE_NAMES[define.Type.META]}',
             )
 
         db = audata.Database.load(self.db_root)
@@ -301,9 +309,7 @@ class Dependencies:
             # download archives with media
             for archive, version in archives_to_download:
                 self._download_media(
-                    archive,
-                    version,
-                    flavor,
+                    archive=archive, version=version, flavor=flavor,
                 )
 
         return db
@@ -324,12 +330,6 @@ class Dependencies:
 
         """
         db = audata.Database.load(self.db_root)
-
-        if version in self.backend.versions():
-            raise RuntimeError(
-                f"A version '{version}' already exists for "
-                f"database '{self.backend.db_name}'."
-            )
 
         archives = archives or {}
         for name in archives.values():
@@ -364,11 +364,8 @@ class Dependencies:
         for table in tables_to_upload:
             file = f'db.{table}.csv'
             self.backend.put_archive(
-                self.db_root,
-                file,
-                table,
-                version,
-                group=define.TYPE_NAMES[define.Type.META],
+                self.db_root, file, table, version, self.repository,
+                f'{self.group_id}.{define.TYPE_NAMES[define.Type.META]}',
             )
 
         # release dependencies to removed media
@@ -417,7 +414,7 @@ class Dependencies:
                 self._upload_archive(
                     archive=archive,
                     mapping=map_media_to_files,
-                    group=define.TYPE_NAMES[define.Type.MEDIA],
+                    folder=define.TYPE_NAMES[define.Type.MEDIA],
                     version=version,
                 )
 
@@ -489,7 +486,8 @@ class Dependencies:
             self.db_root,
             archive,
             version,
-            group=define.TYPE_NAMES[define.Type.MEDIA],
+            self.repository,
+            f'{self.group_id}.{define.TYPE_NAMES[define.Type.MEDIA]}',
         )
         if flavor is not None:
             for file in files:
@@ -499,7 +497,7 @@ class Dependencies:
             self,
             archive: str,
             mapping: typing.Dict[str, typing.List[str]],
-            group: str,
+            folder: str,
             version: str,
     ):
         self.backend.put_archive(
@@ -507,5 +505,7 @@ class Dependencies:
             mapping[archive],
             archive,
             version,
-            group=group,
+            self.repository,
+            f'{self.group_id}.{folder}',
         )
+

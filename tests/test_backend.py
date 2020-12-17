@@ -52,19 +52,16 @@ import audb2
     'backend',
     [
         audb2.backend.FileSystem(
-            'test_put_archive',
             pytest.HOST,
-            repository=pytest.REPOSITORY_PUBLIC,
-            group_id=pytest.GROUP_ID,
         ),
-        audb2.backend.Artifactory(
-            'test_put_archive',
-            repository=pytest.REPOSITORY_PUBLIC,
-            group_id=pytest.GROUP_ID,
-        ),
+        audb2.backend.Artifactory(),
     ]
 )
 def test_archive(tmpdir, files, name, group, version, force, backend):
+
+    repository = pytest.REPOSITORY_PUBLIC
+    group_id = f'{pytest.GROUP_ID}.{group}'
+
     files_as_list = [files] if isinstance(files, str) else files
     for file in files_as_list:
         path = os.path.join(tmpdir, file)
@@ -72,34 +69,27 @@ def test_archive(tmpdir, files, name, group, version, force, backend):
         with open(path, 'w'):
             pass
     backend.put_archive(
-        tmpdir, files, name, version, group=group, force=force,
+        tmpdir, files, name, version, repository, group_id, force=force,
     )
-    assert backend.exists(tmpdir, name + '.zip', version, group=group)
+    assert backend.exists(
+        tmpdir, name + '.zip', version, repository, group_id,
+    )
     assert backend.get_archive(
-        tmpdir, name, version, group=group,
+        tmpdir, name, version, repository, group_id,
     ) == files_as_list
 
 
 @pytest.mark.parametrize(
-    'file, name, group, version, force',
+    'file, name, version, force',
     [
         (
             'file.ext',
             None,
-            None,
             '1.0.0',
             False,
         ),
         (
             os.path.join('dir', 'to', 'file.ext'),
-            None,
-            None,
-            '1.0.0',
-            False,
-        ),
-        (
-            os.path.join('dir', 'to', 'file.ext'),
-            'alias',
             None,
             '1.0.0',
             False,
@@ -107,21 +97,12 @@ def test_archive(tmpdir, files, name, group, version, force, backend):
         (
             os.path.join('dir', 'to', 'file.ext'),
             'alias',
-            'group',
             '1.0.0',
             False,
-        ),
-        (
-            os.path.join('dir', 'to', 'file.ext'),
-            'alias',
-            'group',
-            '1.0.0',
-            True,
         ),
         pytest.param(
             'dir/to/file.ext',
             'alias',
-            'group',
             '1.0.0',
             False,
             marks=pytest.mark.xfail(raises=FileExistsError),
@@ -131,55 +112,49 @@ def test_archive(tmpdir, files, name, group, version, force, backend):
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(
-            'test_file',
-            pytest.HOST,
-            repository=pytest.REPOSITORY_PUBLIC,
-            group_id=pytest.GROUP_ID,
-        ),
-        audb2.backend.Artifactory(
-            'test_file',
-            repository=pytest.REPOSITORY_PUBLIC,
-            group_id=pytest.GROUP_ID,
-        ),
+        audb2.backend.FileSystem(pytest.HOST),
+        audb2.backend.Artifactory(),
     ]
 )
-def test_file(tmpdir, file, name, group, version, force, backend):
+def test_file(tmpdir, file, name, version, force, backend):
+
+    repository = pytest.REPOSITORY_PUBLIC
+    group_id = f'{pytest.GROUP_ID}.test_file'
+
     path = os.path.join(tmpdir, file)
     audeer.mkdir(os.path.dirname(path))
     with open(path, 'w'):
         pass
     backend.put_file(
-        tmpdir, file, version, name=name, group=group, force=force,
+        tmpdir, file, version, repository, group_id, name=name, force=force,
     )
-    assert backend.exists(tmpdir, file, version, name=name, group=group)
+    assert backend.exists(
+        tmpdir, file, version, repository, group_id, name=name,
+    )
     assert path == backend.get_file(
-        tmpdir, file, version, name=name, group=group,
+        tmpdir, file, version, repository, group_id, name=name,
     )
 
 
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(
-            'test_errors',
-            pytest.HOST,
-            repository=pytest.REPOSITORY_PUBLIC,
-            group_id=pytest.GROUP_ID,
-        ),
-        audb2.backend.Artifactory(
-            'test_errors',
-            repository=pytest.REPOSITORY_PUBLIC,
-            group_id=pytest.GROUP_ID,
-        ),
+        audb2.backend.FileSystem(pytest.HOST),
+        audb2.backend.Artifactory(),
     ]
 )
 def test_errors(tmpdir, backend):
+
+    repository = pytest.REPOSITORY_PUBLIC
+    group_id = f'{pytest.GROUP_ID}.test_errors'
+
     with pytest.raises(FileNotFoundError):
         backend.put_file(
             tmpdir,
             'does-not-exist',
             '1.0.0',
+            repository,
+            group_id,
         )
     with pytest.raises(FileNotFoundError):
         backend.put_archive(
@@ -187,54 +162,48 @@ def test_errors(tmpdir, backend):
             'does-not-exist',
             'archive',
             '1.0.0',
+            repository,
+            group_id,
         )
     with pytest.raises(FileNotFoundError):
         backend.get_file(
             tmpdir,
             'does-not-exist',
             '1.0.0',
+            repository,
+            group_id,
         )
     with pytest.raises(FileNotFoundError):
         backend.get_archive(
             tmpdir,
             'does-not-exist',
             '1.0.0',
+            repository,
+            group_id,
         )
 
 
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(
-            'test_versions',
-            pytest.HOST,
-            repository=pytest.REPOSITORY_PUBLIC,
-            group_id=pytest.GROUP_ID,
-        ),
-        audb2.backend.Artifactory(
-            'test_versions',
-            repository=pytest.REPOSITORY_PUBLIC,
-            group_id=pytest.GROUP_ID,
-        ),
+        audb2.backend.FileSystem(pytest.HOST),
+        audb2.backend.Artifactory(),
     ]
 )
 def test_versions(tmpdir, backend):
-    assert not backend.versions()
+
+    repository = pytest.REPOSITORY_PUBLIC
+    group_id = f'{pytest.GROUP_ID}.test_versions'
+    file = 'db.yaml'
+
+    assert not backend.versions(file, repository, group_id)
     with pytest.raises(RuntimeError):
-        backend.latest_version()
-    path = os.path.join(tmpdir, 'db.yaml')
+        backend.latest_version(file, repository, group_id)
+    path = os.path.join(tmpdir, file)
     with open(path, 'w'):
         pass
-    backend.put_file(
-        tmpdir,
-        'db.yaml',
-        '1.0.0',
-    )
-    assert backend.versions() == ['1.0.0']
-    backend.put_file(
-        tmpdir,
-        'db.yaml',
-        '2.0.0',
-    )
-    assert backend.versions() == ['1.0.0', '2.0.0']
-    assert backend.latest_version() == '2.0.0'
+    backend.put_file(tmpdir, file, '1.0.0', repository, group_id)
+    assert backend.versions(file, repository, group_id) == ['1.0.0']
+    backend.put_file(tmpdir, file, '2.0.0', repository, group_id)
+    assert backend.versions(file, repository, group_id) == ['1.0.0', '2.0.0']
+    assert backend.latest_version(file, repository, group_id) == '2.0.0'

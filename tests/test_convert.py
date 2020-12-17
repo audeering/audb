@@ -19,7 +19,7 @@ audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 DB_NAME = 'test_convert'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
-BACKEND = audb2.backend.FileSystem(DB_NAME, pytest.HOST)
+BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 DB_FILES = {
     os.path.join('audio', 'file1.wav'): {
@@ -103,31 +103,16 @@ def fixture_clear_cache():
 
 @pytest.mark.parametrize(
     'bit_depth',
-    [None, 16],
+    [
+        None, 16,
+    ],
 )
-@pytest.mark.parametrize(
-    'format',
-    [None, audb2.define.Format.WAV, audb2.define.Format.FLAC],
-)
-@pytest.mark.parametrize(
-    'mix',
-    [None, audb2.define.Mix.MONO_ONLY, audb2.define.Mix.MONO,
-     audb2.define.Mix.RIGHT, audb2.define.Mix.LEFT, audb2.define.Mix.STEREO,
-     audb2.define.Mix.STEREO_ONLY, 1, [0, -1]],
-)
-@pytest.mark.parametrize(
-    'sampling_rate',
-    [None, 16000],
-)
-def test_convert(bit_depth, format, mix, sampling_rate):
+def test_bit_depth(bit_depth):
 
     db = audb2.load(
         DB_NAME,
         bit_depth=bit_depth,
-        format=format,
-        mix=mix,
         full_path=False,
-        sampling_rate=sampling_rate,
         backend=BACKEND,
     )
     original_files = db['files']['original'].get()
@@ -143,10 +128,56 @@ def test_convert(bit_depth, format, mix, sampling_rate):
         else:
             assert audiofile.bit_depth(converted_file) == bit_depth
 
+
+@pytest.mark.parametrize(
+    'format',
+    [
+        None, audb2.define.Format.WAV, audb2.define.Format.FLAC
+    ],
+)
+def test_format(format):
+
+    db = audb2.load(
+        DB_NAME,
+        format=format,
+        full_path=False,
+        backend=BACKEND,
+    )
+    original_files = db['files']['original'].get()
+
+    for converted_file, original_file in zip(db.files, original_files):
+
+        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        original_file = os.path.join(DB_ROOT, original_file)
+
         if format is None:
             assert converted_file[-4:] == original_file[-4:]
         else:
             assert converted_file.endswith(format)
+
+
+@pytest.mark.parametrize(
+    'mix',
+    [
+        None, audb2.define.Mix.MONO_ONLY, audb2.define.Mix.MONO,
+        audb2.define.Mix.RIGHT, audb2.define.Mix.LEFT, audb2.define.Mix.STEREO,
+        audb2.define.Mix.STEREO_ONLY, 1, [0, -1],
+    ],
+)
+def test_mix(mix):
+
+    db = audb2.load(
+        DB_NAME,
+        mix=mix,
+        full_path=False,
+        backend=BACKEND,
+    )
+    original_files = db['files']['original'].get()
+
+    for converted_file, original_file in zip(db.files, original_files):
+
+        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        original_file = os.path.join(DB_ROOT, original_file)
 
         if mix is None:
             assert audiofile.channels(converted_file) == \
@@ -172,3 +203,31 @@ def test_convert(bit_depth, format, mix, sampling_rate):
                 assert audiofile.channels(converted_file) == 1
             else:
                 assert audiofile.channels(converted_file) == len(mix)
+
+
+@pytest.mark.parametrize(
+    'sampling_rate',
+    [
+        None, 16000
+    ],
+)
+def test_sampling_rate(sampling_rate):
+
+    db = audb2.load(
+        DB_NAME,
+        sampling_rate=sampling_rate,
+        full_path=False,
+        backend=BACKEND,
+    )
+    original_files = db['files']['original'].get()
+
+    for converted_file, original_file in zip(db.files, original_files):
+
+        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        original_file = os.path.join(DB_ROOT, original_file)
+
+        if sampling_rate is None:
+            assert audiofile.sampling_rate(converted_file) == \
+                   audiofile.sampling_rate(original_file)
+        else:
+            assert audiofile.sampling_rate(converted_file) == sampling_rate
