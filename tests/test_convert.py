@@ -2,6 +2,7 @@ import os
 import shutil
 
 import numpy as np
+import pandas as pd
 import pytest
 
 import audata.testing
@@ -79,11 +80,16 @@ def fixture_publish_db():
             path, signal, DB_FILES[file]['sampling_rate'],
             bit_depth=DB_FILES[file]['bit_depth']
         )
+    db['segments'] = audata.Table(
+        [list(DB_FILES)[0]] * 3,
+        starts=pd.to_timedelta(['0s', '1s', '2s']),
+        ends=pd.to_timedelta(['1s', '2s', '3s']),
+    )
     db.save(DB_ROOT)
 
     # publish db
 
-    audb2.publish(DB_ROOT, '1.0.0', backend=BACKEND)
+    audb2.publish(DB_ROOT, '1.0.0', group_id=pytest.GROUP_ID, backend=BACKEND)
 
     yield
 
@@ -110,10 +116,8 @@ def fixture_clear_cache():
 def test_bit_depth(bit_depth):
 
     db = audb2.load(
-        DB_NAME,
-        bit_depth=bit_depth,
-        full_path=False,
-        backend=BACKEND,
+        DB_NAME, bit_depth=bit_depth, full_path=False,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
     original_files = db['files']['original'].get()
 
@@ -138,10 +142,8 @@ def test_bit_depth(bit_depth):
 def test_format(format):
 
     db = audb2.load(
-        DB_NAME,
-        format=format,
-        full_path=False,
-        backend=BACKEND,
+        DB_NAME, format=format, full_path=False,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
     original_files = db['files']['original'].get()
 
@@ -167,10 +169,8 @@ def test_format(format):
 def test_mix(mix):
 
     db = audb2.load(
-        DB_NAME,
-        mix=mix,
-        full_path=False,
-        backend=BACKEND,
+        DB_NAME, mix=mix, full_path=False,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
     original_files = db['files']['original'].get()
 
@@ -214,10 +214,8 @@ def test_mix(mix):
 def test_sampling_rate(sampling_rate):
 
     db = audb2.load(
-        DB_NAME,
-        sampling_rate=sampling_rate,
-        full_path=False,
-        backend=BACKEND,
+        DB_NAME, sampling_rate=sampling_rate, full_path=False,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
     original_files = db['files']['original'].get()
 

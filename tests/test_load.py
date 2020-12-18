@@ -22,7 +22,7 @@ DB_NAME = 'test_load'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
-    ['1.0.0', '1.1.0', '1.1.1', '2.0.0']
+    ['1.0.0', '1.1.0', '1.1.1', '2.0.0', '3.0.0']
 }
 BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
@@ -72,22 +72,26 @@ def fixture_publish_db():
     db.save(DB_ROOT_VERSION['1.0.0'])
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb2.publish(
-        DB_ROOT_VERSION['1.0.0'], '1.0.0', archives=archives, backend=BACKEND,
+        DB_ROOT_VERSION['1.0.0'], '1.0.0', archives=archives,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
     # publish 1.1.0, add table
 
     audata.testing.add_table(
-        db,
-        'train',
-        audata.define.TableType.SEGMENTED,
+        db, 'train', audata.define.TableType.SEGMENTED,
         columns={'label': ('scheme', None)}
     )
 
     audata.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.0'])
     db.save(DB_ROOT_VERSION['1.1.0'])
+    shutil.copy(
+        os.path.join(DB_ROOT_VERSION['1.0.0'], 'db.csv'),
+        os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
+    )
     audb2.publish(
-        DB_ROOT_VERSION['1.1.0'], '1.1.0', backend=BACKEND,
+        DB_ROOT_VERSION['1.1.0'], '1.1.0',
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
     # publish 1.1.1, change label
@@ -96,8 +100,13 @@ def fixture_publish_db():
 
     audata.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.1'])
     db.save(DB_ROOT_VERSION['1.1.1'])
+    shutil.copy(
+        os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
+        os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
+    )
     audb2.publish(
-        DB_ROOT_VERSION['1.1.1'], '1.1.1', backend=BACKEND,
+        DB_ROOT_VERSION['1.1.1'], '1.1.1',
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
     # publish 2.0.0, alter and remove media
@@ -112,8 +121,28 @@ def fixture_publish_db():
     os.remove(audeer.safe_path(os.path.join(DB_ROOT_VERSION['2.0.0'], file)))
 
     db.save(DB_ROOT_VERSION['2.0.0'])
+    shutil.copy(
+        os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
+        os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
+    )
     audb2.publish(
-        DB_ROOT_VERSION['2.0.0'], '2.0.0', backend=BACKEND,
+        DB_ROOT_VERSION['2.0.0'], '2.0.0',
+        group_id=pytest.GROUP_ID, backend=BACKEND,
+    )
+
+    # publish 3.0.0, remove table
+
+    db.drop('train', inplace=True)
+
+    audata.testing.create_audio_files(db, DB_ROOT_VERSION['3.0.0'])
+    db.save(DB_ROOT_VERSION['3.0.0'])
+    shutil.copy(
+        os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
+        os.path.join(DB_ROOT_VERSION['3.0.0'], 'db.csv'),
+    )
+    audb2.publish(
+        DB_ROOT_VERSION['3.0.0'], '3.0.0',
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
     yield
@@ -130,8 +159,9 @@ def fixture_publish_db():
         '1.1.0',
         '1.1.1',
         '2.0.0',
+        '3.0.0',
         pytest.param(
-            '3.0.0',
+            '4.0.0',
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
     ]
@@ -139,16 +169,69 @@ def fixture_publish_db():
 def test_load(version):
 
     db = audb2.load(
-        DB_NAME,
-        version,
-        full_path=False,
-        backend=BACKEND,
+        DB_NAME, version=version, full_path=False,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
     db_root = db.meta['audb']['root']
 
     if version is None:
-        version = audb2.latest_version(DB_NAME, backend=BACKEND)
+        version = audb2.latest_version(
+            DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
+        )
     db_original = audata.Database.load(DB_ROOT_VERSION[version])
+
+    pd.testing.assert_index_equal(db.files, db_original.files)
+    for file in db.files:
+        assert os.path.exists(os.path.join(db_root, file))
+    for table in db.tables:
+        assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
+        pd.testing.assert_frame_equal(
+            db_original[table].df,
+            db[table].df,
+        )
+
+    # from cache with full path
+
+    db = audb2.load(
+        DB_NAME, version=version, full_path=True,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
+    )
+    for file in db.files:
+        assert os.path.exists(file)
+    for table in db.tables:
+        assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
+
+
+@pytest.mark.parametrize(
+    'version',
+    [
+        None,
+        '1.0.0',
+        '1.1.0',
+        '1.1.1',
+        '2.0.0',
+        '3.0.0',
+        pytest.param(
+            '4.0.0',
+            marks=pytest.mark.xfail(raises=RuntimeError),
+        ),
+    ]
+)
+def test_load_raw(version):
+
+    db_root = os.path.join(DB_ROOT, 'raw')
+
+    db = audb2.load_raw(
+        db_root, DB_NAME, version=version,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
+    )
+
+    if version is None:
+        version = audb2.latest_version(
+            DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
+        )
+    db_original = audata.Database.load(DB_ROOT_VERSION[version])
+
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:
         assert os.path.exists(os.path.join(db_root, file))

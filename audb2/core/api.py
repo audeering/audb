@@ -50,30 +50,17 @@ def default_cache_root(
     return audeer.safe_path(cache)
 
 
-def dependencies(
-        dep_path: str,
-) -> pd.DataFrame:
-    r"""Read dependency table.
-
-    Args:
-        dep_path: file path
-
-    Returns:
-        table
-
-    """
-    return pd.read_csv(dep_path, index_col=0, na_filter=False)
-
-
 def latest_version(
         name,
         *,
+        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> str:
     r"""Latest version of database.
 
     Args:
         name: name of database
+        group_id: group ID
         backend: backend object
 
     Returns:
@@ -82,7 +69,7 @@ def latest_version(
     """
     backend = backend or Artifactory(name)
     repository = config.REPOSITORY_PUBLIC  # TODO: figure out
-    group_id: str = f'{config.GROUP_ID}.{name}'
+    group_id: str = f'{group_id}.{name}'
     return backend.latest_version(define.DB_HEADER, repository, group_id)
 
 
@@ -90,6 +77,7 @@ def remove_media(
         name: str,
         files: typing.Union[str, typing.Sequence[str]],
         *,
+        group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
 ):
@@ -98,6 +86,7 @@ def remove_media(
     Args:
         name: name of database
         files: list of files that should be removed
+        group_id: group ID
         backend: backend object
         verbose: show debug messages
 
@@ -105,7 +94,7 @@ def remove_media(
     backend = backend or Artifactory(name, verbose=verbose)
 
     repository = config.REPOSITORY_PUBLIC  # TODO: figure out
-    group_id = f'{config.GROUP_ID}.{name}'
+    group_id = f'{group_id}.{name}'
 
     if isinstance(files, str):
         files = [files]
@@ -159,12 +148,14 @@ def remove_media(
 def versions(
         name: str,
         *,
+        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> typing.List[str]:
     r"""Available versions of database.
 
     Args:
         name: name of database
+        group_id: group ID
         backend: backend object
 
     Returns:
@@ -174,6 +165,6 @@ def versions(
     backend = backend or Artifactory(name)
 
     repository = config.REPOSITORY_PUBLIC  # TODO: figure out
-    group_id: str = f'{config.GROUP_ID}.{name}'
+    group_id = f'{group_id}.{name}'
 
     return backend.versions(define.DB_HEADER, repository, group_id)

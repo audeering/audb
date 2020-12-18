@@ -40,7 +40,7 @@ class Dependencies:
         """
         return file in self._data
 
-    def __getitem__(self, file: str) -> typing.Tuple[str, str]:
+    def __getitem__(self, file: str) -> typing.List:
         r"""Meta information of dependency.
 
         Args:
@@ -50,8 +50,6 @@ class Dependencies:
             list with meta information
 
         """
-        if file not in self:
-            raise RuntimeError(f"An entry for '{file}' does not exist.")
         return self._data[file]
 
     @property

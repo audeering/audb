@@ -64,7 +64,8 @@ def fixture_publish_db():
         db.files[1]: 'bundle',
     }
     audb2.publish(
-        DB_ROOT_VERSION['1.0.0'], '1.0.0', archives=archives, backend=BACKEND,
+        DB_ROOT_VERSION['1.0.0'], '1.0.0', archives=archives,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
     # publish 2.0.0
@@ -73,7 +74,8 @@ def fixture_publish_db():
     audata.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
     db.save(DB_ROOT_VERSION['2.0.0'])
     audb2.publish(
-        DB_ROOT_VERSION['2.0.0'], '2.0.0', backend=BACKEND,
+        DB_ROOT_VERSION['2.0.0'], '2.0.0',
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
     yield
@@ -93,7 +95,9 @@ def fixture_publish_db():
 )
 def test_remove(remove):
 
-    audb2.remove_media(DB_NAME, remove, backend=BACKEND)
+    audb2.remove_media(
+        DB_NAME, remove, group_id=pytest.GROUP_ID, backend=BACKEND,
+    )
 
     for removed_media in [False, True]:
         for version in audb2.versions(DB_NAME, backend=BACKEND):

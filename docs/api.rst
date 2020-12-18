@@ -9,6 +9,13 @@ config
 .. autoclass:: config
     :members:
 
+Dependencies
+------------
+
+.. autoclass:: Dependencies
+    :members:
+    :special-members:
+
 Flavor
 ------
 

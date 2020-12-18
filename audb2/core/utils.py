@@ -26,12 +26,7 @@ def create_archive(
             zf.write(full_file, arcname=file)
 
 
-def sort_versions(versions: typing.List[str]):
-    r"""Sort versions inplace."""
-    versions.sort(key=lambda s: list(map(int, s.split('.'))))
-
-
-def read_chunks(
+def md5_read_chunk(
         fp: typing.IO,
         chunk_size: int = 8192,
 ):
@@ -48,11 +43,13 @@ def md5(
 ) -> str:
     r"""Create MD5 checksum."""
     file = audeer.safe_path(file)
-    if not os.path.exists(file):
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), file)
     with open(file, 'rb') as fp:
         hasher = hashlib.md5()
-        for chunk in read_chunks(fp, chunk_size):
+        for chunk in md5_read_chunk(fp, chunk_size):
             hasher.update(chunk)
         return hasher.hexdigest()
+
+
+def sort_versions(versions: typing.List[str]):
+    r"""Sort versions inplace."""
+    versions.sort(key=lambda s: list(map(int, s.split('.'))))

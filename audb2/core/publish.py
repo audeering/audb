@@ -2,8 +2,6 @@ import collections
 import os
 import typing
 
-import pandas as pd
-
 import audata
 import audeer
 import audiofile
@@ -24,15 +22,17 @@ def publish(
         *,
         archives: typing.Mapping[str, str] = None,
         private: bool = False,
+        group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
-) -> pd.DataFrame:
+) -> Dependencies:
     r"""Publish database to Artifactory.
 
     Args:
         db_root: root directory of database
         version: version string
         archives: map files to archives
+        group_id: group ID
         private: publish as private
         backend: backend object
         verbose: show debug messages
@@ -50,7 +50,7 @@ def publish(
 
     repository = config.REPOSITORY_PRIVATE if private else \
         config.REPOSITORY_PUBLIC
-    group_id: str = f'{config.GROUP_ID}.{db.name}'
+    group_id: str = f'{group_id}.{db.name}'
 
     if version in backend.versions(
         define.DB_HEADER, repository, group_id
@@ -154,7 +154,6 @@ def publish(
             )
 
     depend.to_file(dep_path)
-    df = depend()
 
     # upload header and dependencies
     backend.put_file(
@@ -165,4 +164,4 @@ def publish(
         version, repository, group_id,
     )
 
-    return df
+    return depend

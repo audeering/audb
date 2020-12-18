@@ -88,21 +88,38 @@ def test_publish(version):
 
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb2.publish(
-        DB_ROOT,
-        version,
-        archives=archives,
-        backend=BACKEND,
+        DB_ROOT, version, archives=archives,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
     )
-    assert version in audb2.versions(DB_NAME, backend=BACKEND)
-    assert audb2.latest_version(DB_NAME, backend=BACKEND) == \
-           audb2.versions(DB_NAME, backend=BACKEND)[-1]
+    versions = audb2.versions(
+        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
+    )
+    latest_version = audb2.latest_version(
+        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND
+    )
+
+    assert version in versions
+    assert latest_version == versions[-1]
 
     for file in db.files:
         BACKEND.exists(
-            DB_ROOT,
-            file,
-            version,
-            pytest.REPOSITORY_PUBLIC,
+            DB_ROOT, file, version, pytest.REPOSITORY_PUBLIC,
             f'{pytest.GROUP_ID}.{db.name}.media',
             name=archives[file] if file in archives else None,
+        )
+
+
+@pytest.mark.parametrize(
+    'name',
+    ['?', '!', ','],
+)
+def test_invalid_archives(name):
+
+    archives = {
+        os.path.join('audio', '001.wav'): name
+    }
+    with pytest.raises(ValueError):
+        audb2.publish(
+            DB_ROOT, 'x.x.x', archives=archives,
+            group_id=pytest.GROUP_ID, backend=BACKEND,
         )

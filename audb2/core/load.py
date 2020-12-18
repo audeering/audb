@@ -22,19 +22,20 @@ from audb2.core.flavor import Flavor
 
 
 def _load(
+        *,
         name: str,
         db_root: str,
         version: str,
-        flavor: Flavor = None,
-        removed_media: bool = False,
-        full_path: bool = True,
-        backend: Backend = None,
-        verbose: bool = False,
+        flavor: typing.Optional[Flavor],
+        removed_media: bool,
+        group_id: str,
+        backend: Backend,
+        verbose: bool,
 ) -> audata.Database:
     r"""Helper function for load()."""
 
     repository = config.REPOSITORY_PUBLIC  # TODO: figure out
-    group_id: str = f'{config.GROUP_ID}.{name}'
+    group_id: str = f'{group_id}.{name}'
 
     # load header and dependencies
     backend.get_file(
@@ -79,8 +80,11 @@ def _load(
         else:
             tables_to_download.append(file)
 
-    # download tables
+    # download tables, possibly remove pickled version
     for file in tables_to_download:
+        path_pkl = os.path.join(db_root, file)[:-3] + 'pkl'
+        if os.path.exists(path_pkl):
+            os.remove(path_pkl)
         backend.get_archive(
             db_root, depend.archive(file), depend.version(file),
             repository, f'{group_id}.{define.TYPE_NAMES[define.Type.META]}',
@@ -167,10 +171,7 @@ def _load(
         # download archives with media
         for archive, version in archives_to_download:
             files = backend.get_archive(
-                db_root,
-                archive,
-                version,
-                repository,
+                db_root, archive, version, repository,
                 f'{group_id}.{define.TYPE_NAMES[define.Type.MEDIA]}',
             )
             if flavor is not None:
@@ -209,25 +210,16 @@ def _load(
             'flavor': flavor.arguments,
         }
 
-    if full_path:
-        # Faster solution then using db.map_files()
-        root = db_root + os.path.sep
-        for table in db.tables.values():
-            if table.is_filewise:
-                table.df.index = root + table.df.index
-                table.df.index.name = 'file'
-            elif len(table.df.index) > 0:
-                table.df.index.set_levels(
-                    root + table.df.index.levels[0], 'file', inplace=True,
-                )
+    db.save(db_root)
+    db.save(db_root, compressed=True)
 
     return db
 
 
 def load(
         name: str,
-        version: str = None,
         *,
+        version: str = None,
         only_metadata: bool = False,
         bit_depth: int = None,
         format: str = None,
@@ -238,6 +230,7 @@ def load(
         exclude: typing.Union[str, typing.Sequence[str]] = None,
         removed_media: bool = False,
         full_path: bool = True,
+        group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
 ) -> audata.Database:
@@ -262,6 +255,7 @@ def load(
             after ``include``
         removed_media: keep rows that reference removed media
         full_path: replace relative with absolute file paths
+        group_id: group ID
         backend: backend object
         verbose: show debug messages
 
@@ -272,9 +266,9 @@ def load(
     backend = backend or Artifactory(name, verbose=verbose)
 
     if version is None:
-        version = latest_version(name, backend=backend)
+        version = latest_version(name, group_id=group_id, backend=backend)
 
-    if version not in versions(name, backend=backend):
+    if version not in versions(name, group_id=group_id, backend=backend):
         raise RuntimeError(
             f"A version '{version}' does not exist for database '{name}'."
         )
@@ -289,11 +283,36 @@ def load(
         include=include,
         exclude=exclude,
     )
-    db_root = os.path.join(config.CACHE_ROOT, name, flavor.id, version)
-    return _load(
-        name, db_root, version, flavor, removed_media,
-        full_path, backend, verbose,
+    db_root = audeer.safe_path(
+        os.path.join(config.CACHE_ROOT, name, flavor.id, version)
     )
+    if os.path.exists(db_root):
+        db = audata.Database.load(db_root)
+    else:
+        db = _load(
+            name=name,
+            db_root=db_root,
+            version=version,
+            flavor=flavor,
+            removed_media=removed_media,
+            group_id=group_id,
+            backend=backend,
+            verbose=verbose,
+        )
+
+    if full_path:
+        # Faster solution then using db.map_files()
+        root = db_root + os.path.sep
+        for table in db.tables.values():
+            if table.is_filewise:
+                table.df.index = root + table.df.index
+                table.df.index.name = 'file'
+            elif len(table.df.index) > 0:
+                table.df.index.set_levels(
+                    root + table.df.index.levels[0], 'file', inplace=True,
+                )
+
+    return db
 
 
 def load_raw(
@@ -301,6 +320,7 @@ def load_raw(
         name: str,
         version: str = None,
         *,
+        group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
 ) -> audata.Database:
@@ -310,6 +330,7 @@ def load_raw(
         root: target directory
         name: name of database
         version: version string, latest if ``None``
+        group_id: group ID
         backend: backend object
         verbose: show debug messages
 
@@ -320,10 +341,20 @@ def load_raw(
     backend = backend or Artifactory(name, verbose=verbose)
 
     if version is None:
-        version = latest_version(name, backend=backend)
+        version = latest_version(name, group_id=group_id, backend=backend)
 
-    if version not in versions(name, backend=backend):
+    if version not in versions(name, group_id=group_id, backend=backend):
         raise RuntimeError(
             f"A version '{version}' does not exist for database '{name}'.")
 
-    return _load(name, root, version, None, True, False, backend, verbose)
+    root = audeer.safe_path(root)
+    return _load(
+        name=name,
+        db_root=root,
+        version=version,
+        flavor=None,
+        removed_media=True,
+        group_id=group_id,
+        backend=backend,
+        verbose=verbose
+    )
