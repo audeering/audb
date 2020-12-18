@@ -6,8 +6,8 @@ DB_HEADER = 'db.yaml'
 DB_DEPEND = 'db.csv'
 
 
-class Field:
-    r"""Fields of dependency table."""
+class DependField:
+    r"""Fields stored in dependency table."""
     ARCHIVE = 0
     CHANNELS = 1
     CHECKSUM = 2
@@ -16,13 +16,25 @@ class Field:
     VERSION = 5
 
 
-FIELD_NAMES = {
-    Field.ARCHIVE: 'archive',
-    Field.CHANNELS: 'channels',
-    Field.CHECKSUM: 'checksum',
-    Field.REMOVED: 'removed',
-    Field.TYPE: 'type',
-    Field.VERSION: 'version',
+DEPEND_FIELD_NAMES = {
+    DependField.ARCHIVE: 'archive',
+    DependField.CHANNELS: 'channels',
+    DependField.CHECKSUM: 'checksum',
+    DependField.REMOVED: 'removed',
+    DependField.TYPE: 'type',
+    DependField.VERSION: 'version',
+}
+
+
+class DependType:
+    r"""Dependency file types."""
+    META = 0
+    MEDIA = 1
+
+
+DEPEND_TYPE_NAMES = {
+    DependType.META: 'meta',
+    DependType.MEDIA: 'media',
 }
 
 
@@ -55,15 +67,3 @@ MIXES = [
     Mix.STEREO,
     Mix.STEREO_ONLY,
 ]
-
-
-class Type:
-    r"""Type of dependency artifacts."""
-    META = 0
-    MEDIA = 1
-
-
-TYPE_NAMES = {
-    Type.META: 'meta',
-    Type.MEDIA: 'media',
-}

@@ -8,7 +8,7 @@ import audeer
 from audb2.core import define
 
 
-class Dependencies:
+class Depend:
     r"""Hold dependencies of a database.
 
     """
@@ -25,7 +25,7 @@ class Dependencies:
         return pd.DataFrame.from_dict(
             self._data,
             orient='index',
-            columns=list(define.FIELD_NAMES.values()),
+            columns=list(define.DEPEND_FIELD_NAMES.values()),
         )
 
     def __contains__(self, file: str):
@@ -81,7 +81,8 @@ class Dependencies:
 
         """
         select = [
-            file for file in self.files if self.type(file) == define.Type.MEDIA
+            file for file in self.files
+            if self.type(file) == define.DependType.MEDIA
         ]
         return select
 
@@ -94,7 +95,8 @@ class Dependencies:
 
         """
         select = [
-            file for file in self.files if self.type(file) == define.Type.META
+            file for file in self.files
+            if self.type(file) == define.DependType.META
         ]
         return select
 
@@ -111,7 +113,7 @@ class Dependencies:
             archive name
 
         """
-        return self[file][define.Field.ARCHIVE]
+        return self[file][define.DependField.ARCHIVE]
 
     def channels(self, file: str) -> str:
         r"""Number of channels of media file.
@@ -123,7 +125,7 @@ class Dependencies:
             number of channels
 
         """
-        return self[file][define.Field.CHANNELS]
+        return self[file][define.DependField.CHANNELS]
 
     def checksum(self, file: str) -> str:
         r"""Checksum of file.
@@ -135,7 +137,7 @@ class Dependencies:
             checksum of file
 
         """
-        return self[file][define.Field.CHECKSUM]
+        return self[file][define.DependField.CHECKSUM]
 
     def from_file(
             self,
@@ -163,7 +165,7 @@ class Dependencies:
             file: relative file path
 
         """
-        self._data[file][define.Field.REMOVED] = 1
+        self._data[file][define.DependField.REMOVED] = 1
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
@@ -175,7 +177,7 @@ class Dependencies:
             ``True`` if file was removed
 
         """
-        return self[file][define.Field.REMOVED] != 0
+        return self[file][define.DependField.REMOVED] != 0
 
     def to_file(
             self,
@@ -190,7 +192,7 @@ class Dependencies:
         path = audeer.safe_path(path)
         self().to_csv(path)
 
-    def type(self, file: str) -> define.Type:
+    def type(self, file: str) -> define.DependType:
         r"""File type.
 
         Args:
@@ -200,7 +202,7 @@ class Dependencies:
             type
 
         """
-        return self[file][define.Field.TYPE]
+        return self[file][define.DependField.TYPE]
 
     def version(self, file: str) -> str:
         r"""Version of file.
@@ -212,4 +214,4 @@ class Dependencies:
             version string
 
         """
-        return self[file][define.Field.VERSION]
+        return self[file][define.DependField.VERSION]

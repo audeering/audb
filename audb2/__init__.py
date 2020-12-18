@@ -1,13 +1,14 @@
 from audb2 import backend
 from audb2 import define
 from audb2.core.api import (
+    cached_databases,
     default_cache_root,
     latest_version,
     remove_media,
     versions,
 )
 from audb2.core.config import config
-from audb2.core.depend import Dependencies
+from audb2.core.depend import Depend
 from audb2.core.flavor import Flavor
 from audb2.core.load import (
     load,

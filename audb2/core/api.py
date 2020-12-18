@@ -2,7 +2,10 @@ import os
 import tempfile
 import typing
 
+import pandas as pd
+
 import audeer
+import audformat
 
 from audb2.core import define
 from audb2.core.backend import (
@@ -10,7 +13,44 @@ from audb2.core.backend import (
     Backend,
 )
 from audb2.core.config import config
-from audb2.core.depend import Dependencies
+from audb2.core.depend import Depend
+from audb2.core.utils import subdirs
+
+
+def cached_databases(
+        cache_root: str = None,
+) -> pd.DataFrame:
+    r"""List available databases in the cache.
+
+    Args:
+        cache_root: local cache path where databases are stored.
+            If set, overwrites :attr:`audb.config.CACHE_ROOT`
+
+    Returns:
+        :class:`pandas.DataFrame` listing cached databases
+
+    """
+    root = audeer.safe_path(cache_root or default_cache_root())
+
+    data = {}
+    if os.path.exists(root):
+        databases = subdirs(root, ignore_hidden=True)
+        for database in databases:
+            flavor_ids = subdirs(os.path.join(root, database))
+            for flavor_id in flavor_ids:
+                versions = subdirs(os.path.join(root, database, flavor_id))
+                for version in versions:
+                    path = os.path.join(root, database, flavor_id, version)
+                    db = audformat.Database.load(path, load_data=False)
+                    flavor = db.meta['audb']['flavor']
+                    data[path] = {
+                        'name': database,
+                        'flavor_id': flavor_id,
+                        'version': version,
+                    }
+                    data[path].update(flavor)
+
+    return pd.DataFrame.from_dict(data, orient='index')
 
 
 def default_cache_root(
@@ -110,7 +150,7 @@ def remove_media(
             dep_path = os.path.join(db_root, dep_path)
             upload = False
 
-            depend = Dependencies()
+            depend = Depend()
             depend.from_file(dep_path)
             for file in files:
                 if file in depend.files:
@@ -119,13 +159,15 @@ def remove_media(
                     # remove file from archive
                     files = backend.get_archive(
                         db_root, archive, version, repository,
-                        f'{group_id}.{define.TYPE_NAMES[define.Type.MEDIA]}',
+                        f'{group_id}.'
+                        f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
                     )
                     files.remove(file)
                     os.remove(os.path.join(db_root, file))
                     backend.put_archive(
                         db_root, files, archive, version, repository,
-                        f'{group_id}.{define.TYPE_NAMES[define.Type.MEDIA]}',
+                        f'{group_id}.'
+                        f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
                         force=True,
                     )
 

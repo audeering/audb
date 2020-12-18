@@ -190,6 +190,9 @@ def test_load(version):
             db[table].df,
         )
 
+    df = audb2.cached_databases()
+    assert df.loc[db.meta['audb']['root']]['version'] == version
+
     # from cache with full path
 
     db = audb2.load(

@@ -17,7 +17,7 @@ from audb2.core.backend import (
     Backend,
 )
 from audb2.core.config import config
-from audb2.core.depend import Dependencies
+from audb2.core.depend import Depend
 from audb2.core.flavor import Flavor
 
 
@@ -48,7 +48,7 @@ def _load(
         version, repository, group_id,
     )[0]
     dep_path = os.path.join(db_root, dep_path)
-    depend = Dependencies()
+    depend = Depend()
     depend.from_file(dep_path)
 
     # filter tables
@@ -88,8 +88,8 @@ def _load(
         if os.path.exists(path_pkl):
             os.remove(path_pkl)
         backend.get_archive(
-            db_root, depend.archive(file), depend.version(file),
-            repository, f'{group_id}.{define.TYPE_NAMES[define.Type.META]}',
+            db_root, depend.archive(file), depend.version(file), repository,
+            f'{group_id}.{define.DEPEND_TYPE_NAMES[define.DependType.META]}',
         )
 
     db = audformat.Database.load(db_root)
@@ -174,7 +174,8 @@ def _load(
         for archive, version in archives_to_download:
             files = backend.get_archive(
                 db_root, archive, version, repository,
-                f'{group_id}.{define.TYPE_NAMES[define.Type.MEDIA]}',
+                f'{group_id}.'
+                f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
             )
             if flavor is not None:
                 for file in files:

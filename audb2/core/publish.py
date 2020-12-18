@@ -13,7 +13,7 @@ from audb2.core.backend import (
     Backend,
 )
 from audb2.core.config import config
-from audb2.core.depend import Dependencies
+from audb2.core.depend import Depend
 
 
 def publish(
@@ -25,7 +25,7 @@ def publish(
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
-) -> Dependencies:
+) -> Depend:
     r"""Publish database to Artifactory.
 
     Args:
@@ -63,7 +63,7 @@ def publish(
     # load database and dependencies
     db = audformat.Database.load(db_root)
     dep_path = os.path.join(db_root, define.DB_DEPEND)
-    depend = Dependencies()
+    depend = Depend()
     depend.from_file(dep_path)
 
     # check archives
@@ -87,13 +87,13 @@ def publish(
         checksum = utils.md5(os.path.join(db_root, file))
         if file not in depend:
             depend.data[file] = [
-                table, 0, checksum, 0, define.Type.META, version,
+                table, 0, checksum, 0, define.DependType.META, version,
             ]
             tables_to_upload.append(table)
         elif checksum != depend.checksum(file):
-            depend.data[file][define.Field.CHANNELS] = 0
-            depend.data[file][define.Field.CHECKSUM] = checksum
-            depend.data[file][define.Field.VERSION] = version
+            depend.data[file][define.DependField.CHANNELS] = 0
+            depend.data[file][define.DependField.CHECKSUM] = checksum
+            depend.data[file][define.DependField.VERSION] = version
             tables_to_upload.append(table)
 
     # upload tables
@@ -101,7 +101,8 @@ def publish(
         file = f'db.{table}.csv'
         backend.put_archive(
             db_root, file, table, version, repository,
-            f'{group_id}.{define.TYPE_NAMES[define.Type.META]}',
+            f'{group_id}.'
+            f'{define.DEPEND_TYPE_NAMES[define.DependType.META]}',
         )
 
     # release dependencies to removed media
@@ -123,15 +124,16 @@ def publish(
                 archive = audeer.uid(from_string=file)
             channels = audiofile.channels(path)
             depend.data[file] = [
-                archive, channels, checksum, 0, define.Type.MEDIA, version,
+                archive, channels, checksum, 0,
+                define.DependType.MEDIA, version,
             ]
         elif not depend.removed(file):
             checksum = utils.md5(path)
             if checksum != depend.checksum(file):
                 channels = audiofile.channels(path)
-                depend.data[file][define.Field.CHECKSUM] = channels
-                depend.data[file][define.Field.CHECKSUM] = checksum
-                depend.data[file][define.Field.VERSION] = version
+                depend.data[file][define.DependField.CHECKSUM] = channels
+                depend.data[file][define.DependField.CHECKSUM] = checksum
+                depend.data[file][define.DependField.VERSION] = version
 
     # create a mapping from archives to media and
     # select archives with new or altered files for upload
@@ -146,11 +148,12 @@ def publish(
     for archive in media_to_upload:
         if archive in map_media_to_files:
             for file in map_media_to_files[archive]:
-                depend.data[file][define.Field.VERSION] = version
+                depend.data[file][define.DependField.VERSION] = version
             backend.put_archive(
                 db_root, map_media_to_files[archive],
                 archive, version, repository,
-                f'{group_id}.{define.TYPE_NAMES[define.Type.MEDIA]}',
+                f'{group_id}.'
+                f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
             )
 
     depend.to_file(dep_path)
