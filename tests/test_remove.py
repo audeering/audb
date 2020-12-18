@@ -3,7 +3,7 @@ import shutil
 
 import pytest
 
-import audata.testing
+import audformat.testing
 import audeer
 
 import audb2
@@ -51,13 +51,13 @@ def fixture_publish_db():
 
     # create db
 
-    db = audata.testing.create_db(minimal=True)
+    db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
-    db['files'] = audata.Table(DB_FILES['1.0.0'])
+    db['files'] = audformat.Table(audformat.filewise_index(DB_FILES['1.0.0']))
 
     # publish 1.0.0
 
-    audata.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
     db.save(DB_ROOT_VERSION['1.0.0'])
     archives = {
         db.files[0]: 'bundle',
@@ -70,8 +70,8 @@ def fixture_publish_db():
 
     # publish 2.0.0
 
-    db['files'].extend(files=DB_FILES['2.0.0'])
-    audata.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
+    db['files'].extend_index(audformat.filewise_index(DB_FILES['2.0.0']))
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
     db.save(DB_ROOT_VERSION['2.0.0'])
     audb2.publish(
         DB_ROOT_VERSION['2.0.0'], '2.0.0',

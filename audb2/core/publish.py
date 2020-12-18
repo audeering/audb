@@ -2,7 +2,7 @@ import collections
 import os
 import typing
 
-import audata
+import audformat
 import audeer
 import audiofile
 
@@ -44,7 +44,7 @@ def publish(
         RuntimeError: if version already exists
 
     """
-    db = audata.Database.load(db_root, load_data=False)
+    db = audformat.Database.load(db_root, load_data=False)
 
     backend = backend or Artifactory(db.name, verbose=verbose)
 
@@ -61,7 +61,7 @@ def publish(
         )
 
     # load database and dependencies
-    db = audata.Database.load(db_root)
+    db = audformat.Database.load(db_root)
     dep_path = os.path.join(db_root, define.DB_DEPEND)
     depend = Dependencies()
     depend.from_file(dep_path)

@@ -3,7 +3,7 @@ import re
 import typing
 
 
-import audata
+import audformat
 import audeer
 
 from audb2.core import define
@@ -31,7 +31,7 @@ def _load(
         group_id: str,
         backend: Backend,
         verbose: bool,
-) -> audata.Database:
+) -> audformat.Database:
     r"""Helper function for load()."""
 
     repository = config.REPOSITORY_PUBLIC  # TODO: figure out
@@ -41,7 +41,7 @@ def _load(
     backend.get_file(
         db_root, define.DB_HEADER, version, repository, group_id,
     )
-    db_header = audata.Database.load(db_root, load_data=False)
+    db_header = audformat.Database.load(db_root, load_data=False)
 
     dep_path = backend.get_archive(
         db_root, audeer.basename_wo_ext(define.DB_DEPEND),
@@ -62,7 +62,7 @@ def _load(
                         tables.append(table)
             else:
                 tables = flavor.tables
-            db_header.pick(tables, inplace=True)
+            db_header.pick_tables(tables)
             db_header.save(db_root, header_only=True)
             for file in depend.tables:
                 if not depend.archive(file) in tables:
@@ -82,7 +82,9 @@ def _load(
 
     # download tables, possibly remove pickled version
     for file in tables_to_download:
-        path_pkl = os.path.join(db_root, file)[:-3] + 'pkl'
+        path_pkl = os.path.join(
+            db_root, file
+        )[:-3] + audformat.define.TableStorageFormat.PICKLE
         if os.path.exists(path_pkl):
             os.remove(path_pkl)
         backend.get_archive(
@@ -90,7 +92,7 @@ def _load(
             repository, f'{group_id}.{define.TYPE_NAMES[define.Type.META]}',
         )
 
-    db = audata.Database.load(db_root)
+    db = audformat.Database.load(db_root)
 
     # filter media
     if flavor is not None:
@@ -107,7 +109,7 @@ def _load(
                             include.append(archive)
                 else:
                     include = flavor.include
-                db.filter_files(lambda x: depend.archive(x) in include)
+                db.pick_files(lambda x: depend.archive(x) in include)
             if flavor.exclude is not None:
                 if isinstance(flavor.exclude, str):
                     pattern = re.compile(flavor.exclude)
@@ -117,12 +119,12 @@ def _load(
                             exclude.append(archive)
                 else:
                     exclude = flavor.exclude
-                db.filter_files(lambda x: depend.archive(x) not in exclude)
+                db.pick_files(lambda x: depend.archive(x) not in exclude)
         if flavor.mix is not None:
             if isinstance(flavor.mix, str):
                 if flavor.mix == define.Mix.MONO_ONLY:
                     # keep only mono
-                    db.filter_files(
+                    db.pick_files(
                         lambda x: depend.channels(x) == 1,
                     )
                 if flavor.mix in (
@@ -131,17 +133,17 @@ def _load(
                         define.Mix.STEREO_ONLY,
                 ):
                     # keep only stereo
-                    db.filter_files(
+                    db.pick_files(
                         lambda x: depend.channels(x) == 2,
                     )
                 elif flavor.mix == define.Mix.STEREO:
                     # keep only mono or stereo
-                    db.filter_files(
+                    db.pick_files(
                         lambda x: depend.channels(x) in [1, 2],
                     )
             else:
                 num_channels = max(flavor.mix) + 1
-                db.filter_files(
+                db.pick_files(
                     lambda x: depend.channels(x) >= num_channels,
                 )
 
@@ -182,7 +184,7 @@ def _load(
 
     # filter rows referencing removed media
     if not removed_media:
-        db.filter_files(lambda x: not depend.removed(x))
+        db.pick_files(lambda x: not depend.removed(x))
 
     # fix file extension in tables
     if flavor is not None and flavor.format is not None:
@@ -211,7 +213,7 @@ def _load(
         }
 
     db.save(db_root)
-    db.save(db_root, compressed=True)
+    db.save(db_root, storage_format=audformat.define.TableStorageFormat.PICKLE)
 
     return db
 
@@ -233,7 +235,7 @@ def load(
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
-) -> audata.Database:
+) -> audformat.Database:
     r"""Load database from Artifactory.
 
     Args:
@@ -287,7 +289,7 @@ def load(
         os.path.join(config.CACHE_ROOT, name, flavor.id, version)
     )
     if os.path.exists(db_root):
-        db = audata.Database.load(db_root)
+        db = audformat.Database.load(db_root)
     else:
         db = _load(
             name=name,
@@ -323,7 +325,7 @@ def load_raw(
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
-) -> audata.Database:
+) -> audformat.Database:
     r"""Load database from Artifactory.
 
     Args:

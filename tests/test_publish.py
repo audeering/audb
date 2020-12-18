@@ -3,7 +3,7 @@ import shutil
 
 import pytest
 
-import audata.testing
+import audformat.testing
 import audeer
 
 import audb2
@@ -37,28 +37,28 @@ def fixture_publish_db():
 
     # create db
 
-    db = audata.testing.create_db(minimal=True)
+    db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
-    db.schemes['scheme'] = audata.Scheme(
+    db.schemes['scheme'] = audformat.Scheme(
         labels=['positive', 'neutral', 'negative']
     )
-    audata.testing.add_table(
+    audformat.testing.add_table(
         db,
         'emotion',
-        audata.define.TableType.SEGMENTED,
+        audformat.define.IndexType.SEGMENTED,
         num_files=5,
         columns={'emotion': ('scheme', None)}
     )
-    db.schemes['speaker'] = audata.Scheme(
+    db.schemes['speaker'] = audformat.Scheme(
         labels=['adam', 'eve']
     )
-    db['files'] = audata.Table(db.files)
-    db['files']['speaker'] = audata.Column(scheme_id='speaker')
+    db['files'] = audformat.Table(db.files)
+    db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
-        ['adam', 'adam', 'eva', 'eva'],
-        files=db.files[:4],
+        ['adam', 'adam', 'eve', 'eve'],
+        index=audformat.filewise_index(db.files[:4]),
     )
-    audata.testing.create_audio_files(db, DB_ROOT)
+    audformat.testing.create_audio_files(db, DB_ROOT)
     db.save(DB_ROOT)
 
     yield
@@ -80,7 +80,7 @@ def fixture_publish_db():
 )
 def test_publish(version):
 
-    db = audata.Database.load(DB_ROOT)
+    db = audformat.Database.load(DB_ROOT)
 
     if not audb2.versions(DB_NAME, backend=BACKEND):
         with pytest.raises(RuntimeError):

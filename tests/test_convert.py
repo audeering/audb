@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import audata.testing
+import audformat.testing
 import audeer
 import audiofile
 
@@ -61,10 +61,10 @@ def fixture_publish_db():
 
     # create db
 
-    db = audata.testing.create_db(minimal=True)
+    db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
-    db['files'] = audata.Table(list(DB_FILES))
-    db['files']['original'] = audata.Column()
+    db['files'] = audformat.Table(audformat.filewise_index(list(DB_FILES)))
+    db['files']['original'] = audformat.Column()
     db['files']['original'].set(list(DB_FILES))
     for file in DB_FILES:
         signal = np.zeros(
@@ -80,10 +80,12 @@ def fixture_publish_db():
             path, signal, DB_FILES[file]['sampling_rate'],
             bit_depth=DB_FILES[file]['bit_depth']
         )
-    db['segments'] = audata.Table(
-        [list(DB_FILES)[0]] * 3,
-        starts=pd.to_timedelta(['0s', '1s', '2s']),
-        ends=pd.to_timedelta(['1s', '2s', '3s']),
+    db['segments'] = audformat.Table(
+        audformat.segmented_index(
+            [list(DB_FILES)[0]] * 3,
+            starts=['0s', '1s', '2s'],
+            ends=['1s', '2s', '3s'],
+        )
     )
     db.save(DB_ROOT)
 

@@ -6,7 +6,7 @@ import pytest
 
 import audiofile
 
-import audata.testing
+import audformat.testing
 import audeer
 
 import audb2
@@ -44,31 +44,31 @@ def fixture_publish_db():
 
     # create db
 
-    db = audata.testing.create_db(minimal=True)
+    db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
-    db.schemes['scheme'] = audata.Scheme(
+    db.schemes['scheme'] = audformat.Scheme(
         labels=['positive', 'neutral', 'negative']
     )
-    audata.testing.add_table(
+    audformat.testing.add_table(
         db,
         'emotion',
-        audata.define.TableType.SEGMENTED,
+        audformat.define.IndexType.SEGMENTED,
         num_files=5,
         columns={'emotion': ('scheme', None)}
     )
-    db.schemes['speaker'] = audata.Scheme(
+    db.schemes['speaker'] = audformat.Scheme(
         labels=['adam', 'eve']
     )
-    db['files'] = audata.Table(db.files)
-    db['files']['speaker'] = audata.Column(scheme_id='speaker')
+    db['files'] = audformat.Table(db.files)
+    db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
-        ['adam', 'adam', 'eva', 'eva'],
-        files=db.files[:4],
+        ['adam', 'adam', 'eve', 'eve'],
+        index=audformat.filewise_index(db.files[:4]),
     )
 
     # publish 1.0.0
 
-    audata.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
     db.save(DB_ROOT_VERSION['1.0.0'])
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb2.publish(
@@ -78,12 +78,12 @@ def fixture_publish_db():
 
     # publish 1.1.0, add table
 
-    audata.testing.add_table(
-        db, 'train', audata.define.TableType.SEGMENTED,
+    audformat.testing.add_table(
+        db, 'train', audformat.define.IndexType.SEGMENTED,
         columns={'label': ('scheme', None)}
     )
 
-    audata.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.0'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.0'])
     db.save(DB_ROOT_VERSION['1.1.0'])
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['1.0.0'], 'db.csv'),
@@ -98,7 +98,7 @@ def fixture_publish_db():
 
     db['train'].df['label'][0] = None
 
-    audata.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.1'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.1'])
     db.save(DB_ROOT_VERSION['1.1.1'])
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
@@ -111,13 +111,13 @@ def fixture_publish_db():
 
     # publish 2.0.0, alter and remove media
 
-    audata.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
     file = os.path.join(DB_ROOT_VERSION['2.0.0'], db.files[0])
     y, sr = audiofile.read(file)
     y[0] = 1
     audiofile.write(file, y, sr)
     file = db.files[-1]
-    db.filter_files(lambda x: x != file)
+    db.pick_files(lambda x: x != file)
     os.remove(audeer.safe_path(os.path.join(DB_ROOT_VERSION['2.0.0'], file)))
 
     db.save(DB_ROOT_VERSION['2.0.0'])
@@ -132,9 +132,9 @@ def fixture_publish_db():
 
     # publish 3.0.0, remove table
 
-    db.drop('train', inplace=True)
+    db.drop_tables('train')
 
-    audata.testing.create_audio_files(db, DB_ROOT_VERSION['3.0.0'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['3.0.0'])
     db.save(DB_ROOT_VERSION['3.0.0'])
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
@@ -178,7 +178,7 @@ def test_load(version):
         version = audb2.latest_version(
             DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
         )
-    db_original = audata.Database.load(DB_ROOT_VERSION[version])
+    db_original = audformat.Database.load(DB_ROOT_VERSION[version])
 
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:
@@ -230,7 +230,7 @@ def test_load_raw(version):
         version = audb2.latest_version(
             DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
         )
-    db_original = audata.Database.load(DB_ROOT_VERSION[version])
+    db_original = audformat.Database.load(DB_ROOT_VERSION[version])
 
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:

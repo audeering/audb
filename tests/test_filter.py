@@ -3,7 +3,7 @@ import shutil
 
 import pytest
 
-import audata.testing
+import audformat.testing
 import audeer
 
 import audb2
@@ -37,33 +37,33 @@ def fixture_publish_db():
 
     # create db
 
-    db = audata.testing.create_db(minimal=True)
+    db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
-    db.schemes['scheme'] = audata.Scheme(
+    db.schemes['scheme'] = audformat.Scheme(
         labels=['some', 'test', 'labels']
     )
-    audata.testing.add_table(
+    audformat.testing.add_table(
         db,
         'test',
-        audata.define.TableType.SEGMENTED,
+        audformat.define.IndexType.SEGMENTED,
         columns={'label': ('scheme', None)},
         num_files=[0, 1],
     )
-    audata.testing.add_table(
+    audformat.testing.add_table(
         db,
         'dev',
-        audata.define.TableType.SEGMENTED,
+        audformat.define.IndexType.SEGMENTED,
         columns={'label': ('scheme', None)},
         num_files=[10, 11],
     )
-    audata.testing.add_table(
+    audformat.testing.add_table(
         db,
         'train',
-        audata.define.TableType.SEGMENTED,
+        audformat.define.IndexType.SEGMENTED,
         columns={'label': ('scheme', None)},
         num_files=[20, 21],
     )
-    audata.testing.create_audio_files(db, DB_ROOT)
+    audformat.testing.create_audio_files(db, DB_ROOT)
     db.save(DB_ROOT)
 
     # publish db

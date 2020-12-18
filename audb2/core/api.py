@@ -2,8 +2,6 @@ import os
 import tempfile
 import typing
 
-import pandas as pd
-
 import audeer
 
 from audb2.core import define
