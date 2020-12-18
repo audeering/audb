@@ -1,0 +1,329 @@
+import os
+import re
+import typing
+
+
+import audata
+import audeer
+
+from audb2.core import define
+from audb2.core import utils
+from audb2.core.api import (
+    latest_version,
+    versions,
+)
+from audb2.core.backend import (
+    Artifactory,
+    Backend,
+)
+from audb2.core.config import config
+from audb2.core.depend import Dependencies
+from audb2.core.flavor import Flavor
+
+
+def _load(
+        name: str,
+        db_root: str,
+        version: str,
+        flavor: Flavor = None,
+        removed_media: bool = False,
+        full_path: bool = True,
+        backend: Backend = None,
+        verbose: bool = False,
+) -> audata.Database:
+    r"""Helper function for load()."""
+
+    repository = config.REPOSITORY_PUBLIC  # TODO: figure out
+    group_id: str = f'{config.GROUP_ID}.{name}'
+
+    # load header and dependencies
+    backend.get_file(
+        db_root, define.DB_HEADER, version, repository, group_id,
+    )
+    db_header = audata.Database.load(db_root, load_data=False)
+
+    dep_path = backend.get_archive(
+        db_root, audeer.basename_wo_ext(define.DB_DEPEND),
+        version, repository, group_id,
+    )[0]
+    dep_path = os.path.join(db_root, dep_path)
+    depend = Dependencies()
+    depend.from_file(dep_path)
+
+    # filter tables
+    if flavor is not None:
+        if flavor.tables is not None:
+            if isinstance(flavor.tables, str):
+                pattern = re.compile(flavor.tables)
+                tables = []
+                for table in db_header.tables:
+                    if pattern.search(table):
+                        tables.append(table)
+            else:
+                tables = flavor.tables
+            db_header.pick(tables, inplace=True)
+            db_header.save(db_root, header_only=True)
+            for file in depend.tables:
+                if not depend.archive(file) in tables:
+                    depend.data.pop(file)
+
+    # figure out tables to download
+    tables_to_download = []
+    for table in db_header.tables:
+        file = f'db.{table}.csv'
+        full_file = os.path.join(db_root, file)
+        if os.path.exists(full_file):
+            checksum = utils.md5(full_file)
+            if checksum != depend.checksum(file):
+                tables_to_download.append(file)
+        else:
+            tables_to_download.append(file)
+
+    # download tables
+    for file in tables_to_download:
+        backend.get_archive(
+            db_root, depend.archive(file), depend.version(file),
+            repository, f'{group_id}.{define.TYPE_NAMES[define.Type.META]}',
+        )
+
+    db = audata.Database.load(db_root)
+
+    # filter media
+    if flavor is not None:
+        if flavor.include is not None or flavor.exclude is not None:
+            archives = set()
+            for file in db.files:
+                archives.add(depend.archive(file))
+            if flavor.include is not None:
+                if isinstance(flavor.include, str):
+                    pattern = re.compile(flavor.include)
+                    include = []
+                    for archive in archives:
+                        if pattern.search(archive):
+                            include.append(archive)
+                else:
+                    include = flavor.include
+                db.filter_files(lambda x: depend.archive(x) in include)
+            if flavor.exclude is not None:
+                if isinstance(flavor.exclude, str):
+                    pattern = re.compile(flavor.exclude)
+                    exclude = []
+                    for archive in archives:
+                        if pattern.search(archive):
+                            exclude.append(archive)
+                else:
+                    exclude = flavor.exclude
+                db.filter_files(lambda x: depend.archive(x) not in exclude)
+        if flavor.mix is not None:
+            if isinstance(flavor.mix, str):
+                if flavor.mix == define.Mix.MONO_ONLY:
+                    # keep only mono
+                    db.filter_files(
+                        lambda x: depend.channels(x) == 1,
+                    )
+                if flavor.mix in (
+                        define.Mix.LEFT,
+                        define.Mix.RIGHT,
+                        define.Mix.STEREO_ONLY,
+                ):
+                    # keep only stereo
+                    db.filter_files(
+                        lambda x: depend.channels(x) == 2,
+                    )
+                elif flavor.mix == define.Mix.STEREO:
+                    # keep only mono or stereo
+                    db.filter_files(
+                        lambda x: depend.channels(x) in [1, 2],
+                    )
+            else:
+                num_channels = max(flavor.mix) + 1
+                db.filter_files(
+                    lambda x: depend.channels(x) >= num_channels,
+                )
+
+            db.save(db_root)
+
+    if flavor is None or not flavor.only_metadata:
+
+        # figure out media to download
+        media_to_download = []
+        for file in db.files:
+            if not depend.removed(file):
+                full_file = os.path.join(db_root, file)
+                if os.path.exists(full_file):
+                    checksum = utils.md5(full_file)
+                    if checksum != depend.checksum(file):
+                        media_to_download.append(file)
+                else:
+                    media_to_download.append(file)
+
+        # figure out archives to download
+        archives_to_download = set()
+        for file in media_to_download:
+            archives_to_download.add(
+                (depend.archive(file), depend.version(file))
+            )
+
+        # download archives with media
+        for archive, version in archives_to_download:
+            files = backend.get_archive(
+                db_root,
+                archive,
+                version,
+                repository,
+                f'{group_id}.{define.TYPE_NAMES[define.Type.MEDIA]}',
+            )
+            if flavor is not None:
+                for file in files:
+                    flavor(os.path.join(db_root, file))
+
+    depend.to_file(dep_path)
+
+    # filter rows referencing removed media
+    if not removed_media:
+        db.filter_files(lambda x: not depend.removed(x))
+
+    # fix file extension in tables
+    if flavor is not None and flavor.format is not None:
+        # Faster solution then using db.map_files()
+        cur_ext = r'\.[a-zA-Z0-9]+$'  # match file extension
+        new_ext = f'.{flavor.format}'
+        for table in db.tables.values():
+            if table.is_filewise:
+                table.df.index = table.df.index.str.replace(
+                    cur_ext, new_ext,
+                )
+            else:
+                table.df.index.set_levels(
+                    table.df.index.levels[0].str.replace(
+                        cur_ext, new_ext),
+                    'file',
+                    inplace=True,
+                )
+
+    # store root and flavor
+    if flavor is not None:
+        db.meta['audb'] = {
+            'root': db_root,
+            'version': version,
+            'flavor': flavor.arguments,
+        }
+
+    if full_path:
+        # Faster solution then using db.map_files()
+        root = db_root + os.path.sep
+        for table in db.tables.values():
+            if table.is_filewise:
+                table.df.index = root + table.df.index
+                table.df.index.name = 'file'
+            elif len(table.df.index) > 0:
+                table.df.index.set_levels(
+                    root + table.df.index.levels[0], 'file', inplace=True,
+                )
+
+    return db
+
+
+def load(
+        name: str,
+        version: str = None,
+        *,
+        only_metadata: bool = False,
+        bit_depth: int = None,
+        format: str = None,
+        mix: str = None,
+        sampling_rate: int = None,
+        tables: typing.Union[str, typing.Sequence[str]] = None,
+        include: typing.Union[str, typing.Sequence[str]] = None,
+        exclude: typing.Union[str, typing.Sequence[str]] = None,
+        removed_media: bool = False,
+        full_path: bool = True,
+        backend: Backend = None,
+        verbose: bool = False,
+) -> audata.Database:
+    r"""Load database from Artifactory.
+
+    Args:
+        name: name of database
+        version: version string, latest if ``None``
+        only_metadata: only metadata is stored
+        format: file format, one of ``'flac'``, ``'wav'``
+        mix: mixing strategy, one of
+            ``'left'``, ``'right'``, ``'mono'``, ``'stereo'``
+        bit_depth: bit depth, one of ``16``, ``24``, ``32``
+        sampling_rate: sampling rate in Hz, one of
+            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+        tables: include only tables matching the regular expression or
+            provided in the list
+        include: include only media from archives matching the regular
+            expression or provided in the list
+        exclude: don't include media from archives matching the regular
+            expression or provided in the list. This filter is applied
+            after ``include``
+        removed_media: keep rows that reference removed media
+        full_path: replace relative with absolute file paths
+        backend: backend object
+        verbose: show debug messages
+
+    Returns:
+        database object
+
+    """
+    backend = backend or Artifactory(name, verbose=verbose)
+
+    if version is None:
+        version = latest_version(name, backend=backend)
+
+    if version not in versions(name, backend=backend):
+        raise RuntimeError(
+            f"A version '{version}' does not exist for database '{name}'."
+        )
+
+    flavor = Flavor(
+        only_metadata=only_metadata,
+        format=format,
+        mix=mix,
+        bit_depth=bit_depth,
+        sampling_rate=sampling_rate,
+        tables=tables,
+        include=include,
+        exclude=exclude,
+    )
+    db_root = os.path.join(config.CACHE_ROOT, name, flavor.id, version)
+    return _load(
+        name, db_root, version, flavor, removed_media,
+        full_path, backend, verbose,
+    )
+
+
+def load_raw(
+        root: str,
+        name: str,
+        version: str = None,
+        *,
+        backend: Backend = None,
+        verbose: bool = False,
+) -> audata.Database:
+    r"""Load database from Artifactory.
+
+    Args:
+        root: target directory
+        name: name of database
+        version: version string, latest if ``None``
+        backend: backend object
+        verbose: show debug messages
+
+    Returns:
+        database object
+
+    """
+    backend = backend or Artifactory(name, verbose=verbose)
+
+    if version is None:
+        version = latest_version(name, backend=backend)
+
+    if version not in versions(name, backend=backend):
+        raise RuntimeError(
+            f"A version '{version}' does not exist for database '{name}'.")
+
+    return _load(name, root, version, None, True, False, backend, verbose)
