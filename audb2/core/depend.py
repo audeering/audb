@@ -215,3 +215,9 @@ class Depend:
 
         """
         return self[file][define.DependField.VERSION]
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def __str__(self) -> str:
+        return self().to_string()

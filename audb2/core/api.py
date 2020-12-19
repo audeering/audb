@@ -88,6 +88,35 @@ def default_cache_root(
     return audeer.safe_path(cache)
 
 
+def dependencies(
+        name: str,
+        *,
+        version: str = None,
+        group_id: str = config.GROUP_ID,
+        backend: Backend = None,
+        verbose: bool = False,
+) -> Depend:
+
+    backend = backend or Artifactory(name, verbose=verbose)
+    version = resolve_version(
+        name, version, group_id=group_id, backend=backend,
+    )
+
+    repository = config.REPOSITORY_PUBLIC  # TODO: figure out
+    group_id: str = f'{group_id}.{name}'
+
+    with tempfile.TemporaryDirectory() as root:
+        dep_path = backend.get_archive(
+            root, audeer.basename_wo_ext(define.DB_DEPEND),
+            version, repository, group_id,
+        )[0]
+        dep_path = os.path.join(root, dep_path)
+        depend = Depend()
+        depend.from_file(dep_path)
+
+    return depend
+
+
 def latest_version(
         name,
         *,
@@ -183,6 +212,25 @@ def remove_media(
                     audeer.basename_wo_ext(define.DB_DEPEND),
                     version, repository, group_id, force=True,
                 )
+
+
+def resolve_version(
+        name,
+        version: typing.Optional[str],
+        *,
+        group_id: str = config.GROUP_ID,
+        backend: Backend = None,
+) -> str:
+    r"""Resolve version of database."""
+
+    if version is None:
+        version = latest_version(name, group_id=group_id, backend=backend)
+
+    if version not in versions(name, group_id=group_id, backend=backend):
+        raise RuntimeError(
+            f"A version '{version}' does not exist for database '{name}'.")
+
+    return version
 
 
 def versions(

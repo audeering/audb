@@ -38,6 +38,19 @@ To use emodb_ (see `available databases`_ for more) in your project:
     df = db['emotion'].get()  # get table
     df[:3]  # show first three entries
 
+If you don't specify a version,
+:mod:`audb2` will retrieve the latest version for you.
+You can find the latest version with:
+
+.. jupyter-execute::
+
+    audb2.latest_version('emodb')
+
+Or to get a list of all available versions, you can do:
+
+.. jupyter-execute::
+
+    audb2.versions('emodb')
 
 
 Overview
@@ -57,7 +70,6 @@ In the process of providing you the data,
 .. graphviz:: pics/workflow.dot
 
 
-
 .. _database-dependencies:
 
 Database dependencies
@@ -69,15 +81,11 @@ and one up to several thousand archive files for data.
 All of them are stored as dependencies on Artifactory,
 that are resolved on-the-fly by :mod:`audb2`.
 
-If you don't specify a version,
-:mod:`audb2` will retrieve the latest version for you.
 You can visualize dependencies of a database with:
 
 .. jupyter-execute::
 
-    depend = audb2.Depend()
-    depend_file = os.path.join(db.meta['audb']['root'], 'db.csv')
-    depend.from_file(depend_file)
+    depend = audb2.dependencies('emodb', version='1.0.1')
     depend()
 
 
@@ -144,7 +152,6 @@ You can list all available flavors with:
     df[['name', 'version', 'mix', 'sampling_rate']]
 
 
-
 Metadata and header only
 ------------------------
 
@@ -161,46 +168,61 @@ but all the annotations and the header:
 
 .. _cache-root:
 
-Cache root
-----------
+Caching
+-------
 
-:file:`<cache_root>` points to the local folder
-where the databases are stored.
-It's default value is ``~/audb2``.
 When you request a database the first time,
-:mod:`audb2` will:
+:mod:`audb2` will unpack (and convert) annotations and data to
+:file:`<cache_root>/<name>/<flavor>/<version>/`.
+Next time your request it again,
+:mod:`audb2` will directly load the database from there.
 
-* unpack (and convert) annotations and data to
-  :file:`<cache_root>/<name>/<flavor>/<version>/`.
+:mod:`audb2` distinguishes two :file:`<cache_root>` folders.
+A shared cache folder, which we use on our `compute servers`_.
+By default it is located under :file:`/data/audb2`
+and can be accessed by all users.
 
-There are two ways to change :file:`cache_root`:
+.. jupyter-execute::
 
-1. Explicitly, by setting a different ``cache_root``
+    audb2.default_cache_root(shared=True)
 
-.. code-block:: python
-
-    audb2.config.CACHE_ROOT = '/new/cache/audb2'
-
-2. Implicitly, through the system variable ``AUDB2_CACHE_ROOT``, e.g.:
-
-.. code-block:: bash
-
-    export AUDB2_CACHE_ROOT=/new/cache/audb2
-
-Note that 1. overwrites 2.
-
-
-Cache root on computeX
-----------------------
-
-On our `compute servers`_, we have a shared :mod:`audb2` cache folder
-under :file:`/data/audb2`.
-Please use this for all databases with public access level.
+Please use the shared folder only
+for all databases with public access level.
 If you are unsure,
 have a look at the list of `available databases`_.
 
-Databases with private access levels
-should never be stored under the shared cache folder.
+The second cache folder should be
+accessible to you only.
+It is reserved for databases that
+are not relevant to other users or
+databases that have private access level.
+By default it points to ``~/audb2``.
+
+.. jupyter-execute::
+
+    audb2.default_cache_root(shared=False)
+
+When you request a database with :meth:`audb2.load`,
+:mod:`audb2` first looks for it in the shared cache folder
+and afterwards in your local cache folder.
+
+There are two ways to change the default locations:
+
+1. Within your program by changing the default values in :class:`audb2.config`:
+
+.. code-block:: python
+
+    audb2.config.CACHE_ROOT = '/new/local/cache/audb2'
+    audb2.config.SHARED_CACHE_ROOT = '/new/shared/cache/audb2'
+
+2. System wide by setting the following system variables:
+
+.. code-block:: bash
+
+    export AUDB2_CACHE_ROOT=/new/local/cache/audb2
+    export AUDB2_SHARED_CACHE_ROOT=/new/shared/cache/audb2
+
+Note that 1. overwrites 2.
 
 
 .. _emodb:

@@ -3,6 +3,7 @@ from audb2 import define
 from audb2.core.api import (
     cached_databases,
     default_cache_root,
+    dependencies,
     latest_version,
     remove_media,
     versions,

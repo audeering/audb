@@ -175,10 +175,12 @@ def test_load(version):
     db_root = db.meta['audb']['root']
 
     if version is None:
-        version = audb2.latest_version(
+        resolved_version = audb2.latest_version(
             DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
         )
-    db_original = audformat.Database.load(DB_ROOT_VERSION[version])
+    else:
+        resolved_version = version
+    db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
 
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:
@@ -191,7 +193,13 @@ def test_load(version):
         )
 
     df = audb2.cached_databases()
-    assert df.loc[db.meta['audb']['root']]['version'] == version
+    assert df.loc[db.meta['audb']['root']]['version'] == resolved_version
+
+    depend = audb2.dependencies(
+        DB_NAME, version=version, group_id=pytest.GROUP_ID, backend=BACKEND,
+    )
+    assert str(depend().to_string()) == str(depend)
+    assert len(depend) == len(db.files) + len(db.tables)
 
     # from cache with full path
 
@@ -220,7 +228,7 @@ def test_load(version):
         ),
     ]
 )
-def test_load_raw(version):
+def test_load_original_to(version):
 
     db_root = os.path.join(DB_ROOT, 'raw')
 

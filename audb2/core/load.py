@@ -9,8 +9,8 @@ import audeer
 from audb2.core import define
 from audb2.core import utils
 from audb2.core.api import (
-    latest_version,
-    versions,
+    default_cache_root,
+    resolve_version,
 )
 from audb2.core.backend import (
     Artifactory,
@@ -267,14 +267,9 @@ def load(
 
     """
     backend = backend or Artifactory(name, verbose=verbose)
-
-    if version is None:
-        version = latest_version(name, group_id=group_id, backend=backend)
-
-    if version not in versions(name, group_id=group_id, backend=backend):
-        raise RuntimeError(
-            f"A version '{version}' does not exist for database '{name}'."
-        )
+    version = resolve_version(
+        name, version, group_id=group_id, backend=backend,
+    )
 
     flavor = Flavor(
         only_metadata=only_metadata,
@@ -286,12 +281,20 @@ def load(
         include=include,
         exclude=exclude,
     )
-    db_root = audeer.safe_path(
-        os.path.join(config.CACHE_ROOT, name, flavor.id, version)
-    )
-    if os.path.exists(db_root):
-        db = audformat.Database.load(db_root)
-    else:
+
+    db = None
+    for cache_root in (
+        default_cache_root(True),  # check shared cache first
+        default_cache_root(False),
+    ):
+        db_root = audeer.safe_path(
+            os.path.join(cache_root, name, flavor.id, version)
+        )
+        if os.path.exists(db_root):
+            db = audformat.Database.load(db_root)
+            break
+
+    if db is None:
         db = _load(
             name=name,
             db_root=db_root,
@@ -321,8 +324,8 @@ def load(
 def load_original_to(
         root: str,
         name: str,
-        version: str = None,
         *,
+        version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
@@ -346,13 +349,9 @@ def load_original_to(
 
     """
     backend = backend or Artifactory(name, verbose=verbose)
-
-    if version is None:
-        version = latest_version(name, group_id=group_id, backend=backend)
-
-    if version not in versions(name, group_id=group_id, backend=backend):
-        raise RuntimeError(
-            f"A version '{version}' does not exist for database '{name}'.")
+    version = resolve_version(
+        name, version, group_id=group_id, backend=backend,
+    )
 
     root = audeer.safe_path(root)
     return _load(
