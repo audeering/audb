@@ -21,6 +21,7 @@
     api
     api-backend
     api-define
+    api-info
     genindex
 
 .. toctree::

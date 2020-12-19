@@ -53,13 +53,3 @@ def md5(
 def sort_versions(versions: typing.List[str]):
     r"""Sort versions inplace."""
     versions.sort(key=lambda s: list(map(int, s.split('.'))))
-
-
-def subdirs(
-        root,
-        ignore_hidden=False,
-) -> typing.Sequence[str]:
-    r"""List sub-folders."""
-    return [d for d in os.listdir(root)
-            if os.path.isdir(os.path.join(root, d))
-            and (not ignore_hidden or d[0] != '.')]

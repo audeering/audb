@@ -1,7 +1,9 @@
 import os
 import re
+import tempfile
 import typing
 
+import oyaml as yaml
 
 import audformat
 import audeer
@@ -269,7 +271,7 @@ def load(
         database object
 
     """
-    backend = backend or Artifactory(name, verbose=verbose)
+    backend = backend or Artifactory(verbose=verbose)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
@@ -292,7 +294,10 @@ def load(
     ] if cache_root is None else [cache_root]
     for cache_root in cache_roots:
         db_root = audeer.safe_path(
-            os.path.join(cache_root, name, flavor.id, version)
+            os.path.join(
+                cache_root, repository, group_id.replace('.', os.path.sep),
+                name, flavor.id, version,
+            )
         )
         if os.path.exists(db_root):
             db = audformat.Database.load(db_root)
@@ -326,6 +331,45 @@ def load(
     return db
 
 
+def load_header(
+        name: str,
+        *,
+        version: str = None,
+        group_id: str = config.GROUP_ID,
+        backend: Backend = None,
+        verbose: bool = False,
+) -> audformat.Database:
+    r"""Load header of database.
+
+    Downloads the :file:`db.yaml` to a temporal directory,
+    loads the database header and returns it.
+    Does not write to the :mod:`audb2` cache folders.
+
+    Args:
+        name: name of database
+        version: version of database
+        group_id: group ID
+        backend: backend object
+        verbose: show debug messages
+
+    Returns:
+        database object without table data
+
+    """
+    backend = backend or Artifactory(verbose=verbose)
+    repository, version = repository_and_version(
+        name, version, group_id=group_id, backend=backend,
+    )
+
+    with tempfile.TemporaryDirectory() as root:
+        backend.get_file(
+            root, define.DB_HEADER, version, repository, f'{group_id}.{name}',
+        )
+        db = audformat.Database.load(root, load_data=False)
+
+    return db
+
+
 def load_original_to(
         root: str,
         name: str,
@@ -353,7 +397,7 @@ def load_original_to(
         database object
 
     """
-    backend = backend or Artifactory(name, verbose=verbose)
+    backend = backend or Artifactory(verbose=verbose)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )

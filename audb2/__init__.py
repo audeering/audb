@@ -1,5 +1,6 @@
 from audb2 import backend
 from audb2 import define
+from audb2 import info
 from audb2.core.api import (
     cached_databases,
     default_cache_root,
@@ -13,6 +14,7 @@ from audb2.core.depend import Depend
 from audb2.core.flavor import Flavor
 from audb2.core.load import (
     load,
+    load_header,
     load_original_to,
 )
 from audb2.core.publish import publish

@@ -15,41 +15,40 @@ from audb2.core.backend import (
 )
 from audb2.core.config import config
 from audb2.core.depend import Depend
-from audb2.core.utils import subdirs
 
 
 def cached_databases(
         cache_root: str = None,
+        *,
+        shared: bool = False,
 ) -> pd.DataFrame:
     r"""List available databases in the cache.
 
     Args:
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb2.default_cache_root` is used
+        shared: list shared databases
 
     Returns:
-        :class:`pandas.DataFrame` listing cached databases
+        cached databases
 
     """
-    root = audeer.safe_path(cache_root or default_cache_root())
+    cache_root = audeer.safe_path(
+        cache_root or default_cache_root(shared=shared)
+    )
 
     data = {}
-    if os.path.exists(root):
-        databases = subdirs(root, ignore_hidden=True)
-        for database in databases:
-            flavor_ids = subdirs(os.path.join(root, database))
-            for flavor_id in flavor_ids:
-                versions = subdirs(os.path.join(root, database, flavor_id))
-                for version in versions:
-                    path = os.path.join(root, database, flavor_id, version)
-                    db = audformat.Database.load(path, load_data=False)
-                    flavor = db.meta['audb']['flavor']
-                    data[path] = {
-                        'name': database,
-                        'flavor_id': flavor_id,
-                        'version': version,
-                    }
-                    data[path].update(flavor)
+    for root, dirs, files in os.walk(cache_root):
+        if define.DB_HEADER in files:
+            name, flavor_id, version = root.split(os.path.sep)[-3:]
+            db = audformat.Database.load(root, load_data=False)
+            flavor = db.meta['audb']['flavor']
+            data[root] = {
+                'name': name,
+                'flavor_id': flavor_id,
+                'version': version,
+            }
+            data[root].update(flavor)
 
     return pd.DataFrame.from_dict(data, orient='index')
 
@@ -98,7 +97,7 @@ def dependencies(
         verbose: bool = False,
 ) -> Depend:
 
-    backend = backend or Artifactory(name, verbose=verbose)
+    backend = backend or Artifactory(verbose=verbose)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
@@ -121,6 +120,7 @@ def latest_version(
         *,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
+        verbose: bool = False,
 ) -> str:
     r"""Latest version of database.
 
@@ -128,12 +128,13 @@ def latest_version(
         name: name of database
         group_id: group ID
         backend: backend object
+        verbose: show debug messages
 
     Returns:
         version string
 
     """
-    backend = backend or Artifactory(name)
+    backend = backend or Artifactory(verbose=verbose)
 
     vs = versions(name, group_id=group_id, backend=backend)
     if not vs:
@@ -162,7 +163,7 @@ def remove_media(
         verbose: show debug messages
 
     """
-    backend = backend or Artifactory(name, verbose=verbose)
+    backend = backend or Artifactory(verbose=verbose)
 
     if isinstance(files, str):
         files = [files]
@@ -251,6 +252,7 @@ def versions(
         *,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
+        verbose: bool = False,
 ) -> typing.List[str]:
     r"""Available versions of database.
 
@@ -258,19 +260,23 @@ def versions(
         name: name of database
         group_id: group ID
         backend: backend object
+        verbose: show debug messages
 
     Returns:
         list of versions
 
     """
-    backend = backend or Artifactory(name)
-    group_id = f'{group_id}.{name}'
+    backend = backend or Artifactory(verbose=verbose)
 
     vs = []
     for repository in [
         config.REPOSITORY_PUBLIC,
         config.REPOSITORY_PRIVATE,
     ]:
-        vs.extend(backend.versions(define.DB_HEADER, repository, group_id))
+        vs.extend(
+            backend.versions(
+                define.DB_HEADER, repository, f'{group_id}.{name}',
+            )
+        )
 
     return vs

@@ -33,7 +33,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',  # support for Google-style docstrings
     'sphinx_autodoc_typehints',
-    'sphinx.ext.autosectionlabel',
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinx_copybutton',
