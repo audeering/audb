@@ -103,7 +103,7 @@ def test_publish(version):
 
     for file in db.files:
         BACKEND.exists(
-            DB_ROOT, file, version, pytest.REPOSITORY_PUBLIC,
+            file, version, pytest.REPOSITORY_PUBLIC,
             f'{pytest.GROUP_ID}.{db.name}.media',
             name=archives[file] if file in archives else None,
         )

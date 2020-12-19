@@ -10,7 +10,7 @@ from audb2.core import define
 from audb2.core import utils
 from audb2.core.api import (
     default_cache_root,
-    resolve_version,
+    repository_and_version,
 )
 from audb2.core.backend import (
     Artifactory,
@@ -28,13 +28,13 @@ def _load(
         version: str,
         flavor: typing.Optional[Flavor],
         removed_media: bool,
+        repository: str,
         group_id: str,
         backend: Backend,
         verbose: bool,
 ) -> audformat.Database:
     r"""Helper function for load()."""
 
-    repository = config.REPOSITORY_PUBLIC  # TODO: figure out
     group_id: str = f'{group_id}.{name}'
 
     # load header and dependencies
@@ -233,6 +233,7 @@ def load(
         exclude: typing.Union[str, typing.Sequence[str]] = None,
         removed_media: bool = False,
         full_path: bool = True,
+        cache_root: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
@@ -258,6 +259,8 @@ def load(
             after ``include``
         removed_media: keep rows that reference removed media
         full_path: replace relative with absolute file paths
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb2.default_cache_root` is used
         group_id: group ID
         backend: backend object
         verbose: show debug messages
@@ -267,7 +270,7 @@ def load(
 
     """
     backend = backend or Artifactory(name, verbose=verbose)
-    version = resolve_version(
+    repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
 
@@ -283,10 +286,11 @@ def load(
     )
 
     db = None
-    for cache_root in (
+    cache_roots = [
         default_cache_root(True),  # check shared cache first
         default_cache_root(False),
-    ):
+    ] if cache_root is None else [cache_root]
+    for cache_root in cache_roots:
         db_root = audeer.safe_path(
             os.path.join(cache_root, name, flavor.id, version)
         )
@@ -301,6 +305,7 @@ def load(
             version=version,
             flavor=flavor,
             removed_media=removed_media,
+            repository=repository,
             group_id=group_id,
             backend=backend,
             verbose=verbose,
@@ -349,7 +354,7 @@ def load_original_to(
 
     """
     backend = backend or Artifactory(name, verbose=verbose)
-    version = resolve_version(
+    repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
 
@@ -360,6 +365,7 @@ def load_original_to(
         version=version,
         flavor=None,
         removed_media=True,
+        repository=repository,
         group_id=group_id,
         backend=backend,
         verbose=verbose

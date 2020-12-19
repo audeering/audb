@@ -71,9 +71,7 @@ def test_archive(tmpdir, files, name, group, version, force, backend):
     backend.put_archive(
         tmpdir, files, name, version, repository, group_id, force=force,
     )
-    assert backend.exists(
-        tmpdir, name + '.zip', version, repository, group_id,
-    )
+    assert backend.exists(name + '.zip', version, repository, group_id)
     assert backend.get_archive(
         tmpdir, name, version, repository, group_id,
     ) == files_as_list
@@ -128,9 +126,7 @@ def test_file(tmpdir, file, name, version, force, backend):
     backend.put_file(
         tmpdir, file, version, repository, group_id, name=name, force=force,
     )
-    assert backend.exists(
-        tmpdir, file, version, repository, group_id, name=name,
-    )
+    assert backend.exists(file, version, repository, group_id, name=name)
     assert path == backend.get_file(
         tmpdir, file, version, repository, group_id, name=name,
     )

@@ -8,6 +8,7 @@ import audeer
 import audformat
 
 from audb2.core import define
+from audb2.core import utils
 from audb2.core.backend import (
     Artifactory,
     Backend,
@@ -23,8 +24,8 @@ def cached_databases(
     r"""List available databases in the cache.
 
     Args:
-        cache_root: local cache path where databases are stored.
-            If set, overwrites :attr:`audb.config.CACHE_ROOT`
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb2.default_cache_root` is used
 
     Returns:
         :class:`pandas.DataFrame` listing cached databases
@@ -98,11 +99,9 @@ def dependencies(
 ) -> Depend:
 
     backend = backend or Artifactory(name, verbose=verbose)
-    version = resolve_version(
+    repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
-
-    repository = config.REPOSITORY_PUBLIC  # TODO: figure out
     group_id: str = f'{group_id}.{name}'
 
     with tempfile.TemporaryDirectory() as root:
@@ -135,9 +134,14 @@ def latest_version(
 
     """
     backend = backend or Artifactory(name)
-    repository = config.REPOSITORY_PUBLIC  # TODO: figure out
-    group_id: str = f'{group_id}.{name}'
-    return backend.latest_version(define.DB_HEADER, repository, group_id)
+
+    vs = versions(name, group_id=group_id, backend=backend)
+    if not vs:
+        raise RuntimeError(
+            f"Cannot find a version for database '{name}'.",
+        )
+    utils.sort_versions(vs)
+    return vs[-1]
 
 
 def remove_media(
@@ -160,21 +164,20 @@ def remove_media(
     """
     backend = backend or Artifactory(name, verbose=verbose)
 
-    repository = config.REPOSITORY_PUBLIC  # TODO: figure out
-    group_id = f'{group_id}.{name}'
-
     if isinstance(files, str):
         files = [files]
 
-    for version in backend.versions(
-        define.DB_HEADER, repository, group_id,
-    ):
+    for version in versions(name, group_id=group_id, backend=backend):
+        repository, version = repository_and_version(
+            name, version, group_id=group_id, backend=backend,
+        )
+
         with tempfile.TemporaryDirectory() as db_root:
 
             # download dependencies
             dep_path = backend.get_archive(
                 db_root, audeer.basename_wo_ext(define.DB_DEPEND),
-                version, repository, group_id,
+                version, repository, f'{group_id}.{name}',
             )[0]
             dep_path = os.path.join(db_root, dep_path)
             upload = False
@@ -188,14 +191,14 @@ def remove_media(
                     # remove file from archive
                     files = backend.get_archive(
                         db_root, archive, version, repository,
-                        f'{group_id}.'
+                        f'{group_id}.{name}.'
                         f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
                     )
                     files.remove(file)
                     os.remove(os.path.join(db_root, file))
                     backend.put_archive(
                         db_root, files, archive, version, repository,
-                        f'{group_id}.'
+                        f'{group_id}.{name}.'
                         f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
                         force=True,
                     )
@@ -210,27 +213,37 @@ def remove_media(
                 backend.put_archive(
                     db_root, define.DB_DEPEND,
                     audeer.basename_wo_ext(define.DB_DEPEND),
-                    version, repository, group_id, force=True,
+                    version, repository, f'{group_id}.{name}', force=True,
                 )
 
 
-def resolve_version(
+def repository_and_version(
         name,
         version: typing.Optional[str],
         *,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-) -> str:
+) -> (str, str):
     r"""Resolve version of database."""
 
     if version is None:
         version = latest_version(name, group_id=group_id, backend=backend)
+    else:
+        if version not in versions(name, group_id=group_id, backend=backend):
+            raise RuntimeError(
+                f"A version '{version}' does not exist for database '{name}'."
+            )
 
-    if version not in versions(name, group_id=group_id, backend=backend):
-        raise RuntimeError(
-            f"A version '{version}' does not exist for database '{name}'.")
+    for repository in (
+        config.REPOSITORY_PUBLIC,  # check public repository first
+        config.REPOSITORY_PRIVATE,
+    ):
+        if backend.exists(
+            define.DB_HEADER, version, repository, f'{group_id}.{name}',
+        ):
+            break
 
-    return version
+    return repository, version
 
 
 def versions(
@@ -251,8 +264,13 @@ def versions(
 
     """
     backend = backend or Artifactory(name)
-
-    repository = config.REPOSITORY_PUBLIC  # TODO: figure out
     group_id = f'{group_id}.{name}'
 
-    return backend.versions(define.DB_HEADER, repository, group_id)
+    vs = []
+    for repository in [
+        config.REPOSITORY_PUBLIC,
+        config.REPOSITORY_PRIVATE,
+    ]:
+        vs.extend(backend.versions(define.DB_HEADER, repository, group_id))
+
+    return vs

@@ -43,7 +43,6 @@ class Backend:
 
     def destination(
             self,
-            root: str,
             file: str,
             version: str,
             repository: str,
@@ -54,7 +53,6 @@ class Backend:
         r"""File path or URL on backend.
 
         Args:
-            root: root directory
             file: file path relative to root
             version: version string
             repository: repository name
@@ -69,7 +67,6 @@ class Backend:
 
     def exists(
             self,
-            root: str,
             file: str,
             version: str,
             repository: str,
@@ -80,8 +77,6 @@ class Backend:
         r"""Check if file or URL exists on backend.
 
         Args:
-            root: root directory
-            file: file path relative to root
             version: version string
             repository: repository name
             group_id: group ID
@@ -159,7 +154,6 @@ class Backend:
         r"""Latest version of a file.
 
         Args:
-            root: root directory
             file: relative path to file
             repository: repository name
             group_id: group ID
@@ -169,16 +163,15 @@ class Backend:
             version string
 
         """
-        v = self.versions(
+        vs = self.versions(
             file, repository, group_id, name=name,
         )
-        utils.sort_versions(v)
-        if not v:
+        if not vs:
             raise RuntimeError(
-                f"There is no published version for "
-                f"file '{file}'.",
+                f"Cannot find a version for file '{file}'.",
             )
-        return v[-1]
+        utils.sort_versions(vs)
+        return vs[-1]
 
     def put_archive(
             self,
@@ -295,7 +288,6 @@ class Artifactory(Backend):
 
     def destination(
             self,
-            root: str,
             file: str,
             version: str,
             repository: str,
@@ -306,7 +298,6 @@ class Artifactory(Backend):
         r"""URL of a file on Artifactory.
 
         Args:
-            root: root directory
             file: file path relative to root
             version: version string
             repository: repository name
@@ -333,7 +324,6 @@ class Artifactory(Backend):
 
     def exists(
             self,
-            root: str,
             file: str,
             version: str,
             repository: str,
@@ -344,7 +334,6 @@ class Artifactory(Backend):
         r"""Check if URL exists.
 
         Args:
-            root: root directory
             file: file path relative to root
             version: version string
             repository: repository name
@@ -356,7 +345,7 @@ class Artifactory(Backend):
 
         """
         url = self.destination(
-            root, file, version, repository=repository,
+            file, version, repository=repository,
             group_id=group_id, name=name,
         )
         return audfactory.artifactory_path(url).exists()
@@ -387,7 +376,7 @@ class Artifactory(Backend):
         """
 
         url = self.destination(
-            root, file, version, repository=repository,
+            file, version, repository=repository,
             group_id=group_id, name=name,
         )
 
@@ -434,7 +423,7 @@ class Artifactory(Backend):
         _, ext = os.path.splitext(os.path.basename(file))
 
         url = self.destination(
-            root, file, version, repository=repository,
+            file, version, repository=repository,
             group_id=group_id, name=name,
         )
         if not force and audfactory.artifactory_path(url).exists():
@@ -526,7 +515,6 @@ class FileSystem(Backend):
 
     def destination(
             self,
-            root: str,
             file: str,
             version: str,
             repository: str,
@@ -537,7 +525,6 @@ class FileSystem(Backend):
         r"""File path on backend.
 
         Args:
-            root: root directory
             file: file path relative to root
             version: version string
             repository: repository name
@@ -557,7 +544,6 @@ class FileSystem(Backend):
 
     def exists(
             self,
-            root: str,
             file: str,
             version: str,
             repository: str,
@@ -568,7 +554,6 @@ class FileSystem(Backend):
         r"""Check if file exists on backend.
 
         Args:
-            root: root directory
             file: file path relative to root
             version: version string
             repository: repository name
@@ -580,7 +565,7 @@ class FileSystem(Backend):
 
         """
         path = self.destination(
-            root, file, version, repository=repository,
+            file, version, repository=repository,
             group_id=group_id, name=name,
         )
         return os.path.exists(path)
@@ -610,7 +595,7 @@ class FileSystem(Backend):
 
         """
         src_path = self.destination(
-            root, file, version, repository=repository,
+            file, version, repository=repository,
             group_id=group_id, name=name,
         )
 
@@ -655,7 +640,7 @@ class FileSystem(Backend):
 
         """
         dst_path = self.destination(
-            root, file, version, repository=repository,
+            file, version, repository=repository,
             group_id=group_id, name=name,
         )
 
