@@ -12,7 +12,7 @@ from audb2.core.depend import Depend
 from audb2.core.flavor import Flavor
 from audb2.core.load import (
     load,
-    load_raw,
+    load_original_to,
 )
 from audb2.core.publish import publish
 

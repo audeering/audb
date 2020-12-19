@@ -33,6 +33,11 @@ load
 
 .. autofunction:: load
 
+load_original_to
+----------------
+
+.. autofunction:: load_original_to
+
 publish
 -------
 

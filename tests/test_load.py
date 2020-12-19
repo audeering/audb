@@ -224,7 +224,7 @@ def test_load_raw(version):
 
     db_root = os.path.join(DB_ROOT, 'raw')
 
-    db = audb2.load_raw(
+    db = audb2.load_original_to(
         db_root, DB_NAME, version=version,
         group_id=pytest.GROUP_ID, backend=BACKEND,
     )

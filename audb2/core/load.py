@@ -237,7 +237,7 @@ def load(
         backend: Backend = None,
         verbose: bool = False,
 ) -> audformat.Database:
-    r"""Load database from Artifactory.
+    r"""Load database.
 
     Args:
         name: name of database
@@ -318,7 +318,7 @@ def load(
     return db
 
 
-def load_raw(
+def load_original_to(
         root: str,
         name: str,
         version: str = None,
@@ -327,7 +327,11 @@ def load_raw(
         backend: Backend = None,
         verbose: bool = False,
 ) -> audformat.Database:
-    r"""Load database from Artifactory.
+    r"""Load database to directory.
+
+    Loads the original state of the database
+    to a custom directory.
+    No conversion or filtering will be applied.
 
     Args:
         root: target directory

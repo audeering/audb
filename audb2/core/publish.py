@@ -26,7 +26,7 @@ def publish(
         backend: Backend = None,
         verbose: bool = False,
 ) -> Depend:
-    r"""Publish database to Artifactory.
+    r"""Publish database.
 
     Args:
         db_root: root directory of database
