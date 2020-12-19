@@ -10,6 +10,7 @@
     install
     authentication
     usage
+    cli
 
 .. Warning: then usage of genindex is a hack to get a TOC entry, see
 .. https://stackoverflow.com/a/42310803. This might break the usage of sphinx if

@@ -37,6 +37,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx_copybutton',
     'sphinxcontrib.katex',  # has to be before jupyter_sphinx
+    'sphinxcontrib.programoutput',
     'jupyter_sphinx',
 ]
 

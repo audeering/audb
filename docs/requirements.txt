@@ -4,3 +4,4 @@ sphinx-audeering-theme
 sphinx-autodoc-typehints
 sphinx-copybutton
 sphinxcontrib-katex
+sphinxcontrib-programoutput
