@@ -1,4 +1,5 @@
 import errno
+import glob
 import os
 import shutil
 import tempfile
@@ -140,6 +141,27 @@ class Backend:
 
         Returns:
             local file path
+
+        """
+        raise NotImplementedError()
+
+    def glob(
+            self,
+            pattern: str,
+            repository: str,
+            group_id: str,
+    ) -> typing.List[str]:  # pragma: no cover
+        r"""Return matching files names.
+
+        Use ``'**'`` to scan into sub-directories.
+
+        Args:
+            pattern: pattern string
+            repository: repository name
+            group_id: group ID
+
+        Returns:
+            file names
 
         """
         raise NotImplementedError()
@@ -391,6 +413,32 @@ class Artifactory(Backend):
 
         return audfactory.download_artifact(url, path, verbose=self.verbose)
 
+    def glob(
+            self,
+            pattern: str,
+            repository: str,
+            group_id: str,
+    ) -> typing.List[str]:
+        r"""Return matching files names.
+
+        Use ``'**'`` to scan into sub-directories.
+
+        Args:
+            pattern: pattern string
+            repository: repository name
+            group_id: group ID
+
+        Returns:
+            file names
+
+        """
+        url = audfactory.server_url(
+            group_id,
+            repository=repository,
+        )
+        path = audfactory.artifactory_path(url)
+        return [str(x) for x in path.glob(pattern)]
+
     def put_file(
             self,
             root: str,
@@ -610,6 +658,31 @@ class FileSystem(Backend):
         shutil.copy(src_path, dst_path)
 
         return dst_path
+
+    def glob(
+            self,
+            pattern: str,
+            repository: str,
+            group_id: str,
+    ) -> typing.List[str]:
+        r"""Return matching files names.
+
+        Use ``'**'`` to scan into sub-directories.
+
+        Args:
+            pattern: pattern string
+            repository: repository name
+            group_id: group ID
+
+        Returns:
+            file names
+
+        """
+        root = os.path.join(
+            self.host, repository, group_id.replace('.', os.path.sep),
+        )
+        path = os.path.join(root, pattern)
+        return [os.path.join(root, p) for p in glob.glob(path, recursive=True)]
 
     def put_file(
             self,

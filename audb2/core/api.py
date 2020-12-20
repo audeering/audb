@@ -17,7 +17,41 @@ from audb2.core.config import config
 from audb2.core.depend import Depend
 
 
-def cached_databases(
+def available(
+        group_id: str = config.GROUP_ID,
+        *,
+        backend: Backend = None,
+        verbose: bool = False,
+) -> pd.DataFrame:
+    r"""List all databases that are available to the user.
+
+    Args:
+        group_id: group ID
+        backend: backend object
+        verbose: show debug messages
+
+    Returns:
+        table with name, version and private flag
+
+    """
+    backend = default_backend(backend, verbose=verbose)
+
+    data = {}
+    for repository in (
+            config.REPOSITORY_PUBLIC,
+            # config.REPOSITORY_PRIVATE, TODO: catch errors
+    ):
+        for p in backend.glob('**/*.yaml', repository, group_id):
+            name, _, version, _ = p.split('/')[-4:]
+            data[name] = {
+                'version': version,
+                'private': repository == config.REPOSITORY_PRIVATE,
+            }
+
+    return pd.DataFrame.from_dict(data, orient='index')
+
+
+def cached(
         cache_root: str = None,
         *,
         shared: bool = False,

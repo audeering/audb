@@ -2,7 +2,8 @@ from audb2 import backend
 from audb2 import define
 from audb2 import info
 from audb2.core.api import (
-    cached_databases,
+    available,
+    cached,
     default_cache_root,
     dependencies,
     latest_version,

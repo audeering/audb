@@ -148,7 +148,7 @@ You can list all available flavors with:
 
 .. jupyter-execute::
 
-    df = audb2.cached_databases()
+    df = audb2.cached()
     df[['name', 'version', 'only_metadata', 'mix', 'sampling_rate']]
 
 

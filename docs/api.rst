@@ -3,6 +3,16 @@ audb2
 
 .. automodule:: audb2
 
+available
+---------
+
+.. autofunction:: available
+
+cached
+------
+
+.. autofunction:: cached
+
 config
 ------
 
@@ -15,6 +25,11 @@ Depend
 .. autoclass:: Depend
     :members:
     :special-members:
+
+dependencies
+------------
+
+.. autofunction:: dependencies
 
 Flavor
 ------

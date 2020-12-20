@@ -101,6 +101,10 @@ def test_publish(version):
     assert version in versions
     assert latest_version == versions[-1]
 
+    df = audb2.available(pytest.GROUP_ID, backend=BACKEND)
+    assert DB_NAME in df.index
+    assert version == df['version'][0]
+
     for file in db.files:
         BACKEND.exists(
             file, version, pytest.REPOSITORY_PUBLIC,

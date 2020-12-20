@@ -192,7 +192,7 @@ def test_load(version):
             db[table].df,
         )
 
-    df = audb2.cached_databases()
+    df = audb2.cached()
     assert df.loc[db.meta['audb']['root']]['version'] == resolved_version
 
     depend = audb2.dependencies(

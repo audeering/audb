@@ -99,7 +99,7 @@ def test_archive(tmpdir, files, name, group, version, force, backend):
             False,
         ),
         pytest.param(
-            'dir/to/file.ext',
+            os.path.join('dir', 'to', 'file.ext'),
             'alias',
             '1.0.0',
             False,
@@ -177,6 +177,38 @@ def test_errors(tmpdir, backend):
             repository,
             group_id,
         )
+
+
+@pytest.mark.parametrize(
+    'files',
+    [
+        [],
+        ['file.ext', os.path.join('path', 'to', 'file.ext')],
+    ],
+)
+@pytest.mark.parametrize(
+    'backend',
+    [
+        audb2.backend.FileSystem(pytest.HOST),
+        audb2.backend.Artifactory(),
+    ]
+)
+def test_glob(tmpdir, files, backend):
+
+    repository = pytest.REPOSITORY_PUBLIC
+    group_id = f'{pytest.GROUP_ID}.test_glob'
+
+    paths = []
+    for file in files:
+        path = os.path.join(tmpdir, file)
+        audeer.mkdir(os.path.dirname(path))
+        with open(path, 'w'):
+            pass
+        paths.append(
+            backend.put_file(tmpdir, file, '1.0.0', repository, group_id)
+        )
+
+    assert set(paths) == set(backend.glob('**/*.ext', repository, group_id))
 
 
 @pytest.mark.parametrize(
