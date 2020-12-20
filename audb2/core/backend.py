@@ -437,7 +437,11 @@ class Artifactory(Backend):
             repository=repository,
         )
         path = audfactory.artifactory_path(url)
-        return [str(x) for x in path.glob(pattern)]
+        try:
+            result = [str(x) for x in path.glob(pattern)]
+        except RuntimeError:  # pragma: no cover
+            result = []
+        return result
 
     def put_file(
             self,

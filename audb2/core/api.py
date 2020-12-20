@@ -20,6 +20,7 @@ from audb2.core.depend import Depend
 def available(
         group_id: str = config.GROUP_ID,
         *,
+        latest_only: bool = False,
         backend: Backend = None,
         verbose: bool = False,
 ) -> pd.DataFrame:
@@ -27,6 +28,7 @@ def available(
 
     Args:
         group_id: group ID
+        latest_only: keep only latest version
         backend: backend object
         verbose: show debug messages
 
@@ -36,19 +38,36 @@ def available(
     """
     backend = default_backend(backend, verbose=verbose)
 
-    data = {}
+    match = {}
     for repository in (
             config.REPOSITORY_PUBLIC,
-            # config.REPOSITORY_PRIVATE, TODO: catch errors
+            config.REPOSITORY_PRIVATE,
     ):
         for p in backend.glob('**/*.yaml', repository, group_id):
             name, _, version, _ = p.split('/')[-4:]
-            data[name] = {
-                'version': version,
-                'private': repository == config.REPOSITORY_PRIVATE,
-            }
+            if name not in match:
+                match[name] = {
+                    'version': [],
+                    'private': repository == config.REPOSITORY_PRIVATE,
+                }
+            match[name]['version'].append(version)
 
-    return pd.DataFrame.from_dict(data, orient='index')
+    print(match)
+
+    for name in match:
+        utils.sort_versions(match[name]['version'])
+        if latest_only:
+            match[name]['version'] = [match[name]['version'][-1]]
+
+    data = []
+    for name in match:
+        for v in match[name]['version']:
+            data.append(
+                [name, v, match[name]['private']]
+            )
+    return pd.DataFrame.from_records(
+        data, columns=['name', 'version', 'private']
+    ).set_index('name')
 
 
 def cached(
