@@ -8,6 +8,7 @@ import audfactory
 import audeer
 
 from audb2.core import utils
+from audb2.core.config import config
 
 
 def _alias(file: str, name: str):
@@ -280,7 +281,7 @@ class Artifactory(Backend):
 
     def __init__(
             self,
-            host=audfactory.config.ARTIFACTORY_ROOT,
+            host=config.ARTIFACTORY_HOST,
             *,
             verbose: bool = False,
     ):
@@ -492,13 +493,13 @@ class FileSystem(Backend):
     Stores files and archives on a file system.
 
     Args:
-        host: host address
+        host: host directory
         verbose: show debug messages
 
     """
     def __init__(
             self,
-            host: str,
+            host: str = config.FILE_SYSTEM_HOST,
             *,
             verbose: bool = False,
     ):

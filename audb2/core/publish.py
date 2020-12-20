@@ -8,10 +8,8 @@ import audiofile
 
 from audb2.core import define
 from audb2.core import utils
-from audb2.core.backend import (
-    Artifactory,
-    Backend,
-)
+from audb2.core.api import default_backend
+from audb2.core.backend import Backend
 from audb2.core.config import config
 from audb2.core.depend import Depend
 
@@ -46,7 +44,7 @@ def publish(
     """
     db = audformat.Database.load(db_root, load_data=False)
 
-    backend = backend or Artifactory(db.name, verbose=verbose)
+    backend = default_backend(backend, verbose=verbose)
 
     repository = config.REPOSITORY_PRIVATE if private else \
         config.REPOSITORY_PUBLIC

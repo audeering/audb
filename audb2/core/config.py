@@ -8,11 +8,17 @@ class config:
 
     """
 
+    ARTIFACTORY_HOST = 'https://artifactory.audeering.com/artifactory'
+    r"""Default Artifactory host URL."""
+
     CACHE_ROOT = '~/audb2'
-    """Cache folder."""
+    r"""Default cache folder."""
+
+    FILE_SYSTEM_HOST = '~/audb2-host'
+    r"""Default file system host folder."""
 
     GROUP_ID = 'com.audeering.data'
-    """Default group ID."""
+    r"""Default group ID."""
 
     REPOSITORY_PRIVATE = 'data-private-local'
     r"""Default private repository."""
@@ -21,7 +27,7 @@ class config:
     r"""Default public repository."""
 
     SHARED_CACHE_ROOT = '/data/audb2'
-    """Shared cache folder.
+    r"""Default shared cache folder.
 
     This will be checked for data loading
     before :attr:`audb2.config.CACHE_ROOT`.

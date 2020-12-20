@@ -3,21 +3,17 @@ import re
 import tempfile
 import typing
 
-import oyaml as yaml
-
 import audformat
 import audeer
 
 from audb2.core import define
 from audb2.core import utils
 from audb2.core.api import (
+    default_backend,
     default_cache_root,
     repository_and_version,
 )
-from audb2.core.backend import (
-    Artifactory,
-    Backend,
-)
+from audb2.core.backend import Backend
 from audb2.core.config import config
 from audb2.core.depend import Depend
 from audb2.core.flavor import Flavor
@@ -271,7 +267,7 @@ def load(
         database object
 
     """
-    backend = backend or Artifactory(verbose=verbose)
+    backend = default_backend(backend, verbose=verbose)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
@@ -356,7 +352,7 @@ def load_header(
         database object without table data
 
     """
-    backend = backend or Artifactory(verbose=verbose)
+    backend = default_backend(backend, verbose=verbose)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
@@ -397,7 +393,7 @@ def load_original_to(
         database object
 
     """
-    backend = backend or Artifactory(verbose=verbose)
+    backend = default_backend(backend, verbose=verbose)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )

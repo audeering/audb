@@ -53,10 +53,19 @@ def cached_databases(
     return pd.DataFrame.from_dict(data, orient='index')
 
 
+def default_backend(
+        backend: Backend = None,
+        *,
+        verbose: bool = False,
+):
+    r"""Default backend."""
+    return backend or Artifactory(verbose=verbose)
+
+
 def default_cache_root(
         shared=False,
 ) -> str:
-    r"""Return default cache folder.
+    r"""Default cache folder.
 
     If ``shared`` is ``True``,
     returns the path specified
@@ -96,8 +105,20 @@ def dependencies(
         backend: Backend = None,
         verbose: bool = False,
 ) -> Depend:
+    r"""Database dependencies.
 
-    backend = backend or Artifactory(verbose=verbose)
+    Args:
+        name: name of database
+        version: version string
+        group_id: group ID
+        backend: backend object
+        verbose: show debug messages
+
+    Returns:
+        dependency object
+
+    """
+    backend = default_backend(backend, verbose=verbose)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
@@ -134,7 +155,7 @@ def latest_version(
         version string
 
     """
-    backend = backend or Artifactory(verbose=verbose)
+    backend = default_backend(backend, verbose=verbose)
 
     vs = versions(name, group_id=group_id, backend=backend)
     if not vs:
@@ -163,7 +184,7 @@ def remove_media(
         verbose: show debug messages
 
     """
-    backend = backend or Artifactory(verbose=verbose)
+    backend = default_backend(backend, verbose=verbose)
 
     if isinstance(files, str):
         files = [files]
@@ -266,7 +287,7 @@ def versions(
         list of versions
 
     """
-    backend = backend or Artifactory(verbose=verbose)
+    backend = default_backend(backend, verbose=verbose)
 
     vs = []
     for repository in [
