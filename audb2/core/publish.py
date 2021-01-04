@@ -64,6 +64,13 @@ def publish(
     depend = Depend()
     depend.from_file(dep_path)
 
+    # make sure all tables are stored in CSV format
+    for table_id, table in db.tables.items():
+        table_path = os.path.join(db_root, f'db.{table_id}')
+        table_ext = audformat.define.TableStorageFormat.CSV
+        if not os.path.exists(table_path + f'.{table_ext}'):
+            table.save(table_path, storage_format=table_ext)
+
     # check archives
     archives = archives or {}
     for name in archives.values():

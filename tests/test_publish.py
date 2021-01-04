@@ -59,7 +59,7 @@ def fixture_publish_db():
         index=audformat.filewise_index(db.files[:4]),
     )
     audformat.testing.create_audio_files(db, DB_ROOT)
-    db.save(DB_ROOT)
+    db.save(DB_ROOT, storage_format=audformat.define.TableStorageFormat.PICKLE)
 
     yield
 
