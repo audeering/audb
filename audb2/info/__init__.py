@@ -21,6 +21,7 @@ You can run:
 """
 from audb2.core.info import (
     description,
+    header,
     languages,
     media,
     meta,

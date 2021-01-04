@@ -8,6 +8,11 @@ description
 
 .. autofunction:: description
 
+header
+------
+
+.. autofunction:: header
+
 languages
 ---------
 

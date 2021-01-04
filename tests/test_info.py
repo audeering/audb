@@ -78,7 +78,7 @@ def fixture_clear_cache():
 
 
 def test_info():
-    assert str(audb2.load_header(
+    assert str(audb2.info.header(
         DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
     )) == str(DB)
     assert audb2.info.description(

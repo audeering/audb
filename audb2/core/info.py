@@ -1,8 +1,15 @@
+import tempfile
 import typing
 
+import audformat
+
+from audb2.core import define
+from audb2.core.api import (
+    default_backend,
+    repository_and_version,
+)
 from audb2.core.backend import Backend
 from audb2.core.config import config
-from audb2.core.load import load_header
 
 
 def description(
@@ -26,11 +33,50 @@ def description(
         description of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )
     return db.description
+
+
+def header(
+        name: str,
+        *,
+        version: str = None,
+        group_id: str = config.GROUP_ID,
+        backend: Backend = None,
+        verbose: bool = False,
+) -> audformat.Database:
+    r"""Load header of database.
+
+    Downloads the :file:`db.yaml` to a temporal directory,
+    loads the database header and returns it.
+    Does not write to the :mod:`audb2` cache folders.
+
+    Args:
+        name: name of database
+        version: version of database
+        group_id: group ID
+        backend: backend object
+        verbose: show debug messages
+
+    Returns:
+        database object without table data
+
+    """
+    backend = default_backend(backend, verbose=verbose)
+    repository, version = repository_and_version(
+        name, version, group_id=group_id, backend=backend,
+    )
+
+    with tempfile.TemporaryDirectory() as root:
+        backend.get_file(
+            root, define.DB_HEADER, version, repository, f'{group_id}.{name}',
+        )
+        db = audformat.Database.load(root, load_data=False)
+
+    return db
 
 
 def languages(
@@ -54,7 +100,7 @@ def languages(
         languages of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )
@@ -82,7 +128,7 @@ def media(
         media of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )
@@ -110,7 +156,7 @@ def meta(
         meta information of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )
@@ -138,7 +184,7 @@ def raters(
         raters of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )
@@ -166,7 +212,7 @@ def schemes(
         schemes of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )
@@ -194,7 +240,7 @@ def source(
         source of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )
@@ -222,7 +268,7 @@ def splits(
         splits of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )
@@ -250,7 +296,7 @@ def tables(
         tables of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )
@@ -278,7 +324,7 @@ def usage(
         usage of database
 
     """
-    db = load_header(
+    db = header(
         name, group_id=group_id, version=version,
         backend=backend, verbose=verbose,
     )

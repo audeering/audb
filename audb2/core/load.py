@@ -1,6 +1,5 @@
 import os
 import re
-import tempfile
 import typing
 
 import audformat
@@ -323,45 +322,6 @@ def load(
                 table.df.index.set_levels(
                     root + table.df.index.levels[0], 'file', inplace=True,
                 )
-
-    return db
-
-
-def load_header(
-        name: str,
-        *,
-        version: str = None,
-        group_id: str = config.GROUP_ID,
-        backend: Backend = None,
-        verbose: bool = False,
-) -> audformat.Database:
-    r"""Load header of database.
-
-    Downloads the :file:`db.yaml` to a temporal directory,
-    loads the database header and returns it.
-    Does not write to the :mod:`audb2` cache folders.
-
-    Args:
-        name: name of database
-        version: version of database
-        group_id: group ID
-        backend: backend object
-        verbose: show debug messages
-
-    Returns:
-        database object without table data
-
-    """
-    backend = default_backend(backend, verbose=verbose)
-    repository, version = repository_and_version(
-        name, version, group_id=group_id, backend=backend,
-    )
-
-    with tempfile.TemporaryDirectory() as root:
-        backend.get_file(
-            root, define.DB_HEADER, version, repository, f'{group_id}.{name}',
-        )
-        db = audformat.Database.load(root, load_data=False)
 
     return db
 
