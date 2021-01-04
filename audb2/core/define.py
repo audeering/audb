@@ -39,7 +39,13 @@ DEPEND_TYPE_NAMES = {
 
 
 class Format:
-    r"""Supported media formats."""
+    r"""Supported media formats.
+
+    Defines the media formats supported by :meth:`audb2.load`.
+    If the original file format differs,
+    files will be converted to the requested format.
+
+    """
     WAV = 'wav'
     FLAC = 'flac'
 
