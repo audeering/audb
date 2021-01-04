@@ -52,8 +52,6 @@ def available(
                 }
             match[name]['version'].append(version)
 
-    print(match)
-
     for name in match:
         utils.sort_versions(match[name]['version'])
         if latest_only:
