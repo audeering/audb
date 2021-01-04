@@ -85,7 +85,7 @@ class Backend:
             name: alias name of file
 
         Returns:
-            ``True if file exists``
+            ``True`` if file exists
 
         """
         raise NotImplementedError()
@@ -364,7 +364,7 @@ class Artifactory(Backend):
             name: alias name of file
 
         Returns:
-            ``True if URL exists``
+            ``True`` if URL exists
 
         """
         url = self.destination(
@@ -614,7 +614,7 @@ class FileSystem(Backend):
             name: alias name of file
 
         Returns:
-            ``True if file exists``
+            ``True`` if file exists
 
         """
         path = self.destination(

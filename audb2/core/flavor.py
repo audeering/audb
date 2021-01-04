@@ -130,11 +130,11 @@ class Flavor(audobject.Object):
                 file = name + '.' + self.format
         return file
 
-    def _convert(
+    def _check_convert(
             self,
             file: str,
     ) -> bool:
-        r"""Convert signal to flavor."""
+        r"""Check if file needs to be converted to flavor."""
 
         # format change
         if file != self.destination(file):
@@ -236,7 +236,7 @@ class Flavor(audobject.Object):
             path to converted file
 
         """
-        if not self._convert(file):
+        if not self._check_convert(file):
             return file
 
         signal, sampling_rate = audiofile.read(file, always_2d=True)

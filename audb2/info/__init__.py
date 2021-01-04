@@ -7,14 +7,21 @@ provide you direct access to this information.
 
 So instead of running:
 
-.. code-block:: python
+.. jupyter-execute::
+    :hide-code:
+    :hide-output:
+
+    import audb2
+
+
+.. jupyter-execute::
 
     db = audb2.load('emodb', version='1.0.1', only_metadata=True)
     db.tables
 
 You can run:
 
-.. code-block:: python
+.. jupyter-execute::
 
     audb2.info.tables('emodb', version='1.0.1')
 
