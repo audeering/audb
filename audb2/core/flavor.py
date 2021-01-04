@@ -1,8 +1,10 @@
 import os
+import shutil
 import typing
 
 import numpy as np
 
+import audeer
 import audiofile
 import audobject
 import audresample
@@ -30,7 +32,38 @@ def check_channels(
 class Flavor(audobject.Object):
     r"""Database flavor.
 
-    Use :meth:`audb2.Flavor.__call__` to convert a file to the flavor.
+    When working with data,
+    we often make assumptions about the media files.
+    For instance, we expect that audio files are in a certain format
+    and have a specific sampling rate.
+    Since our requirements may not be satisfied
+    by the original media files on the :class:`audb2.backend.Backend`,
+    we have the option to request the database in
+    a specific flavor (see also :meth:`audb2.load`).
+    This class acts as a helper class
+    that stores the meta information about a flavor
+    and offers a convenient way to convert files to it.
+
+    E.g. if we require audio files in WAV format
+    with a 16 kHz, we do:
+
+    .. code-block::  python
+
+        flavor = Flavor(
+            format=define.Format.WAV,
+            sampling_rate=16000
+        )
+
+    And then use :meth:`audb2.Flavor.__call__` to
+    convert a file to the flavor:
+
+    .. code-block::  python
+
+        original_file = '/org/path/file.flac'
+        converted_file = '/new/path/file.wav'
+
+        # convert file to 16 kHz WAV
+        flavor(original_file, converted_file)
 
     Args:
         only_metadata: only metadata is stored
@@ -108,28 +141,6 @@ class Flavor(audobject.Object):
         self.tables = tables
         r"""Table filter."""
 
-    def destination(
-            self,
-            file: str,
-    ) -> str:
-        r"""Return converted file path.
-
-        The file path will only change if the file is converted to a different
-        format.
-
-        Args:
-            file: path to input file
-
-        Returns:
-            path to output file
-
-        """
-        if self.format is not None:
-            name, format = os.path.splitext(file)
-            if format[1:].lower() != self.format:
-                file = name + '.' + self.format
-        return file
-
     def _check_convert(
             self,
             file: str,
@@ -137,8 +148,10 @@ class Flavor(audobject.Object):
         r"""Check if file needs to be converted to flavor."""
 
         # format change
-        if file != self.destination(file):
-            return True
+        if self.format is not None:
+            _, ext = os.path.splitext(file)
+            if self.format != ext.lower():
+                return True
 
         # mix change
         if self.mix is not None:
@@ -222,34 +235,52 @@ class Flavor(audobject.Object):
 
     def __call__(
             self,
-            file: str,
-    ) -> str:
+            src_path: str,
+            dst_path: str,
+    ):
         r"""Convert file to flavor.
 
-        Depending on the type of conversion,
-        the input file will be replaced or deleted.
-
         Args:
-            file: path to input file
+            src_path: path to input file
+            dst_path: path to output file
 
-        Returns:
-            path to converted file
+        Raises:
+            ValueError: if extension of output file does not match the
+                format of the flavor
 
         """
-        if not self._check_convert(file):
-            return file
+        src_path = audeer.safe_path(src_path)
+        dst_path = audeer.safe_path(dst_path)
 
-        signal, sampling_rate = audiofile.read(file, always_2d=True)
-        signal = self._remix(signal)
-        signal, sampling_rate = self._resample(signal, sampling_rate)
-        destination = self.destination(file)
-        bit_depth = self.bit_depth or audiofile.bit_depth(file)
-        audiofile.write(
-            destination,
-            signal,
-            sampling_rate,
-            bit_depth=bit_depth,
-        )
-        if file != destination:
-            os.remove(file)
-        return destination
+        # verify that extension matches the output format
+        _, src_ext = os.path.splitext(src_path)
+        src_ext = src_ext[1:]
+        _, dst_ext = os.path.splitext(dst_path)
+        dst_ext = dst_ext[1:]
+        expected_ext = self.format or src_ext.lower()
+        if expected_ext != dst_ext.lower():
+            raise ValueError(
+                f"Extension of output file is '{dst_ext}', "
+                f"but should be '{expected_ext} "
+                "to match the format of the converted file."
+            )
+
+        if not self._check_convert(src_path):
+
+            # file already satisfies flavor
+            if src_path != dst_path:
+                shutil.copy(src_path, dst_path)
+
+        else:
+
+            # convert file to flavor
+            signal, sampling_rate = audiofile.read(src_path, always_2d=True)
+            signal = self._remix(signal)
+            signal, sampling_rate = self._resample(signal, sampling_rate)
+            bit_depth = self.bit_depth or audiofile.bit_depth(src_path)
+            audiofile.write(
+                dst_path,
+                signal,
+                sampling_rate,
+                bit_depth=bit_depth,
+            )

@@ -137,6 +137,12 @@ def test_init(only_metadata, bit_depth, format, mix, sampling_rate):
             audb2.Flavor(format=audb2.define.Format.FLAC),
             16, 1, audb2.define.Format.FLAC, 16000,
         ),
+        pytest.param(
+            16, 1, audb2.define.Format.WAV, 16000,
+            audb2.Flavor(format=audb2.define.Format.FLAC),
+            16, 2, audb2.define.Format.WAV, 16000,
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
         (
             16, 2, audb2.define.Format.WAV, 16000,
             audb2.Flavor(mix=0),
@@ -196,8 +202,8 @@ def test_call(tmpdir, bit_depth_in, channels_in, format_in, sampling_rate_in,
               flavor, bit_depth_out, channels_out, format_out,
               sampling_rate_out):
 
-    file_in = os.path.join(tmpdir, 'file.' + format_in)
-    file_out = os.path.join(tmpdir, 'file.' + format_out)
+    file_in = os.path.join(tmpdir, 'in.' + format_in)
+    file_out = os.path.join(tmpdir, 'out.' + format_out)
 
     signal = np.zeros((channels_in, sampling_rate_in), np.float32)
     audiofile.write(
@@ -207,7 +213,7 @@ def test_call(tmpdir, bit_depth_in, channels_in, format_in, sampling_rate_in,
         bit_depth_in,
     )
 
-    assert flavor(file_in) == file_out
+    flavor(file_in, file_out)
     assert audiofile.bit_depth(file_out) == bit_depth_out
     assert audiofile.channels(file_out) == channels_out
     assert audiofile.sampling_rate(file_out) == sampling_rate_out

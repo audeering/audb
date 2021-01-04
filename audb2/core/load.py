@@ -176,7 +176,14 @@ def _load(
             )
             if flavor is not None:
                 for file in files:
-                    flavor(os.path.join(db_root, file))
+                    src_path = dst_path = os.path.join(db_root, file)
+                    if flavor.format is not None:
+                        name, ext = os.path.splitext(src_path)
+                        if ext[1:].lower() != flavor.format:
+                            dst_path = name + '.' + flavor.format
+                    flavor(src_path, dst_path)
+                    if src_path != dst_path:
+                        os.remove(src_path)
 
     depend.to_file(dep_path)
 
