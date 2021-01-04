@@ -48,7 +48,7 @@ intersphinx_mapping = {
     'audformat': ('http://audeering.github.io/audformat/', None),
     'audiofile': ('https://audeering.github.io/audiofile/', None),
     'audobject': ('http://tools.pp.audeering.com/audobject/', None),
-    'audresample': ('http://tools.pp.audeering.com/pyaudresample//', None),
+    'audresample': ('http://tools.pp.audeering.com/pyaudresample/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'python': ('https://docs.python.org/3/', None),
 }

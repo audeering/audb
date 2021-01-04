@@ -51,23 +51,3 @@ class Format:
 FORMATS = [Format.WAV, Format.FLAC]
 BIT_DEPTHS = [16, 24, 32]
 SAMPLING_RATES = [8000, 16000, 2250, 44100, 48000]
-
-
-class Mix:
-    r"""Supported mix strings."""
-    MONO = 'mono'
-    MONO_ONLY = 'mono-only'
-    LEFT = 'left'
-    RIGHT = 'right'
-    STEREO = 'stereo'
-    STEREO_ONLY = 'stereo-only'
-
-
-MIXES = [
-    Mix.MONO,
-    Mix.MONO_ONLY,
-    Mix.LEFT,
-    Mix.RIGHT,
-    Mix.STEREO,
-    Mix.STEREO_ONLY,
-]

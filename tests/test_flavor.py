@@ -10,47 +10,46 @@ import audb2
 
 
 @pytest.mark.parametrize(
-    'only_metadata, bit_depth, format, mix, sampling_rate',
+    'only_metadata, bit_depth, channels, format, mixdown, sampling_rate',
     [
         (
-            False, None, None, None, None,
+            False, None, None, None, False, None,
         ),
         (
-            False, 16, audb2.define.Format.WAV, audb2.define.Mix.MONO, 16000,
+            False, 16, None, audb2.define.Format.WAV, True, 16000,
         ),
         (
-            True, 16, audb2.define.Format.WAV, audb2.define.Mix.MONO, 16000,
+            True, 16, None, audb2.define.Format.WAV, True, 16000,
         ),
         pytest.param(
-            False, 0, audb2.define.Format.WAV, audb2.define.Mix.MONO, 16000,
+            False, 0, None, audb2.define.Format.WAV, True, 16000,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
         pytest.param(
-            False, 16, 'bad', audb2.define.Mix.MONO, 16000,
+            False, 16, None, 'bad', True, 16000,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
         pytest.param(
-            False, 16, audb2.define.Format.WAV, 'bad', 16000,
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
-        pytest.param(
-            False, 16, audb2.define.Format.WAV, audb2.define.Mix.MONO, 0,
+            False, 16, None, audb2.define.Format.WAV, True, 0,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
     ]
 )
-def test_init(only_metadata, bit_depth, format, mix, sampling_rate):
+def test_init(only_metadata, bit_depth, channels, format, mixdown,
+              sampling_rate):
     flavor = audb2.Flavor(
         only_metadata=only_metadata,
         bit_depth=bit_depth,
+        channels=channels,
         format=format,
-        mix=mix,
+        mixdown=mixdown,
         sampling_rate=sampling_rate,
     )
     if only_metadata:
         assert flavor.bit_depth is None
+        assert flavor.channels is None
         assert flavor.format is None
-        assert flavor.mix is None
+        assert not flavor.mixdown
         assert flavor.sampling_rate is None
     flavor_s = flavor.to_yaml_s()
     flavor_2 = audobject.Object.from_yaml_s(flavor_s)
@@ -73,66 +72,6 @@ def test_init(only_metadata, bit_depth, format, mix, sampling_rate):
             32, 1, audb2.define.Format.WAV, 16000,
         ),
         (
-            16, 3, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.MONO),
-            16, 1, audb2.define.Format.WAV, 16000,
-        ),
-        (
-            16, 1, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.MONO_ONLY),
-            16, 1, audb2.define.Format.WAV, 16000,
-        ),
-        pytest.param(
-            16, 3, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.MONO_ONLY),
-            16, 1, audb2.define.Format.WAV, 16000,
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
-        (
-            16, 2, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.LEFT),
-            16, 1, audb2.define.Format.WAV, 16000,
-        ),
-        pytest.param(
-            16, 3, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.LEFT),
-            16, 1, audb2.define.Format.WAV, 16000,
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
-        (
-            16, 2, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.RIGHT),
-            16, 1, audb2.define.Format.WAV, 16000,
-        ),
-        pytest.param(
-            16, 3, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.RIGHT),
-            16, 1, audb2.define.Format.WAV, 16000,
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
-        (
-            16, 1, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.STEREO),
-            16, 2, audb2.define.Format.WAV, 16000,
-        ),
-        pytest.param(
-            16, 3, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.STEREO),
-            16, 2, audb2.define.Format.WAV, 16000,
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
-        (
-            16, 2, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.STEREO_ONLY),
-            16, 2, audb2.define.Format.WAV, 16000,
-        ),
-        pytest.param(
-            16, 1, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=audb2.define.Mix.STEREO_ONLY),
-            16, 2, audb2.define.Format.WAV, 16000,
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
-        (
             16, 1, audb2.define.Format.WAV, 16000,
             audb2.Flavor(format=audb2.define.Format.FLAC),
             16, 1, audb2.define.Format.FLAC, 16000,
@@ -144,23 +83,38 @@ def test_init(only_metadata, bit_depth, format, mix, sampling_rate):
             marks=pytest.mark.xfail(raises=ValueError),
         ),
         (
-            16, 2, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=0),
+            16, 1, audb2.define.Format.WAV, 16000,
+            audb2.Flavor(mixdown=True),
+            16, 1, audb2.define.Format.WAV, 16000,
+        ),
+        (
+            16, 3, audb2.define.Format.WAV, 16000,
+            audb2.Flavor(mixdown=True),
             16, 1, audb2.define.Format.WAV, 16000,
         ),
         (
             16, 2, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=[0, 1]),
+            audb2.Flavor(channels=0),
+            16, 1, audb2.define.Format.WAV, 16000,
+        ),
+        (
+            16, 2, audb2.define.Format.WAV, 16000,
+            audb2.Flavor(channels=1),
+            16, 1, audb2.define.Format.WAV, 16000,
+        ),
+        (
+            16, 2, audb2.define.Format.WAV, 16000,
+            audb2.Flavor(channels=[0, 1]),
             16, 2, audb2.define.Format.WAV, 16000,
         ),
         (
             16, 3, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=[0, -1]),
+            audb2.Flavor(channels=[0, -1]),
             16, 2, audb2.define.Format.WAV, 16000,
         ),
         pytest.param(
             16, 2, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(mix=[0, 2]),
+            audb2.Flavor(channels=[0, 2]),
             16, 2, audb2.define.Format.WAV, 16000,
             marks=pytest.mark.xfail(raises=RuntimeError)
         ),

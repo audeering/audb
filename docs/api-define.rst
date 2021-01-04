@@ -10,10 +10,3 @@ Format
 .. autoclass:: Format
     :members:
     :undoc-members:
-
-Mix
----
-
-.. autoclass:: Mix
-    :members:
-    :undoc-members:

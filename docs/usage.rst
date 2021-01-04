@@ -18,7 +18,6 @@ Usage
         'emodb',
         version='1.0.1',
         format='flac',
-        mix='stereo',
         sampling_rate=44100,
     )
     audb2.load('emodb', only_metadata=True)
@@ -106,16 +105,15 @@ The following properties can be changed:
       - 16
       - 24
       - 32 (WAV only)
+    channels, e.g.:
+      - 0        # select first channel
+      - [0, -1]  # select first and last channel
     format:
       - 'wav'
       - 'flac'
-    mix:
-      - 'mono'
-      - 'mono-only'
-      - 'left'
-      - 'right'
-      - 'stereo'
-      - 'stereo-only'
+    mixdown:
+      - False
+      - True
     sampling_rate:
       - 8000
       - 16000
@@ -134,7 +132,6 @@ inside the :ref:`cache <cache-root>`.
         'emodb',
         version='1.0.1',
         format='flac',
-        mix='stereo',
         sampling_rate=44100,
     )
 
@@ -149,7 +146,7 @@ You can list all available flavors with:
 .. jupyter-execute::
 
     df = audb2.cached()
-    df[['name', 'version', 'only_metadata', 'mix', 'sampling_rate']]
+    df[['name', 'version', 'only_metadata', 'sampling_rate']]
 
 
 Metadata and header only

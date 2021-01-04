@@ -1,6 +1,7 @@
 import os
 import re
 import typing
+import warnings
 
 import audformat
 import audeer
@@ -93,6 +94,9 @@ def _load(
 
     # filter media
     if flavor is not None:
+
+        save_db = False
+
         if flavor.include is not None or flavor.exclude is not None:
             archives = set()
             for file in db.files:
@@ -117,33 +121,16 @@ def _load(
                 else:
                     exclude = flavor.exclude
                 db.pick_files(lambda x: depend.archive(x) not in exclude)
-        if flavor.mix is not None:
-            if isinstance(flavor.mix, str):
-                if flavor.mix == define.Mix.MONO_ONLY:
-                    # keep only mono
-                    db.pick_files(
-                        lambda x: depend.channels(x) == 1,
-                    )
-                if flavor.mix in (
-                        define.Mix.LEFT,
-                        define.Mix.RIGHT,
-                        define.Mix.STEREO_ONLY,
-                ):
-                    # keep only stereo
-                    db.pick_files(
-                        lambda x: depend.channels(x) == 2,
-                    )
-                elif flavor.mix == define.Mix.STEREO:
-                    # keep only mono or stereo
-                    db.pick_files(
-                        lambda x: depend.channels(x) in [1, 2],
-                    )
-            else:
-                num_channels = max(flavor.mix) + 1
-                db.pick_files(
-                    lambda x: depend.channels(x) >= num_channels,
-                )
+            save_db = True
 
+        if flavor.channels is not None:
+            num_channels = max(flavor.channels) + 1
+            db.pick_files(
+                lambda x: depend.channels(x) >= num_channels,
+            )
+            save_db = True
+
+        if save_db:
             db.save(db_root)
 
     if flavor is None or not flavor.only_metadata:
@@ -229,8 +216,9 @@ def load(
         version: str = None,
         only_metadata: bool = False,
         bit_depth: int = None,
+        channels: typing.Union[int, typing.Sequence[int]] = None,
         format: str = None,
-        mix: str = None,
+        mixdown: bool = False,
         sampling_rate: int = None,
         tables: typing.Union[str, typing.Sequence[str]] = None,
         include: typing.Union[str, typing.Sequence[str]] = None,
@@ -241,6 +229,7 @@ def load(
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
+        **kwargs,
 ) -> audformat.Database:
     r"""Load database.
 
@@ -248,10 +237,10 @@ def load(
         name: name of database
         version: version string, latest if ``None``
         only_metadata: only metadata is stored
-        format: file format, one of ``'flac'``, ``'wav'``
-        mix: mixing strategy, one of
-            ``'left'``, ``'right'``, ``'mono'``, ``'stereo'``
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
+        channels: channel selection, see :func:`audresample.remix`
+        format: file format, one of ``'flac'``, ``'wav'``
+        mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
         tables: include only tables matching the regular expression or
@@ -273,6 +262,29 @@ def load(
         database object
 
     """
+    if 'mix' in kwargs:  # pragma: no cover
+        warnings.warn(
+            "Argument 'mix' is deprecated "
+            "and will be removed with version '1.0.0'. "
+            "Use 'channels' and 'mixdown' instead.",
+            category=UserWarning,
+            stacklevel=2,
+        )
+        mix = kwargs['mix']
+        if mix == 'mono':
+            mixdown = True
+        elif channels is None and mix == 'stereo':
+            channels = [0, 1]
+        elif channels is None and mix == 'left':
+            channels = 0
+        elif channels is None and mix == 'right':
+            channels = 1
+        else:
+            raise ValueError(
+                f"Using deprecated argument 'mix' with value '{mix}' "
+                "is no longer supported."
+            )
+
     backend = default_backend(backend, verbose=verbose)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
@@ -280,8 +292,9 @@ def load(
 
     flavor = Flavor(
         only_metadata=only_metadata,
+        channels=channels,
         format=format,
-        mix=mix,
+        mixdown=mixdown,
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
         tables=tables,

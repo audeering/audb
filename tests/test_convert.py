@@ -136,6 +136,34 @@ def test_bit_depth(bit_depth):
 
 
 @pytest.mark.parametrize(
+    'channels',
+    [
+        None, 1, [0, -1],
+    ],
+)
+def test_channels(channels):
+
+    db = audb2.load(
+        DB_NAME, channels=channels, full_path=False,
+        group_id=pytest.GROUP_ID, backend=BACKEND,
+    )
+    original_files = db['files']['original'].get()
+
+    for converted_file, original_file in zip(db.files, original_files):
+
+        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        original_file = os.path.join(DB_ROOT, original_file)
+
+        if channels is None:
+            assert audiofile.channels(converted_file) == \
+                   audiofile.channels(original_file)
+        elif isinstance(channels, int):
+            assert audiofile.channels(converted_file) == 1
+        else:
+            assert audiofile.channels(converted_file) == len(channels)
+
+
+@pytest.mark.parametrize(
     'format',
     [
         None, audb2.define.Format.WAV, audb2.define.Format.FLAC
@@ -161,17 +189,15 @@ def test_format(format):
 
 
 @pytest.mark.parametrize(
-    'mix',
+    'mixdown',
     [
-        None, audb2.define.Mix.MONO_ONLY, audb2.define.Mix.MONO,
-        audb2.define.Mix.RIGHT, audb2.define.Mix.LEFT, audb2.define.Mix.STEREO,
-        audb2.define.Mix.STEREO_ONLY, 1, [0, -1],
+        False, True
     ],
 )
-def test_mix(mix):
+def test_mixdown(mixdown):
 
     db = audb2.load(
-        DB_NAME, mix=mix, full_path=False,
+        DB_NAME, mixdown=mixdown, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
     )
     original_files = db['files']['original'].get()
@@ -181,30 +207,11 @@ def test_mix(mix):
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
         original_file = os.path.join(DB_ROOT, original_file)
 
-        if mix is None:
+        if mixdown:
+            assert audiofile.channels(converted_file) == 1
+        else:
             assert audiofile.channels(converted_file) == \
                    audiofile.channels(original_file)
-        else:
-            if mix == audb2.define.Mix.MONO:
-                assert audiofile.channels(converted_file) == 1
-            elif mix == audb2.define.Mix.MONO_ONLY:
-                assert audiofile.channels(converted_file) == \
-                       audiofile.channels(original_file) == 1
-            elif mix in (
-                audb2.define.Mix.LEFT,
-                audb2.define.Mix.RIGHT,
-            ):
-                assert audiofile.channels(converted_file) == 1
-                assert audiofile.channels(original_file) == 2
-            elif mix == audb2.define.Mix.STEREO:
-                assert audiofile.channels(converted_file) == 2
-            elif mix == audb2.define.Mix.STEREO_ONLY:
-                assert audiofile.channels(converted_file) == \
-                       audiofile.channels(original_file) == 2
-            elif isinstance(mix, int):
-                assert audiofile.channels(converted_file) == 1
-            else:
-                assert audiofile.channels(converted_file) == len(mix)
 
 
 @pytest.mark.parametrize(

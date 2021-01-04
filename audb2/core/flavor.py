@@ -12,23 +12,6 @@ import audresample
 from audb2.core import define
 
 
-def check_channels(
-        channels: int,
-        expected: typing.Union[int, typing.Sequence[int]],
-):
-    r"""Raises an error if ``channels`` does not matches ``expected``."""
-    if isinstance(expected, int):
-        if channels != expected:
-            raise ValueError(
-                f'Got {channels} channels, but expected {expected}.'
-            )
-    else:
-        if channels not in expected:
-            raise ValueError(
-                f'Got {channels} channels, but expected one of {expected}.'
-            )
-
-
 class Flavor(audobject.Object):
     r"""Database flavor.
 
@@ -67,11 +50,10 @@ class Flavor(audobject.Object):
 
     Args:
         only_metadata: only metadata is stored
-        format: file format, one of ``'flac'``, ``'wav'``
-        mix: mixing strategy, one of
-            ``'left'``, ``'right'``, ``'mono'``, ``'stereo'`` or
-            a list with channels numbers
         bit_depth: sample precision, one of ``16``, ``24``, ``32``
+        channels: channel selection, see :func:`audresample.remix`
+        format: file format, one of ``'flac'``, ``'wav'``
+        mixdown: apply mono mix-down on selection
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
         include: regexp pattern specifying data artifacts to include
@@ -83,21 +65,29 @@ class Flavor(audobject.Object):
             *,
             only_metadata: bool = False,
             bit_depth: int = None,
+            channels: typing.Union[int, typing.Sequence[int]] = None,
             format: str = None,
-            mix: typing.Union[str, int, typing.Sequence[int]] = None,
+            mixdown: bool = False,
             sampling_rate: int = None,
             tables: typing.Union[str, typing.Sequence[str]] = None,
             exclude: typing.Union[str, typing.Sequence[str]] = None,
             include: typing.Union[str, typing.Sequence[str]] = None,
     ):
         if only_metadata:
-            bit_depth = format = sampling_rate = mix = None
+            bit_depth = channels = format = sampling_rate = None
+            mixdown = False
 
-        if mix is not None and not isinstance(mix, str):
-            if isinstance(mix, int):
-                mix = [mix]
-            else:
-                mix = list(mix)
+        if bit_depth is not None:
+            if bit_depth not in define.BIT_DEPTHS:
+                raise ValueError(
+                    f'Bit depth has to be one of '
+                    f"{define.BIT_DEPTHS}, not {bit_depth}."
+                )
+
+        if channels is not None:
+            if isinstance(channels, int):
+                channels = [channels]
+            channels = list(channels)
 
         if format is not None:
             if format not in define.FORMATS:
@@ -105,18 +95,7 @@ class Flavor(audobject.Object):
                     f'Format has to be one of '
                     f"{define.FORMATS}, not '{format}'."
                 )
-        if mix is not None:
-            if isinstance(mix, str) and mix not in define.MIXES:
-                raise ValueError(
-                    f'Mix has to be one of '
-                    f"{define.MIXES}, not '{mix}'."
-                )
-        if bit_depth is not None:
-            if bit_depth not in define.BIT_DEPTHS:
-                raise ValueError(
-                    f'Bit depth has to be one of '
-                    f"{define.BIT_DEPTHS}, not {bit_depth}."
-                )
+
         if sampling_rate is not None:
             if sampling_rate not in define.SAMPLING_RATES:
                 raise ValueError(
@@ -124,17 +103,19 @@ class Flavor(audobject.Object):
                     f'{define.SAMPLING_RATES}, not {sampling_rate}.'
                 )
 
+        self.bit_depth = bit_depth
+        r"""Sample precision."""
+        self.channels = channels
+        r"""Selected channels."""
         self.exclude = exclude
         r"""Filter for excluding media."""
         self.format = format
         r"""File format."""
         self.include = include
         r"""Filter for including media."""
-        self.mix = mix
-        r"""Mixing strategy."""
+        self.mixdown = mixdown
+        r"""Apply mixdown."""
         self.only_metadata = only_metadata
-        r"""Sample precision."""
-        self.bit_depth = bit_depth
         r"""Only metadata is stored."""
         self.sampling_rate = sampling_rate
         r"""Sampling rate in Hz."""
@@ -153,25 +134,19 @@ class Flavor(audobject.Object):
             if self.format != ext.lower():
                 return True
 
-        # mix change
-        if self.mix is not None:
+        # precision change
+        if self.bit_depth is not None:
+            bit_depth = audiofile.bit_depth(file)
+            if self.bit_depth != bit_depth:
+                return True
+
+        # mixdown and channel selection
+        if self.mixdown or self.channels is not None:
             channels = audiofile.channels(file)
-            if isinstance(self.mix, str):
-                if self.mix == define.Mix.MONO_ONLY:
-                    check_channels(channels, 1)
-                elif self.mix == define.Mix.MONO and channels != 1:
-                    return True
-                elif self.mix in (define.Mix.LEFT, define.Mix.RIGHT):
-                    check_channels(channels, 2)
-                    return True
-                elif self.mix == define.Mix.STEREO and channels != 2:
-                    check_channels(channels, [1, 2])
-                    return True
-                elif self.mix == define.Mix.STEREO_ONLY:
-                    check_channels(channels, 2)
-            else:
-                if list(range(channels)) != self.mix:
-                    return True
+            if self.mixdown and channels != 1:
+                return True
+            elif list(range(channels)) != self.channels:
+                return True
 
         # sampling rate change
         if self.sampling_rate is not None:
@@ -179,44 +154,7 @@ class Flavor(audobject.Object):
             if self.sampling_rate != sampling_rate:
                 return True
 
-        # precision change
-        if self.bit_depth is not None:
-            bit_depth = audiofile.bit_depth(file)
-            if self.bit_depth != bit_depth:
-                return True
-
         return False
-
-    def _remix(
-            self,
-            signal: np.ndarray,
-    ) -> np.ndarray:
-        r"""Remix signal to flavor."""
-
-        if self.mix is None:
-            return signal
-
-        channels = signal.shape[0]
-
-        if isinstance(self.mix, str):
-            if self.mix == define.Mix.MONO:
-                # mixdown
-                signal = audresample.remix(signal, mixdown=True)
-            elif self.mix == define.Mix.LEFT:
-                # input 2 channels, output left
-                signal = signal[0, :]
-            elif self.mix == define.Mix.RIGHT:
-                # input 2 channels, output right
-                signal = signal[1, :]
-            elif self.mix == define.Mix.STEREO:
-                # input either 1 or 2 channels,
-                # output always 2 channels
-                if channels == 1:
-                    signal = np.repeat(signal, 2, axis=0)
-        else:
-            signal = audresample.remix(signal, channels=self.mix)
-
-        return signal
 
     def _resample(
             self,
@@ -275,7 +213,7 @@ class Flavor(audobject.Object):
 
             # convert file to flavor
             signal, sampling_rate = audiofile.read(src_path, always_2d=True)
-            signal = self._remix(signal)
+            signal = audresample.remix(signal, self.channels, self.mixdown)
             signal, sampling_rate = self._resample(signal, sampling_rate)
             bit_depth = self.bit_depth or audiofile.bit_depth(src_path)
             audiofile.write(

@@ -14,7 +14,12 @@ tables as CSV is provided.
 
     import audb2
 
-    db = audb2.load('emodb', version='1.0.1', format='flac', mix='stereo', sampling_rate=44100)
+    audb2.load(
+        'emodb',
+        version='1.0.1',
+        format='flac',
+        sampling_rate=44100,
+    )
 
 
 audb2
@@ -42,7 +47,7 @@ Load version ``1.0.1`` of ``emodb`` as stereo FLAC files at 44100 Hz.
 The database is stored in your :ref:`cache root <cache-root>` and
 its header is printed to standard out:
 
-.. command-output:: audb2 load emodb --version 1.0.1 --format flac --mix stereo --sampling_rate 44100
+.. command-output:: audb2 load emodb --version 1.0.1 --format flac --sampling_rate 44100
 
 audb2get
 ~~~~~~~~
@@ -66,7 +71,7 @@ but instead of returning the header of the database
 you specify a table and optional some columns to be printed to standard out.
 The following returns the `emotion` table:
 
-.. command-output:: audb2get emodb emotion --version 1.0.1 --format flac --mix stereo --sampling_rate 44100
+.. command-output:: audb2get emodb emotion --version 1.0.1 --format flac --sampling_rate 44100
     :ellipsis: 10
 
 audb2info
