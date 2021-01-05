@@ -234,16 +234,6 @@ def load(
     Loads meta and media files of a database to the local cache and returns
     a :class:`audformat.Database` object.
 
-    It is possible to filter meta and media files with the arguments
-    ``tables``, ``include`` and ``exclude``.
-    Note that only media files with at least one reference are loaded.
-    I.e. filtering meta files, may also remove media files.
-    Likewise, references to missing media files will be removed, too.
-    I.e. filtering media files, may also remove entries from the meta files.
-    Except if ``only_metadata`` is set to ``True``.
-    In that case, no media files are loaded
-    but all references in the meta files are kept.
-
     When working with data,
     we often make assumptions about the media files.
     For instance, we expect that audio files are
@@ -254,21 +244,27 @@ def load(
     In that case media files are automatically converted to the desired
     properties (see also :class:`audb2.Flavor`).
 
-    .. note:: If ``only_metadata`` is set ``True``, the arguments
-        ``bit_depth``, ``channels``, ``format``, ``mixdown``,
-        and ``sampling_rate`` are ignored.
-
-    .. note:: If ``channels`` are selected,
-        media files with too few channels are not loaded.
-        E.g. ``channels=[0, 1]`` will skip media files with only one channel
-        and also remove their entries from the meta files.
+    It is possible to filter meta and media files with the arguments
+    ``tables``, ``include`` and ``exclude``.
+    Note that only media files with at least one reference are loaded.
+    I.e. filtering meta files, may also remove media files.
+    Likewise, references to missing media files will be removed, too.
+    I.e. filtering media files, may also remove entries from the meta files.
+    Except if ``only_metadata`` is set to ``True``.
+    In that case, no media files are loaded
+    but all references in the meta files are kept
+    and the arguments ``bit_depth``, ``channels``, ``format``,
+    ``mixdown``, and ``sampling_rate`` are ignored.
 
     Args:
         name: name of database
         version: version string, latest if ``None``
         only_metadata: only metadata is stored
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
-        channels: channel selection, see :func:`audresample.remix`
+        channels: channel selection, see :func:`audresample.remix`.
+            Note that media files with too few channels are not loaded.
+            E.g. ``channels=[0, 1]`` will skip media files with only
+            one channel and also remove their entries from the meta files.
         format: file format, one of ``'flac'``, ``'wav'``
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
