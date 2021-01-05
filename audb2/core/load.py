@@ -78,8 +78,13 @@ def _load(
         else:
             tables_to_download.append(file)
 
-    # download tables, possibly remove pickled version
+    # download tables
     for file in tables_to_download:
+        # If pickled versions of the tables exist,
+        # we have to remove them to make sure that
+        # we load the new CSV tables.
+        # This may happen if we upgrade an existing
+        # version of the database to a different version.
         path_pkl = os.path.join(
             db_root, file
         )[:-3] + audformat.define.TableStorageFormat.PICKLE
@@ -94,8 +99,6 @@ def _load(
 
     # filter media
     if flavor is not None:
-
-        save_db = False
 
         if flavor.include is not None or flavor.exclude is not None:
             archives = set()
@@ -121,17 +124,12 @@ def _load(
                 else:
                     exclude = flavor.exclude
                 db.pick_files(lambda x: depend.archive(x) not in exclude)
-            save_db = True
 
         if flavor.channels is not None:
             num_channels = max(flavor.channels) + 1
             db.pick_files(
                 lambda x: depend.channels(x) >= num_channels,
             )
-            save_db = True
-
-        if save_db:
-            db.save(db_root)
 
     if flavor is None or not flavor.only_metadata:
 
@@ -255,6 +253,15 @@ def load(
     we can request a specific flavor of the database.
     In that case media files are automatically converted to the desired
     properties (see also :class:`audb2.Flavor`).
+
+    .. note:: If ``only_metadata`` is set ``True``, the arguments
+        ``bit_depth``, ``channels``, ``format``, ``mixdown``,
+        and ``sampling_rate`` are ignored.
+
+    .. note:: If ``channels`` are selected,
+        media files with too few channels are not loaded.
+        E.g. ``channels=[0, 1]`` will skip media files with only one channel
+        and also remove their entries from the meta files.
 
     Args:
         name: name of database
