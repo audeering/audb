@@ -233,6 +233,29 @@ def load(
 ) -> audformat.Database:
     r"""Load database.
 
+    Loads meta and media files of a database to the local cache and returns
+    a :class:`audformat.Database` object.
+
+    It is possible to filter meta and media files with the arguments
+    ``tables``, ``include`` and ``exclude``.
+    Note that only media files with at least one reference are loaded.
+    I.e. filtering meta files, may also remove media files.
+    Likewise, references to missing media files will be removed, too.
+    I.e. filtering media files, may also remove entries from the meta files.
+    Except if ``only_metadata`` is set to ``True``.
+    In that case, no media files are loaded
+    but all references in the meta files are kept.
+
+    When working with data,
+    we often make assumptions about the media files.
+    For instance, we expect that audio files are
+    have a specific sampling rate.
+    By setting
+    ``bit_depth``, ``channels``, ``format``, ``mixdown``, and ``sampling_rate``
+    we can request a specific flavor of the database.
+    In that case media files are automatically converted to the desired
+    properties (see also :class:`audb2.Flavor`).
+
     Args:
         name: name of database
         version: version string, latest if ``None``

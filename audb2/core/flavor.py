@@ -15,37 +15,21 @@ from audb2.core import define
 class Flavor(audobject.Object):
     r"""Database flavor.
 
-    When working with data,
-    we often make assumptions about the media files.
-    For instance, we expect that audio files are in a certain format
-    and have a specific sampling rate.
-    Since our requirements may not be satisfied
-    by the original media files on the :class:`audb2.backend.Backend`,
-    we have the option to request the database in
-    a specific flavor (see also :meth:`audb2.load`).
-    This class acts as a helper class
-    that stores the meta information about a flavor
+    Helper class used by :meth:`audb2.load`
+    to convert media files to the desired format.
+    It stores the meta information about a flavor
     and offers a convenient way to convert files to it.
 
-    E.g. if we require audio files in WAV format
-    with a 16 kHz, we do:
-
-    .. code-block::  python
-
-        flavor = Flavor(
-            format=define.Format.WAV,
-            sampling_rate=16000
-        )
-
-    And then use :meth:`audb2.Flavor.__call__` to
-    convert a file to the flavor:
+    As the following example shows,
+    it can also be used to convert files that are not part of database:
 
     .. code-block::  python
 
         original_file = '/org/path/file.flac'
         converted_file = '/new/path/file.wav'
 
-        # convert file to 16 kHz WAV
+        # convert file to 16 kHz
+        flavor = Flavor(sampling_rate=16000)
         flavor(original_file, converted_file)
 
     Args:
