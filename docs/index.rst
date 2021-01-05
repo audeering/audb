@@ -9,7 +9,12 @@
 
     install
     authentication
-    usage
+    quickstart
+    overview
+    dependencies
+    flavors
+    metadata
+    caching
     cli
 
 .. Warning: then usage of genindex is a hack to get a TOC entry, see
