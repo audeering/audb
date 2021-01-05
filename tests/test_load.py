@@ -176,6 +176,7 @@ def test_load(version):
     db = audb2.load(
         DB_NAME, version=version, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
+        num_workers=5,
     )
     db_root = db.meta['audb']['root']
 
@@ -246,6 +247,7 @@ def test_load_original_to(version):
     db = audb2.load_original_to(
         db_root, DB_NAME, version=version,
         group_id=pytest.GROUP_ID, backend=BACKEND,
+        num_workers=5,
     )
 
     if version is None:

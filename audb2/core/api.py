@@ -24,7 +24,6 @@ def available(
         *,
         latest_only: bool = False,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> pd.DataFrame:
     r"""List all databases that are available to the user.
 
@@ -32,13 +31,12 @@ def available(
         group_id: group ID
         latest_only: keep only latest version
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         table with name, version and private flag
 
     """
-    backend = default_backend(backend, verbose=verbose)
+    backend = default_backend(backend)
 
     match = {}
     for repository in (
@@ -106,13 +104,9 @@ def cached(
     return pd.DataFrame.from_dict(data, orient='index')
 
 
-def default_backend(
-        backend: Backend = None,
-        *,
-        verbose: bool = False,
-):
+def default_backend(backend: Backend = None):
     r"""Default backend."""
-    return backend or Artifactory(verbose=verbose)
+    return backend or Artifactory()
 
 
 def default_cache_root(
@@ -157,7 +151,6 @@ def dependencies(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> Depend:
     r"""Database dependencies.
 
@@ -166,13 +159,12 @@ def dependencies(
         version: version string
         group_id: group ID
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         dependency object
 
     """
-    backend = default_backend(backend, verbose=verbose)
+    backend = default_backend(backend)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
@@ -206,7 +198,6 @@ def exists(
     cache_root: str = None,
     group_id: str = config.GROUP_ID,
     backend: Backend = None,
-    verbose: bool = False,
 ) -> typing.Optional[str]:
     r"""Check if specified database flavor exists in local cache folder.
 
@@ -254,7 +245,6 @@ def exists(
             If not set :meth:`audb2.default_cache_root` is used
         group_id: group ID
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         ``None`` or path to flavor.
@@ -270,7 +260,7 @@ def exists(
         stacklevel=2,
     )
 
-    backend = default_backend(backend, verbose=verbose)
+    backend = default_backend(backend)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
@@ -382,7 +372,6 @@ def latest_version(
         *,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> str:
     r"""Latest version of database.
 
@@ -390,13 +379,12 @@ def latest_version(
         name: name of database
         group_id: group ID
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         version string
 
     """
-    backend = default_backend(backend, verbose=verbose)
+    backend = default_backend(backend)
 
     vs = versions(name, group_id=group_id, backend=backend)
     if not vs:
@@ -425,7 +413,7 @@ def remove_media(
         verbose: show debug messages
 
     """
-    backend = default_backend(backend, verbose=verbose)
+    backend = default_backend(backend)
 
     if isinstance(files, str):
         files = [files]
@@ -514,7 +502,6 @@ def versions(
         *,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> typing.List[str]:
     r"""Available versions of database.
 
@@ -522,13 +509,12 @@ def versions(
         name: name of database
         group_id: group ID
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         list of versions
 
     """
-    backend = default_backend(backend, verbose=verbose)
+    backend = default_backend(backend)
 
     vs = []
     for repository in [

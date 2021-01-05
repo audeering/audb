@@ -19,6 +19,7 @@ tables as CSV is provided.
         version='1.0.1',
         format='flac',
         sampling_rate=44100,
+        num_workers=5,
     )
 
 

@@ -44,7 +44,7 @@ def publish(
     """
     db = audformat.Database.load(db_root, load_data=False)
 
-    backend = default_backend(backend, verbose=verbose)
+    backend = default_backend(backend)
 
     repository = config.REPOSITORY_PRIVATE if private else \
         config.REPOSITORY_PUBLIC

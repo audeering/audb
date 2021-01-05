@@ -29,19 +29,14 @@ class Backend:
 
     Args:
         host: host address
-        verbose: show debug messages
 
     """
     def __init__(
             self,
-            host: str,
-            *,
-            verbose: bool = False,
+            host: str
     ):
         self.host = host
         r"""Host path"""
-        self.verbose = verbose
-        r"""Verbose flag"""
 
     def destination(
             self,
@@ -297,17 +292,14 @@ class Artifactory(Backend):
 
     Args:
         host: host address
-        verbose: show debug messages
 
     """
 
     def __init__(
             self,
             host=config.ARTIFACTORY_HOST,
-            *,
-            verbose: bool = False,
     ):
-        super().__init__(host, verbose=verbose)
+        super().__init__(host)
 
     def destination(
             self,
@@ -411,7 +403,7 @@ class Artifactory(Backend):
         path = audeer.safe_path(os.path.join(root, file))
         audeer.mkdir(os.path.dirname(path))
 
-        return audfactory.download_artifact(url, path, verbose=self.verbose)
+        return audfactory.download_artifact(url, path)
 
     def glob(
             self,
@@ -491,7 +483,6 @@ class Artifactory(Backend):
                 group_id,
                 name,
                 version,
-                verbose=self.verbose
             )
         else:
             with tempfile.TemporaryDirectory() as tmp:
@@ -508,7 +499,6 @@ class Artifactory(Backend):
                     group_id,
                     name,
                     version,
-                    verbose=self.verbose
                 )
 
     def versions(
@@ -546,16 +536,13 @@ class FileSystem(Backend):
 
     Args:
         host: host directory
-        verbose: show debug messages
 
     """
     def __init__(
             self,
             host: str = config.FILE_SYSTEM_HOST,
-            *,
-            verbose: bool = False,
     ):
-        super().__init__(audeer.safe_path(host), verbose=verbose)
+        super().__init__(audeer.safe_path(host))
 
     def _root(
             self,

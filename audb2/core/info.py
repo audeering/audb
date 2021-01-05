@@ -18,7 +18,6 @@ def description(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> str:
     """Description of database.
 
@@ -27,15 +26,13 @@ def description(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         description of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.description
 
@@ -46,7 +43,6 @@ def header(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> audformat.Database:
     r"""Load header of database.
 
@@ -59,13 +55,12 @@ def header(
         version: version of database
         group_id: group ID
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         database object without table data
 
     """
-    backend = default_backend(backend, verbose=verbose)
+    backend = default_backend(backend)
     repository, version = repository_and_version(
         name, version, group_id=group_id, backend=backend,
     )
@@ -85,7 +80,6 @@ def languages(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> typing.List[str]:
     """Languages of database.
 
@@ -94,15 +88,13 @@ def languages(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         languages of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.languages
 
@@ -113,7 +105,6 @@ def media(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> typing.Dict:
     """Audio and video media of database.
 
@@ -122,15 +113,13 @@ def media(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         media of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.media
 
@@ -141,7 +130,6 @@ def meta(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> typing.Dict:
     """Meta information of database.
 
@@ -150,15 +138,13 @@ def meta(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         meta information of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.meta
 
@@ -169,7 +155,6 @@ def raters(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> typing.Dict:
     """Raters contributed to database.
 
@@ -178,15 +163,13 @@ def raters(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         raters of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.raters
 
@@ -197,7 +180,6 @@ def schemes(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> typing.Dict:
     """Schemes of database.
 
@@ -206,15 +188,13 @@ def schemes(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         schemes of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.schemes
 
@@ -225,7 +205,6 @@ def source(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> str:
     """Source of database.
 
@@ -234,15 +213,13 @@ def source(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         source of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.source
 
@@ -253,7 +230,6 @@ def splits(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> typing.Dict:
     """Splits of database.
 
@@ -262,15 +238,13 @@ def splits(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         splits of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.splits
 
@@ -281,7 +255,6 @@ def tables(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> typing.Dict:
     """Tables of database.
 
@@ -290,15 +263,13 @@ def tables(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         tables of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.tables
 
@@ -309,7 +280,6 @@ def usage(
         version: str = None,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
-        verbose: bool = False,
 ) -> str:
     """Usage of database.
 
@@ -318,14 +288,12 @@ def usage(
         group_id: group ID of database
         version: version of database
         backend: backend object
-        verbose: show debug messages
 
     Returns:
         usage of database
 
     """
     db = header(
-        name, group_id=group_id, version=version,
-        backend=backend, verbose=verbose,
+        name, group_id=group_id, version=version, backend=backend,
     )
     return db.usage
