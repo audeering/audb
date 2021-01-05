@@ -26,6 +26,11 @@ Depend
     :members:
     :special-members:
 
+default_cache_root
+------------------
+
+.. autofunction:: default_cache_root
+
 dependencies
 ------------
 

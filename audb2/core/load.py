@@ -11,7 +11,6 @@ from audb2.core import utils
 from audb2.core.api import (
     default_backend,
     default_cache_root,
-    flavor_path,
     repository_and_version,
 )
 from audb2.core.backend import Backend
