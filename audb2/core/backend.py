@@ -403,7 +403,7 @@ class Artifactory(Backend):
         path = audeer.safe_path(os.path.join(root, file))
         audeer.mkdir(os.path.dirname(path))
 
-        return audfactory.download_artifact(url, path)
+        return audfactory.download_artifact(url, path, verbose=False)
 
     def glob(
             self,

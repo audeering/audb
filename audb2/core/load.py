@@ -19,6 +19,17 @@ from audb2.core.depend import Depend
 from audb2.core.flavor import Flavor
 
 
+def _filter_archives(
+        match: typing.Union[str, typing.Sequence[str]],
+        archives: typing.Set[str],
+):
+    r"""Filter archives by regular expression."""
+    if isinstance(match, str):
+        pattern = re.compile(match)
+        match = [a for a in archives if pattern.search(a)]
+    return match
+
+
 def _filter_media(
         db: audformat.Database,
         flavor: Flavor,
@@ -28,36 +39,20 @@ def _filter_media(
 
     if flavor is not None:
 
+        # keep only media files in matching archives
         if flavor.include is not None or flavor.exclude is not None:
-            archives = set()
-            for file in db.files:
-                archives.add(depend.archive(file))
+            archives = set([depend.archive(f) for f in db.files])
             if flavor.include is not None:
-                if isinstance(flavor.include, str):
-                    pattern = re.compile(flavor.include)
-                    include = []
-                    for archive in archives:
-                        if pattern.search(archive):
-                            include.append(archive)
-                else:
-                    include = flavor.include
+                include = _filter_archives(flavor.include, archives)
                 db.pick_files(lambda x: depend.archive(x) in include)
             if flavor.exclude is not None:
-                if isinstance(flavor.exclude, str):
-                    pattern = re.compile(flavor.exclude)
-                    exclude = []
-                    for archive in archives:
-                        if pattern.search(archive):
-                            exclude.append(archive)
-                else:
-                    exclude = flavor.exclude
+                exclude = _filter_archives(flavor.exclude, archives)
                 db.pick_files(lambda x: depend.archive(x) not in exclude)
 
+        # keep only media files with a sufficient number of channels
         if flavor.channels is not None:
             num_channels = max(flavor.channels) + 1
-            db.pick_files(
-                lambda x: depend.channels(x) >= num_channels,
-            )
+            db.pick_files(lambda x: depend.channels(x) >= num_channels)
 
 
 def _filter_tables(
@@ -92,7 +87,7 @@ def _find_media(
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
-    r"""Fine altered and new media."""
+    r"""Find altered and new media."""
 
     media = []
 
@@ -108,7 +103,7 @@ def _find_media(
 
     audeer.run_tasks(
         job,
-        params=[([file], {},) for file in db.files],
+        params=[([file], {}) for file in db.files],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Find media',
@@ -141,7 +136,7 @@ def _find_tables(
 
     audeer.run_tasks(
         job,
-        params=[([table], {},) for table in db_header.tables],
+        params=[([table], {}) for table in db_header.tables],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Find tables',
@@ -194,7 +189,7 @@ def _get_media(
 
     audeer.run_tasks(
         job,
-        params=[([archive, version], {},) for archive, version in archives],
+        params=[([archive, version], {}) for archive, version in archives],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Get media',
@@ -214,11 +209,11 @@ def _get_tables(
     r"""Get tables."""
 
     def job(table: str):
-        # If pickled version of the table exists,
+        # If a pickled version of the table exists,
         # we have to remove it to make sure that
-        # we load the new CSV tables.
-        # This may happen if we upgrade an existing
-        # version of the database to a different version.
+        # later on the new CSV tables are loaded.
+        # This can happen if we upgrading an existing
+        # database to a different version.
         path_pkl = os.path.join(
             db_root, table
         )[:-3] + audformat.define.TableStorageFormat.PICKLE
@@ -231,7 +226,7 @@ def _get_tables(
 
     audeer.run_tasks(
         job,
-        params=[([table], {},) for table in tables],
+        params=[([table], {}) for table in tables],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Get tables',

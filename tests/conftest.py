@@ -18,8 +18,9 @@ pytest.ROOT = audeer.safe_path(
 pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
 pytest.GROUP_ID = f'audb2.{audeer.uid()}'
 pytest.HOST = os.path.join(pytest.ROOT, 'repo')
-pytest.SHARED_CACHE_ROOT = os.path.join(pytest.ROOT, 'shared')
+pytest.NUM_WORKERS = 5
 pytest.REPOSITORY_PUBLIC = 'unittests-public-local'
+pytest.SHARED_CACHE_ROOT = os.path.join(pytest.ROOT, 'shared')
 
 
 @pytest.fixture(scope='session', autouse=True)

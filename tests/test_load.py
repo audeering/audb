@@ -176,7 +176,7 @@ def test_load(version):
     db = audb2.load(
         DB_NAME, version=version, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=5,
+        num_workers=pytest.NUM_WORKERS,
     )
     db_root = db.meta['audb']['root']
 
@@ -218,6 +218,7 @@ def test_load(version):
     db = audb2.load(
         DB_NAME, version=version, full_path=True,
         group_id=pytest.GROUP_ID, backend=BACKEND,
+        num_workers=pytest.NUM_WORKERS,
     )
     for file in db.files:
         assert os.path.exists(file)
@@ -247,7 +248,7 @@ def test_load_original_to(version):
     db = audb2.load_original_to(
         db_root, DB_NAME, version=version,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=5,
+        num_workers=pytest.NUM_WORKERS,
     )
 
     if version is None:

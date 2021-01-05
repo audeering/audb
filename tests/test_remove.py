@@ -107,6 +107,7 @@ def test_remove(remove):
                 db = audb2.load(
                     DB_NAME, version=version, removed_media=removed_media,
                     full_path=False, backend=BACKEND,
+                    num_workers=pytest.NUM_WORKERS,
                 )
                 if removed_media:
                     assert remove in db.files
