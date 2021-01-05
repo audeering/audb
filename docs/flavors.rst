@@ -9,7 +9,7 @@
     import audb2
 
 
-    audb2.load('emodb', version='1.0.1', num_workers=10)
+    audb2.load('emodb', version='1.0.1', num_workers=5)
     audb2.load(
         'emodb',
         version='1.0.1',
