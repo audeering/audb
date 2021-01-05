@@ -106,6 +106,30 @@ class Flavor(audobject.Object):
         self.tables = tables
         r"""Table filter."""
 
+    def path(
+            self,
+            name: str,
+            version: str,
+            repository: str,
+            group_id: str,
+    ) -> str:
+        r"""Flavor path.
+
+        Args:
+            name: database name
+            version: version string
+            repository: repository
+            group_id: group ID
+
+        Returns:
+            relative path
+
+        """
+        return os.path.join(
+            repository, group_id.replace('.', os.path.sep),
+            name, self.id, version,
+        )
+
     def _check_convert(
             self,
             file: str,

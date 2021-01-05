@@ -154,12 +154,11 @@ def fixture_publish_db():
 @pytest.mark.parametrize(
     'version',
     [
-        None,
         '1.0.0',
         '1.1.0',
         '1.1.1',
         '2.0.0',
-        '3.0.0',
+        None,  # 3.0.0
         pytest.param(
             '4.0.0',
             marks=pytest.mark.xfail(raises=RuntimeError),
@@ -168,11 +167,23 @@ def fixture_publish_db():
 )
 def test_load(version):
 
+    with pytest.warns(UserWarning):
+        assert not audb2.exists(
+            DB_NAME, version=version,
+            group_id=pytest.GROUP_ID, backend=BACKEND,
+        )
+
     db = audb2.load(
         DB_NAME, version=version, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
     )
     db_root = db.meta['audb']['root']
+
+    with pytest.warns(UserWarning):
+        assert audb2.exists(
+            DB_NAME, version=version,
+            group_id=pytest.GROUP_ID, backend=BACKEND,
+        )
 
     if version is None:
         resolved_version = audb2.latest_version(
@@ -193,7 +204,7 @@ def test_load(version):
         )
 
     df = audb2.cached()
-    assert df.loc[db.meta['audb']['root']]['version'] == resolved_version
+    assert df.loc[db_root]['version'] == resolved_version
 
     depend = audb2.dependencies(
         DB_NAME, version=version, group_id=pytest.GROUP_ID, backend=BACKEND,

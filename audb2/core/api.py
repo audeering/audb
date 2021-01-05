@@ -1,6 +1,7 @@
 import os
 import tempfile
 import typing
+import warnings
 
 import pandas as pd
 
@@ -15,6 +16,7 @@ from audb2.core.backend import (
 )
 from audb2.core.config import config
 from audb2.core.depend import Depend
+from audb2.core.flavor import Flavor
 
 
 def available(
@@ -129,10 +131,11 @@ def default_cache_root(
     ``AUDB2_CACHE_ROOT``
     or :attr:`audb2.config.CACHE_ROOT`.
 
-    The returned path is normalized by :func:`audeer.safe_path`.
-
     Args:
         shared: if ``True`` returns path to shared cache folder
+
+    Returns:
+        path normalized by :func:`audeer.safe_path`
 
     """
     if shared:
@@ -185,6 +188,191 @@ def dependencies(
         depend.from_file(dep_path)
 
     return depend
+
+
+def exists(
+    name: str,
+    *,
+    version: str = None,
+    only_metadata: bool = False,
+    bit_depth: int = None,
+    channels: typing.Union[int, typing.Sequence[int]] = None,
+    format: str = None,
+    mixdown: bool = False,
+    sampling_rate: int = None,
+    tables: typing.Union[str, typing.Sequence[str]] = None,
+    include: typing.Union[str, typing.Sequence[str]] = None,
+    exclude: typing.Union[str, typing.Sequence[str]] = None,
+    cache_root: str = None,
+    group_id: str = config.GROUP_ID,
+    backend: Backend = None,
+    verbose: bool = False,
+) -> typing.Optional[str]:
+    r"""Check if specified database flavor exists in local cache folder.
+
+    Does not yet return ``True`` or ``False``,
+    but ``None`` or path to flavor.
+    Nonetheless,
+    it can still be used with an if-statement:
+
+    .. code-block::
+
+        if audb2.exists('emodb', version='1.0.1', mixdown=True):
+            print('emodb v1.0.1 {mono} cached')
+
+    Note that the return value will change to 'bool' with version 1.0.0.
+
+    Does not check for any flavor of the requested database in the cache,
+    but only for a particular flavor.
+    Note, that using only the name, e.g. ``audb.exists('emodb')``
+    is also a single flavor.
+
+    To list all available flavors of a particular database, use:
+
+    .. code-block::
+
+        audb2.cached().query('name == "emodb"')
+
+    Args:
+        name: name of database
+        version: version string, latest if ``None``
+        only_metadata: only metadata is stored
+        bit_depth: bit depth, one of ``16``, ``24``, ``32``
+        channels: channel selection, see :func:`audresample.remix`
+        format: file format, one of ``'flac'``, ``'wav'``
+        mixdown: apply mono mix-down
+        sampling_rate: sampling rate in Hz, one of
+            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+        tables: include only tables matching the regular expression or
+            provided in the list
+        include: include only media from archives matching the regular
+            expression or provided in the list
+        exclude: don't include media from archives matching the regular
+            expression or provided in the list. This filter is applied
+            after ``include``
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb2.default_cache_root` is used
+        group_id: group ID
+        backend: backend object
+        verbose: show debug messages
+
+    Returns:
+        ``None`` or path to flavor
+
+    """
+    warnings.warn(
+        "The return value of 'exists' will "
+        "change from 'str' to 'bool' "
+        "with version '1.0.0'.",
+        category=UserWarning,
+        stacklevel=2,
+    )
+
+    backend = default_backend(backend, verbose=verbose)
+    repository, version = repository_and_version(
+        name, version, group_id=group_id, backend=backend,
+    )
+
+    relative_flavor_path = flavor_path(
+        name,
+        version,
+        repository,
+        group_id,
+        only_metadata=only_metadata,
+        channels=channels,
+        format=format,
+        mixdown=mixdown,
+        bit_depth=bit_depth,
+        sampling_rate=sampling_rate,
+        tables=tables,
+        include=include,
+        exclude=exclude,
+    )
+
+    cache_roots = [
+        default_cache_root(True),  # check shared cache first
+        default_cache_root(False),
+    ] if cache_root is None else [cache_root]
+    for cache_root in cache_roots:
+        db_root = audeer.safe_path(
+            os.path.join(cache_root, relative_flavor_path)
+        )
+        if os.path.exists(db_root):
+            return db_root  # True
+
+    return None  # False
+
+
+def flavor_path(
+    name: str,
+    version: str,
+    repository: str,
+    group_id: str,
+    *,
+    only_metadata: bool = False,
+    bit_depth: int = None,
+    channels: typing.Union[int, typing.Sequence[int]] = None,
+    format: str = None,
+    mixdown: bool = False,
+    sampling_rate: int = None,
+    tables: typing.Union[str, typing.Sequence[str]] = None,
+    include: typing.Union[str, typing.Sequence[str]] = None,
+    exclude: typing.Union[str, typing.Sequence[str]] = None,
+) -> str:
+    r"""Flavor cache path.
+
+    Returns the path under which :func:`audb2.load` stores a specific
+    flavor of a database in the cache folder, that is:
+
+     ``<repository>/<group-id>/<name>/<flavor-id>/<version>/``
+
+    Note that the returned path is relative.
+    To get the absolute path, do:
+
+    .. code-block::
+
+        os.path.join(
+            audb2.default_cache_root(...),
+            audb2.flavor_path(...),
+        )
+
+    Args:
+        name: name of database
+        version: version string
+        repository: repository
+        group_id: group ID
+        only_metadata: only metadata is stored
+        bit_depth: bit depth, one of ``16``, ``24``, ``32``
+        channels: channel selection, see :func:`audresample.remix`
+        format: file format, one of ``'flac'``, ``'wav'``
+        mixdown: apply mono mix-down
+        sampling_rate: sampling rate in Hz, one of
+            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+        tables: include only tables matching the regular expression or
+            provided in the list
+        include: include only media from archives matching the regular
+            expression or provided in the list
+        exclude: don't include media from archives matching the regular
+            expression or provided in the list. This filter is applied
+            after ``include``
+
+    Returns:
+        flavor path relative to cache folder
+
+    """
+    flavor = Flavor(
+        only_metadata=only_metadata,
+        channels=channels,
+        format=format,
+        mixdown=mixdown,
+        bit_depth=bit_depth,
+        sampling_rate=sampling_rate,
+        tables=tables,
+        include=include,
+        exclude=exclude,
+    )
+
+    return flavor.path(name, version, repository, group_id)
 
 
 def latest_version(

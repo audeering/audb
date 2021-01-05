@@ -11,6 +11,7 @@ from audb2.core import utils
 from audb2.core.api import (
     default_backend,
     default_cache_root,
+    flavor_path,
     repository_and_version,
 )
 from audb2.core.backend import Backend
@@ -336,8 +337,7 @@ def load(
     for cache_root in cache_roots:
         db_root = audeer.safe_path(
             os.path.join(
-                cache_root, repository, group_id.replace('.', os.path.sep),
-                name, flavor.id, version,
+                cache_root, flavor.path(name, version, repository, group_id)
             )
         )
         if os.path.exists(db_root):

@@ -6,6 +6,8 @@ from audb2.core.api import (
     cached,
     default_cache_root,
     dependencies,
+    exists,
+    flavor_path,
     latest_version,
     remove_media,
     versions,
