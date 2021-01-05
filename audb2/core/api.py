@@ -220,7 +220,7 @@ def exists(
         if audb2.exists('emodb', version='1.0.1', mixdown=True):
             print('emodb v1.0.1 {mono} cached')
 
-    Note that the return value will change to 'bool' with version 1.0.0.
+    Note that the return value will change to ``bool`` with version 1.0.0.
 
     Does not check for any flavor of the requested database in the cache,
     but only for a particular flavor.

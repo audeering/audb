@@ -31,12 +31,22 @@ dependencies
 
 .. autofunction:: dependencies
 
+exists
+------
+
+.. autofunction:: exists
+
 Flavor
 ------
 
 .. autoclass:: Flavor
     :members:
     :special-members:
+
+flavor_path
+-----------
+
+.. autofunction:: flavor_path
 
 latest_version
 --------------
