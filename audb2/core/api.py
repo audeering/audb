@@ -257,7 +257,9 @@ def exists(
         verbose: show debug messages
 
     Returns:
-        ``None`` or path to flavor
+        ``None`` or path to flavor.
+        Note that the return value will change
+        to ``False`` or ``True`` with version 1.0.0.
 
     """
     warnings.warn(
