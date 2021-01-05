@@ -528,7 +528,7 @@ class Artifactory(Backend):
             name: alias name of file
 
         Returns:
-            list of versions
+            list of versions in ascending order
 
         """
         name = _alias(file, name)
@@ -744,15 +744,16 @@ class FileSystem(Backend):
         r"""Versions of database.
 
         Returns:
-            list of versions
+            list of versions in ascending order
 
         """
         name = _alias(file, name)
         root = os.path.join(self._root(repository, group_id), name)
+        vs = []
         if os.path.exists(root):
-            return [
-                v for v in os.listdir(root) if os.path.isdir(
-                    os.path.join(root, v))
+            vs = [
+                v for v in os.listdir(root)
+                if os.path.isdir(os.path.join(root, v))
             ]
-        else:
-            return []
+        utils.sort_versions(vs)
+        return vs
