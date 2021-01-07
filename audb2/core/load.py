@@ -185,7 +185,7 @@ def _fix_file_ext(
         new_ext = f'.{flavor.format}'
         audeer.run_tasks(
             job,
-            params=[([table], {}) for table in db.tables],
+            params=[([table], {}) for table in db.tables.values()],
             num_workers=num_workers,
             progress_bar=verbose,
             task_description='Fix file extension',
@@ -367,8 +367,14 @@ def _load(
             'flavor': flavor.arguments,
         }
 
-    db.save(db_root)
-    db.save(db_root, storage_format=audformat.define.TableStorageFormat.PICKLE)
+    for storage_format in [
+        audformat.define.TableStorageFormat.CSV,
+        audformat.define.TableStorageFormat.PICKLE,
+    ]:
+        db.save(
+            db_root, storage_format=storage_format,
+            num_workers=num_workers, verbose=verbose,
+        )
 
     return db
 
