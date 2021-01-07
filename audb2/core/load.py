@@ -34,6 +34,8 @@ def _filter_media(
         db: audformat.Database,
         flavor: Flavor,
         depend: Depend,
+        num_workers: typing.Optional[int],
+        verbose: bool,
 ):
     r"""Filter media files."""
 
@@ -44,15 +46,27 @@ def _filter_media(
             archives = set([depend.archive(f) for f in db.files])
             if flavor.include is not None:
                 include = _filter_archives(flavor.include, archives)
-                db.pick_files(lambda x: depend.archive(x) in include)
+                db.pick_files(
+                    lambda x: depend.archive(x) in include,
+                    num_workers=num_workers,
+                    verbose=verbose,
+                )
             if flavor.exclude is not None:
                 exclude = _filter_archives(flavor.exclude, archives)
-                db.pick_files(lambda x: depend.archive(x) not in exclude)
+                db.pick_files(
+                    lambda x: depend.archive(x) not in exclude,
+                    num_workers=num_workers,
+                    verbose=verbose,
+                )
 
         # keep only media files with a sufficient number of channels
         if flavor.channels is not None:
             num_channels = max(flavor.channels) + 1
-            db.pick_files(lambda x: depend.channels(x) >= num_channels)
+            db.pick_files(
+                lambda x: depend.channels(x) >= num_channels,
+                num_workers=num_workers,
+                verbose=verbose,
+            )
 
 
 def _filter_tables(
@@ -143,6 +157,39 @@ def _find_tables(
     )
 
     return tables
+
+
+def _fix_file_ext(
+        db: audformat.Database,
+        flavor: typing.Optional[Flavor],
+        num_workers: typing.Optional[int],
+        verbose: bool,
+):
+    if flavor is not None and flavor.format is not None:
+
+        def job(table):
+            if table.is_filewise:
+                table.df.index = table.df.index.str.replace(
+                    cur_ext, new_ext,
+                )
+            else:
+                table.df.index.set_levels(
+                    table.df.index.levels[0].str.replace(
+                        cur_ext, new_ext),
+                    'file',
+                    inplace=True,
+                )
+
+        # Faster solution then using db.map_files()
+        cur_ext = r'\.[a-zA-Z0-9]+$'  # match file extension
+        new_ext = f'.{flavor.format}'
+        audeer.run_tasks(
+            job,
+            params=[([table], {}) for table in db.tables],
+            num_workers=num_workers,
+            progress_bar=verbose,
+            task_description='Fix file extension',
+        )
 
 
 def _get_media(
@@ -281,7 +328,7 @@ def _load(
     # load database and filter media
 
     db = audformat.Database.load(db_root)
-    _filter_media(db, flavor, depend)
+    _filter_media(db, flavor, depend, num_workers, verbose)
 
     # get altered and new media files,
     # eventually convert them
@@ -304,24 +351,12 @@ def _load(
     # eventually fix file extension
 
     if not removed_media:
-        db.pick_files(lambda x: not depend.removed(x))
-
-    if flavor is not None and flavor.format is not None:
-        # Faster solution then using db.map_files()
-        cur_ext = r'\.[a-zA-Z0-9]+$'  # match file extension
-        new_ext = f'.{flavor.format}'
-        for table in db.tables.values():
-            if table.is_filewise:
-                table.df.index = table.df.index.str.replace(
-                    cur_ext, new_ext,
-                )
-            else:
-                table.df.index.set_levels(
-                    table.df.index.levels[0].str.replace(
-                        cur_ext, new_ext),
-                    'file',
-                    inplace=True,
-                )
+        db.pick_files(
+            lambda x: not depend.removed(x),
+            num_workers=num_workers,
+            verbose=verbose,
+        )
+    _fix_file_ext(db, flavor, num_workers, verbose)
 
     # save database
 
