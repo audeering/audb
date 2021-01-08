@@ -14,6 +14,170 @@ from audb2.core.config import config
 from audb2.core.depend import Depend
 
 
+def _find_tables(
+        db: audformat.Database,
+        db_root: str,
+        version: str,
+        depend: Depend,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+) -> typing.List[str]:
+    r"""Update tables."""
+
+    # release dependencies to removed tables
+
+    db_tables = [f'db.{table}.csv' for table in db.tables]
+    for file in set(depend.tables) - set(db_tables):
+        depend.data.pop(file)
+
+    tables = []
+
+    def job(table: str):
+
+        file = f'db.{table}.csv'
+        checksum = utils.md5(os.path.join(db_root, file))
+        if file not in depend:
+            depend.data[file] = [
+                table, 0, checksum, 0, define.DependType.META, version,
+            ]
+            tables.append(table)
+        elif checksum != depend.checksum(file):
+            depend.data[file][define.DependField.CHANNELS] = 0
+            depend.data[file][define.DependField.CHECKSUM] = checksum
+            depend.data[file][define.DependField.VERSION] = version
+            tables.append(table)
+
+    audeer.run_tasks(
+        job,
+        params=[([table], {}) for table in db.tables],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Find tables',
+    )
+
+    return tables
+
+
+def _find_media(
+        db: audformat.Database,
+        db_root: str,
+        version: str,
+        depend: Depend,
+        archives: typing.Mapping[str, str],
+        num_workers: typing.Optional[int],
+        verbose: bool,
+) -> typing.Set[str]:
+
+    # release dependencies to removed media
+    # and select according archives for upload
+    media = set()
+    db_media = db.files
+    for file in set(depend.media) - set(db_media):
+        media.add(depend.archive(file))
+        depend.data.pop(file)
+
+    # update version of altered media and insert new ones
+
+    def job(file):
+        path = os.path.join(db_root, file)
+        if file not in depend:
+            checksum = utils.md5(path)
+            if file in archives:
+                archive = archives[file]
+            else:
+                archive = audeer.uid(from_string=file)
+            channels = audiofile.channels(path)
+            depend.data[file] = [
+                archive, channels, checksum, 0,
+                define.DependType.MEDIA, version,
+            ]
+        elif not depend.removed(file):
+            checksum = utils.md5(path)
+            if checksum != depend.checksum(file):
+                channels = audiofile.channels(path)
+                depend.data[file][define.DependField.CHECKSUM] = channels
+                depend.data[file][define.DependField.CHECKSUM] = checksum
+                depend.data[file][define.DependField.VERSION] = version
+
+    audeer.run_tasks(
+        job,
+        params=[([file], {}) for file in db_media],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Find media',
+    )
+
+    return media
+
+
+def _put_media(
+        media: typing.Set[str],
+        db_root: str,
+        version: str,
+        depend: Depend,
+        backend: Backend,
+        repository: str,
+        group_id: str,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+):
+    # create a mapping from archives to media and
+    # select archives with new or altered files for upload
+    map_media_to_files = collections.defaultdict(list)
+    for file in depend.media:
+        if not depend.removed(file):
+            map_media_to_files[depend.archive(file)].append(file)
+            if depend.version(file) == version:
+                media.add(depend.archive(file))
+
+    def job(archive):
+        if archive in map_media_to_files:
+            for file in map_media_to_files[archive]:
+                depend.data[file][define.DependField.VERSION] = version
+            backend.put_archive(
+                db_root, map_media_to_files[archive],
+                archive, version, repository,
+                f'{group_id}.'
+                f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
+            )
+
+    # upload new and altered archives if it contains at least one file
+    audeer.run_tasks(
+        job,
+        params=[([archive], {}) for archive in media],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Put media',
+    )
+
+
+def _put_tables(
+        tables: typing.List[str],
+        db_root: str,
+        version: str,
+        backend: Backend,
+        repository: str,
+        group_id: str,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+):
+    def job(table: str):
+        file = f'db.{table}.csv'
+        backend.put_archive(
+            db_root, file, table, version, repository,
+            f'{group_id}.'
+            f'{define.DEPEND_TYPE_NAMES[define.DependType.META]}',
+        )
+
+    audeer.run_tasks(
+        job,
+        params=[([table], {}) for table in tables],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Put tables',
+    )
+
+
 def publish(
         db_root: str,
         version: str,
@@ -22,6 +186,7 @@ def publish(
         private: bool = False,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
+        num_workers: typing.Optional[int] = 1,
         verbose: bool = False,
 ) -> Depend:
     r"""Publish database.
@@ -33,6 +198,9 @@ def publish(
         group_id: group ID
         private: publish as private
         backend: backend object
+        num_workers: number of parallel jobs or 1 for sequential
+            processing. If ``None`` will be set to the number of
+            processors on the machine multiplied by 5
         verbose: show debug messages
 
     Returns:
@@ -80,90 +248,26 @@ def publish(
                 "allowed characters are '[0-9][a-z][A-Z].-_'."
             )
 
-    # release dependencies to removed tables
-    db_tables = [f'db.{table}.csv' for table in db.tables]
-    for file in set(depend.tables) - set(db_tables):
-        depend.data.pop(file)
+    # publish tables
+    tables = _find_tables(
+        db, db_root, version, depend, num_workers, verbose,
+    )
+    _put_tables(
+        tables, db_root, version, backend,
+        repository, group_id, num_workers, verbose,
+    )
 
-    # update version of altered tables and insert new ones
-    tables_to_upload = []
-    for table in db.tables:
-        file = f'db.{table}.csv'
-        checksum = utils.md5(os.path.join(db_root, file))
-        if file not in depend:
-            depend.data[file] = [
-                table, 0, checksum, 0, define.DependType.META, version,
-            ]
-            tables_to_upload.append(table)
-        elif checksum != depend.checksum(file):
-            depend.data[file][define.DependField.CHANNELS] = 0
-            depend.data[file][define.DependField.CHECKSUM] = checksum
-            depend.data[file][define.DependField.VERSION] = version
-            tables_to_upload.append(table)
+    # publish media
+    media = _find_media(
+        db, db_root, version, depend, archives, num_workers, verbose,
+    )
+    _put_media(
+        media, db_root, version, depend,
+        backend, repository, group_id, num_workers, verbose,
+    )
 
-    # upload tables
-    for table in tables_to_upload:
-        file = f'db.{table}.csv'
-        backend.put_archive(
-            db_root, file, table, version, repository,
-            f'{group_id}.'
-            f'{define.DEPEND_TYPE_NAMES[define.DependType.META]}',
-        )
-
-    # release dependencies to removed media
-    # and select according archives for upload
-    media_to_upload = set()
-    db_media = db.files
-    for file in set(depend.media) - set(db_media):
-        media_to_upload.add(depend.archive(file))
-        depend.data.pop(file)
-
-    # update version of altered media and insert new ones
-    for file in db_media:
-        path = os.path.join(db_root, file)
-        if file not in depend:
-            checksum = utils.md5(path)
-            if file in archives:
-                archive = archives[file]
-            else:
-                archive = audeer.uid(from_string=file)
-            channels = audiofile.channels(path)
-            depend.data[file] = [
-                archive, channels, checksum, 0,
-                define.DependType.MEDIA, version,
-            ]
-        elif not depend.removed(file):
-            checksum = utils.md5(path)
-            if checksum != depend.checksum(file):
-                channels = audiofile.channels(path)
-                depend.data[file][define.DependField.CHECKSUM] = channels
-                depend.data[file][define.DependField.CHECKSUM] = checksum
-                depend.data[file][define.DependField.VERSION] = version
-
-    # create a mapping from archives to media and
-    # select archives with new or altered files for upload
-    map_media_to_files = collections.defaultdict(list)
-    for file in depend.media:
-        if not depend.removed(file):
-            map_media_to_files[depend.archive(file)].append(file)
-            if depend.version(file) == version:
-                media_to_upload.add(depend.archive(file))
-
-    # upload new and altered archives if it contains at least one file
-    for archive in media_to_upload:
-        if archive in map_media_to_files:
-            for file in map_media_to_files[archive]:
-                depend.data[file][define.DependField.VERSION] = version
-            backend.put_archive(
-                db_root, map_media_to_files[archive],
-                archive, version, repository,
-                f'{group_id}.'
-                f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
-            )
-
+    # publish dependencies and header
     depend.to_file(dep_path)
-
-    # upload header and dependencies
     backend.put_file(
         db_root, define.DB_HEADER, version, repository, group_id,
     )

@@ -90,6 +90,7 @@ def test_publish(version):
     audb2.publish(
         DB_ROOT, version, archives=archives,
         group_id=pytest.GROUP_ID, backend=BACKEND,
+        num_workers=pytest.NUM_WORKERS,
     )
     versions = audb2.versions(
         DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
@@ -130,4 +131,5 @@ def test_invalid_archives(name):
         audb2.publish(
             DB_ROOT, 'x.x.x', archives=archives,
             group_id=pytest.GROUP_ID, backend=BACKEND,
+            num_workers=pytest.NUM_WORKERS,
         )
