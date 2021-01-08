@@ -18,11 +18,7 @@ def create_archive(
     audeer.mkdir(os.path.dirname(out_file))
     with zipfile.ZipFile(out_file, 'w', zipfile.ZIP_DEFLATED) as zf:
         for file in files:
-            full_file = audeer.safe_path(os.path.join(root, file))
-            if not os.path.exists(full_file):
-                raise FileNotFoundError(
-                    errno.ENOENT, os.strerror(errno.ENOENT), full_file,
-                )
+            full_file = os.path.join(root, file)
             zf.write(full_file, arcname=file)
 
 

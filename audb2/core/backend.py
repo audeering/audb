@@ -60,6 +60,9 @@ class Backend:
         Returns:
             MD5 checksum
 
+        Raises:
+            FileNotFoundError: if file does not exist on backend
+
         """
         raise NotImplementedError()
 
@@ -130,6 +133,9 @@ class Backend:
         Returns:
             extracted files
 
+        Raises:
+            FileNotFoundError: if archive does not exist on backend
+
         """
         with tempfile.TemporaryDirectory() as tmp:
             tmp_root = os.path.join(tmp, os.path.basename(root))
@@ -161,6 +167,9 @@ class Backend:
 
         Returns:
             local file path
+
+        Raises:
+            FileNotFoundError: if file does not exist on backend
 
         """
         raise NotImplementedError()
@@ -242,11 +251,22 @@ class Backend:
             path or URL
 
         Raises:
-            RuntimeError: if archive already exists
+            FileExistsError: if archive already exists on backend
+            FileNotFoundError: if local file does not exist
 
         """
+        root = audeer.safe_path(root)
+
         if isinstance(files, str):
             files = [files]
+
+        for file in files:
+            path = os.path.join(root, file)
+            if not os.path.exists(path):
+                raise FileNotFoundError(
+                    errno.ENOENT, os.strerror(errno.ENOENT), path,
+                )
+
         with tempfile.TemporaryDirectory() as tmp:
             file = f'{name}-{version}.zip'
             outfile = os.path.join(tmp, file)
@@ -282,7 +302,8 @@ class Backend:
             path or URL
 
         Raises:
-            RuntimeError: if file already exists on backend
+            FileExistsError: if file already exists on backend
+            FileNotFoundError: if local file does not exist
 
         """
         raise NotImplementedError()
@@ -347,7 +368,7 @@ class Artifactory(Backend):
             MD5 checksum
 
         Raises:
-            FileNotFoundError: if file does not exist
+            FileNotFoundError: if file does not exist on backend
 
         """
         url = self.destination(
@@ -451,9 +472,10 @@ class Artifactory(Backend):
             local file path
 
         Raises:
-            FileNotFoundError: if file does not exist
+            FileNotFoundError: if file does not exist on backend
 
         """
+        root = audeer.safe_path(root)
 
         url = self.destination(
             file, version, repository=repository,
@@ -465,7 +487,7 @@ class Artifactory(Backend):
                 errno.ENOENT, os.strerror(errno.ENOENT), url,
             )
 
-        path = audeer.safe_path(os.path.join(root, file))
+        path = os.path.join(root, file)
         audeer.mkdir(os.path.dirname(path))
 
         return audfactory.download_artifact(url, path, verbose=False)
@@ -526,9 +548,18 @@ class Artifactory(Backend):
             URL
 
         Raises:
-            FileExistsError: if URL already exists
+            FileExistsError: if URL already exists on backend
+            FileNotFoundError: if local file does not exist
 
         """
+        root = audeer.safe_path(root)
+
+        path = os.path.join(root, file)
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), path,
+            )
+
         name = _alias(file, name)
         _, ext = os.path.splitext(os.path.basename(file))
 
@@ -555,7 +586,7 @@ class Artifactory(Backend):
                     tmp, f'{name}-{version}{ext}'
                 )
                 shutil.copy(
-                    audeer.safe_path(os.path.join(root, file)),
+                    os.path.join(root, file),
                     tmp_file,
                 )
                 return audfactory.upload_artifact(
@@ -639,7 +670,7 @@ class FileSystem(Backend):
             MD5 checksum
 
         Raises:
-            FileNotFoundError: if file does not exist
+            FileNotFoundError: if file does not exist on backend
 
         """
         path = self.destination(
@@ -721,7 +752,7 @@ class FileSystem(Backend):
             *,
             name: str = None,
     ) -> str:
-        r"""Copy file from backend.
+        r"""Get file from backend.
 
         Args:
             root: root directory
@@ -735,9 +766,11 @@ class FileSystem(Backend):
             local file path
 
         Raises:
-            FileNotFoundError: if file does not exist
+            FileNotFoundError: if file does not exist no backend
 
         """
+        root = audeer.safe_path(root)
+
         src_path = self.destination(
             file, version, repository=repository,
             group_id=group_id, name=name,
@@ -748,7 +781,7 @@ class FileSystem(Backend):
                 errno.ENOENT, os.strerror(errno.ENOENT), src_path,
             )
 
-        dst_path = audeer.safe_path(os.path.join(root, file))
+        dst_path = os.path.join(root, file)
         audeer.mkdir(os.path.dirname(dst_path))
         shutil.copy(src_path, dst_path)
 
@@ -805,9 +838,18 @@ class FileSystem(Backend):
             path
 
         Raises:
-            FileExistsError: if file already exists
+            FileExistsError: if file already exists on backend
+            FileNotFoundError: if local file does not exist
 
         """
+        root = audeer.safe_path(root)
+
+        path = os.path.join(root, file)
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), path,
+            )
+
         dst_path = self.destination(
             file, version, repository=repository,
             group_id=group_id, name=name,
@@ -818,7 +860,7 @@ class FileSystem(Backend):
                 errno.EEXIST, os.strerror(errno.EEXIST), dst_path,
             )
 
-        src_path = audeer.safe_path(os.path.join(root, file))
+        src_path = os.path.join(root, file)
         audeer.mkdir(os.path.dirname(dst_path))
         shutil.copy(src_path, dst_path)
 
