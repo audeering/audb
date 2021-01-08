@@ -48,10 +48,15 @@ def test_archive(tmpdir, files, name, group, version, backend):
         audeer.mkdir(os.path.dirname(path))
         with open(path, 'w'):
             pass
-    backend.put_archive(
+
+    path_backend = backend.put_archive(
         tmpdir, files, name, version, repository, group_id,
     )
+    assert backend.put_archive(  # operation will be skipped
+        tmpdir, files, name, version, repository, group_id,
+    ) == path_backend
     assert backend.exists(name + '.zip', version, repository, group_id)
+
     assert backend.get_archive(
         tmpdir, name, version, repository, group_id,
     ) == files_as_list
@@ -93,16 +98,24 @@ def test_file(tmpdir, file, name, version, backend):
     audeer.mkdir(os.path.dirname(path))
     with open(path, 'w'):
         pass
-    backend.put_file(
+
+    assert not backend.exists(file, version, repository, group_id, name=name)
+    backend_path = backend.put_file(
         tmpdir, file, version, repository, group_id, name=name,
     )
     assert backend.exists(file, version, repository, group_id, name=name)
+
     assert path == backend.get_file(
         tmpdir, file, version, repository, group_id, name=name,
     )
     assert backend.checksum(
         file, version, repository, group_id, name=name
     ) == audb2.core.utils.md5(path)
+
+    assert backend.rem_file(
+        file, version, repository, group_id, name=name,
+    ) == backend_path
+    assert not backend.exists(file, version, repository, group_id, name=name)
 
 
 @pytest.mark.parametrize(
@@ -152,6 +165,13 @@ def test_errors(tmpdir, backend):
         )
     with pytest.raises(FileNotFoundError):
         backend.checksum(
+            'does-not-exist',
+            '1.0.0',
+            repository,
+            group_id,
+        )
+    with pytest.raises(FileNotFoundError):
+        backend.rem_file(
             'does-not-exist',
             '1.0.0',
             repository,

@@ -254,30 +254,45 @@ def publish(
 
     # publish tables
     tables = _find_tables(
-        db, db_root, version, depend, num_workers, verbose,
+        db, db_root, version, depend,
+        num_workers, verbose,
     )
     _put_tables(
-        tables, db_root, version, backend,
-        repository, group_id, num_workers, verbose,
+        tables, db_root, version, backend, repository, group_id,
+        num_workers, verbose,
     )
 
     # publish media
     media = _find_media(
-        db, db_root, version, depend, archives, num_workers, verbose,
+        db, db_root, version, depend, archives,
+        num_workers, verbose,
     )
     _put_media(
-        media, db_root, version, depend,
-        backend, repository, group_id, num_workers, verbose,
+        media, db_root, version, depend, backend, repository, group_id,
+        num_workers, verbose,
     )
 
     # publish dependencies and header
     depend.to_file(dep_path)
-    backend.put_file(
-        db_root, define.DB_HEADER, version, repository, group_id,
-    )
     backend.put_archive(
-        db_root, define.DB_DEPEND, audeer.basename_wo_ext(define.DB_DEPEND),
+        db_root, define.DB_DEPEND,
+        audeer.basename_wo_ext(define.DB_DEPEND),
         version, repository, group_id,
     )
+    try:
+        backend.put_file(
+            db_root, define.DB_HEADER, version, repository, group_id,
+        )
+    except Exception:  # pragma: no cover
+        # after the header is published
+        # the new version becomes visible,
+        # so if something goes wrong here
+        # we better clean up
+        if backend.exists(
+                define.DB_HEADER, version, repository, group_id,
+        ):
+            backend.rem_file(
+                define.DB_HEADER, version, repository, group_id,
+            )
 
     return depend

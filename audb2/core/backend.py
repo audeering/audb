@@ -236,6 +236,10 @@ class Backend:
     ) -> str:
         r"""Create archive and put to backend.
 
+        The operation is silently skipped,
+        if an archive with the same checksum
+        already exists on the backend.
+
         Args:
             root: root directory
             files: relative path to file(s)
@@ -267,6 +271,22 @@ class Backend:
             file = f'{name}-{version}.zip'
             outfile = os.path.join(tmp, file)
             utils.create_archive(root, files, outfile)
+
+            # skip if file with same checksum exists already
+            if self.exists(
+                file, version, repository=repository,
+                group_id=group_id, name=name,
+            ):
+                checksum = utils.md5(outfile)
+                if checksum == self.checksum(
+                    file, version, repository=repository,
+                    group_id=group_id, name=name,
+                ):
+                    return self.destination(
+                        file, version, repository=repository,
+                        group_id=group_id, name=name
+                    )
+
             return self.put_file(
                 tmp, file, version, repository=repository,
                 group_id=group_id, name=name,
@@ -297,6 +317,33 @@ class Backend:
 
         Raises:
             FileNotFoundError: if local file does not exist
+
+        """
+        raise NotImplementedError()
+
+    def rem_file(
+            self,
+            file: str,
+            version: str,
+            repository: str,
+            group_id: str,
+            *,
+            name: str = None,
+    ) -> str:  # pragma: no cover
+        r"""Remove file from backend.
+
+        Args:
+            file: relative path to file
+            version: version string
+            repository: repository name
+            group_id: group ID
+            name: alias name of file
+
+        Returns:
+            path or URL of removed file
+
+        Raises:
+            FileNotFoundError: if file does not exist on backend
 
         """
         raise NotImplementedError()
@@ -578,6 +625,46 @@ class Artifactory(Backend):
                     version,
                 )
 
+    def rem_file(
+            self,
+            file: str,
+            version: str,
+            repository: str,
+            group_id: str,
+            *,
+            name: str = None,
+    ) -> str:
+        r"""Remove file from backend.
+
+        Args:
+            file: relative path to file
+            version: version string
+            repository: repository name
+            group_id: group ID
+            name: alias name of file
+
+        Returns:
+            URL of removed file
+
+        Raises:
+            FileNotFoundError: if file does not exist on backend
+
+        """
+        url = self.destination(
+            file, version, repository=repository,
+            group_id=group_id, name=name,
+        )
+
+        path = audfactory.artifactory_path(url)
+        if not path.exists():
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), url,
+            )
+
+        path.unlink()
+
+        return url
+
     def versions(
             self,
             file: str,
@@ -839,6 +926,45 @@ class FileSystem(Backend):
 
         return dst_path
 
+    def rem_file(
+            self,
+            file: str,
+            version: str,
+            repository: str,
+            group_id: str,
+            *,
+            name: str = None,
+    ):
+        r"""Remove file from backend.
+
+        Args:
+            file: relative path to file
+            version: version string
+            repository: repository name
+            group_id: group ID
+            name: alias name of file
+
+        Returns:
+            path of removed file
+
+        Raises:
+            FileNotFoundError: if file does not exist on backend
+
+        """
+        path = self.destination(
+            file, version, repository=repository,
+            group_id=group_id, name=name,
+        )
+
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), path,
+            )
+
+        os.remove(path)
+
+        return path
+
     def versions(
             self,
             file: str,
@@ -847,7 +973,7 @@ class FileSystem(Backend):
             *,
             name: str = None,
     ) -> typing.List[str]:
-        r"""Versions of database.
+        r"""Versions of a file.
 
         Returns:
             list of versions in ascending order
