@@ -1,3 +1,4 @@
+import glob
 import os
 import re
 import typing
@@ -72,6 +73,7 @@ def _filter_media(
 def _filter_tables(
         db_header: audformat.Database,
         db_root: str,
+        db_root_tmp: str,
         flavor: typing.Optional[Flavor],
         depend: Depend,
 ):
@@ -88,7 +90,8 @@ def _filter_tables(
             else:
                 tables = flavor.tables
             db_header.pick_tables(tables)
-            db_header.save(db_root, header_only=True)
+            db_header.save(db_root_tmp, header_only=True)
+            _move_file(db_root_tmp, db_root, define.DB_HEADER)
             for file in depend.tables:
                 if not depend.archive(file) in tables:
                     depend.data.pop(file)
@@ -96,7 +99,8 @@ def _filter_tables(
 
 def _find_media(
         db: audformat.Database,
-        db_root,
+        db_root: str,
+        flavor: typing.Optional[Flavor],
         depend: Depend,
         num_workers: typing.Optional[int],
         verbose: bool,
@@ -108,11 +112,9 @@ def _find_media(
     def job(file: str):
         if not depend.removed(file):
             full_file = os.path.join(db_root, file)
-            if os.path.exists(full_file):
-                checksum = utils.md5(full_file)
-                if checksum != depend.checksum(file):
-                    media.append(file)
-            else:
+            if flavor is not None:
+                full_file = flavor.destination(full_file)
+            if not os.path.exists(full_file):
                 media.append(file)
 
     audeer.run_tasks(
@@ -129,11 +131,16 @@ def _find_media(
 def _find_tables(
         db_header: audformat.Database,
         db_root: str,
-        depend: Depend,
+        flavor: typing.Optional[Flavor],
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
     r"""Find altered and new tables."""
+
+    if flavor is not None and flavor.format is not None:
+        # if a specific format is required always download all tables
+        # as the file extension of referenced media may have changed
+        return [f'db.{table}.csv' for table in db_header.tables]
 
     tables = []
 
@@ -141,11 +148,7 @@ def _find_tables(
 
         file = f'db.{table}.csv'
         full_file = os.path.join(db_root, file)
-        if os.path.exists(full_file):
-            checksum = utils.md5(full_file)
-            if checksum != depend.checksum(file):
-                tables.append(file)
-        else:
+        if not os.path.exists(full_file):
             tables.append(file)
 
     audeer.run_tasks(
@@ -195,6 +198,7 @@ def _fix_file_ext(
 def _get_media(
         media: typing.List[str],
         db_root: str,
+        db_root_tmp: str,
         flavor: typing.Optional[Flavor],
         depend: Depend,
         backend: Backend,
@@ -209,6 +213,7 @@ def _get_media(
     # in os.makedirs when files are unpacked
     for file in media:
         audeer.mkdir(os.path.dirname(os.path.join(db_root, file)))
+        audeer.mkdir(os.path.dirname(os.path.join(db_root_tmp, file)))
 
     # figure out archives
     archives = set()
@@ -219,20 +224,19 @@ def _get_media(
 
     def job(archive: str, version: str):
         files = backend.get_archive(
-            db_root, archive, version, repository,
+            db_root_tmp, archive, version, repository,
             f'{group_id}.'
             f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
         )
-        if flavor is not None:
-            for file in files:
-                src_path = dst_path = os.path.join(db_root, file)
-                if flavor.format is not None:
-                    name, ext = os.path.splitext(src_path)
-                    if ext[1:].lower() != flavor.format:
-                        dst_path = name + '.' + flavor.format
+        for file in files:
+            if flavor is not None:
+                src_path = os.path.join(db_root_tmp, file)
+                file = flavor.destination(file)
+                dst_path = os.path.join(db_root_tmp, file)
                 flavor(src_path, dst_path)
                 if src_path != dst_path:
                     os.remove(src_path)
+            _move_file(db_root_tmp, db_root, file)
 
     audeer.run_tasks(
         job,
@@ -246,6 +250,7 @@ def _get_media(
 def _get_tables(
         tables: typing.List[str],
         db_root: str,
+        db_root_tmp: str,
         depend: Depend,
         backend: Backend,
         repository: str,
@@ -267,9 +272,11 @@ def _get_tables(
         if os.path.exists(path_pkl):
             os.remove(path_pkl)
         backend.get_archive(
-            db_root, depend.archive(table), depend.version(table), repository,
+            db_root_tmp, depend.archive(table),
+            depend.version(table), repository,
             f'{group_id}.{define.DEPEND_TYPE_NAMES[define.DependType.META]}',
         )
+        _move_file(db_root_tmp, db_root, table)
 
     audeer.run_tasks(
         job,
@@ -280,86 +287,41 @@ def _get_tables(
     )
 
 
-def _load(
-        *,
-        name: str,
-        db_root: str,
+def _move_file(
+        root_src: str,
+        root_dst: str,
+        file: str,
+):
+    r"""Move file to another directory."""
+    os.rename(
+        os.path.join(root_src, file),
+        os.path.join(root_dst, file),
+    )
+
+
+def _remove_empty_dirs(root):
+    r"""Remove directories, fails if it contains non-empty sub-folders."""
+
+    files = os.listdir(root)
+    if len(files):
+        for file in files:
+            full_file = os.path.join(root, file)
+            if os.path.isdir(full_file):
+                _remove_empty_dirs(full_file)
+
+    os.rmdir(root)
+
+
+def _save_database(
+        db: audformat.Database,
         version: str,
-        flavor: typing.Optional[Flavor],
-        removed_media: bool,
-        repository: str,
-        group_id: str,
-        backend: Backend,
+        db_root: str,
+        db_root_tmp: str,
+        flavor: Flavor,
         num_workers: typing.Optional[int],
         verbose: bool,
-) -> audformat.Database:
-    r"""Helper function for load()."""
-
-    group_id: str = f'{group_id}.{name}'
-
-    # load database header
-
-    backend.get_file(
-        db_root, define.DB_HEADER, version, repository, group_id,
-    )
-    db_header = audformat.Database.load(db_root, load_data=False)
-
-    # get list with dependencies
-
-    dep_path = backend.get_archive(
-        db_root, audeer.basename_wo_ext(define.DB_DEPEND),
-        version, repository, group_id,
-    )[0]
-    dep_path = os.path.join(db_root, dep_path)
-    depend = Depend()
-    depend.from_file(dep_path)
-
-    # get altered and new tables
-
-    _filter_tables(db_header, db_root, flavor, depend)
-    tables = _find_tables(
-        db_header, db_root, depend, num_workers, verbose,
-    )
-    _get_tables(
-        tables, db_root, depend, backend,
-        repository, group_id, num_workers, verbose,
-    )
-
-    # load database and filter media
-
-    db = audformat.Database.load(db_root)
-    _filter_media(db, flavor, depend, num_workers, verbose)
-
-    # get altered and new media files,
-    # eventually convert them
-
-    if flavor is None or not flavor.only_metadata:
-        media = _find_media(
-            db, db_root, depend, num_workers, verbose,
-        )
-        _get_media(
-            media, db_root, flavor, depend,
-            backend, repository, group_id,
-            num_workers, verbose,
-        )
-
-    # save dependencies
-
-    depend.to_file(dep_path)
-
-    # filter rows referencing removed media
-    # eventually fix file extension
-
-    if not removed_media:
-        db.pick_files(
-            lambda x: not depend.removed(x),
-            num_workers=num_workers,
-            verbose=verbose,
-        )
-    _fix_file_ext(db, flavor, num_workers, verbose)
-
-    # save database
-
+):
+    r"""Save database."""
     if flavor is not None:
         db.meta['audb'] = {
             'root': db_root,
@@ -372,8 +334,113 @@ def _load(
         audformat.define.TableStorageFormat.PICKLE,
     ]:
         db.save(
-            db_root, storage_format=storage_format,
+            db_root_tmp, storage_format=storage_format,
             num_workers=num_workers, verbose=verbose,
+        )
+        _move_file(db_root_tmp, db_root, define.DB_HEADER)
+        for path in glob.glob(
+                os.path.join(db_root_tmp, f'*.{storage_format}')
+        ):
+            file = os.path.relpath(path, db_root_tmp)
+            _move_file(db_root_tmp, db_root, file)
+
+
+def _load(
+        *,
+        name: str,
+        db_root: str,
+        db_root_tmp: str,
+        version: str,
+        flavor: typing.Optional[Flavor],
+        removed_media: bool,
+        repository: str,
+        group_id: str,
+        backend: Backend,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+) -> audformat.Database:
+    r"""Helper function for load()."""
+
+    audeer.mkdir(db_root)
+    audeer.mkdir(db_root_tmp)
+
+    group_id: str = f'{group_id}.{name}'
+
+    # load database header
+
+    backend.get_file(
+        db_root_tmp, define.DB_HEADER, version, repository, group_id,
+    )
+    _move_file(db_root_tmp, db_root, define.DB_HEADER)
+    db_header = audformat.Database.load(db_root, load_data=False)
+
+    # get list with dependencies
+
+    backend.get_archive(
+        db_root_tmp, audeer.basename_wo_ext(define.DB_DEPEND),
+        version, repository, group_id,
+    )
+    dep_path_tmp = os.path.join(db_root_tmp, define.DB_DEPEND)
+    depend = Depend()
+    depend.from_file(dep_path_tmp)
+
+    # get altered and new tables
+
+    _filter_tables(db_header, db_root, db_root_tmp, flavor, depend)
+    tables = _find_tables(
+        db_header, db_root, flavor, num_workers, verbose,
+    )
+    _get_tables(
+        tables, db_root, db_root_tmp, depend,
+        backend, repository, group_id, num_workers, verbose,
+    )
+
+    # load database and filter media
+
+    db = audformat.Database.load(db_root)
+    _filter_media(db, flavor, depend, num_workers, verbose)
+
+    # get altered and new media files,
+    # eventually convert them
+
+    if flavor is None or not flavor.only_metadata:
+        media = _find_media(
+            db, db_root, flavor, depend, num_workers, verbose,
+        )
+        _get_media(
+            media, db_root, db_root_tmp, flavor,
+            depend, backend, repository, group_id,
+            num_workers, verbose,
+        )
+
+    # save dependencies
+
+    depend.to_file(dep_path_tmp)
+    _move_file(db_root_tmp, db_root, define.DB_DEPEND)
+
+    # filter rows referencing removed media
+    # eventually fix file extension
+
+    if not removed_media:
+        db.pick_files(
+            lambda x: not depend.removed(x),
+            num_workers=num_workers,
+            verbose=verbose,
+        )
+    _fix_file_ext(db, flavor, num_workers, verbose)
+
+    # save database and remove the temporal directory
+    # to signal all files were correctly loaded
+    _save_database(
+        db, version, db_root, db_root_tmp, flavor, num_workers, verbose,
+    )
+    try:
+        _remove_empty_dirs(db_root_tmp)
+    except OSError:  # pragma: no cover
+        raise RuntimeError(
+            'Could not remove temporary directory, '
+            'probably there are some leftover files.'
+            'This should not happen.'
         )
 
     return db
@@ -503,6 +570,15 @@ def load(
         exclude=exclude,
     )
 
+    # check if database is already in cache
+    #
+    # db_root -> final destination of database
+    # db_root_tmp -> temporal directory used when loading the database
+    #
+    # db_root does not exist -> start loading database
+    # db_root and db_root_tmp already exist -> continue loading database
+    # only db_root exists -> load database from cache
+    #
     db = None
     cache_roots = [
         default_cache_root(True),  # check shared cache first
@@ -514,7 +590,8 @@ def load(
                 cache_root, flavor.path(name, version, repository, group_id)
             )
         )
-        if os.path.exists(db_root):
+        db_root_tmp = db_root + '~'
+        if os.path.exists(db_root) and not os.path.exists(db_root_tmp):
             db = audformat.Database.load(db_root)
             break
 
@@ -522,6 +599,7 @@ def load(
         db = _load(
             name=name,
             db_root=db_root,
+            db_root_tmp=db_root_tmp,
             version=version,
             flavor=flavor,
             removed_media=removed_media,
@@ -562,6 +640,10 @@ def load_original_to(
     Loads the original state of the database
     to a custom directory.
     No conversion or filtering will be applied.
+    If the target folder already contains
+    some version of the database,
+    it will upgrade to the requested version.
+    Unchanged files will be skipped.
 
     Args:
         root: target directory
@@ -583,10 +665,32 @@ def load_original_to(
         name, version, group_id=group_id, backend=backend,
     )
 
-    root = audeer.safe_path(root)
-    return _load(
+    db_root = audeer.safe_path(root)
+    db_root_tmp = db_root + '~'
+
+    # remove files with a wrong checksum
+    # to ensure we load correct version
+    update = os.path.exists(db_root) and os.listdir(db_root)
+    audeer.mkdir(db_root)
+    backend.get_archive(
+        db_root, audeer.basename_wo_ext(define.DB_DEPEND),
+        version, repository, f'{group_id}.{name}',
+    )
+    if update:
+        dep_path = os.path.join(db_root, define.DB_DEPEND)
+        depend = Depend()
+        depend.from_file(dep_path)
+        for file in depend.files:
+            full_file = os.path.join(db_root, file)
+            if os.path.exists(full_file):
+                checksum = utils.md5(full_file)
+                if checksum != depend.checksum(file):
+                    os.remove(full_file)
+
+    db = _load(
         name=name,
-        db_root=root,
+        db_root=db_root,
+        db_root_tmp=db_root_tmp,
         version=version,
         flavor=None,
         removed_media=True,
@@ -596,3 +700,5 @@ def load_original_to(
         num_workers=num_workers,
         verbose=verbose
     )
+
+    return db

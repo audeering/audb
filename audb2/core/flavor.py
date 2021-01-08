@@ -106,6 +106,28 @@ class Flavor(audobject.Object):
         self.tables = tables
         r"""Table filter."""
 
+    def destination(
+            self,
+            file: str,
+    ) -> str:
+        r"""Return converted file path.
+
+        The file path will only change if the file is converted to a different
+        format.
+
+        Args:
+            file: path to input file
+
+        Returns:
+            path to output file
+
+        """
+        if self.format is not None:
+            name, format = os.path.splitext(file)
+            if format[1:].lower() != self.format:
+                file = name + '.' + self.format
+        return file
+
     def path(
             self,
             name: str,
