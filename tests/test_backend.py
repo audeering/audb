@@ -51,9 +51,7 @@ import audb2
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(
-            pytest.HOST,
-        ),
+        audb2.backend.FileSystem(pytest.HOST),
         audb2.backend.Artifactory(),
     ]
 )
@@ -130,6 +128,9 @@ def test_file(tmpdir, file, name, version, force, backend):
     assert path == backend.get_file(
         tmpdir, file, version, repository, group_id, name=name,
     )
+    assert backend.checksum(
+        file, version, repository, group_id, name=name
+    ) == audb2.core.utils.md5(path)
 
 
 @pytest.mark.parametrize(
@@ -172,6 +173,13 @@ def test_errors(tmpdir, backend):
     with pytest.raises(FileNotFoundError):
         backend.get_archive(
             tmpdir,
+            'does-not-exist',
+            '1.0.0',
+            repository,
+            group_id,
+        )
+    with pytest.raises(FileNotFoundError):
+        backend.checksum(
             'does-not-exist',
             '1.0.0',
             repository,

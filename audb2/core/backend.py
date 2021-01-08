@@ -5,6 +5,8 @@ import shutil
 import tempfile
 import typing
 
+from artifactory import ArtifactoryPath
+
 import audfactory
 import audeer
 
@@ -37,6 +39,29 @@ class Backend:
     ):
         self.host = host
         r"""Host path"""
+
+    def checksum(
+            self,
+            file: str,
+            version: str,
+            repository: str,
+            group_id: str,
+            *,
+            name: str = None,
+    ) -> str:  # pragma: no cover
+        r"""Get MD5 checksum for file on backend.
+
+        Args:
+            version: version string
+            repository: repository name
+            group_id: group ID
+            name: alias name of file
+
+        Returns:
+            MD5 checksum
+
+        """
+        raise NotImplementedError()
 
     def destination(
             self,
@@ -301,6 +326,43 @@ class Artifactory(Backend):
     ):
         super().__init__(host)
 
+    def checksum(
+            self,
+            file: str,
+            version: str,
+            repository: str,
+            group_id: str,
+            *,
+            name: str = None,
+    ) -> str:
+        r"""MD5 checksum of file on backend.
+
+        Args:
+            version: version string
+            repository: repository name
+            group_id: group ID
+            name: alias name of file
+
+        Returns:
+            MD5 checksum
+
+        Raises:
+            FileNotFoundError: if file does not exist
+
+        """
+        url = self.destination(
+            file, version, repository=repository,
+            group_id=group_id, name=name,
+        )
+        path = audfactory.artifactory_path(url)
+
+        if not path.exists():
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), url,
+            )
+
+        return ArtifactoryPath.stat(path).md5
+
     def destination(
             self,
             file: str,
@@ -388,6 +450,9 @@ class Artifactory(Backend):
         Returns:
             local file path
 
+        Raises:
+            FileNotFoundError: if file does not exist
+
         """
 
         url = self.destination(
@@ -461,7 +526,7 @@ class Artifactory(Backend):
             URL
 
         Raises:
-            RuntimeError: if URL already exists on backend
+            FileExistsError: if URL already exists
 
         """
         name = _alias(file, name)
@@ -553,6 +618,42 @@ class FileSystem(Backend):
             self.host, repository, group_id.replace('.', os.path.sep),
         )
 
+    def checksum(
+            self,
+            file: str,
+            version: str,
+            repository: str,
+            group_id: str,
+            *,
+            name: str = None,
+    ) -> str:
+        r"""MD5 checksum of file on backend.
+
+        Args:
+            version: version string
+            repository: repository name
+            group_id: group ID
+            name: alias name of file
+
+        Returns:
+            MD5 checksum
+
+        Raises:
+            FileNotFoundError: if file does not exist
+
+        """
+        path = self.destination(
+            file, version, repository=repository,
+            group_id=group_id, name=name,
+        )
+
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), path,
+            )
+
+        return utils.md5(path)
+
     def destination(
             self,
             file: str,
@@ -633,6 +734,9 @@ class FileSystem(Backend):
         Returns:
             local file path
 
+        Raises:
+            FileNotFoundError: if file does not exist
+
         """
         src_path = self.destination(
             file, version, repository=repository,
@@ -701,7 +805,7 @@ class FileSystem(Backend):
             path
 
         Raises:
-            RuntimeError: if file already exists on backend
+            FileExistsError: if file already exists
 
         """
         dst_path = self.destination(
