@@ -131,16 +131,11 @@ def _find_media(
 def _find_tables(
         db_header: audformat.Database,
         db_root: str,
-        flavor: typing.Optional[Flavor],
+        depend: Depend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
     r"""Find altered and new tables."""
-
-    if flavor is not None and flavor.format is not None:
-        # if a specific format is required always download all tables
-        # as the file extension of referenced media may have changed
-        return [f'db.{table}.csv' for table in db_header.tables]
 
     tables = []
 
@@ -150,6 +145,13 @@ def _find_tables(
         full_file = os.path.join(db_root, file)
         if not os.path.exists(full_file):
             tables.append(file)
+        else:
+            checksum = utils.md5(full_file)
+            # if the table already exists
+            # we have to compare checksum
+            # in case it was altered by flavor
+            if checksum != depend.checksum(file):  # pragma: no cover
+                tables.append(file)
 
     audeer.run_tasks(
         job,
@@ -388,7 +390,7 @@ def _load(
 
     _filter_tables(db_header, db_root, db_root_tmp, flavor, depend)
     tables = _find_tables(
-        db_header, db_root, flavor, num_workers, verbose,
+        db_header, db_root, depend, num_workers, verbose,
     )
     _get_tables(
         tables, db_root, db_root_tmp, depend,
