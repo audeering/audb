@@ -8,43 +8,25 @@ import audb2
 
 
 @pytest.mark.parametrize(
-    'files, name, group, version, force',
+    'files, name, group, version',
     [
         (
             [],
             'empty',
             None,
             '1.0.0',
-            False,
         ),
         (
             'file.ext',
             'not-empty',
             None,
             '1.0.0',
-            False,
         ),
         (
             ['file.ext', os.path.join('dir', 'to', 'file.ext')],
             'not-empty',
             'group',
             '1.0.0',
-            False,
-        ),
-        (
-            ['file.ext', os.path.join('dir', 'to', 'file.ext')],
-            'not-empty',
-            'group',
-            '1.0.0',
-            True,
-        ),
-        pytest.param(
-            ['file.ext', os.path.join('dir', 'to', 'file.ext')],
-            'not-empty',
-            'group',
-            '1.0.0',
-            False,
-            marks=pytest.mark.xfail(raises=FileExistsError),
         ),
     ],
 )
@@ -55,7 +37,7 @@ import audb2
         audb2.backend.Artifactory(),
     ]
 )
-def test_archive(tmpdir, files, name, group, version, force, backend):
+def test_archive(tmpdir, files, name, group, version, backend):
 
     repository = pytest.REPOSITORY_PUBLIC
     group_id = f'{pytest.GROUP_ID}.{group}'
@@ -67,7 +49,7 @@ def test_archive(tmpdir, files, name, group, version, force, backend):
         with open(path, 'w'):
             pass
     backend.put_archive(
-        tmpdir, files, name, version, repository, group_id, force=force,
+        tmpdir, files, name, version, repository, group_id,
     )
     assert backend.exists(name + '.zip', version, repository, group_id)
     assert backend.get_archive(
@@ -76,33 +58,23 @@ def test_archive(tmpdir, files, name, group, version, force, backend):
 
 
 @pytest.mark.parametrize(
-    'file, name, version, force',
+    'file, name, version',
     [
         (
             'file.ext',
             None,
             '1.0.0',
-            False,
         ),
         (
             os.path.join('dir', 'to', 'file.ext'),
             None,
             '1.0.0',
-            False,
         ),
         (
             os.path.join('dir', 'to', 'file.ext'),
             'alias',
             '1.0.0',
-            False,
         ),
-        pytest.param(
-            os.path.join('dir', 'to', 'file.ext'),
-            'alias',
-            '1.0.0',
-            False,
-            marks=pytest.mark.xfail(raises=FileExistsError),
-        )
     ],
 )
 @pytest.mark.parametrize(
@@ -112,7 +84,7 @@ def test_archive(tmpdir, files, name, group, version, force, backend):
         audb2.backend.Artifactory(),
     ]
 )
-def test_file(tmpdir, file, name, version, force, backend):
+def test_file(tmpdir, file, name, version, backend):
 
     repository = pytest.REPOSITORY_PUBLIC
     group_id = f'{pytest.GROUP_ID}.test_file'
@@ -122,7 +94,7 @@ def test_file(tmpdir, file, name, version, force, backend):
     with open(path, 'w'):
         pass
     backend.put_file(
-        tmpdir, file, version, repository, group_id, name=name, force=force,
+        tmpdir, file, version, repository, group_id, name=name,
     )
     assert backend.exists(file, version, repository, group_id, name=name)
     assert path == backend.get_file(

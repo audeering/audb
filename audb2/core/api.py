@@ -451,7 +451,6 @@ def remove_media(
                         db_root, files, archive, version, repository,
                         f'{group_id}.{name}.'
                         f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
-                        force=True,
                     )
 
                     # update dependency
@@ -464,7 +463,7 @@ def remove_media(
                 backend.put_archive(
                     db_root, define.DB_DEPEND,
                     audeer.basename_wo_ext(define.DB_DEPEND),
-                    version, repository, f'{group_id}.{name}', force=True,
+                    version, repository, f'{group_id}.{name}',
                 )
 
 

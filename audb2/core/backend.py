@@ -233,8 +233,6 @@ class Backend:
             version: str,
             repository: str,
             group_id: str,
-            *,
-            force: bool = False,
     ) -> str:
         r"""Create archive and put to backend.
 
@@ -245,13 +243,11 @@ class Backend:
             version: version string
             repository: repository name
             group_id: group ID
-            force: overwrite archive if it exists
 
         Returns:
             path or URL
 
         Raises:
-            FileExistsError: if archive already exists on backend
             FileNotFoundError: if local file does not exist
 
         """
@@ -273,7 +269,7 @@ class Backend:
             utils.create_archive(root, files, outfile)
             return self.put_file(
                 tmp, file, version, repository=repository,
-                group_id=group_id, name=name, force=force,
+                group_id=group_id, name=name,
             )
 
     def put_file(
@@ -285,7 +281,6 @@ class Backend:
             group_id: str,
             *,
             name: str = None,
-            force: bool = False,
     ) -> str:  # pragma: no cover
         r"""Put file to backend.
 
@@ -296,13 +291,11 @@ class Backend:
             repository: repository name
             group_id: group ID
             name: alias name of file
-            force: overwrite archive if it exists
 
         Returns:
             path or URL
 
         Raises:
-            FileExistsError: if file already exists on backend
             FileNotFoundError: if local file does not exist
 
         """
@@ -531,7 +524,6 @@ class Artifactory(Backend):
             group_id: str,
             *,
             name: str = None,
-            force: bool = False,
     ) -> str:
         r"""Upload file to Artifactory.
 
@@ -542,13 +534,11 @@ class Artifactory(Backend):
             repository: repository name
             group_id: group ID
             name: alias name of file
-            force: overwrite archive if it exists
 
         Returns:
             URL
 
         Raises:
-            FileExistsError: if URL already exists on backend
             FileNotFoundError: if local file does not exist
 
         """
@@ -562,15 +552,6 @@ class Artifactory(Backend):
 
         name = _alias(file, name)
         _, ext = os.path.splitext(os.path.basename(file))
-
-        url = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
-        if not force and audfactory.artifactory_path(url).exists():
-            raise FileExistsError(
-                errno.EEXIST, os.strerror(errno.EEXIST), url,
-            )
 
         if file == f'{name}-{version}{ext}':
             return audfactory.upload_artifact(
@@ -821,7 +802,6 @@ class FileSystem(Backend):
             group_id: str,
             *,
             name: str = None,
-            force: bool = False,
     ) -> str:
         r"""Copy file to backend.
 
@@ -832,13 +812,11 @@ class FileSystem(Backend):
             repository: repository name
             group_id: group ID
             name: alias name of file
-            force: overwrite archive if it exists
 
         Returns:
             path
 
         Raises:
-            FileExistsError: if file already exists on backend
             FileNotFoundError: if local file does not exist
 
         """
@@ -854,11 +832,6 @@ class FileSystem(Backend):
             file, version, repository=repository,
             group_id=group_id, name=name,
         )
-
-        if not force and os.path.exists(dst_path):
-            raise FileExistsError(
-                errno.EEXIST, os.strerror(errno.EEXIST), dst_path,
-            )
 
         src_path = os.path.join(root, file)
         audeer.mkdir(os.path.dirname(dst_path))
