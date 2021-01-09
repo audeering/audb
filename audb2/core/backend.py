@@ -356,13 +356,9 @@ class Backend:
 
     def _put_file(
             self,
-            root: str,
-            file: str,
-            name: str,
-            version: str,
-            repository: str,
-            group_id: str,
-    ) -> str:  # pragma: no cover
+            src_path: str,
+            dst_path: str,
+    ):  # pragma: no cover
         r"""Put file to backend."""
         raise NotImplementedError()
 
@@ -413,7 +409,7 @@ class Backend:
         skip = self._exists(dst_path) and \
             utils.md5(src_path) == self._checksum(dst_path)
         if not skip:
-            self._put_file(src_path, file, name, version, repository, group_id)
+            self._put_file(src_path, dst_path)
 
         return dst_path
 
@@ -572,30 +568,24 @@ class Artifactory(Backend):
 
     def _put_file(
             self,
-            path: str,
-            file: str,
-            name: str,
-            version: str,
-            repository: str,
-            group_id: str,
+            src_path: str,
+            dst_path: str,
     ):
         r"""Put file to backend."""
-        name = _alias(file, name)
-        _, ext = os.path.splitext(os.path.basename(file))
+        dst_root = audfactory.artifactory_path(os.path.dirname(dst_path))
+        if not dst_root.exists():
+            dst_root.mkdir()
 
-        if file == f'{name}-{version}{ext}':
-            audfactory.upload_artifact(
-                path, repository, group_id, name, version,
-            )
+        src_name = os.path.basename(src_path)
+        dst_name = os.path.basename(dst_path)
+
+        if src_name == dst_name:
+            dst_root.deploy_file(src_path)
         else:
             with tempfile.TemporaryDirectory() as tmp:
-                tmp_path = os.path.join(
-                    tmp, f'{name}-{version}{ext}'
-                )
-                shutil.copy(path, tmp_path)
-                audfactory.upload_artifact(
-                    tmp_path, repository, group_id, name, version,
-                )
+                tmp_path = os.path.join(tmp, dst_name)
+                os.symlink(src_path, tmp_path)
+                dst_root.deploy_file(tmp_path)
 
     def _rem_file(
             self,
@@ -689,20 +679,12 @@ class FileSystem(Backend):
 
     def _put_file(
             self,
-            path: str,
-            file: str,
-            name: str,
-            version: str,
-            repository: str,
-            group_id: str,
+            src_path: str,
+            dst_path: str,
     ):
         r"""Put file to backend."""
-        dst_path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
         audeer.mkdir(os.path.dirname(dst_path))
-        shutil.copy(path, dst_path)
+        shutil.copy(src_path, dst_path)
 
     def _rem_file(
             self,
