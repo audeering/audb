@@ -301,7 +301,6 @@ class Backend:
             raise RuntimeError(
                 f"Cannot find a version for file '{file}'.",
             )
-        utils.sort_versions(vs)
         return vs[-1]
 
     def put_archive(
