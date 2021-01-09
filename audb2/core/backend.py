@@ -14,11 +14,12 @@ from audb2.core import utils
 from audb2.core.config import config
 
 
-def _alias(file: str, name: str):
-    r"""convert file to alias"""
+def _alias(file: str, name: typing.Optional[str]):
+    r"""Convert file to alias."""
     if name is None:
         if file != os.path.basename(file):
-            name = audeer.uid(from_string=file)
+            # replace file sep with '/' to get same uid on all platforms
+            name = audeer.uid(from_string=file.replace(os.path.sep, '/'))
         else:
             name = audeer.basename_wo_ext(file)
     return name
@@ -40,6 +41,13 @@ class Backend:
         self.host = host
         r"""Host path"""
 
+    def _checksum(
+            self,
+            path: str,
+    ) -> str:  # pragma: no cover
+        r"""MD5 checksum of file on backend."""
+        raise NotImplementedError()
+
     def checksum(
             self,
             file: str,
@@ -48,10 +56,11 @@ class Backend:
             group_id: str,
             *,
             name: str = None,
-    ) -> str:  # pragma: no cover
+    ) -> str:
         r"""Get MD5 checksum for file on backend.
 
         Args:
+            file: file name
             version: version string
             repository: repository name
             group_id: group ID
@@ -64,6 +73,30 @@ class Backend:
             FileNotFoundError: if file does not exist on backend
 
         """
+        path = self.destination(
+            file, version, repository=repository,
+            group_id=group_id, name=name,
+        )
+
+        if not self.exists(
+                file, version, repository=repository,
+                group_id=group_id, name=name,
+        ):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), path,
+            )
+
+        return self._checksum(path)
+
+    def _destination(
+            self,
+            name: str,
+            ext: str,
+            version: str,
+            repository: str,
+            group_id: str,
+    ) -> str:  # pragma: no cover
+        r"""File path on backend."""
         raise NotImplementedError()
 
     def destination(
@@ -74,20 +107,29 @@ class Backend:
             group_id: str,
             *,
             name: str = None,
-    ) -> str:  # pragma: no cover
-        r"""File path or URL on backend.
+    ) -> str:
+        r"""File path on backend.
 
         Args:
-            file: file path relative to root
+            file: file name
             version: version string
             repository: repository name
             group_id: group ID
             name: alias name of file
 
         Returns:
-            path or URL
+            file path on backend
 
         """
+        name = _alias(file, name)
+        _, ext = os.path.splitext(os.path.basename(file))
+        return self._destination(name, ext, version, repository, group_id)
+
+    def _exists(
+            self,
+            path: str,
+    ) -> bool:  # pragma: no cover
+        r"""Check if file exists on backend."""
         raise NotImplementedError()
 
     def exists(
@@ -98,10 +140,11 @@ class Backend:
             group_id: str,
             *,
             name: str = None,
-    ) -> bool:  # pragma: no cover
-        r"""Check if file or URL exists on backend.
+    ) -> bool:
+        r"""Check if file exists on backend.
 
         Args:
+            file: file name
             version: version string
             repository: repository name
             group_id: group ID
@@ -111,7 +154,11 @@ class Backend:
             ``True`` if file exists
 
         """
-        raise NotImplementedError()
+        path = self.destination(
+            file, version, repository=repository,
+            group_id=group_id, name=name,
+        )
+        return self._exists(path)
 
     def get_archive(
             self,
@@ -145,6 +192,14 @@ class Backend:
             )
             return audeer.extract_archive(path, root)
 
+    def _get_file(
+            self,
+            src_path: str,
+            dst_path: str,
+    ) -> str:  # pragma: no cover
+        r"""Get file from backend."""
+        raise NotImplementedError()
+
     def get_file(
             self,
             root: str,
@@ -154,7 +209,7 @@ class Backend:
             group_id: str,
             *,
             name: str = None,
-    ) -> str:  # pragma: no cover
+    ) -> str:
         r"""Get file from backend.
 
         Args:
@@ -166,12 +221,36 @@ class Backend:
             name: alias name of file
 
         Returns:
-            local file path
+            full path to local file
 
         Raises:
             FileNotFoundError: if file does not exist on backend
 
         """
+        src_path = self.destination(
+            file, version, repository=repository,
+            group_id=group_id, name=name,
+        )
+        if not self._exists(src_path):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), src_path,
+            )
+
+        root = audeer.safe_path(root)
+        dst_path = os.path.join(root, file)
+        audeer.mkdir(os.path.dirname(dst_path))
+
+        self._get_file(src_path, dst_path)
+
+        return dst_path
+
+    def _glob(
+            self,
+            pattern: str,
+            repository: str,
+            group_id: str,
+    ) -> typing.List[str]:  # pragma: no cover
+        r"""Return matching files names."""
         raise NotImplementedError()
 
     def glob(
@@ -179,7 +258,7 @@ class Backend:
             pattern: str,
             repository: str,
             group_id: str,
-    ) -> typing.List[str]:  # pragma: no cover
+    ) -> typing.List[str]:
         r"""Return matching files names.
 
         Use ``'**'`` to scan into sub-directories.
@@ -190,10 +269,10 @@ class Backend:
             group_id: group ID
 
         Returns:
-            file names
+            matching files on backend
 
         """
-        raise NotImplementedError()
+        return self._glob(pattern, repository, group_id)
 
     def latest_version(
             self,
@@ -234,7 +313,7 @@ class Backend:
             repository: str,
             group_id: str,
     ) -> str:
-        r"""Create archive and put to backend.
+        r"""Create archive and put on backend.
 
         The operation is silently skipped,
         if an archive with the same checksum
@@ -249,10 +328,10 @@ class Backend:
             group_id: group ID
 
         Returns:
-            path or URL
+            archive path on backend
 
         Raises:
-            FileNotFoundError: if local file does not exist
+            FileNotFoundError: if one or more files do not exist
 
         """
         root = audeer.safe_path(root)
@@ -269,29 +348,24 @@ class Backend:
 
         with tempfile.TemporaryDirectory() as tmp:
             file = f'{name}-{version}.zip'
-            outfile = os.path.join(tmp, file)
-            utils.create_archive(root, files, outfile)
-
-            # skip if file with same checksum exists already
-            if self.exists(
-                file, version, repository=repository,
-                group_id=group_id, name=name,
-            ):
-                checksum = utils.md5(outfile)
-                if checksum == self.checksum(
-                    file, version, repository=repository,
-                    group_id=group_id, name=name,
-                ):
-                    return self.destination(
-                        file, version, repository=repository,
-                        group_id=group_id, name=name
-                    )
-
+            utils.create_archive(root, files, os.path.join(tmp, file))
             return self.put_file(
                 tmp, file, version, repository=repository,
                 group_id=group_id, name=name,
             )
 
+    def _put_file(
+            self,
+            root: str,
+            file: str,
+            name: str,
+            version: str,
+            repository: str,
+            group_id: str,
+    ) -> str:  # pragma: no cover
+        r"""Put file to backend."""
+        raise NotImplementedError()
+
     def put_file(
             self,
             root: str,
@@ -301,8 +375,12 @@ class Backend:
             group_id: str,
             *,
             name: str = None,
-    ) -> str:  # pragma: no cover
-        r"""Put file to backend.
+    ):
+        r"""Put file on backend.
+
+        The operation is silently skipped,
+        if a file with the same checksum
+        already exists on the backend.
 
         Args:
             root: root directory
@@ -313,12 +391,37 @@ class Backend:
             name: alias name of file
 
         Returns:
-            path or URL
+            file path on backend
 
         Raises:
             FileNotFoundError: if local file does not exist
 
         """
+        root = audeer.safe_path(root)
+        src_path = os.path.join(root, file)
+        if not os.path.exists(src_path):
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), src_path,
+            )
+
+        dst_path = self.destination(
+            file, version, repository=repository,
+            group_id=group_id, name=name,
+        )
+
+        # skip if file with same checksum exists on backend
+        skip = self._exists(dst_path) and \
+            utils.md5(src_path) == self._checksum(dst_path)
+        if not skip:
+            self._put_file(src_path, file, name, version, repository, group_id)
+
+        return dst_path
+
+    def _rem_file(
+            self,
+            path: str,
+    ):  # pragma: no cover
+        r"""Remove file from backend."""
         raise NotImplementedError()
 
     def rem_file(
@@ -329,7 +432,7 @@ class Backend:
             group_id: str,
             *,
             name: str = None,
-    ) -> str:  # pragma: no cover
+    ) -> str:
         r"""Remove file from backend.
 
         Args:
@@ -340,330 +443,33 @@ class Backend:
             name: alias name of file
 
         Returns:
-            path or URL of removed file
+            path of removed file on backend
 
         Raises:
             FileNotFoundError: if file does not exist on backend
 
         """
-        raise NotImplementedError()
-
-    def versions(
-            self,
-            file: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
-    ) -> typing.List[str]:  # pragma: no cover
-        r"""Versions of a file.
-
-        Args:
-            file: relative path to file
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            list of versions
-
-        """
-        raise NotImplementedError()
-
-
-class Artifactory(Backend):
-    r"""Artifactory backend.
-
-    Stores files and archives on Artifactory.
-
-    Args:
-        host: host address
-
-    """
-
-    def __init__(
-            self,
-            host=config.ARTIFACTORY_HOST,
-    ):
-        super().__init__(host)
-
-    def checksum(
-            self,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
-    ) -> str:
-        r"""MD5 checksum of file on backend.
-
-        Args:
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            MD5 checksum
-
-        Raises:
-            FileNotFoundError: if file does not exist on backend
-
-        """
-        url = self.destination(
+        path = self.destination(
             file, version, repository=repository,
             group_id=group_id, name=name,
         )
-        path = audfactory.artifactory_path(url)
-
-        if not path.exists():
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), url,
-            )
-
-        return ArtifactoryPath.stat(path).md5
-
-    def destination(
-            self,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
-    ) -> str:
-        r"""URL of a file on Artifactory.
-
-        Args:
-            file: file path relative to root
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            URL
-
-        """
-        if name is None:
-            if file != os.path.basename(file):
-                name = audeer.uid(from_string=file)
-            else:
-                name = audeer.basename_wo_ext(file)
-        _, ext = os.path.splitext(os.path.basename(file))
-        server_url = audfactory.server_url(
-            group_id,
-            name=name,
-            repository=repository,
-            version=version,
-        )
-        return f'{server_url}/{name}-{version}{ext}'
-
-    def exists(
-            self,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
-    ) -> bool:
-        r"""Check if URL exists.
-
-        Args:
-            file: file path relative to root
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            ``True`` if URL exists
-
-        """
-        url = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
-        return audfactory.artifactory_path(url).exists()
-
-    def get_file(
-            self,
-            root: str,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
-    ) -> str:
-        r"""Download file from Artifactory.
-
-        Args:
-            root: root directory
-            file: file path relative to root
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            local file path
-
-        Raises:
-            FileNotFoundError: if file does not exist on backend
-
-        """
-        root = audeer.safe_path(root)
-
-        url = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
-
-        if not audfactory.artifactory_path(url).exists():
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), url,
-            )
-
-        path = os.path.join(root, file)
-        audeer.mkdir(os.path.dirname(path))
-
-        return audfactory.download_artifact(url, path, verbose=False)
-
-    def glob(
-            self,
-            pattern: str,
-            repository: str,
-            group_id: str,
-    ) -> typing.List[str]:
-        r"""Return matching files names.
-
-        Use ``'**'`` to scan into sub-directories.
-
-        Args:
-            pattern: pattern string
-            repository: repository name
-            group_id: group ID
-
-        Returns:
-            file names
-
-        """
-        url = audfactory.server_url(
-            group_id,
-            repository=repository,
-        )
-        path = audfactory.artifactory_path(url)
-        try:
-            result = [str(x) for x in path.glob(pattern)]
-        except RuntimeError:  # pragma: no cover
-            result = []
-        return result
-
-    def put_file(
-            self,
-            root: str,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
-    ) -> str:
-        r"""Upload file to Artifactory.
-
-        Args:
-            root: root directory
-            file: relative path to file
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            URL
-
-        Raises:
-            FileNotFoundError: if local file does not exist
-
-        """
-        root = audeer.safe_path(root)
-
-        path = os.path.join(root, file)
-        if not os.path.exists(path):
+        if not self._exists(path):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), path,
             )
 
-        name = _alias(file, name)
-        _, ext = os.path.splitext(os.path.basename(file))
+        self._rem_file(path)
 
-        if file == f'{name}-{version}{ext}':
-            return audfactory.upload_artifact(
-                os.path.join(root, file),
-                repository,
-                group_id,
-                name,
-                version,
-            )
-        else:
-            with tempfile.TemporaryDirectory() as tmp:
-                tmp_file = os.path.join(
-                    tmp, f'{name}-{version}{ext}'
-                )
-                shutil.copy(
-                    os.path.join(root, file),
-                    tmp_file,
-                )
-                return audfactory.upload_artifact(
-                    tmp_file,
-                    repository,
-                    group_id,
-                    name,
-                    version,
-                )
+        return path
 
-    def rem_file(
+    def _versions(
             self,
-            file: str,
-            version: str,
+            name: str,
             repository: str,
             group_id: str,
-            *,
-            name: str = None,
-    ) -> str:
-        r"""Remove file from backend.
-
-        Args:
-            file: relative path to file
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            URL of removed file
-
-        Raises:
-            FileNotFoundError: if file does not exist on backend
-
-        """
-        url = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
-
-        path = audfactory.artifactory_path(url)
-        if not path.exists():
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), url,
-            )
-
-        path.unlink()
-
-        return url
+    ) -> typing.List[str]:  # pragma: no cover
+        r"""Versions of a file."""
+        raise NotImplementedError()
 
     def versions(
             self,
@@ -686,11 +492,126 @@ class Artifactory(Backend):
 
         """
         name = _alias(file, name)
-        return audfactory.versions(
+        vs = self._versions(name, repository, group_id)
+        utils.sort_versions(vs)
+        return vs
+
+
+class Artifactory(Backend):
+    r"""Artifactory backend.
+
+    Stores files and archives on Artifactory.
+
+    Args:
+        host: host address
+
+    """
+
+    def __init__(
+            self,
+            host=config.ARTIFACTORY_HOST,
+    ):
+        super().__init__(host)
+
+    def _checksum(
+            self,
+            path: str,
+    ) -> str:
+        r"""MD5 checksum of file on backend."""
+        return ArtifactoryPath.stat(audfactory.artifactory_path(path)).md5
+
+    def _destination(
+            self,
+            name: str,
+            ext: str,
+            version: str,
+            repository: str,
+            group_id: str,
+    ) -> str:
+        r"""File path on backend."""
+        server_url = audfactory.server_url(
             group_id,
-            name,
+            name=name,
+            repository=repository,
+            version=version,
+        )
+        return f'{server_url}/{name}-{version}{ext}'
+
+    def _exists(
+            self,
+            path: str,
+    ) -> bool:
+        r"""Check if file exists on backend."""
+        return audfactory.artifactory_path(path).exists()
+
+    def _get_file(
+            self,
+            src_path: str,
+            dst_path: str,
+    ):
+        r"""Get file from backend."""
+        audfactory.download_artifact(src_path, dst_path, verbose=False)
+
+    def _glob(
+            self,
+            pattern: str,
+            repository: str,
+            group_id: str,
+    ) -> typing.List[str]:
+        r"""Return matching files names."""
+        url = audfactory.server_url(
+            group_id,
             repository=repository,
         )
+        path = audfactory.artifactory_path(url)
+        try:
+            result = [str(x) for x in path.glob(pattern)]
+        except RuntimeError:  # pragma: no cover
+            result = []
+        return result
+
+    def _put_file(
+            self,
+            path: str,
+            file: str,
+            name: str,
+            version: str,
+            repository: str,
+            group_id: str,
+    ):
+        r"""Put file to backend."""
+        name = _alias(file, name)
+        _, ext = os.path.splitext(os.path.basename(file))
+
+        if file == f'{name}-{version}{ext}':
+            audfactory.upload_artifact(
+                path, repository, group_id, name, version,
+            )
+        else:
+            with tempfile.TemporaryDirectory() as tmp:
+                tmp_path = os.path.join(
+                    tmp, f'{name}-{version}{ext}'
+                )
+                shutil.copy(path, tmp_path)
+                audfactory.upload_artifact(
+                    tmp_path, repository, group_id, name, version,
+                )
+
+    def _rem_file(
+            self,
+            path: str,
+    ):
+        r"""Remove file from backend."""
+        audfactory.artifactory_path(path).unlink()
+
+    def _versions(
+            self,
+            name: str,
+            repository: str,
+            group_id: str,
+    ) -> typing.List[str]:
+        r"""Versions of a file."""
+        return audfactory.versions(group_id, name, repository=repository)
 
 
 class FileSystem(Backend):
@@ -717,269 +638,86 @@ class FileSystem(Backend):
             self.host, repository, group_id.replace('.', os.path.sep),
         )
 
-    def checksum(
+    def _checksum(
             self,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
+            path: str,
     ) -> str:
-        r"""MD5 checksum of file on backend.
-
-        Args:
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            MD5 checksum
-
-        Raises:
-            FileNotFoundError: if file does not exist on backend
-
-        """
-        path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
-
-        if not os.path.exists(path):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), path,
-            )
-
+        r"""MD5 checksum of file on backend."""
         return utils.md5(path)
 
-    def destination(
+    def _destination(
             self,
-            file: str,
+            name: str,
+            ext: str,
             version: str,
             repository: str,
             group_id: str,
-            *,
-            name: str = None,
     ) -> str:
-        r"""File path on backend.
-
-        Args:
-            file: file path relative to root
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            path
-
-        """
-        name = _alias(file, name)
-        _, ext = os.path.splitext(os.path.basename(file))
+        r"""File path on backend."""
         return os.path.join(
             self._root(repository, group_id),
             name, version, f'{name}-{version}{ext}',
         )
 
-    def exists(
+    def _exists(
             self,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
+            path: str,
     ) -> bool:
-        r"""Check if file exists on backend.
-
-        Args:
-            file: file path relative to root
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            ``True`` if file exists
-
-        """
-        path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
+        r"""Check if file exists on backend."""
         return os.path.exists(path)
 
-    def get_file(
+    def _get_file(
             self,
-            root: str,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
-    ) -> str:
-        r"""Get file from backend.
-
-        Args:
-            root: root directory
-            file: file path relative to root
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            local file path
-
-        Raises:
-            FileNotFoundError: if file does not exist no backend
-
-        """
-        root = audeer.safe_path(root)
-
-        src_path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
-
-        if not os.path.exists(src_path):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), src_path,
-            )
-
-        dst_path = os.path.join(root, file)
-        audeer.mkdir(os.path.dirname(dst_path))
+            src_path: str,
+            dst_path: str,
+    ):
+        r"""Get file from backend."""
         shutil.copy(src_path, dst_path)
 
-        return dst_path
-
-    def glob(
+    def _glob(
             self,
             pattern: str,
             repository: str,
             group_id: str,
     ) -> typing.List[str]:
-        r"""Return matching files names.
-
-        Use ``'**'`` to scan into sub-directories.
-
-        Args:
-            pattern: pattern string
-            repository: repository name
-            group_id: group ID
-
-        Returns:
-            file names
-
-        """
+        r"""Return matching files names."""
         root = os.path.join(
             self.host, repository, group_id.replace('.', os.path.sep),
         )
         path = os.path.join(root, pattern)
         return [os.path.join(root, p) for p in glob.glob(path, recursive=True)]
 
-    def put_file(
+    def _put_file(
             self,
-            root: str,
+            path: str,
             file: str,
+            name: str,
             version: str,
             repository: str,
             group_id: str,
-            *,
-            name: str = None,
-    ) -> str:
-        r"""Copy file to backend.
-
-        Args:
-            root: root directory
-            file: relative path to file
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            path
-
-        Raises:
-            FileNotFoundError: if local file does not exist
-
-        """
-        root = audeer.safe_path(root)
-
-        path = os.path.join(root, file)
-        if not os.path.exists(path):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), path,
-            )
-
+    ):
+        r"""Put file to backend."""
         dst_path = self.destination(
             file, version, repository=repository,
             group_id=group_id, name=name,
         )
-
-        src_path = os.path.join(root, file)
         audeer.mkdir(os.path.dirname(dst_path))
-        shutil.copy(src_path, dst_path)
+        shutil.copy(path, dst_path)
 
-        return dst_path
-
-    def rem_file(
+    def _rem_file(
             self,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
+            path: str,
     ):
-        r"""Remove file from backend.
-
-        Args:
-            file: relative path to file
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            path of removed file
-
-        Raises:
-            FileNotFoundError: if file does not exist on backend
-
-        """
-        path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
-
-        if not os.path.exists(path):
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), path,
-            )
-
+        r"""Remove file from backend."""
         os.remove(path)
 
-        return path
-
-    def versions(
+    def _versions(
             self,
-            file: str,
+            name: str,
             repository: str,
             group_id: str,
-            *,
-            name: str = None,
     ) -> typing.List[str]:
-        r"""Versions of a file.
-
-        Returns:
-            list of versions in ascending order
-
-        """
-        name = _alias(file, name)
+        r"""Versions of a file."""
         root = os.path.join(self._root(repository, group_id), name)
         vs = []
         if os.path.exists(root):
@@ -987,5 +725,4 @@ class FileSystem(Backend):
                 v for v in os.listdir(root)
                 if os.path.isdir(os.path.join(root, v))
             ]
-        utils.sort_versions(vs)
         return vs

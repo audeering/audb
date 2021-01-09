@@ -100,9 +100,12 @@ def test_file(tmpdir, file, name, version, backend):
         pass
 
     assert not backend.exists(file, version, repository, group_id, name=name)
-    backend_path = backend.put_file(
+    path_backend = backend.put_file(
         tmpdir, file, version, repository, group_id, name=name,
     )
+    assert backend.put_file(  # operation will be skipped
+        tmpdir, file, version, repository, group_id, name=name,
+    ) == path_backend
     assert backend.exists(file, version, repository, group_id, name=name)
 
     assert path == backend.get_file(
@@ -114,7 +117,7 @@ def test_file(tmpdir, file, name, version, backend):
 
     assert backend.rem_file(
         file, version, repository, group_id, name=name,
-    ) == backend_path
+    ) == path_backend
     assert not backend.exists(file, version, repository, group_id, name=name)
 
 
