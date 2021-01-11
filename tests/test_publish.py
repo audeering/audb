@@ -5,6 +5,7 @@ import pytest
 
 import audformat.testing
 import audeer
+import audiofile
 
 import audb2
 
@@ -87,7 +88,7 @@ def test_publish(version):
             audb2.latest_version(DB_NAME, backend=BACKEND)
 
     archives = db['files']['speaker'].get().dropna().to_dict()
-    audb2.publish(
+    depend = audb2.publish(
         DB_ROOT, version, archives=archives,
         group_id=pytest.GROUP_ID, backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
@@ -116,6 +117,10 @@ def test_publish(version):
             f'{pytest.GROUP_ID}.{db.name}.media',
             name=archives[file] if file in archives else None,
         )
+        path = os.path.join(DB_ROOT, file)
+        assert depend.channels(file) == audiofile.channels(path)
+        assert depend.checksum(file) == audb2.core.utils.md5(path)
+        assert depend.duration(file) == audiofile.duration(path)
 
 
 @pytest.mark.parametrize(

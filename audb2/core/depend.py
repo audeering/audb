@@ -139,6 +139,18 @@ class Depend:
         """
         return self[file][define.DependField.CHECKSUM]
 
+    def duration(self, file: str) -> float:
+        r"""Duration of file.
+
+        Args:
+            file: relative file path
+
+        Returns:
+            duration in seconds
+
+        """
+        return self[file][define.DependField.DURATION]
+
     def from_file(
             self,
             path: str,

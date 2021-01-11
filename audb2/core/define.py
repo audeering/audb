@@ -11,15 +11,17 @@ class DependField:
     ARCHIVE = 0
     CHANNELS = 1
     CHECKSUM = 2
-    REMOVED = 3
-    TYPE = 4
-    VERSION = 5
+    DURATION = 3
+    REMOVED = 4
+    TYPE = 5
+    VERSION = 6
 
 
 DEPEND_FIELD_NAMES = {
     DependField.ARCHIVE: 'archive',
     DependField.CHANNELS: 'channels',
     DependField.CHECKSUM: 'checksum',
+    DependField.DURATION: 'duration',
     DependField.REMOVED: 'removed',
     DependField.TYPE: 'type',
     DependField.VERSION: 'version',
