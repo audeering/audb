@@ -583,7 +583,11 @@ class Artifactory(Backend):
         else:
             with tempfile.TemporaryDirectory() as tmp:
                 tmp_path = os.path.join(tmp, dst_name)
-                os.symlink(src_path, tmp_path)
+                # TODO: remove pragma when we get back Windows tests
+                if os.name == 'nt':  # pragma: no cover
+                    shutil.copy(src_path, tmp_path)
+                else:
+                    os.symlink(src_path, tmp_path)
                 dst_root.deploy_file(tmp_path)
 
     def _rem_file(
