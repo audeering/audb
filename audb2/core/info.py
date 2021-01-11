@@ -1,11 +1,14 @@
 import tempfile
 import typing
 
+import pandas as pd
+
 import audformat
 
 from audb2.core import define
 from audb2.core.api import (
     default_backend,
+    dependencies,
     repository_and_version,
 )
 from audb2.core.backend import Backend
@@ -35,6 +38,34 @@ def description(
         name, group_id=group_id, version=version, backend=backend,
     )
     return db.description
+
+
+def duration(
+        name: str,
+        *,
+        version: str = None,
+        group_id: str = config.GROUP_ID,
+        backend: Backend = None,
+) -> pd.Timedelta:
+    """Total media duration.
+
+    Args:
+        name: name of database
+        group_id: group ID of database
+        version: version of database
+        backend: backend object
+
+    Returns:
+        duration
+
+    """
+    depend = dependencies(
+        name, group_id=group_id, version=version, backend=backend,
+    )
+    return pd.to_timedelta(
+        sum([depend.duration(file) for file in depend.media]),
+        unit='s',
+    )
 
 
 def header(

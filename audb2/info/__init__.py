@@ -28,6 +28,7 @@ You can run:
 """
 from audb2.core.info import (
     description,
+    duration,
     header,
     languages,
     media,

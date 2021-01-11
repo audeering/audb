@@ -22,18 +22,5 @@ You can visualize dependencies of a database with:
 
     depend = audb2.dependencies('emodb', version='1.0.1')
     depend()
-
-From the dependencies you can easily calculate the total
-duration of all media files in the database:
-
-.. jupyter-execute::
-
-    import pandas as pd
-
-
-    pd.to_timedelta(
-        sum([depend.duration(file) for file in depend.media]),
-        unit='s',
-    )
     
 .. _audformat: http://tools.pp.audeering.com/audata/data-format.html

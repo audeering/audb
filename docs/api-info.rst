@@ -8,6 +8,11 @@ description
 
 .. autofunction:: description
 
+duration
+--------
+
+.. autofunction:: duration
+
 header
 ------
 

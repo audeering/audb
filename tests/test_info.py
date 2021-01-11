@@ -1,6 +1,7 @@
 import os
 import shutil
 
+import pandas as pd
 import pytest
 
 import audformat.testing
@@ -78,12 +79,23 @@ def fixture_clear_cache():
 
 
 def test_info():
+
+    depend = audb2.dependencies(
+        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
+    )
+
     assert str(audb2.info.header(
         DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
     )) == str(DB)
     assert audb2.info.description(
         DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
     ) == DB.description
+    assert audb2.info.duration(
+        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
+    ) == pd.to_timedelta(
+        sum([depend.duration(file) for file in depend.media]),
+        unit='s',
+    )
     assert audb2.info.languages(
         DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
     ) == DB.languages

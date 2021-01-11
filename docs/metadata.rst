@@ -42,4 +42,13 @@ or if you are only interested in table information:
         version='1.0.1',
     )
 
+And to get the total duration of all media files:
+
+.. jupyter-execute::
+
+    audb2.info.duration(
+        'emodb',
+        version='1.0.1',
+    )
+
 See :mod:`audb2.info` for a list of all available options.
