@@ -571,24 +571,11 @@ class Artifactory(Backend):
             dst_path: str,
     ):
         r"""Put file to backend."""
-        dst_root = audfactory.artifactory_path(os.path.dirname(dst_path))
-        if not dst_root.exists():
-            dst_root.mkdir()
-
-        src_name = os.path.basename(src_path)
-        dst_name = os.path.basename(dst_path)
-
-        if src_name == dst_name:
-            dst_root.deploy_file(src_path)
-        else:
-            with tempfile.TemporaryDirectory() as tmp:
-                tmp_path = os.path.join(tmp, dst_name)
-                # TODO: remove pragma when we get back Windows tests
-                if os.name == 'nt':  # pragma: no cover
-                    shutil.copy(src_path, tmp_path)
-                else:
-                    os.symlink(src_path, tmp_path)
-                dst_root.deploy_file(tmp_path)
+        dst_path = audfactory.artifactory_path(dst_path)
+        if not dst_path.parent.exists():
+            dst_path.parent.mkdir()
+        with open(src_path, "rb") as fobj:
+            dst_path.deploy(fobj, md5=utils.md5(src_path))
 
     def _rem_file(
             self,
