@@ -7,7 +7,7 @@ import audb2
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
 audb2.config.GROUP_ID = pytest.GROUP_ID
-audb2.config.REPOSITORY_PUBLIC = pytest.REPOSITORY_PUBLIC
+audb2.config.REPOSITORIES = [pytest.REPOSITORY]
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 

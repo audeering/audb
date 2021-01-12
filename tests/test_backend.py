@@ -39,7 +39,7 @@ import audb2
 )
 def test_archive(tmpdir, files, name, group, version, backend):
 
-    repository = pytest.REPOSITORY_PUBLIC
+    repository = pytest.REPOSITORY
     group_id = f'{pytest.GROUP_ID}.{group}'
 
     files_as_list = [files] if isinstance(files, str) else files
@@ -91,7 +91,7 @@ def test_archive(tmpdir, files, name, group, version, backend):
 )
 def test_file(tmpdir, file, name, version, backend):
 
-    repository = pytest.REPOSITORY_PUBLIC
+    repository = pytest.REPOSITORY
     group_id = f'{pytest.GROUP_ID}.test_file'
 
     path = os.path.join(tmpdir, file)
@@ -130,7 +130,7 @@ def test_file(tmpdir, file, name, version, backend):
 )
 def test_errors(tmpdir, backend):
 
-    repository = pytest.REPOSITORY_PUBLIC
+    repository = pytest.REPOSITORY
     group_id = f'{pytest.GROUP_ID}.test_errors'
 
     with pytest.raises(FileNotFoundError):
@@ -198,7 +198,7 @@ def test_errors(tmpdir, backend):
 )
 def test_glob(tmpdir, files, backend):
 
-    repository = pytest.REPOSITORY_PUBLIC
+    repository = pytest.REPOSITORY
     group_id = f'{pytest.GROUP_ID}.test_glob'
 
     paths = []
@@ -223,7 +223,7 @@ def test_glob(tmpdir, files, backend):
 )
 def test_versions(tmpdir, backend):
 
-    repository = pytest.REPOSITORY_PUBLIC
+    repository = pytest.REPOSITORY
     group_id = f'{pytest.GROUP_ID}.test_versions'
     file = 'db.yaml'
 

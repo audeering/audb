@@ -14,7 +14,7 @@ import audb2
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
 audb2.config.GROUP_ID = pytest.GROUP_ID
-audb2.config.REPOSITORY_PUBLIC = pytest.REPOSITORY_PUBLIC
+audb2.config.REPOSITORIES = [pytest.REPOSITORY]
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
@@ -72,8 +72,8 @@ def fixture_publish_db():
     db.save(DB_ROOT_VERSION['1.0.0'])
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb2.publish(
-        DB_ROOT_VERSION['1.0.0'], '1.0.0', archives=archives,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
+        DB_ROOT_VERSION['1.0.0'], '1.0.0', pytest.REPOSITORY,
+        archives=archives, group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
     # publish 1.1.0, add table
@@ -90,7 +90,7 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
     )
     audb2.publish(
-        DB_ROOT_VERSION['1.1.0'], '1.1.0',
+        DB_ROOT_VERSION['1.1.0'], '1.1.0', pytest.REPOSITORY,
         group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
@@ -105,7 +105,7 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
     )
     audb2.publish(
-        DB_ROOT_VERSION['1.1.1'], '1.1.1',
+        DB_ROOT_VERSION['1.1.1'], '1.1.1', pytest.REPOSITORY,
         group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
@@ -126,7 +126,7 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
     )
     audb2.publish(
-        DB_ROOT_VERSION['2.0.0'], '2.0.0',
+        DB_ROOT_VERSION['2.0.0'], '2.0.0', pytest.REPOSITORY,
         group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
@@ -141,7 +141,7 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['3.0.0'], 'db.csv'),
     )
     audb2.publish(
-        DB_ROOT_VERSION['3.0.0'], '3.0.0',
+        DB_ROOT_VERSION['3.0.0'], '3.0.0', pytest.REPOSITORY,
         group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 

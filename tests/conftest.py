@@ -19,7 +19,7 @@ pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
 pytest.GROUP_ID = f'audb2.{audeer.uid()}'
 pytest.HOST = os.path.join(pytest.ROOT, 'repo')
 pytest.NUM_WORKERS = 5
-pytest.REPOSITORY_PUBLIC = 'unittests-public-local'
+pytest.REPOSITORY = 'unittests-public-local'
 pytest.SHARED_CACHE_ROOT = os.path.join(pytest.ROOT, 'shared')
 
 
@@ -35,14 +35,11 @@ def cleanup_session():
     yield
     if os.path.exists(pytest.ROOT):
         shutil.rmtree(pytest.ROOT)
-    for repository in (
-            pytest.REPOSITORY_PUBLIC,
-    ):
-        url = audfactory.artifactory_path(
-            audfactory.server_url(
-                pytest.GROUP_ID,
-                repository=repository,
-            ),
-        )
-        if url.exists():
-            url.unlink()
+    url = audfactory.artifactory_path(
+        audfactory.server_url(
+            pytest.GROUP_ID,
+            repository=pytest.REPOSITORY,
+        ),
+    )
+    if url.exists():
+        url.unlink()

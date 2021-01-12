@@ -39,16 +39,13 @@ def available(
     backend = default_backend(backend)
 
     match = {}
-    for repository in (
-            config.REPOSITORY_PUBLIC,
-            config.REPOSITORY_PRIVATE,
-    ):
+    for repository in config.REPOSITORIES:
         for p in backend.glob('**/*.yaml', repository, group_id):
             name, _, version, _ = p.split('/')[-4:]
             if name not in match:
                 match[name] = {
                     'version': [],
-                    'private': repository == config.REPOSITORY_PRIVATE,
+                    'repository': repository,
                 }
             match[name]['version'].append(version)
 
@@ -61,10 +58,10 @@ def available(
     for name in match:
         for v in match[name]['version']:
             data.append(
-                [name, v, match[name]['private']]
+                [name, v, match[name]['repository']]
             )
     return pd.DataFrame.from_records(
-        data, columns=['name', 'version', 'private']
+        data, columns=['name', 'version', 'repository']
     ).set_index('name')
 
 
@@ -484,10 +481,7 @@ def repository_and_version(
                 f"A version '{version}' does not exist for database '{name}'."
             )
 
-    for repository in (
-        config.REPOSITORY_PUBLIC,  # check public repository first
-        config.REPOSITORY_PRIVATE,
-    ):
+    for repository in config.REPOSITORIES:
         if backend.exists(
             define.DB_HEADER, version, repository, f'{group_id}.{name}',
         ):
@@ -516,10 +510,7 @@ def versions(
     backend = default_backend(backend)
 
     vs = []
-    for repository in [
-        config.REPOSITORY_PUBLIC,
-        config.REPOSITORY_PRIVATE,
-    ]:
+    for repository in config.REPOSITORIES:
         vs.extend(
             backend.versions(
                 define.DB_HEADER, repository, f'{group_id}.{name}',

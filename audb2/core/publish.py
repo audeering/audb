@@ -185,9 +185,9 @@ def _put_tables(
 def publish(
         db_root: str,
         version: str,
+        repository: str,
         *,
         archives: typing.Mapping[str, str] = None,
-        private: bool = False,
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
@@ -198,9 +198,9 @@ def publish(
     Args:
         db_root: root directory of database
         version: version string
+        repository: name of repository
         archives: map files to archives
         group_id: group ID
-        private: publish as private
         backend: backend object
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
@@ -217,9 +217,6 @@ def publish(
     db = audformat.Database.load(db_root, load_data=False)
 
     backend = default_backend(backend)
-
-    repository = config.REPOSITORY_PRIVATE if private else \
-        config.REPOSITORY_PUBLIC
     group_id: str = f'{group_id}.{db.name}'
 
     if version in backend.versions(
