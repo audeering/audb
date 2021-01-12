@@ -513,7 +513,7 @@ class Artifactory(Backend):
             path: str,
     ) -> str:
         r"""MD5 checksum of file on backend."""
-        return ArtifactoryPath.stat(audfactory.artifactory_path(path)).md5
+        return audfactory.checksum(path)
 
     def _destination(
             self,
@@ -571,11 +571,7 @@ class Artifactory(Backend):
             dst_path: str,
     ):
         r"""Put file to backend."""
-        dst_path = audfactory.artifactory_path(dst_path)
-        if not dst_path.parent.exists():
-            dst_path.parent.mkdir()
-        with open(src_path, "rb") as fobj:
-            dst_path.deploy(fobj, md5=utils.md5(src_path))
+        audfactory.deploy_artifact(src_path, dst_path)
 
     def _rem_file(
             self,
