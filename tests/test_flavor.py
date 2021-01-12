@@ -112,11 +112,10 @@ def test_init(only_metadata, bit_depth, channels, format, mixdown,
             audb2.Flavor(channels=[0, -1]),
             16, 2, audb2.define.Format.WAV, 16000,
         ),
-        pytest.param(
+        (
             16, 2, audb2.define.Format.WAV, 16000,
             audb2.Flavor(channels=[0, 2]),
             16, 2, audb2.define.Format.WAV, 16000,
-            marks=pytest.mark.xfail(raises=RuntimeError)
         ),
         (
             16, 1, audb2.define.Format.WAV, 16000,

@@ -142,7 +142,7 @@ def test_bit_depth(bit_depth):
 @pytest.mark.parametrize(
     'channels',
     [
-        None, 1, [0, -1],
+        None, 1, [0, -1], range(5),
     ],
 )
 def test_channels(channels):

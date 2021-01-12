@@ -60,15 +60,6 @@ def _filter_media(
                     verbose=verbose,
                 )
 
-        # keep only media files with a sufficient number of channels
-        if flavor.channels is not None:
-            num_channels = max(flavor.channels) + 1
-            db.pick_files(
-                lambda x: depend.channels(x) >= num_channels,
-                num_workers=num_workers,
-                verbose=verbose,
-            )
-
 
 def _filter_tables(
         db_header: audformat.Database,

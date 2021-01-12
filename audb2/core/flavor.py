@@ -186,6 +186,25 @@ class Flavor(audobject.Object):
 
         return False
 
+    def _remix(
+            self,
+            signal: np.ndarray,
+    ) -> np.ndarray:
+
+        if (self.channels is not None) or self.mixdown:
+            if self.channels is not None:
+                max_channel = max(self.channels)
+                if 0 < max_channel >= signal.shape[0]:
+                    signal_ex = np.zeros(
+                        (max_channel + 1, signal.shape[1]),
+                        dtype=signal.dtype,
+                    )
+                    signal_ex[:signal.shape[0], :] = signal
+                    signal = signal_ex
+            signal = audresample.remix(signal, self.channels, self.mixdown)
+
+        return signal
+
     def _resample(
             self,
             signal: np.ndarray,
@@ -243,7 +262,7 @@ class Flavor(audobject.Object):
 
             # convert file to flavor
             signal, sampling_rate = audiofile.read(src_path, always_2d=True)
-            signal = audresample.remix(signal, self.channels, self.mixdown)
+            signal = self._remix(signal)
             signal, sampling_rate = self._resample(signal, sampling_rate)
             bit_depth = self.bit_depth or audiofile.bit_depth(src_path)
             audiofile.write(
