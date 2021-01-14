@@ -390,7 +390,9 @@ def _load(
 
     # load database and filter media
 
-    db = audformat.Database.load(db_root)
+    db = audformat.Database.load(
+        db_root, num_workers=num_workers, verbose=verbose,
+    )
     _filter_media(db, flavor, depend, num_workers, verbose)
 
     # get altered and new media files,
@@ -458,7 +460,7 @@ def load(
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
-        verbose: bool = False,
+        verbose: bool = True,
         **kwargs,
 ) -> audformat.Database:
     r"""Load database.
@@ -563,6 +565,9 @@ def load(
         exclude=exclude,
     )
 
+    if verbose:  # pragma: no cover
+        print(f'Get:  {name} v{version}')
+
     # check if database is already in cache
     #
     # db_root -> final destination of database
@@ -585,10 +590,14 @@ def load(
         )
         db_root_tmp = db_root + '~'
         if os.path.exists(db_root) and not os.path.exists(db_root_tmp):
-            db = audformat.Database.load(db_root)
+            db = audformat.Database.load(db_root, num_workers=num_workers)
+            if verbose:  # pragma: no cover
+                print(f'From: {db_root}')
             break
 
     if db is None:
+        if verbose:   # pragma: no cover
+            print(f'To: {db_root}')
         db = _load(
             name=name,
             db_root=db_root,
@@ -626,7 +635,7 @@ def load_original_to(
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
-        verbose: bool = False,
+        verbose: bool = True,
 ) -> audformat.Database:
     r"""Load database to directory.
 

@@ -20,6 +20,7 @@ tables as CSV is provided.
         format='flac',
         sampling_rate=44100,
         num_workers=5,
+        verbose=False,
     )
 
 

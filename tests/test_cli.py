@@ -17,16 +17,18 @@ import pytest
         ),
     ],
 )
-def test_audb2get(script_runner, name, table, version):
+def test_audb2(script_runner, name, table, version):
 
     ret = script_runner.run(
         'audb2', 'load', name, '--version', version,
+        '--verbose', 'False',
     )
     assert ret.success
     assert ret.stderr == ''
 
     ret = script_runner.run(
         'audb2get', name, table, '--version', version,
+        '--verbose', 'False',
     )
     assert ret.success
     assert ret.stderr == ''

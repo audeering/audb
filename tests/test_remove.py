@@ -66,6 +66,7 @@ def fixture_publish_db():
     audb2.publish(
         DB_ROOT_VERSION['1.0.0'], '1.0.0', pytest.REPOSITORY,
         archives=archives, group_id=pytest.GROUP_ID, backend=BACKEND,
+        verbose=False,
     )
 
     # publish 2.0.0
@@ -75,7 +76,7 @@ def fixture_publish_db():
     db.save(DB_ROOT_VERSION['2.0.0'])
     audb2.publish(
         DB_ROOT_VERSION['2.0.0'], '2.0.0', pytest.REPOSITORY,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
+        group_id=pytest.GROUP_ID, backend=BACKEND, verbose=False,
     )
 
     yield
@@ -107,7 +108,7 @@ def test_remove(remove):
                 db = audb2.load(
                     DB_NAME, version=version, removed_media=removed_media,
                     full_path=False, backend=BACKEND,
-                    num_workers=pytest.NUM_WORKERS,
+                    num_workers=pytest.NUM_WORKERS, verbose=False,
                 )
                 if removed_media:
                     assert remove in db.files

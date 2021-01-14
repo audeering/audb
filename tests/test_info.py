@@ -59,8 +59,8 @@ def fixture_publish_db():
     # publish db
 
     audb2.publish(
-        DB_ROOT, '1.0.0', pytest.REPOSITORY,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
+        DB_ROOT, '1.0.0', pytest.REPOSITORY, group_id=pytest.GROUP_ID,
+        backend=BACKEND, verbose=False,
     )
 
     yield

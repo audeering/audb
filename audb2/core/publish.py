@@ -191,7 +191,7 @@ def publish(
         group_id: str = config.GROUP_ID,
         backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
-        verbose: bool = False,
+        verbose: bool = True,
 ) -> Depend:
     r"""Publish database.
 

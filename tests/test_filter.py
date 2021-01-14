@@ -77,7 +77,7 @@ def fixture_publish_db():
         )
     audb2.publish(
         DB_ROOT, '1.0.0', pytest.REPOSITORY, archives=archives,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
+        group_id=pytest.GROUP_ID, backend=BACKEND, verbose=False,
     )
 
     yield
@@ -134,7 +134,7 @@ def test_tables(tables, expected_tables, expected_files):
     db = audb2.load(
         DB_NAME, tables=tables, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=pytest.NUM_WORKERS, verbose=False,
     )
     assert list(db.tables) == expected_tables
     assert list(db.files) == expected_files
@@ -187,6 +187,6 @@ def test_files(include, exclude, expected_files):
     db = audb2.load(
         DB_NAME, include=include, exclude=exclude, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=pytest.NUM_WORKERS, verbose=False,
     )
     assert list(db.files) == expected_files

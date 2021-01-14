@@ -92,8 +92,8 @@ def fixture_publish_db():
     # publish db
 
     audb2.publish(
-        DB_ROOT, '1.0.0', pytest.REPOSITORY,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
+        DB_ROOT, '1.0.0', pytest.REPOSITORY, group_id=pytest.GROUP_ID,
+        backend=BACKEND, verbose=False,
     )
 
     yield
@@ -123,7 +123,7 @@ def test_bit_depth(bit_depth):
     db = audb2.load(
         DB_NAME, bit_depth=bit_depth, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=pytest.NUM_WORKERS, verbose=False,
     )
     original_files = db['files']['original'].get()
 
@@ -150,7 +150,7 @@ def test_channels(channels):
     db = audb2.load(
         DB_NAME, channels=channels, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=pytest.NUM_WORKERS, verbose=False,
     )
     original_files = db['files']['original'].get()
 
@@ -179,7 +179,7 @@ def test_format(format):
     db = audb2.load(
         DB_NAME, format=format, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=pytest.NUM_WORKERS, verbose=False,
     )
     original_files = db['files']['original'].get()
 
@@ -205,7 +205,7 @@ def test_mixdown(mixdown):
     db = audb2.load(
         DB_NAME, mixdown=mixdown, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=pytest.NUM_WORKERS, verbose=False,
     )
     original_files = db['files']['original'].get()
 
@@ -232,7 +232,7 @@ def test_sampling_rate(sampling_rate):
     db = audb2.load(
         DB_NAME, sampling_rate=sampling_rate, full_path=False,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=pytest.NUM_WORKERS, verbose=False,
     )
     original_files = db['files']['original'].get()
 

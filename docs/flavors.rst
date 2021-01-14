@@ -9,13 +9,19 @@
     import audb2
 
 
-    audb2.load('emodb', version='1.0.1', num_workers=5)
+    audb2.load(
+        'emodb',
+        version='1.0.1',
+        num_workers=5,
+        verbose=False,
+    )
     audb2.load(
         'emodb',
         version='1.0.1',
         format='flac',
         sampling_rate=44100,
         num_workers=5,
+        verbose=False,
     )
 
 

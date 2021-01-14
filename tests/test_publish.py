@@ -91,13 +91,13 @@ def test_publish(version):
     depend = audb2.publish(
         DB_ROOT, version, pytest.REPOSITORY, archives=archives,
         group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=pytest.NUM_WORKERS, verbose=False,
     )
     versions = audb2.versions(
         DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
     )
     latest_version = audb2.latest_version(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND
+        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
     )
 
     assert version in versions
@@ -134,7 +134,7 @@ def test_invalid_archives(name):
     }
     with pytest.raises(ValueError):
         audb2.publish(
-            DB_ROOT, 'x.x.x', pytest.REPOSITORY,
-            archives=archives, group_id=pytest.GROUP_ID,
-            backend=BACKEND, num_workers=pytest.NUM_WORKERS,
+            DB_ROOT, 'x.x.x', pytest.REPOSITORY, archives=archives,
+            group_id=pytest.GROUP_ID, backend=BACKEND,
+            num_workers=pytest.NUM_WORKERS, verbose=False,
         )

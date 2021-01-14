@@ -9,7 +9,7 @@
     import audb2
 
 
-    audb2.load('emodb', only_metadata=True)
+    audb2.load('emodb', version='1.0.1', only_metadata=True, verbose=False)
 
 
 Metadata and header only
