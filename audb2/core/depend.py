@@ -1,6 +1,7 @@
 import os
 import typing
 
+import numpy as np
 import pandas as pd
 
 import audeer
@@ -156,7 +157,8 @@ class Depend:
 
         """
         self.data[file] = [
-            archive, 0, checksum, 0, 0, define.DependType.META, version,
+            archive, np.nan, checksum, np.nan, 0, define.DependType.META,
+            version,
         ]
 
     def archive(
@@ -225,7 +227,7 @@ class Depend:
         self._data = {}
         path = audeer.safe_path(path)
         if os.path.exists(path):
-            df = pd.read_csv(path, index_col=0, na_filter=False)
+            df = pd.read_csv(path, index_col=0)
             for file, row in df.iterrows():
                 self._data[file] = list(row)
 
