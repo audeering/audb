@@ -1,13 +1,13 @@
 import os
 import typing
 
-import numpy as np
 import pandas as pd
 
 import audeer
 import audiofile
 
 from audb2.core import define
+from audb2.core import utils
 
 
 class Depend:
@@ -133,9 +133,7 @@ class Depend:
             version: version string
 
         """
-        _, format = os.path.splitext(file.lower())
-        if format:
-            format = format[1:]
+        format = utils.to_format(file)
 
         bit_depth = channels = sampling_rate = 0
         duration = 0.0
@@ -267,7 +265,7 @@ class Depend:
         """
         return self[file][define.DependField.FORMAT]
 
-    def from_file(
+    def load(
             self,
             path: str,
     ):
@@ -320,7 +318,7 @@ class Depend:
         """
         return self[file][define.DependField.SAMPLING_RATE] or None
 
-    def to_file(
+    def save(
             self,
             path: str,
     ):

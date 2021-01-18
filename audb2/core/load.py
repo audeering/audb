@@ -411,7 +411,7 @@ def _load(
     # save dependencies
 
     dep_path_tmp = os.path.join(db_root_tmp, define.DB_DEPEND)
-    depend.to_file(dep_path_tmp)
+    depend.save(dep_path_tmp)
     _move_file(db_root_tmp, db_root, define.DB_DEPEND)
     _fix_file_ext(db, flavor, num_workers, verbose)
 
@@ -592,7 +592,7 @@ def load(
         dep_path = os.path.join(db_root_tmp, define.DB_DEPEND)
     else:
         dep_path = os.path.join(db_root, define.DB_DEPEND)
-    depend.from_file(dep_path)
+    depend.load(dep_path)
 
     if db is None:
         if verbose:   # pragma: no cover
@@ -691,7 +691,7 @@ def load_original_to(
     backend.get_archive(archive, db_root, version, repository)
     dep_path = os.path.join(db_root, define.DB_DEPEND)
     depend = Depend()
-    depend.from_file(dep_path)
+    depend.load(dep_path)
     if update:
         for file in depend.files:
             full_file = os.path.join(db_root, file)

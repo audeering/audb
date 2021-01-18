@@ -220,7 +220,7 @@ def publish(
     db = audformat.Database.load(db_root)
     dep_path = os.path.join(db_root, define.DB_DEPEND)
     depend = Depend()
-    depend.from_file(dep_path)
+    depend.load(dep_path)
 
     # make sure all tables are stored in CSV format
     for table_id, table in db.tables.items():
@@ -253,7 +253,7 @@ def publish(
     )
 
     # publish dependencies and header
-    depend.to_file(dep_path)
+    depend.save(dep_path)
     archive_file = backend.join(db.name, define.DB)
     backend.put_archive(
         db_root, define.DB_DEPEND, archive_file, version, repository,

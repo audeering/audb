@@ -10,12 +10,7 @@ import audobject
 import audresample
 
 from audb2.core import define
-
-
-def split_ext(file: str) -> str:
-    r"""File extension without . and lower case."""
-    _, ext = os.path.splitext(file.lower())
-    return ext[1:]
+from audb2.core import utils
 
 
 class Flavor(audobject.Object):
@@ -129,9 +124,9 @@ class Flavor(audobject.Object):
 
         """
         if self.format is not None:
-            name, format = os.path.splitext(file)
-            if format[1:].lower() != self.format:
-                file = name + '.' + self.format
+            format = utils.to_format(file)
+            if format != self.format:
+                file = audeer.basename_wo_ext(file) + '.' + self.format
         return file
 
     def path(
@@ -164,7 +159,7 @@ class Flavor(audobject.Object):
 
         # format change
         if self.format is not None:
-            ext = split_ext(file)
+            ext = utils.to_format(file)
             if self.format != ext:
                 return True
 
@@ -251,8 +246,8 @@ class Flavor(audobject.Object):
         dst_path = audeer.safe_path(dst_path)
 
         # verify that extension matches the output format
-        src_ext = split_ext(src_path)
-        dst_ext = split_ext(dst_path)
+        src_ext = utils.to_format(src_path)
+        dst_ext = utils.to_format(dst_path)
         expected_ext = self.format or src_ext
         if expected_ext != dst_ext:
             raise ValueError(

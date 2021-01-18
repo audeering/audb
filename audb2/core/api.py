@@ -167,7 +167,7 @@ def dependencies(
         dep_path = backend.get_archive(archive, root, version, repository)[0]
         dep_path = os.path.join(root, dep_path)
         depend = Depend()
-        depend.from_file(dep_path)
+        depend.load(dep_path)
 
     return depend
 
@@ -413,7 +413,7 @@ def remove_media(
             )[0]
             dep_path = os.path.join(db_root, dep_path)
             depend = Depend()
-            depend.from_file(dep_path)
+            depend.load(dep_path)
             upload = False
 
             for file in files:
@@ -447,7 +447,7 @@ def remove_media(
 
             # upload dependencies
             if upload:
-                depend.to_file(dep_path)
+                depend.save(dep_path)
                 remote_archive = backend.join(name, define.DB)
                 backend.put_archive(
                     db_root,
