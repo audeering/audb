@@ -3,6 +3,16 @@ audb2.info
 
 .. automodule:: audb2.info
 
+bit_depths
+----------
+
+.. autofunction:: bit_depths
+
+channels
+--------
+
+.. autofunction:: channels
+
 description
 -----------
 
@@ -12,6 +22,11 @@ duration
 --------
 
 .. autofunction:: duration
+
+formats
+-------
+
+.. autofunction:: formats
 
 header
 ------
@@ -37,6 +52,11 @@ raters
 ------
 
 .. autofunction:: raters
+
+sampling_rates
+--------------
+
+.. autofunction:: sampling_rates
 
 schemes
 -------
