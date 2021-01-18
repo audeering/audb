@@ -10,12 +10,11 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.GROUP_ID = pytest.GROUP_ID
 audb2.config.REPOSITORIES = [pytest.REPOSITORY]
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
-DB_NAME = 'test_filter'
+DB_NAME = f'test_filter-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
@@ -76,8 +75,12 @@ def fixture_publish_db():
             }
         )
     audb2.publish(
-        DB_ROOT, '1.0.0', pytest.REPOSITORY, archives=archives,
-        group_id=pytest.GROUP_ID, backend=BACKEND, verbose=False,
+        DB_ROOT,
+        '1.0.0',
+        pytest.REPOSITORY,
+        archives=archives,
+        backend=BACKEND,
+        verbose=False,
     )
 
     yield
@@ -132,9 +135,12 @@ def fixture_clear_cache():
 )
 def test_tables(tables, expected_tables, expected_files):
     db = audb2.load(
-        DB_NAME, tables=tables, full_path=False,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS, verbose=False,
+        DB_NAME,
+        tables=tables,
+        full_path=False,
+        backend=BACKEND,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
     )
     assert list(db.tables) == expected_tables
     assert list(db.files) == expected_files
@@ -185,8 +191,12 @@ def test_tables(tables, expected_tables, expected_files):
 )
 def test_files(include, exclude, expected_files):
     db = audb2.load(
-        DB_NAME, include=include, exclude=exclude, full_path=False,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS, verbose=False,
+        DB_NAME,
+        include=include,
+        exclude=exclude,
+        full_path=False,
+        backend=BACKEND,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
     )
     assert list(db.files) == expected_files

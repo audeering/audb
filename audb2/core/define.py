@@ -1,9 +1,7 @@
-import re
-
-
-ARCHIVE_NAME_PATTERN = re.compile('[A-Za-z0-9._-]+')
-DB_HEADER = 'db.yaml'
-DB_DEPEND = 'db.csv'
+BACKEND_ALLOWED_CHARS = '[A-Za-z0-9/._-]+'
+DB = 'db'
+DB_HEADER = f'{DB}.yaml'
+DB_DEPEND = f'{DB}.csv'
 
 
 class DependField:

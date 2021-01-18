@@ -1,30 +1,3 @@
-.. Preload some data to avoid stderr print outs from tqdm,
-.. but still avoid using the verbose=False flag later on
-
-.. jupyter-execute::
-    :stderr:
-    :hide-output:
-    :hide-code:
-
-    import audb2
-
-
-    audb2.load(
-        'emodb',
-        version='1.0.1',
-        num_workers=5,
-        verbose=False,
-    )
-    audb2.load(
-        'emodb',
-        version='1.0.1',
-        format='flac',
-        sampling_rate=44100,
-        num_workers=5,
-        verbose=False,
-    )
-
-
 .. _database-conversion-and-flavors:
 
 Data conversion and flavors
@@ -65,6 +38,9 @@ For each flavor a sub-folder will be created
 inside the :ref:`cache <cache-root>`.
 
 .. jupyter-execute::
+
+    import audb2
+
 
     db = audb2.load(
         'emodb',

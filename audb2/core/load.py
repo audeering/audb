@@ -192,11 +192,11 @@ def _get_media(
         media: typing.List[str],
         db_root: str,
         db_root_tmp: str,
+        db_name: str,
         flavor: typing.Optional[Flavor],
         depend: Depend,
         backend: Backend,
         repository: str,
-        group_id: str,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
@@ -216,11 +216,12 @@ def _get_media(
         )
 
     def job(archive: str, version: str):
-        files = backend.get_archive(
-            db_root_tmp, archive, version, repository,
-            f'{group_id}.'
-            f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
+        archive = backend.join(
+            db_name,
+            define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
+            archive,
         )
+        files = backend.get_archive(archive, db_root_tmp, version, repository)
         for file in files:
             if flavor is not None:
                 src_path = os.path.join(db_root_tmp, file)
@@ -244,10 +245,10 @@ def _get_tables(
         tables: typing.List[str],
         db_root: str,
         db_root_tmp: str,
+        db_name: str,
         depend: Depend,
         backend: Backend,
         repository: str,
-        group_id: str,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
@@ -264,10 +265,13 @@ def _get_tables(
         )[:-3] + audformat.define.TableStorageFormat.PICKLE
         if os.path.exists(path_pkl):
             os.remove(path_pkl)
+        archive = backend.join(
+            db_name,
+            define.DEPEND_TYPE_NAMES[define.DependType.META],
+            depend.archive(table),
+        )
         backend.get_archive(
-            db_root_tmp, depend.archive(table),
-            depend.version(table), repository,
-            f'{group_id}.{define.DEPEND_TYPE_NAMES[define.DependType.META]}',
+            archive, db_root_tmp, depend.version(table), repository,
         )
         _move_file(db_root_tmp, db_root, table)
 
@@ -345,10 +349,9 @@ def _load(
         db_root_tmp: str,
         version: str,
         flavor: typing.Optional[Flavor],
-        removed_media: bool,
         repository: str,
-        group_id: str,
         backend: Backend,
+        depend: Depend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> audformat.Database:
@@ -357,25 +360,13 @@ def _load(
     audeer.mkdir(db_root)
     audeer.mkdir(db_root_tmp)
 
-    group_id: str = f'{group_id}.{name}'
-
     # load database header
 
-    backend.get_file(
-        db_root_tmp, define.DB_HEADER, version, repository, group_id,
-    )
+    remote_header = backend.join(name, define.DB_HEADER)
+    local_header = os.path.join(db_root_tmp, define.DB_HEADER)
+    backend.get_file(remote_header, local_header, version, repository)
     _move_file(db_root_tmp, db_root, define.DB_HEADER)
     db_header = audformat.Database.load(db_root, load_data=False)
-
-    # get list with dependencies
-
-    backend.get_archive(
-        db_root_tmp, audeer.basename_wo_ext(define.DB_DEPEND),
-        version, repository, group_id,
-    )
-    dep_path_tmp = os.path.join(db_root_tmp, define.DB_DEPEND)
-    depend = Depend()
-    depend.from_file(dep_path_tmp)
 
     # get altered and new tables
 
@@ -384,8 +375,8 @@ def _load(
         db_header, db_root, depend, num_workers, verbose,
     )
     _get_tables(
-        tables, db_root, db_root_tmp, depend,
-        backend, repository, group_id, num_workers, verbose,
+        tables, db_root, db_root_tmp, name, depend,
+        backend, repository, num_workers, verbose,
     )
 
     # load database and filter media
@@ -403,25 +394,16 @@ def _load(
             db, db_root, flavor, depend, num_workers, verbose,
         )
         _get_media(
-            media, db_root, db_root_tmp, flavor,
-            depend, backend, repository, group_id,
+            media, db_root, db_root_tmp, name,
+            flavor, depend, backend, repository,
             num_workers, verbose,
         )
 
     # save dependencies
 
+    dep_path_tmp = os.path.join(db_root_tmp, define.DB_DEPEND)
     depend.to_file(dep_path_tmp)
     _move_file(db_root_tmp, db_root, define.DB_DEPEND)
-
-    # filter rows referencing removed media
-    # eventually fix file extension
-
-    if not removed_media:
-        db.pick_files(
-            lambda x: not depend.removed(x),
-            num_workers=num_workers,
-            verbose=verbose,
-        )
     _fix_file_ext(db, flavor, num_workers, verbose)
 
     # save database and remove the temporal directory
@@ -457,7 +439,6 @@ def load(
         removed_media: bool = False,
         full_path: bool = True,
         cache_root: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
@@ -514,7 +495,6 @@ def load(
         full_path: replace relative with absolute file paths
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb2.default_cache_root` is used
-        group_id: group ID
         backend: backend object
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
@@ -550,7 +530,7 @@ def load(
 
     backend = default_backend(backend)
     repository, version = repository_and_version(
-        name, version, group_id=group_id, backend=backend,
+        name, version, backend=backend,
     )
 
     flavor = Flavor(
@@ -585,7 +565,7 @@ def load(
     for cache_root in cache_roots:
         db_root = audeer.safe_path(
             os.path.join(
-                cache_root, flavor.path(name, version, repository, group_id)
+                cache_root, flavor.path(name, version, repository)
             )
         )
         db_root_tmp = db_root + '~'
@@ -594,6 +574,16 @@ def load(
             if verbose:  # pragma: no cover
                 print(f'From: {db_root}')
             break
+
+    # Get list with dependencies
+    depend = Depend()
+    if db is None:
+        archive = backend.join(name, define.DB)
+        backend.get_archive(archive, db_root_tmp, version, repository)
+        dep_path = os.path.join(db_root_tmp, define.DB_DEPEND)
+    else:
+        dep_path = os.path.join(db_root, define.DB_DEPEND)
+    depend.from_file(dep_path)
 
     if db is None:
         if verbose:   # pragma: no cover
@@ -604,13 +594,29 @@ def load(
             db_root_tmp=db_root_tmp,
             version=version,
             flavor=flavor,
-            removed_media=removed_media,
             repository=repository,
-            group_id=group_id,
             backend=backend,
+            depend=depend,
             num_workers=num_workers,
             verbose=verbose,
         )
+
+    # Remove rows referencing removed media
+    if not removed_media:
+        removed_files = []
+        for file in depend.removed_media:
+            if flavor.format is not None:
+                # Rename removed media file to requested format
+                name, _ = os.path.splitext(file)
+                file = f'{name}.{flavor.format}'
+            removed_files.append(file)
+
+        if removed_files:
+            db.drop_files(
+                removed_files,
+                num_workers=num_workers,
+                verbose=verbose,
+            )
 
     if full_path:
         # Faster solution then using db.map_files()
@@ -632,7 +638,6 @@ def load_original_to(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
@@ -654,7 +659,6 @@ def load_original_to(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        group_id: group ID
         backend: backend object
         verbose: show debug messages
 
@@ -664,7 +668,7 @@ def load_original_to(
     """
     backend = default_backend(backend)
     repository, version = repository_and_version(
-        name, version, group_id=group_id, backend=backend,
+        name, version, backend=backend,
     )
 
     db_root = audeer.safe_path(root)
@@ -674,14 +678,12 @@ def load_original_to(
     # to ensure we load correct version
     update = os.path.exists(db_root) and os.listdir(db_root)
     audeer.mkdir(db_root)
-    backend.get_archive(
-        db_root, audeer.basename_wo_ext(define.DB_DEPEND),
-        version, repository, f'{group_id}.{name}',
-    )
+    archive = backend.join(name, define.DB)
+    backend.get_archive(archive, db_root, version, repository)
+    dep_path = os.path.join(db_root, define.DB_DEPEND)
+    depend = Depend()
+    depend.from_file(dep_path)
     if update:
-        dep_path = os.path.join(db_root, define.DB_DEPEND)
-        depend = Depend()
-        depend.from_file(dep_path)
         for file in depend.files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
@@ -695,10 +697,9 @@ def load_original_to(
         db_root_tmp=db_root_tmp,
         version=version,
         flavor=None,
-        removed_media=True,
         repository=repository,
-        group_id=group_id,
         backend=backend,
+        depend=depend,
         num_workers=num_workers,
         verbose=verbose
     )

@@ -11,12 +11,11 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.GROUP_ID = pytest.GROUP_ID
 audb2.config.REPOSITORIES = [pytest.REPOSITORY]
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
-DB_NAME = 'test_info'
+DB_NAME = f'test_info-{pytest.ID}'
 DB = audformat.Database(
     DB_NAME,
     source='https://gitlab.audeering.com/tools/audb2',
@@ -59,8 +58,11 @@ def fixture_publish_db():
     # publish db
 
     audb2.publish(
-        DB_ROOT, '1.0.0', pytest.REPOSITORY, group_id=pytest.GROUP_ID,
-        backend=BACKEND, verbose=False,
+        DB_ROOT,
+        '1.0.0',
+        pytest.REPOSITORY,
+        backend=BACKEND,
+        verbose=False,
     )
 
     yield
@@ -81,46 +83,20 @@ def fixture_clear_cache():
 
 def test_info():
 
-    depend = audb2.dependencies(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    )
+    depend = audb2.dependencies(DB_NAME, backend=BACKEND,)
 
-    assert str(audb2.info.header(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    )) == str(DB)
-    assert audb2.info.description(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    ) == DB.description
-    assert audb2.info.duration(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    ) == pd.to_timedelta(
+    assert str(audb2.info.header(DB_NAME, backend=BACKEND)) == str(DB)
+    assert audb2.info.description(DB_NAME, backend=BACKEND) == DB.description
+    assert audb2.info.duration(DB_NAME, backend=BACKEND) == pd.to_timedelta(
         sum([depend.duration(file) for file in depend.media]),
         unit='s',
     )
-    assert audb2.info.languages(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    ) == DB.languages
-    assert str(audb2.info.media(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    )) == str(DB.media)
-    assert audb2.info.meta(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    ) == DB.meta
-    assert str(audb2.info.raters(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    )) == str(DB.raters)
-    assert str(audb2.info.schemes(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    )) == str(DB.schemes)
-    assert str(audb2.info.splits(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    )) == str(DB.splits)
-    assert audb2.info.source(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    ) == DB.source
-    assert str(audb2.info.tables(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    )) == str(DB.tables)
-    assert audb2.info.usage(
-        DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
-    ) == DB.usage
+    assert audb2.info.languages(DB_NAME, backend=BACKEND) == DB.languages
+    assert str(audb2.info.media(DB_NAME, backend=BACKEND)) == str(DB.media)
+    assert audb2.info.meta(DB_NAME, backend=BACKEND) == DB.meta
+    assert str(audb2.info.raters(DB_NAME, backend=BACKEND)) == str(DB.raters)
+    assert str(audb2.info.schemes(DB_NAME, backend=BACKEND)) == str(DB.schemes)
+    assert str(audb2.info.splits(DB_NAME, backend=BACKEND)) == str(DB.splits)
+    assert audb2.info.source(DB_NAME, backend=BACKEND) == DB.source
+    assert str(audb2.info.tables(DB_NAME, backend=BACKEND)) == str(DB.tables)
+    assert audb2.info.usage(DB_NAME, backend=BACKEND) == DB.usage

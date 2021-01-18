@@ -133,7 +133,6 @@ class Flavor(audobject.Object):
             name: str,
             version: str,
             repository: str,
-            group_id: str,
     ) -> str:
         r"""Flavor path.
 
@@ -141,16 +140,12 @@ class Flavor(audobject.Object):
             name: database name
             version: version string
             repository: repository
-            group_id: group ID
 
         Returns:
             relative path
 
         """
-        return os.path.join(
-            repository, group_id.replace('.', os.path.sep),
-            name, self.id, version,
-        )
+        return os.path.join(repository, name, self.id, version)
 
     def _check_convert(
             self,

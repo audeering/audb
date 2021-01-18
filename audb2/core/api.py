@@ -20,7 +20,6 @@ from audb2.core.flavor import Flavor
 
 
 def available(
-        group_id: str = config.GROUP_ID,
         *,
         latest_only: bool = False,
         backend: Backend = None,
@@ -28,7 +27,6 @@ def available(
     r"""List all databases that are available to the user.
 
     Args:
-        group_id: group ID
         latest_only: keep only latest version
         backend: backend object
 
@@ -40,7 +38,7 @@ def available(
 
     match = {}
     for repository in config.REPOSITORIES:
-        for p in backend.glob('**/*.yaml', repository, group_id):
+        for p in backend.glob('**/*.yaml', repository):
             name, _, version, _ = p.split('/')[-4:]
             if name not in match:
                 match[name] = {
@@ -146,7 +144,6 @@ def dependencies(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> Depend:
     r"""Database dependencies.
@@ -154,7 +151,6 @@ def dependencies(
     Args:
         name: name of database
         version: version string
-        group_id: group ID
         backend: backend object
 
     Returns:
@@ -163,15 +159,12 @@ def dependencies(
     """
     backend = default_backend(backend)
     repository, version = repository_and_version(
-        name, version, group_id=group_id, backend=backend,
+        name, version, backend=backend,
     )
-    group_id: str = f'{group_id}.{name}'
 
     with tempfile.TemporaryDirectory() as root:
-        dep_path = backend.get_archive(
-            root, audeer.basename_wo_ext(define.DB_DEPEND),
-            version, repository, group_id,
-        )[0]
+        archive = backend.join(name, define.DB)
+        dep_path = backend.get_archive(archive, root, version, repository)[0]
         dep_path = os.path.join(root, dep_path)
         depend = Depend()
         depend.from_file(dep_path)
@@ -193,7 +186,6 @@ def exists(
     include: typing.Union[str, typing.Sequence[str]] = None,
     exclude: typing.Union[str, typing.Sequence[str]] = None,
     cache_root: str = None,
-    group_id: str = config.GROUP_ID,
     backend: Backend = None,
 ) -> typing.Optional[str]:
     r"""Check if specified database flavor exists in local cache folder.
@@ -240,7 +232,6 @@ def exists(
             after ``include``
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb2.default_cache_root` is used
-        group_id: group ID
         backend: backend object
 
     Returns:
@@ -259,14 +250,13 @@ def exists(
 
     backend = default_backend(backend)
     repository, version = repository_and_version(
-        name, version, group_id=group_id, backend=backend,
+        name, version, backend=backend,
     )
 
     relative_flavor_path = flavor_path(
         name,
         version,
         repository,
-        group_id,
         only_metadata=only_metadata,
         channels=channels,
         format=format,
@@ -296,7 +286,6 @@ def flavor_path(
     name: str,
     version: str,
     repository: str,
-    group_id: str,
     *,
     only_metadata: bool = False,
     bit_depth: int = None,
@@ -329,7 +318,6 @@ def flavor_path(
         name: name of database
         version: version string
         repository: repository
-        group_id: group ID
         only_metadata: only metadata is stored
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`
@@ -361,20 +349,18 @@ def flavor_path(
         exclude=exclude,
     )
 
-    return flavor.path(name, version, repository, group_id)
+    return flavor.path(name, version, repository)
 
 
 def latest_version(
         name,
         *,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> str:
     r"""Latest version of database.
 
     Args:
         name: name of database
-        group_id: group ID
         backend: backend object
 
     Returns:
@@ -383,7 +369,7 @@ def latest_version(
     """
     backend = default_backend(backend)
 
-    vs = versions(name, group_id=group_id, backend=backend)
+    vs = versions(name, backend=backend)
     if not vs:
         raise RuntimeError(
             f"Cannot find a version for database '{name}'.",
@@ -396,7 +382,6 @@ def remove_media(
         name: str,
         files: typing.Union[str, typing.Sequence[str]],
         *,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
         verbose: bool = False,
 ):
@@ -405,7 +390,6 @@ def remove_media(
     Args:
         name: name of database
         files: list of files that should be removed
-        group_id: group ID
         backend: backend object
         verbose: show debug messages
 
@@ -415,52 +399,62 @@ def remove_media(
     if isinstance(files, str):
         files = [files]
 
-    for version in versions(name, group_id=group_id, backend=backend):
+    for version in versions(name, backend=backend):
         repository, version = repository_and_version(
-            name, version, group_id=group_id, backend=backend,
+            name, version, backend=backend,
         )
 
         with tempfile.TemporaryDirectory() as db_root:
 
             # download dependencies
+            archive = backend.join(name, define.DB)
             dep_path = backend.get_archive(
-                db_root, audeer.basename_wo_ext(define.DB_DEPEND),
-                version, repository, f'{group_id}.{name}',
+                archive, db_root, version, repository,
             )[0]
             dep_path = os.path.join(db_root, dep_path)
-            upload = False
-
             depend = Depend()
             depend.from_file(dep_path)
+            upload = False
+
             for file in files:
-                if file in depend.files:
+                if file in depend.media:
                     archive = depend.archive(file)
 
-                    # remove file from archive
-                    files = backend.get_archive(
-                        db_root, archive, version, repository,
-                        f'{group_id}.{name}.'
-                        f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
+                    # if archive exists in this version,
+                    # remove file from it and re-publish
+                    remote_archive = backend.join(
+                        name,
+                        define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
+                        archive,
                     )
-                    files.remove(file)
-                    os.remove(os.path.join(db_root, file))
-                    backend.put_archive(
-                        db_root, files, archive, version, repository,
-                        f'{group_id}.{name}.'
-                        f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
-                    )
+                    if backend.exists(
+                            f'{remote_archive}.zip', version, repository
+                    ):
 
-                    # update dependency
+                        files_in_archive = backend.get_archive(
+                            remote_archive, db_root, version, repository,
+                        )
+                        os.remove(os.path.join(db_root, file))
+                        files_in_archive.remove(file)
+                        backend.put_archive(
+                            db_root, files_in_archive, remote_archive,
+                            version, repository,
+                        )
+
+                    # mark file as removed
                     depend.remove(file)
                     upload = True
 
             # upload dependencies
             if upload:
                 depend.to_file(dep_path)
+                remote_archive = backend.join(name, define.DB)
                 backend.put_archive(
-                    db_root, define.DB_DEPEND,
-                    audeer.basename_wo_ext(define.DB_DEPEND),
-                    version, repository, f'{group_id}.{name}',
+                    db_root,
+                    define.DB_DEPEND,
+                    remote_archive,
+                    version,
+                    repository,
                 )
 
 
@@ -468,23 +462,21 @@ def repository_and_version(
         name,
         version: typing.Optional[str],
         *,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> (str, str):
     r"""Resolve version of database."""
 
     if version is None:
-        version = latest_version(name, group_id=group_id, backend=backend)
+        version = latest_version(name, backend=backend)
     else:
-        if version not in versions(name, group_id=group_id, backend=backend):
+        if version not in versions(name, backend=backend):
             raise RuntimeError(
                 f"A version '{version}' does not exist for database '{name}'."
             )
 
     for repository in config.REPOSITORIES:
-        if backend.exists(
-            define.DB_HEADER, version, repository, f'{group_id}.{name}',
-        ):
+        remote_header = backend.join(name, define.DB_HEADER)
+        if backend.exists(remote_header, version, repository):
             break
 
     return repository, version
@@ -493,14 +485,12 @@ def repository_and_version(
 def versions(
         name: str,
         *,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> typing.List[str]:
     r"""Available versions of database.
 
     Args:
         name: name of database
-        group_id: group ID
         backend: backend object
 
     Returns:
@@ -511,10 +501,7 @@ def versions(
 
     vs = []
     for repository in config.REPOSITORIES:
-        vs.extend(
-            backend.versions(
-                define.DB_HEADER, repository, f'{group_id}.{name}',
-            )
-        )
+        remote_header = backend.join(name, define.DB_HEADER)
+        vs.extend(backend.versions(remote_header, repository))
 
     return vs

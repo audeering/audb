@@ -1,3 +1,4 @@
+import os
 import tempfile
 import typing
 
@@ -19,14 +20,12 @@ def description(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> str:
     """Description of database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -34,9 +33,7 @@ def description(
         description of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.description
 
 
@@ -44,14 +41,12 @@ def duration(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> pd.Timedelta:
     """Total media duration.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -59,9 +54,7 @@ def duration(
         duration
 
     """
-    depend = dependencies(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    depend = dependencies(name, version=version, backend=backend)
     return pd.to_timedelta(
         sum([depend.duration(file) for file in depend.media]),
         unit='s',
@@ -72,7 +65,6 @@ def header(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> audformat.Database:
     r"""Load header of database.
@@ -84,7 +76,6 @@ def header(
     Args:
         name: name of database
         version: version of database
-        group_id: group ID
         backend: backend object
 
     Returns:
@@ -93,13 +84,13 @@ def header(
     """
     backend = default_backend(backend)
     repository, version = repository_and_version(
-        name, version, group_id=group_id, backend=backend,
+        name, version, backend=backend,
     )
 
     with tempfile.TemporaryDirectory() as root:
-        backend.get_file(
-            root, define.DB_HEADER, version, repository, f'{group_id}.{name}',
-        )
+        remote_header = backend.join(name, define.DB_HEADER)
+        local_header = os.path.join(root, define.DB_HEADER)
+        backend.get_file(remote_header, local_header, version, repository)
         db = audformat.Database.load(root, load_data=False)
 
     return db
@@ -109,14 +100,12 @@ def languages(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> typing.List[str]:
     """Languages of database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -124,9 +113,7 @@ def languages(
         languages of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.languages
 
 
@@ -134,14 +121,12 @@ def media(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> typing.Dict:
     """Audio and video media of database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -149,9 +134,7 @@ def media(
         media of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.media
 
 
@@ -159,14 +142,12 @@ def meta(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> typing.Dict:
     """Meta information of database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -174,9 +155,7 @@ def meta(
         meta information of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.meta
 
 
@@ -184,14 +163,12 @@ def raters(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> typing.Dict:
     """Raters contributed to database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -199,9 +176,7 @@ def raters(
         raters of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.raters
 
 
@@ -209,14 +184,12 @@ def schemes(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> typing.Dict:
     """Schemes of database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -224,9 +197,7 @@ def schemes(
         schemes of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.schemes
 
 
@@ -234,14 +205,12 @@ def source(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> str:
     """Source of database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -249,9 +218,7 @@ def source(
         source of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.source
 
 
@@ -259,14 +226,12 @@ def splits(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> typing.Dict:
     """Splits of database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -274,9 +239,7 @@ def splits(
         splits of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.splits
 
 
@@ -284,14 +247,12 @@ def tables(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> typing.Dict:
     """Tables of database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -299,9 +260,7 @@ def tables(
         tables of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.tables
 
 
@@ -309,14 +268,12 @@ def usage(
         name: str,
         *,
         version: str = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
 ) -> str:
     """Usage of database.
 
     Args:
         name: name of database
-        group_id: group ID of database
         version: version of database
         backend: backend object
 
@@ -324,7 +281,5 @@ def usage(
         usage of database
 
     """
-    db = header(
-        name, group_id=group_id, version=version, backend=backend,
-    )
+    db = header(name, version=version, backend=backend)
     return db.usage

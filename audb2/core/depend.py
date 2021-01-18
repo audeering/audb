@@ -87,6 +87,19 @@ class Depend:
         return select
 
     @property
+    def removed_media(self) -> typing.List[str]:
+        r"""Media to which a dependency exists.
+
+        Returns:
+            list of media
+
+        """
+        select = [
+            file for file in self.media if self.removed(file)
+        ]
+        return select
+
+    @property
     def tables(self) -> typing.List[str]:
         r"""Tables to which a dependency exists.
 

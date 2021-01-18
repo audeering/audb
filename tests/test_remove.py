@@ -10,17 +10,12 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.GROUP_ID = pytest.GROUP_ID
 audb2.config.REPOSITORIES = [pytest.REPOSITORY]
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
-DB_NAME = 'test_remove'
+DB_NAME = f'test_remove-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
-DB_ROOT_VERSION = {
-    version: os.path.join(DB_ROOT, version) for version in
-    ['1.0.0', '2.0.0']
-}
 DB_FILES = {
     '1.0.0': [
         os.path.join('audio', 'bundle1.wav'),
@@ -40,11 +35,8 @@ def clear_root(root: str):
         shutil.rmtree(root)
 
 
-@pytest.fixture(
-    scope='module',
-    autouse=True,
-)
-def fixture_publish_db():
+@pytest.fixture
+def publish_db():
 
     clear_root(DB_ROOT)
     clear_root(pytest.HOST)
@@ -57,26 +49,35 @@ def fixture_publish_db():
 
     # publish 1.0.0
 
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
-    db.save(DB_ROOT_VERSION['1.0.0'])
+    audformat.testing.create_audio_files(db, DB_ROOT)
+    db.save(DB_ROOT)
     archives = {
         db.files[0]: 'bundle',
         db.files[1]: 'bundle',
     }
     audb2.publish(
-        DB_ROOT_VERSION['1.0.0'], '1.0.0', pytest.REPOSITORY,
-        archives=archives, group_id=pytest.GROUP_ID, backend=BACKEND,
+        DB_ROOT,
+        '1.0.0',
+        pytest.REPOSITORY,
+        archives=archives,
+        backend=BACKEND,
         verbose=False,
     )
 
     # publish 2.0.0
 
-    db['files'].extend_index(audformat.filewise_index(DB_FILES['2.0.0']))
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
-    db.save(DB_ROOT_VERSION['2.0.0'])
+    db['files'].extend_index(
+        audformat.filewise_index(DB_FILES['2.0.0']),
+        inplace=True,
+    )
+    audformat.testing.create_audio_files(db, DB_ROOT)
+    db.save(DB_ROOT)
     audb2.publish(
-        DB_ROOT_VERSION['2.0.0'], '2.0.0', pytest.REPOSITORY,
-        group_id=pytest.GROUP_ID, backend=BACKEND, verbose=False,
+        DB_ROOT,
+        '2.0.0',
+        pytest.REPOSITORY,
+        backend=BACKEND,
+        verbose=False,
     )
 
     yield
@@ -86,34 +87,54 @@ def fixture_publish_db():
 
 
 @pytest.mark.parametrize(
-    'remove',
+    'format',
     [
-        DB_FILES['1.0.0'][0],  # bundle1
-        DB_FILES['1.0.0'][1],  # bundle2
-        DB_FILES['1.0.0'][2],  # single
-        DB_FILES['2.0.0'][0],  # new
+        None,
+        'wav',
+        'flac',
     ]
 )
-def test_remove(remove):
+def test_remove(publish_db, format):
 
-    audb2.remove_media(
-        DB_NAME, remove, group_id=pytest.GROUP_ID, backend=BACKEND,
-    )
+    for remove in (
+            DB_FILES['1.0.0'][0],  # bundle1
+            DB_FILES['1.0.0'][1],  # bundle2
+            DB_FILES['1.0.0'][2],  # single
+            DB_FILES['2.0.0'][0],  # new
+    ):
 
-    for removed_media in [False, True]:
-        for version in audb2.versions(DB_NAME, backend=BACKEND):
+        audb2.remove_media(DB_NAME, remove, backend=BACKEND)
 
-            if remove in DB_FILES[version]:
+        for removed_media in [False, True]:
 
-                db = audb2.load(
-                    DB_NAME, version=version, removed_media=removed_media,
-                    full_path=False, backend=BACKEND,
-                    num_workers=pytest.NUM_WORKERS, verbose=False,
-                )
-                if removed_media:
-                    assert remove in db.files
-                else:
-                    assert remove not in db.files
-                assert remove not in audeer.list_file_names(
-                    os.path.join(db.meta['audb']['root'], 'audio'),
-                )
+            for version in audb2.versions(DB_NAME, backend=BACKEND):
+
+                if remove in DB_FILES[version]:
+
+                    if format is not None:
+                        name, _ = os.path.splitext(remove)
+                        removed_file = f'{name}.{format}'
+                    else:
+                        removed_file = remove
+
+                    db = audb2.load(
+                        DB_NAME,
+                        version=version,
+                        format=format,
+                        removed_media=removed_media,
+                        full_path=False,
+                        backend=BACKEND,
+                        num_workers=pytest.NUM_WORKERS,
+                        verbose=False,
+                    )
+
+                    if removed_media:
+                        assert removed_file in db.files
+                    else:
+                        assert removed_file not in db.files
+                    assert removed_file not in audeer.list_file_names(
+                        os.path.join(db.meta['audb']['root'], 'audio'),
+                    )
+
+        # remove db from cache to ensure we always get a fresh copy
+        shutil.rmtree(db.meta['audb']['root'])

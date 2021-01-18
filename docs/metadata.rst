@@ -1,17 +1,3 @@
-.. Preload some data to avoid stderr print outs from tqdm,
-.. but still avoid using the verbose=False flag later on
-
-.. jupyter-execute::
-    :stderr:
-    :hide-output:
-    :hide-code:
-
-    import audb2
-
-
-    audb2.load('emodb', version='1.0.1', only_metadata=True, verbose=False)
-
-
 Metadata and header only
 ========================
 
@@ -22,6 +8,9 @@ In that case audio files are not loaded,
 but all the annotations and the header:
 
 .. jupyter-execute::
+
+    import audb2
+
 
     db = audb2.load(
         'emodb',

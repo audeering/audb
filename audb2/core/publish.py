@@ -86,7 +86,7 @@ def _find_media(
             if file in archives:
                 archive = archives[file]
             else:
-                archive = audeer.uid(from_string=file)
+                archive = audeer.uid(from_string=file.replace('\\', '/'))
             channels = audiofile.channels(path)
             duration = audiofile.duration(path)
             depend.data[file] = [
@@ -117,11 +117,11 @@ def _find_media(
 def _put_media(
         media: typing.Set[str],
         db_root: str,
+        db_name: str,
         version: str,
         depend: Depend,
         backend: Backend,
         repository: str,
-        group_id: str,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
@@ -138,11 +138,17 @@ def _put_media(
         if archive in map_media_to_files:
             for file in map_media_to_files[archive]:
                 depend.data[file][define.DependField.VERSION] = version
+            archive_file = backend.join(
+                db_name,
+                define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
+                archive,
+            )
             backend.put_archive(
-                db_root, map_media_to_files[archive],
-                archive, version, repository,
-                f'{group_id}.'
-                f'{define.DEPEND_TYPE_NAMES[define.DependType.MEDIA]}',
+                db_root,
+                map_media_to_files[archive],
+                archive_file,
+                version,
+                repository,
             )
 
     # upload new and altered archives if it contains at least one file
@@ -158,20 +164,21 @@ def _put_media(
 def _put_tables(
         tables: typing.List[str],
         db_root: str,
+        db_name: str,
         version: str,
         backend: Backend,
         repository: str,
-        group_id: str,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
     def job(table: str):
         file = f'db.{table}.csv'
-        backend.put_archive(
-            db_root, file, table, version, repository,
-            f'{group_id}.'
-            f'{define.DEPEND_TYPE_NAMES[define.DependType.META]}',
+        archive_file = backend.join(
+            db_name,
+            define.DEPEND_TYPE_NAMES[define.DependType.META],
+            table,
         )
+        backend.put_archive(db_root, file, archive_file, version, repository)
 
     audeer.run_tasks(
         job,
@@ -188,7 +195,6 @@ def publish(
         repository: str,
         *,
         archives: typing.Mapping[str, str] = None,
-        group_id: str = config.GROUP_ID,
         backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
@@ -200,7 +206,6 @@ def publish(
         version: version string
         repository: name of repository
         archives: map files to archives
-        group_id: group ID
         backend: backend object
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
@@ -217,11 +222,9 @@ def publish(
     db = audformat.Database.load(db_root, load_data=False)
 
     backend = default_backend(backend)
-    group_id: str = f'{group_id}.{db.name}'
 
-    if version in backend.versions(
-        define.DB_HEADER, repository, group_id
-    ):
+    remote_header = backend.join(db.name, define.DB_HEADER)
+    if version in backend.versions(remote_header, repository):
         raise RuntimeError(
             f"A version '{version}' already exists for "
             f"database '{db.name}'."
@@ -242,12 +245,6 @@ def publish(
 
     # check archives
     archives = archives or {}
-    for name in archives.values():
-        if name and define.ARCHIVE_NAME_PATTERN.fullmatch(name) is None:
-            raise ValueError(
-                f"Invalid archive name '{name}', "
-                "allowed characters are '[0-9][a-z][A-Z].-_'."
-            )
 
     # publish tables
     tables = _find_tables(
@@ -255,7 +252,7 @@ def publish(
         num_workers, verbose,
     )
     _put_tables(
-        tables, db_root, version, backend, repository, group_id,
+        tables, db_root, db.name, version, backend, repository,
         num_workers, verbose,
     )
 
@@ -265,31 +262,26 @@ def publish(
         num_workers, verbose,
     )
     _put_media(
-        media, db_root, version, depend, backend, repository, group_id,
+        media, db_root, db.name, version, depend, backend, repository,
         num_workers, verbose,
     )
 
     # publish dependencies and header
     depend.to_file(dep_path)
+    archive_file = backend.join(db.name, define.DB)
     backend.put_archive(
-        db_root, define.DB_DEPEND,
-        audeer.basename_wo_ext(define.DB_DEPEND),
-        version, repository, group_id,
+        db_root, define.DB_DEPEND, archive_file, version, repository,
     )
     try:
-        backend.put_file(
-            db_root, define.DB_HEADER, version, repository, group_id,
-        )
+        local_header = os.path.join(db_root, define.DB_HEADER)
+        remote_header = db.name + '/' + define.DB_HEADER
+        backend.put_file(local_header, remote_header, version, repository)
     except Exception:  # pragma: no cover
         # after the header is published
         # the new version becomes visible,
         # so if something goes wrong here
         # we better clean up
-        if backend.exists(
-                define.DB_HEADER, version, repository, group_id,
-        ):
-            backend.rem_file(
-                define.DB_HEADER, version, repository, group_id,
-            )
+        if backend.exists(remote_header, version, repository):
+            backend.remove_file(remote_header, version, repository)
 
     return depend

@@ -16,10 +16,10 @@ pytest.ROOT = audeer.safe_path(
 )
 
 pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
-pytest.GROUP_ID = f'audb2.{audeer.uid()}'
+pytest.ID = audeer.uid()
 pytest.HOST = os.path.join(pytest.ROOT, 'repo')
 pytest.NUM_WORKERS = 5
-pytest.REPOSITORY = 'unittests-public-local'
+pytest.REPOSITORY = 'data-unittests-local'
 pytest.SHARED_CACHE_ROOT = os.path.join(pytest.ROOT, 'shared')
 
 
@@ -37,7 +37,7 @@ def cleanup_session():
         shutil.rmtree(pytest.ROOT)
     url = audfactory.artifactory_path(
         audfactory.server_url(
-            pytest.GROUP_ID,
+            pytest.ID,
             repository=pytest.REPOSITORY,
         ),
     )

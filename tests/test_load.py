@@ -13,12 +13,11 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.GROUP_ID = pytest.GROUP_ID
 audb2.config.REPOSITORIES = [pytest.REPOSITORY]
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
-DB_NAME = 'test_load'
+DB_NAME = f'test_load-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
@@ -72,8 +71,11 @@ def fixture_publish_db():
     db.save(DB_ROOT_VERSION['1.0.0'])
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb2.publish(
-        DB_ROOT_VERSION['1.0.0'], '1.0.0', pytest.REPOSITORY,
-        archives=archives, group_id=pytest.GROUP_ID, backend=BACKEND,
+        DB_ROOT_VERSION['1.0.0'],
+        '1.0.0',
+        pytest.REPOSITORY,
+        archives=archives,
+        backend=BACKEND,
         verbose=False,
     )
 
@@ -91,8 +93,11 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
     )
     audb2.publish(
-        DB_ROOT_VERSION['1.1.0'], '1.1.0', pytest.REPOSITORY,
-        group_id=pytest.GROUP_ID, backend=BACKEND, verbose=False,
+        DB_ROOT_VERSION['1.1.0'],
+        '1.1.0',
+        pytest.REPOSITORY,
+        backend=BACKEND,
+        verbose=False,
     )
 
     # publish 1.1.1, change label
@@ -106,8 +111,11 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
     )
     audb2.publish(
-        DB_ROOT_VERSION['1.1.1'], '1.1.1', pytest.REPOSITORY,
-        group_id=pytest.GROUP_ID, backend=BACKEND, verbose=False,
+        DB_ROOT_VERSION['1.1.1'],
+        '1.1.1',
+        pytest.REPOSITORY,
+        backend=BACKEND,
+        verbose=False,
     )
 
     # publish 2.0.0, alter and remove media
@@ -127,8 +135,11 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
     )
     audb2.publish(
-        DB_ROOT_VERSION['2.0.0'], '2.0.0', pytest.REPOSITORY,
-        group_id=pytest.GROUP_ID, backend=BACKEND, verbose=False,
+        DB_ROOT_VERSION['2.0.0'],
+        '2.0.0',
+        pytest.REPOSITORY,
+        backend=BACKEND,
+        verbose=False,
     )
 
     # publish 3.0.0, remove table
@@ -142,8 +153,11 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['3.0.0'], 'db.csv'),
     )
     audb2.publish(
-        DB_ROOT_VERSION['3.0.0'], '3.0.0', pytest.REPOSITORY,
-        group_id=pytest.GROUP_ID, backend=BACKEND, verbose=False,
+        DB_ROOT_VERSION['3.0.0'],
+        '3.0.0',
+        pytest.REPOSITORY,
+        backend=BACKEND,
+        verbose=False,
     )
 
     yield
@@ -170,26 +184,27 @@ def test_load(version):
 
     with pytest.warns(UserWarning):
         assert not audb2.exists(
-            DB_NAME, version=version,
-            group_id=pytest.GROUP_ID, backend=BACKEND,
+            DB_NAME, version=version, backend=BACKEND,
         )
 
     db = audb2.load(
-        DB_NAME, version=version, full_path=False,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS, verbose=False,
+        DB_NAME,
+        version=version,
+        full_path=False,
+        backend=BACKEND,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
     )
     db_root = db.meta['audb']['root']
 
     with pytest.warns(UserWarning):
         assert audb2.exists(
-            DB_NAME, version=version,
-            group_id=pytest.GROUP_ID, backend=BACKEND,
+            DB_NAME, version=version, backend=BACKEND,
         )
 
     if version is None:
         resolved_version = audb2.latest_version(
-            DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
+            DB_NAME, backend=BACKEND,
         )
     else:
         resolved_version = version
@@ -209,7 +224,7 @@ def test_load(version):
     assert df.loc[db_root]['version'] == resolved_version
 
     depend = audb2.dependencies(
-        DB_NAME, version=version, group_id=pytest.GROUP_ID, backend=BACKEND,
+        DB_NAME, version=version, backend=BACKEND,
     )
     assert str(depend().to_string()) == str(depend)
     assert len(depend) == len(db.files) + len(db.tables)
@@ -217,9 +232,12 @@ def test_load(version):
     # from cache with full path
 
     db = audb2.load(
-        DB_NAME, version=version, full_path=True,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS, verbose=False,
+        DB_NAME,
+        version=version,
+        full_path=True,
+        backend=BACKEND,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
     )
     for file in db.files:
         assert os.path.exists(file)
@@ -247,14 +265,17 @@ def test_load_original_to(version):
     db_root = os.path.join(DB_ROOT, 'raw')
 
     db = audb2.load_original_to(
-        db_root, DB_NAME, version=version,
-        group_id=pytest.GROUP_ID, backend=BACKEND,
-        num_workers=pytest.NUM_WORKERS, verbose=False,
+        db_root,
+        DB_NAME,
+        version=version,
+        backend=BACKEND,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
     )
 
     if version is None:
         version = audb2.latest_version(
-            DB_NAME, group_id=pytest.GROUP_ID, backend=BACKEND,
+            DB_NAME, backend=BACKEND,
         )
     db_original = audformat.Database.load(DB_ROOT_VERSION[version])
 

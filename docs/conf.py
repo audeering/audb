@@ -4,6 +4,9 @@ import os
 import subprocess
 
 
+import audb2
+
+
 config = configparser.ConfigParser()
 config.read(os.path.join('..', 'setup.cfg'))
 
@@ -70,3 +73,28 @@ html_theme_options = {
     'wide_pages': ['data-example'],
 }
 html_title = title
+
+
+# cache databases to avoid progress bar in code examples
+
+audb2.load(
+    'emodb',
+    version='1.0.1',
+    num_workers=5,
+    verbose=False,
+)
+audb2.load(
+    'emodb',
+    version='1.0.1',
+    only_metadata=True,
+    num_workers=5,
+    verbose=False,
+)
+audb2.load(
+    'emodb',
+    version='1.0.1',
+    format='flac',
+    sampling_rate=44100,
+    num_workers=5,
+    verbose=False,
+)

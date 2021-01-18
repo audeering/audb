@@ -8,7 +8,7 @@ import audb2
 
 
 @pytest.mark.parametrize(
-    'files, name, group, version',
+    'files, name, folder, version',
     [
         (
             [],
@@ -37,10 +37,9 @@ import audb2
         audb2.backend.Artifactory(),
     ]
 )
-def test_archive(tmpdir, files, name, group, version, backend):
+def test_archive(tmpdir, files, name, folder, version, backend):
 
     repository = pytest.REPOSITORY
-    group_id = f'{pytest.GROUP_ID}.{group}'
 
     files_as_list = [files] if isinstance(files, str) else files
     for file in files_as_list:
@@ -49,30 +48,35 @@ def test_archive(tmpdir, files, name, group, version, backend):
         with open(path, 'w'):
             pass
 
+    archive = backend.join(
+        pytest.ID,
+        'test_archive',
+        name,
+    )
     path_backend = backend.put_archive(
-        tmpdir, files, name, version, repository, group_id,
+        tmpdir, files, archive, version, repository,
     )
     assert backend.put_archive(  # operation will be skipped
-        tmpdir, files, name, version, repository, group_id,
+        tmpdir, files, archive, version, repository,
     ) == path_backend
-    assert backend.exists(name + '.zip', version, repository, group_id)
+    assert backend.exists(archive + '.zip', version, repository)
 
     assert backend.get_archive(
-        tmpdir, name, version, repository, group_id,
+        archive, tmpdir, version, repository,
     ) == files_as_list
 
 
 @pytest.mark.parametrize(
-    'file, name, version',
+    'local_file, remote_file, version',
     [
         (
             'file.ext',
-            None,
+            'file.ext',
             '1.0.0',
         ),
         (
             os.path.join('dir', 'to', 'file.ext'),
-            None,
+            'dir/to/file.ext',
             '1.0.0',
         ),
         (
@@ -89,36 +93,40 @@ def test_archive(tmpdir, files, name, group, version, backend):
         audb2.backend.Artifactory(),
     ]
 )
-def test_file(tmpdir, file, name, version, backend):
+def test_file(tmpdir, local_file, remote_file, version, backend):
 
     repository = pytest.REPOSITORY
-    group_id = f'{pytest.GROUP_ID}.test_file'
 
-    path = os.path.join(tmpdir, file)
-    audeer.mkdir(os.path.dirname(path))
-    with open(path, 'w'):
+    local_file = os.path.join(tmpdir, local_file)
+    audeer.mkdir(os.path.dirname(local_file))
+    with open(local_file, 'w'):
         pass
 
-    assert not backend.exists(file, version, repository, group_id, name=name)
+    remote_file = backend.join(
+        pytest.ID,
+        'test_file',
+        remote_file,
+    )
+
+    assert not backend.exists(remote_file, version, repository)
     path_backend = backend.put_file(
-        tmpdir, file, version, repository, group_id, name=name,
+        local_file, remote_file, version, repository,
     )
     assert backend.put_file(  # operation will be skipped
-        tmpdir, file, version, repository, group_id, name=name,
+        local_file, remote_file, version, repository,
     ) == path_backend
-    assert backend.exists(file, version, repository, group_id, name=name)
+    assert backend.exists(remote_file, version, repository)
 
-    assert path == backend.get_file(
-        tmpdir, file, version, repository, group_id, name=name,
-    )
+    backend.get_file(remote_file, local_file, version, repository)
+    assert os.path.exists(local_file)
     assert backend.checksum(
-        file, version, repository, group_id, name=name
-    ) == audb2.core.utils.md5(path)
+        remote_file, version, repository,
+    ) == audb2.core.utils.md5(local_file)
 
-    assert backend.rem_file(
-        file, version, repository, group_id, name=name,
+    assert backend.remove_file(
+        remote_file, version, repository,
     ) == path_backend
-    assert not backend.exists(file, version, repository, group_id, name=name)
+    assert not backend.exists(remote_file, version, repository)
 
 
 @pytest.mark.parametrize(
@@ -131,54 +139,55 @@ def test_file(tmpdir, file, name, version, backend):
 def test_errors(tmpdir, backend):
 
     repository = pytest.REPOSITORY
-    group_id = f'{pytest.GROUP_ID}.test_errors'
+
+    file_name = 'does-not-exist'
+    local_file = os.path.join(tmpdir, file_name)
+    remote_file = backend.join(
+        pytest.ID,
+        'test_errors',
+        file_name,
+    )
 
     with pytest.raises(FileNotFoundError):
         backend.put_file(
-            tmpdir,
-            'does-not-exist',
+            local_file,
+            remote_file,
             '1.0.0',
             repository,
-            group_id,
         )
     with pytest.raises(FileNotFoundError):
         backend.put_archive(
             tmpdir,
-            'does-not-exist',
             'archive',
+            remote_file,
             '1.0.0',
             repository,
-            group_id,
         )
     with pytest.raises(FileNotFoundError):
         backend.get_file(
-            tmpdir,
-            'does-not-exist',
+            remote_file,
+            local_file,
             '1.0.0',
             repository,
-            group_id,
         )
     with pytest.raises(FileNotFoundError):
         backend.get_archive(
+            remote_file,
             tmpdir,
-            'does-not-exist',
             '1.0.0',
             repository,
-            group_id,
         )
     with pytest.raises(FileNotFoundError):
         backend.checksum(
-            'does-not-exist',
+            remote_file,
             '1.0.0',
             repository,
-            group_id,
         )
     with pytest.raises(FileNotFoundError):
-        backend.rem_file(
-            'does-not-exist',
+        backend.remove_file(
+            remote_file,
             '1.0.0',
             repository,
-            group_id,
         )
 
 
@@ -199,19 +208,24 @@ def test_errors(tmpdir, backend):
 def test_glob(tmpdir, files, backend):
 
     repository = pytest.REPOSITORY
-    group_id = f'{pytest.GROUP_ID}.test_glob'
 
     paths = []
     for file in files:
-        path = os.path.join(tmpdir, file)
-        audeer.mkdir(os.path.dirname(path))
-        with open(path, 'w'):
+        local_file = os.path.join(tmpdir, file)
+        audeer.mkdir(os.path.dirname(local_file))
+        with open(local_file, 'w'):
             pass
+        remote_file = backend.join(
+            pytest.ID,
+            'test_glob',
+            file,
+        )
         paths.append(
-            backend.put_file(tmpdir, file, '1.0.0', repository, group_id)
+            backend.put_file(local_file, remote_file, '1.0.0', repository)
         )
 
-    assert set(paths) == set(backend.glob('**/*.ext', repository, group_id))
+    pattern = f'{pytest.ID}/test_glob/**/*.ext'
+    assert set(paths) == set(backend.glob(pattern, repository))
 
 
 @pytest.mark.parametrize(
@@ -224,17 +238,40 @@ def test_glob(tmpdir, files, backend):
 def test_versions(tmpdir, backend):
 
     repository = pytest.REPOSITORY
-    group_id = f'{pytest.GROUP_ID}.test_versions'
-    file = 'db.yaml'
 
-    assert not backend.versions(file, repository, group_id)
-    with pytest.raises(RuntimeError):
-        backend.latest_version(file, repository, group_id)
-    path = os.path.join(tmpdir, file)
-    with open(path, 'w'):
+    file_name = 'db.yaml'
+    local_file = os.path.join(tmpdir, file_name)
+    with open(local_file, 'w'):
         pass
-    backend.put_file(tmpdir, file, '1.0.0', repository, group_id)
-    assert backend.versions(file, repository, group_id) == ['1.0.0']
-    backend.put_file(tmpdir, file, '2.0.0', repository, group_id)
-    assert backend.versions(file, repository, group_id) == ['1.0.0', '2.0.0']
-    assert backend.latest_version(file, repository, group_id) == '2.0.0'
+    remote_file = backend.join(
+        pytest.ID,
+        'test_versions',
+        file_name,
+    )
+
+    assert not backend.versions(remote_file, repository)
+    backend.put_file(local_file, remote_file, '1.0.0', repository)
+    assert backend.versions(remote_file, repository) == ['1.0.0']
+    backend.put_file(local_file, remote_file, '2.0.0', repository)
+    assert backend.versions(remote_file, repository) == ['1.0.0', '2.0.0']
+
+
+@pytest.mark.parametrize(
+    'backend',
+    [
+        audb2.backend.FileSystem(pytest.HOST),
+        audb2.backend.Artifactory(),
+    ]
+)
+@pytest.mark.parametrize(
+    'path',
+    [
+        'media/test1-12.344',
+        pytest.param(
+            r'media\test1',
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+    ]
+)
+def test_path_names(backend, path):
+    backend.path(path, None, pytest.REPOSITORY)

@@ -6,23 +6,6 @@ are also available from the command line.
 In addition, a command line tool for getting
 tables as CSV is provided.
 
-.. Pre-load the example database
-.. jupyter-execute::
-    :stderr:
-    :hide-output:
-    :hide-code:
-
-    import audb2
-
-    audb2.load(
-        'emodb',
-        version='1.0.1',
-        format='flac',
-        sampling_rate=44100,
-        num_workers=5,
-        verbose=False,
-    )
-
 
 audb2
 ~~~~~

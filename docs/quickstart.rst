@@ -1,17 +1,3 @@
-.. Preload some data to avoid stderr print outs from tqdm,
-.. but still avoid using the verbose=False flag later on
-
-.. jupyter-execute::
-    :stderr:
-    :hide-output:
-    :hide-code:
-
-    import audb2
-
-
-    audb2.load('emodb', version='1.0.1', num_workers=5, verbose=False)
-
-
 Quickstart
 ==========
 
@@ -22,7 +8,7 @@ To use emodb_ (see `available databases`_ for more) in your project:
     import audb2
 
 
-    db = audb2.load('emodb', version='1.0.1')  # load database
+    db = audb2.load('emodb', version='1.0.1', verbose=False)  # load database
     df = db['emotion'].get()  # get table
     df[:3]  # show first three entries
 

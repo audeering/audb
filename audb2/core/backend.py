@@ -1,28 +1,17 @@
 import errno
 import glob
 import os
+import re
 import shutil
 import tempfile
 import typing
 
-from artifactory import ArtifactoryPath
-
 import audfactory
 import audeer
 
+from audb2.core import define
 from audb2.core import utils
 from audb2.core.config import config
-
-
-def _alias(file: str, name: typing.Optional[str]):
-    r"""Convert file to alias."""
-    if name is None:
-        if file != os.path.basename(file):
-            # replace file sep with '/' to get same uid on all platforms
-            name = audeer.uid(from_string=file.replace(os.path.sep, '/'))
-        else:
-            name = audeer.basename_wo_ext(file)
-    return name
 
 
 class Backend:
@@ -50,21 +39,16 @@ class Backend:
 
     def checksum(
             self,
-            file: str,
+            path: str,
             version: str,
             repository: str,
-            group_id: str,
-            *,
-            name: str = None,
     ) -> str:
         r"""Get MD5 checksum for file on backend.
 
         Args:
-            file: file name
+            path: path to file on backend
             version: version string
             repository: repository name
-            group_id: group ID
-            name: alias name of file
 
         Returns:
             MD5 checksum
@@ -73,57 +57,14 @@ class Backend:
             FileNotFoundError: if file does not exist on backend
 
         """
-        path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
+        backend_path = self.path(path, version, repository)
 
-        if not self.exists(
-                file, version, repository=repository,
-                group_id=group_id, name=name,
-        ):
+        if not self._exists(backend_path):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), path,
             )
 
-        return self._checksum(path)
-
-    def _destination(
-            self,
-            name: str,
-            ext: str,
-            version: str,
-            repository: str,
-            group_id: str,
-    ) -> str:  # pragma: no cover
-        r"""File path on backend."""
-        raise NotImplementedError()
-
-    def destination(
-            self,
-            file: str,
-            version: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
-    ) -> str:
-        r"""File path on backend.
-
-        Args:
-            file: file name
-            version: version string
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
-
-        Returns:
-            file path on backend
-
-        """
-        name = _alias(file, name)
-        _, ext = os.path.splitext(os.path.basename(file))
-        return self._destination(name, ext, version, repository, group_id)
+        return self._checksum(backend_path)
 
     def _exists(
             self,
@@ -134,48 +75,39 @@ class Backend:
 
     def exists(
             self,
-            file: str,
+            path: str,
             version: str,
             repository: str,
-            group_id: str,
-            *,
-            name: str = None,
     ) -> bool:
         r"""Check if file exists on backend.
 
         Args:
-            file: file name
+            path: path to file on backend
             version: version string
             repository: repository name
-            group_id: group ID
-            name: alias name of file
 
         Returns:
             ``True`` if file exists
 
         """
-        path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
+        path = self.path(path, version, repository)
         return self._exists(path)
 
     def get_archive(
             self,
-            root: str,
-            name: str,
+            src_path: str,
+            dst_root: str,
             version: str,
             repository: str,
-            group_id: str,
     ) -> typing.List[str]:
         r"""Get archive from backend and extract.
 
         Args:
-            root: root directory
-            name: alias name of archive
+            src_path: path to archive on backend without extension,
+                e.g. ``media/archive1``
+            dst_root: local destination directory
             version: version string
             repository: repository name
-            group_id: group ID
 
         Returns:
             extracted files
@@ -185,12 +117,14 @@ class Backend:
 
         """
         with tempfile.TemporaryDirectory() as tmp:
-            tmp_root = os.path.join(tmp, os.path.basename(root))
-            file = name + '.zip'
-            path = self.get_file(
-                tmp_root, file, version, repository, group_id, name=name,
+            tmp_root = os.path.join(tmp, os.path.basename(dst_root))
+            remote_archive = src_path + '.zip'
+            local_archive = os.path.join(
+                tmp_root,
+                os.path.basename(remote_archive),
             )
-            return audeer.extract_archive(path, root)
+            self.get_file(remote_archive, local_archive, version, repository)
+            return audeer.extract_archive(local_archive, dst_root)
 
     def _get_file(
             self,
@@ -202,23 +136,18 @@ class Backend:
 
     def get_file(
             self,
-            root: str,
-            file: str,
+            src_path: str,
+            dst_path: str,
             version: str,
             repository: str,
-            group_id: str,
-            *,
-            name: str = None,
-    ) -> str:
+    ):
         r"""Get file from backend.
 
         Args:
-            root: root directory
-            file: file path relative to root
+            src_path: path to file on backend
+            dst_path: destination path to local file
             version: version string
             repository: repository name
-            group_id: group ID
-            name: alias name of file
 
         Returns:
             full path to local file
@@ -227,28 +156,21 @@ class Backend:
             FileNotFoundError: if file does not exist on backend
 
         """
-        src_path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
+        src_path = self.path(src_path, version, repository)
         if not self._exists(src_path):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), src_path,
             )
 
-        root = audeer.safe_path(root)
-        dst_path = os.path.join(root, file)
+        dst_path = audeer.safe_path(dst_path)
         audeer.mkdir(os.path.dirname(dst_path))
 
         self._get_file(src_path, dst_path)
-
-        return dst_path
 
     def _glob(
             self,
             pattern: str,
             repository: str,
-            group_id: str,
     ) -> typing.List[str]:  # pragma: no cover
         r"""Return matching files names."""
         raise NotImplementedError()
@@ -257,7 +179,6 @@ class Backend:
             self,
             pattern: str,
             repository: str,
-            group_id: str,
     ) -> typing.List[str]:
         r"""Return matching files names.
 
@@ -266,51 +187,86 @@ class Backend:
         Args:
             pattern: pattern string
             repository: repository name
-            group_id: group ID
 
         Returns:
             matching files on backend
 
         """
-        return self._glob(pattern, repository, group_id)
+        return self._glob(pattern, repository)
 
-    def latest_version(
+    def join(
             self,
-            file: str,
-            repository: str,
-            group_id: str,
-            *,
-            name: str = None,
+            path: str,
+            *paths,
     ) -> str:
-        r"""Latest version of a file.
+        r"""Join to path on backend.
 
         Args:
-            file: relative path to file
-            repository: repository name
-            group_id: group ID
-            name: alias name of file
+            path: first part of path
+            *paths: additional parts of path
 
         Returns:
-            version string
+            path joined by :attr:`Backend.sep`
 
         """
-        vs = self.versions(
-            file, repository, group_id, name=name,
-        )
-        if not vs:
-            raise RuntimeError(
-                f"Cannot find a version for file '{file}'.",
+        return self.sep.join([path] + [p for p in paths])
+
+    def _path(
+            self,
+            repository: str,
+            folder: str,
+            name: str,
+            ext: str,
+            version: str,
+    ) -> str:  # pragma: no cover
+        r"""File path on backend."""
+        raise NotImplementedError()
+
+    def path(
+            self,
+            path: str,
+            version: str,
+            repository: str,
+    ) -> str:
+        r"""File path on backend.
+
+        This converts a file path on the backend
+        from the form it is presented to a user
+        to the actual path on the backend storage.
+
+        Args:
+            path: relative path to file in repository
+            version: version string
+            repository: repository name
+
+        Returns:
+            file path on backend
+
+        Example:
+            >>> backend = FileSystem()
+            >>> path = backend.path('media/archive1.zip', '1.0.0', 'data')
+            >>> home = os.path.expanduser('~')
+            >>> path[len(home) + 1:]
+            'audb2-host/data/media/archive1/1.0.0/archive1-1.0.0.zip'
+
+        """
+        allowed_chars = re.compile(define.BACKEND_ALLOWED_CHARS)
+        if allowed_chars.fullmatch(path) is None:
+            raise ValueError(
+                f"Invalid path name '{path}', "
+                f"allowed characters are '{define.BACKEND_ALLOWED_CHARS}'."
             )
-        return vs[-1]
+        folder, file = self.split(path)
+        name, ext = os.path.splitext(file)
+        return self._path(repository, folder, name, ext, version)
 
     def put_archive(
             self,
-            root: str,
+            src_root: str,
             files: typing.Union[str, typing.Sequence[str]],
-            name: str,
+            dst_path: str,
             version: str,
             repository: str,
-            group_id: str,
     ) -> str:
         r"""Create archive and put on backend.
 
@@ -319,12 +275,14 @@ class Backend:
         already exists on the backend.
 
         Args:
-            root: root directory
-            files: relative path to file(s)
-            name: alias name of archive
+            src_root: local root directory where files are located.
+                Only folders and files below ``src_root``
+                will be included into the archive
+            files: relative path to file(s) from ``src_root``
+            dst_path: path to archive on backend without extension,
+                e.g. ``media/archive1``
             version: version string
             repository: repository name
-            group_id: group ID
 
         Returns:
             archive path on backend
@@ -333,25 +291,24 @@ class Backend:
             FileNotFoundError: if one or more files do not exist
 
         """
-        root = audeer.safe_path(root)
+        src_root = audeer.safe_path(src_root)
 
         if isinstance(files, str):
             files = [files]
 
         for file in files:
-            path = os.path.join(root, file)
+            path = os.path.join(src_root, file)
             if not os.path.exists(path):
                 raise FileNotFoundError(
                     errno.ENOENT, os.strerror(errno.ENOENT), path,
                 )
 
         with tempfile.TemporaryDirectory() as tmp:
-            file = f'{name}-{version}.zip'
-            utils.create_archive(root, files, os.path.join(tmp, file))
-            return self.put_file(
-                tmp, file, version, repository=repository,
-                group_id=group_id, name=name,
-            )
+            _, archive_name = self.split(dst_path)
+            archive = os.path.join(tmp, f'{archive_name}-{version}.zip')
+            utils.create_archive(src_root, files, archive)
+            remote_archive = dst_path + '.zip'
+            return self.put_file(archive, remote_archive, version, repository)
 
     def _put_file(
             self,
@@ -363,13 +320,10 @@ class Backend:
 
     def put_file(
             self,
-            root: str,
-            file: str,
+            src_path: str,
+            dst_path: str,
             version: str,
             repository: str,
-            group_id: str,
-            *,
-            name: str = None,
     ):
         r"""Put file on backend.
 
@@ -378,12 +332,10 @@ class Backend:
         already exists on the backend.
 
         Args:
-            root: root directory
-            file: relative path to file
+            src_path: path to local file
+            dst_path: path to file on backend
             version: version string
             repository: repository name
-            group_id: group ID
-            name: alias name of file
 
         Returns:
             file path on backend
@@ -392,17 +344,12 @@ class Backend:
             FileNotFoundError: if local file does not exist
 
         """
-        root = audeer.safe_path(root)
-        src_path = os.path.join(root, file)
         if not os.path.exists(src_path):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), src_path,
             )
 
-        dst_path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
+        dst_path = self.path(dst_path, version, repository)
 
         # skip if file with same checksum exists on backend
         skip = self._exists(dst_path) and \
@@ -412,30 +359,25 @@ class Backend:
 
         return dst_path
 
-    def _rem_file(
+    def _remove_file(
             self,
             path: str,
     ):  # pragma: no cover
         r"""Remove file from backend."""
         raise NotImplementedError()
 
-    def rem_file(
+    def remove_file(
             self,
-            file: str,
+            path: str,
             version: str,
             repository: str,
-            group_id: str,
-            *,
-            name: str = None,
     ) -> str:
         r"""Remove file from backend.
 
         Args:
-            file: relative path to file
+            path: path to file on backend
             version: version string
             repository: repository name
-            group_id: group ID
-            name: alias name of file
 
         Returns:
             path of removed file on backend
@@ -444,50 +386,65 @@ class Backend:
             FileNotFoundError: if file does not exist on backend
 
         """
-        path = self.destination(
-            file, version, repository=repository,
-            group_id=group_id, name=name,
-        )
+        path = self.path(path, version, repository)
         if not self._exists(path):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), path,
             )
 
-        self._rem_file(path)
+        self._remove_file(path)
 
         return path
 
+    @property
+    def sep(self) -> str:
+        r"""File separator on backend."""
+        return '/'
+
+    def split(
+            self,
+            path: str,
+    ) -> typing.Tuple[str, str]:
+        r"""Split path on backend into folder and basename.
+
+        Args:
+            path: path containing :attr:`Backend.sep` as separator
+
+        Returns:
+            tuple containing (folder, basename)
+
+        """
+        folder = self.sep.join(path.split(self.sep)[:-1])
+        basename = path.split(self.sep)[-1]
+        return folder, basename
+
     def _versions(
             self,
-            name: str,
             repository: str,
-            group_id: str,
+            folder: str,
+            name: str,
     ) -> typing.List[str]:  # pragma: no cover
         r"""Versions of a file."""
         raise NotImplementedError()
 
     def versions(
             self,
-            file: str,
+            path: str,
             repository: str,
-            group_id: str,
-            *,
-            name: str = None,
     ) -> typing.List[str]:
         r"""Versions of a file.
 
         Args:
-            file: relative path to file
+            path: path to file on backend
             repository: repository name
-            group_id: group ID
-            name: alias name of file
 
         Returns:
             list of versions in ascending order
 
         """
-        name = _alias(file, name)
-        vs = self._versions(name, repository, group_id)
+        folder, file = self.split(path)
+        name = audeer.basename_wo_ext(file)
+        vs = self._versions(repository, folder, name)
         utils.sort_versions(vs)
         return vs
 
@@ -515,17 +472,17 @@ class Artifactory(Backend):
         r"""MD5 checksum of file on backend."""
         return audfactory.checksum(path)
 
-    def _destination(
+    def _path(
             self,
+            repository: str,
+            folder: str,
             name: str,
             ext: str,
             version: str,
-            repository: str,
-            group_id: str,
     ) -> str:
         r"""File path on backend."""
         server_url = audfactory.server_url(
-            group_id,
+            group_id=audfactory.path_to_group_id(folder),
             name=name,
             repository=repository,
             version=version,
@@ -551,11 +508,10 @@ class Artifactory(Backend):
             self,
             pattern: str,
             repository: str,
-            group_id: str,
     ) -> typing.List[str]:
         r"""Return matching files names."""
         url = audfactory.server_url(
-            group_id,
+            '',
             repository=repository,
         )
         path = audfactory.artifactory_path(url)
@@ -573,7 +529,7 @@ class Artifactory(Backend):
         r"""Put file to backend."""
         audfactory.deploy_artifact(src_path, dst_path)
 
-    def _rem_file(
+    def _remove_file(
             self,
             path: str,
     ):
@@ -582,11 +538,12 @@ class Artifactory(Backend):
 
     def _versions(
             self,
-            name: str,
             repository: str,
-            group_id: str,
+            folder: str,
+            name: str,
     ) -> typing.List[str]:
         r"""Versions of a file."""
+        group_id = audfactory.path_to_group_id(folder)
         return audfactory.versions(group_id, name, repository=repository)
 
 
@@ -605,15 +562,6 @@ class FileSystem(Backend):
     ):
         super().__init__(audeer.safe_path(host))
 
-    def _root(
-            self,
-            repository: str,
-            group_id: str,
-    ) -> str:
-        return os.path.join(
-            self.host, repository, group_id.replace('.', os.path.sep),
-        )
-
     def _checksum(
             self,
             path: str,
@@ -621,19 +569,28 @@ class FileSystem(Backend):
         r"""MD5 checksum of file on backend."""
         return utils.md5(path)
 
-    def _destination(
+    def _path(
             self,
+            repository: str,
+            folder: str,
             name: str,
             ext: str,
             version: str,
-            repository: str,
-            group_id: str,
     ) -> str:
         r"""File path on backend."""
-        return os.path.join(
-            self._root(repository, group_id),
-            name, version, f'{name}-{version}{ext}',
+        path = os.path.join(
+            self.host,
+            repository,
+            folder.replace(self.sep, os.path.sep),
+            name,
         )
+        if version is not None:
+            path = os.path.join(
+                path,
+                version,
+                f'{name}-{version}{ext}',
+            )
+        return path
 
     def _exists(
             self,
@@ -654,12 +611,9 @@ class FileSystem(Backend):
             self,
             pattern: str,
             repository: str,
-            group_id: str,
     ) -> typing.List[str]:
         r"""Return matching files names."""
-        root = os.path.join(
-            self.host, repository, group_id.replace('.', os.path.sep),
-        )
+        root = os.path.join(self.host, repository)
         path = os.path.join(root, pattern)
         return [os.path.join(root, p) for p in glob.glob(path, recursive=True)]
 
@@ -672,7 +626,7 @@ class FileSystem(Backend):
         audeer.mkdir(os.path.dirname(dst_path))
         shutil.copy(src_path, dst_path)
 
-    def _rem_file(
+    def _remove_file(
             self,
             path: str,
     ):
@@ -681,12 +635,12 @@ class FileSystem(Backend):
 
     def _versions(
             self,
-            name: str,
             repository: str,
-            group_id: str,
+            folder: str,
+            name: str,
     ) -> typing.List[str]:
         r"""Versions of a file."""
-        root = os.path.join(self._root(repository, group_id), name)
+        root = self._path(repository, folder, name, '', None)
         vs = []
         if os.path.exists(root):
             vs = [
