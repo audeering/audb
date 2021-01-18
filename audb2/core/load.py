@@ -223,11 +223,20 @@ def _get_media(
         )
         files = backend.get_archive(archive, db_root_tmp, version, repository)
         for file in files:
-            if flavor is not None:
+            if flavor is not None and depend.format(file) in define.FORMATS:
+                bit_depth = depend.bit_depth(file)
+                channels = depend.channels(file)
+                sampling_rate = depend.sampling_rate(file)
                 src_path = os.path.join(db_root_tmp, file)
                 file = flavor.destination(file)
                 dst_path = os.path.join(db_root_tmp, file)
-                flavor(src_path, dst_path)
+                flavor(
+                    src_path,
+                    dst_path,
+                    bit_depth=bit_depth,
+                    channels=channels,
+                    sampling_rate=sampling_rate,
+                )
                 if src_path != dst_path:
                     os.remove(src_path)
             _move_file(db_root_tmp, db_root, file)

@@ -12,6 +12,12 @@ import audresample
 from audb2.core import define
 
 
+def split_ext(file: str) -> str:
+    r"""File extension without . and lower case."""
+    _, ext = os.path.splitext(file.lower())
+    return ext[1:]
+
+
 class Flavor(audobject.Object):
     r"""Database flavor.
 
@@ -150,24 +156,27 @@ class Flavor(audobject.Object):
     def _check_convert(
             self,
             file: str,
+            bit_depth: typing.Optional[int],
+            channels: typing.Optional[int],
+            sampling_rate: typing.Optional[int],
     ) -> bool:
         r"""Check if file needs to be converted to flavor."""
 
         # format change
         if self.format is not None:
-            _, ext = os.path.splitext(file)
-            if self.format != ext.lower():
+            ext = split_ext(file)
+            if self.format != ext:
                 return True
 
         # precision change
         if self.bit_depth is not None:
-            bit_depth = audiofile.bit_depth(file)
+            bit_depth = bit_depth or audiofile.bit_depth(file)
             if self.bit_depth != bit_depth:
                 return True
 
         # mixdown and channel selection
         if self.mixdown or self.channels is not None:
-            channels = audiofile.channels(file)
+            channels = channels or audiofile.channels(file)
             if self.mixdown and channels != 1:
                 return True
             elif list(range(channels)) != self.channels:
@@ -175,7 +184,7 @@ class Flavor(audobject.Object):
 
         # sampling rate change
         if self.sampling_rate is not None:
-            sampling_rate = audiofile.sampling_rate(file)
+            sampling_rate = sampling_rate or audiofile.sampling_rate(file)
             if self.sampling_rate != sampling_rate:
                 return True
 
@@ -219,12 +228,19 @@ class Flavor(audobject.Object):
             self,
             src_path: str,
             dst_path: str,
+            *,
+            bit_depth: int = None,
+            channels: int = None,
+            sampling_rate: int = None,
     ):
         r"""Convert file to flavor.
 
         Args:
             src_path: path to input file
             dst_path: path to output file
+            bit_depth: bit depth
+            channels: number of channels
+            sampling_rate: sampling rate in Hz
 
         Raises:
             ValueError: if extension of output file does not match the
@@ -235,19 +251,19 @@ class Flavor(audobject.Object):
         dst_path = audeer.safe_path(dst_path)
 
         # verify that extension matches the output format
-        _, src_ext = os.path.splitext(src_path)
-        src_ext = src_ext[1:]
-        _, dst_ext = os.path.splitext(dst_path)
-        dst_ext = dst_ext[1:]
-        expected_ext = self.format or src_ext.lower()
-        if expected_ext != dst_ext.lower():
+        src_ext = split_ext(src_path)
+        dst_ext = split_ext(dst_path)
+        expected_ext = self.format or src_ext
+        if expected_ext != dst_ext:
             raise ValueError(
                 f"Extension of output file is '{dst_ext}', "
                 f"but should be '{expected_ext} "
                 "to match the format of the converted file."
             )
 
-        if not self._check_convert(src_path):
+        if not self._check_convert(
+                src_path, bit_depth, channels, sampling_rate
+        ):
 
             # file already satisfies flavor
             if src_path != dst_path:
@@ -259,7 +275,10 @@ class Flavor(audobject.Object):
             signal, sampling_rate = audiofile.read(src_path, always_2d=True)
             signal = self._remix(signal)
             signal, sampling_rate = self._resample(signal, sampling_rate)
-            bit_depth = self.bit_depth or audiofile.bit_depth(src_path)
+            if self.bit_depth:
+                bit_depth = self.bit_depth
+            else:
+                bit_depth = bit_depth or audiofile.bit_depth(src_path)
             audiofile.write(
                 dst_path,
                 signal,
