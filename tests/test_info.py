@@ -86,15 +86,42 @@ def test_info():
     depend = audb2.dependencies(DB_NAME, backend=BACKEND,)
 
     assert str(audb2.info.header(DB_NAME, backend=BACKEND)) == str(DB)
+    assert audb2.info.bit_depths(DB_NAME, backend=BACKEND) == set(
+        [
+            depend.bit_depth(file) for file in depend.media
+            if depend.bit_depth(file)
+        ]
+    )
+    assert audb2.info.channels(DB_NAME, backend=BACKEND) == set(
+        [
+            depend.channels(file) for file in depend.media
+            if depend.channels(file)
+        ]
+    )
     assert audb2.info.description(DB_NAME, backend=BACKEND) == DB.description
     assert audb2.info.duration(DB_NAME, backend=BACKEND) == pd.to_timedelta(
-        sum([depend.duration(file) for file in depend.media]),
+        sum(
+            [
+                depend.duration(file) for file in depend.media
+            ]
+        ),
         unit='s',
+    )
+    assert audb2.info.formats(DB_NAME, backend=BACKEND) == set(
+        [
+            depend.format(file) for file in depend.media
+        ]
     )
     assert audb2.info.languages(DB_NAME, backend=BACKEND) == DB.languages
     assert str(audb2.info.media(DB_NAME, backend=BACKEND)) == str(DB.media)
     assert audb2.info.meta(DB_NAME, backend=BACKEND) == DB.meta
     assert str(audb2.info.raters(DB_NAME, backend=BACKEND)) == str(DB.raters)
+    assert audb2.info.sampling_rates(DB_NAME, backend=BACKEND) == set(
+        [
+            depend.sampling_rate(file) for file in depend.media
+            if depend.sampling_rate(file)
+        ]
+    )
     assert str(audb2.info.schemes(DB_NAME, backend=BACKEND)) == str(DB.schemes)
     assert str(audb2.info.splits(DB_NAME, backend=BACKEND)) == str(DB.splits)
     assert audb2.info.source(DB_NAME, backend=BACKEND) == DB.source

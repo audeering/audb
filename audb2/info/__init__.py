@@ -43,13 +43,17 @@ You can run:
 
 """
 from audb2.core.info import (
+    bit_depths,
+    channels,
     description,
     duration,
+    formats,
     header,
     languages,
     media,
     meta,
     raters,
+    sampling_rates,
     schemes,
     source,
     splits,

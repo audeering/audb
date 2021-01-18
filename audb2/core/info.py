@@ -16,6 +16,58 @@ from audb2.core.backend import Backend
 from audb2.core.config import config
 
 
+def bit_depths(
+        name: str,
+        *,
+        version: str = None,
+        backend: Backend = None,
+) -> typing.Set[int]:
+    """Media bit depth.
+
+    Args:
+        name: name of database
+        version: version of database
+        backend: backend object
+
+    Returns:
+        bit depths
+
+    """
+    depend = dependencies(name, version=version, backend=backend)
+    return set(
+        [
+            depend.bit_depth(file) for file in depend.media
+            if depend.bit_depth(file)
+        ]
+    )
+
+
+def channels(
+        name: str,
+        *,
+        version: str = None,
+        backend: Backend = None,
+) -> typing.Set[int]:
+    """Media channels.
+
+    Args:
+        name: name of database
+        version: version of database
+        backend: backend object
+
+    Returns:
+        channel numbers
+
+    """
+    depend = dependencies(name, version=version, backend=backend)
+    return set(
+        [
+            depend.channels(file) for file in depend.media
+            if depend.channels(file)
+        ]
+    )
+
+
 def description(
         name: str,
         *,
@@ -58,6 +110,31 @@ def duration(
     return pd.to_timedelta(
         sum([depend.duration(file) for file in depend.media]),
         unit='s',
+    )
+
+
+def formats(
+        name: str,
+        *,
+        version: str = None,
+        backend: Backend = None,
+) -> typing.Set[str]:
+    """Media formats.
+
+    Args:
+        name: name of database
+        version: version of database
+        backend: backend object
+
+    Returns:
+        format
+
+    """
+    depend = dependencies(name, version=version, backend=backend)
+    return set(
+        [
+            depend.format(file) for file in depend.media
+        ]
     )
 
 
@@ -178,6 +255,32 @@ def raters(
     """
     db = header(name, version=version, backend=backend)
     return db.raters
+
+
+def sampling_rates(
+        name: str,
+        *,
+        version: str = None,
+        backend: Backend = None,
+) -> typing.Set[int]:
+    """Media sampling rates.
+
+    Args:
+        name: name of database
+        version: version of database
+        backend: backend object
+
+    Returns:
+        sampling rates
+
+    """
+    depend = dependencies(name, version=version, backend=backend)
+    return set(
+        [
+            depend.sampling_rate(file) for file in depend.media
+            if depend.sampling_rate(file)
+        ]
+    )
 
 
 def schemes(
