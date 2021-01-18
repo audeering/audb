@@ -36,7 +36,7 @@ def _find_tables(
         file = f'db.{table}.csv'
         checksum = utils.md5(os.path.join(db_root, file))
         if file not in depend:
-            depend.add_table(file, table, checksum, version)
+            depend.add_meta(file, table, checksum, version)
             tables.append(table)
         elif checksum != depend.checksum(file):
             depend.data[file][define.DependField.CHECKSUM] = checksum
@@ -82,21 +82,12 @@ def _find_media(
                 archive = archives[file]
             else:
                 archive = audeer.uid(from_string=file.replace('\\', '/'))
-            channels = audiofile.channels(path)
-            duration = audiofile.duration(path)
-            depend.add_media(
-                file, archive, checksum, version,
-                channels=channels, duration=duration,
-            )
+            depend.add_media(db_root, file, archive, checksum, version)
         elif not depend.removed(file):
             checksum = utils.md5(path)
             if checksum != depend.checksum(file):
-                channels = audiofile.channels(path)
-                duration = audiofile.duration(path)
-                depend.data[file][define.DependField.CHANNELS] = channels
-                depend.data[file][define.DependField.CHECKSUM] = checksum
-                depend.data[file][define.DependField.DURATION] = duration
-                depend.data[file][define.DependField.VERSION] = version
+                archive = depend.data[file][define.DependField.ARCHIVE]
+                depend.add_media(db_root, file, archive, checksum, version)
 
     audeer.run_tasks(
         job,

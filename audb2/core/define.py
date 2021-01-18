@@ -7,20 +7,26 @@ DB_DEPEND = f'{DB}.csv'
 class DependField:
     r"""Fields stored in dependency table."""
     ARCHIVE = 0
-    CHANNELS = 1
-    CHECKSUM = 2
-    DURATION = 3
-    REMOVED = 4
-    TYPE = 5
-    VERSION = 6
+    BIT_DEPTH = 1
+    CHANNELS = 2
+    CHECKSUM = 3
+    DURATION = 4
+    FORMAT = 5
+    REMOVED = 6
+    SAMPLING_RATE = 7
+    TYPE = 8
+    VERSION = 9
 
 
 DEPEND_FIELD_NAMES = {
     DependField.ARCHIVE: 'archive',
+    DependField.BIT_DEPTH: 'bit_depth',
     DependField.CHANNELS: 'channels',
     DependField.CHECKSUM: 'checksum',
     DependField.DURATION: 'duration',
+    DependField.FORMAT: 'format',
     DependField.REMOVED: 'removed',
+    DependField.SAMPLING_RATE: 'sampling_rate',
     DependField.TYPE: 'type',
     DependField.VERSION: 'version',
 }

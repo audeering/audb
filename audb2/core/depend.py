@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 import audeer
+import audiofile
 
 from audb2.core import define
 
@@ -116,31 +117,49 @@ class Depend:
 
     def add_media(
             self,
+            root: str,
             file: str,
             archive: str,
             checksum: str,
             version: str,
-            *,
-            channels: int = None,
-            duration: float = None,
     ):
         r"""Add media to dependencies.
 
         Args:
+            root: root directory
             file: relative file path
             archive: archive name without extension
             checksum: checksum of file
             version: version string
-            channels: number of channels
-            duration: duration in seconds
 
         """
+        _, format = os.path.splitext(file.lower())
+        if format:
+            format = format[1:]
+
+        bit_depth = channels = sampling_rate = 0
+        duration = 0.0
+        if format in define.FORMATS:
+            path = os.path.join(root, file)
+            bit_depth = audiofile.bit_depth(path)
+            channels = audiofile.channels(path)
+            duration = audiofile.duration(path)
+            sampling_rate = audiofile.sampling_rate(path)
+
         self.data[file] = [
-            archive, channels, checksum, duration,
-            0, define.DependType.MEDIA, version,
+            archive,
+            bit_depth,
+            channels,
+            checksum,
+            duration,
+            format,
+            0,  # removed
+            sampling_rate,
+            define.DependType.MEDIA,
+            version,
         ]
 
-    def add_table(
+    def add_meta(
             self,
             file: str,
             archive: str,
@@ -156,9 +175,21 @@ class Depend:
             version: version string
 
         """
+        _, format = os.path.splitext(file.lower())
+        if format:
+            format = format[1:]
+
         self.data[file] = [
-            archive, np.nan, checksum, np.nan, 0, define.DependType.META,
-            version,
+            archive,                 # archive
+            0,                       # bit_depth
+            0,                       # channels
+            checksum,                # checksum
+            0.0,                     # duration
+            format,                  # format
+            0,                       # removed
+            0,                       # sampling_rate
+            define.DependType.META,  # type
+            version,                 # version
         ]
 
     def archive(
@@ -176,7 +207,19 @@ class Depend:
         """
         return self[file][define.DependField.ARCHIVE]
 
-    def channels(self, file: str) -> str:
+    def bit_depth(self, file: str) -> typing.Optional[int]:
+        r"""Bit depth of media file.
+
+        Args:
+            file: relative file path
+
+        Returns:
+            bit depth
+
+        """
+        return self[file][define.DependField.BIT_DEPTH] or None
+
+    def channels(self, file: str) -> typing.Optional[int]:
         r"""Number of channels of media file.
 
         Args:
@@ -186,7 +229,7 @@ class Depend:
             number of channels
 
         """
-        return self[file][define.DependField.CHANNELS]
+        return self[file][define.DependField.CHANNELS] or None
 
     def checksum(self, file: str) -> str:
         r"""Checksum of file.
@@ -200,7 +243,7 @@ class Depend:
         """
         return self[file][define.DependField.CHECKSUM]
 
-    def duration(self, file: str) -> float:
+    def duration(self, file: str) -> typing.Optional[float]:
         r"""Duration of file.
 
         Args:
@@ -210,7 +253,19 @@ class Depend:
             duration in seconds
 
         """
-        return self[file][define.DependField.DURATION]
+        return self[file][define.DependField.DURATION] or None
+
+    def format(self, file: str) -> str:
+        r"""Format of file.
+
+        Args:
+            file: relative file path
+
+        Returns:
+            file format (always lower case)
+
+        """
+        return self[file][define.DependField.FORMAT]
 
     def from_file(
             self,
@@ -227,9 +282,10 @@ class Depend:
         self._data = {}
         path = audeer.safe_path(path)
         if os.path.exists(path):
-            df = pd.read_csv(path, index_col=0)
-            for file, row in df.iterrows():
-                self._data[file] = list(row)
+            df = pd.read_csv(path, index_col=0, na_filter=False)
+            self._data = {
+                file: list(row) for file, row in df.iterrows()
+            }
 
     def remove(self, file: str):
         r"""Mark file as removed.
@@ -251,6 +307,18 @@ class Depend:
 
         """
         return self[file][define.DependField.REMOVED] != 0
+
+    def sampling_rate(self, file: str) -> typing.Optional[int]:
+        r"""Sampling rate of media file.
+
+        Args:
+            file: relative file path
+
+        Returns:
+            sampling rate in Hz
+
+        """
+        return self[file][define.DependField.SAMPLING_RATE] or None
 
     def to_file(
             self,
