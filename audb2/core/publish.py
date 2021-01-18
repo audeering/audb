@@ -10,7 +10,6 @@ from audb2.core import define
 from audb2.core import utils
 from audb2.core.api import default_backend
 from audb2.core.backend import Backend
-from audb2.core.config import config
 from audb2.core.depend import Depend
 
 
@@ -37,14 +36,10 @@ def _find_tables(
         file = f'db.{table}.csv'
         checksum = utils.md5(os.path.join(db_root, file))
         if file not in depend:
-            depend.data[file] = [
-                table, 0, checksum, 0, 0, define.DependType.META, version,
-            ]
+            depend.add_table(file, table, checksum, version)
             tables.append(table)
         elif checksum != depend.checksum(file):
-            depend.data[file][define.DependField.CHANNELS] = 0
             depend.data[file][define.DependField.CHECKSUM] = checksum
-            depend.data[file][define.DependField.DURATION] = 0
             depend.data[file][define.DependField.VERSION] = version
             tables.append(table)
 
@@ -89,10 +84,10 @@ def _find_media(
                 archive = audeer.uid(from_string=file.replace('\\', '/'))
             channels = audiofile.channels(path)
             duration = audiofile.duration(path)
-            depend.data[file] = [
-                archive, channels, checksum, duration, 0,
-                define.DependType.MEDIA, version,
-            ]
+            depend.add_media(
+                file, archive, checksum, version,
+                channels=channels, duration=duration,
+            )
         elif not depend.removed(file):
             checksum = utils.md5(path)
             if checksum != depend.checksum(file):

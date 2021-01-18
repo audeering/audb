@@ -113,6 +113,52 @@ class Depend:
         ]
         return select
 
+    def add_media(
+            self,
+            file: str,
+            archive: str,
+            checksum: str,
+            version: str,
+            *,
+            channels: int = None,
+            duration: float = None,
+    ):
+        r"""Add media to dependencies.
+
+        Args:
+            file: relative file path
+            archive: archive name without extension
+            checksum: checksum of file
+            version: version string
+            channels: number of channels
+            duration: duration in seconds
+
+        """
+        self.data[file] = [
+            archive, channels, checksum, duration,
+            0, define.DependType.MEDIA, version,
+        ]
+
+    def add_table(
+            self,
+            file: str,
+            archive: str,
+            checksum: str,
+            version: str,
+    ):
+        r"""Add table to dependencies.
+
+        Args:
+            file: relative file path
+            archive: archive name without extension
+            checksum: checksum of file
+            version: version string
+
+        """
+        self.data[file] = [
+            archive, 0, checksum, 0, 0, define.DependType.META, version,
+        ]
+
     def archive(
             self,
             file: str,
