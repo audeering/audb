@@ -38,7 +38,8 @@ def available(
 
     match = {}
     for repository in config.REPOSITORIES:
-        for p in backend.glob('**/*.yaml', repository):
+        pattern = f'*/{define.DB}/*/{define.DB}-*.yaml'
+        for p in backend.glob(pattern, repository):
             name, _, version, _ = p.split('/')[-4:]
             if name not in match:
                 match[name] = {
