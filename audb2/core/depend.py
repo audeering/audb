@@ -7,7 +7,6 @@ import audeer
 import audiofile
 
 from audb2.core import define
-from audb2.core import utils
 
 
 class Depend:
@@ -133,7 +132,7 @@ class Depend:
             version: version string
 
         """
-        format = utils.to_format(file)
+        format = audeer.file_extension(file).lower()
 
         bit_depth = channels = sampling_rate = 0
         duration = 0.0
@@ -173,9 +172,7 @@ class Depend:
             version: version string
 
         """
-        _, format = os.path.splitext(file.lower())
-        if format:
-            format = format[1:]
+        format = audeer.file_extension(file).lower()
 
         self.data[file] = [
             archive,                 # archive

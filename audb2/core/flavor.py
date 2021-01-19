@@ -10,7 +10,6 @@ import audobject
 import audresample
 
 from audb2.core import define
-from audb2.core import utils
 
 
 class Flavor(audobject.Object):
@@ -124,7 +123,7 @@ class Flavor(audobject.Object):
 
         """
         if self.format is not None:
-            format = utils.to_format(file)
+            format = audeer.file_extension(file).lower()
             if format != self.format:
                 file = audeer.basename_wo_ext(file) + '.' + self.format
         return file
@@ -159,8 +158,8 @@ class Flavor(audobject.Object):
 
         # format change
         if self.format is not None:
-            ext = utils.to_format(file)
-            if self.format != ext:
+            format = audeer.file_extension(file).lower()
+            if self.format != format:
                 return True
 
         # precision change
@@ -250,8 +249,8 @@ class Flavor(audobject.Object):
         dst_path = audeer.safe_path(dst_path)
 
         # verify that extension matches the output format
-        src_ext = utils.to_format(src_path)
-        dst_ext = utils.to_format(dst_path)
+        src_ext = audeer.file_extension(src_path).lower()
+        dst_ext = audeer.file_extension(dst_path).lower()
         expected_ext = self.format or src_ext
         if expected_ext != dst_ext:
             raise ValueError(

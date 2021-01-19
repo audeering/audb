@@ -49,11 +49,3 @@ def md5(
 def sort_versions(versions: typing.List[str]):
     r"""Sort versions inplace."""
     versions.sort(key=lambda s: list(map(int, s.split('.'))))
-
-
-def to_format(file: str) -> str:
-    r"""Return file extension without . and lower case."""
-    _, format = os.path.splitext(file.lower())
-    if format:
-        format = format[1:]
-    return format
