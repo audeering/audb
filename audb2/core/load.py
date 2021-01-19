@@ -233,9 +233,9 @@ def _get_media(
                 flavor(
                     src_path,
                     dst_path,
-                    bit_depth=bit_depth,
-                    channels=channels,
-                    sampling_rate=sampling_rate,
+                    src_bit_depth=bit_depth,
+                    src_channels=channels,
+                    src_sampling_rate=sampling_rate,
                 )
                 if src_path != dst_path:
                     os.remove(src_path)

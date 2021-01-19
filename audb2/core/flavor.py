@@ -224,18 +224,22 @@ class Flavor(audobject.Object):
             src_path: str,
             dst_path: str,
             *,
-            bit_depth: int = None,
-            channels: int = None,
-            sampling_rate: int = None,
+            src_bit_depth: int = None,
+            src_channels: int = None,
+            src_sampling_rate: int = None,
     ):
         r"""Convert file to flavor.
+
+        If ``bit_depth``, ``channels`` or ``sampling_rate``
+        of source signal are known, they can be provided.
+        Otherwise, they will be computed using :mod:`audiofile`.
 
         Args:
             src_path: path to input file
             dst_path: path to output file
-            bit_depth: bit depth
-            channels: number of channels
-            sampling_rate: sampling rate in Hz
+            src_bit_depth: bit depth
+            src_channels: number of channels
+            src_sampling_rate: sampling rate in Hz
 
         Raises:
             ValueError: if extension of output file does not match the
@@ -257,7 +261,7 @@ class Flavor(audobject.Object):
             )
 
         if not self._check_convert(
-                src_path, bit_depth, channels, sampling_rate
+                src_path, src_bit_depth, src_channels, src_sampling_rate
         ):
 
             # file already satisfies flavor
@@ -270,10 +274,9 @@ class Flavor(audobject.Object):
             signal, sampling_rate = audiofile.read(src_path, always_2d=True)
             signal = self._remix(signal)
             signal, sampling_rate = self._resample(signal, sampling_rate)
-            if self.bit_depth:
-                bit_depth = self.bit_depth
-            else:
-                bit_depth = bit_depth or audiofile.bit_depth(src_path)
+            bit_depth = self.bit_depth or \
+                src_bit_depth or \
+                audiofile.bit_depth(src_path)
             audiofile.write(
                 dst_path,
                 signal,
