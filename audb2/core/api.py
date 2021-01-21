@@ -86,7 +86,7 @@ def cached(
 
     data = {}
     for root, dirs, files in os.walk(cache_root):
-        if define.DB_HEADER in files:
+        if define.HEADER_FILE in files:
             name, flavor_id, version = root.split(os.path.sep)[-3:]
             db = audformat.Database.load(root, load_data=False)
             flavor = db.meta['audb']['flavor']
@@ -165,12 +165,12 @@ def dependencies(
 
     with tempfile.TemporaryDirectory() as root:
         archive = backend.join(name, define.DB)
-        dep_path = backend.get_archive(archive, root, version, repository)[0]
-        dep_path = os.path.join(root, dep_path)
-        depend = Depend()
-        depend.load(dep_path)
+        deps_path = backend.get_archive(archive, root, version, repository)[0]
+        deps_path = os.path.join(root, deps_path)
+        deps = Depend()
+        deps.load(deps_path)
 
-    return depend
+    return deps
 
 
 def exists(
@@ -409,17 +409,17 @@ def remove_media(
 
             # download dependencies
             archive = backend.join(name, define.DB)
-            dep_path = backend.get_archive(
+            deps_path = backend.get_archive(
                 archive, db_root, version, repository,
             )[0]
-            dep_path = os.path.join(db_root, dep_path)
-            depend = Depend()
-            depend.load(dep_path)
+            deps_path = os.path.join(db_root, deps_path)
+            deps = Depend()
+            deps.load(deps_path)
             upload = False
 
             for file in files:
-                if file in depend.media:
-                    archive = depend.archive(file)
+                if file in deps.media:
+                    archive = deps.archive(file)
 
                     # if archive exists in this version,
                     # remove file from it and re-publish
@@ -443,16 +443,16 @@ def remove_media(
                         )
 
                     # mark file as removed
-                    depend.remove(file)
+                    deps.remove(file)
                     upload = True
 
             # upload dependencies
             if upload:
-                depend.save(dep_path)
+                deps.save(deps_path)
                 remote_archive = backend.join(name, define.DB)
                 backend.put_archive(
                     db_root,
-                    define.DB_DEPEND,
+                    define.DEPS_FILE,
                     remote_archive,
                     version,
                     repository,
@@ -476,7 +476,7 @@ def repository_and_version(
             )
 
     for repository in config.REPOSITORIES:
-        remote_header = backend.join(name, define.DB_HEADER)
+        remote_header = backend.join(name, define.HEADER_FILE)
         if backend.exists(remote_header, version, repository):
             break
 
@@ -502,7 +502,7 @@ def versions(
 
     vs = []
     for repository in config.REPOSITORIES:
-        remote_header = backend.join(name, define.DB_HEADER)
+        remote_header = backend.join(name, define.HEADER_FILE)
         vs.extend(backend.versions(remote_header, repository))
 
     return vs

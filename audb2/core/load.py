@@ -34,7 +34,7 @@ def _filter_archives(
 def _filter_media(
         db: audformat.Database,
         flavor: Flavor,
-        depend: Depend,
+        deps: Depend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
@@ -44,18 +44,18 @@ def _filter_media(
 
         # keep only media files in matching archives
         if flavor.include is not None or flavor.exclude is not None:
-            archives = set([depend.archive(f) for f in db.files])
+            archives = set([deps.archive(f) for f in db.files])
             if flavor.include is not None:
                 include = _filter_archives(flavor.include, archives)
                 db.pick_files(
-                    lambda x: depend.archive(x) in include,
+                    lambda x: deps.archive(x) in include,
                     num_workers=num_workers,
                     verbose=verbose,
                 )
             if flavor.exclude is not None:
                 exclude = _filter_archives(flavor.exclude, archives)
                 db.pick_files(
-                    lambda x: depend.archive(x) not in exclude,
+                    lambda x: deps.archive(x) not in exclude,
                     num_workers=num_workers,
                     verbose=verbose,
                 )
@@ -66,7 +66,7 @@ def _filter_tables(
         db_root: str,
         db_root_tmp: str,
         flavor: typing.Optional[Flavor],
-        depend: Depend,
+        deps: Depend,
 ):
     r"""Filter tables."""
 
@@ -82,17 +82,17 @@ def _filter_tables(
                 tables = flavor.tables
             db_header.pick_tables(tables)
             db_header.save(db_root_tmp, header_only=True)
-            _move_file(db_root_tmp, db_root, define.DB_HEADER)
-            for file in depend.tables:
-                if not depend.archive(file) in tables:
-                    depend.data.pop(file)
+            _move_file(db_root_tmp, db_root, define.HEADER_FILE)
+            for file in deps.tables:
+                if not deps.archive(file) in tables:
+                    deps.data.pop(file)
 
 
 def _find_media(
         db: audformat.Database,
         db_root: str,
         flavor: typing.Optional[Flavor],
-        depend: Depend,
+        deps: Depend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
@@ -101,7 +101,7 @@ def _find_media(
     media = []
 
     def job(file: str):
-        if not depend.is_removed(file):
+        if not deps.is_removed(file):
             full_file = os.path.join(db_root, file)
             if flavor is not None:
                 full_file = flavor.destination(full_file)
@@ -122,7 +122,7 @@ def _find_media(
 def _find_tables(
         db_header: audformat.Database,
         db_root: str,
-        depend: Depend,
+        deps: Depend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
@@ -141,7 +141,7 @@ def _find_tables(
             # if the table already exists
             # we have to compare checksum
             # in case it was altered by flavor
-            if checksum != depend.checksum(file):  # pragma: no cover
+            if checksum != deps.checksum(file):  # pragma: no cover
                 tables.append(file)
 
     audeer.run_tasks(
@@ -194,7 +194,7 @@ def _get_media(
         db_root_tmp: str,
         db_name: str,
         flavor: typing.Optional[Flavor],
-        depend: Depend,
+        deps: Depend,
         backend: Backend,
         repository: str,
         num_workers: typing.Optional[int],
@@ -212,7 +212,7 @@ def _get_media(
     archives = set()
     for file in media:
         archives.add(
-            (depend.archive(file), depend.version(file))
+            (deps.archive(file), deps.version(file))
         )
 
     def job(archive: str, version: str):
@@ -223,10 +223,10 @@ def _get_media(
         )
         files = backend.get_archive(archive, db_root_tmp, version, repository)
         for file in files:
-            if flavor is not None and depend.format(file) in define.FORMATS:
-                bit_depth = depend.bit_depth(file)
-                channels = depend.channels(file)
-                sampling_rate = depend.sampling_rate(file)
+            if flavor is not None and deps.format(file) in define.FORMATS:
+                bit_depth = deps.bit_depth(file)
+                channels = deps.channels(file)
+                sampling_rate = deps.sampling_rate(file)
                 src_path = os.path.join(db_root_tmp, file)
                 file = flavor.destination(file)
                 dst_path = os.path.join(db_root_tmp, file)
@@ -255,7 +255,7 @@ def _get_tables(
         db_root: str,
         db_root_tmp: str,
         db_name: str,
-        depend: Depend,
+        deps: Depend,
         backend: Backend,
         repository: str,
         num_workers: typing.Optional[int],
@@ -277,10 +277,10 @@ def _get_tables(
         archive = backend.join(
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.META],
-            depend.archive(table),
+            deps.archive(table),
         )
         backend.get_archive(
-            archive, db_root_tmp, depend.version(table), repository,
+            archive, db_root_tmp, deps.version(table), repository,
         )
         _move_file(db_root_tmp, db_root, table)
 
@@ -343,7 +343,7 @@ def _save_database(
             db_root_tmp, storage_format=storage_format,
             num_workers=num_workers, verbose=verbose,
         )
-        _move_file(db_root_tmp, db_root, define.DB_HEADER)
+        _move_file(db_root_tmp, db_root, define.HEADER_FILE)
         for path in glob.glob(
                 os.path.join(db_root_tmp, f'*.{storage_format}')
         ):
@@ -360,7 +360,7 @@ def _load(
         flavor: typing.Optional[Flavor],
         repository: str,
         backend: Backend,
-        depend: Depend,
+        deps: Depend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> audformat.Database:
@@ -371,20 +371,20 @@ def _load(
 
     # load database header
 
-    remote_header = backend.join(name, define.DB_HEADER)
-    local_header = os.path.join(db_root_tmp, define.DB_HEADER)
+    remote_header = backend.join(name, define.HEADER_FILE)
+    local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
     backend.get_file(remote_header, local_header, version, repository)
-    _move_file(db_root_tmp, db_root, define.DB_HEADER)
+    _move_file(db_root_tmp, db_root, define.HEADER_FILE)
     db_header = audformat.Database.load(db_root, load_data=False)
 
     # get altered and new tables
 
-    _filter_tables(db_header, db_root, db_root_tmp, flavor, depend)
+    _filter_tables(db_header, db_root, db_root_tmp, flavor, deps)
     tables = _find_tables(
-        db_header, db_root, depend, num_workers, verbose,
+        db_header, db_root, deps, num_workers, verbose,
     )
     _get_tables(
-        tables, db_root, db_root_tmp, name, depend,
+        tables, db_root, db_root_tmp, name, deps,
         backend, repository, num_workers, verbose,
     )
 
@@ -393,26 +393,26 @@ def _load(
     db = audformat.Database.load(
         db_root, num_workers=num_workers, verbose=verbose,
     )
-    _filter_media(db, flavor, depend, num_workers, verbose)
+    _filter_media(db, flavor, deps, num_workers, verbose)
 
     # get altered and new media files,
     # eventually convert them
 
     if flavor is None or not flavor.only_metadata:
         media = _find_media(
-            db, db_root, flavor, depend, num_workers, verbose,
+            db, db_root, flavor, deps, num_workers, verbose,
         )
         _get_media(
             media, db_root, db_root_tmp, name,
-            flavor, depend, backend, repository,
+            flavor, deps, backend, repository,
             num_workers, verbose,
         )
 
     # save dependencies
 
-    dep_path_tmp = os.path.join(db_root_tmp, define.DB_DEPEND)
-    depend.save(dep_path_tmp)
-    _move_file(db_root_tmp, db_root, define.DB_DEPEND)
+    dep_path_tmp = os.path.join(db_root_tmp, define.DEPS_FILE)
+    deps.save(dep_path_tmp)
+    _move_file(db_root_tmp, db_root, define.DEPS_FILE)
     _fix_file_ext(db, flavor, num_workers, verbose)
 
     # save database and remove the temporal directory
@@ -585,14 +585,14 @@ def load(
             break
 
     # Get list with dependencies
-    depend = Depend()
+    deps = Depend()
     if db is None:
         archive = backend.join(name, define.DB)
         backend.get_archive(archive, db_root_tmp, version, repository)
-        dep_path = os.path.join(db_root_tmp, define.DB_DEPEND)
+        deps_path = os.path.join(db_root_tmp, define.DEPS_FILE)
     else:
-        dep_path = os.path.join(db_root, define.DB_DEPEND)
-    depend.load(dep_path)
+        deps_path = os.path.join(db_root, define.DEPS_FILE)
+    deps.load(deps_path)
 
     if db is None:
         if verbose:   # pragma: no cover
@@ -605,7 +605,7 @@ def load(
             flavor=flavor,
             repository=repository,
             backend=backend,
-            depend=depend,
+            deps=deps,
             num_workers=num_workers,
             verbose=verbose,
         )
@@ -613,7 +613,7 @@ def load(
     # Remove rows referencing removed media
     if not removed_media:
         removed_files = []
-        for file in depend.removed_media:
+        for file in deps.removed_media:
             if flavor.format is not None:
                 # Rename removed media file to requested format
                 name, _ = os.path.splitext(file)
@@ -689,15 +689,15 @@ def load_original_to(
     audeer.mkdir(db_root)
     archive = backend.join(name, define.DB)
     backend.get_archive(archive, db_root, version, repository)
-    dep_path = os.path.join(db_root, define.DB_DEPEND)
-    depend = Depend()
-    depend.load(dep_path)
+    deps_path = os.path.join(db_root, define.DEPS_FILE)
+    deps = Depend()
+    deps.load(deps_path)
     if update:
-        for file in depend.files:
+        for file in deps.files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
                 checksum = utils.md5(full_file)
-                if checksum != depend.checksum(file):
+                if checksum != deps.checksum(file):
                     os.remove(full_file)
 
     db = _load(
@@ -708,7 +708,7 @@ def load_original_to(
         flavor=None,
         repository=repository,
         backend=backend,
-        depend=depend,
+        deps=deps,
         num_workers=num_workers,
         verbose=verbose
     )

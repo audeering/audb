@@ -17,7 +17,7 @@ def _find_tables(
         db: audformat.Database,
         db_root: str,
         version: str,
-        depend: Depend,
+        deps: Depend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
@@ -26,8 +26,8 @@ def _find_tables(
     # release dependencies to removed tables
 
     db_tables = [f'db.{table}.csv' for table in db.tables]
-    for file in set(depend.tables) - set(db_tables):
-        depend.data.pop(file)
+    for file in set(deps.tables) - set(db_tables):
+        deps.data.pop(file)
 
     tables = []
 
@@ -35,12 +35,12 @@ def _find_tables(
 
         file = f'db.{table}.csv'
         checksum = utils.md5(os.path.join(db_root, file))
-        if file not in depend:
-            depend.add_meta(file, table, checksum, version)
+        if file not in deps:
+            deps.add_meta(file, table, checksum, version)
             tables.append(table)
-        elif checksum != depend.checksum(file):
-            depend.data[file][define.DependField.CHECKSUM] = checksum
-            depend.data[file][define.DependField.VERSION] = version
+        elif checksum != deps.checksum(file):
+            deps.data[file][define.DependField.CHECKSUM] = checksum
+            deps.data[file][define.DependField.VERSION] = version
             tables.append(table)
 
     audeer.run_tasks(
@@ -58,7 +58,7 @@ def _find_media(
         db: audformat.Database,
         db_root: str,
         version: str,
-        depend: Depend,
+        deps: Depend,
         archives: typing.Mapping[str, str],
         num_workers: typing.Optional[int],
         verbose: bool,
@@ -68,26 +68,26 @@ def _find_media(
     # and select according archives for upload
     media = set()
     db_media = db.files
-    for file in set(depend.media) - set(db_media):
-        media.add(depend.archive(file))
-        depend.data.pop(file)
+    for file in set(deps.media) - set(db_media):
+        media.add(deps.archive(file))
+        deps.data.pop(file)
 
     # update version of altered media and insert new ones
 
     def job(file):
         path = os.path.join(db_root, file)
-        if file not in depend:
+        if file not in deps:
             checksum = utils.md5(path)
             if file in archives:
                 archive = archives[file]
             else:
                 archive = audeer.uid(from_string=file.replace('\\', '/'))
-            depend.add_media(db_root, file, archive, checksum, version)
-        elif not depend.is_removed(file):
+            deps.add_media(db_root, file, archive, checksum, version)
+        elif not deps.is_removed(file):
             checksum = utils.md5(path)
-            if checksum != depend.checksum(file):
-                archive = depend.data[file][define.DependField.ARCHIVE]
-                depend.add_media(db_root, file, archive, checksum, version)
+            if checksum != deps.checksum(file):
+                archive = deps.data[file][define.DependField.ARCHIVE]
+                deps.add_media(db_root, file, archive, checksum, version)
 
     audeer.run_tasks(
         job,
@@ -105,7 +105,7 @@ def _put_media(
         db_root: str,
         db_name: str,
         version: str,
-        depend: Depend,
+        deps: Depend,
         backend: Backend,
         repository: str,
         num_workers: typing.Optional[int],
@@ -114,16 +114,16 @@ def _put_media(
     # create a mapping from archives to media and
     # select archives with new or altered files for upload
     map_media_to_files = collections.defaultdict(list)
-    for file in depend.media:
-        if not depend.is_removed(file):
-            map_media_to_files[depend.archive(file)].append(file)
-            if depend.version(file) == version:
-                media.add(depend.archive(file))
+    for file in deps.media:
+        if not deps.is_removed(file):
+            map_media_to_files[deps.archive(file)].append(file)
+            if deps.version(file) == version:
+                media.add(deps.archive(file))
 
     def job(archive):
         if archive in map_media_to_files:
             for file in map_media_to_files[archive]:
-                depend.data[file][define.DependField.VERSION] = version
+                deps.data[file][define.DependField.VERSION] = version
             archive_file = backend.join(
                 db_name,
                 define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
@@ -209,7 +209,7 @@ def publish(
 
     backend = default_backend(backend)
 
-    remote_header = backend.join(db.name, define.DB_HEADER)
+    remote_header = backend.join(db.name, define.HEADER_FILE)
     if version in backend.versions(remote_header, repository):
         raise RuntimeError(
             f"A version '{version}' already exists for "
@@ -218,9 +218,9 @@ def publish(
 
     # load database and dependencies
     db = audformat.Database.load(db_root)
-    dep_path = os.path.join(db_root, define.DB_DEPEND)
-    depend = Depend()
-    depend.load(dep_path)
+    deps_path = os.path.join(db_root, define.DEPS_FILE)
+    deps = Depend()
+    deps.load(deps_path)
 
     # make sure all tables are stored in CSV format
     for table_id, table in db.tables.items():
@@ -234,7 +234,7 @@ def publish(
 
     # publish tables
     tables = _find_tables(
-        db, db_root, version, depend,
+        db, db_root, version, deps,
         num_workers, verbose,
     )
     _put_tables(
@@ -244,23 +244,23 @@ def publish(
 
     # publish media
     media = _find_media(
-        db, db_root, version, depend, archives,
+        db, db_root, version, deps, archives,
         num_workers, verbose,
     )
     _put_media(
-        media, db_root, db.name, version, depend, backend, repository,
+        media, db_root, db.name, version, deps, backend, repository,
         num_workers, verbose,
     )
 
     # publish dependencies and header
-    depend.save(dep_path)
+    deps.save(deps_path)
     archive_file = backend.join(db.name, define.DB)
     backend.put_archive(
-        db_root, define.DB_DEPEND, archive_file, version, repository,
+        db_root, define.DEPS_FILE, archive_file, version, repository,
     )
     try:
-        local_header = os.path.join(db_root, define.DB_HEADER)
-        remote_header = db.name + '/' + define.DB_HEADER
+        local_header = os.path.join(db_root, define.HEADER_FILE)
+        remote_header = db.name + '/' + define.HEADER_FILE
         backend.put_file(local_header, remote_header, version, repository)
     except Exception:  # pragma: no cover
         # after the header is published
@@ -270,4 +270,4 @@ def publish(
         if backend.exists(remote_header, version, repository):
             backend.remove_file(remote_header, version, repository)
 
-    return depend
+    return deps

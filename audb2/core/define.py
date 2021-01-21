@@ -1,7 +1,7 @@
 BACKEND_ALLOWED_CHARS = '[A-Za-z0-9/._-]+'
 DB = 'db'
-DB_HEADER = f'{DB}.yaml'
-DB_DEPEND = f'{DB}.csv'
+DEPS_FILE = f'{DB}.csv'
+HEADER_FILE = f'{DB}.yaml'
 
 
 class DependField:

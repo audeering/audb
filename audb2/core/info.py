@@ -33,11 +33,11 @@ def bit_depths(
         bit depths
 
     """
-    depend = dependencies(name, version=version, backend=backend)
+    deps = dependencies(name, version=version, backend=backend)
     return set(
         [
-            depend.bit_depth(file) for file in depend.media
-            if depend.bit_depth(file)
+            deps.bit_depth(file) for file in deps.media
+            if deps.bit_depth(file)
         ]
     )
 
@@ -59,11 +59,11 @@ def channels(
         channel numbers
 
     """
-    depend = dependencies(name, version=version, backend=backend)
+    deps = dependencies(name, version=version, backend=backend)
     return set(
         [
-            depend.channels(file) for file in depend.media
-            if depend.channels(file)
+            deps.channels(file) for file in deps.media
+            if deps.channels(file)
         ]
     )
 
@@ -106,9 +106,9 @@ def duration(
         duration
 
     """
-    depend = dependencies(name, version=version, backend=backend)
+    deps = dependencies(name, version=version, backend=backend)
     return pd.to_timedelta(
-        sum([depend.duration(file) for file in depend.media]),
+        sum([deps.duration(file) for file in deps.media]),
         unit='s',
     )
 
@@ -130,10 +130,10 @@ def formats(
         format
 
     """
-    depend = dependencies(name, version=version, backend=backend)
+    deps = dependencies(name, version=version, backend=backend)
     return set(
         [
-            depend.format(file) for file in depend.media
+            deps.format(file) for file in deps.media
         ]
     )
 
@@ -165,8 +165,8 @@ def header(
     )
 
     with tempfile.TemporaryDirectory() as root:
-        remote_header = backend.join(name, define.DB_HEADER)
-        local_header = os.path.join(root, define.DB_HEADER)
+        remote_header = backend.join(name, define.HEADER_FILE)
+        local_header = os.path.join(root, define.HEADER_FILE)
         backend.get_file(remote_header, local_header, version, repository)
         db = audformat.Database.load(root, load_data=False)
 
@@ -274,11 +274,11 @@ def sampling_rates(
         sampling rates
 
     """
-    depend = dependencies(name, version=version, backend=backend)
+    deps = dependencies(name, version=version, backend=backend)
     return set(
         [
-            depend.sampling_rate(file) for file in depend.media
-            if depend.sampling_rate(file)
+            deps.sampling_rate(file) for file in deps.media
+            if deps.sampling_rate(file)
         ]
     )
 

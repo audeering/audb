@@ -128,7 +128,7 @@ def test_publish(version):
             audb2.latest_version(DB_NAME, backend=BACKEND)
 
     archives = db['files']['speaker'].get().dropna().to_dict()
-    depend = audb2.publish(
+    deps = audb2.publish(
         DB_ROOT_VERSION[version],
         version,
         pytest.REPOSITORY,
@@ -166,15 +166,15 @@ def test_publish(version):
         file_path = BACKEND.join(db.name, 'media', name)
         BACKEND.exists(file_path, version, pytest.REPOSITORY)
         path = os.path.join(DB_ROOT_VERSION[version], file)
-        assert depend.checksum(file) == audb2.core.utils.md5(path)
-        if depend.format(file) in [
+        assert deps.checksum(file) == audb2.core.utils.md5(path)
+        if deps.format(file) in [
             audb2.define.Format.WAV,
             audb2.define.Format.FLAC,
         ]:
-            assert depend.bit_depth(file) == audiofile.bit_depth(path)
-            assert depend.channels(file) == audiofile.channels(path)
-            assert depend.duration(file) == audiofile.duration(path)
-            assert depend.sampling_rate(file) == audiofile.sampling_rate(path)
+            assert deps.bit_depth(file) == audiofile.bit_depth(path)
+            assert deps.channels(file) == audiofile.channels(path)
+            assert deps.duration(file) == audiofile.duration(path)
+            assert deps.sampling_rate(file) == audiofile.sampling_rate(path)
 
 
 @pytest.mark.parametrize(

@@ -223,11 +223,11 @@ def test_load(version):
     df = audb2.cached()
     assert df.loc[db_root]['version'] == resolved_version
 
-    depend = audb2.dependencies(
+    deps = audb2.dependencies(
         DB_NAME, version=version, backend=BACKEND,
     )
-    assert str(depend().to_string()) == str(depend)
-    assert len(depend) == len(db.files) + len(db.tables)
+    assert str(deps().to_string()) == str(deps)
+    assert len(deps) == len(db.files) + len(db.tables)
 
     # from cache with full path
 
