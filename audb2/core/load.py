@@ -101,7 +101,7 @@ def _find_media(
     media = []
 
     def job(file: str):
-        if not depend.removed(file):
+        if not depend.is_removed(file):
             full_file = os.path.join(db_root, file)
             if flavor is not None:
                 full_file = flavor.destination(full_file)

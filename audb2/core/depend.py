@@ -96,7 +96,7 @@ class Depend:
 
         """
         select = [
-            file for file in self.media if self.removed(file)
+            file for file in self.media if self.is_removed(file)
         ]
         return select
 
@@ -262,6 +262,18 @@ class Depend:
         """
         return self[file][define.DependField.FORMAT]
 
+    def is_removed(self, file: str) -> bool:
+        r"""Check if file is marked as removed.
+
+        Args:
+            file: relative file path
+
+        Returns:
+            ``True`` if file was removed
+
+        """
+        return self[file][define.DependField.REMOVED] != 0
+
     def load(
             self,
             path: str,
@@ -290,18 +302,6 @@ class Depend:
 
         """
         self._data[file][define.DependField.REMOVED] = 1
-
-    def removed(self, file: str) -> bool:
-        r"""Check if file is marked as removed.
-
-        Args:
-            file: relative file path
-
-        Returns:
-            ``True`` if file was removed
-
-        """
-        return self[file][define.DependField.REMOVED] != 0
 
     def sampling_rate(self, file: str) -> typing.Optional[int]:
         r"""Sampling rate of media file.
