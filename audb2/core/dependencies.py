@@ -9,7 +9,7 @@ import audiofile
 from audb2.core import define
 
 
-class Depend:
+class Dependencies:
     r"""Hold dependencies of a database.
 
     """

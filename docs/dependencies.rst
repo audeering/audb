@@ -20,7 +20,7 @@ You can visualize dependencies of a database with:
 
 .. jupyter-execute::
 
-    depend = audb2.dependencies('emodb', version='1.0.1')
-    depend()
+    deps = audb2.dependencies('emodb', version='1.0.1')
+    deps()
     
 .. _audformat: http://tools.pp.audeering.com/audata/data-format.html

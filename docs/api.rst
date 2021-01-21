@@ -19,10 +19,10 @@ config
 .. autoclass:: config
     :members:
 
-Depend
-------
+Dependencies
+------------
 
-.. autoclass:: Depend
+.. autoclass:: Dependencies
     :members:
     :special-members:
 

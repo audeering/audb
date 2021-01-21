@@ -16,7 +16,7 @@ from audb2.core.api import (
 )
 from audb2.core.backend import Backend
 from audb2.core.config import config
-from audb2.core.depend import Depend
+from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
 
 
@@ -34,7 +34,7 @@ def _filter_archives(
 def _filter_media(
         db: audformat.Database,
         flavor: Flavor,
-        deps: Depend,
+        deps: Dependencies,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
@@ -66,7 +66,7 @@ def _filter_tables(
         db_root: str,
         db_root_tmp: str,
         flavor: typing.Optional[Flavor],
-        deps: Depend,
+        deps: Dependencies,
 ):
     r"""Filter tables."""
 
@@ -92,7 +92,7 @@ def _find_media(
         db: audformat.Database,
         db_root: str,
         flavor: typing.Optional[Flavor],
-        deps: Depend,
+        deps: Dependencies,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
@@ -122,7 +122,7 @@ def _find_media(
 def _find_tables(
         db_header: audformat.Database,
         db_root: str,
-        deps: Depend,
+        deps: Dependencies,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
@@ -194,7 +194,7 @@ def _get_media(
         db_root_tmp: str,
         db_name: str,
         flavor: typing.Optional[Flavor],
-        deps: Depend,
+        deps: Dependencies,
         backend: Backend,
         repository: str,
         num_workers: typing.Optional[int],
@@ -255,7 +255,7 @@ def _get_tables(
         db_root: str,
         db_root_tmp: str,
         db_name: str,
-        deps: Depend,
+        deps: Dependencies,
         backend: Backend,
         repository: str,
         num_workers: typing.Optional[int],
@@ -360,7 +360,7 @@ def _load(
         flavor: typing.Optional[Flavor],
         repository: str,
         backend: Backend,
-        deps: Depend,
+        deps: Dependencies,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> audformat.Database:
@@ -410,9 +410,9 @@ def _load(
 
     # save dependencies
 
-    dep_path_tmp = os.path.join(db_root_tmp, define.DEPS_FILE)
+    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCIES_FILE)
     deps.save(dep_path_tmp)
-    _move_file(db_root_tmp, db_root, define.DEPS_FILE)
+    _move_file(db_root_tmp, db_root, define.DEPENDENCIES_FILE)
     _fix_file_ext(db, flavor, num_workers, verbose)
 
     # save database and remove the temporal directory
@@ -585,13 +585,13 @@ def load(
             break
 
     # Get list with dependencies
-    deps = Depend()
+    deps = Dependencies()
     if db is None:
         archive = backend.join(name, define.DB)
         backend.get_archive(archive, db_root_tmp, version, repository)
-        deps_path = os.path.join(db_root_tmp, define.DEPS_FILE)
+        deps_path = os.path.join(db_root_tmp, define.DEPENDENCIES_FILE)
     else:
-        deps_path = os.path.join(db_root, define.DEPS_FILE)
+        deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
     deps.load(deps_path)
 
     if db is None:
@@ -689,8 +689,8 @@ def load_original_to(
     audeer.mkdir(db_root)
     archive = backend.join(name, define.DB)
     backend.get_archive(archive, db_root, version, repository)
-    deps_path = os.path.join(db_root, define.DEPS_FILE)
-    deps = Depend()
+    deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
+    deps = Dependencies()
     deps.load(deps_path)
     if update:
         for file in deps.files:

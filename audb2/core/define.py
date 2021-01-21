@@ -1,6 +1,6 @@
 BACKEND_ALLOWED_CHARS = '[A-Za-z0-9/._-]+'
 DB = 'db'
-DEPS_FILE = f'{DB}.csv'
+DEPENDENCIES_FILE = f'{DB}.csv'
 HEADER_FILE = f'{DB}.yaml'
 
 

@@ -15,7 +15,7 @@ from audb2.core.backend import (
     Backend,
 )
 from audb2.core.config import config
-from audb2.core.depend import Depend
+from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
 
 
@@ -146,7 +146,7 @@ def dependencies(
         *,
         version: str = None,
         backend: Backend = None,
-) -> Depend:
+) -> Dependencies:
     r"""Database dependencies.
 
     Args:
@@ -167,7 +167,7 @@ def dependencies(
         archive = backend.join(name, define.DB)
         deps_path = backend.get_archive(archive, root, version, repository)[0]
         deps_path = os.path.join(root, deps_path)
-        deps = Depend()
+        deps = Dependencies()
         deps.load(deps_path)
 
     return deps
@@ -413,7 +413,7 @@ def remove_media(
                 archive, db_root, version, repository,
             )[0]
             deps_path = os.path.join(db_root, deps_path)
-            deps = Depend()
+            deps = Dependencies()
             deps.load(deps_path)
             upload = False
 
@@ -452,7 +452,7 @@ def remove_media(
                 remote_archive = backend.join(name, define.DB)
                 backend.put_archive(
                     db_root,
-                    define.DEPS_FILE,
+                    define.DEPENDENCIES_FILE,
                     remote_archive,
                     version,
                     repository,

@@ -10,14 +10,14 @@ from audb2.core import define
 from audb2.core import utils
 from audb2.core.api import default_backend
 from audb2.core.backend import Backend
-from audb2.core.depend import Depend
+from audb2.core.dependencies import Dependencies
 
 
 def _find_tables(
         db: audformat.Database,
         db_root: str,
         version: str,
-        deps: Depend,
+        deps: Dependencies,
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
@@ -58,7 +58,7 @@ def _find_media(
         db: audformat.Database,
         db_root: str,
         version: str,
-        deps: Depend,
+        deps: Dependencies,
         archives: typing.Mapping[str, str],
         num_workers: typing.Optional[int],
         verbose: bool,
@@ -105,7 +105,7 @@ def _put_media(
         db_root: str,
         db_name: str,
         version: str,
-        deps: Depend,
+        deps: Dependencies,
         backend: Backend,
         repository: str,
         num_workers: typing.Optional[int],
@@ -184,7 +184,7 @@ def publish(
         backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
-) -> Depend:
+) -> Dependencies:
     r"""Publish database.
 
     Args:
@@ -218,8 +218,8 @@ def publish(
 
     # load database and dependencies
     db = audformat.Database.load(db_root)
-    deps_path = os.path.join(db_root, define.DEPS_FILE)
-    deps = Depend()
+    deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
+    deps = Dependencies()
     deps.load(deps_path)
 
     # make sure all tables are stored in CSV format
@@ -256,7 +256,7 @@ def publish(
     deps.save(deps_path)
     archive_file = backend.join(db.name, define.DB)
     backend.put_archive(
-        db_root, define.DEPS_FILE, archive_file, version, repository,
+        db_root, define.DEPENDENCIES_FILE, archive_file, version, repository,
     )
     try:
         local_header = os.path.join(db_root, define.HEADER_FILE)

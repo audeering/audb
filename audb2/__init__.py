@@ -13,7 +13,7 @@ from audb2.core.api import (
     versions,
 )
 from audb2.core.config import config
-from audb2.core.depend import Depend
+from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
 from audb2.core.load import (
     load,
