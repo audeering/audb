@@ -8,7 +8,7 @@ and this project adheres to `Semantic Versioning`_.
 
 
 Version 0.90.0 (2021-01-22)
---------------------------
+---------------------------
 
 * Added: initial release
 
