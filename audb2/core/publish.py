@@ -191,7 +191,9 @@ def publish(
         db_root: root directory of database
         version: version string
         repository: name of repository
-        archives: map files to archives
+        archives: dictionary mapping files to archive names.
+            Can be used to bundle files into archives.
+            Name must not include an extension
         backend: backend object
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
