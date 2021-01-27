@@ -20,7 +20,7 @@ class config:
     GROUP_ID = 'com.audeering.data'
     r"""Default group ID."""
 
-    REPOSITORIES = ['data-public-local']
+    REPOSITORIES = ['data-public-local', 'data-private-local']
     r"""List of repositories, will be iterated in given order."""
 
     SHARED_CACHE_ROOT = '/data/audb2'
