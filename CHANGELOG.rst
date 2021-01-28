@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.90.2 (2021-01-28)
+---------------------------
+
+* Added: ``data-provate-local`` to the default repositories
+
+
 Version 0.90.1 (2021-01-25)
 ---------------------------
 
