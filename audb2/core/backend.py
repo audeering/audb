@@ -211,6 +211,33 @@ class Backend:
         """
         return self.sep.join([path] + [p for p in paths])
 
+    def latest_version(
+            self,
+            path: str,
+            repository: str,
+    ) -> str:
+        r"""Latest version of a file.
+
+        Args:
+            path: relative path to file in repository
+            repository: repository name
+
+        Returns:
+            version string
+
+        Raises:
+            RuntimeError: if file does not exist on backend
+
+        """
+        vs = self.versions(path, repository)
+        if not vs:
+            raise RuntimeError(
+                f"Cannot find a version for "
+                f"'{path}' in "
+                f"'{repository}'.",
+            )
+        return vs[-1]
+
     def _path(
             self,
             repository: str,

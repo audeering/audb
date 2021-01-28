@@ -67,6 +67,68 @@ def test_archive(tmpdir, files, name, folder, version, backend):
 
 
 @pytest.mark.parametrize(
+    'backend',
+    [
+        audb2.backend.FileSystem(pytest.HOST),
+        audb2.backend.Artifactory(),
+    ]
+)
+def test_errors(tmpdir, backend):
+
+    repository = pytest.REPOSITORY
+
+    file_name = 'does-not-exist'
+    local_file = os.path.join(tmpdir, file_name)
+    remote_file = backend.join(
+        pytest.ID,
+        'test_errors',
+        file_name,
+    )
+
+    with pytest.raises(FileNotFoundError):
+        backend.put_file(
+            local_file,
+            remote_file,
+            '1.0.0',
+            repository,
+        )
+    with pytest.raises(FileNotFoundError):
+        backend.put_archive(
+            tmpdir,
+            'archive',
+            remote_file,
+            '1.0.0',
+            repository,
+        )
+    with pytest.raises(FileNotFoundError):
+        backend.get_file(
+            remote_file,
+            local_file,
+            '1.0.0',
+            repository,
+        )
+    with pytest.raises(FileNotFoundError):
+        backend.get_archive(
+            remote_file,
+            tmpdir,
+            '1.0.0',
+            repository,
+        )
+    with pytest.raises(FileNotFoundError):
+        backend.checksum(
+            remote_file,
+            '1.0.0',
+            repository,
+        )
+    with pytest.raises(FileNotFoundError):
+        backend.remove_file(
+            remote_file,
+            '1.0.0',
+            repository,
+        )
+
+
+@pytest.mark.parametrize(
     'local_file, remote_file, version',
     [
         (
@@ -130,68 +192,6 @@ def test_file(tmpdir, local_file, remote_file, version, backend):
 
 
 @pytest.mark.parametrize(
-    'backend',
-    [
-        audb2.backend.FileSystem(pytest.HOST),
-        audb2.backend.Artifactory(),
-    ]
-)
-def test_errors(tmpdir, backend):
-
-    repository = pytest.REPOSITORY
-
-    file_name = 'does-not-exist'
-    local_file = os.path.join(tmpdir, file_name)
-    remote_file = backend.join(
-        pytest.ID,
-        'test_errors',
-        file_name,
-    )
-
-    with pytest.raises(FileNotFoundError):
-        backend.put_file(
-            local_file,
-            remote_file,
-            '1.0.0',
-            repository,
-        )
-    with pytest.raises(FileNotFoundError):
-        backend.put_archive(
-            tmpdir,
-            'archive',
-            remote_file,
-            '1.0.0',
-            repository,
-        )
-    with pytest.raises(FileNotFoundError):
-        backend.get_file(
-            remote_file,
-            local_file,
-            '1.0.0',
-            repository,
-        )
-    with pytest.raises(FileNotFoundError):
-        backend.get_archive(
-            remote_file,
-            tmpdir,
-            '1.0.0',
-            repository,
-        )
-    with pytest.raises(FileNotFoundError):
-        backend.checksum(
-            remote_file,
-            '1.0.0',
-            repository,
-        )
-    with pytest.raises(FileNotFoundError):
-        backend.remove_file(
-            remote_file,
-            '1.0.0',
-            repository,
-        )
-
-
-@pytest.mark.parametrize(
     'files',
     [
         [],
@@ -235,6 +235,27 @@ def test_glob(tmpdir, files, backend):
         audb2.backend.Artifactory(),
     ]
 )
+@pytest.mark.parametrize(
+    'path',
+    [
+        'media/test1-12.344',
+        pytest.param(
+            r'media\test1',
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+    ]
+)
+def test_path(backend, path):
+    backend.path(path, None, pytest.REPOSITORY)
+
+
+@pytest.mark.parametrize(
+    'backend',
+    [
+        audb2.backend.FileSystem(pytest.HOST),
+        audb2.backend.Artifactory(),
+    ]
+)
 def test_versions(tmpdir, backend):
 
     repository = pytest.REPOSITORY
@@ -250,28 +271,11 @@ def test_versions(tmpdir, backend):
     )
 
     assert not backend.versions(remote_file, repository)
+    with pytest.raises(RuntimeError):
+        backend.latest_version(remote_file, repository)
     backend.put_file(local_file, remote_file, '1.0.0', repository)
     assert backend.versions(remote_file, repository) == ['1.0.0']
+    assert backend.latest_version(remote_file, repository) == '1.0.0'
     backend.put_file(local_file, remote_file, '2.0.0', repository)
     assert backend.versions(remote_file, repository) == ['1.0.0', '2.0.0']
-
-
-@pytest.mark.parametrize(
-    'backend',
-    [
-        audb2.backend.FileSystem(pytest.HOST),
-        audb2.backend.Artifactory(),
-    ]
-)
-@pytest.mark.parametrize(
-    'path',
-    [
-        'media/test1-12.344',
-        pytest.param(
-            r'media\test1',
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
-    ]
-)
-def test_path_names(backend, path):
-    backend.path(path, None, pytest.REPOSITORY)
+    assert backend.latest_version(remote_file, repository) == '2.0.0'
