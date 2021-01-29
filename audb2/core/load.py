@@ -10,12 +10,10 @@ import audeer
 from audb2.core import define
 from audb2.core import utils
 from audb2.core.api import (
-    default_backend,
     default_cache_root,
-    repository_and_version,
+    lookup,
 )
 from audb2.core.backend import Backend
-from audb2.core.config import config
 from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
 
@@ -448,7 +446,6 @@ def load(
         removed_media: bool = False,
         full_path: bool = True,
         cache_root: str = None,
-        backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
         **kwargs,
@@ -504,7 +501,6 @@ def load(
         full_path: replace relative with absolute file paths
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb2.default_cache_root` is used
-        backend: backend object
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
@@ -537,10 +533,7 @@ def load(
                 "is no longer supported."
             )
 
-    backend = default_backend(backend)
-    repository, version = repository_and_version(
-        name, version, backend=backend,
-    )
+    repository, version, backend = lookup(name, version)
 
     flavor = Flavor(
         only_metadata=only_metadata,
@@ -647,7 +640,6 @@ def load_original_to(
         name: str,
         *,
         version: str = None,
-        backend: Backend = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
 ) -> audformat.Database:
@@ -668,17 +660,13 @@ def load_original_to(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        backend: backend object
         verbose: show debug messages
 
     Returns:
         database object
 
     """
-    backend = default_backend(backend)
-    repository, version = repository_and_version(
-        name, version, backend=backend,
-    )
+    repository, version, backend = lookup(name, version)
 
     db_root = audeer.safe_path(root)
     db_root_tmp = db_root + '~'

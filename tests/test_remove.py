@@ -10,13 +10,7 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.REPOSITORIES = [
-    (
-        audb2.config.FILE_SYSTEM_REGISTRY_NAME,
-        pytest.HOST,
-        pytest.REPOSITORY
-    )
-]
+audb2.config.REPOSITORIES = pytest.REPOSITORIES
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
@@ -32,7 +26,6 @@ DB_FILES = {
         os.path.join('audio', 'new.wav'),
     ],
 }
-BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 
 def clear_root(root: str):
@@ -66,7 +59,8 @@ def publish_db():
         '1.0.0',
         pytest.REPOSITORY,
         archives=archives,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -82,7 +76,8 @@ def publish_db():
         DB_ROOT,
         '2.0.0',
         pytest.REPOSITORY,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -109,11 +104,11 @@ def test_remove(publish_db, format):
             DB_FILES['2.0.0'][0],  # new
     ):
 
-        audb2.remove_media(DB_NAME, remove, backend=BACKEND)
+        audb2.remove_media(DB_NAME, remove)
 
         for removed_media in [False, True]:
 
-            for version in audb2.versions(DB_NAME, backend=BACKEND):
+            for version in audb2.versions(DB_NAME):
 
                 if remove in DB_FILES[version]:
 
@@ -129,7 +124,6 @@ def test_remove(publish_db, format):
                         format=format,
                         removed_media=removed_media,
                         full_path=False,
-                        backend=BACKEND,
                         num_workers=pytest.NUM_WORKERS,
                         verbose=False,
                     )

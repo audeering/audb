@@ -44,13 +44,13 @@ class config:
         ),
     ]
     r"""List of repositories, will be iterated in given order.
-    
+
     Defines by a tuple with three entries:
-    
-    * the name of the backend
-    * the host address
-    * the name of the repository
-    
+
+    * backend name, e.g. 'artifactory'
+    * host address, e.g. 'https://artifactory.audeering.com/artifactory'
+    * repository name, e.g. ''data-public-local'
+
     """
 
     SHARED_CACHE_ROOT = '/data/audb2'

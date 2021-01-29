@@ -11,13 +11,7 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.REPOSITORIES = [
-    (
-        audb2.config.FILE_SYSTEM_REGISTRY_NAME,
-        pytest.HOST,
-        pytest.REPOSITORY
-    )
-]
+audb2.config.REPOSITORIES = pytest.REPOSITORIES
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
@@ -27,7 +21,6 @@ DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
     ['1.0.0', '2.0.0', '3.0.0']
 }
-BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 
 def clear_root(root: str):
@@ -107,7 +100,8 @@ def test_invalid_archives(name):
             '1.0.1',
             pytest.REPOSITORY,
             archives=archives,
-            backend=BACKEND,
+            backend=pytest.BACKEND,
+            host=pytest.HOST,
             num_workers=pytest.NUM_WORKERS,
             verbose=False,
         )
@@ -129,9 +123,9 @@ def test_publish(version):
 
     db = audformat.Database.load(DB_ROOT_VERSION[version])
 
-    if not audb2.versions(DB_NAME, backend=BACKEND):
+    if not audb2.versions(DB_NAME):
         with pytest.raises(RuntimeError):
-            audb2.latest_version(DB_NAME, backend=BACKEND)
+            audb2.latest_version(DB_NAME)
 
     archives = db['files']['speaker'].get().dropna().to_dict()
     deps = audb2.publish(
@@ -139,38 +133,39 @@ def test_publish(version):
         version,
         pytest.REPOSITORY,
         archives=archives,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
+    _, _, backend = audb2.lookup(DB_NAME, version)
 
     db = audb2.load(
         DB_NAME,
         version=version,
         full_path=False,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
     )
     assert db.name == DB_NAME
 
-    versions = audb2.versions(DB_NAME, backend=BACKEND)
-    latest_version = audb2.latest_version(DB_NAME, backend=BACKEND)
+    versions = audb2.versions(DB_NAME)
+    latest_version = audb2.latest_version(DB_NAME)
 
     assert version in versions
     assert latest_version == versions[-1]
 
-    df = audb2.available(latest_only=False, backend=BACKEND)
+    df = audb2.available(latest_only=False)
     assert DB_NAME in df.index
     assert set(df[df.index == DB_NAME]['version']) == set(versions)
 
-    df = audb2.available(latest_only=True, backend=BACKEND)
+    df = audb2.available(latest_only=True)
     assert DB_NAME in df.index
     assert df[df.index == DB_NAME]['version'][0] == latest_version
 
     for file in db.files:
         name = archives[file] if file in archives else file
-        file_path = BACKEND.join(db.name, 'media', name)
-        BACKEND.exists(file_path, version, pytest.REPOSITORY)
+        file_path = backend.join(db.name, 'media', name)
+        backend.exists(file_path, version, pytest.REPOSITORY)
         path = os.path.join(DB_ROOT_VERSION[version], file)
         assert deps.checksum(file) == audb2.core.utils.md5(path)
         if deps.format(file) in [
@@ -225,17 +220,8 @@ def test_publish(version):
 )
 def test_publish_changed_db(version1, version2, media_difference):
 
-    depend1 = audb2.dependencies(
-        DB_NAME,
-        version=version1,
-        backend=BACKEND,
-    )
-
-    depend2 = audb2.dependencies(
-        DB_NAME,
-        version=version2,
-        backend=BACKEND,
-    )
+    depend1 = audb2.dependencies(DB_NAME, version=version1)
+    depend2 = audb2.dependencies(DB_NAME, version=version2)
 
     media1 = set(sorted(depend1.media))
     media2 = set(sorted(depend2.media))

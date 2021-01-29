@@ -11,13 +11,7 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.REPOSITORIES = [
-    (
-        audb2.config.FILE_SYSTEM_REGISTRY_NAME,
-        pytest.HOST,
-        pytest.REPOSITORY
-    )
-]
+audb2.config.REPOSITORIES = pytest.REPOSITORIES
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
@@ -39,7 +33,6 @@ DB['table']['column'] = audformat.Column(
     scheme_id='scheme', rater_id='rater',
 )
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
-BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 
 def clear_root(root: str):
@@ -67,7 +60,8 @@ def fixture_publish_db():
         DB_ROOT,
         '1.0.0',
         pytest.REPOSITORY,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -89,23 +83,23 @@ def fixture_clear_cache():
 
 def test_info():
 
-    deps = audb2.dependencies(DB_NAME, backend=BACKEND,)
+    deps = audb2.dependencies(DB_NAME)
 
-    assert str(audb2.info.header(DB_NAME, backend=BACKEND)) == str(DB)
-    assert audb2.info.bit_depths(DB_NAME, backend=BACKEND) == set(
+    assert str(audb2.info.header(DB_NAME)) == str(DB)
+    assert audb2.info.bit_depths(DB_NAME) == set(
         [
             deps.bit_depth(file) for file in deps.media
             if deps.bit_depth(file)
         ]
     )
-    assert audb2.info.channels(DB_NAME, backend=BACKEND) == set(
+    assert audb2.info.channels(DB_NAME) == set(
         [
             deps.channels(file) for file in deps.media
             if deps.channels(file)
         ]
     )
-    assert audb2.info.description(DB_NAME, backend=BACKEND) == DB.description
-    assert audb2.info.duration(DB_NAME, backend=BACKEND) == pd.to_timedelta(
+    assert audb2.info.description(DB_NAME) == DB.description
+    assert audb2.info.duration(DB_NAME) == pd.to_timedelta(
         sum(
             [
                 deps.duration(file) for file in deps.media
@@ -113,23 +107,23 @@ def test_info():
         ),
         unit='s',
     )
-    assert audb2.info.formats(DB_NAME, backend=BACKEND) == set(
+    assert audb2.info.formats(DB_NAME) == set(
         [
             deps.format(file) for file in deps.media
         ]
     )
-    assert audb2.info.languages(DB_NAME, backend=BACKEND) == DB.languages
-    assert str(audb2.info.media(DB_NAME, backend=BACKEND)) == str(DB.media)
-    assert audb2.info.meta(DB_NAME, backend=BACKEND) == DB.meta
-    assert str(audb2.info.raters(DB_NAME, backend=BACKEND)) == str(DB.raters)
-    assert audb2.info.sampling_rates(DB_NAME, backend=BACKEND) == set(
+    assert audb2.info.languages(DB_NAME) == DB.languages
+    assert str(audb2.info.media(DB_NAME)) == str(DB.media)
+    assert audb2.info.meta(DB_NAME) == DB.meta
+    assert str(audb2.info.raters(DB_NAME)) == str(DB.raters)
+    assert audb2.info.sampling_rates(DB_NAME) == set(
         [
             deps.sampling_rate(file) for file in deps.media
             if deps.sampling_rate(file)
         ]
     )
-    assert str(audb2.info.schemes(DB_NAME, backend=BACKEND)) == str(DB.schemes)
-    assert str(audb2.info.splits(DB_NAME, backend=BACKEND)) == str(DB.splits)
-    assert audb2.info.source(DB_NAME, backend=BACKEND) == DB.source
-    assert str(audb2.info.tables(DB_NAME, backend=BACKEND)) == str(DB.tables)
-    assert audb2.info.usage(DB_NAME, backend=BACKEND) == DB.usage
+    assert str(audb2.info.schemes(DB_NAME)) == str(DB.schemes)
+    assert str(audb2.info.splits(DB_NAME)) == str(DB.splits)
+    assert audb2.info.source(DB_NAME) == DB.source
+    assert str(audb2.info.tables(DB_NAME)) == str(DB.tables)
+    assert audb2.info.usage(DB_NAME) == DB.usage

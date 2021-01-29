@@ -10,19 +10,12 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.REPOSITORIES = [
-    (
-        audb2.config.FILE_SYSTEM_REGISTRY_NAME,
-        pytest.HOST,
-        pytest.REPOSITORY
-    )
-]
+audb2.config.REPOSITORIES = pytest.REPOSITORIES
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
 DB_NAME = f'test_filter-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
-BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 
 def clear_root(root: str):
@@ -85,7 +78,8 @@ def fixture_publish_db():
         '1.0.0',
         pytest.REPOSITORY,
         archives=archives,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -144,7 +138,6 @@ def test_tables(tables, expected_tables, expected_files):
         DB_NAME,
         tables=tables,
         full_path=False,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
@@ -201,7 +194,6 @@ def test_files(include, exclude, expected_files):
         include=include,
         exclude=exclude,
         full_path=False,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )

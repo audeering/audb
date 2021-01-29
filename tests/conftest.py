@@ -7,6 +7,8 @@ import pytest
 import audeer
 import audfactory
 
+import audb2
+
 
 pytest.ROOT = audeer.safe_path(
     os.path.join(
@@ -15,11 +17,19 @@ pytest.ROOT = audeer.safe_path(
     )
 )
 
+pytest.BACKEND = audb2.config.FILE_SYSTEM_REGISTRY_NAME
 pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
 pytest.ID = audeer.uid()
 pytest.HOST = os.path.join(pytest.ROOT, 'repo')
 pytest.NUM_WORKERS = 5
 pytest.REPOSITORY = 'data-unittests-local'
+pytest.REPOSITORIES = [
+    (
+        pytest.BACKEND,
+        pytest.HOST,
+        pytest.REPOSITORY,
+    ),
+]
 pytest.SHARED_CACHE_ROOT = os.path.join(pytest.ROOT, 'shared')
 
 

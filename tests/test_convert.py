@@ -13,19 +13,12 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.REPOSITORIES = [
-    (
-        audb2.config.FILE_SYSTEM_REGISTRY_NAME,
-        pytest.HOST,
-        pytest.REPOSITORY
-    )
-]
+audb2.config.REPOSITORIES = pytest.REPOSITORIES
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
 DB_NAME = f'test_convert-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
-BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 DB_FILES = {
     os.path.join('audio', 'file1.wav'): {
@@ -100,7 +93,8 @@ def fixture_publish_db():
         DB_ROOT,
         '1.0.0',
         pytest.REPOSITORY,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -132,7 +126,6 @@ def test_bit_depth(bit_depth):
         DB_NAME,
         bit_depth=bit_depth,
         full_path=False,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
@@ -162,7 +155,6 @@ def test_channels(channels):
         DB_NAME,
         channels=channels,
         full_path=False,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
@@ -194,7 +186,6 @@ def test_format(format):
         DB_NAME,
         format=format,
         full_path=False,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
@@ -223,7 +214,6 @@ def test_mixdown(mixdown):
         DB_NAME,
         mixdown=mixdown,
         full_path=False,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
@@ -253,7 +243,6 @@ def test_sampling_rate(sampling_rate):
         DB_NAME,
         sampling_rate=sampling_rate,
         full_path=False,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )

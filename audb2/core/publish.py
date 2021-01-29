@@ -4,12 +4,14 @@ import typing
 
 import audformat
 import audeer
-import audiofile
 
 from audb2.core import define
 from audb2.core import utils
-from audb2.core.api import default_backend
-from audb2.core.backend import Backend
+from audb2.core.backend import (
+    Backend,
+    create,
+)
+from audb2.core.config import config
 from audb2.core.dependencies import Dependencies
 
 
@@ -181,7 +183,8 @@ def publish(
         repository: str,
         *,
         archives: typing.Mapping[str, str] = None,
-        backend: Backend = None,
+        backend: str = config.ARTIFACTORY_REGISTRY_NAME,
+        host: str = config.ARTIFACTORY_HOST,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
 ) -> Dependencies:
@@ -194,7 +197,8 @@ def publish(
         archives: dictionary mapping files to archive names.
             Can be used to bundle files into archives.
             Name must not include an extension
-        backend: backend object
+        backend: backend name
+        host: host address
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
@@ -209,7 +213,7 @@ def publish(
     """
     db = audformat.Database.load(db_root, load_data=False)
 
-    backend = default_backend(backend)
+    backend = create(backend, host)
 
     remote_header = backend.join(db.name, define.HEADER_FILE)
     if version in backend.versions(remote_header, repository):

@@ -67,6 +67,25 @@ def test_archive(tmpdir, files, name, folder, version, backend):
 
 
 @pytest.mark.parametrize(
+    'name, host, cls',
+    [
+        (
+            'file-system', pytest.HOST, audb2.backend.FileSystem,
+        ),
+        (
+            'artifactory', pytest.HOST, audb2.backend.Artifactory,
+        ),
+        pytest.param(  # backend does not exist
+            'does-not-exist', '', None,
+            marks=pytest.mark.xfail(raises=ValueError)
+        )
+    ]
+)
+def test_create(name, host, cls):
+    assert isinstance(audb2.backend.create(name, host), cls)
+
+
+@pytest.mark.parametrize(
     'backend',
     [
         audb2.backend.FileSystem(pytest.HOST),

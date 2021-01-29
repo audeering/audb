@@ -11,7 +11,6 @@ import audformat
 from audb2.core import define
 from audb2.core import utils
 from audb2.core.backend import (
-    Artifactory,
     Backend,
     create,
 )
@@ -23,29 +22,29 @@ from audb2.core.flavor import Flavor
 def available(
         *,
         latest_only: bool = False,
-        backend: Backend = None,
 ) -> pd.DataFrame:
     r"""List all databases that are available to the user.
 
     Args:
         latest_only: keep only latest version
-        backend: backend object
 
     Returns:
         table with name, version and private flag
 
     """
-    backend = default_backend(backend)
 
     match = {}
-    for _, _, repository in config.REPOSITORIES:
+    for backend_name, host, repository in config.REPOSITORIES:
         pattern = f'*/{define.DB}/*/{define.DB}-*.yaml'
+        backend = create(backend_name, host)
         for p in backend.glob(pattern, repository):
             name, _, version, _ = p.split('/')[-4:]
             if name not in match:
                 match[name] = {
-                    'version': [],
+                    'backend': backend_name,
+                    'host': host,
                     'repository': repository,
+                    'version': [],
                 }
             match[name]['version'].append(version)
 
@@ -58,10 +57,17 @@ def available(
     for name in match:
         for v in match[name]['version']:
             data.append(
-                [name, v, match[name]['repository']]
+                [
+                    name,
+                    match[name]['backend'],
+                    match[name]['host'],
+                    match[name]['repository'],
+                    v,
+                ]
             )
     return pd.DataFrame.from_records(
-        data, columns=['name', 'version', 'repository']
+        data,
+        columns=['name', 'backend', 'host', 'repository', 'version'],
     ).set_index('name')
 
 
@@ -99,11 +105,6 @@ def cached(
             data[root].update(flavor)
 
     return pd.DataFrame.from_dict(data, orient='index')
-
-
-def default_backend(backend: Backend = None):
-    r"""Default backend."""
-    return backend or Artifactory()
 
 
 def default_cache_root(
@@ -146,23 +147,18 @@ def dependencies(
         name: str,
         *,
         version: str = None,
-        backend: Backend = None,
 ) -> Dependencies:
     r"""Database dependencies.
 
     Args:
         name: name of database
         version: version string
-        backend: backend object
 
     Returns:
         dependency object
 
     """
-    backend = default_backend(backend)
-    repository, version = repository_and_version(
-        name, version, backend=backend,
-    )
+    repository, version, backend = lookup(name, version)
 
     with tempfile.TemporaryDirectory() as root:
         archive = backend.join(name, define.DB)
@@ -188,7 +184,6 @@ def exists(
     include: typing.Union[str, typing.Sequence[str]] = None,
     exclude: typing.Union[str, typing.Sequence[str]] = None,
     cache_root: str = None,
-    backend: Backend = None,
 ) -> typing.Optional[str]:
     r"""Check if specified database flavor exists in local cache folder.
 
@@ -234,7 +229,6 @@ def exists(
             after ``include``
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb2.default_cache_root` is used
-        backend: backend object
 
     Returns:
         ``None`` or path to flavor.
@@ -250,10 +244,7 @@ def exists(
         stacklevel=2,
     )
 
-    backend = default_backend(backend)
-    repository, version = repository_and_version(
-        name, version, backend=backend,
-    )
+    repository, version, backend = lookup(name, version)
 
     relative_flavor_path = flavor_path(
         name,
@@ -356,22 +347,17 @@ def flavor_path(
 
 def latest_version(
         name,
-        *,
-        backend: Backend = None,
 ) -> str:
     r"""Latest version of database.
 
     Args:
         name: name of database
-        backend: backend object
 
     Returns:
         version string
 
     """
-    backend = default_backend(backend)
-
-    vs = versions(name, backend=backend)
+    vs = versions(name)
     if not vs:
         raise RuntimeError(
             f"Cannot find a version for database '{name}'.",
@@ -381,10 +367,8 @@ def latest_version(
 
 
 def lookup(
-        db_name: str,
+        name: str,
         version: str = None,
-        *,
-        backend: Backend = None,
 ) -> (str, str, Backend):
     r"""Look for database.
 
@@ -392,9 +376,8 @@ def lookup(
     will look in default repositories.
 
     Args:
-        db_name: database name
+        name: database name
         version: version string, if `None` look for latest
-        backend: backend object
 
     Returns:
         repository name, version string, backend object
@@ -404,10 +387,10 @@ def lookup(
 
 
     """
-    for name, host, repository in config.REPOSITORIES:
+    for backend_name, host, repository in config.REPOSITORIES:
 
-        backend = create(name, host)
-        header = backend.join(db_name, 'db.yaml')
+        backend = create(backend_name, host)
+        header = backend.join(name, 'db.yaml')
 
         if version is None:
             try:
@@ -421,14 +404,14 @@ def lookup(
     if version is None:
         raise RuntimeError(
             'Cannot find database '
-            f"'{db_name}'."
+            f"'{name}'."
         )
     else:
         raise RuntimeError(
             'Cannot find version '
             f'{version} '
             f'for database '
-            f"'{db_name}'."
+            f"'{name}'."
         )
 
 
@@ -436,7 +419,6 @@ def remove_media(
         name: str,
         files: typing.Union[str, typing.Sequence[str]],
         *,
-        backend: Backend = None,
         verbose: bool = False,
 ):
     r"""Remove media from all versions.
@@ -444,19 +426,15 @@ def remove_media(
     Args:
         name: name of database
         files: list of files that should be removed
-        backend: backend object
         verbose: show debug messages
 
     """
-    backend = default_backend(backend)
-
     if isinstance(files, str):
         files = [files]
 
-    for version in versions(name, backend=backend):
-        repository, version = repository_and_version(
-            name, version, backend=backend,
-        )
+    for version in versions(name):
+
+        repository, version, backend = lookup(name, version)
 
         with tempfile.TemporaryDirectory() as db_root:
 
@@ -512,50 +490,23 @@ def remove_media(
                 )
 
 
-def repository_and_version(
-        name,
-        version: typing.Optional[str],
-        *,
-        backend: Backend = None,
-) -> (str, str):
-    r"""Resolve version of database."""
-
-    if version is None:
-        version = latest_version(name, backend=backend)
-    else:
-        if version not in versions(name, backend=backend):
-            raise RuntimeError(
-                f"A version '{version}' does not exist for database '{name}'."
-            )
-
-    for _, _, repository in config.REPOSITORIES:
-        remote_header = backend.join(name, define.HEADER_FILE)
-        if backend.exists(remote_header, version, repository):
-            break
-
-    return repository, version
-
-
 def versions(
         name: str,
-        *,
-        backend: Backend = None,
 ) -> typing.List[str]:
     r"""Available versions of database.
 
     Args:
         name: name of database
-        backend: backend object
 
     Returns:
         list of versions
 
     """
-    backend = default_backend(backend)
-
-    vs = []
-    for _, _, repository in config.REPOSITORIES:
-        remote_header = backend.join(name, define.HEADER_FILE)
-        vs.extend(backend.versions(remote_header, repository))
-
+    vs = set()
+    for backend_name, host, repository in config.REPOSITORIES:
+        backend = create(backend_name, host)
+        header = backend.join(name, 'db.yaml')
+        vs.update(backend.versions(header, repository))
+    vs = list(vs)
+    utils.sort_versions(vs)
     return vs

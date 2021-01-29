@@ -13,13 +13,7 @@ import audb2
 
 
 audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.REPOSITORIES = [
-    (
-        audb2.config.FILE_SYSTEM_REGISTRY_NAME,
-        pytest.HOST,
-        pytest.REPOSITORY
-    )
-]
+audb2.config.REPOSITORIES = pytest.REPOSITORIES
 audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
@@ -29,7 +23,6 @@ DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
     ['1.0.0', '1.1.0', '1.1.1', '2.0.0', '3.0.0']
 }
-BACKEND = audb2.backend.FileSystem(pytest.HOST)
 
 
 def clear_root(root: str):
@@ -81,7 +74,8 @@ def fixture_publish_db():
         '1.0.0',
         pytest.REPOSITORY,
         archives=archives,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -102,7 +96,8 @@ def fixture_publish_db():
         DB_ROOT_VERSION['1.1.0'],
         '1.1.0',
         pytest.REPOSITORY,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -120,7 +115,8 @@ def fixture_publish_db():
         DB_ROOT_VERSION['1.1.1'],
         '1.1.1',
         pytest.REPOSITORY,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -144,7 +140,8 @@ def fixture_publish_db():
         DB_ROOT_VERSION['2.0.0'],
         '2.0.0',
         pytest.REPOSITORY,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -162,7 +159,8 @@ def fixture_publish_db():
         DB_ROOT_VERSION['3.0.0'],
         '3.0.0',
         pytest.REPOSITORY,
-        backend=BACKEND,
+        backend=pytest.BACKEND,
+        host=pytest.HOST,
         verbose=False,
     )
 
@@ -189,29 +187,22 @@ def fixture_publish_db():
 def test_load(version):
 
     with pytest.warns(UserWarning):
-        assert not audb2.exists(
-            DB_NAME, version=version, backend=BACKEND,
-        )
+        assert not audb2.exists(DB_NAME, version=version)
 
     db = audb2.load(
         DB_NAME,
         version=version,
         full_path=False,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
     db_root = db.meta['audb']['root']
 
     with pytest.warns(UserWarning):
-        assert audb2.exists(
-            DB_NAME, version=version, backend=BACKEND,
-        )
+        assert audb2.exists(DB_NAME, version=version)
 
     if version is None:
-        resolved_version = audb2.latest_version(
-            DB_NAME, backend=BACKEND,
-        )
+        resolved_version = audb2.latest_version(DB_NAME)
     else:
         resolved_version = version
     db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
@@ -229,9 +220,7 @@ def test_load(version):
     df = audb2.cached()
     assert df.loc[db_root]['version'] == resolved_version
 
-    deps = audb2.dependencies(
-        DB_NAME, version=version, backend=BACKEND,
-    )
+    deps = audb2.dependencies(DB_NAME, version=version)
     assert str(deps().to_string()) == str(deps)
     assert len(deps) == len(db.files) + len(db.tables)
 
@@ -241,7 +230,6 @@ def test_load(version):
         DB_NAME,
         version=version,
         full_path=True,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
@@ -274,15 +262,12 @@ def test_load_original_to(version):
         db_root,
         DB_NAME,
         version=version,
-        backend=BACKEND,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
 
     if version is None:
-        version = audb2.latest_version(
-            DB_NAME, backend=BACKEND,
-        )
+        version = audb2.latest_version(DB_NAME)
     db_original = audformat.Database.load(DB_ROOT_VERSION[version])
 
     pd.testing.assert_index_equal(db.files, db_original.files)
@@ -294,3 +279,28 @@ def test_load_original_to(version):
             db_original[table].df,
             db[table].df,
         )
+
+
+@pytest.mark.parametrize(
+    'name, version',
+    [
+        (DB_NAME, None),
+        (DB_NAME, '1.0.0'),
+        pytest.param(  # database does not exist
+            'does-not-exist', None,
+            marks=pytest.mark.xfail(raises=RuntimeError),
+        ),
+        pytest.param(  # version does not exist
+            DB_NAME, 'does-not-exist',
+            marks=pytest.mark.xfail(raises=RuntimeError),
+        )
+    ]
+)
+def test_lookup(name, version):
+    repository, v, backend = audb2.lookup(name, version)
+    assert repository == pytest.REPOSITORY
+    if version is not None:
+        assert v == version
+    else:
+        assert v == audb2.latest_version(name)
+    assert isinstance(backend, audb2.backend.FileSystem)
