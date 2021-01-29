@@ -370,10 +370,7 @@ def lookup(
         name: str,
         version: str = None,
 ) -> (str, str, Backend):
-    r"""Look for database.
-
-    If no ``backend`` is given,
-    will look in default repositories.
+    r"""Look for database in default repositories.
 
     Args:
         name: database name
