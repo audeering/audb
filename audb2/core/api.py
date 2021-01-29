@@ -13,6 +13,7 @@ from audb2.core import utils
 from audb2.core.backend import (
     Artifactory,
     Backend,
+    create,
 )
 from audb2.core.config import config
 from audb2.core.dependencies import Dependencies
@@ -37,7 +38,7 @@ def available(
     backend = default_backend(backend)
 
     match = {}
-    for repository in config.REPOSITORIES:
+    for _, _, repository in config.REPOSITORIES:
         pattern = f'*/{define.DB}/*/{define.DB}-*.yaml'
         for p in backend.glob(pattern, repository):
             name, _, version, _ = p.split('/')[-4:]
@@ -379,6 +380,58 @@ def latest_version(
     return vs[-1]
 
 
+def lookup(
+        db_name: str,
+        version: str = None,
+        *,
+        backend: Backend = None,
+) -> (str, str, Backend):
+    r"""Look for database.
+
+    If no ``backend`` is given,
+    will look in default repositories.
+
+    Args:
+        db_name: database name
+        version: version string, if `None` look for latest
+        backend: backend object
+
+    Returns:
+        repository name, version string, backend object
+
+    Raises:
+        RuntimeError: if database and/or version is not found
+
+
+    """
+    for name, host, repository in config.REPOSITORIES:
+
+        backend = create(name, host)
+        header = backend.join(db_name, 'db.yaml')
+
+        if version is None:
+            try:
+                version = backend.latest_version(header, repository)
+            except RuntimeError:
+                continue
+
+        if backend.exists(header, version, repository):
+            return repository, version, backend
+
+    if version is None:
+        raise RuntimeError(
+            'Cannot find database '
+            f"'{db_name}'."
+        )
+    else:
+        raise RuntimeError(
+            'Cannot find version '
+            f'{version} '
+            f'for database '
+            f"'{db_name}'."
+        )
+
+
 def remove_media(
         name: str,
         files: typing.Union[str, typing.Sequence[str]],
@@ -475,7 +528,7 @@ def repository_and_version(
                 f"A version '{version}' does not exist for database '{name}'."
             )
 
-    for repository in config.REPOSITORIES:
+    for _, _, repository in config.REPOSITORIES:
         remote_header = backend.join(name, define.HEADER_FILE)
         if backend.exists(remote_header, version, repository):
             break
@@ -501,7 +554,7 @@ def versions(
     backend = default_backend(backend)
 
     vs = []
-    for repository in config.REPOSITORIES:
+    for _, _, repository in config.REPOSITORIES:
         remote_header = backend.join(name, define.HEADER_FILE)
         vs.extend(backend.versions(remote_header, repository))
 

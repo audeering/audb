@@ -675,3 +675,73 @@ class FileSystem(Backend):
                 if os.path.isdir(os.path.join(root, v))
             ]
         return vs
+
+
+backends = {}
+r"""Backend cache."""
+
+backend_registry = {
+    'file-system': FileSystem,
+    'artifactory': Artifactory,
+}
+r"""Backend registry."""
+
+
+def create(
+        name: str,
+        host: str,
+) -> Backend:
+    r"""Create backend.
+
+    Args:
+        name: backend registry name
+        host: host address
+
+    Returns:
+        backend object
+
+    Raises:
+        ValueError: if registry name does not exist
+
+    """
+    if name not in backend_registry:
+        raise ValueError(
+            'A backend class with name '
+            f"'{name} "
+            'does not exist.'
+            "Use 'register_backend()' to register one."
+        )
+
+    if name not in backends:
+        backends[name] = {}
+    if host not in backends[name]:
+        backends[name][host] = backend_registry[name](host)
+    return backends[name][host]
+
+
+def register(
+        name: str,
+        cls: typing.Type[Backend],
+):
+    r"""Register backend.
+
+    If a backend with this name already exists,
+    it will be overwritten
+
+    Args:
+        name: backend registry name
+        cls: backend class
+
+    """
+    backend_registry[name] = cls
+
+
+register(
+    config.ARTIFACTORY_REGISTRY_NAME,
+    Artifactory,
+)
+
+register(
+    config.FILE_SYSTEM_REGISTRY_NAME,
+    FileSystem,
+)
