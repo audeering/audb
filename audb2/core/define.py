@@ -31,6 +31,19 @@ DEPEND_FIELD_NAMES = {
     DependField.VERSION: 'version',
 }
 
+DEPEND_FIELD_DTYPES = {
+    DependField.ARCHIVE: str,
+    DependField.BIT_DEPTH: int,
+    DependField.CHANNELS: int,
+    DependField.CHECKSUM: str,
+    DependField.DURATION: float,
+    DependField.FORMAT: str,
+    DependField.REMOVED: int,
+    DependField.SAMPLING_RATE: int,
+    DependField.TYPE: int,
+    DependField.VERSION: str,
+}
+
 
 class DependType:
     r"""Dependency file types."""

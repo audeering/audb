@@ -289,7 +289,22 @@ class Dependencies:
         self._data = {}
         path = audeer.safe_path(path)
         if os.path.exists(path):
-            df = pd.read_csv(path, index_col=0, na_filter=False)
+            # Data type of dependency columns
+            dtype_mapping = {
+                name: dtype for name, dtype in zip(
+                    define.DEPEND_FIELD_NAMES.values(),
+                    define.DEPEND_FIELD_DTYPES.values(),
+                )
+            }
+            # Data type of index
+            index = 0
+            dtype_mapping[index] = str
+            df = pd.read_csv(
+                path,
+                index_col=index,
+                na_filter=False,
+                dtype=dtype_mapping,
+            )
             self._data = {
                 file: list(row) for file, row in df.iterrows()
             }

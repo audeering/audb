@@ -54,12 +54,12 @@ def fixture_publish_db():
         columns={'emotion': ('scheme', None)}
     )
     db.schemes['speaker'] = audformat.Scheme(
-        labels=['adam', 'eve']
+        labels=['adam', '11']
     )
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
-        ['adam', 'adam', 'eve', 'eve'],
+        ['adam', 'adam', '11', '11'],
         index=audformat.filewise_index(db.files[:4]),
     )
     audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
