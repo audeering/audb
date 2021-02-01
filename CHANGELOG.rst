@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.90.3 (2021-02-01)
+---------------------------
+
+* Changed: define data types when reading dependency file
+
+
 Version 0.90.2 (2021-01-28)
 ---------------------------
 
