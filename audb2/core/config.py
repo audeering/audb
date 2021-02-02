@@ -33,11 +33,11 @@ class config:
     ]
     r"""List of repositories, will be iterated in given order.
 
-    Defines by a tuple with three entries:
+    A repository is defined by a dictionary with three entries:
 
-    * backend name, e.g. 'artifactory'
-    * host address, e.g. 'https://artifactory.audeering.com/artifactory'
-    * repository name, e.g. ''data-public-local'
+    * 'name': repository name, e.g. 'data-public-local'
+    * 'backend': backend name, e.g. 'artifactory'
+    * 'host': host name, e.g. 'https://artifactory.audeering.com/artifactory'
 
     """
 
