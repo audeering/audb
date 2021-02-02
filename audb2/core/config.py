@@ -41,6 +41,13 @@ class config:
 
     """
 
+    REPOSITORY_PUBLISH = {
+        'name': 'data-public-local',
+        'backend': 'artifactory',
+        'host': 'https://artifactory.audeering.com/artifactory',
+    }
+    r"""Default repository for publishing databases."""
+
     SHARED_CACHE_ROOT = '/data/audb2'
     r"""Default shared cache folder.
 

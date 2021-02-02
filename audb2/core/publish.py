@@ -180,7 +180,7 @@ def _put_tables(
 def publish(
         db_root: str,
         version: str,
-        repository: typing.Dict[str, str],
+        repository: typing.Dict[str, str] = config.REPOSITORY_PUBLISH,
         *,
         archives: typing.Mapping[str, str] = None,
         num_workers: typing.Optional[int] = 1,
