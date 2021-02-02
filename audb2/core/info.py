@@ -149,7 +149,12 @@ def header(
     with tempfile.TemporaryDirectory() as root:
         remote_header = backend.join(name, define.HEADER_FILE)
         local_header = os.path.join(root, define.HEADER_FILE)
-        backend.get_file(remote_header, local_header, version, repository)
+        backend.get_file(
+            remote_header,
+            local_header,
+            version,
+            repository['name'],
+        )
         db = audformat.Database.load(root, load_data=False)
 
     return db

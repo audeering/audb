@@ -9,7 +9,7 @@ from audb2.core.api import (
     exists,
     flavor_path,
     latest_version,
-    lookup,
+    lookup_repository,
     remove_media,
     versions,
 )

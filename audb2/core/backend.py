@@ -11,7 +11,6 @@ import audeer
 
 from audb2.core import define
 from audb2.core import utils
-from audb2.core.config import config
 
 
 class Backend:
@@ -726,7 +725,7 @@ def register(
     r"""Register backend.
 
     If a backend with this name already exists,
-    it will be overwritten
+    it will be overwritten.
 
     Args:
         name: backend registry name

@@ -567,7 +567,8 @@ def load(
     for cache_root in cache_roots:
         db_root = audeer.safe_path(
             os.path.join(
-                cache_root, flavor.path(name, version, repository)
+                cache_root,
+                flavor.path(name, version, repository['name']),
             )
         )
         db_root_tmp = db_root + '~'
@@ -581,7 +582,7 @@ def load(
     deps = Dependencies()
     if db is None:
         archive = backend.join(name, define.DB)
-        backend.get_archive(archive, db_root_tmp, version, repository)
+        backend.get_archive(archive, db_root_tmp, version, repository['name'])
         deps_path = os.path.join(db_root_tmp, define.DEPENDENCIES_FILE)
     else:
         deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
@@ -596,7 +597,7 @@ def load(
             db_root_tmp=db_root_tmp,
             version=version,
             flavor=flavor,
-            repository=repository,
+            repository=repository['name'],
             backend=backend,
             deps=deps,
             num_workers=num_workers,
@@ -676,7 +677,7 @@ def load_original_to(
     update = os.path.exists(db_root) and os.listdir(db_root)
     audeer.mkdir(db_root)
     archive = backend.join(name, define.DB)
-    backend.get_archive(archive, db_root, version, repository)
+    backend.get_archive(archive, db_root, version, repository['name'])
     deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
     deps = Dependencies()
     deps.load(deps_path)
@@ -694,7 +695,7 @@ def load_original_to(
         db_root_tmp=db_root_tmp,
         version=version,
         flavor=None,
-        repository=repository,
+        repository=repository['name'],
         backend=backend,
         deps=deps,
         num_workers=num_workers,

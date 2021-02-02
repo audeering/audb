@@ -68,6 +68,11 @@ load_original_to
 
 .. autofunction:: load_original_to
 
+lookup_repository
+-----------------
+
+.. autofunction:: lookup_repository
+
 publish
 -------
 

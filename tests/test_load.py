@@ -286,11 +286,6 @@ def test_load_original_to(version):
         )
     ]
 )
-def test_lookup(name, version):
-    repository, v, backend = audb2.lookup(name, version)
-    assert repository == pytest.REPOSITORY_NAME
-    if version is not None:
-        assert v == version
-    else:
-        assert v == audb2.latest_version(name)
-    assert isinstance(backend, audb2.backend.FileSystem)
+def test_lookup_repository(name, version):
+    repository = audb2.lookup_repository(name, version)
+    assert repository == pytest.REPOSITORY

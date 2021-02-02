@@ -162,7 +162,12 @@ def dependencies(
 
     with tempfile.TemporaryDirectory() as root:
         archive = backend.join(name, define.DB)
-        deps_path = backend.get_archive(archive, root, version, repository)[0]
+        deps_path = backend.get_archive(
+            archive,
+            root,
+            version,
+            repository['name'],
+        )[0]
         deps_path = os.path.join(root, deps_path)
         deps = Dependencies()
         deps.load(deps_path)
@@ -249,7 +254,7 @@ def exists(
     relative_flavor_path = flavor_path(
         name,
         version,
-        repository,
+        repository['name'],
         only_metadata=only_metadata,
         channels=channels,
         format=format,
@@ -369,19 +374,10 @@ def latest_version(
 def lookup(
         name: str,
         version: str = None,
-) -> (str, str, Backend):
-    r"""Look for database in default repositories.
+) -> (typing.Dict[str, str], str, Backend):
+    r"""Helper function to look up database in all repositories.
 
-    Args:
-        name: database name
-        version: version string, if `None` look for latest
-
-    Returns:
-        repository name, version string, backend object
-
-    Raises:
-        RuntimeError: if database and/or version is not found
-
+    Returns repository, version and backend object.
 
     """
     for repository in config.REPOSITORIES:
@@ -396,7 +392,7 @@ def lookup(
                 continue
 
         if backend.exists(header, version, repository['name']):
-            return repository['name'], version, backend
+            return repository, version, backend
 
     if version is None:
         raise RuntimeError(
@@ -410,6 +406,26 @@ def lookup(
             f'for database '
             f"'{name}'."
         )
+
+
+def lookup_repository(
+        name: str,
+        version: str = None,
+) -> typing.Dict[str, str]:
+    r"""Look for database in all repositories.
+
+    Args:
+        name: database name
+        version: version string, if `None` look for latest
+
+    Returns:
+        repository name, version string, backend object
+
+    Raises:
+        RuntimeError: if database and/or version is not found
+
+    """
+    return lookup(name, version)[0]
 
 
 def remove_media(
@@ -438,7 +454,10 @@ def remove_media(
             # download dependencies
             archive = backend.join(name, define.DB)
             deps_path = backend.get_archive(
-                archive, db_root, version, repository,
+                archive,
+                db_root,
+                version,
+                repository['name'],
             )[0]
             deps_path = os.path.join(db_root, deps_path)
             deps = Dependencies()
@@ -457,17 +476,25 @@ def remove_media(
                         archive,
                     )
                     if backend.exists(
-                            f'{remote_archive}.zip', version, repository
+                            f'{remote_archive}.zip',
+                            version,
+                            repository['name'],
                     ):
 
                         files_in_archive = backend.get_archive(
-                            remote_archive, db_root, version, repository,
+                            remote_archive,
+                            db_root,
+                            version,
+                            repository['name'],
                         )
                         os.remove(os.path.join(db_root, file))
                         files_in_archive.remove(file)
                         backend.put_archive(
-                            db_root, files_in_archive, remote_archive,
-                            version, repository,
+                            db_root,
+                            files_in_archive,
+                            remote_archive,
+                            version,
+                            repository['name'],
                         )
 
                     # mark file as removed
@@ -483,7 +510,7 @@ def remove_media(
                     define.DEPENDENCIES_FILE,
                     remote_archive,
                     version,
-                    repository,
+                    repository['name'],
                 )
 
 
