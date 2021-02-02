@@ -270,11 +270,11 @@ class Backend:
             file path on backend
 
         Example:
-            >>> backend = FileSystem()
+            >>> backend = FileSystem('~/my-host')
             >>> path = backend.path('media/archive1.zip', '1.0.0', 'data')
             >>> home = os.path.expanduser('~')
             >>> path[len(home) + 1:]
-            'audb2-host/data/media/archive1/1.0.0/archive1-1.0.0.zip'
+            'my-host/data/media/archive1/1.0.0/archive1-1.0.0.zip'
 
         """
         allowed_chars = re.compile(define.BACKEND_ALLOWED_CHARS)
@@ -488,7 +488,7 @@ class Artifactory(Backend):
 
     def __init__(
             self,
-            host=config.ARTIFACTORY_HOST,
+            host,
     ):
         super().__init__(host)
 
@@ -585,7 +585,7 @@ class FileSystem(Backend):
     """
     def __init__(
             self,
-            host: str = config.FILE_SYSTEM_HOST,
+            host: str,
     ):
         super().__init__(audeer.safe_path(host))
 
@@ -736,12 +736,5 @@ def register(
     backend_registry[name] = cls
 
 
-register(
-    config.ARTIFACTORY_REGISTRY_NAME,
-    Artifactory,
-)
-
-register(
-    config.FILE_SYSTEM_REGISTRY_NAME,
-    FileSystem,
-)
+register('artifactory', Artifactory)
+register('file-system', FileSystem)

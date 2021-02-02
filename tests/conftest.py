@@ -17,19 +17,19 @@ pytest.ROOT = audeer.safe_path(
     )
 )
 
-pytest.BACKEND = audb2.config.FILE_SYSTEM_REGISTRY_NAME
+pytest.ARTIFACTORY_HOST = 'https://artifactory.audeering.com/artifactory'
+pytest.BACKEND = 'file-system'
 pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
+pytest.FILE_SYSTEM_HOST = os.path.join(pytest.ROOT, 'repo')
 pytest.ID = audeer.uid()
-pytest.HOST = os.path.join(pytest.ROOT, 'repo')
 pytest.NUM_WORKERS = 5
-pytest.REPOSITORY = 'data-unittests-local'
-pytest.REPOSITORIES = [
-    (
-        pytest.BACKEND,
-        pytest.HOST,
-        pytest.REPOSITORY,
-    ),
-]
+pytest.REPOSITORY_NAME = 'data-unittests-local'
+pytest.REPOSITORY = {
+    'name': pytest.REPOSITORY_NAME,
+    'backend': pytest.BACKEND,
+    'host': pytest.FILE_SYSTEM_HOST,
+}
+pytest.REPOSITORIES = [pytest.REPOSITORY]
 pytest.SHARED_CACHE_ROOT = os.path.join(pytest.ROOT, 'shared')
 
 
@@ -48,7 +48,7 @@ def cleanup_session():
     url = audfactory.artifactory_path(
         audfactory.server_url(
             pytest.ID,
-            repository=pytest.REPOSITORY,
+            repository=pytest.REPOSITORY_NAME,
         ),
     )
     if url.exists():

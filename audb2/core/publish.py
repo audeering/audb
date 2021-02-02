@@ -180,11 +180,9 @@ def _put_tables(
 def publish(
         db_root: str,
         version: str,
-        repository: str,
+        repository: typing.Dict[str, str],
         *,
         archives: typing.Mapping[str, str] = None,
-        backend: str = config.ARTIFACTORY_REGISTRY_NAME,
-        host: str = config.ARTIFACTORY_HOST,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
 ) -> Dependencies:
@@ -197,8 +195,6 @@ def publish(
         archives: dictionary mapping files to archive names.
             Can be used to bundle files into archives.
             Name must not include an extension
-        backend: backend name
-        host: host address
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
@@ -213,13 +209,16 @@ def publish(
     """
     db = audformat.Database.load(db_root, load_data=False)
 
-    backend = create(backend, host)
+    backend = create(repository['backend'], repository['host'])
+    repository = repository['name']
 
     remote_header = backend.join(db.name, define.HEADER_FILE)
     if version in backend.versions(remote_header, repository):
         raise RuntimeError(
-            f"A version '{version}' already exists for "
-            f"database '{db.name}'."
+            'A version '
+            f"'{version}' "
+            'already exists for database '
+            f"'{db.name}'."
         )
 
     # load database and dependencies

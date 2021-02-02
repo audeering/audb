@@ -55,7 +55,7 @@ def clear_root(root: str):
 def fixture_publish_db():
 
     clear_root(DB_ROOT)
-    clear_root(pytest.HOST)
+    clear_root(pytest.FILE_SYSTEM_HOST)
 
     # create db
 
@@ -93,15 +93,13 @@ def fixture_publish_db():
         DB_ROOT,
         '1.0.0',
         pytest.REPOSITORY,
-        backend=pytest.BACKEND,
-        host=pytest.HOST,
         verbose=False,
     )
 
     yield
 
     clear_root(DB_ROOT)
-    clear_root(pytest.HOST)
+    clear_root(pytest.FILE_SYSTEM_HOST)
 
 
 @pytest.fixture(

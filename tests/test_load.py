@@ -38,7 +38,7 @@ def clear_root(root: str):
 def fixture_publish_db():
 
     clear_root(DB_ROOT)
-    clear_root(pytest.HOST)
+    clear_root(pytest.FILE_SYSTEM_HOST)
 
     # create db
 
@@ -74,8 +74,6 @@ def fixture_publish_db():
         '1.0.0',
         pytest.REPOSITORY,
         archives=archives,
-        backend=pytest.BACKEND,
-        host=pytest.HOST,
         verbose=False,
     )
 
@@ -96,8 +94,6 @@ def fixture_publish_db():
         DB_ROOT_VERSION['1.1.0'],
         '1.1.0',
         pytest.REPOSITORY,
-        backend=pytest.BACKEND,
-        host=pytest.HOST,
         verbose=False,
     )
 
@@ -115,8 +111,6 @@ def fixture_publish_db():
         DB_ROOT_VERSION['1.1.1'],
         '1.1.1',
         pytest.REPOSITORY,
-        backend=pytest.BACKEND,
-        host=pytest.HOST,
         verbose=False,
     )
 
@@ -140,8 +134,6 @@ def fixture_publish_db():
         DB_ROOT_VERSION['2.0.0'],
         '2.0.0',
         pytest.REPOSITORY,
-        backend=pytest.BACKEND,
-        host=pytest.HOST,
         verbose=False,
     )
 
@@ -159,15 +151,13 @@ def fixture_publish_db():
         DB_ROOT_VERSION['3.0.0'],
         '3.0.0',
         pytest.REPOSITORY,
-        backend=pytest.BACKEND,
-        host=pytest.HOST,
         verbose=False,
     )
 
     yield
 
     clear_root(DB_ROOT)
-    clear_root(pytest.HOST)
+    clear_root(pytest.FILE_SYSTEM_HOST)
 
 
 @pytest.mark.parametrize(
@@ -298,7 +288,7 @@ def test_load_original_to(version):
 )
 def test_lookup(name, version):
     repository, v, backend = audb2.lookup(name, version)
-    assert repository == pytest.REPOSITORY
+    assert repository == pytest.REPOSITORY_NAME
     if version is not None:
         assert v == version
     else:

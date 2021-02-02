@@ -34,16 +34,16 @@ def available(
     """
 
     match = {}
-    for backend_name, host, repository in config.REPOSITORIES:
+    for repository in config.REPOSITORIES:
         pattern = f'*/{define.DB}/*/{define.DB}-*.yaml'
-        backend = create(backend_name, host)
-        for p in backend.glob(pattern, repository):
+        backend = create(repository['backend'], repository['host'])
+        for p in backend.glob(pattern, repository['name']):
             name, _, version, _ = p.split('/')[-4:]
             if name not in match:
                 match[name] = {
-                    'backend': backend_name,
-                    'host': host,
-                    'repository': repository,
+                    'backend': repository['backend'],
+                    'host': repository['host'],
+                    'repository': repository['name'],
                     'version': [],
                 }
             match[name]['version'].append(version)
@@ -384,19 +384,19 @@ def lookup(
 
 
     """
-    for backend_name, host, repository in config.REPOSITORIES:
+    for repository in config.REPOSITORIES:
 
-        backend = create(backend_name, host)
+        backend = create(repository['backend'], repository['host'])
         header = backend.join(name, 'db.yaml')
 
         if version is None:
             try:
-                version = backend.latest_version(header, repository)
+                version = backend.latest_version(header, repository['name'])
             except RuntimeError:
                 continue
 
-        if backend.exists(header, version, repository):
-            return repository, version, backend
+        if backend.exists(header, version, repository['name']):
+            return repository['name'], version, backend
 
     if version is None:
         raise RuntimeError(
@@ -499,11 +499,10 @@ def versions(
         list of versions
 
     """
-    vs = set()
-    for backend_name, host, repository in config.REPOSITORIES:
-        backend = create(backend_name, host)
+    vs = []
+    for repository in config.REPOSITORIES:
+        backend = create(repository['backend'], repository['host'])
         header = backend.join(name, 'db.yaml')
-        vs.update(backend.versions(header, repository))
-    vs = list(vs)
+        vs.extend(backend.versions(header, repository['name']))
     utils.sort_versions(vs)
     return vs

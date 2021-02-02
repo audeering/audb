@@ -7,41 +7,29 @@ class config:
         audb2.config.CACHE_ROOT = '~/data'
 
     """
-
-    ARTIFACTORY_HOST = 'https://artifactory.audeering.com/artifactory'
-    r"""Default Artifactory host URL."""
-
-    ARTIFACTORY_REGISTRY_NAME = 'artifactory'
-    r"""Name of Artifactory backend."""
-
     CACHE_ROOT = '~/audb2'
     r"""Default cache folder."""
-
-    FILE_SYSTEM_HOST = '~/audb2-host'
-    r"""Default file system host folder."""
-
-    FILE_SYSTEM_REGISTRY_NAME = 'file-system'
-    r"""Default file system host folder."""
 
     GROUP_ID = 'com.audeering.data'
     r"""Default group ID."""
 
     REPOSITORIES = [
-        (
-            ARTIFACTORY_REGISTRY_NAME,
-            ARTIFACTORY_HOST,
-            'data-public-local',
-        ),
-        (
-            ARTIFACTORY_REGISTRY_NAME,
-            ARTIFACTORY_HOST,
-            'data-private-local',
-        ),
-        (
-            FILE_SYSTEM_REGISTRY_NAME,
-            FILE_SYSTEM_HOST,
-            'data-local',
-        ),
+        {
+            'name': 'data-public-local',
+            'backend': 'artifactory',
+            'host': 'https://artifactory.audeering.com/artifactory',
+        },
+        {
+            'name': 'data-private-local',
+            'backend': 'artifactory',
+            'host': 'https://artifactory.audeering.com/artifactory',
+
+        },
+        {
+            'name': 'data-local',
+            'backend': 'file-system',
+            'host': '~/audb2-host',
+        },
     ]
     r"""List of repositories, will be iterated in given order.
 

@@ -36,7 +36,7 @@ def clear_root(root: str):
 def fixture_publish_db():
 
     clear_root(DB_ROOT)
-    clear_root(pytest.HOST)
+    clear_root(pytest.FILE_SYSTEM_HOST)
 
     # create db
 
@@ -82,7 +82,7 @@ def fixture_publish_db():
     yield
 
     clear_root(DB_ROOT)
-    clear_root(pytest.HOST)
+    clear_root(pytest.FILE_SYSTEM_HOST)
 
 
 @pytest.mark.parametrize(
@@ -100,8 +100,6 @@ def test_invalid_archives(name):
             '1.0.1',
             pytest.REPOSITORY,
             archives=archives,
-            backend=pytest.BACKEND,
-            host=pytest.HOST,
             num_workers=pytest.NUM_WORKERS,
             verbose=False,
         )
@@ -133,8 +131,6 @@ def test_publish(version):
         version,
         pytest.REPOSITORY,
         archives=archives,
-        backend=pytest.BACKEND,
-        host=pytest.HOST,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
@@ -165,7 +161,7 @@ def test_publish(version):
     for file in db.files:
         name = archives[file] if file in archives else file
         file_path = backend.join(db.name, 'media', name)
-        backend.exists(file_path, version, pytest.REPOSITORY)
+        backend.exists(file_path, version, pytest.REPOSITORY_NAME)
         path = os.path.join(DB_ROOT_VERSION[version], file)
         assert deps.checksum(file) == audb2.core.utils.md5(path)
         if deps.format(file) in [

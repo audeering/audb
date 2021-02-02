@@ -33,13 +33,13 @@ import audb2
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(pytest.HOST),
-        audb2.backend.Artifactory(),
+        audb2.backend.FileSystem(pytest.FILE_SYSTEM_HOST),
+        audb2.backend.Artifactory(pytest.ARTIFACTORY_HOST),
     ]
 )
 def test_archive(tmpdir, files, name, folder, version, backend):
 
-    repository = pytest.REPOSITORY
+    repository = pytest.REPOSITORY_NAME
 
     files_as_list = [files] if isinstance(files, str) else files
     for file in files_as_list:
@@ -70,10 +70,10 @@ def test_archive(tmpdir, files, name, folder, version, backend):
     'name, host, cls',
     [
         (
-            'file-system', pytest.HOST, audb2.backend.FileSystem,
+            'file-system', pytest.FILE_SYSTEM_HOST, audb2.backend.FileSystem,
         ),
         (
-            'artifactory', pytest.HOST, audb2.backend.Artifactory,
+            'artifactory', pytest.ARTIFACTORY_HOST, audb2.backend.Artifactory,
         ),
         pytest.param(  # backend does not exist
             'does-not-exist', '', None,
@@ -88,13 +88,13 @@ def test_create(name, host, cls):
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(pytest.HOST),
-        audb2.backend.Artifactory(),
+        audb2.backend.FileSystem(pytest.FILE_SYSTEM_HOST),
+        audb2.backend.Artifactory(pytest.ARTIFACTORY_HOST),
     ]
 )
 def test_errors(tmpdir, backend):
 
-    repository = pytest.REPOSITORY
+    repository = pytest.REPOSITORY_NAME
 
     file_name = 'does-not-exist'
     local_file = os.path.join(tmpdir, file_name)
@@ -170,13 +170,13 @@ def test_errors(tmpdir, backend):
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(pytest.HOST),
-        audb2.backend.Artifactory(),
+        audb2.backend.FileSystem(pytest.FILE_SYSTEM_HOST),
+        audb2.backend.Artifactory(pytest.ARTIFACTORY_HOST),
     ]
 )
 def test_file(tmpdir, local_file, remote_file, version, backend):
 
-    repository = pytest.REPOSITORY
+    repository = pytest.REPOSITORY_NAME
 
     local_file = os.path.join(tmpdir, local_file)
     audeer.mkdir(os.path.dirname(local_file))
@@ -220,13 +220,13 @@ def test_file(tmpdir, local_file, remote_file, version, backend):
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(pytest.HOST),
-        audb2.backend.Artifactory(),
+        audb2.backend.FileSystem(pytest.FILE_SYSTEM_HOST),
+        audb2.backend.Artifactory(pytest.ARTIFACTORY_HOST),
     ]
 )
 def test_glob(tmpdir, files, backend):
 
-    repository = pytest.REPOSITORY
+    repository = pytest.REPOSITORY_NAME
 
     paths = []
     for file in files:
@@ -250,8 +250,8 @@ def test_glob(tmpdir, files, backend):
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(pytest.HOST),
-        audb2.backend.Artifactory(),
+        audb2.backend.FileSystem(pytest.FILE_SYSTEM_HOST),
+        audb2.backend.Artifactory(pytest.ARTIFACTORY_HOST),
     ]
 )
 @pytest.mark.parametrize(
@@ -265,19 +265,19 @@ def test_glob(tmpdir, files, backend):
     ]
 )
 def test_path(backend, path):
-    backend.path(path, None, pytest.REPOSITORY)
+    backend.path(path, None, pytest.REPOSITORY_NAME)
 
 
 @pytest.mark.parametrize(
     'backend',
     [
-        audb2.backend.FileSystem(pytest.HOST),
-        audb2.backend.Artifactory(),
+        audb2.backend.FileSystem(pytest.FILE_SYSTEM_HOST),
+        audb2.backend.Artifactory(pytest.ARTIFACTORY_HOST),
     ]
 )
 def test_versions(tmpdir, backend):
 
-    repository = pytest.REPOSITORY
+    repository = pytest.REPOSITORY_NAME
 
     file_name = 'db.yaml'
     local_file = os.path.join(tmpdir, file_name)
