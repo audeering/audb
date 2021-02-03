@@ -9,7 +9,7 @@ import audformat
 from audb2.core import define
 from audb2.core.api import (
     dependencies,
-    lookup,
+    _lookup,
 )
 
 
@@ -144,7 +144,7 @@ def header(
         database object without table data
 
     """
-    repository, version, backend = lookup(name, version)
+    repository, version, backend = _lookup(name, version)
 
     with tempfile.TemporaryDirectory() as root:
         remote_header = backend.join(name, define.HEADER_FILE)

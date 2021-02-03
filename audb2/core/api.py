@@ -158,7 +158,7 @@ def dependencies(
         dependency object
 
     """
-    repository, version, backend = lookup(name, version)
+    repository, version, backend = _lookup(name, version)
 
     with tempfile.TemporaryDirectory() as root:
         archive = backend.join(name, define.DB)
@@ -249,7 +249,7 @@ def exists(
         stacklevel=2,
     )
 
-    repository, version, backend = lookup(name, version)
+    repository, version, backend = _lookup(name, version)
 
     relative_flavor_path = flavor_path(
         name,
@@ -371,7 +371,7 @@ def latest_version(
     return vs[-1]
 
 
-def lookup(
+def _lookup(
         name: str,
         version: str = None,
 ) -> (typing.Dict[str, str], str, Backend):
@@ -425,7 +425,7 @@ def lookup_repository(
         RuntimeError: if database and/or version is not found
 
     """
-    return lookup(name, version)[0]
+    return _lookup(name, version)[0]
 
 
 def remove_media(
@@ -447,7 +447,7 @@ def remove_media(
 
     for version in versions(name):
 
-        repository, version, backend = lookup(name, version)
+        repository, version, backend = _lookup(name, version)
 
         with tempfile.TemporaryDirectory() as db_root:
 

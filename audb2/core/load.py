@@ -11,7 +11,7 @@ from audb2.core import define
 from audb2.core import utils
 from audb2.core.api import (
     default_cache_root,
-    lookup,
+    _lookup,
 )
 from audb2.core.backend import Backend
 from audb2.core.dependencies import Dependencies
@@ -533,7 +533,7 @@ def load(
                 "is no longer supported."
             )
 
-    repository, version, backend = lookup(name, version)
+    repository, version, backend = _lookup(name, version)
 
     flavor = Flavor(
         only_metadata=only_metadata,
@@ -667,7 +667,7 @@ def load_original_to(
         database object
 
     """
-    repository, version, backend = lookup(name, version)
+    repository, version, backend = _lookup(name, version)
 
     db_root = audeer.safe_path(root)
     db_root_tmp = db_root + '~'
