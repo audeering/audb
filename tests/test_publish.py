@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 
 import pytest
@@ -19,7 +20,7 @@ DB_NAME = f'test_publish-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
-    ['1.0.0', '2.0.0', '3.0.0']
+    ['1.0.0', '2.0.0', '3.0.0', '4.0.0', '5.0.0']
 }
 
 
@@ -79,6 +80,16 @@ def fixture_publish_db():
     audformat.testing.create_audio_files(db, DB_ROOT_VERSION['3.0.0'])
     db.save(DB_ROOT_VERSION['3.0.0'])
 
+    # Store without audio files in version 4.0.0
+    db.save(DB_ROOT_VERSION['4.0.0'])
+
+    # Extend database to >20 files and store without audio in version 5.0.0
+    db['files'] = db['files'].extend_index(
+        audformat.filewise_index([f'file{n}.wav' for n in range(20)])
+    )
+    assert len(db.files) > 20
+    db.save(DB_ROOT_VERSION['5.0.0'])
+
     yield
 
     clear_root(DB_ROOT)
@@ -115,6 +126,20 @@ def test_invalid_archives(name):
         ),
         '2.0.0',
         '3.0.0',
+        pytest.param(
+            '4.0.0',
+            marks=pytest.mark.xfail(
+                raises=RuntimeError,
+                reason='Files missing (fewer than 20)',
+            ),
+        ),
+        pytest.param(
+            '5.0.0',
+            marks=pytest.mark.xfail(
+                raises=RuntimeError,
+                reason='Files missing (more than 20)',
+            ),
+        ),
     ]
 )
 def test_publish(version):
@@ -223,3 +248,40 @@ def test_publish_changed_db(version1, version2, media_difference):
     media2 = set(sorted(depend2.media))
 
     assert media1 - media2 == set(media_difference)
+
+
+def test_publish_error_messages():
+
+    for version in ['1.0.0', '4.0.0', '5.0.0']:
+
+        if version == '1.0.0':
+            error_msg = (
+                "A version '1.0.0' already exists for database "
+                f"'{DB_NAME}'."
+            )
+        elif version == '4.0.0':
+            error_msg = (
+                "5 files are referenced in tables that cannot be found. "
+                "Missing files are: '['audio/002.wav', 'audio/003.wav', "
+                "'audio/004.wav', 'audio/005.wav', 'audio/new.wav']'."
+            )
+        elif version == '5.0.0':
+            error_msg = (
+                "25 files are referenced in tables that cannot be found. "
+                "Missing files are: '['audio/002.wav', 'audio/003.wav', "
+                "'audio/004.wav', 'audio/005.wav', 'audio/new.wav', "
+                "'file0.wav', 'file1.wav', 'file10.wav', 'file11.wav', "
+                "'file12.wav', 'file13.wav', 'file14.wav', 'file15.wav', "
+                "'file16.wav', 'file17.wav', 'file18.wav', 'file19.wav', "
+                "'file2.wav', 'file3.wav', 'file4.wav'], ...'."
+            )
+
+        with pytest.raises(RuntimeError, match=re.escape(error_msg)):
+
+            audb2.publish(
+                DB_ROOT_VERSION[version],
+                version,
+                pytest.REPOSITORY,
+                num_workers=pytest.NUM_WORKERS,
+                verbose=False,
+            )

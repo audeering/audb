@@ -205,6 +205,7 @@ def publish(
 
     Raises:
         RuntimeError: if version already exists
+        RuntimeError: if database tables reference non-existing files
 
     """
     db = audformat.Database.load(db_root, load_data=False)
@@ -226,6 +227,24 @@ def publish(
     deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
     deps = Dependencies()
     deps.load(deps_path)
+
+    # check all files referenced in a table exists
+    missing_files = [
+        f for f in db.files
+        if not os.path.exists(os.path.join(db_root, f))
+    ]
+    if len(missing_files) > 0:
+        number_of_presented_files = 20
+        error_msg = (
+            f'{len(missing_files)} files are referenced in tables '
+            'that cannot be found. '
+            f"Missing files are: '{missing_files[:number_of_presented_files]}"
+        )
+        if len(missing_files) <= number_of_presented_files:
+            error_msg += "'."
+        else:
+            error_msg += ", ...'."
+        raise RuntimeError(error_msg)
 
     # make sure all tables are stored in CSV format
     for table_id, table in db.tables.items():
