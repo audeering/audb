@@ -10,9 +10,6 @@ class config:
     CACHE_ROOT = '~/audb2'
     r"""Default cache folder."""
 
-    GROUP_ID = 'com.audeering.data'
-    r"""Default group ID."""
-
     REPOSITORIES = [
         {
             'name': 'data-public-local',
