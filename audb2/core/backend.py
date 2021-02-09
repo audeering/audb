@@ -471,8 +471,7 @@ class Backend:
         folder, file = self.split(path)
         name = audeer.basename_wo_ext(file)
         vs = self._versions(repository, folder, name)
-        utils.sort_versions(vs)
-        return vs
+        return audeer.sort_versions(vs)
 
 
 class Artifactory(Backend):

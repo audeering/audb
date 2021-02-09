@@ -9,7 +9,6 @@ import audeer
 import audformat
 
 from audb2.core import define
-from audb2.core import utils
 from audb2.core.backend import (
     Backend,
     create,
@@ -49,7 +48,9 @@ def available(
             match[name]['version'].append(version)
 
     for name in match:
-        utils.sort_versions(match[name]['version'])
+        match[name]['version'] = audeer.sort_versions(
+            match[name]['version']
+        )
         if latest_only:
             match[name]['version'] = [match[name]['version'][-1]]
 
@@ -367,7 +368,7 @@ def latest_version(
         raise RuntimeError(
             f"Cannot find a version for database '{name}'.",
         )
-    utils.sort_versions(vs)
+    vs = audeer.sort_versions(vs)
     return vs[-1]
 
 
@@ -531,5 +532,4 @@ def versions(
         backend = create(repository['backend'], repository['host'])
         header = backend.join(name, 'db.yaml')
         vs.extend(backend.versions(header, repository['name']))
-    utils.sort_versions(vs)
-    return vs
+    return audeer.sort_versions(vs)

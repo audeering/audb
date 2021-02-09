@@ -44,8 +44,3 @@ def md5(
         for chunk in md5_read_chunk(fp, chunk_size):
             hasher.update(chunk)
         return hasher.hexdigest()
-
-
-def sort_versions(versions: typing.List[str]):
-    r"""Sort versions inplace."""
-    versions.sort(key=lambda s: list(map(int, s.split('.'))))
