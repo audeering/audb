@@ -6,9 +6,7 @@ stages:
 
 generate-token:
   stage: token
-  image: docker.audeering.com/alpine
-  before_script:
-    - apk --no-cache add git curl bash
+  image: docker.audeering.com/audeering/alpine-token:latest
   script:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${GITLAB_USER_LOGIN}/artifactory-tokenizer.git
     - cd artifactory-tokenizer
@@ -20,8 +18,6 @@ generate-token:
 
 .pytest:
   before_script:
-    - apt-get update
-    - apt-get install -y sox curl jq pandoc graphviz
     - username=${GITLAB_USER_LOGIN}
     - api_key=$(cat token.json | jq -r '.access_token')
     - export ARTIFACTORY_USERNAME=${username}
@@ -39,12 +35,12 @@ generate-token:
 python-3.6:
   extends: .pytest
   stage: test
-  image: docker.audeering.com/python:3.6
+  image: docker.audeering.com/audeering/python-3.6:latest
 
 python-3.7:
   extends: .pytest
   stage: test
-  image: docker.audeering.com/python:3.7
+  image: docker.audeering.com/audeering/python-3.7:latest
 
 #test-windows-general:
 #  # Based on Python 3.8 by default
@@ -59,7 +55,7 @@ python-3.7:
 docs:
   extends: .pytest
   stage: test
-  image: docker.audeering.com/python:3.6
+  image: docker.audeering.com/audeering/python-3.6:latest
   script:
     - pip install -r requirements.txt
     - pip install -r docs/requirements.txt
@@ -88,11 +84,10 @@ pages:
 pypi:
   extends: .pytest
   stage: publish
-  image: docker.audeering.com/python:3.6
+  image: docker.audeering.com/audeering/python-3.6:latest
   variables:
     TWINE_REPOSITORY_URL: https://artifactory.audeering.com/artifactory/api/pypi/pypi
   script:
-    - pip install twine
     - python setup.py sdist bdist_wheel
     - python -m twine upload --repository local dist/*
   only:
