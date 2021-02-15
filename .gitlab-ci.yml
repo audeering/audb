@@ -85,8 +85,6 @@ pypi:
   extends: .pytest
   stage: publish
   image: docker.audeering.com/audeering/python-3.6:latest
-  variables:
-    TWINE_REPOSITORY_URL: https://artifactory.audeering.com/artifactory/api/pypi/pypi
   script:
     - python setup.py sdist bdist_wheel
     - python -m twine upload --repository local dist/*
