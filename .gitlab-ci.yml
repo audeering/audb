@@ -1,36 +1,26 @@
 stages:
-  - token
+  - prepare
   - test
   - doc
   - publish
 
-generate-token:
-  stage: token
-  image: docker.audeering.com/audeering/alpine-token:latest
-  script:
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${GITLAB_USER_LOGIN}/artifactory-tokenizer.git
-    - cd artifactory-tokenizer
-    - bash get_token.sh "readers,deployers" > ../token.json
-  artifacts:
-    paths:
-      - token.json
-    expire_in: 20 mins
+
+variables:
+  ARTIFACTORY_GROUPS: "readers,deployers"
+  ARTIFACTORY_TOKEN_VARS: "ARTIFACTORY_API_KEY,TWINE_PASSWORD"
+  ARTIFACTORY_USERNAME_VARS: "ARTIFACTORY_USERNAME,TWINE_USERNAME"
+
+include:
+  - project: 'devops/artifactory-token-helper'
+    file: '/.gitlab-ci-artifactory-token.yml'
 
 .pytest:
   before_script:
-    - username=${GITLAB_USER_LOGIN}
-    - api_key=$(cat token.json | jq -r '.access_token')
-    - export ARTIFACTORY_USERNAME=${username}
-    - export ARTIFACTORY_API_KEY=${api_key}
-    - export TWINE_USERNAME=${username}
-    - export TWINE_PASSWORD=${api_key}
     - python -V
   script:
     - pip install -r requirements.txt
     - pip install -r tests/requirements.txt
     - python -m pytest
-  dependencies:
-    - generate-token
 
 python-3.6:
   extends: .pytest
