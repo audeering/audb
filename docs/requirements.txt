@@ -1,5 +1,5 @@
 jupyter-sphinx
-sphinx
+sphinx >=3.5.1
 sphinx-audeering-theme
 sphinx-autodoc-typehints
 sphinx-copybutton
