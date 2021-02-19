@@ -7,6 +7,20 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.91.0 (2021-02-19)
+---------------------------
+
+* Added: ``audb2.Backend.latest_version()``
+* Added: ``audb2.Backend.create()``
+* Added: ``audb2.Backend.register()``
+* Added: ``audb2.lookup_repository()``
+* Added: ``config.REPOSITORY_PUBLISH``
+* Fixed: update ``fire`` dependency
+* Fixed: remove ``config.GROUP_ID``
+* Fixed: use ``sphinx>=3.5.1`` to fix inherited attributes
+  in documentation
+
+
 Version 0.90.3 (2021-02-01)
 ---------------------------
 
