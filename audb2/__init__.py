@@ -1,4 +1,3 @@
-from audb2 import backend
 from audb2 import define
 from audb2 import info
 from audb2.core.api import (

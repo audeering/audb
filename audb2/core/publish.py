@@ -2,15 +2,11 @@ import collections
 import os
 import typing
 
-import audformat
+import audbackend
 import audeer
+import audformat
 
 from audb2.core import define
-from audb2.core import utils
-from audb2.core.backend import (
-    Backend,
-    create,
-)
 from audb2.core.config import config
 from audb2.core.dependencies import Dependencies
 
@@ -36,7 +32,7 @@ def _find_tables(
     def job(table: str):
 
         file = f'db.{table}.csv'
-        checksum = utils.md5(os.path.join(db_root, file))
+        checksum = audbackend.md5(os.path.join(db_root, file))
         if file not in deps:
             deps.add_meta(file, table, checksum, version)
             tables.append(table)
@@ -79,14 +75,14 @@ def _find_media(
     def job(file):
         path = os.path.join(db_root, file)
         if file not in deps:
-            checksum = utils.md5(path)
+            checksum = audbackend.md5(path)
             if file in archives:
                 archive = archives[file]
             else:
                 archive = audeer.uid(from_string=file.replace('\\', '/'))
             deps.add_media(db_root, file, archive, checksum, version)
         elif not deps.is_removed(file):
-            checksum = utils.md5(path)
+            checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.data[file][define.DependField.ARCHIVE]
                 deps.add_media(db_root, file, archive, checksum, version)
@@ -108,8 +104,7 @@ def _put_media(
         db_name: str,
         version: str,
         deps: Dependencies,
-        backend: Backend,
-        repository: str,
+        backend: audbackend.Backend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
@@ -136,7 +131,6 @@ def _put_media(
                 map_media_to_files[archive],
                 archive_file,
                 version,
-                repository,
             )
 
     # upload new and altered archives if it contains at least one file
@@ -154,8 +148,7 @@ def _put_tables(
         db_root: str,
         db_name: str,
         version: str,
-        backend: Backend,
-        repository: str,
+        backend: audbackend.Backend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
@@ -166,7 +159,7 @@ def _put_tables(
             define.DEPEND_TYPE_NAMES[define.DependType.META],
             table,
         )
-        backend.put_archive(db_root, file, archive_file, version, repository)
+        backend.put_archive(db_root, file, archive_file, version)
 
     audeer.run_tasks(
         job,
@@ -210,11 +203,14 @@ def publish(
     """
     db = audformat.Database.load(db_root, load_data=False)
 
-    backend = create(repository['backend'], repository['host'])
-    repository = repository['name']
+    backend = audbackend.create(
+        repository['backend'],
+        repository['host'],
+        repository['name']
+    )
 
     remote_header = backend.join(db.name, define.HEADER_FILE)
-    if version in backend.versions(remote_header, repository):
+    if version in backend.versions(remote_header):
         raise RuntimeError(
             'A version '
             f"'{version}' "
@@ -262,7 +258,7 @@ def publish(
         num_workers, verbose,
     )
     _put_tables(
-        tables, db_root, db.name, version, backend, repository,
+        tables, db_root, db.name, version, backend,
         num_workers, verbose,
     )
 
@@ -272,7 +268,7 @@ def publish(
         num_workers, verbose,
     )
     _put_media(
-        media, db_root, db.name, version, deps, backend, repository,
+        media, db_root, db.name, version, deps, backend,
         num_workers, verbose,
     )
 
@@ -280,18 +276,18 @@ def publish(
     deps.save(deps_path)
     archive_file = backend.join(db.name, define.DB)
     backend.put_archive(
-        db_root, define.DEPENDENCIES_FILE, archive_file, version, repository,
+        db_root, define.DEPENDENCIES_FILE, archive_file, version,
     )
     try:
         local_header = os.path.join(db_root, define.HEADER_FILE)
         remote_header = db.name + '/' + define.HEADER_FILE
-        backend.put_file(local_header, remote_header, version, repository)
+        backend.put_file(local_header, remote_header, version)
     except Exception:  # pragma: no cover
         # after the header is published
         # the new version becomes visible,
         # so if something goes wrong here
         # we better clean up
-        if backend.exists(remote_header, version, repository):
-            backend.remove_file(remote_header, version, repository)
+        if backend.exists(remote_header, version):
+            backend.remove_file(remote_header, version)
 
     return deps

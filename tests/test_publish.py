@@ -4,8 +4,9 @@ import shutil
 
 import pytest
 
-import audformat.testing
+import audbackend
 import audeer
+import audformat.testing
 import audiofile
 
 import audb2
@@ -186,9 +187,9 @@ def test_publish(version):
     for file in db.files:
         name = archives[file] if file in archives else file
         file_path = backend.join(db.name, 'media', name)
-        backend.exists(file_path, version, pytest.REPOSITORY_NAME)
+        backend.exists(file_path, version)
         path = os.path.join(DB_ROOT_VERSION[version], file)
-        assert deps.checksum(file) == audb2.core.utils.md5(path)
+        assert deps.checksum(file) == audbackend.md5(path)
         if deps.format(file) in [
             audb2.define.Format.WAV,
             audb2.define.Format.FLAC,

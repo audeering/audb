@@ -5,14 +5,11 @@ import warnings
 
 import pandas as pd
 
+import audbackend
 import audeer
 import audformat
 
 from audb2.core import define
-from audb2.core.backend import (
-    Backend,
-    create,
-)
 from audb2.core.config import config
 from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
@@ -35,8 +32,12 @@ def available(
     match = {}
     for repository in config.REPOSITORIES:
         pattern = f'*/{define.DB}/*/{define.DB}-*.yaml'
-        backend = create(repository['backend'], repository['host'])
-        for p in backend.glob(pattern, repository['name']):
+        backend = audbackend.create(
+            repository['backend'],
+            repository['host'],
+            repository['name'],
+        )
+        for p in backend.glob(pattern):
             name, _, version, _ = p.split('/')[-4:]
             if name not in match:
                 match[name] = {
@@ -159,7 +160,7 @@ def dependencies(
         dependency object
 
     """
-    repository, version, backend = _lookup(name, version)
+    _, version, backend = _lookup(name, version)
 
     with tempfile.TemporaryDirectory() as root:
         archive = backend.join(name, define.DB)
@@ -167,7 +168,6 @@ def dependencies(
             archive,
             root,
             version,
-            repository['name'],
         )[0]
         deps_path = os.path.join(root, deps_path)
         deps = Dependencies()
@@ -375,7 +375,7 @@ def latest_version(
 def _lookup(
         name: str,
         version: str = None,
-) -> (typing.Dict[str, str], str, Backend):
+) -> (typing.Dict[str, str], str, audbackend.Backend):
     r"""Helper function to look up database in all repositories.
 
     Returns repository, version and backend object.
@@ -383,16 +383,20 @@ def _lookup(
     """
     for repository in config.REPOSITORIES:
 
-        backend = create(repository['backend'], repository['host'])
+        backend = audbackend.create(
+            repository['backend'],
+            repository['host'],
+            repository['name'],
+        )
         header = backend.join(name, 'db.yaml')
 
         if version is None:
             try:
-                version = backend.latest_version(header, repository['name'])
+                version = backend.latest_version(header)
             except RuntimeError:
                 continue
 
-        if backend.exists(header, version, repository['name']):
+        if backend.exists(header, version):
             return repository, version, backend
 
     if version is None:
@@ -448,7 +452,7 @@ def remove_media(
 
     for version in versions(name):
 
-        repository, version, backend = _lookup(name, version)
+        _, version, backend = _lookup(name, version)
 
         with tempfile.TemporaryDirectory() as db_root:
 
@@ -458,7 +462,6 @@ def remove_media(
                 archive,
                 db_root,
                 version,
-                repository['name'],
             )[0]
             deps_path = os.path.join(db_root, deps_path)
             deps = Dependencies()
@@ -479,14 +482,12 @@ def remove_media(
                     if backend.exists(
                             f'{remote_archive}.zip',
                             version,
-                            repository['name'],
                     ):
 
                         files_in_archive = backend.get_archive(
                             remote_archive,
                             db_root,
                             version,
-                            repository['name'],
                         )
                         os.remove(os.path.join(db_root, file))
                         files_in_archive.remove(file)
@@ -495,7 +496,6 @@ def remove_media(
                             files_in_archive,
                             remote_archive,
                             version,
-                            repository['name'],
                         )
 
                     # mark file as removed
@@ -511,7 +511,6 @@ def remove_media(
                     define.DEPENDENCIES_FILE,
                     remote_archive,
                     version,
-                    repository['name'],
                 )
 
 
@@ -529,7 +528,11 @@ def versions(
     """
     vs = []
     for repository in config.REPOSITORIES:
-        backend = create(repository['backend'], repository['host'])
+        backend = audbackend.create(
+            repository['backend'],
+            repository['host'],
+            repository['name'],
+        )
         header = backend.join(name, 'db.yaml')
-        vs.extend(backend.versions(header, repository['name']))
+        vs.extend(backend.versions(header))
     return audeer.sort_versions(vs)

@@ -5,7 +5,6 @@ import shutil
 import pytest
 
 import audeer
-import audfactory
 
 import audb2
 
@@ -17,7 +16,6 @@ pytest.ROOT = audeer.safe_path(
     )
 )
 
-pytest.ARTIFACTORY_HOST = 'https://artifactory.audeering.com/artifactory'
 pytest.BACKEND = 'file-system'
 pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
 pytest.FILE_SYSTEM_HOST = os.path.join(pytest.ROOT, 'repo')
@@ -45,11 +43,3 @@ def cleanup_session():
     yield
     if os.path.exists(pytest.ROOT):
         shutil.rmtree(pytest.ROOT)
-    url = audfactory.artifactory_path(
-        audfactory.server_url(
-            pytest.ID,
-            repository=pytest.REPOSITORY_NAME,
-        ),
-    )
-    if url.exists():
-        url.unlink()

@@ -4,16 +4,15 @@ import re
 import typing
 import warnings
 
-import audformat
+import audbackend
 import audeer
+import audformat
 
 from audb2.core import define
-from audb2.core import utils
 from audb2.core.api import (
     default_cache_root,
     _lookup,
 )
-from audb2.core.backend import Backend
 from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
 
@@ -135,7 +134,7 @@ def _find_tables(
         if not os.path.exists(full_file):
             tables.append(file)
         else:
-            checksum = utils.md5(full_file)
+            checksum = audbackend.md5(full_file)
             # if the table already exists
             # we have to compare checksum
             # in case it was altered by flavor
@@ -193,8 +192,7 @@ def _get_media(
         db_name: str,
         flavor: typing.Optional[Flavor],
         deps: Dependencies,
-        backend: Backend,
-        repository: str,
+        backend: audbackend.Backend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
@@ -219,7 +217,7 @@ def _get_media(
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
             archive,
         )
-        files = backend.get_archive(archive, db_root_tmp, version, repository)
+        files = backend.get_archive(archive, db_root_tmp, version)
         for file in files:
             if flavor is not None and deps.format(file) in define.FORMATS:
                 bit_depth = deps.bit_depth(file)
@@ -254,8 +252,7 @@ def _get_tables(
         db_root_tmp: str,
         db_name: str,
         deps: Dependencies,
-        backend: Backend,
-        repository: str,
+        backend: audbackend.Backend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
@@ -277,9 +274,7 @@ def _get_tables(
             define.DEPEND_TYPE_NAMES[define.DependType.META],
             deps.archive(table),
         )
-        backend.get_archive(
-            archive, db_root_tmp, deps.version(table), repository,
-        )
+        backend.get_archive(archive, db_root_tmp, deps.version(table))
         _move_file(db_root_tmp, db_root, table)
 
     audeer.run_tasks(
@@ -356,8 +351,7 @@ def _load(
         db_root_tmp: str,
         version: str,
         flavor: typing.Optional[Flavor],
-        repository: str,
-        backend: Backend,
+        backend: audbackend.Backend,
         deps: Dependencies,
         num_workers: typing.Optional[int],
         verbose: bool,
@@ -371,7 +365,7 @@ def _load(
 
     remote_header = backend.join(name, define.HEADER_FILE)
     local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
-    backend.get_file(remote_header, local_header, version, repository)
+    backend.get_file(remote_header, local_header, version)
     _move_file(db_root_tmp, db_root, define.HEADER_FILE)
     db_header = audformat.Database.load(db_root, load_data=False)
 
@@ -383,7 +377,7 @@ def _load(
     )
     _get_tables(
         tables, db_root, db_root_tmp, name, deps,
-        backend, repository, num_workers, verbose,
+        backend, num_workers, verbose,
     )
 
     # load database and filter media
@@ -402,7 +396,7 @@ def _load(
         )
         _get_media(
             media, db_root, db_root_tmp, name,
-            flavor, deps, backend, repository,
+            flavor, deps, backend,
             num_workers, verbose,
         )
 
@@ -582,7 +576,7 @@ def load(
     deps = Dependencies()
     if db is None:
         archive = backend.join(name, define.DB)
-        backend.get_archive(archive, db_root_tmp, version, repository['name'])
+        backend.get_archive(archive, db_root_tmp, version)
         deps_path = os.path.join(db_root_tmp, define.DEPENDENCIES_FILE)
     else:
         deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
@@ -597,7 +591,6 @@ def load(
             db_root_tmp=db_root_tmp,
             version=version,
             flavor=flavor,
-            repository=repository['name'],
             backend=backend,
             deps=deps,
             num_workers=num_workers,
@@ -667,7 +660,7 @@ def load_original_to(
         database object
 
     """
-    repository, version, backend = _lookup(name, version)
+    _, version, backend = _lookup(name, version)
 
     db_root = audeer.safe_path(root)
     db_root_tmp = db_root + '~'
@@ -677,7 +670,7 @@ def load_original_to(
     update = os.path.exists(db_root) and os.listdir(db_root)
     audeer.mkdir(db_root)
     archive = backend.join(name, define.DB)
-    backend.get_archive(archive, db_root, version, repository['name'])
+    backend.get_archive(archive, db_root, version)
     deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
     deps = Dependencies()
     deps.load(deps_path)
@@ -685,7 +678,7 @@ def load_original_to(
         for file in deps.files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
-                checksum = utils.md5(full_file)
+                checksum = audbackend.md5(full_file)
                 if checksum != deps.checksum(file):
                     os.remove(full_file)
 
@@ -695,7 +688,6 @@ def load_original_to(
         db_root_tmp=db_root_tmp,
         version=version,
         flavor=None,
-        repository=repository['name'],
         backend=backend,
         deps=deps,
         num_workers=num_workers,

@@ -144,7 +144,7 @@ def header(
         database object without table data
 
     """
-    repository, version, backend = _lookup(name, version)
+    _, version, backend = _lookup(name, version)
 
     with tempfile.TemporaryDirectory() as root:
         remote_header = backend.join(name, define.HEADER_FILE)
@@ -153,7 +153,6 @@ def header(
             remote_header,
             local_header,
             version,
-            repository['name'],
         )
         db = audformat.Database.load(root, load_data=False)
 
