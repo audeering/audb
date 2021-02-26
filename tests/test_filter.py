@@ -9,9 +9,9 @@ import audeer
 import audb2
 
 
-audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
+os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 audb2.config.REPOSITORIES = pytest.REPOSITORIES
-audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
 DB_NAME = f'test_filter-{pytest.ID}'
@@ -76,7 +76,7 @@ def fixture_publish_db():
     audb2.publish(
         DB_ROOT,
         '1.0.0',
-        pytest.REPOSITORY,
+        pytest.PUBLISH_REPOSITORY,
         archives=archives,
         verbose=False,
     )

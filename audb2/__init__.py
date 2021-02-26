@@ -20,6 +20,7 @@ from audb2.core.load import (
     load_original_to,
 )
 from audb2.core.publish import publish
+from audb2.core.repository import Repository
 
 
 __all__ = []

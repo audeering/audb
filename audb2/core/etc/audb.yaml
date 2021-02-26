@@ -1,0 +1,12 @@
+cache_root: ~/audb2
+shared_cache_root: /data/audb2
+repositories:
+  - name: data-public-local
+    backend: artifactory
+    host: https://artifactory.audeering.com/artifactory
+  - name: data-private-local
+    backend: artifactory
+    host: https://artifactory.audeering.com/artifactory
+  - name: data-local
+    backend: file-system
+    host: ~/audb2-host

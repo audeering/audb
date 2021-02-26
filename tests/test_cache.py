@@ -1,3 +1,4 @@
+import os
 import pytest
 
 import audeer
@@ -5,15 +6,15 @@ import audeer
 import audb2
 
 
-audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
-audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
+os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 
 
 @pytest.mark.parametrize(
     'shared, expected',
     [
-        (False, audeer.safe_path(audb2.config.CACHE_ROOT)),
-        (True, audeer.safe_path(audb2.config.SHARED_CACHE_ROOT)),
+        (False, audeer.safe_path(pytest.CACHE_ROOT)),
+        (True, audeer.safe_path(pytest.SHARED_CACHE_ROOT)),
     ]
 )
 def test_cache_root(shared, expected):

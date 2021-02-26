@@ -1,6 +1,16 @@
+import os
+
+
+# Configuration files
+CONFIG_FILE = os.path.join('etc', 'audb.yaml')
+USER_CONFIG_FILE = '~/.audb.yaml'
+
+# Database
 DB = 'db'
-DEPENDENCIES_FILE = f'{DB}.csv'
 HEADER_FILE = f'{DB}.yaml'
+
+# Dependencies
+DEPENDENCIES_FILE = f'{DB}.csv'
 
 
 class DependField:
@@ -56,6 +66,7 @@ DEPEND_TYPE_NAMES = {
 }
 
 
+# Flavors
 class Format:
     r"""Media formats.
 

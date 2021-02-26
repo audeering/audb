@@ -83,6 +83,12 @@ remove_media
 
 .. autofunction:: remove_media
 
+Repository
+----------
+
+.. autoclass:: Repository
+    :members:
+
 versions
 --------
 

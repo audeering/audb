@@ -29,7 +29,7 @@ And to get help on a specific method, please do:
     $ audb2 --help
 
 Load version ``1.0.1`` of ``emodb`` as stereo FLAC files at 44100 Hz.
-The database is stored in your :ref:`cache root <cache-root>` and
+The database is stored in your :ref:`cache root <caching>` and
 its header is printed to standard out:
 
 .. command-output:: audb2 load emodb --version 1.0.1 --format flac --sampling_rate 44100

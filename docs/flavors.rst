@@ -35,7 +35,7 @@ The following properties can be changed:
 The next example will convert the original files
 to FLAC with a sampling rate of 44100 Hz.
 For each flavor a sub-folder will be created
-inside the :ref:`cache <cache-root>`.
+inside the :ref:`cache <caching>`.
 
 .. jupyter-execute::
 

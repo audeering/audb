@@ -12,9 +12,9 @@ import audiofile
 import audb2
 
 
-audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
+os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 audb2.config.REPOSITORIES = pytest.REPOSITORIES
-audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
 DB_NAME = f'test_publish-{pytest.ID}'
@@ -110,7 +110,7 @@ def test_invalid_archives(name):
         audb2.publish(
             DB_ROOT_VERSION['1.0.0'],
             '1.0.1',
-            pytest.REPOSITORY,
+            pytest.PUBLISH_REPOSITORY,
             archives=archives,
             num_workers=pytest.NUM_WORKERS,
             verbose=False,
@@ -155,7 +155,7 @@ def test_publish(version):
     deps = audb2.publish(
         DB_ROOT_VERSION[version],
         version,
-        pytest.REPOSITORY,
+        pytest.PUBLISH_REPOSITORY,
         archives=archives,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
@@ -282,7 +282,7 @@ def test_publish_error_messages():
             audb2.publish(
                 DB_ROOT_VERSION[version],
                 version,
-                pytest.REPOSITORY,
+                pytest.PUBLISH_REPOSITORY,
                 num_workers=pytest.NUM_WORKERS,
                 verbose=False,
             )

@@ -33,17 +33,17 @@ def available(
     for repository in config.REPOSITORIES:
         pattern = f'*/{define.DB}/*/{define.DB}-*.yaml'
         backend = audbackend.create(
-            repository['backend'],
-            repository['host'],
-            repository['name'],
+            repository.backend,
+            repository.host,
+            repository.name,
         )
         for p in backend.glob(pattern):
             name, _, version, _ = p.split('/')[-4:]
             if name not in match:
                 match[name] = {
-                    'backend': repository['backend'],
-                    'host': repository['host'],
-                    'repository': repository['name'],
+                    'backend': repository.backend,
+                    'host': repository.host,
+                    'repository': repository.name,
                     'version': [],
                 }
             match[name]['version'].append(version)
@@ -118,12 +118,14 @@ def default_cache_root(
     returns the path specified
     by the environment variable
     ``AUDB2_SHARED_CACHE_ROOT``
-    or :attr:`audb2.config.SHARED_CACHE_ROOT`.
+    or
+    ``audb2.config.SHARED_CACHE_ROOT``.
     If ``shared`` is ``False``,
     returns the path specified
     by the environment variable
     ``AUDB2_CACHE_ROOT``
-    or :attr:`audb2.config.CACHE_ROOT`.
+    or
+    ``audb2.config.CACHE_ROOT``.
 
     Args:
         shared: if ``True`` returns path to shared cache folder
@@ -255,7 +257,7 @@ def exists(
     relative_flavor_path = flavor_path(
         name,
         version,
-        repository['name'],
+        repository.name,
         only_metadata=only_metadata,
         channels=channels,
         format=format,
@@ -316,7 +318,7 @@ def flavor_path(
     Args:
         name: name of database
         version: version string
-        repository: repository
+        repository: repository name
         only_metadata: only metadata is stored
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`
@@ -384,9 +386,9 @@ def _lookup(
     for repository in config.REPOSITORIES:
 
         backend = audbackend.create(
-            repository['backend'],
-            repository['host'],
-            repository['name'],
+            repository.backend,
+            repository.host,
+            repository.name,
         )
         header = backend.join(name, 'db.yaml')
 
@@ -529,9 +531,9 @@ def versions(
     vs = []
     for repository in config.REPOSITORIES:
         backend = audbackend.create(
-            repository['backend'],
-            repository['host'],
-            repository['name'],
+            repository.backend,
+            repository.host,
+            repository.name,
         )
         header = backend.join(name, 'db.yaml')
         vs.extend(backend.versions(header))

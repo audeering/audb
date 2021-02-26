@@ -12,9 +12,9 @@ import audiofile
 import audb2
 
 
-audb2.config.CACHE_ROOT = pytest.CACHE_ROOT
+os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 audb2.config.REPOSITORIES = pytest.REPOSITORIES
-audb2.config.SHARED_CACHE_ROOT = pytest.SHARED_CACHE_ROOT
 
 
 DB_NAME = f'test_convert-{pytest.ID}'
@@ -92,7 +92,7 @@ def fixture_publish_db():
     audb2.publish(
         DB_ROOT,
         '1.0.0',
-        pytest.REPOSITORY,
+        pytest.PUBLISH_REPOSITORY,
         verbose=False,
     )
 
@@ -136,7 +136,7 @@ def test_bit_depth(bit_depth):
 
         if bit_depth is None:
             assert audiofile.bit_depth(converted_file) == \
-                   audiofile.bit_depth(original_file)
+                audiofile.bit_depth(original_file)
         else:
             assert audiofile.bit_depth(converted_file) == bit_depth
 
@@ -165,7 +165,7 @@ def test_channels(channels):
 
         if channels is None:
             assert audiofile.channels(converted_file) == \
-                   audiofile.channels(original_file)
+                audiofile.channels(original_file)
         elif isinstance(channels, int):
             assert audiofile.channels(converted_file) == 1
         else:
@@ -226,7 +226,7 @@ def test_mixdown(mixdown):
             assert audiofile.channels(converted_file) == 1
         else:
             assert audiofile.channels(converted_file) == \
-                   audiofile.channels(original_file)
+                audiofile.channels(original_file)
 
 
 @pytest.mark.parametrize(
@@ -253,6 +253,6 @@ def test_sampling_rate(sampling_rate):
 
         if sampling_rate is None:
             assert audiofile.sampling_rate(converted_file) == \
-                   audiofile.sampling_rate(original_file)
+                audiofile.sampling_rate(original_file)
         else:
             assert audiofile.sampling_rate(converted_file) == sampling_rate

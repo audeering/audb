@@ -9,6 +9,7 @@ import audformat
 from audb2.core import define
 from audb2.core.config import config
 from audb2.core.dependencies import Dependencies
+from audb2.core.repository import Repository
 
 
 def _find_tables(
@@ -173,7 +174,7 @@ def _put_tables(
 def publish(
         db_root: str,
         version: str,
-        repository: typing.Dict[str, str] = config.REPOSITORY_PUBLISH,
+        repository: Repository,
         *,
         archives: typing.Mapping[str, str] = None,
         num_workers: typing.Optional[int] = 1,
@@ -204,9 +205,9 @@ def publish(
     db = audformat.Database.load(db_root, load_data=False)
 
     backend = audbackend.create(
-        repository['backend'],
-        repository['host'],
-        repository['name']
+        repository.backend,
+        repository.host,
+        repository.name,
     )
 
     remote_header = backend.join(db.name, define.HEADER_FILE)

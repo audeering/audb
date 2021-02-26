@@ -562,7 +562,7 @@ def load(
         db_root = audeer.safe_path(
             os.path.join(
                 cache_root,
-                flavor.path(name, version, repository['name']),
+                flavor.path(name, version, repository.name),
             )
         )
         db_root_tmp = db_root + '~'

@@ -10,6 +10,6 @@ In the process of providing you the data,
 4. unpacks the archive files
 5. inspects and :ref:`converts <database-conversion-and-flavors>`
    the audio files (optional)
-6. stores the data in a :ref:`cache <cache-root>` folder
+6. stores the data in a :ref:`cache <caching>` folder
 
 .. graphviz:: pics/workflow.dot
