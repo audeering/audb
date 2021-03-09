@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.92.0 (2021-03-09)
+---------------------------
+
+* Added: configuration file
+* Changed: use external package for backend implementations
+
+
 Version 0.91.0 (2021-02-19)
 ---------------------------
 
