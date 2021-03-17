@@ -69,9 +69,9 @@ class Flavor(audobject.Object):
                 )
 
         if channels is not None:
-            if isinstance(channels, int):
-                channels = [channels]
-            channels = list(channels)
+            channels = audeer.to_list(channels)
+            if len(channels) < 2:
+                mixdown = False
 
         if format is not None:
             if format not in define.FORMATS:
