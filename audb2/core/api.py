@@ -94,7 +94,13 @@ def cached(
     )
 
     data = {}
-    for root, dirs, files in os.walk(cache_root):
+    for root, _, files in os.walk(cache_root):
+
+        # Skip tmp folder (e.g. 1.0.0~)
+        # and corresponding broken folders (e.g. 1.0.0)
+        if root.endswith('~') or os.path.exists(f'{root}~'):
+            continue
+
         if define.HEADER_FILE in files:
             name, version, flavor_id = root.split(os.path.sep)[-3:]
             db = audformat.Database.load(root, load_data=False)

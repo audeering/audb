@@ -229,6 +229,23 @@ def test_load(version):
         assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
 
 
+def test_broken_flavor_cache():
+
+    # Create a '~1.0.0' folder which indicates cache '1.0.0' is broken
+    version = '1.0.0'
+    db = audb2.load(
+        DB_NAME,
+        version=version,
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    db_root = db.meta['audb']['root']
+    audeer.mkdir(f'{db_root}~')
+    df = audb2.cached()
+    assert db_root not in df.index
+
+
 @pytest.mark.parametrize(
     'version',
     [
