@@ -1,5 +1,6 @@
 import collections
 import os
+import tempfile
 import typing
 
 import audbackend
@@ -177,10 +178,34 @@ def publish(
         repository: Repository,
         *,
         archives: typing.Mapping[str, str] = None,
+        previous_version: typing.Optional[str] = 'latest',
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
 ) -> Dependencies:
     r"""Publish database.
+
+    A database can have dependencies
+    to files of an older version of itself.
+    E.g. you might add a few new files to an existing database
+    and publish as a new version.
+    :func:`audb.publish` will upload then only the new files
+    and store dependencies on the already published files.
+
+    To allow for dependencies
+    you first have to load the version of the database
+    that the new version should depend on
+    with :func:`audb2.load_original_to` to ``db_root``.
+    Afterwards you make your changes to that folder
+    and run :func:`audb2.publish`.
+    :func:`audb2.publish` will then check
+    that the version of the files inside that folder
+    match the version given by ``previous_version``.
+
+    Setting ``previous_version=None`` allows you
+    to start from scratch and upload all files
+    even if an older versions exist.
+    In this case you don't call :func:`audb2.load_original_to`
+    before running :func:`audb2.publish`.
 
     Args:
         db_root: root directory of database
@@ -189,6 +214,13 @@ def publish(
         archives: dictionary mapping files to archive names.
             Can be used to bundle files into archives.
             Name must not include an extension
+        previous_version: specifies the version
+            this publication should be based on.
+            If ``'latest'``
+            it will use automatically the latest published version
+            or ``None``
+            if no version was published.
+            If ``None`` it assumes you start from scratch.
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
@@ -200,6 +232,8 @@ def publish(
     Raises:
         RuntimeError: if version already exists
         RuntimeError: if database tables reference non-existing files
+        RuntimeError: if database in ``db_root`` depends on other version
+            as indicated by ``previous_version``
 
     """
     db = audformat.Database.load(db_root, load_data=False)
@@ -211,19 +245,74 @@ def publish(
     )
 
     remote_header = backend.join(db.name, define.HEADER_FILE)
-    if version in backend.versions(remote_header):
+    versions = backend.versions(remote_header)
+    if version in versions:
         raise RuntimeError(
             'A version '
             f"'{version}' "
             'already exists for database '
             f"'{db.name}'."
         )
+    if previous_version == 'latest':
+        if len(versions) > 0:
+            previous_version = versions[-1]
+        else:
+            previous_version = None
 
     # load database and dependencies
-    db = audformat.Database.load(db_root)
     deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
     deps = Dependencies()
     deps.load(deps_path)
+
+    # check if database folder depends on the right version
+
+    # dependencies shouldn't be there
+    if previous_version is None and len(deps) > 0:
+        raise RuntimeError(
+            f"You did not set a dependency to a previous version, "
+            f"but you have a '{define.DEPENDENCIES_FILE}' file present "
+            f"in {db_root}."
+        )
+
+    # dependencies missing
+    if previous_version is not None and len(deps) == 0:
+        raise RuntimeError(
+            f"You want to depend on '{previous_version}' "
+            f"of {db.name}, "
+            f"but you don't have a '{define.DEPENDENCIES_FILE}' file present "
+            f"in {db_root}. "
+            f"Did you forgot to call "
+            f"'audb2.load_original_to({db_root}, {db.name}, "
+            f"version={previous_version}?"
+        )
+
+    # dependencies do not match version
+    if previous_version is not None and len(deps) > 0:
+        # Check that md5 sum of
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            archive = backend.join(db.name, define.DB)
+            backend.get_archive(archive, tmp_dir, previous_version)
+            previous_deps_path = os.path.join(
+                tmp_dir,
+                define.DEPENDENCIES_FILE,
+            )
+            if audbackend.md5(deps_path) != audbackend.md5(previous_deps_path):
+                raise RuntimeError(
+                    f"You want to depend on '{previous_version}' "
+                    f"of {db.name}, "
+                    f"but the MD5 sum of your "
+                    f"'{define.DEPENDENCIES_FILE}' file "
+                    f"in {db_root} "
+                    f"does not match the MD5 sum of the corresponding file "
+                    f"for the requested version in the repository. "
+                    f"Did you forgot to call "
+                    f"'audb2.load_original_to({db_root}, {db.name}, "
+                    f"version='{previous_version}') "
+                    f"or modified the file manually?"
+                )
+
+    # load database from folder
+    db = audformat.Database.load(db_root)
 
     # check all files referenced in a table exists
     missing_files = [
