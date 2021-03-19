@@ -516,7 +516,7 @@ def load(
         mix = kwargs['mix']
         channels, mixdown = _mix_mapping(mix)
 
-    repository, version, backend = _lookup(name, version)
+    _, version, backend = _lookup(name, version)
 
     flavor = Flavor(
         only_metadata=only_metadata,
@@ -551,7 +551,7 @@ def load(
         db_root = audeer.safe_path(
             os.path.join(
                 cache_root,
-                flavor.path(name, version, repository.name),
+                flavor.path(name, version),
             )
         )
         db_root_tmp = db_root + '~'

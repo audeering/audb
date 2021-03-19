@@ -132,20 +132,18 @@ class Flavor(audobject.Object):
             self,
             name: str,
             version: str,
-            repository: str,
     ) -> str:
         r"""Flavor path.
 
         Args:
             name: database name
             version: version string
-            repository: repository
 
         Returns:
             relative path
 
         """
-        return os.path.join(repository, name, self.id, version)
+        return os.path.join(name, version, self.id)
 
     def _check_convert(
             self,

@@ -12,7 +12,7 @@ Caching
 
 When you request a database the first time,
 :mod:`audb2` will unpack (and convert) annotations and data to
-:file:`<cache>/<repository>/<group_id>/<name>/<flavor>/<version>/`.
+:file:`<cache>/<name>/<version>/<flavor>/`.
 Next time your request it again,
 :mod:`audb2` will directly load the database from there.
 

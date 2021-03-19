@@ -96,7 +96,7 @@ def cached(
     data = {}
     for root, dirs, files in os.walk(cache_root):
         if define.HEADER_FILE in files:
-            name, flavor_id, version = root.split(os.path.sep)[-3:]
+            name, version, flavor_id = root.split(os.path.sep)[-3:]
             db = audformat.Database.load(root, load_data=False)
             flavor = db.meta['audb']['flavor']
             data[root] = {
@@ -262,12 +262,11 @@ def exists(
         mix = kwargs['mix']
         channels, mixdown = _mix_mapping(mix)
 
-    repository, version, backend = _lookup(name, version)
+    _, version, backend = _lookup(name, version)
 
     relative_flavor_path = flavor_path(
         name,
         version,
-        repository.name,
         only_metadata=only_metadata,
         channels=channels,
         format=format,
@@ -296,7 +295,6 @@ def exists(
 def flavor_path(
     name: str,
     version: str,
-    repository: str,
     *,
     only_metadata: bool = False,
     bit_depth: int = None,
@@ -313,7 +311,7 @@ def flavor_path(
     Returns the path under which :func:`audb2.load` stores a specific
     flavor of a database in the cache folder, that is:
 
-     ``<repository>/<group-id>/<name>/<flavor-id>/<version>/``
+     ``<name>/<version>/<flavor-id>/``
 
     Note that the returned path is relative.
     To get the absolute path, do:
@@ -328,7 +326,6 @@ def flavor_path(
     Args:
         name: name of database
         version: version string
-        repository: repository name
         only_metadata: only metadata is stored
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`
@@ -360,7 +357,7 @@ def flavor_path(
         exclude=exclude,
     )
 
-    return flavor.path(name, version, repository)
+    return flavor.path(name, version)
 
 
 def latest_version(
