@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.92.1 (2021-03-19)
+---------------------------
+
+* Changed: enforce ``mixdown=False`` for mono file flavors
+* Fixed: global config file was missing in PyPI package
+
+
 Version 0.92.0 (2021-03-09)
 ---------------------------
 
