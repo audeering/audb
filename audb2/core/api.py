@@ -192,6 +192,7 @@ def exists(
     include: typing.Union[str, typing.Sequence[str]] = None,
     exclude: typing.Union[str, typing.Sequence[str]] = None,
     cache_root: str = None,
+    **kwargs,
 ) -> typing.Optional[str]:
     r"""Check if specified database flavor exists in local cache folder.
 
@@ -251,6 +252,15 @@ def exists(
         category=UserWarning,
         stacklevel=2,
     )
+
+    # Map mix to channels and mixdown
+    if (
+            channels is None
+            and not mixdown
+            and 'mix' in kwargs
+    ):  # pragma: no cover
+        mix = kwargs['mix']
+        channels, mixdown = _mix_mapping(mix)
 
     repository, version, backend = _lookup(name, version)
 
@@ -538,3 +548,35 @@ def versions(
         header = backend.join(name, 'db.yaml')
         vs.extend(backend.versions(header))
     return audeer.sort_versions(vs)
+
+
+def _mix_mapping(mix):
+    r"""Argument mapping for deprecated mix argument."""
+    warnings.warn(
+        "Argument 'mix' is deprecated "
+        "and will be removed with version '1.1.0'. "
+        "Use 'channels' and 'mixdown' instead.",
+        category=UserWarning,
+        stacklevel=2,
+    )
+    if mix == 'mono':
+        channels = None
+        mixdown = True
+    elif mix == 'stereo':
+        channels = [0, 1]
+        mixdown = False
+    elif mix == 'left':
+        channels = 0
+        mixdown = False
+    elif mix == 'right':
+        channels = 1
+        mixdown = False
+    elif mix is None:
+        channels = None
+        mixdown = False
+    else:
+        raise ValueError(
+            f"Using deprecated argument 'mix' with value '{mix}' "
+            "is no longer supported."
+        )
+    return channels, mixdown

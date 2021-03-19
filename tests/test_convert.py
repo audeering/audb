@@ -201,6 +201,49 @@ def test_format(format):
 
 
 @pytest.mark.parametrize(
+    'mix',
+    [
+        'mono',
+        'stereo',
+        'left',
+        'right',
+        pytest.param(
+            'left-only',
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        pytest.param(
+            'right-only',
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        None,
+    ],
+)
+def test_mix(mix):
+    # Test for backward compatibility
+    db = audb2.load(
+        DB_NAME,
+        mix=mix,
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    original_files = db['files']['original'].get()
+
+    for converted_file, original_file in zip(db.files, original_files):
+
+        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        original_file = os.path.join(DB_ROOT, original_file)
+
+        if mix in ['mono', 'left', 'right']:
+            assert audiofile.channels(converted_file) == 1
+        elif mix == 'stereo':
+            assert audiofile.channels(converted_file) == 2
+        else:
+            assert audiofile.channels(converted_file) == \
+                audiofile.channels(original_file)
+
+
+@pytest.mark.parametrize(
     'mixdown',
     [
         False, True

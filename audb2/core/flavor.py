@@ -189,19 +189,15 @@ class Flavor(audobject.Object):
             signal: np.ndarray,
     ) -> np.ndarray:
 
-        if (self.channels is not None) or self.mixdown:
-            if self.channels is not None:
-                max_channel = max(self.channels)
-                if 0 < max_channel >= signal.shape[0]:
-                    signal_ex = np.zeros(
-                        (max_channel + 1, signal.shape[1]),
-                        dtype=signal.dtype,
-                    )
-                    signal_ex[:signal.shape[0], :] = signal
-                    signal = signal_ex
-            signal = audresample.remix(signal, self.channels, self.mixdown)
-
-        return signal
+        if self.channels is None and not self.mixdown:
+            return signal
+        else:
+            return audresample.remix(
+                signal,
+                self.channels,
+                self.mixdown,
+                upmix='repeat',
+            )
 
     def _resample(
             self,

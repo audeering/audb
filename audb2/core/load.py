@@ -12,6 +12,7 @@ from audb2.core import define
 from audb2.core.api import (
     default_cache_root,
     _lookup,
+    _mix_mapping,
 )
 from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
@@ -477,9 +478,12 @@ def load(
         only_metadata: only metadata is stored
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`.
-            Note that media files with too few channels are not loaded.
-            E.g. ``channels=[0, 1]`` will skip media files with only
-            one channel and also remove their entries from the meta files.
+            Note that media files with too few channels
+            will be first upsampled by repeating the existing channels.
+            E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,
+            and ``channels=[1]`` returns the second channel
+            of all multi-channel files
+            and all mono files.
         format: file format, one of ``'flac'``, ``'wav'``
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
@@ -504,28 +508,13 @@ def load(
         database object
 
     """
-    if 'mix' in kwargs:  # pragma: no cover
-        warnings.warn(
-            "Argument 'mix' is deprecated "
-            "and will be removed with version '1.0.0'. "
-            "Use 'channels' and 'mixdown' instead.",
-            category=UserWarning,
-            stacklevel=2,
-        )
+    if (
+            channels is None
+            and not mixdown
+            and 'mix' in kwargs
+    ):  # pragma: no cover
         mix = kwargs['mix']
-        if mix == 'mono':
-            mixdown = True
-        elif channels is None and mix == 'stereo':
-            channels = [0, 1]
-        elif channels is None and mix == 'left':
-            channels = 0
-        elif channels is None and mix == 'right':
-            channels = 1
-        else:
-            raise ValueError(
-                f"Using deprecated argument 'mix' with value '{mix}' "
-                "is no longer supported."
-            )
+        channels, mixdown = _mix_mapping(mix)
 
     repository, version, backend = _lookup(name, version)
 
