@@ -13,6 +13,10 @@ from audb2.core import define
 from audb2.core.config import config
 from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
+from audb2.core.utils import (
+    lookup_backend,
+    mix_mapping,
+)
 
 
 def available(
@@ -168,7 +172,9 @@ def dependencies(
         dependency object
 
     """
-    _, version, backend = _lookup(name, version)
+    if version is None:
+        version = latest_version(name)
+    backend = lookup_backend(name, version)
 
     with tempfile.TemporaryDirectory() as root:
         archive = backend.join(name, define.DB)
@@ -266,9 +272,10 @@ def exists(
             and 'mix' in kwargs
     ):  # pragma: no cover
         mix = kwargs['mix']
-        channels, mixdown = _mix_mapping(mix)
+        channels, mixdown = mix_mapping(mix)
 
-    _, version, backend = _lookup(name, version)
+    if version is None:
+        version = latest_version(name)
 
     relative_flavor_path = flavor_path(
         name,
@@ -383,69 +390,7 @@ def latest_version(
         raise RuntimeError(
             f"Cannot find a version for database '{name}'.",
         )
-    vs = audeer.sort_versions(vs)
     return vs[-1]
-
-
-def _lookup(
-        name: str,
-        version: str = None,
-) -> (typing.Dict[str, str], str, audbackend.Backend):
-    r"""Helper function to look up database in all repositories.
-
-    Returns repository, version and backend object.
-
-    """
-    for repository in config.REPOSITORIES:
-
-        backend = audbackend.create(
-            repository.backend,
-            repository.host,
-            repository.name,
-        )
-        header = backend.join(name, 'db.yaml')
-
-        if version is None:
-            try:
-                version = backend.latest_version(header)
-            except RuntimeError:
-                continue
-
-        if backend.exists(header, version):
-            return repository, version, backend
-
-    if version is None:
-        raise RuntimeError(
-            'Cannot find database '
-            f"'{name}'."
-        )
-    else:
-        raise RuntimeError(
-            'Cannot find version '
-            f'{version} '
-            f'for database '
-            f"'{name}'."
-        )
-
-
-def lookup_repository(
-        name: str,
-        version: str = None,
-) -> typing.Dict[str, str]:
-    r"""Look for database in all repositories.
-
-    Args:
-        name: database name
-        version: version string, if `None` look for latest
-
-    Returns:
-        repository name, version string, backend object
-
-    Raises:
-        RuntimeError: if database and/or version is not found
-
-    """
-    return _lookup(name, version)[0]
 
 
 def remove_media(
@@ -467,7 +412,7 @@ def remove_media(
 
     for version in versions(name):
 
-        _, version, backend = _lookup(name, version)
+        backend = lookup_backend(name, version)
 
         with tempfile.TemporaryDirectory() as db_root:
 
@@ -551,35 +496,3 @@ def versions(
         header = backend.join(name, 'db.yaml')
         vs.extend(backend.versions(header))
     return audeer.sort_versions(vs)
-
-
-def _mix_mapping(mix):
-    r"""Argument mapping for deprecated mix argument."""
-    warnings.warn(
-        "Argument 'mix' is deprecated "
-        "and will be removed with version '1.1.0'. "
-        "Use 'channels' and 'mixdown' instead.",
-        category=UserWarning,
-        stacklevel=2,
-    )
-    if mix == 'mono':
-        channels = None
-        mixdown = True
-    elif mix == 'stereo':
-        channels = [0, 1]
-        mixdown = False
-    elif mix == 'left':
-        channels = 0
-        mixdown = False
-    elif mix == 'right':
-        channels = 1
-        mixdown = False
-    elif mix is None:
-        channels = None
-        mixdown = False
-    else:
-        raise ValueError(
-            f"Using deprecated argument 'mix' with value '{mix}' "
-            "is no longer supported."
-        )
-    return channels, mixdown

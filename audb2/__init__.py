@@ -8,7 +8,6 @@ from audb2.core.api import (
     exists,
     flavor_path,
     latest_version,
-    lookup_repository,
     remove_media,
     versions,
 )
@@ -25,6 +24,7 @@ from audb2.core.load import (
 )
 from audb2.core.publish import publish
 from audb2.core.repository import Repository
+from audb2.core.utils import lookup_repository
 
 
 __all__ = []

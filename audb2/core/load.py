@@ -11,11 +11,14 @@ import audformat
 from audb2.core import define
 from audb2.core.api import (
     default_cache_root,
-    _lookup,
-    _mix_mapping,
+    latest_version,
 )
 from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
+from audb2.core.utils import (
+    lookup_backend,
+    mix_mapping,
+)
 
 
 def _filter_archives(
@@ -514,9 +517,11 @@ def load(
             and 'mix' in kwargs
     ):  # pragma: no cover
         mix = kwargs['mix']
-        channels, mixdown = _mix_mapping(mix)
+        channels, mixdown = mix_mapping(mix)
 
-    _, version, backend = _lookup(name, version)
+    if version is None:
+        version = latest_version(name)
+    backend = lookup_backend(name, version)
 
     flavor = Flavor(
         only_metadata=only_metadata,
@@ -649,7 +654,9 @@ def load_original_to(
         database object
 
     """
-    _, version, backend = _lookup(name, version)
+    if version is None:
+        version = latest_version(name)
+    backend = lookup_backend(name, version)
 
     db_root = audeer.safe_path(root)
     db_root_tmp = db_root + '~'

@@ -9,8 +9,9 @@ import audformat
 from audb2.core import define
 from audb2.core.api import (
     dependencies,
-    _lookup,
+    latest_version,
 )
+from audb2.core.utils import lookup_backend
 
 
 def bit_depths(
@@ -144,7 +145,9 @@ def header(
         database object without table data
 
     """
-    _, version, backend = _lookup(name, version)
+    if version is None:
+        version = latest_version(name)
+    backend = lookup_backend(name, version)
 
     with tempfile.TemporaryDirectory() as root:
         remote_header = backend.join(name, define.HEADER_FILE)

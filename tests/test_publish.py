@@ -161,7 +161,7 @@ def test_publish(version):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    _, _, backend = audb2.core.api._lookup(DB_NAME, version)
+    backend = audb2.core.utils.lookup_backend(DB_NAME, version)
 
     db = audb2.load(
         DB_NAME,
