@@ -295,7 +295,7 @@ def test_update_database():
     version = '2.1.0'
     start_version = '2.0.0'
 
-    db = audb2.load_original_to(
+    db = audb2.load_to(
         DB_ROOT_VERSION[version],
         DB_NAME,
         version=start_version,
@@ -318,7 +318,7 @@ def test_update_database():
         f"file present "
         f"in {DB_ROOT_VERSION[version]}. "
         f"Did you forgot to call "
-        f"'audb2.load_original_to({DB_ROOT_VERSION[version]}, {DB_NAME}, "
+        f"'audb2.load_to({DB_ROOT_VERSION[version]}, {DB_NAME}, "
         f"version={previous_version}?"
     )
     with pytest.raises(RuntimeError, match=re.escape(error_msg)):
@@ -333,7 +333,7 @@ def test_update_database():
 
     # Reload data to restore dependency file
     shutil.rmtree(DB_ROOT_VERSION[version])
-    db = audb2.load_original_to(
+    db = audb2.load_to(
         DB_ROOT_VERSION[version],
         DB_NAME,
         version=start_version,
@@ -358,7 +358,7 @@ def test_update_database():
         f"does not match the MD5 sum of the corresponding file "
         f"for the requested version in the repository. "
         f"Did you forgot to call "
-        f"'audb2.load_original_to({DB_ROOT_VERSION[version]}, {DB_NAME}, "
+        f"'audb2.load_to({DB_ROOT_VERSION[version]}, {DB_NAME}, "
         f"version='{audb2.latest_version(DB_NAME)}') "
         f"or modified the file manually?"
     )

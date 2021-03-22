@@ -63,10 +63,10 @@ load
 
 .. autofunction:: load
 
-load_original_to
-----------------
+load_to
+-------
 
-.. autofunction:: load_original_to
+.. autofunction:: load_to
 
 lookup_repository
 -----------------

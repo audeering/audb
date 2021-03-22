@@ -261,11 +261,11 @@ def test_broken_flavor_cache():
         ),
     ]
 )
-def test_load_original_to(version):
+def test_load_to(version):
 
     db_root = os.path.join(DB_ROOT, 'raw')
 
-    db = audb2.load_original_to(
+    db = audb2.load_to(
         db_root,
         DB_NAME,
         version=version,

@@ -20,7 +20,7 @@ from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
 from audb2.core.load import (
     load,
-    load_original_to,
+    load_to,
 )
 from audb2.core.publish import publish
 from audb2.core.repository import Repository

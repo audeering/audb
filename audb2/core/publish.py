@@ -195,7 +195,7 @@ def publish(
     To allow for dependencies
     you first have to load the version of the database
     that the new version should depend on
-    with :func:`audb2.load_original_to` to ``db_root``.
+    with :func:`audb2.load_to` to ``db_root``.
     Afterwards you make your changes to that folder
     and run :func:`audb2.publish`.
     :func:`audb2.publish` will then check
@@ -205,7 +205,7 @@ def publish(
     Setting ``previous_version=None`` allows you
     to start from scratch and upload all files
     even if an older versions exist.
-    In this case you don't call :func:`audb2.load_original_to`
+    In this case you don't call :func:`audb2.load_to`
     before running :func:`audb2.publish`.
 
     Args:
@@ -283,7 +283,7 @@ def publish(
             f"but you don't have a '{define.DEPENDENCIES_FILE}' file present "
             f"in {db_root}. "
             f"Did you forgot to call "
-            f"'audb2.load_original_to({db_root}, {db.name}, "
+            f"'audb2.load_to({db_root}, {db.name}, "
             f"version={previous_version}?"
         )
 
@@ -306,7 +306,7 @@ def publish(
                     f"does not match the MD5 sum of the corresponding file "
                     f"for the requested version in the repository. "
                     f"Did you forgot to call "
-                    f"'audb2.load_original_to({db_root}, {db.name}, "
+                    f"'audb2.load_to({db_root}, {db.name}, "
                     f"version='{previous_version}') "
                     f"or modified the file manually?"
                 )

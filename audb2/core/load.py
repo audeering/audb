@@ -630,7 +630,7 @@ def load(
     return db
 
 
-def load_original_to(
+def load_to(
         root: str,
         name: str,
         *,
