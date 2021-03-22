@@ -125,7 +125,7 @@ class Flavor(audobject.Object):
         if self.format is not None:
             format = audeer.file_extension(file).lower()
             if format != self.format:
-                file = audeer.basename_wo_ext(file) + '.' + self.format
+                file = f'{file[:-len(format)]}{self.format}'
         return file
 
     def path(

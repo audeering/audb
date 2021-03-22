@@ -58,6 +58,20 @@ def test_init(only_metadata, bit_depth, channels, format, mixdown,
 
 
 @pytest.mark.parametrize(
+    'format',
+    [
+        audb2.define.Format.WAV,
+        audb2.define.Format.FLAC,
+    ],
+)
+def test_destination(format):
+    flavor = audb2.Flavor(format=format)
+    filename = 'wav/audio1.wav'
+    expected_filename = f'{filename[:-4]}.{format}'
+    assert flavor.destination(filename) == expected_filename
+
+
+@pytest.mark.parametrize(
     'bit_depth_in, channels_in, format_in, sampling_rate_in, flavor, '
     'bit_depth_out, channels_out, format_out, sampling_rate_out',
     [
