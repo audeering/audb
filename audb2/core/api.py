@@ -449,14 +449,16 @@ def remove_media(
                             db_root,
                             version,
                         )
-                        os.remove(os.path.join(db_root, file))
-                        files_in_archive.remove(file)
-                        backend.put_archive(
-                            db_root,
-                            files_in_archive,
-                            remote_archive,
-                            version,
-                        )
+                        # skip if file was already deleted
+                        if file in files_in_archive:
+                            os.remove(os.path.join(db_root, file))
+                            files_in_archive.remove(file)
+                            backend.put_archive(
+                                db_root,
+                                files_in_archive,
+                                remote_archive,
+                                version,
+                            )
 
                     # mark file as removed
                     deps.remove(file)

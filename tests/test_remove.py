@@ -132,5 +132,7 @@ def test_remove(publish_db, format):
                         os.path.join(db.meta['audb']['root'], 'audio'),
                     )
 
+        # Make sure calling it again doesn't raise error
+        audb2.remove_media(DB_NAME, remove)
         # remove db from cache to ensure we always get a fresh copy
         shutil.rmtree(db.meta['audb']['root'])
