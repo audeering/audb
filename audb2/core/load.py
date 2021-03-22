@@ -64,7 +64,6 @@ def _filter_media(
 
 def _filter_tables(
         db_header: audformat.Database,
-        db_root: str,
         db_root_tmp: str,
         flavor: typing.Optional[Flavor],
         deps: Dependencies,
@@ -83,7 +82,6 @@ def _filter_tables(
                 tables = flavor.tables
             db_header.pick_tables(tables)
             db_header.save(db_root_tmp, header_only=True)
-            _move_file(db_root_tmp, db_root, define.HEADER_FILE)
             for file in deps.tables:
                 if not deps.archive(file) in tables:
                     deps.data.pop(file)
@@ -370,12 +368,11 @@ def _load(
     remote_header = backend.join(name, define.HEADER_FILE)
     local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
     backend.get_file(remote_header, local_header, version)
-    _move_file(db_root_tmp, db_root, define.HEADER_FILE)
-    db_header = audformat.Database.load(db_root, load_data=False)
+    db_header = audformat.Database.load(db_root_tmp, load_data=False)
 
     # get altered and new tables
 
-    _filter_tables(db_header, db_root, db_root_tmp, flavor, deps)
+    _filter_tables(db_header, db_root_tmp, flavor, deps)
     tables = _find_tables(
         db_header, db_root, deps, num_workers, verbose,
     )
@@ -386,9 +383,19 @@ def _load(
 
     # load database and filter media
 
-    db = audformat.Database.load(
-        db_root, num_workers=num_workers, verbose=verbose,
-    )
+    # move header to root and load database ...
+    _move_file(db_root_tmp, db_root, define.HEADER_FILE)
+    try:
+        db = audformat.Database.load(
+            db_root, num_workers=num_workers, verbose=verbose,
+        )
+    except (KeyboardInterrupt, Exception):  # pragma: no cover
+        # make sure to remove header if user interrupts
+        os.remove(os.path.join(db_root, define.HEADER_FILE))
+        raise
+    # afterwards remove header to avoid the database
+    # can be loaded before download is complete
+    os.remove(os.path.join(db_root, define.HEADER_FILE))
     _filter_media(db, flavor, deps, num_workers, verbose)
 
     # get altered and new media files,
