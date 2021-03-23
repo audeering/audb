@@ -1,6 +1,5 @@
 import glob
 import os
-import re
 import typing
 
 import audbackend

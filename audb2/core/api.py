@@ -101,18 +101,19 @@ def cached(
     for root, _, files in os.walk(cache_root):
 
         # Skip tmp folder (e.g. 1.0.0~)
-        # and corresponding broken folders (e.g. 1.0.0)
-        if root.endswith('~') or os.path.exists(f'{root}~'):
+        if root.endswith('~'):  # pragma: no cover
             continue
 
         if define.HEADER_FILE in files:
             name, version, flavor_id = root.split(os.path.sep)[-3:]
             db = audformat.Database.load(root, load_data=False)
             flavor = db.meta['audb']['flavor']
+            complete = db.meta['audb']['complete']
             data[root] = {
                 'name': name,
                 'flavor_id': flavor_id,
                 'version': version,
+                'complete': complete,
             }
             data[root].update(flavor)
 

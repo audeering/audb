@@ -310,7 +310,6 @@ def _include_exclude_mapping(
 def _media(
         deps: Dependencies,
         media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
-        **kwargs,
 ) -> typing.Sequence[str]:
 
     if media is None:
@@ -543,8 +542,7 @@ def load(
         missing_media = _missing_media(db_root, requested_media)
         _get_media(db, missing_media, db_root, db_root_tmp, flavor, deps,
                    backend, num_workers, verbose)
-        if missing_tables or missing_media:
-            _database_check_complete(db, db_root, db_root_tmp, flavor, deps)
+        _database_check_complete(db, db_root, db_root_tmp, flavor, deps)
 
     if tables is not None:
         db.pick_tables(requested_tables)
