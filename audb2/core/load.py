@@ -43,7 +43,9 @@ def _database_check_complete(
 
     if check():
         db.meta['audb']['complete'] = True
-        db.save(db_root_tmp, header_only=True)
+        db_original = audformat.Database.load(db_root, load_data=False)
+        db_original.meta['audb']['complete'] = True
+        db_original.save(db_root_tmp, header_only=True)
         _move_file(db_root_tmp, db_root, define.HEADER_FILE)
 
 
@@ -116,34 +118,43 @@ def _dependencies(
         version: str,
         backend: audbackend.Backend,
 ) -> Dependencies:
-    deps = Dependencies()
     deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
     if not os.path.exists(deps_path):
         archive = backend.join(name, define.DB)
         backend.get_archive(archive, db_root_tmp, version)
         _move_file(db_root_tmp, db_root, define.DEPENDENCIES_FILE)
+    deps = Dependencies()
     deps.load(deps_path)
     return deps
 
 
 def _fix_media_ext(
-        table: audformat.Table,
+        tables: typing.Sequence[audformat.Table],
         format: str,
+        num_workers: typing.Optional[int],
+        verbose: bool,
 ):
-    # Faster solution then using db.map_files()
-    cur_ext = r'\.[a-zA-Z0-9]+$'  # match file extension
-    new_ext = f'.{format}'
-    if table.is_filewise:
-        table.df.index = table.df.index.str.replace(
-            cur_ext, new_ext,
-        )
-    else:
-        table.df.index.set_levels(
-            table.df.index.levels[0].str.replace(
-                cur_ext, new_ext),
-            'file',
-            inplace=True,
-        )
+
+    def job(table):
+        # Faster solution then using db.map_files()
+        cur_ext = r'\.[a-zA-Z0-9]+$'  # match file extension
+        new_ext = f'.{format}'
+        if table.is_filewise:
+            table.df.index = table.df.index.str.replace(cur_ext, new_ext)
+        else:
+            table.df.index.set_levels(
+                table.df.index.levels[0].str.replace(cur_ext, new_ext),
+                'file',
+                inplace=True,
+            )
+
+    audeer.run_tasks(
+        job,
+        params=[([table], {}) for table in tables],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Fix format',
+    )
 
 
 def _full_path(
@@ -230,7 +241,6 @@ def _get_tables(
         tables: typing.Sequence[str],
         db_root: str,
         db_root_tmp: str,
-        flavor: Flavor,
         deps: Dependencies,
         backend: audbackend.Backend,
         num_workers: typing.Optional[int],
@@ -254,12 +264,6 @@ def _get_tables(
         table_id = table[3:-4]
         table_path = os.path.join(db_root_tmp, f'db.{table_id}')
         db[table_id].load(table_path)
-        if flavor.format is not None:
-            _fix_media_ext(db[table_id], flavor.format)
-            db[table_id].save(
-                table_path,
-                storage_format=audformat.define.TableStorageFormat.CSV,
-            )
         db[table_id].save(
             table_path,
             storage_format=audformat.define.TableStorageFormat.PICKLE,
@@ -308,16 +312,16 @@ def _include_exclude_mapping(
 
 
 def _media(
-        deps: Dependencies,
+        db: audformat.Database,
         media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
 ) -> typing.Sequence[str]:
 
     if media is None:
-        media = deps.media
+        media = db.files
     elif isinstance(media, str):
         pattern = re.compile(media)
         media = []
-        for m in deps.media:
+        for m in db.files:
             if pattern.search(m):
                 media.append(m)
 
@@ -439,16 +443,11 @@ def load(
     I.e. filtering meta files, may also remove media files.
     Likewise, references to missing media files will be removed, too.
     I.e. filtering media files, may also remove entries from the meta files.
-    Except if ``only_metadata`` is set to ``True``.
-    In that case, no media files are loaded
-    but all references in the meta files are kept
-    and the arguments ``bit_depth``, ``channels``, ``format``,
-    ``mixdown``, and ``sampling_rate`` are ignored.
 
     Args:
         name: name of database
         version: version string, latest if ``None``
-        only_metadata: only metadata is stored
+        only_metadata: load only metadata
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`.
             Note that media files with too few channels
@@ -491,7 +490,6 @@ def load(
     backend = lookup_backend(name, version)
 
     flavor = Flavor(
-        only_metadata=only_metadata,
         channels=channels,
         format=format,
         mixdown=mixdown,
@@ -506,6 +504,7 @@ def load(
         print(f'From: {db_root}')
 
     db = _database_header(db_root, db_root_tmp, name, version, flavor, backend)
+    db_is_complete = _database_is_complete(db)
     deps = _dependencies(db_root, db_root_tmp, name, version, backend)
 
     if 'include' in kwargs or 'exclude' in kwargs:  # pragma: no cover
@@ -532,31 +531,50 @@ def load(
         if include is not None or exclude is not None:
             media = _include_exclude_mapping(deps, include, exclude)
 
+    # filter tables
     requested_tables = _tables(deps, tables)
-    requested_media = _media(deps, media, **kwargs)
 
-    if not _database_is_complete(db):
+    # load missing tables
+    if not db_is_complete:
         missing_tables = _missing_tables(db_root, requested_tables)
-        _get_tables(db, missing_tables, db_root, db_root_tmp, flavor, deps,
+        _get_tables(db, missing_tables, db_root, db_root_tmp, deps,
                     backend, num_workers, verbose)
-        missing_media = _missing_media(db_root, requested_media)
-        _get_media(db, missing_media, db_root, db_root_tmp, flavor, deps,
-                   backend, num_workers, verbose)
-        _database_check_complete(db, db_root, db_root_tmp, flavor, deps)
 
+    # filter tables
     if tables is not None:
         db.pick_tables(requested_tables)
+
+    # load tables
     for table in requested_tables:
         db[table].load(os.path.join(db_root, f'db.{table}'))
 
-    if media is not None:
+    # filter media
+    requested_media = _media(db, media)
+
+    # load missing media
+    if not db_is_complete and not only_metadata:
+        missing_media = _missing_media(db_root, requested_media)
+        _get_media(db, missing_media, db_root, db_root_tmp, flavor, deps,
+                   backend, num_workers, verbose)
+
+    # fix media extension in tables
+    if flavor.format is not None:
+        _fix_media_ext(db.tables.values(), flavor.format, num_workers, verbose)
+
+    # filter media
+    if media is not None or tables is not None:
         db.pick_files(requested_media)
 
     if not removed_media:
         _remove_media(db, deps, flavor, num_workers, verbose)
 
+    # convert to full path
     if full_path:
         _full_path(db, db_root)
+
+    # check if database is now complete
+    if not db_is_complete:
+        _database_check_complete(db, db_root, db_root_tmp, flavor, deps)
 
     if os.path.exists(db_root_tmp):
         shutil.rmtree(db_root_tmp)

@@ -18,6 +18,7 @@ def cached_databases(
     df = cached(cache_root)
     df['exclude'] = None
     df['include'] = None
+    df['only_metadata'] = None
 
     for idx in df[['channels', 'mixdown']].index:
         mix = None

@@ -38,6 +38,8 @@ For each flavor a sub-folder will be created
 inside the :ref:`cache <caching>`.
 
 .. jupyter-execute::
+    :hide-output:
+    :stderr:
 
     import audb2
 
@@ -60,4 +62,7 @@ You can list all available flavors with:
 .. jupyter-execute::
 
     df = audb2.cached()
-    df[['name', 'version', 'only_metadata', 'sampling_rate']]
+    df[['name', 'version', 'complete', 'sampling_rate']]
+
+The entry ``'complete'`` tells you if a database flavor is completely cached,
+or if some table or media files are still missing.

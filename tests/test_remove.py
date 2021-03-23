@@ -86,8 +86,8 @@ def publish_db():
 @pytest.mark.parametrize(
     'format',
     [
-        None,
-        'wav',
+        # None,
+        # 'wav',
         'flac',
     ]
 )

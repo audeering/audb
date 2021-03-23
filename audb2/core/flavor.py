@@ -33,7 +33,6 @@ class Flavor(audobject.Object):
         flavor(original_file, converted_file)
 
     Args:
-        only_metadata: only metadata is stored
         bit_depth: sample precision, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`
         format: file format, one of ``'flac'``, ``'wav'``
@@ -45,17 +44,12 @@ class Flavor(audobject.Object):
     def __init__(
             self,
             *,
-            only_metadata: bool = False,
             bit_depth: int = None,
             channels: typing.Union[int, typing.Sequence[int]] = None,
             format: str = None,
             mixdown: bool = False,
             sampling_rate: int = None,
     ):
-        if only_metadata:
-            bit_depth = channels = format = sampling_rate = None
-            mixdown = False
-
         if bit_depth is not None:
             if bit_depth not in define.BIT_DEPTHS:
                 raise ValueError(
@@ -90,8 +84,6 @@ class Flavor(audobject.Object):
         r"""File format."""
         self.mixdown = mixdown
         r"""Apply mixdown."""
-        self.only_metadata = only_metadata
-        r"""Only metadata is stored."""
         self.sampling_rate = sampling_rate
         r"""Sampling rate in Hz."""
 

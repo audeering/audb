@@ -195,7 +195,6 @@ def exists(
     name: str,
     *,
     version: str = None,
-    only_metadata: bool = False,
     bit_depth: int = None,
     channels: typing.Union[int, typing.Sequence[int]] = None,
     format: str = None,
@@ -232,7 +231,6 @@ def exists(
     Args:
         name: name of database
         version: version string, latest if ``None``
-        only_metadata: only metadata is stored
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`
         format: file format, one of ``'flac'``, ``'wav'``
@@ -271,7 +269,6 @@ def exists(
     relative_flavor_path = flavor_path(
         name,
         version,
-        only_metadata=only_metadata,
         channels=channels,
         format=format,
         mixdown=mixdown,
@@ -297,7 +294,6 @@ def flavor_path(
     name: str,
     version: str,
     *,
-    only_metadata: bool = False,
     bit_depth: int = None,
     channels: typing.Union[int, typing.Sequence[int]] = None,
     format: str = None,
@@ -324,7 +320,6 @@ def flavor_path(
     Args:
         name: name of database
         version: version string
-        only_metadata: only metadata is stored
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`
         format: file format, one of ``'flac'``, ``'wav'``
@@ -337,7 +332,6 @@ def flavor_path(
 
     """
     flavor = Flavor(
-        only_metadata=only_metadata,
         channels=channels,
         format=format,
         mixdown=mixdown,
