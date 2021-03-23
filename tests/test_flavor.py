@@ -163,6 +163,30 @@ def test_destination(format):
             ),
             24, 1, audb2.define.Format.FLAC, 8000,
         ),
+        (
+            16, 1, 'mp3', 16000,
+            audb2.Flavor(format=audb2.define.Format.WAV),
+            16, 1, audb2.define.Format.WAV, 16000,
+        ),
+        # Cannot convert MP3 files
+        pytest.param(
+            16, 1, 'mp3', 16000,
+            audb2.Flavor(bit_depth=24),
+            24, 1, 'mp3', 16000,
+            marks=pytest.mark.xfail(raises=RuntimeError),
+        ),
+        pytest.param(
+            16, 1, 'mp3', 16000,
+            audb2.Flavor(channels=[0, 0]),
+            16, 2, 'mp3', 16000,
+            marks=pytest.mark.xfail(raises=RuntimeError),
+        ),
+        pytest.param(
+            16, 1, 'mp3', 16000,
+            audb2.Flavor(sampling_rate=8000),
+            16, 1, 'mp3', 8000,
+            marks=pytest.mark.xfail(raises=RuntimeError),
+        ),
     ],
 )
 def test_call(tmpdir, bit_depth_in, channels_in, format_in, sampling_rate_in,
@@ -173,12 +197,21 @@ def test_call(tmpdir, bit_depth_in, channels_in, format_in, sampling_rate_in,
     file_out = os.path.join(tmpdir, 'out.' + format_out)
 
     signal = np.zeros((channels_in, sampling_rate_in), np.float32)
-    audiofile.write(
-        file_in,
-        signal,
-        sampling_rate_in,
-        bit_depth_in,
-    )
+    if format_in == 'mp3':
+        audiofile.write(
+            f'{file_in[:-4]}.wav',
+            signal,
+            sampling_rate_in,
+            bit_depth_in,
+        )
+        os.rename(f'{file_in[:-4]}.wav', file_in)
+    else:
+        audiofile.write(
+            file_in,
+            signal,
+            sampling_rate_in,
+            bit_depth_in,
+        )
 
     flavor(file_in, file_out)
     assert audiofile.bit_depth(file_out) == bit_depth_out

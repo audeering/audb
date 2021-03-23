@@ -153,34 +153,44 @@ class Flavor(audobject.Object):
             sampling_rate: typing.Optional[int],
     ) -> bool:
         r"""Check if file needs to be converted to flavor."""
+        format = audeer.file_extension(file).lower()
 
         # format change
         if self.format is not None:
-            format = audeer.file_extension(file).lower()
             if self.format != format:
                 return True
 
+        convert = False
+
         # precision change
-        if self.bit_depth is not None:
+        if not convert and self.bit_depth is not None:
             bit_depth = bit_depth or audiofile.bit_depth(file)
             if self.bit_depth != bit_depth:
-                return True
+                convert = True
 
         # mixdown and channel selection
-        if self.mixdown or self.channels is not None:
+        if not convert and self.mixdown or self.channels is not None:
             channels = channels or audiofile.channels(file)
             if self.mixdown and channels != 1:
-                return True
+                convert = True
             elif list(range(channels)) != self.channels:
-                return True
+                convert = True
 
         # sampling rate change
-        if self.sampling_rate is not None:
+        if not convert and self.sampling_rate is not None:
             sampling_rate = sampling_rate or audiofile.sampling_rate(file)
             if self.sampling_rate != sampling_rate:
-                return True
+                convert = True
 
-        return False
+        if convert and format not in define.FORMATS:
+            raise RuntimeError(
+                f"You have to specify the 'format' argument "
+                f"to convert '{file}' "
+                f"to the specified flavor "
+                f"as we cannot write to {format.upper()} files."
+            )
+
+        return convert
 
     def _remix(
             self,
@@ -237,6 +247,9 @@ class Flavor(audobject.Object):
         Raises:
             ValueError: if extension of output file does not match the
                 format of the flavor
+            RuntimeError: if a conversion is requested,
+                but no output format is specified,
+                and the input format is not WAV or FLAC
 
         """
         src_path = audeer.safe_path(src_path)
@@ -249,7 +262,7 @@ class Flavor(audobject.Object):
         if expected_ext != dst_ext:
             raise ValueError(
                 f"Extension of output file is '{dst_ext}', "
-                f"but should be '{expected_ext} "
+                f"but should be '{expected_ext}' "
                 "to match the format of the converted file."
             )
 
@@ -267,9 +280,12 @@ class Flavor(audobject.Object):
             signal, sampling_rate = audiofile.read(src_path, always_2d=True)
             signal = self._remix(signal)
             signal, sampling_rate = self._resample(signal, sampling_rate)
-            bit_depth = self.bit_depth or \
-                src_bit_depth or \
-                audiofile.bit_depth(src_path)
+            bit_depth = (
+                self.bit_depth
+                or src_bit_depth
+                or audiofile.bit_depth(src_path)
+                or 16
+            )
             audiofile.write(
                 dst_path,
                 signal,
