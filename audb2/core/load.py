@@ -34,52 +34,48 @@ def _filter_archives(
 
 def _filter_media(
         db: audformat.Database,
-        flavor: Flavor,
         deps: Dependencies,
+        exclude: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        include: typing.Optional[typing.Union[str, typing.Sequence[str]]],
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
     r"""Filter media files."""
 
-    if flavor is not None:
-
+    if exclude is not None or include is not None:
         # keep only media files in matching archives
-        if flavor.include is not None or flavor.exclude is not None:
-            archives = set([deps.archive(f) for f in db.files])
-            if flavor.include is not None:
-                include = _filter_archives(flavor.include, archives)
-                db.pick_files(
-                    lambda x: deps.archive(x) in include,
-                    num_workers=num_workers,
-                    verbose=verbose,
-                )
-            if flavor.exclude is not None:
-                exclude = _filter_archives(flavor.exclude, archives)
-                db.pick_files(
-                    lambda x: deps.archive(x) not in exclude,
-                    num_workers=num_workers,
-                    verbose=verbose,
-                )
+        archives = set([deps.archive(f) for f in db.files])
+        if include is not None:
+            include = _filter_archives(include, archives)
+            db.pick_files(
+                lambda x: deps.archive(x) in include,
+                num_workers=num_workers,
+                verbose=verbose,
+            )
+        if exclude is not None:
+            exclude = _filter_archives(exclude, archives)
+            db.pick_files(
+                lambda x: deps.archive(x) not in exclude,
+                num_workers=num_workers,
+                verbose=verbose,
+            )
 
 
 def _filter_tables(
         db_header: audformat.Database,
         db_root_tmp: str,
-        flavor: typing.Optional[Flavor],
         deps: Dependencies,
+        tables: typing.Optional[typing.Union[str, typing.Sequence[str]]],
 ):
     r"""Filter tables."""
 
-    if flavor is not None:
-        if flavor.tables is not None:
-            if isinstance(flavor.tables, str):
-                pattern = re.compile(flavor.tables)
-                tables = []
-                for table in db_header.tables:
-                    if pattern.search(table):
-                        tables.append(table)
-            else:
-                tables = flavor.tables
+    if tables is not None:
+        if isinstance(tables, str):
+            pattern = re.compile(tables)
+            tables = []
+            for table in db_header.tables:
+                if pattern.search(table):
+                    tables.append(table)
             db_header.pick_tables(tables)
             db_header.save(db_root_tmp, header_only=True)
             for file in deps.tables:
@@ -352,6 +348,9 @@ def _load(
         db_root: str,
         db_root_tmp: str,
         version: str,
+        tables: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        exclude: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        include: typing.Optional[typing.Union[str, typing.Sequence[str]]],
         flavor: typing.Optional[Flavor],
         backend: audbackend.Backend,
         deps: Dependencies,
@@ -372,7 +371,7 @@ def _load(
 
     # get altered and new tables
 
-    _filter_tables(db_header, db_root_tmp, flavor, deps)
+    _filter_tables(db_header, db_root_tmp, deps, tables)
     tables = _find_tables(
         db_header, db_root, deps, num_workers, verbose,
     )
@@ -396,7 +395,7 @@ def _load(
     # afterwards remove header to avoid the database
     # can be loaded before download is complete
     os.remove(os.path.join(db_root, define.HEADER_FILE))
-    _filter_media(db, flavor, deps, num_workers, verbose)
+    _filter_media(db, deps, include, exclude, num_workers, verbose)
 
     # get altered and new media files,
     # eventually convert them
@@ -537,9 +536,6 @@ def load(
         mixdown=mixdown,
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
-        tables=tables,
-        include=include,
-        exclude=exclude,
     )
 
     if verbose:  # pragma: no cover
@@ -591,6 +587,9 @@ def load(
             db_root=db_root,
             db_root_tmp=db_root_tmp,
             version=version,
+            tables=tables,
+            include=include,
+            exclude=exclude,
             flavor=flavor,
             backend=backend,
             deps=deps,
@@ -690,6 +689,9 @@ def load_to(
         db_root=db_root,
         db_root_tmp=db_root_tmp,
         version=version,
+        tables=None,
+        include=None,
+        exclude=None,
         flavor=None,
         backend=backend,
         deps=deps,

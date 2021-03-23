@@ -64,8 +64,10 @@ def fixture_publish_db():
     ],
 )
 def test_cached_databases(mix):
-    db = audb2.load(DB_NAME, version='1.0.0', mix=mix)
-    df = audb2.cached_databases()
+    with pytest.warns(UserWarning):
+        db = audb2.load(DB_NAME, version='1.0.0', mix=mix)
+    with pytest.warns(UserWarning):
+        df = audb2.cached_databases()
     assert len(df) > 0
     assert list(df.columns) == [
         'name',
@@ -86,5 +88,6 @@ def test_cached_databases(mix):
 
 
 def test_get_default_cache_root():
-    cache = audb2.get_default_cache_root()
+    with pytest.warns(UserWarning):
+        cache = audb2.get_default_cache_root()
     assert cache == audb2.default_cache_root()

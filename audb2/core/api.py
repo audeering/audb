@@ -200,9 +200,6 @@ def exists(
     format: str = None,
     mixdown: bool = False,
     sampling_rate: int = None,
-    tables: typing.Union[str, typing.Sequence[str]] = None,
-    include: typing.Union[str, typing.Sequence[str]] = None,
-    exclude: typing.Union[str, typing.Sequence[str]] = None,
     cache_root: str = None,
     **kwargs,
 ) -> typing.Optional[str]:
@@ -241,13 +238,6 @@ def exists(
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
-        tables: include only tables matching the regular expression or
-            provided in the list
-        include: include only media from archives matching the regular
-            expression or provided in the list
-        exclude: don't include media from archives matching the regular
-            expression or provided in the list. This filter is applied
-            after ``include``
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb2.default_cache_root` is used
 
@@ -286,9 +276,6 @@ def exists(
         mixdown=mixdown,
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
-        tables=tables,
-        include=include,
-        exclude=exclude,
     )
 
     cache_roots = [
@@ -315,9 +302,6 @@ def flavor_path(
     format: str = None,
     mixdown: bool = False,
     sampling_rate: int = None,
-    tables: typing.Union[str, typing.Sequence[str]] = None,
-    include: typing.Union[str, typing.Sequence[str]] = None,
-    exclude: typing.Union[str, typing.Sequence[str]] = None,
 ) -> str:
     r"""Flavor cache path.
 
@@ -346,13 +330,6 @@ def flavor_path(
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
-        tables: include only tables matching the regular expression or
-            provided in the list
-        include: include only media from archives matching the regular
-            expression or provided in the list
-        exclude: don't include media from archives matching the regular
-            expression or provided in the list. This filter is applied
-            after ``include``
 
     Returns:
         flavor path relative to cache folder
@@ -365,9 +342,6 @@ def flavor_path(
         mixdown=mixdown,
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
-        tables=tables,
-        include=include,
-        exclude=exclude,
     )
 
     return flavor.path(name, version)

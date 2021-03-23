@@ -40,8 +40,6 @@ class Flavor(audobject.Object):
         mixdown: apply mono mix-down on selection
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
-        include: regexp pattern specifying data artifacts to include
-        exclude: regexp pattern specifying data artifacts to exclude
 
     """
     def __init__(
@@ -53,9 +51,6 @@ class Flavor(audobject.Object):
             format: str = None,
             mixdown: bool = False,
             sampling_rate: int = None,
-            tables: typing.Union[str, typing.Sequence[str]] = None,
-            exclude: typing.Union[str, typing.Sequence[str]] = None,
-            include: typing.Union[str, typing.Sequence[str]] = None,
     ):
         if only_metadata:
             bit_depth = channels = format = sampling_rate = None
@@ -91,20 +86,14 @@ class Flavor(audobject.Object):
         r"""Sample precision."""
         self.channels = channels
         r"""Selected channels."""
-        self.exclude = exclude
-        r"""Filter for excluding media."""
         self.format = format
         r"""File format."""
-        self.include = include
-        r"""Filter for including media."""
         self.mixdown = mixdown
         r"""Apply mixdown."""
         self.only_metadata = only_metadata
         r"""Only metadata is stored."""
         self.sampling_rate = sampling_rate
         r"""Sampling rate in Hz."""
-        self.tables = tables
-        r"""Table filter."""
 
     def destination(
             self,
