@@ -220,13 +220,14 @@ def test_format(format):
 )
 def test_mix(mix):
     # Test for backward compatibility
-    db = audb2.load(
-        DB_NAME,
-        mix=mix,
-        full_path=False,
-        num_workers=pytest.NUM_WORKERS,
-        verbose=False,
-    )
+    with pytest.warns(UserWarning):
+        db = audb2.load(
+            DB_NAME,
+            mix=mix,
+            full_path=False,
+            num_workers=pytest.NUM_WORKERS,
+            verbose=False,
+        )
     original_files = db['files']['original'].get()
 
     for converted_file, original_file in zip(db.files, original_files):

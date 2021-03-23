@@ -18,10 +18,8 @@ from audb2.core.backward import (
 from audb2.core.config import config
 from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
-from audb2.core.load import (
-    load,
-    load_to,
-)
+from audb2.core.load import load
+from audb2.core.load_to import load_to
 from audb2.core.publish import publish
 from audb2.core.repository import Repository
 from audb2.core.utils import lookup_repository

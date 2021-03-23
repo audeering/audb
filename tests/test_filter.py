@@ -98,52 +98,6 @@ def fixture_clear_cache():
 
 
 @pytest.mark.parametrize(
-    'tables, expected_tables, expected_files',
-    [
-        (
-            None,
-            ['dev', 'test', 'train'],
-            ['audio/000.wav', 'audio/001.wav',
-             'audio/010.wav', 'audio/011.wav',
-             'audio/020.wav', 'audio/021.wav'],
-        ),
-        (
-            'test',
-            ['test'],
-            ['audio/000.wav', 'audio/001.wav'],
-        ),
-        (
-            't.*',
-            ['test', 'train'],
-            ['audio/000.wav', 'audio/001.wav',
-             'audio/020.wav', 'audio/021.wav'],
-        ),
-        (
-            ['dev', 'train'],
-            ['dev', 'train'],
-            ['audio/010.wav', 'audio/011.wav',
-             'audio/020.wav', 'audio/021.wav'],
-        ),
-        (
-            'bad',
-            [],
-            [],
-        ),
-    ]
-)
-def test_tables(tables, expected_tables, expected_files):
-    db = audb2.load(
-        DB_NAME,
-        tables=tables,
-        full_path=False,
-        num_workers=pytest.NUM_WORKERS,
-        verbose=False,
-    )
-    assert list(db.tables) == expected_tables
-    assert list(db.files) == expected_files
-
-
-@pytest.mark.parametrize(
     'include, exclude, expected_files',
     [
         (
@@ -186,13 +140,91 @@ def test_tables(tables, expected_tables, expected_files):
         ),
     ]
 )
-def test_files(include, exclude, expected_files):
+def test_include_and_exclude(include, exclude, expected_files):
+    # Test for backward compatibility
+    with pytest.warns(UserWarning):
+        db = audb2.load(
+            DB_NAME,
+            include=include,
+            exclude=exclude,
+            full_path=False,
+            num_workers=pytest.NUM_WORKERS,
+            verbose=False,
+        )
+    assert list(db.files) == expected_files
+
+
+@pytest.mark.parametrize(
+    'media, expected_files',
+    [
+        (
+            None,
+            ['audio/000.wav', 'audio/001.wav',
+             'audio/010.wav', 'audio/011.wav',
+             'audio/020.wav', 'audio/021.wav'],
+        ),
+        (
+            ['audio/000.wav', 'audio/001.wav'],
+            ['audio/000.wav', 'audio/001.wav'],
+        ),
+        (
+            r'.*0\.wav',
+            ['audio/000.wav', 'audio/010.wav', 'audio/020.wav'],
+        ),
+    ]
+)
+def test_media(media, expected_files):
     db = audb2.load(
         DB_NAME,
-        include=include,
-        exclude=exclude,
+        media=media,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
+    assert list(db.files) == expected_files
+
+
+@pytest.mark.parametrize(
+    'tables, expected_tables, expected_files',
+    [
+        (
+            None,
+            ['dev', 'test', 'train'],
+            ['audio/000.wav', 'audio/001.wav',
+             'audio/010.wav', 'audio/011.wav',
+             'audio/020.wav', 'audio/021.wav'],
+        ),
+        (
+            'test',
+            ['test'],
+            ['audio/000.wav', 'audio/001.wav'],
+        ),
+        (
+            't.*',
+            ['test', 'train'],
+            ['audio/000.wav', 'audio/001.wav',
+             'audio/020.wav', 'audio/021.wav'],
+        ),
+        (
+            ['dev', 'train'],
+            ['dev', 'train'],
+            ['audio/010.wav', 'audio/011.wav',
+             'audio/020.wav', 'audio/021.wav'],
+        ),
+        (
+            'bad',
+            [],
+            [],
+        ),
+    ]
+)
+def test_tables(tables, expected_tables, expected_files):
+    db = audb2.load(
+        DB_NAME,
+        tables=tables,
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    assert list(db.tables) == expected_tables
     assert list(db.files) == expected_files

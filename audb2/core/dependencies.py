@@ -101,6 +101,16 @@ class Dependencies:
         return select
 
     @property
+    def table_ids(self) -> typing.List[str]:
+        r"""Table IDs to which a dependency exists.
+
+        Returns:
+            list of table IDs
+
+        """
+        return [table[3:-4] for table in self.tables]
+
+    @property
     def tables(self) -> typing.List[str]:
         r"""Tables to which a dependency exists.
 
@@ -187,10 +197,7 @@ class Dependencies:
             version,                 # version
         ]
 
-    def archive(
-            self,
-            file: str,
-    ) -> str:
+    def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
 
         Args:
@@ -274,10 +281,7 @@ class Dependencies:
         """
         return self[file][define.DependField.REMOVED] != 0
 
-    def load(
-            self,
-            path: str,
-    ):
+    def load(self, path: str):
         r"""Read dependencies from CSV file.
 
         Clears existing dependencies.
@@ -330,10 +334,7 @@ class Dependencies:
         """
         return self[file][define.DependField.SAMPLING_RATE] or None
 
-    def save(
-            self,
-            path: str,
-    ):
+    def save(self, path: str):
         r"""Write dependencies to CSV file.
 
         Args:
