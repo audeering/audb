@@ -143,7 +143,19 @@ class Flavor(audobject.Object):
             relative path
 
         """
-        return os.path.join(name, version, self.id)
+        return os.path.join(name, version, self.short_id)
+
+    @property
+    def short_id(
+            self,
+    ) -> str:
+        r"""Short flavor ID.
+
+        This just truncates the ID
+        to its last eight characters.
+
+        """
+        return self.id[-8:]
 
     def _check_convert(
             self,
