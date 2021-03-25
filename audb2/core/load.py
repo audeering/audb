@@ -500,8 +500,8 @@ def load(
     db_root, db_root_tmp = _database_root(name, version, flavor, cache_root)
 
     if verbose:  # pragma: no cover
-        print(f'Get:  {name} v{version}')
-        print(f'From: {db_root}')
+        print(f'Get:   {name} v{version}')
+        print(f'Cache: {db_root}')
 
     db = _database_header(db_root, db_root_tmp, name, version, flavor, backend)
     db_is_complete = _database_is_complete(db)

@@ -14,6 +14,7 @@
     dependencies
     flavors
     metadata
+    filter
     configuration
     caching
     cli

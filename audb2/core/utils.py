@@ -119,11 +119,8 @@ def _lookup(
         )
         header = backend.join(name, 'db.yaml')
 
-        try:
-            if backend.exists(header, version):
-                return repository, backend
-        except RuntimeError:  # pragma: no cover
-            pass
+        if backend.exists(header, version):
+            return repository, backend
 
     raise RuntimeError(
         'Cannot find version '
