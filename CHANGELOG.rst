@@ -7,6 +7,28 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.93.0 (2021-03-29)
+---------------------------
+
+* Added: ``complete`` column in ``audb.cached()``
+* Added: ``previous_version`` argument to ``audb.publish()``
+* Added: backward compatibility with ``audb <0.90``
+* Changed: cache flavor path to name/version/flavor_id
+* Changed: use open source releases of ``audbackend``,
+  ``audobject``,
+  and ``audresample``
+* Changed: require ``audformat>=0.10.0``
+* Changed: rename ``audb.load_original_to()`` to ``audb.load_to()``
+* Changed: shorten flavor ID in cache
+* Changed: filter operations and ``only_metadata`` no longer part
+  of ``audb.Flavor``
+* Deprecated: ``include`` and ``excldue`` arguments
+* Fixed: looking for latest version across repositories
+* Fixed: ``Flavor.destination`` for nested paths
+* Fixed: allow for cross-backend dependencies for ``audb.publish()``
+* Fixed: ``audb.remove_media()`` can now be called several times
+
+
 Version 0.92.1 (2021-03-19)
 ---------------------------
 
