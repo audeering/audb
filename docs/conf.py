@@ -71,6 +71,7 @@ html_theme_options = {
     'display_version': True,
     'logo_only': False,
     'wide_pages': ['data-example'],
+    'footer_links': False,
 }
 html_context = {
     'display_github': True,
