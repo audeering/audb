@@ -11,10 +11,7 @@ from audb2.core.api import (
     remove_media,
     versions,
 )
-from audb2.core.backward import (
-    cached_databases,
-    get_default_cache_root,
-)
+from audb2.core.backward import get_default_cache_root
 from audb2.core.config import config
 from audb2.core.dependencies import Dependencies
 from audb2.core.flavor import Flavor
