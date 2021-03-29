@@ -30,7 +30,7 @@ class Dependencies:
         )
 
     def __contains__(self, file: str):
-        r"""Check if dependency to file exists.
+        r"""Check if file exists.
 
         Args:
             file: relative file path
@@ -42,7 +42,7 @@ class Dependencies:
         return file in self._data
 
     def __getitem__(self, file: str) -> typing.List:
-        r"""Meta information of dependency.
+        r"""File information.
 
         Args:
             file: relative file path
@@ -65,7 +65,7 @@ class Dependencies:
 
     @property
     def files(self) -> typing.List[str]:
-        r"""Files to which a dependency exists.
+        r"""All files (table and media).
 
         Returns:
             list of files
@@ -75,7 +75,7 @@ class Dependencies:
 
     @property
     def media(self) -> typing.List[str]:
-        r"""Media to which a dependency exists.
+        r"""Media files.
 
         Returns:
             list of media
@@ -89,7 +89,7 @@ class Dependencies:
 
     @property
     def removed_media(self) -> typing.List[str]:
-        r"""Media to which a dependency exists.
+        r"""Removed media files.
 
         Returns:
             list of media
@@ -102,7 +102,11 @@ class Dependencies:
 
     @property
     def table_ids(self) -> typing.List[str]:
-        r"""Table IDs to which a dependency exists.
+        r"""Table IDs.
+
+        Like :meth:`audb2.Dependencies.tables`,
+        but only returns the table ID,
+        i.e. ``db.<id>.csv``.
 
         Returns:
             list of table IDs
@@ -112,7 +116,7 @@ class Dependencies:
 
     @property
     def tables(self) -> typing.List[str]:
-        r"""Tables to which a dependency exists.
+        r"""Tables files.
 
         Returns:
             list of tables
@@ -132,7 +136,7 @@ class Dependencies:
             checksum: str,
             version: str,
     ):
-        r"""Add media to dependencies.
+        r"""Add media file.
 
         Args:
             root: root directory
@@ -173,7 +177,7 @@ class Dependencies:
             checksum: str,
             version: str,
     ):
-        r"""Add table to dependencies.
+        r"""Add table file.
 
         Args:
             file: relative file path
@@ -345,7 +349,7 @@ class Dependencies:
         self().to_csv(path)
 
     def type(self, file: str) -> define.DependType:
-        r"""File type.
+        r"""Type of file.
 
         Args:
             file: relative file path
