@@ -16,6 +16,7 @@ audb2.config.REPOSITORIES = pytest.REPOSITORIES
 
 
 DB_NAME = f'test_info-{pytest.ID}'
+DB_VERSION = '1.0.0'
 DB = audformat.Database(
     DB_NAME,
     source='https://gitlab.audeering.com/tools/audb2',
@@ -58,7 +59,7 @@ def fixture_publish_db():
 
     audb2.publish(
         DB_ROOT,
-        '1.0.0',
+        DB_VERSION,
         pytest.PUBLISH_REPOSITORY,
         verbose=False,
     )
@@ -79,24 +80,36 @@ def fixture_clear_cache():
     clear_root(pytest.CACHE_ROOT)
 
 
-def test_info():
-
-    deps = audb2.dependencies(DB_NAME)
-
+def test_header():
     assert str(audb2.info.header(DB_NAME)) == str(DB)
+
+
+def test_bit_depths():
+    deps = audb2.dependencies(DB_NAME, version=DB_VERSION)
     assert audb2.info.bit_depths(DB_NAME) == set(
         [
             deps.bit_depth(file) for file in deps.media
             if deps.bit_depth(file)
         ]
     )
+
+
+def test_channels():
+    deps = audb2.dependencies(DB_NAME, version=DB_VERSION)
     assert audb2.info.channels(DB_NAME) == set(
         [
             deps.channels(file) for file in deps.media
             if deps.channels(file)
         ]
     )
+
+
+def test_description():
     assert audb2.info.description(DB_NAME) == DB.description
+
+
+def test_duration():
+    deps = audb2.dependencies(DB_NAME, version=DB_VERSION)
     assert audb2.info.duration(DB_NAME) == pd.to_timedelta(
         sum(
             [
@@ -105,23 +118,58 @@ def test_info():
         ),
         unit='s',
     )
+
+
+def test_formats():
+    deps = audb2.dependencies(DB_NAME, version=DB_VERSION)
     assert audb2.info.formats(DB_NAME) == set(
         [
             deps.format(file) for file in deps.media
         ]
     )
+
+
+def test_languages():
     assert audb2.info.languages(DB_NAME) == DB.languages
+
+
+def test_media():
     assert str(audb2.info.media(DB_NAME)) == str(DB.media)
+
+
+def test_meta():
     assert audb2.info.meta(DB_NAME) == DB.meta
+
+
+def test_raters():
     assert str(audb2.info.raters(DB_NAME)) == str(DB.raters)
+
+
+def test_sampling_rates():
+    deps = audb2.dependencies(DB_NAME, version=DB_VERSION)
     assert audb2.info.sampling_rates(DB_NAME) == set(
         [
             deps.sampling_rate(file) for file in deps.media
             if deps.sampling_rate(file)
         ]
     )
+
+
+def test_schemes():
     assert str(audb2.info.schemes(DB_NAME)) == str(DB.schemes)
+
+
+def test_splits():
     assert str(audb2.info.splits(DB_NAME)) == str(DB.splits)
+
+
+def test_source():
     assert audb2.info.source(DB_NAME) == DB.source
+
+
+def test_tables():
     assert str(audb2.info.tables(DB_NAME)) == str(DB.tables)
+
+
+def test_usage():
     assert audb2.info.usage(DB_NAME) == DB.usage
