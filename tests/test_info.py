@@ -80,6 +80,10 @@ def fixture_clear_cache():
     clear_root(pytest.CACHE_ROOT)
 
 
+def test_author():
+    assert audb2.info.author(DB_NAME) == DB.author
+
+
 def test_header():
     assert str(audb2.info.header(DB_NAME)) == str(DB)
 

@@ -3,6 +3,11 @@ audb2.info
 
 .. automodule:: audb2.info
 
+author
+------
+
+.. autofunction:: author
+
 bit_depths
 ----------
 

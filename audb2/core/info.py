@@ -14,6 +14,25 @@ from audb2.core.api import (
 from audb2.core.utils import lookup_backend
 
 
+def author(
+        name: str,
+        *,
+        version: str = None,
+) -> str:
+    """Author(s) of database.
+
+    Args:
+        name: name of database
+        version: version of database
+
+    Returns:
+        author(s) of database
+
+    """
+    db = header(name, version=version)
+    return db.author
+
+
 def bit_depths(
         name: str,
         *,

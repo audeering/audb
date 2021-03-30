@@ -43,6 +43,7 @@ You can run:
 
 """
 from audb2.core.info import (
+    author,
     bit_depths,
     channels,
     description,
