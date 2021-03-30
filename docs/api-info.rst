@@ -63,6 +63,11 @@ meta
 
 .. autofunction:: meta
 
+organization
+------------
+
+.. autofunction:: organization
+
 raters
 ------
 

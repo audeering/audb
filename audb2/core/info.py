@@ -276,6 +276,25 @@ def meta(
     return db.meta
 
 
+def organization(
+        name: str,
+        *,
+        version: str = None,
+) -> str:
+    """Organization responsible for database.
+
+    Args:
+        name: name of database
+        version: version of database
+
+    Returns:
+        organization responsible for database
+
+    """
+    db = header(name, version=version)
+    return db.organization
+
+
 def raters(
         name: str,
         *,

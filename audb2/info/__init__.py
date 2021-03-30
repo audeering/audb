@@ -55,6 +55,7 @@ from audb2.core.info import (
     license_url,
     media,
     meta,
+    organization,
     raters,
     sampling_rates,
     schemes,

@@ -153,6 +153,10 @@ def test_meta():
     assert audb2.info.meta(DB_NAME) == DB.meta
 
 
+def test_organization():
+    assert audb2.info.organization(DB_NAME) == DB.organization
+
+
 def test_raters():
     assert str(audb2.info.raters(DB_NAME)) == str(DB.raters)
 
