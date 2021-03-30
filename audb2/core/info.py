@@ -219,6 +219,25 @@ def license(
     return db.license
 
 
+def license_url(
+        name: str,
+        *,
+        version: str = None,
+) -> str:
+    """License URL of database.
+
+    Args:
+        name: name of database
+        version: version of database
+
+    Returns:
+        license URL of database
+
+    """
+    db = header(name, version=version)
+    return db.license_url
+
+
 def media(
         name: str,
         *,

@@ -141,6 +141,10 @@ def test_license():
     assert audb2.info.license(DB_NAME) == DB.license
 
 
+def test_license_url():
+    assert audb2.info.license_url(DB_NAME) == DB.license_url
+
+
 def test_media():
     assert str(audb2.info.media(DB_NAME)) == str(DB.media)
 

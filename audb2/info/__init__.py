@@ -52,6 +52,7 @@ from audb2.core.info import (
     header,
     languages,
     license,
+    license_url,
     media,
     meta,
     raters,

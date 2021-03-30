@@ -48,6 +48,11 @@ license
 
 .. autofunction:: license
 
+license_url
+-----------
+
+.. autofunction:: license_url
+
 media
 -----
 
