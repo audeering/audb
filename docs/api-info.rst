@@ -43,6 +43,11 @@ languages
 
 .. autofunction:: languages
 
+license
+-------
+
+.. autofunction:: license
+
 media
 -----
 

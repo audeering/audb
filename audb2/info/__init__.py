@@ -51,6 +51,7 @@ from audb2.core.info import (
     formats,
     header,
     languages,
+    license,
     media,
     meta,
     raters,

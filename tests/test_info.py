@@ -137,6 +137,10 @@ def test_languages():
     assert audb2.info.languages(DB_NAME) == DB.languages
 
 
+def test_license():
+    assert audb2.info.license(DB_NAME) == DB.license
+
+
 def test_media():
     assert str(audb2.info.media(DB_NAME)) == str(DB.media)
 

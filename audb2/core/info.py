@@ -200,6 +200,25 @@ def languages(
     return db.languages
 
 
+def license(
+        name: str,
+        *,
+        version: str = None,
+) -> str:
+    """License of database.
+
+    Args:
+        name: name of database
+        version: version of database
+
+    Returns:
+        license of database
+
+    """
+    db = header(name, version=version)
+    return db.license
+
+
 def media(
         name: str,
         *,
