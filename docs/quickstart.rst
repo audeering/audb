@@ -1,15 +1,28 @@
+.. _quickstart:
+
 Quickstart
 ==========
 
-To use emodb_ (see `available databases`_ for more) in your project,
-you first load it:
+The most common task is to load a database
+with :func:`audb2.load`.
+
+Let's first see which databases are available to load:
 
 .. jupyter-execute::
-    :hide-code:
-    :hide-output:
 
     import audb2
 
+    audb2.available()
+
+As you can see we provide the emodb_ database
+as small example database,
+which we `have published`_
+to our `public Artifactory server`_.
+Let's load the database:
+
+.. Load with only_metadata=True in the background
+.. jupyter-execute::
+    :hide-code:
 
     db = audb2.load(
         'emodb',
@@ -20,34 +33,51 @@ you first load it:
 
 .. code-block:: python
 
-    import audb2
-
-
     db = audb2.load('emodb', version='1.1.0', verbose=False)
 
+This downloads the database header,
+all the media files,
+and tables with annotations
+to a caching folder on your machine.
+The database is then returned
+as an :class:`audformat.Database` object.
 
-Then you get a table and inspect its first three entries:
-
-.. jupyter-execute::
-
-    df = db['emotion'].get()
-    df[:3]
-
-If you don't specify a version,
-:mod:`audb2` will retrieve the latest version for you.
-You can find the latest version with:
-
-.. jupyter-execute::
-
-    audb2.latest_version('emodb')
-
-Or to get a list of all available versions, you can do:
+Each database comes with a description,
+which is a good starting point
+to learn what the database is all about:
 
 .. jupyter-execute::
 
-    audb2.versions('emodb')
+    db.description
+
+The annotations of a database are stored in
+tables represented by :class:`audformat.Table`:
+
+.. jupyter-execute::
+
+    db.tables
+
+Each table contains columns (:class:`audformat.Column`)
+that have corresponding schemes (:class:`audformat.Scheme`)
+describing its content.
+For example,
+to get an idea about the emotion annotations
+stored in the ``emotion`` column,
+we can inspect the corresponding scheme:
+
+.. jupyter-execute::
+
+    db.schemes['emotion']
+
+Finally, we get the actual annotations
+as a :class:`pandas.DataFrame`:
+
+.. jupyter-execute::
+
+    df = db['emotion'].get()  # get table
+    df[:3]  # show first three entries
 
 
-
-.. _emodb: https://gitlab.audeering.com/data/emodb
-.. _available databases: http://data.pp.audeering.com/databases.html
+.. _emodb: http://emodb.bilderbar.info/start.html
+.. _have published: https://github.com/audeering/emodb
+.. _public Artifactory server: https://audeering.jfrog.io/artifactory
