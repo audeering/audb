@@ -188,18 +188,30 @@ def _get_media(
     if not media:
         return
 
+    # figure out archives
+    archives = set()
+    archive_names = set()
+    for file in media:
+        archive_name = deps.archive(file)
+        archive_version = deps.version(file)
+        archives.add((archive_name, archive_version))
+        archive_names.add(archive_name)
+    # collect all files that will be extracted,
+    # if we have more files than archives
+    if len(deps.files) > len(deps.archives):
+        files = list()
+        for file in deps.media:
+            archive = deps.archive(file)
+            if archive in archive_names:
+                files.append(file)
+        media = files
+
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
+    # using multi-processing
     for file in media:
         audeer.mkdir(os.path.dirname(os.path.join(db_root, file)))
         audeer.mkdir(os.path.dirname(os.path.join(db_root_tmp, file)))
-
-    # figure out archives
-    archives = set()
-    for file in media:
-        archives.add(
-            (deps.archive(file), deps.version(file))
-        )
 
     def job(archive: str, version: str):
         archive = backend.join(
@@ -207,6 +219,8 @@ def _get_media(
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
             archive,
         )
+        # extract and move all files that are stored in the archive,
+        # even if only a single file from the archive was requested
         files = backend.get_archive(archive, db_root_tmp, version)
         for file in files:
             if flavor is not None and deps.format(file) in define.FORMATS:
@@ -225,6 +239,7 @@ def _get_media(
                 )
                 if src_path != dst_path:
                     os.remove(src_path)
+
             _move_file(db_root_tmp, db_root, file)
 
     audeer.run_tasks(

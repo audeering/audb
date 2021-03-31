@@ -61,6 +61,20 @@ def fixture_publish_db():
         columns={'label': ('scheme', None)},
         num_files=[20, 21],
     )
+    # Add nested folder structure to ensure not all files in an archive
+    # are stored in the same folder
+    mapping = {
+        'audio/020.wav': 'audio/1/020.wav',
+        'audio/021.wav': 'audio/2/021.wav',
+    }
+    files = db['train'].df.index.get_level_values('file')
+    starts = db['train'].df.index.get_level_values('start')
+    ends = db['train'].df.index.get_level_values('end')
+    db['train'].df.index = audformat.segmented_index(
+        files=[mapping[f] for f in files],
+        starts=starts,
+        ends=ends,
+    )
     audformat.testing.create_audio_files(db, DB_ROOT)
     db.save(DB_ROOT)
 
@@ -105,13 +119,13 @@ def fixture_clear_cache():
             None,
             ['audio/000.wav', 'audio/001.wav',
              'audio/010.wav', 'audio/011.wav',
-             'audio/020.wav', 'audio/021.wav'],
+             'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
             't.*',
             None,
             ['audio/000.wav', 'audio/001.wav',
-             'audio/020.wav', 'audio/021.wav'],
+             'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
             None,
@@ -161,7 +175,7 @@ def test_include_and_exclude(include, exclude, expected_files):
             None,
             ['audio/000.wav', 'audio/001.wav',
              'audio/010.wav', 'audio/011.wav',
-             'audio/020.wav', 'audio/021.wav'],
+             'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
             [],
@@ -173,7 +187,7 @@ def test_include_and_exclude(include, exclude, expected_files):
         ),
         (
             r'.*0\.wav',
-            ['audio/000.wav', 'audio/010.wav', 'audio/020.wav'],
+            ['audio/000.wav', 'audio/010.wav', 'audio/1/020.wav'],
         ),
     ]
 )
@@ -197,7 +211,7 @@ def test_media(media, expected_files):
             ['dev', 'test', 'train'],
             ['audio/000.wav', 'audio/001.wav',
              'audio/010.wav', 'audio/011.wav',
-             'audio/020.wav', 'audio/021.wav'],
+             'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
             'test',
@@ -208,13 +222,13 @@ def test_media(media, expected_files):
             't.*',
             ['test', 'train'],
             ['audio/000.wav', 'audio/001.wav',
-             'audio/020.wav', 'audio/021.wav'],
+             'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
             ['dev', 'train'],
             ['dev', 'train'],
             ['audio/010.wav', 'audio/011.wav',
-             'audio/020.wav', 'audio/021.wav'],
+             'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
             'bad',
