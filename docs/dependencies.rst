@@ -10,17 +10,32 @@
 Database dependencies
 =====================
 
-Databases stored in the audformat_
-consists of one metadata archive file
-and one up to several thousand archive files for data.
-All of them are stored as dependencies on Artifactory,
-that are resolved on-the-fly by :mod:`audb2`.
+Media and table files of databases are stored
+in archive files.
+A database can also reuse an archive file
+from a previous version of a database
+if its content hasn't changed.
 
-You can visualize dependencies of a database with:
+We keep track of those dependencies
+and store some additional metadata about the audio files
+like duration and number of channels
+in a dependency table in a file :file:`db.csv`
+for every version of a database.
+
+You request a :class:`audb2.Dependencies` object with:
 
 .. jupyter-execute::
 
     deps = audb2.dependencies('emodb', version='1.1.0')
+
+You can see all entries with
+
+.. jupyter-execute::
+
     deps()
-    
-.. _audformat: http://tools.pp.audeering.com/audata/data-format.html
+
+or request certain aspects, e.g.
+
+.. jupyter-execute::
+
+    deps.duration('wav/03a01Fa.wav')
