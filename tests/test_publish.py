@@ -162,6 +162,13 @@ def test_publish(version):
         verbose=False,
     )
     backend = audb2.core.utils.lookup_backend(DB_NAME, version)
+    number_of_files = len(set(archives.keys()))
+    number_of_archives = len(set(archives.values()))
+    assert len(deps.files) - len(deps.archives) == (
+        number_of_files - number_of_archives
+    )
+    for archive in set(archives.values()):
+        assert archive in deps.archives
 
     db = audb2.load(
         DB_NAME,

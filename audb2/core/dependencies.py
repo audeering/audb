@@ -54,6 +54,17 @@ class Dependencies:
         return self._data[file]
 
     @property
+    def archives(self) -> typing.List[str]:
+        r"""All archives (table and media).
+
+        Return:
+            list of archives
+
+        """
+        archives = [self.archive(file) for file in self.files]
+        return list(set(archives))
+
+    @property
     def data(self) -> typing.Dict[str, typing.List]:
         r"""Get table data.
 
