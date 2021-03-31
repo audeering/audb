@@ -10,6 +10,7 @@
     authentication
     quickstart
     overview
+    publish
     load
     dependencies
     configuration
