@@ -83,20 +83,20 @@ html_title = title
 
 audb2.load(
     'emodb',
-    version='1.0.1',
+    version='1.1.0',
     num_workers=5,
     verbose=False,
 )
 audb2.load(
     'emodb',
-    version='1.0.1',
+    version='1.1.0',
     only_metadata=True,
     num_workers=5,
     verbose=False,
 )
 audb2.load(
     'emodb',
-    version='1.0.1',
+    version='1.1.0',
     format='flac',
     sampling_rate=44100,
     num_workers=5,

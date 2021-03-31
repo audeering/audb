@@ -46,7 +46,7 @@ inside the :ref:`cache <caching>`.
 
     db = audb2.load(
         'emodb',
-        version='1.0.1',
+        version='1.1.0',
         format='flac',
         sampling_rate=44100,
     )

@@ -14,7 +14,7 @@ but all the annotations and the header:
 
     db = audb2.load(
         'emodb',
-        version='1.0.1',
+        version='1.1.0',
         only_metadata=True,
     )
 
@@ -28,7 +28,7 @@ or if you are only interested in table information:
 
     audb2.info.tables(
         'emodb',
-        version='1.0.1',
+        version='1.1.0',
     )
 
 And to get the total duration of all media files:
@@ -37,7 +37,7 @@ And to get the total duration of all media files:
 
     audb2.info.duration(
         'emodb',
-        version='1.0.1',
+        version='1.1.0',
     )
 
 See :mod:`audb2.info` for a list of all available options.

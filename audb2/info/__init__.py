@@ -17,7 +17,7 @@ So instead of running:
 
     audb2.load(
         'emodb',
-        version='1.0.1',
+        version='1.1.0',
         only_metadata=True,
         verbose=False,
     )
@@ -27,7 +27,7 @@ So instead of running:
 
     db = audb2.load(
         'emodb',
-        version='1.0.1',
+        version='1.1.0',
         only_metadata=True,
     )
     db.tables
@@ -38,7 +38,7 @@ You can run:
 
     audb2.info.tables(
         'emodb',
-        version='1.0.1',
+        version='1.1.0',
     )
 
 """

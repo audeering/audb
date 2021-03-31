@@ -41,7 +41,7 @@ about the speakers (here ``db['files']``):
 
     db = audb2.load(
         'emodb',
-        version='1.0.1',
+        version='1.1.0',
         tables=['files'],
         only_metadata=True,
         full_path=False,
@@ -80,7 +80,7 @@ from the tables.
 
     db = audb2.load(
         'emodb',
-        version='1.0.1',
+        version='1.1.0',
         media=media,
     )
     db['emotion'].get()

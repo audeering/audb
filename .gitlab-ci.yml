@@ -47,6 +47,9 @@ docs:
   stage: test
   image: docker.audeering.com/audeering/python-3.6:latest
   script:
+    # Unset envrionment variables to force usage of anonymous user
+    - unset ARTIFACTORY_USERNAME
+    - unset ARTIFACTORY_API_KEY
     - pip install -r requirements.txt
     - pip install -r docs/requirements.txt
     - python -m sphinx -W docs/ build/html -b html

@@ -212,8 +212,8 @@ def exists(
 
     .. code-block::
 
-        if audb2.exists('emodb', version='1.0.1', mixdown=True):
-            print('emodb v1.0.1 {mono} cached')
+        if audb2.exists('emodb', version='1.1.0', mixdown=True):
+            print('emodb v1.1.0 {mono} cached')
 
     Note that the return value will change to ``bool`` with version 1.0.0.
 

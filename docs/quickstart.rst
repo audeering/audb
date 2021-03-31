@@ -8,7 +8,7 @@ To use emodb_ (see `available databases`_ for more) in your project:
     import audb2
 
 
-    db = audb2.load('emodb', version='1.0.1', verbose=False)  # load database
+    db = audb2.load('emodb', version='1.1.0', verbose=False)  # load database
     df = db['emotion'].get()  # get table
     df[:3]  # show first three entries
 
