@@ -10,10 +10,8 @@
     authentication
     quickstart
     overview
+    load
     dependencies
-    flavors
-    metadata
-    filter
     configuration
     caching
 
