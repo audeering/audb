@@ -1,0 +1,41 @@
+
+digraph G {
+
+    rankdir=LR
+    node[shape=Mrecord, style=filled, color=orange]
+    compound=true
+
+    subgraph cluster_backend {
+        label="Backend"
+        subgraph cluster_database {
+            label="Database vX.Y.Z"
+            header_in[label="Header"]
+            tables_in[label="Tables"]
+            media_in[label="Media"]
+            deps_in[label="Deps"]
+        }
+    }
+
+    subgraph cluster_load {
+        label="Load with audb"
+        download[label="Download"]
+        unpack[label="Unpack"]
+        convert[label="Convert"]
+    }
+
+    subgraph cluster_cache {
+        label="Cache"
+        subgraph cluster_flavor {
+            label="Database vX.Y.Z Flavor"
+            header_out[label="Header"]
+            tables_out[label="Tables"]
+            media_out[label="(Conv.) Media"]
+            deps_out[label="Deps"]
+        }
+    }
+
+    header_in->download [ltail=cluster_database]
+    download->unpack->convert
+    convert->header_out [lhead=cluster_flavor]
+
+}

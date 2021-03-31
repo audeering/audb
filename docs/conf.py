@@ -47,6 +47,7 @@ extensions = [
 napoleon_use_ivar = True  # List of class attributes
 autodoc_inherit_docstrings = False  # disable docstring inheritance
 intersphinx_mapping = {
+    'audbackend': ('https://audeering.github.io/audbackend/', None),
     'audeer': ('https://audeering.github.io/audeer/', None),
     'audformat': ('http://audeering.github.io/audformat/', None),
     'audiofile': ('https://audeering.github.io/audiofile/', None),

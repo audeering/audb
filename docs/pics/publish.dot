@@ -1,0 +1,40 @@
+
+digraph G {
+
+    rankdir=LR
+    node[shape=Mrecord, style=filled, color=orange]
+    compound=true
+
+    subgraph cluster_project {
+        label="Database Project"
+        subgraph cluster_folder {
+            label="Database Folder"
+            header_in[label="Header"]
+            tables_in[label="Tables"]
+            media_in[label="Media"]
+            deps_in[label="(Deps)"]
+        }
+    }
+
+    subgraph cluster_publish {
+        label="Publish with audb"
+        pack[label="Pack"]
+        upload[label="Upload"]
+    }
+
+    subgraph cluster_backend {
+        label="Backend"
+        subgraph cluster_database {
+            label="Database vX.Y.Z"
+            header_out[label="Header"]
+            tables_out[label="Tables"]
+            media_out[label="Media"]
+            deps_out[label="Deps"]
+        }
+    }
+
+    header_in->pack [ltail=cluster_folder]
+    pack->upload
+    upload->header_out [lhead=cluster_database]
+
+}
