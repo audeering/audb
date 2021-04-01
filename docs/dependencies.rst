@@ -1,8 +1,12 @@
+.. Specify pandas format output in cells
 .. jupyter-execute::
     :hide-code:
     :hide-output:
 
     import audb2
+    import pandas as pd
+
+    pd.set_option('display.max_columns', 7)
 
 
 .. _database-dependencies:
