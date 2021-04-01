@@ -1,3 +1,4 @@
+.. Import audb2
 .. jupyter-execute::
     :hide-code:
     :hide-output:
