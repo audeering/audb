@@ -202,7 +202,7 @@ def exists(
     sampling_rate: int = None,
     cache_root: str = None,
     **kwargs,
-) -> typing.Optional[str]:
+) -> bool:
     r"""Check if specified database flavor exists in local cache folder.
 
     Does not yet return ``True`` or ``False``,
@@ -214,8 +214,6 @@ def exists(
 
         if audb2.exists('emodb', version='1.1.0', mixdown=True):
             print('emodb v1.1.0 {mono} cached')
-
-    Note that the return value will change to ``bool`` with version 1.0.0.
 
     Does not check for any flavor of the requested database in the cache,
     but only for a particular flavor.
@@ -241,19 +239,9 @@ def exists(
             If not set :meth:`audb2.default_cache_root` is used
 
     Returns:
-        ``None`` or path to flavor.
-        Note that the return value will change
-        to ``False`` or ``True`` with version 1.0.0.
+        ``True`` if database flavor exists
 
     """
-    warnings.warn(
-        "The return value of 'exists' will "
-        "change from 'str' to 'bool' "
-        "with version '1.0.0'.",
-        category=UserWarning,
-        stacklevel=2,
-    )
-
     # Map mix to channels and mixdown
     if (
             channels is None
@@ -285,9 +273,9 @@ def exists(
             os.path.join(cache_root, relative_flavor_path)
         )
         if os.path.exists(db_root):
-            return db_root  # True
+            return True
 
-    return None  # False
+    return False
 
 
 def flavor_path(

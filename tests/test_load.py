@@ -176,8 +176,7 @@ def fixture_publish_db():
 )
 def test_load(version):
 
-    with pytest.warns(UserWarning):
-        assert not audb2.exists(DB_NAME, version=version)
+    assert not audb2.exists(DB_NAME, version=version)
 
     db = audb2.load(
         DB_NAME,
@@ -188,8 +187,7 @@ def test_load(version):
     )
     db_root = db.meta['audb']['root']
 
-    with pytest.warns(UserWarning):
-        assert audb2.exists(DB_NAME, version=version)
+    assert audb2.exists(DB_NAME, version=version)
 
     if version is None:
         resolved_version = audb2.latest_version(DB_NAME)
