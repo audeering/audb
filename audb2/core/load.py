@@ -223,7 +223,7 @@ def _get_media(
         # even if only a single file from the archive was requested
         files = backend.get_archive(archive, db_root_tmp, version)
         for file in files:
-            if flavor is not None and deps.format(file) in define.FORMATS:
+            if flavor is not None:
                 bit_depth = deps.bit_depth(file)
                 channels = deps.channels(file)
                 sampling_rate = deps.sampling_rate(file)
