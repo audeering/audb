@@ -81,24 +81,28 @@ html_title = title
 
 # cache databases to avoid progress bar in code examples
 
-audb2.load(
-    'emodb',
-    version='1.1.0',
-    num_workers=5,
-    verbose=False,
-)
-audb2.load(
-    'emodb',
-    version='1.1.0',
-    only_metadata=True,
-    num_workers=5,
-    verbose=False,
-)
-audb2.load(
-    'emodb',
-    version='1.1.0',
-    format='flac',
-    sampling_rate=44100,
-    num_workers=5,
-    verbose=False,
-)
+if not audb2.exists('emodb', version='1.1.0'):
+    print('Pre-caching emodb v1.1.0')
+    audb2.load(
+        'emodb',
+        version='1.1.0',
+        num_workers=5,
+        only_metadata=True,
+        verbose=False,
+    )
+if not audb2.exists(
+        'emodb',
+        version='1.1.0',
+        format='flac',
+        sampling_rate=44100,
+):
+    print('Pre-caching emodb v1.1.0 {flac, 44100Hz}')
+    audb2.load(
+        'emodb',
+        version='1.1.0',
+        format='flac',
+        sampling_rate=44100,
+        num_workers=5,
+        only_metadata=True,
+        verbose=False,
+    )

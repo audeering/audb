@@ -37,7 +37,10 @@ to FLAC with a sampling rate of 44100 Hz.
 For each flavor a sub-folder will be created
 inside the :ref:`cache <caching>`.
 
+.. Load only metadata instead,
+.. but hide for the reader
 .. jupyter-execute::
+    :hide-code:
     :hide-output:
     :stderr:
 
@@ -49,6 +52,21 @@ inside the :ref:`cache <caching>`.
         version='1.1.0',
         format='flac',
         sampling_rate=44100,
+        only_metadata=True,
+        verbose=False,
+    )
+
+.. code-block:: python
+
+    import audb2
+
+
+    db = audb2.load(
+        'emodb',
+        version='1.1.0',
+        format='flac',
+        sampling_rate=44100,
+        verbose=False,
     )
 
 The new audio format is included in the flavor of the converted database:

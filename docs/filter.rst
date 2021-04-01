@@ -72,15 +72,30 @@ that belong to speaker 3.
 Finally, we load the database again
 and use the list to request
 only the data of this speaker.
-This will also remove
-entries of other speakers
-from the tables.
 
 .. jupyter-execute::
+    :hide-code:
+    :hide-output:
+
+    db = audb2.load(
+        'emodb',
+        version='1.1.0',
+        media=media,
+        only_metadata=True,
+    )
+    
+.. code-block:: python
 
     db = audb2.load(
         'emodb',
         version='1.1.0',
         media=media,
     )
+
+This will also remove
+entries of other speakers
+from the tables.
+
+.. jupyter-execute::
+
     db['emotion'].get()

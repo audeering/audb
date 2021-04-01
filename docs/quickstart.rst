@@ -1,16 +1,37 @@
 Quickstart
 ==========
 
-To use emodb_ (see `available databases`_ for more) in your project:
+To use emodb_ (see `available databases`_ for more) in your project,
+you first load it:
 
 .. jupyter-execute::
+    :hide-code:
+    :hide-output:
 
     import audb2
 
 
-    db = audb2.load('emodb', version='1.1.0', verbose=False)  # load database
-    df = db['emotion'].get()  # get table
-    df[:3]  # show first three entries
+    db = audb2.load(
+        'emodb',
+        version='1.1.0',
+        only_metadata=True,
+        verbose=False,
+    )
+
+.. code-block:: python
+
+    import audb2
+
+
+    db = audb2.load('emodb', version='1.1.0', verbose=False)
+
+
+Then you get a table and inspect its first three entries:
+
+.. jupyter-execute::
+
+    df = db['emotion'].get()
+    df[:3]
 
 If you don't specify a version,
 :mod:`audb2` will retrieve the latest version for you.
