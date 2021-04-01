@@ -7,13 +7,13 @@
     :hidden:
 
     install
-    authentication
     quickstart
     overview
     publish
     load
     dependencies
     configuration
+    authentication
     caching
 
 .. Warning: then usage of genindex is a hack to get a TOC entry, see
