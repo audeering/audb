@@ -98,24 +98,43 @@ def cached(
     )
 
     data = {}
-    for root, _, files in os.walk(cache_root):
 
-        # Skip tmp folder (e.g. 1.0.0~)
-        if root.endswith('~'):  # pragma: no cover
-            continue
+    database_paths = audeer.list_dir_names(cache_root)
+    for database_path in database_paths:
+        database = os.path.basename(database_path)
+        version_paths = audeer.list_dir_names(database_path)
+        for version_path in version_paths:
+            version = os.path.basename(version_path)
 
-        if define.HEADER_FILE in files:
-            name, version, flavor_id = root.split(os.path.sep)[-3:]
-            db = audformat.Database.load(root, load_data=False)
-            flavor = db.meta['audb']['flavor']
-            complete = db.meta['audb']['complete']
-            data[root] = {
-                'name': name,
-                'flavor_id': flavor_id,
-                'version': version,
-                'complete': complete,
-            }
-            data[root].update(flavor)
+            # Skip tmp folder (e.g. 1.0.0~)
+            if version.endswith('~'):  # pragma: no cover
+                continue
+
+            flavor_id_paths = audeer.list_dir_names(version_path)
+
+            # Skip old audb cache (e.g. 1 as flavor)
+            if audeer.list_file_names(version_path):  # pragma: no cover
+                continue
+
+            for flavor_id_path in flavor_id_paths:
+                flavor_id = os.path.basename(flavor_id_path)
+                files = audeer.list_file_names(flavor_id_path)
+                files = [os.path.basename(f) for f in files]
+
+                if define.HEADER_FILE in files:
+                    db = audformat.Database.load(
+                        flavor_id_path,
+                        load_data=False,
+                    )
+                    flavor = db.meta['audb']['flavor']
+                    complete = db.meta['audb']['complete']
+                    data[flavor_id_path] = {
+                        'name': database,
+                        'flavor_id': flavor_id,
+                        'version': version,
+                        'complete': complete,
+                    }
+                    data[flavor_id_path].update(flavor)
 
     return pd.DataFrame.from_dict(data, orient='index')
 
