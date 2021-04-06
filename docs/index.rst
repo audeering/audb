@@ -25,7 +25,6 @@
     :hidden:
 
     api
-    api-define
     api-info
     genindex
 

@@ -175,7 +175,9 @@ def test_channels(channels):
 @pytest.mark.parametrize(
     'format',
     [
-        None, audb2.define.Format.WAV, audb2.define.Format.FLAC
+        None,
+        audb2.core.define.Format.WAV,
+        audb2.core.define.Format.FLAC,
     ],
 )
 def test_format(format):

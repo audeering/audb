@@ -16,13 +16,13 @@ import audb2
             None, None, None, False, None,
         ),
         (
-            16, None, audb2.define.Format.WAV, True, 16000,
+            16, None, audb2.core.define.Format.WAV, True, 16000,
         ),
         (
-            16, None, audb2.define.Format.WAV, True, 16000,
+            16, None, audb2.core.define.Format.WAV, True, 16000,
         ),
         pytest.param(
-            0, None, audb2.define.Format.WAV, True, 16000,
+            0, None, audb2.core.define.Format.WAV, True, 16000,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
         pytest.param(
@@ -30,7 +30,7 @@ import audb2
             marks=pytest.mark.xfail(raises=ValueError),
         ),
         pytest.param(
-            16, None, audb2.define.Format.WAV, True, 0,
+            16, None, audb2.core.define.Format.WAV, True, 0,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
     ]
@@ -52,8 +52,8 @@ def test_init(bit_depth, channels, format, mixdown, sampling_rate):
 @pytest.mark.parametrize(
     'format',
     [
-        audb2.define.Format.WAV,
-        audb2.define.Format.FLAC,
+        audb2.core.define.Format.WAV,
+        audb2.core.define.Format.FLAC,
     ],
 )
 def test_destination(format):
@@ -68,97 +68,97 @@ def test_destination(format):
     'bit_depth_out, channels_out, format_out, sampling_rate_out',
     [
         (
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(),
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
         ),
         (
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(bit_depth=32),
-            32, 1, audb2.define.Format.WAV, 16000,
+            32, 1, audb2.core.define.Format.WAV, 16000,
         ),
         (
-            16, 1, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(format=audb2.define.Format.FLAC),
-            16, 1, audb2.define.Format.FLAC, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
+            audb2.Flavor(format=audb2.core.define.Format.FLAC),
+            16, 1, audb2.core.define.Format.FLAC, 16000,
         ),
         pytest.param(
-            16, 1, audb2.define.Format.WAV, 16000,
-            audb2.Flavor(format=audb2.define.Format.FLAC),
-            16, 2, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
+            audb2.Flavor(format=audb2.core.define.Format.FLAC),
+            16, 2, audb2.core.define.Format.WAV, 16000,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
         (
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(mixdown=True),
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
         ),
         (
-            16, 3, audb2.define.Format.WAV, 16000,
+            16, 3, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(mixdown=True),
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
         ),
         (
-            16, 2, audb2.define.Format.WAV, 16000,
+            16, 2, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(channels=0),
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
         ),
         (
-            16, 2, audb2.define.Format.WAV, 16000,
+            16, 2, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(channels=1),
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
         ),
         (
-            16, 2, audb2.define.Format.WAV, 16000,
+            16, 2, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(channels=[0, 1]),
-            16, 2, audb2.define.Format.WAV, 16000,
+            16, 2, audb2.core.define.Format.WAV, 16000,
         ),
         (
-            16, 3, audb2.define.Format.WAV, 16000,
+            16, 3, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(channels=[0, -1]),
-            16, 2, audb2.define.Format.WAV, 16000,
+            16, 2, audb2.core.define.Format.WAV, 16000,
         ),
         (
-            16, 2, audb2.define.Format.WAV, 16000,
+            16, 2, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(channels=[0, 2]),
-            16, 2, audb2.define.Format.WAV, 16000,
+            16, 2, audb2.core.define.Format.WAV, 16000,
         ),
         (
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(sampling_rate=8000),
-            16, 1, audb2.define.Format.WAV, 8000,
+            16, 1, audb2.core.define.Format.WAV, 8000,
         ),
         (
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(
                 bit_depth=24,
-                format=audb2.define.Format.FLAC,
+                format=audb2.core.define.Format.FLAC,
                 sampling_rate=8000,
             ),
-            24, 1, audb2.define.Format.FLAC, 8000,
+            24, 1, audb2.core.define.Format.FLAC, 8000,
         ),
         (
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(
                 bit_depth=24,
-                format=audb2.define.Format.FLAC,
+                format=audb2.core.define.Format.FLAC,
                 sampling_rate=8000,
             ),
-            24, 1, audb2.define.Format.FLAC, 8000,
+            24, 1, audb2.core.define.Format.FLAC, 8000,
         ),
         (
-            16, 1, audb2.define.Format.WAV, 16000,
+            16, 1, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(
                 bit_depth=24,
-                format=audb2.define.Format.FLAC,
+                format=audb2.core.define.Format.FLAC,
                 sampling_rate=8000,
             ),
-            24, 1, audb2.define.Format.FLAC, 8000,
+            24, 1, audb2.core.define.Format.FLAC, 8000,
         ),
         (
             16, 1, 'mp3', 16000,
-            audb2.Flavor(format=audb2.define.Format.WAV),
-            16, 1, audb2.define.Format.WAV, 16000,
+            audb2.Flavor(format=audb2.core.define.Format.WAV),
+            16, 1, audb2.core.define.Format.WAV, 16000,
         ),
         # Cannot convert MP3 files
         pytest.param(

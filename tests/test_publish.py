@@ -199,8 +199,8 @@ def test_publish(version):
         path = os.path.join(DB_ROOT_VERSION[version], file)
         assert deps.checksum(file) == audbackend.md5(path)
         if deps.format(file) in [
-            audb2.define.Format.WAV,
-            audb2.define.Format.FLAC,
+            audb2.core.define.Format.WAV,
+            audb2.core.define.Format.FLAC,
         ]:
             assert deps.bit_depth(file) == audiofile.bit_depth(path)
             assert deps.channels(file) == audiofile.channels(path)
