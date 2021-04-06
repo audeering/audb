@@ -68,11 +68,6 @@ load_to
 
 .. autofunction:: load_to
 
-lookup_repository
------------------
-
-.. autofunction:: lookup_repository
-
 publish
 -------
 
@@ -88,6 +83,11 @@ Repository
 
 .. autoclass:: Repository
     :members:
+
+repository
+----------
+
+.. autofunction:: repository
 
 versions
 --------

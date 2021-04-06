@@ -19,7 +19,7 @@ from audb2.core.load import load
 from audb2.core.load_to import load_to
 from audb2.core.publish import publish
 from audb2.core.repository import Repository
-from audb2.core.utils import lookup_repository
+from audb2.core.utils import repository
 
 
 __all__ = []

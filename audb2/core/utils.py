@@ -33,7 +33,7 @@ def lookup_backend(
     return _lookup(name, version)[1]
 
 
-def lookup_repository(
+def repository(
         name: str,
         version: str,
 ) -> Repository:

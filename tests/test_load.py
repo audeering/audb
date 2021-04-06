@@ -284,6 +284,6 @@ def test_load_to(version):
         )
     ]
 )
-def test_lookup_repository(name, version):
-    repository = audb2.lookup_repository(name, version)
+def test_repository(name, version):
+    repository = audb2.repository(name, version)
     assert repository == pytest.PUBLISH_REPOSITORY
