@@ -52,7 +52,7 @@ intersphinx_mapping = {
     'audformat': ('http://audeering.github.io/audformat/', None),
     'audiofile': ('https://audeering.github.io/audiofile/', None),
     'audobject': ('https://audeering.github.io/audobject/', None),
-    'audresample': ('https://audeering.github.io/pyaudresample/', None),
+    'audresample': ('https://audeering.github.io/audresample/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'python': ('https://docs.python.org/3/', None),
 }
