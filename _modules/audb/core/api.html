@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.0.1
+                v1.0.2
               </div>
             
           
@@ -204,12 +204,12 @@
 
 <div class="viewcode-block" id="available"><a class="viewcode-back" href="../../../api.html#audb.available">[docs]</a><span class="k">def</span> <span class="nf">available</span><span class="p">(</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">latest_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">only_latest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;List all databases that are available to the user.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        latest_only: keep only latest version</span>
+<span class="sd">        only_latest: keep only latest version</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        table with name, version and private flag</span>
@@ -239,7 +239,7 @@
         <span class="n">match</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">sort_versions</span><span class="p">(</span>
             <span class="n">match</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="n">latest_only</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">only_latest</span><span class="p">:</span>
             <span class="n">match</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">match</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
