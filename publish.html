@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Publish a database &mdash; audb Documentation</title>
@@ -75,7 +74,7 @@
             
             
               <div class="version">
-                v1.0.0
+                v1.0.1
               </div>
             
           
@@ -99,7 +98,7 @@
               
             
             
-              <p><span class="caption-text">Getting started</span></p>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
@@ -117,13 +116,13 @@
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a></li>
 </ul>
-<p><span class="caption-text">API Documentation</span></p>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
 </ul>
-<p><span class="caption-text">Development</span></p>
+<p class="caption"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -179,7 +178,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.0.0/docs/publish.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.0.1/docs/publish.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -201,7 +200,7 @@
 <div class="cell_output docutils container">
 </div>
 </div>
-<section id="publish-a-database">
+<div class="section" id="publish-a-database">
 <span id="publish"></span><h1>Publish a database<a class="headerlink" href="#publish-a-database" title="Permalink to this headline">¶</a></h1>
 <p>To publish a database we need to first create
 and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.10.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
@@ -209,7 +208,7 @@ Afterwards we publish the database to a <a class="reference internal" href="api.
 Finally,
 we add more files
 and release a new version.</p>
-<section id="create-a-database">
+<div class="section" id="create-a-database">
 <h2>Create a database<a class="headerlink" href="#create-a-database" title="Permalink to this headline">¶</a></h2>
 <p>The first one can be done by the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.10.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module,
 which let you easily create a database:</p>
@@ -297,15 +296,15 @@ tables:
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>51</td>
+      <td>37</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>62</td>
+      <td>33</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>88</td>
+      <td>65</td>
     </tr>
   </tbody>
 </table>
@@ -321,8 +320,8 @@ tables:
 <div class="cell_output docutils container">
 </div>
 </div>
-</section>
-<section id="publish-the-first-version">
+</div>
+<div class="section" id="publish-the-first-version">
 <h2>Publish the first version<a class="headerlink" href="#publish-the-first-version" title="Permalink to this headline">¶</a></h2>
 <p>We define a repository on the <a class="reference external" href="https://audeering.github.io/audbackend/api.html#audbackend.FileSystem" title="(in audbackend v0.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.FileSystem</span></code></a> backend
 to publish the database to.</p>
@@ -543,8 +542,8 @@ instead of its default ones.</p>
 </table>
 </div></div></div>
 </div>
-</section>
-<section id="update-a-database">
+</div>
+<div class="section" id="update-a-database">
 <h2>Update a database<a class="headerlink" href="#update-a-database" title="Permalink to this headline">¶</a></h2>
 <p>In a next step we will add another file with age annotation
 to the database.
@@ -604,15 +603,15 @@ and add the age annotation of 22 to it.</p>
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>51</td>
+      <td>37</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>62</td>
+      <td>33</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>88</td>
+      <td>65</td>
     </tr>
     <tr>
       <th>audio/004.wav</th>
@@ -840,8 +839,8 @@ We can again inspect the repository.</p>
 <p>As you can even <a class="reference external" href="https://audeering.github.io/audformat/update-database.html">update one database by another one</a>,
 you could automate the update step
 and let a database grow every day.</p>
-</section>
-<section id="real-world-example">
+</div>
+<div class="section" id="real-world-example">
 <h2>Real world example<a class="headerlink" href="#real-world-example" title="Permalink to this headline">¶</a></h2>
 <p>We published a version of a small German acted emotional speech databases
 called <a class="reference external" href="http://emodb.bilderbar.info/start.html">emodb</a>
@@ -853,8 +852,8 @@ to see how to load and use a database.</p>
 <div class="cell_output docutils container">
 </div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
