@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.2 (2021-04-07)
+--------------------------
+
+* Fixed: renamed ``latest_only`` argument of ``audb.available()``
+  to ``only_latest`` as it was before
+
+
 Version 1.0.1 (2021-04-07)
 --------------------------
 
