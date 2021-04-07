@@ -129,6 +129,9 @@ def test_bit_depth(bit_depth):
     )
     original_files = db['files']['original'].get()
 
+    df = audb2.cached()
+    assert df['bit_depth'].values[0] == bit_depth
+
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
@@ -158,6 +161,8 @@ def test_channels(channels):
     )
     original_files = db['files']['original'].get()
 
+    df = audb2.cached()
+
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
@@ -166,8 +171,10 @@ def test_channels(channels):
         if channels is None:
             assert audiofile.channels(converted_file) == \
                 audiofile.channels(original_file)
+            assert df['channels'].values[0] == channels
         elif isinstance(channels, int):
             assert audiofile.channels(converted_file) == 1
+            assert df['channels'].values[0] == [1]
         else:
             assert audiofile.channels(converted_file) == len(channels)
 
@@ -190,6 +197,9 @@ def test_format(format):
         verbose=False,
     )
     original_files = db['files']['original'].get()
+
+    df = audb2.cached()
+    assert df['format'].values[0] == format
 
     for converted_file, original_file in zip(db.files, original_files):
 
@@ -263,6 +273,9 @@ def test_mixdown(mixdown):
     )
     original_files = db['files']['original'].get()
 
+    df = audb2.cached()
+    assert df['mixdown'].values[0] == mixdown
+
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
@@ -291,6 +304,9 @@ def test_sampling_rate(sampling_rate):
         verbose=False,
     )
     original_files = db['files']['original'].get()
+
+    df = audb2.cached()
+    assert df['sampling_rate'].values[0] == sampling_rate
 
     for converted_file, original_file in zip(db.files, original_files):
 

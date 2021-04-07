@@ -73,6 +73,11 @@ def test_destination(format):
             16, 1, audb2.core.define.Format.WAV, 16000,
         ),
         (
+            16.0, 1, audb2.core.define.Format.WAV, 16000.0,
+            audb2.Flavor(),
+            16, 1, audb2.core.define.Format.WAV, 16000,
+        ),
+        (
             16, 1, audb2.core.define.Format.WAV, 16000,
             audb2.Flavor(bit_depth=32),
             32, 1, audb2.core.define.Format.WAV, 16000,
@@ -188,21 +193,21 @@ def test_call(tmpdir, bit_depth_in, channels_in, format_in, sampling_rate_in,
     file_in = os.path.join(tmpdir, 'in.' + format_in)
     file_out = os.path.join(tmpdir, 'out.' + format_out)
 
-    signal = np.zeros((channels_in, sampling_rate_in), np.float32)
+    signal = np.zeros((channels_in, int(sampling_rate_in)), np.float32)
     if format_in == 'mp3':
         audiofile.write(
             f'{file_in[:-4]}.wav',
             signal,
             sampling_rate_in,
-            bit_depth_in,
+            int(bit_depth_in),
         )
         os.rename(f'{file_in[:-4]}.wav', file_in)
     else:
         audiofile.write(
             file_in,
             signal,
-            sampling_rate_in,
-            bit_depth_in,
+            int(sampling_rate_in),
+            int(bit_depth_in),
         )
 
     flavor(file_in, file_out)

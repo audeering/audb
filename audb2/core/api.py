@@ -136,7 +136,9 @@ def cached(
                     }
                     data[flavor_id_path].update(flavor)
 
-    return pd.DataFrame.from_dict(data, orient='index')
+    df = pd.DataFrame.from_dict(data, orient='index', dtype='object')
+    # Replace NaN with None
+    return df.where(pd.notnull(df), None)
 
 
 def default_cache_root(

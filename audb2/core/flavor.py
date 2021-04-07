@@ -51,6 +51,7 @@ class Flavor(audobject.Object):
             sampling_rate: int = None,
     ):
         if bit_depth is not None:
+            bit_depth = int(bit_depth)
             if bit_depth not in define.BIT_DEPTHS:
                 raise ValueError(
                     f'Bit depth has to be one of '
@@ -70,6 +71,7 @@ class Flavor(audobject.Object):
                 )
 
         if sampling_rate is not None:
+            sampling_rate = int(sampling_rate)
             if sampling_rate not in define.SAMPLING_RATES:
                 raise ValueError(
                     f'Sampling_rate has to be one of '
