@@ -7,6 +7,29 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.0 (2021-04-07)
+--------------------------
+
+* Added: first public release
+* Added: ``audb.info.author()``
+* Added: ``audb.info.license()``
+* Added: ``audb.info.license_url()``
+* Added: ``audb.info.organization()``
+* Added: ``audb.Dependencies.archives`` property
+* Added: section on publication in the documentation
+* Added: introduction texts to documentation
+* Changed: raise error for conversion of non-supported format
+* Changed: ``audb.exists()`` to return bool
+* Changed: rename ``audb.lookup_repository()`` to ``audb.repository()``
+* Changed: one combined section on load in the documentation
+* Fixed: data types in dataframe returned by ``audb.cached()``
+* Fixed: support files stored in archives with nested folders
+* Fixed: listing of cache entries
+* Removed: command line interface
+* Removed: ``audb.cached_databases()``
+* Removed: ``audb.define`` module
+
+
 Version 0.93.0 (2021-03-29)
 ---------------------------
 
