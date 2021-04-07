@@ -60,24 +60,27 @@ def repository(
 
 def mix_mapping(
         mix: str,
+        warn: bool = True,
 ) -> typing.Tuple[typing.Optional[typing.List[int]], bool]:
     r"""Argument mapping for deprecated mix argument.
 
     Args:
         mix: old mix argument from audb,
             can be ``'mono'``, ``'stereo'``, ``'left'``, ``'right'``
+        warn: if ``True`` it shows a deprecation warning
 
     Returns:
         channels and mixdown arguments
 
     """
-    warnings.warn(
-        "Argument 'mix' is deprecated "
-        "and will be removed with version '1.1.0'. "
-        "Use 'channels' and 'mixdown' instead.",
-        category=UserWarning,
-        stacklevel=2,
-    )
+    if warn:
+        warnings.warn(
+            "Argument 'mix' is deprecated "
+            "and will be removed with version '1.1.0'. "
+            "Use 'channels' and 'mixdown' instead.",
+            category=UserWarning,
+            stacklevel=2,
+        )
     if mix == 'mono':
         channels = None
         mixdown = True
