@@ -8,14 +8,14 @@ import audbackend
 import audeer
 import audformat
 
-from audb2.core import define
-from audb2.core.api import (
+from audb.core import define
+from audb.core.api import (
     default_cache_root,
     latest_version,
 )
-from audb2.core.dependencies import Dependencies
-from audb2.core.flavor import Flavor
-from audb2.core.utils import (
+from audb.core.dependencies import Dependencies
+from audb.core.flavor import Flavor
+from audb.core.utils import (
     lookup_backend,
     mix_mapping,
 )
@@ -450,7 +450,7 @@ def load(
     ``bit_depth``, ``channels``, ``format``, ``mixdown``, and ``sampling_rate``
     we can request a specific flavor of the database.
     In that case media files are automatically converted to the desired
-    properties (see also :class:`audb2.Flavor`).
+    properties (see also :class:`audb.Flavor`).
 
     It is possible to filter meta and media files with the arguments
     ``tables`` and ``media``.
@@ -482,7 +482,7 @@ def load(
         removed_media: keep rows that reference removed media
         full_path: replace relative with absolute file paths
         cache_root: cache folder where databases are stored.
-            If not set :meth:`audb2.default_cache_root` is used
+            If not set :meth:`audb.default_cache_root` is used
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5

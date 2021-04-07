@@ -1,7 +1,7 @@
 from setuptools import setup
 
 
-package_data = {'audb2': ['core/etc/*']}
+package_data = {'audb': ['core/etc/*']}
 
 setup(
     use_scm_version=True,

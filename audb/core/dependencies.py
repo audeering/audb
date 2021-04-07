@@ -6,7 +6,7 @@ import pandas as pd
 import audeer
 import audiofile
 
-from audb2.core import define
+from audb.core import define
 
 
 class Dependencies:
@@ -115,7 +115,7 @@ class Dependencies:
     def table_ids(self) -> typing.List[str]:
         r"""Table IDs.
 
-        Like :meth:`audb2.Dependencies.tables`,
+        Like :meth:`audb.Dependencies.tables`,
         but only returns the table ID,
         i.e. ``db.<id>.csv``.
 

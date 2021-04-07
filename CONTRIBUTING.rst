@@ -7,9 +7,9 @@ that need improvement, please create an issue_.
 Contributions are always welcome!
 
 .. _issue:
-    https://gitlab.audeering.com/tools/audb2/issues/new?issue%5BD=
+    https://gitlab.audeering.com/tools/audb/issues/new?issue%5BD=
 .. _merge request:
-    https://gitlab.audeering.com/tools/audb2/merge_requests/new
+    https://gitlab.audeering.com/tools/audb/merge_requests/new
 
 Development Installation
 ------------------------
@@ -17,12 +17,12 @@ Development Installation
 Instead of pip-installing the latest release from PyPI, you should get the
 newest development version from Gitlab_::
 
-    git clone git@srv-app-01.audeering.local:tools/audb2.git
-    cd audb2
+    git clone git@srv-app-01.audeering.local:tools/audb.git
+    cd audb
     # Use virutal environment
     pip install -r requirements.txt
 
-.. _Gitlab: https://gitlab.audeering.com/tools/audb2
+.. _Gitlab: https://gitlab.audeering.com/tools/audb
 
 This way, your installation always stays up-to-date, even if you pull new
 changes from the Gitlab repository.

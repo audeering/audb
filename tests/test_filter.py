@@ -6,12 +6,12 @@ import pytest
 import audformat.testing
 import audeer
 
-import audb2
+import audb
 
 
-os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-audb2.config.REPOSITORIES = pytest.REPOSITORIES
+os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
+audb.config.REPOSITORIES = pytest.REPOSITORIES
 
 
 DB_NAME = f'test_filter-{pytest.ID}'
@@ -87,7 +87,7 @@ def fixture_publish_db():
                 file: table for file in db[table].files
             }
         )
-    audb2.publish(
+    audb.publish(
         DB_ROOT,
         '1.0.0',
         pytest.PUBLISH_REPOSITORY,
@@ -157,7 +157,7 @@ def fixture_clear_cache():
 def test_include_and_exclude(include, exclude, expected_files):
     # Test for backward compatibility
     with pytest.warns(UserWarning):
-        db = audb2.load(
+        db = audb.load(
             DB_NAME,
             include=include,
             exclude=exclude,
@@ -192,7 +192,7 @@ def test_include_and_exclude(include, exclude, expected_files):
     ]
 )
 def test_media(media, expected_files):
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         media=media,
         full_path=False,
@@ -238,7 +238,7 @@ def test_media(media, expected_files):
     ]
 )
 def test_tables(tables, expected_tables, expected_files):
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         tables=tables,
         full_path=False,

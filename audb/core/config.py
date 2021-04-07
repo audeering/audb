@@ -4,11 +4,11 @@ import oyaml as yaml
 
 import audeer
 
-from audb2.core.define import (
+from audb.core.define import (
     CONFIG_FILE,
     USER_CONFIG_FILE,
 )
-from audb2.core.repository import Repository
+from audb.core.repository import Repository
 
 
 def load_configuration_file(config_file: str):
@@ -68,7 +68,7 @@ global_config.update(user_config)
 
 
 class config:
-    """Get/set configuration values for the :mod:`audb2` module.
+    """Get/set configuration values for the :mod:`audb` module.
 
     The configuration values are read in during module import
     from the :ref:`configuration file <configuration>`
@@ -83,10 +83,10 @@ class config:
     Example:
 
         >>> config.CACHE_ROOT
-        '~/audb2'
-        >>> config.CACHE_ROOT = '~/caches/audb2'
+        '~/audb'
+        >>> config.CACHE_ROOT = '~/caches/audb'
         >>> config.CACHE_ROOT
-        '~/caches/audb2'
+        '~/caches/audb'
 
     """
 
@@ -99,10 +99,10 @@ class config:
     ]
     r"""Repositories, will be iterated in given order.
 
-    A repository is defined by the object :class:`audb2.Repository`,
+    A repository is defined by the object :class:`audb.Repository`,
     containing the following attributes:
 
-    * :attr:`audb2.Repository.name`: repository name, e.g. ``'data-local'``
+    * :attr:`audb.Repository.name`: repository name, e.g. ``'data-local'``
     * :attr:`aub2.Repository.backend`: backend name, e.g. ``'artifactory'``
     * :attr:`audb.Repository.host`: host name,
       e.g. ``'https://artifactory.audeering.com/artifactory'``

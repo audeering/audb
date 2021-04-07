@@ -3,7 +3,7 @@
     :hide-code:
     :hide-output:
 
-    import audb2
+    import audb
     import pandas as pd
 
     pd.set_option('display.max_columns', 7)
@@ -26,11 +26,11 @@ like duration and number of channels
 in a dependency table in a file :file:`db.csv`
 for every version of a database.
 
-You request a :class:`audb2.Dependencies` object with:
+You request a :class:`audb.Dependencies` object with:
 
 .. jupyter-execute::
 
-    deps = audb2.dependencies('emodb', version='1.1.0')
+    deps = audb.dependencies('emodb', version='1.1.0')
 
 You can see all entries with
 

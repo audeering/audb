@@ -1,7 +1,7 @@
-audb2
-=====
+audb
+====
 
-.. automodule:: audb2
+.. automodule:: audb
 
 available
 ---------

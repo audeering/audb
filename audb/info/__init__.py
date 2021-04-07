@@ -2,7 +2,7 @@ r"""Get information from database headers.
 
 Instead of caching the header (:file:`db.yaml`)
 of a database first locally to inspect it,
-the functions under :mod:`audb2.info`
+the functions under :mod:`audb.info`
 provide you direct access to this information.
 
 So instead of running:
@@ -12,10 +12,10 @@ So instead of running:
     :hide-code:
     :hide-output:
 
-    import audb2
+    import audb
 
 
-    audb2.load(
+    audb.load(
         'emodb',
         version='1.1.0',
         only_metadata=True,
@@ -25,7 +25,7 @@ So instead of running:
 
 .. jupyter-execute::
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         only_metadata=True,
@@ -36,13 +36,13 @@ You can run:
 
 .. jupyter-execute::
 
-    audb2.info.tables(
+    audb.info.tables(
         'emodb',
         version='1.1.0',
     )
 
 """
-from audb2.core.info import (
+from audb.core.info import (
     author,
     bit_depths,
     channels,

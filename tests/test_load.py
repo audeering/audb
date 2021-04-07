@@ -9,12 +9,12 @@ import audiofile
 import audformat.testing
 import audeer
 
-import audb2
+import audb
 
 
-os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-audb2.config.REPOSITORIES = pytest.REPOSITORIES
+os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
+audb.config.REPOSITORIES = pytest.REPOSITORIES
 
 
 DB_NAME = f'test_load-{pytest.ID}'
@@ -69,7 +69,7 @@ def fixture_publish_db():
     audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
     db.save(DB_ROOT_VERSION['1.0.0'])
     archives = db['files']['speaker'].get().dropna().to_dict()
-    audb2.publish(
+    audb.publish(
         DB_ROOT_VERSION['1.0.0'],
         '1.0.0',
         pytest.PUBLISH_REPOSITORY,
@@ -90,7 +90,7 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['1.0.0'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
     )
-    audb2.publish(
+    audb.publish(
         DB_ROOT_VERSION['1.1.0'],
         '1.1.0',
         pytest.PUBLISH_REPOSITORY,
@@ -107,7 +107,7 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
     )
-    audb2.publish(
+    audb.publish(
         DB_ROOT_VERSION['1.1.1'],
         '1.1.1',
         pytest.PUBLISH_REPOSITORY,
@@ -130,7 +130,7 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
     )
-    audb2.publish(
+    audb.publish(
         DB_ROOT_VERSION['2.0.0'],
         '2.0.0',
         pytest.PUBLISH_REPOSITORY,
@@ -147,7 +147,7 @@ def fixture_publish_db():
         os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['3.0.0'], 'db.csv'),
     )
-    audb2.publish(
+    audb.publish(
         DB_ROOT_VERSION['3.0.0'],
         '3.0.0',
         pytest.PUBLISH_REPOSITORY,
@@ -176,9 +176,9 @@ def fixture_publish_db():
 )
 def test_load(version):
 
-    assert not audb2.exists(DB_NAME, version=version)
+    assert not audb.exists(DB_NAME, version=version)
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=version,
         full_path=False,
@@ -187,10 +187,10 @@ def test_load(version):
     )
     db_root = db.meta['audb']['root']
 
-    assert audb2.exists(DB_NAME, version=version)
+    assert audb.exists(DB_NAME, version=version)
 
     if version is None:
-        resolved_version = audb2.latest_version(DB_NAME)
+        resolved_version = audb.latest_version(DB_NAME)
     else:
         resolved_version = version
     db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
@@ -205,16 +205,16 @@ def test_load(version):
             db[table].df,
         )
 
-    df = audb2.cached()
+    df = audb.cached()
     assert df.loc[db_root]['version'] == resolved_version
 
-    deps = audb2.dependencies(DB_NAME, version=version)
+    deps = audb.dependencies(DB_NAME, version=version)
     assert str(deps().to_string()) == str(deps)
     assert len(deps) == len(db.files) + len(db.tables)
 
     # from cache with full path
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=version,
         full_path=True,
@@ -246,7 +246,7 @@ def test_load_to(version):
 
     db_root = os.path.join(DB_ROOT, 'raw')
 
-    db = audb2.load_to(
+    db = audb.load_to(
         db_root,
         DB_NAME,
         version=version,
@@ -255,7 +255,7 @@ def test_load_to(version):
     )
 
     if version is None:
-        version = audb2.latest_version(DB_NAME)
+        version = audb.latest_version(DB_NAME)
     db_original = audformat.Database.load(DB_ROOT_VERSION[version])
 
     pd.testing.assert_index_equal(db.files, db_original.files)
@@ -285,5 +285,5 @@ def test_load_to(version):
     ]
 )
 def test_repository(name, version):
-    repository = audb2.repository(name, version)
+    repository = audb.repository(name, version)
     assert repository == pytest.PUBLISH_REPOSITORY

@@ -9,12 +9,12 @@ import audeer
 import audformat.testing
 import audiofile
 
-import audb2
+import audb
 
 
-os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-audb2.config.REPOSITORIES = pytest.REPOSITORIES
+os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
+audb.config.REPOSITORIES = pytest.REPOSITORIES
 
 
 DB_NAME = f'test_publish-{pytest.ID}'
@@ -107,7 +107,7 @@ def test_invalid_archives(name):
         os.path.join('audio', '001.wav'): name
     }
     with pytest.raises(ValueError):
-        audb2.publish(
+        audb.publish(
             DB_ROOT_VERSION['1.0.0'],
             '1.0.1',
             pytest.PUBLISH_REPOSITORY,
@@ -147,12 +147,12 @@ def test_publish(version):
 
     db = audformat.Database.load(DB_ROOT_VERSION[version])
 
-    if not audb2.versions(DB_NAME):
+    if not audb.versions(DB_NAME):
         with pytest.raises(RuntimeError):
-            audb2.latest_version(DB_NAME)
+            audb.latest_version(DB_NAME)
 
     archives = db['files']['speaker'].get().dropna().to_dict()
-    deps = audb2.publish(
+    deps = audb.publish(
         DB_ROOT_VERSION[version],
         version,
         pytest.PUBLISH_REPOSITORY,
@@ -161,7 +161,7 @@ def test_publish(version):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    backend = audb2.core.utils.lookup_backend(DB_NAME, version)
+    backend = audb.core.utils.lookup_backend(DB_NAME, version)
     number_of_files = len(set(archives.keys()))
     number_of_archives = len(set(archives.values()))
     assert len(deps.files) - len(deps.archives) == (
@@ -170,7 +170,7 @@ def test_publish(version):
     for archive in set(archives.values()):
         assert archive in deps.archives
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=version,
         full_path=False,
@@ -178,17 +178,17 @@ def test_publish(version):
     )
     assert db.name == DB_NAME
 
-    versions = audb2.versions(DB_NAME)
-    latest_version = audb2.latest_version(DB_NAME)
+    versions = audb.versions(DB_NAME)
+    latest_version = audb.latest_version(DB_NAME)
 
     assert version in versions
     assert latest_version == versions[-1]
 
-    df = audb2.available(latest_only=False)
+    df = audb.available(latest_only=False)
     assert DB_NAME in df.index
     assert set(df[df.index == DB_NAME]['version']) == set(versions)
 
-    df = audb2.available(latest_only=True)
+    df = audb.available(latest_only=True)
     assert DB_NAME in df.index
     assert df[df.index == DB_NAME]['version'][0] == latest_version
 
@@ -199,8 +199,8 @@ def test_publish(version):
         path = os.path.join(DB_ROOT_VERSION[version], file)
         assert deps.checksum(file) == audbackend.md5(path)
         if deps.format(file) in [
-            audb2.core.define.Format.WAV,
-            audb2.core.define.Format.FLAC,
+            audb.core.define.Format.WAV,
+            audb.core.define.Format.FLAC,
         ]:
             assert deps.bit_depth(file) == audiofile.bit_depth(path)
             assert deps.channels(file) == audiofile.channels(path)
@@ -250,8 +250,8 @@ def test_publish(version):
 )
 def test_publish_changed_db(version1, version2, media_difference):
 
-    depend1 = audb2.dependencies(DB_NAME, version=version1)
-    depend2 = audb2.dependencies(DB_NAME, version=version2)
+    depend1 = audb.dependencies(DB_NAME, version=version1)
+    depend2 = audb.dependencies(DB_NAME, version=version2)
 
     media1 = set(sorted(depend1.media))
     media2 = set(sorted(depend2.media))
@@ -287,7 +287,7 @@ def test_publish_error_messages():
 
         with pytest.raises(RuntimeError, match=re.escape(error_msg)):
 
-            audb2.publish(
+            audb.publish(
                 DB_ROOT_VERSION[version],
                 version,
                 pytest.PUBLISH_REPOSITORY,
@@ -302,7 +302,7 @@ def test_update_database():
     version = '2.1.0'
     start_version = '2.0.0'
 
-    db = audb2.load_to(
+    db = audb.load_to(
         DB_ROOT_VERSION[version],
         DB_NAME,
         version=start_version,
@@ -314,22 +314,22 @@ def test_update_database():
     previous_version = start_version
     dep_file = os.path.join(
         DB_ROOT_VERSION[version],
-        audb2.core.define.DEPENDENCIES_FILE,
+        audb.core.define.DEPENDENCIES_FILE,
     )
     os.remove(dep_file)
     print(audeer.list_file_names(DB_ROOT_VERSION[version]))
     error_msg = (
         f"You want to depend on '{previous_version}' "
         f"of {DB_NAME}, "
-        f"but you don't have a '{audb2.core.define.DEPENDENCIES_FILE}' "
+        f"but you don't have a '{audb.core.define.DEPENDENCIES_FILE}' "
         f"file present "
         f"in {DB_ROOT_VERSION[version]}. "
         f"Did you forgot to call "
-        f"'audb2.load_to({DB_ROOT_VERSION[version]}, {DB_NAME}, "
+        f"'audb.load_to({DB_ROOT_VERSION[version]}, {DB_NAME}, "
         f"version={previous_version}?"
     )
     with pytest.raises(RuntimeError, match=re.escape(error_msg)):
-        audb2.publish(
+        audb.publish(
             DB_ROOT_VERSION[version],
             version,
             pytest.PUBLISH_REPOSITORY,
@@ -340,7 +340,7 @@ def test_update_database():
 
     # Reload data to restore dependency file
     shutil.rmtree(DB_ROOT_VERSION[version])
-    db = audb2.load_to(
+    db = audb.load_to(
         DB_ROOT_VERSION[version],
         DB_NAME,
         version=start_version,
@@ -357,20 +357,20 @@ def test_update_database():
     # == Fail as 2.0.0 is not the latest version
     previous_version = 'latest'
     error_msg = (
-        f"You want to depend on '{audb2.latest_version(DB_NAME)}' "
+        f"You want to depend on '{audb.latest_version(DB_NAME)}' "
         f"of {DB_NAME}, "
         f"but the MD5 sum of your "
-        f"'{audb2.core.define.DEPENDENCIES_FILE}' file "
+        f"'{audb.core.define.DEPENDENCIES_FILE}' file "
         f"in {DB_ROOT_VERSION[version]} "
         f"does not match the MD5 sum of the corresponding file "
         f"for the requested version in the repository. "
         f"Did you forgot to call "
-        f"'audb2.load_to({DB_ROOT_VERSION[version]}, {DB_NAME}, "
-        f"version='{audb2.latest_version(DB_NAME)}') "
+        f"'audb.load_to({DB_ROOT_VERSION[version]}, {DB_NAME}, "
+        f"version='{audb.latest_version(DB_NAME)}') "
         f"or modified the file manually?"
     )
     with pytest.raises(RuntimeError, match=re.escape(error_msg)):
-        audb2.publish(
+        audb.publish(
             DB_ROOT_VERSION[version],
             version,
             pytest.PUBLISH_REPOSITORY,
@@ -383,11 +383,11 @@ def test_update_database():
     previous_version = None
     error_msg = (
         f"You did not set a dependency to a previous version, "
-        f"but you have a '{audb2.core.define.DEPENDENCIES_FILE}' file present "
+        f"but you have a '{audb.core.define.DEPENDENCIES_FILE}' file present "
         f"in {DB_ROOT_VERSION[version]}."
     )
     with pytest.raises(RuntimeError, match=re.escape(error_msg)):
-        audb2.publish(
+        audb.publish(
             DB_ROOT_VERSION[version],
             version,
             pytest.PUBLISH_REPOSITORY,
@@ -397,7 +397,7 @@ def test_update_database():
         )
 
     previous_version = start_version
-    deps = audb2.publish(
+    deps = audb.publish(
         DB_ROOT_VERSION[version],
         version,
         pytest.PUBLISH_REPOSITORY,
@@ -413,14 +413,14 @@ def test_update_database():
 
     # Check that there is no difference in the database
     # if published from scratch or from previous version
-    db1 = audb2.load(
+    db1 = audb.load(
         DB_NAME,
         version=version,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    db2 = audb2.load(
+    db2 = audb.load(
         DB_NAME,
         version='3.0.0',
         full_path=False,

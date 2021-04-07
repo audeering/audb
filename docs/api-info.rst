@@ -1,7 +1,7 @@
-audb2.info
+audb.info
 ==========
 
-.. automodule:: audb2.info
+.. automodule:: audb.info
 
 author
 ------

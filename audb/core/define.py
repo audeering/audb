@@ -70,7 +70,7 @@ DEPEND_TYPE_NAMES = {
 class Format:
     r"""Media formats.
 
-    Media formats :meth:`audb2.load` can convert to on request.
+    Media formats :meth:`audb.load` can convert to on request.
 
     """
     WAV = 'wav'

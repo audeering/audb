@@ -3,8 +3,8 @@ import warnings
 
 import audbackend
 
-from audb2.core.config import config
-from audb2.core.repository import Repository
+from audb.core.config import config
+from audb.core.repository import Repository
 
 
 def lookup_backend(

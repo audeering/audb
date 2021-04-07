@@ -6,12 +6,12 @@ import pandas as pd
 
 import audformat
 
-from audb2.core import define
-from audb2.core.api import (
+from audb.core import define
+from audb.core.api import (
     dependencies,
     latest_version,
 )
-from audb2.core.utils import lookup_backend
+from audb.core.utils import lookup_backend
 
 
 def author(
@@ -154,7 +154,7 @@ def header(
 
     Downloads the :file:`db.yaml` to a temporal directory,
     loads the database header and returns it.
-    Does not write to the :mod:`audb2` cache folders.
+    Does not write to the :mod:`audb` cache folders.
 
     Args:
         name: name of database

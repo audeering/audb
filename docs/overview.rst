@@ -1,7 +1,7 @@
 Overview
 ========
 
-:mod:`audb2` is similar to a version control system
+:mod:`audb` is similar to a version control system
 for text and binary data.
 It allows to manage your databases
 for machine learning applications
@@ -16,7 +16,7 @@ without the need to copy data
 that hasn't changed between the different versions.
 
 In the following we provide a technical overview
-of the underlying workings of :mod:`audb2`.
+of the underlying workings of :mod:`audb`.
 If you just want to use it,
 you might read on at :ref:`publish`
 or :ref:`load`.
@@ -25,7 +25,7 @@ or :ref:`load`.
 Backends
 --------
 
-:mod:`audb2` abstracts the database storage
+:mod:`audb` abstracts the database storage
 by using the :mod:`audbackend` package
 to communicate with the underlying backend.
 At the moment,
@@ -38,7 +38,7 @@ You could easily expand this,
 by adding your own backend
 that `implements the required functions`_.
 
-Storage on backends are managed by :class:`audb2.Repository`
+Storage on backends are managed by :class:`audb.Repository`
 objects.
 For example,
 to store all your data
@@ -48,17 +48,17 @@ you would use the following repository:
 .. jupyter-execute::
     :hide-code:
 
-    import audb2
+    import audb
 
 .. jupyter-execute::
 
-    repository = audb2.Repository(
+    repository = audb.Repository(
         name='data-local',
         host='/data',
         backend='file-system',
     )
 
-The default repositories are stored in :attr:`audb2.config.REPOSITORIES`
+The default repositories are stored in :attr:`audb.config.REPOSITORIES`
 and can be managed best
 by specifying them in the :ref:`configuration`.
 
@@ -67,7 +67,7 @@ Publish
 -------
 
 When publishing your data
-with :func:`audb2.publish`
+with :func:`audb.publish`
 the following operations are performed:
 
 1. calculates :ref:`database dependencies <database-dependencies>`
@@ -81,7 +81,7 @@ Load
 ----
 
 In the process of loading data
-with :func:`audb2.load`
+with :func:`audb.load`
 the following operations are performed:
 
 1. finds the backends where the database is stored

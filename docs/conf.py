@@ -4,7 +4,7 @@ import os
 import subprocess
 
 
-import audb2
+import audb
 
 
 config = configparser.ConfigParser()
@@ -82,23 +82,23 @@ html_title = title
 
 # cache databases to avoid progress bar in code examples
 
-if not audb2.exists('emodb', version='1.1.0'):
+if not audb.exists('emodb', version='1.1.0'):
     print('Pre-caching emodb v1.1.0')
-    audb2.load(
+    audb.load(
         'emodb',
         version='1.1.0',
         num_workers=5,
         only_metadata=True,
         verbose=False,
     )
-if not audb2.exists(
+if not audb.exists(
         'emodb',
         version='1.1.0',
         format='flac',
         sampling_rate=44100,
 ):
     print('Pre-caching emodb v1.1.0 {flac, 44100Hz}')
-    audb2.load(
+    audb.load(
         'emodb',
         version='1.1.0',
         format='flac',

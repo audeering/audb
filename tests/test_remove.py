@@ -6,12 +6,12 @@ import pytest
 import audformat.testing
 import audeer
 
-import audb2
+import audb
 
 
-os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-audb2.config.REPOSITORIES = pytest.REPOSITORIES
+os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
+audb.config.REPOSITORIES = pytest.REPOSITORIES
 
 
 DB_NAME = f'test_remove-{pytest.ID}'
@@ -54,7 +54,7 @@ def publish_db():
         db.files[0]: 'bundle',
         db.files[1]: 'bundle',
     }
-    audb2.publish(
+    audb.publish(
         DB_ROOT,
         '1.0.0',
         pytest.PUBLISH_REPOSITORY,
@@ -70,7 +70,7 @@ def publish_db():
     )
     audformat.testing.create_audio_files(db, DB_ROOT)
     db.save(DB_ROOT)
-    audb2.publish(
+    audb.publish(
         DB_ROOT,
         '2.0.0',
         pytest.PUBLISH_REPOSITORY,
@@ -100,11 +100,11 @@ def test_remove(publish_db, format):
             DB_FILES['2.0.0'][0],  # new
     ):
 
-        audb2.remove_media(DB_NAME, remove)
+        audb.remove_media(DB_NAME, remove)
 
         for removed_media in [False, True]:
 
-            for version in audb2.versions(DB_NAME):
+            for version in audb.versions(DB_NAME):
 
                 if remove in DB_FILES[version]:
 
@@ -114,7 +114,7 @@ def test_remove(publish_db, format):
                     else:
                         removed_file = remove
 
-                    db = audb2.load(
+                    db = audb.load(
                         DB_NAME,
                         version=version,
                         format=format,
@@ -133,6 +133,6 @@ def test_remove(publish_db, format):
                     )
 
         # Make sure calling it again doesn't raise error
-        audb2.remove_media(DB_NAME, remove)
+        audb.remove_media(DB_NAME, remove)
         # remove db from cache to ensure we always get a fresh copy
         shutil.rmtree(db.meta['audb']['root'])

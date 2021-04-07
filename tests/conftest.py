@@ -4,7 +4,7 @@ import shutil
 
 import pytest
 
-import audb2
+import audb
 import audeer
 
 
@@ -22,7 +22,7 @@ pytest.ID = audeer.uid()
 pytest.NUM_WORKERS = 5
 pytest.REPOSITORY_NAME = 'data-unittests-local'
 pytest.REPOSITORIES = [
-    audb2.Repository(
+    audb.Repository(
         name=pytest.REPOSITORY_NAME,
         host=pytest.FILE_SYSTEM_HOST,
         backend=pytest.BACKEND,

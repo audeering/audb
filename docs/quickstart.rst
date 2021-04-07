@@ -4,15 +4,15 @@ Quickstart
 ==========
 
 The most common task is to load a database
-with :func:`audb2.load`.
+with :func:`audb.load`.
 
 Let's first see which databases are available to load:
 
 .. jupyter-execute::
 
-    import audb2
+    import audb
 
-    audb2.available()
+    audb.available()
 
 As you can see we provide the emodb_ database
 as small example database,
@@ -24,7 +24,7 @@ Let's load the database:
 .. jupyter-execute::
     :hide-code:
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         only_metadata=True,
@@ -33,7 +33,7 @@ Let's load the database:
 
 .. code-block:: python
 
-    db = audb2.load('emodb', version='1.1.0', verbose=False)
+    db = audb.load('emodb', version='1.1.0', verbose=False)
 
 This downloads the database header,
 all the media files,

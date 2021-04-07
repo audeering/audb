@@ -2,7 +2,7 @@ import pandas as pd
 
 import audeer
 
-from audb2.core.api import default_cache_root
+from audb.core.api import default_cache_root
 
 
 @audeer.deprecated(

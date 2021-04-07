@@ -1,9 +1,9 @@
-cache_root: ~/audb2
-shared_cache_root: /data/audb2
+cache_root: ~/audb
+shared_cache_root: /data/audb
 repositories:
   - name: data-public
     backend: artifactory
     host: https://audeering.jfrog.io/artifactory
   - name: data-local
     backend: file-system
-    host: ~/audb2-host
+    host: ~/audb-host

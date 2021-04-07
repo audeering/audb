@@ -3,14 +3,14 @@ import os
 import pytest
 
 
-import audb2
+import audb
 
 
-os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
+os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 
 
 def test_get_default_cache_root():
     with pytest.warns(UserWarning):
-        cache = audb2.get_default_cache_root()
-    assert cache == audb2.default_cache_root()
+        cache = audb.get_default_cache_root()
+    assert cache == audb.default_cache_root()

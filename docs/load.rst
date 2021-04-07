@@ -3,7 +3,7 @@
     :hide-code:
     :hide-output:
 
-    import audb2
+    import audb
     import pandas as pd
 
 
@@ -31,7 +31,7 @@ To load a database you only need its name.
 However,
 we recommend to specify its version as well.
 This is not needed,
-as :func:`audb2.load` searches automatically
+as :func:`audb.load` searches automatically
 for the latest available version,
 but it will ensure your code returns the same data,
 even if a new version of the database is published.
@@ -40,7 +40,7 @@ even if a new version of the database is published.
 .. jupyter-execute::
     :hide-code:
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         only_metadata=True,
@@ -49,13 +49,13 @@ even if a new version of the database is published.
 
 .. code-block:: python
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         verbose=False,
     )
 
-:func:`audb2.load` will download the data,
+:func:`audb.load` will download the data,
 store them in a cache folder,
 and return the database as an :class:`audformat.Database` object.
 The most important content of that object
@@ -102,7 +102,7 @@ Media conversion and flavors
 When loading a database,
 audio files can be automatically converted.
 This creates a new flavor of the database,
-represented by :class:`audb2.Flavor`.
+represented by :class:`audb.Flavor`.
 The following properties can be changed:
 
 .. code-block:: yaml
@@ -138,7 +138,7 @@ inside the :ref:`cache <caching>`.
 .. jupyter-execute::
     :hide-code:
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         format='flac',
@@ -149,7 +149,7 @@ inside the :ref:`cache <caching>`.
 
 .. code-block:: python
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         format='flac',
@@ -167,7 +167,7 @@ You can list all available flavors and their locations in the cache with:
 
 .. jupyter-execute::
 
-    df = audb2.cached()
+    df = audb.cached()
     df[['name', 'version', 'complete', 'sampling_rate']]
 
 The entry ``'complete'`` tells you if a database flavor is completely cached,
@@ -187,7 +187,7 @@ but all the tables and the header:
 
 .. jupyter-execute::
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         only_metadata=True,
@@ -197,14 +197,14 @@ but all the tables and the header:
 For databases with many annotations,
 this can still take some time.
 If you are only interested in header information,
-you can use :func:`audb2.info.header`.
+you can use :func:`audb.info.header`.
 Or if you are only interested
 in parts of the header,
 like table definitions:
 
 .. jupyter-execute::
 
-    audb2.info.tables(
+    audb.info.tables(
         'emodb',
         version='1.1.0',
     )
@@ -213,12 +213,12 @@ And to get the total duration of all media files:
 
 .. jupyter-execute::
 
-    audb2.info.duration(
+    audb.info.duration(
         'emodb',
         version='1.1.0',
     )
 
-See :mod:`audb2.info` for a list of all available options.
+See :mod:`audb.info` for a list of all available options.
 
 
 .. _filter:
@@ -243,7 +243,7 @@ about the speakers (here ``db['files']``):
 
 .. jupyter-execute::
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         tables=['files'],
@@ -283,7 +283,7 @@ only the data of this speaker.
 .. jupyter-execute::
     :hide-code:
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         media=media,
@@ -294,7 +294,7 @@ only the data of this speaker.
 
 .. code-block:: python
 
-    db = audb2.load(
+    db = audb.load(
         'emodb',
         version='1.1.0',
         media=media,

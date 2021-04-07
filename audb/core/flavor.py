@@ -9,13 +9,13 @@ import audiofile
 import audobject
 import audresample
 
-from audb2.core import define
+from audb.core import define
 
 
 class Flavor(audobject.Object):
     r"""Database flavor.
 
-    Helper class used by :meth:`audb2.load`
+    Helper class used by :meth:`audb.load`
     to convert media files to the desired format.
     It stores the meta information about a flavor
     and offers a convenient way to convert files to it.

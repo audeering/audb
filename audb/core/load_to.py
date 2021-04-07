@@ -6,10 +6,10 @@ import audbackend
 import audeer
 import audformat
 
-from audb2.core import define
-from audb2.core.api import latest_version
-from audb2.core.dependencies import Dependencies
-from audb2.core.utils import lookup_backend
+from audb.core import define
+from audb.core.api import latest_version
+from audb.core.dependencies import Dependencies
+from audb.core.utils import lookup_backend
 
 
 def _find_media(

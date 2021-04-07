@@ -46,10 +46,10 @@ Version 0.92.0 (2021-03-09)
 Version 0.91.0 (2021-02-19)
 ---------------------------
 
-* Added: ``audb2.Backend.latest_version()``
-* Added: ``audb2.Backend.create()``
-* Added: ``audb2.Backend.register()``
-* Added: ``audb2.lookup_repository()``
+* Added: ``audb.Backend.latest_version()``
+* Added: ``audb.Backend.create()``
+* Added: ``audb.Backend.register()``
+* Added: ``audb.lookup_repository()``
 * Added: ``config.REPOSITORY_PUBLISH``
 * Fixed: update ``fire`` dependency
 * Fixed: remove ``config.GROUP_ID``

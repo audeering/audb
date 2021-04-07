@@ -30,7 +30,7 @@ Publish a database
 
 To publish a database we need to first create
 and store a database in :mod:`audformat`.
-Afterwards we publish the database to a :class:`audb2.Repository`.
+Afterwards we publish the database to a :class:`audb.Repository`.
 Finally,
 we add more files
 and release a new version.
@@ -89,9 +89,9 @@ to publish the database to.
 
 .. jupyter-execute::
 
-    import audb2
+    import audb
 
-    repository = audb2.Repository(
+    repository = audb.Repository(
         name='data-local',
         host='./data',
         backend='file-system',
@@ -103,9 +103,9 @@ and pick a version for publishing it.
 
 .. jupyter-execute::
 
-    deps = audb2.publish(build_dir, '1.0.0', repository, verbose=False)
+    deps = audb.publish(build_dir, '1.0.0', repository, verbose=False)
 
-It returns a :class:`audb2.Dependencies` object
+It returns a :class:`audb.Dependencies` object
 that specifies
 which files are part of the database
 in which archives they are stored,
@@ -141,13 +141,13 @@ inside :file:`db-1.0.0.zip`.
 
 To load the database,
 or see which databases are available in your repository,
-we need to tell :mod:`audb2` that it should use our repository
+we need to tell :mod:`audb` that it should use our repository
 instead of its default ones.
 
 .. jupyter-execute::
 
-    audb2.config.REPOSITORIES = [repository]
-    audb2.available()
+    audb.config.REPOSITORIES = [repository]
+    audb.available()
 
 
 Update a database
@@ -163,7 +163,7 @@ to a new folder.
 .. jupyter-execute::
 
     build_dir = './age-test-1.1.0'
-    db = audb2.load_to(build_dir, 'age-test', version='1.0.0', verbose=False)
+    db = audb.load_to(build_dir, 'age-test', version='1.0.0', verbose=False)
 
 Then we extend the age table by another file (:file:`audio/004.wav`)
 and add the age annotation of 22 to it.
@@ -185,13 +185,13 @@ Now we overwrite the table stored in the database build folder.
 
 Publishing works as before,
 but this time we have to specify a version where our update should be based on.
-:func:`audb2.publish` will then automatically figure out
+:func:`audb.publish` will then automatically figure out
 which files have changed
 and will only publish those.
 
 .. jupyter-execute::
 
-    deps = audb2.publish(
+    deps = audb.publish(
         build_dir,
         '1.1.0',
         repository,
@@ -214,7 +214,7 @@ And check which databases are available.
 
 .. jupyter-execute::
 
-    audb2.available()
+    audb.available()
 
 As you can even `update one database by another one`_,
 you could automate the update step
@@ -226,7 +226,7 @@ Real world example
 
 We published a version of a small German acted emotional speech databases
 called emodb_
-in the default Artifactory repository of :mod:`audb2`.
+in the default Artifactory repository of :mod:`audb`.
 You can find the example code at
 and can continue at :ref:`load`
 to see how to load and use a database.

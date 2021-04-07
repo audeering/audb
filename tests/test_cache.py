@@ -3,11 +3,11 @@ import pytest
 
 import audeer
 
-import audb2
+import audb
 
 
-os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
+os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 
 
 @pytest.mark.parametrize(
@@ -18,4 +18,4 @@ os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
     ]
 )
 def test_cache_root(shared, expected):
-    assert audb2.default_cache_root(shared=shared) == expected
+    assert audb.default_cache_root(shared=shared) == expected

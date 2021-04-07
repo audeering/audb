@@ -22,5 +22,5 @@ Have a look at the installation_ and quickstart_ instructions.
 
 .. _common format: https://audeering.github.io/audformat/
 .. _Artifactory: https://jfrog.com/artifactory/
-.. _installation: http://tools.pp.audeering.com/audb2/install.html
-.. _quickstart: http://tools.pp.audeering.com/audb2/quickstart.html
+.. _installation: http://tools.pp.audeering.com/audb/install.html
+.. _quickstart: http://tools.pp.audeering.com/audb/quickstart.html

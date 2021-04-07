@@ -9,11 +9,11 @@ import audbackend
 import audeer
 import audformat
 
-from audb2.core import define
-from audb2.core.config import config
-from audb2.core.dependencies import Dependencies
-from audb2.core.flavor import Flavor
-from audb2.core.utils import (
+from audb.core import define
+from audb.core.config import config
+from audb.core.dependencies import Dependencies
+from audb.core.flavor import Flavor
+from audb.core.utils import (
     lookup_backend,
     mix_mapping,
 )
@@ -86,7 +86,7 @@ def cached(
 
     Args:
         cache_root: cache folder where databases are stored.
-            If not set :meth:`audb2.default_cache_root` is used
+            If not set :meth:`audb.default_cache_root` is used
         shared: list shared databases
 
     Returns:
@@ -149,15 +149,15 @@ def default_cache_root(
     If ``shared`` is ``True``,
     returns the path specified
     by the environment variable
-    ``AUDB2_SHARED_CACHE_ROOT``
+    ``AUDB_SHARED_CACHE_ROOT``
     or
-    ``audb2.config.SHARED_CACHE_ROOT``.
+    ``audb.config.SHARED_CACHE_ROOT``.
     If ``shared`` is ``False``,
     returns the path specified
     by the environment variable
-    ``AUDB2_CACHE_ROOT``
+    ``AUDB_CACHE_ROOT``
     or
-    ``audb2.config.CACHE_ROOT``.
+    ``audb.config.CACHE_ROOT``.
 
     Args:
         shared: if ``True`` returns path to shared cache folder
@@ -168,12 +168,12 @@ def default_cache_root(
     """
     if shared:
         cache = (
-            os.environ.get('AUDB2_SHARED_CACHE_ROOT')
+            os.environ.get('AUDB_SHARED_CACHE_ROOT')
             or config.SHARED_CACHE_ROOT
         )
     else:
         cache = (
-            os.environ.get('AUDB2_CACHE_ROOT')
+            os.environ.get('AUDB_CACHE_ROOT')
             or config.CACHE_ROOT
         )
     return audeer.safe_path(cache)
@@ -233,7 +233,7 @@ def exists(
 
     .. code-block::
 
-        if audb2.exists('emodb', version='1.1.0', mixdown=True):
+        if audb.exists('emodb', version='1.1.0', mixdown=True):
             print('emodb v1.1.0 {mono} cached')
 
     Does not check for any flavor of the requested database in the cache,
@@ -245,7 +245,7 @@ def exists(
 
     .. code-block::
 
-        audb2.cached().query('name == "emodb"')
+        audb.cached().query('name == "emodb"')
 
     Args:
         name: name of database
@@ -257,7 +257,7 @@ def exists(
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
         cache_root: cache folder where databases are stored.
-            If not set :meth:`audb2.default_cache_root` is used
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         ``True`` if database flavor exists
@@ -311,7 +311,7 @@ def flavor_path(
 ) -> str:
     r"""Flavor cache path.
 
-    Returns the path under which :func:`audb2.load` stores a specific
+    Returns the path under which :func:`audb.load` stores a specific
     flavor of a database in the cache folder, that is:
 
      ``<name>/<version>/<flavor-id>/``
@@ -322,8 +322,8 @@ def flavor_path(
     .. code-block::
 
         os.path.join(
-            audb2.default_cache_root(...),
-            audb2.flavor_path(...),
+            audb.default_cache_root(...),
+            audb.flavor_path(...),
         )
 
     Args:

@@ -1,5 +1,5 @@
-from audb2 import info
-from audb2.core.api import (
+from audb import info
+from audb.core.api import (
     available,
     cached,
     default_cache_root,
@@ -10,15 +10,15 @@ from audb2.core.api import (
     remove_media,
     versions,
 )
-from audb2.core.backward import get_default_cache_root
-from audb2.core.config import config
-from audb2.core.dependencies import Dependencies
-from audb2.core.flavor import Flavor
-from audb2.core.load import load
-from audb2.core.load_to import load_to
-from audb2.core.publish import publish
-from audb2.core.repository import Repository
-from audb2.core.utils import repository
+from audb.core.backward import get_default_cache_root
+from audb.core.config import config
+from audb.core.dependencies import Dependencies
+from audb.core.flavor import Flavor
+from audb.core.load import load
+from audb.core.load_to import load_to
+from audb.core.publish import publish
+from audb.core.repository import Repository
+from audb.core.utils import repository
 
 
 __all__ = []

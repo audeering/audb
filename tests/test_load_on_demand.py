@@ -9,12 +9,12 @@ import audiofile
 import audformat.testing
 import audeer
 
-import audb2
+import audb
 
 
-os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-audb2.config.REPOSITORIES = pytest.REPOSITORIES
+os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
+audb.config.REPOSITORIES = pytest.REPOSITORIES
 
 
 DB_NAME = f'test_load_on_demand-{pytest.ID}'
@@ -60,7 +60,7 @@ def fixture_publish_db():
     # publish 1.0.0
 
     db.save(DB_ROOT)
-    audb2.publish(
+    audb.publish(
         DB_ROOT,
         DB_VERSION,
         pytest.PUBLISH_REPOSITORY,
@@ -77,7 +77,7 @@ def test_load_on_demand():
 
     db_original = audformat.Database.load(DB_ROOT)
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=DB_VERSION,
         only_metadata=True,
@@ -90,7 +90,7 @@ def test_load_on_demand():
     pd.testing.assert_index_equal(db.files, db_original.files)
     assert not db.meta['audb']['complete']
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=DB_VERSION,
         only_metadata=True,
@@ -104,7 +104,7 @@ def test_load_on_demand():
     pd.testing.assert_index_equal(db.files, db_original['table1'].files)
     assert not db.meta['audb']['complete']
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=DB_VERSION,
         only_metadata=True,
@@ -118,7 +118,7 @@ def test_load_on_demand():
     pd.testing.assert_index_equal(db.files, db_original['table1'].files)
     assert not db.meta['audb']['complete']
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=DB_VERSION,
         tables=['table1'],
@@ -131,7 +131,7 @@ def test_load_on_demand():
     pd.testing.assert_index_equal(db.files, db_original['table1'].files)
     assert not db.meta['audb']['complete']
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=DB_VERSION,
         media=['audio/000.wav', 'audio/001.wav'],
@@ -147,7 +147,7 @@ def test_load_on_demand():
     )
     assert not db.meta['audb']['complete']
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=DB_VERSION,
         tables=['table2'],
@@ -160,7 +160,7 @@ def test_load_on_demand():
     pd.testing.assert_index_equal(db.files, db_original['table2'].files)
     assert db.meta['audb']['complete']
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         version=DB_VERSION,
         full_path=False,

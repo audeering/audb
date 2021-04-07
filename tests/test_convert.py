@@ -9,12 +9,12 @@ import audformat.testing
 import audeer
 import audiofile
 
-import audb2
+import audb
 
 
-os.environ['AUDB2_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB2_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-audb2.config.REPOSITORIES = pytest.REPOSITORIES
+os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
+os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
+audb.config.REPOSITORIES = pytest.REPOSITORIES
 
 
 DB_NAME = f'test_convert-{pytest.ID}'
@@ -89,7 +89,7 @@ def fixture_publish_db():
 
     # publish db
 
-    audb2.publish(
+    audb.publish(
         DB_ROOT,
         '1.0.0',
         pytest.PUBLISH_REPOSITORY,
@@ -120,7 +120,7 @@ def fixture_clear_cache():
 )
 def test_bit_depth(bit_depth):
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         bit_depth=bit_depth,
         full_path=False,
@@ -129,7 +129,7 @@ def test_bit_depth(bit_depth):
     )
     original_files = db['files']['original'].get()
 
-    df = audb2.cached()
+    df = audb.cached()
     assert df['bit_depth'].values[0] == bit_depth
 
     for converted_file, original_file in zip(db.files, original_files):
@@ -152,7 +152,7 @@ def test_bit_depth(bit_depth):
 )
 def test_channels(channels):
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         channels=channels,
         full_path=False,
@@ -161,7 +161,7 @@ def test_channels(channels):
     )
     original_files = db['files']['original'].get()
 
-    df = audb2.cached()
+    df = audb.cached()
 
     for converted_file, original_file in zip(db.files, original_files):
 
@@ -183,13 +183,13 @@ def test_channels(channels):
     'format',
     [
         None,
-        audb2.core.define.Format.WAV,
-        audb2.core.define.Format.FLAC,
+        audb.core.define.Format.WAV,
+        audb.core.define.Format.FLAC,
     ],
 )
 def test_format(format):
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         format=format,
         full_path=False,
@@ -198,7 +198,7 @@ def test_format(format):
     )
     original_files = db['files']['original'].get()
 
-    df = audb2.cached()
+    df = audb.cached()
     assert df['format'].values[0] == format
 
     for converted_file, original_file in zip(db.files, original_files):
@@ -233,7 +233,7 @@ def test_format(format):
 def test_mix(mix):
     # Test for backward compatibility
     with pytest.warns(UserWarning):
-        db = audb2.load(
+        db = audb.load(
             DB_NAME,
             mix=mix,
             full_path=False,
@@ -264,7 +264,7 @@ def test_mix(mix):
 )
 def test_mixdown(mixdown):
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         mixdown=mixdown,
         full_path=False,
@@ -273,7 +273,7 @@ def test_mixdown(mixdown):
     )
     original_files = db['files']['original'].get()
 
-    df = audb2.cached()
+    df = audb.cached()
     assert df['mixdown'].values[0] == mixdown
 
     for converted_file, original_file in zip(db.files, original_files):
@@ -296,7 +296,7 @@ def test_mixdown(mixdown):
 )
 def test_sampling_rate(sampling_rate):
 
-    db = audb2.load(
+    db = audb.load(
         DB_NAME,
         sampling_rate=sampling_rate,
         full_path=False,
@@ -305,7 +305,7 @@ def test_sampling_rate(sampling_rate):
     )
     original_files = db['files']['original'].get()
 
-    df = audb2.cached()
+    df = audb.cached()
     assert df['sampling_rate'].values[0] == sampling_rate
 
     for converted_file, original_file in zip(db.files, original_files):
