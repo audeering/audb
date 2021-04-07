@@ -19,7 +19,7 @@ DB_NAME = f'test_info-{pytest.ID}'
 DB_VERSION = '1.0.0'
 DB = audformat.Database(
     DB_NAME,
-    source='https://gitlab.audeering.com/tools/audb',
+    source='https://audeering.github.io/audb/',
     usage=audformat.define.Usage.UNRESTRICTED,
     languages=['de', 'English'],
     description='audb.info unit test database',
