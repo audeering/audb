@@ -184,11 +184,11 @@ def test_publish(version):
     assert version in versions
     assert latest_version == versions[-1]
 
-    df = audb.available(latest_only=False)
+    df = audb.available(only_latest=False)
     assert DB_NAME in df.index
     assert set(df[df.index == DB_NAME]['version']) == set(versions)
 
-    df = audb.available(latest_only=True)
+    df = audb.available(only_latest=True)
     assert DB_NAME in df.index
     assert df[df.index == DB_NAME]['version'][0] == latest_version
 
