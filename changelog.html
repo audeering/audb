@@ -1,0 +1,381 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Changelog &mdash; audb Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" />
+    
+      
+    
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="index.html">
+          
+            <img src="_static/images/audeering.svg" class="logo" alt="audEERING"/>
+          
+          
+            <span> audb</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publish.html">Publish a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Load a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependencies.html">Database dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a></li>
+</ul>
+<p><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+<p><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-0-2021-04-07">Version 1.0.0 (2021-04-07)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-93-0-2021-03-29">Version 0.93.0 (2021-03-29)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-92-1-2021-03-19">Version 0.92.1 (2021-03-19)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-92-0-2021-03-09">Version 0.92.0 (2021-03-09)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-91-0-2021-02-19">Version 0.91.0 (2021-02-19)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-90-3-2021-02-01">Version 0.90.3 (2021-02-01)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-90-2-2021-01-28">Version 0.90.2 (2021-01-28)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-90-1-2021-01-25">Version 0.90.1 (2021-01-25)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-90-0-2021-01-22">Version 0.90.0 (2021-01-22)</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">audb</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Changelog</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/audeering/audb/blob/v1.0.0/docs/changelog.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
+and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<section id="version-1-0-0-2021-04-07">
+<h2>Version 1.0.0 (2021-04-07)<a class="headerlink" href="#version-1-0-0-2021-04-07" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added: first public release</p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.info.author()</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.info.license()</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.info.license_url()</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.info.organization()</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies.archives</span></code> property</p></li>
+<li><p>Added: section on publication in the documentation</p></li>
+<li><p>Added: introduction texts to documentation</p></li>
+<li><p>Changed: raise error for conversion of non-supported format</p></li>
+<li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.exists()</span></code> to return bool</p></li>
+<li><p>Changed: rename <code class="docutils literal notranslate"><span class="pre">audb.lookup_repository()</span></code> to <code class="docutils literal notranslate"><span class="pre">audb.repository()</span></code></p></li>
+<li><p>Changed: one combined section on load in the documentation</p></li>
+<li><p>Fixed: data types in dataframe returned by <code class="docutils literal notranslate"><span class="pre">audb.cached()</span></code></p></li>
+<li><p>Fixed: support files stored in archives with nested folders</p></li>
+<li><p>Fixed: listing of cache entries</p></li>
+<li><p>Removed: command line interface</p></li>
+<li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audb.cached_databases()</span></code></p></li>
+<li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audb.define</span></code> module</p></li>
+</ul>
+</section>
+<section id="version-0-93-0-2021-03-29">
+<h2>Version 0.93.0 (2021-03-29)<a class="headerlink" href="#version-0-93-0-2021-03-29" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">complete</span></code> column in <code class="docutils literal notranslate"><span class="pre">audb.cached()</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">previous_version</span></code> argument to <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code></p></li>
+<li><p>Added: backward compatibility with <code class="docutils literal notranslate"><span class="pre">audb</span> <span class="pre">&lt;0.90</span></code></p></li>
+<li><p>Changed: cache flavor path to name/version/flavor_id</p></li>
+<li><p>Changed: use open source releases of <code class="docutils literal notranslate"><span class="pre">audbackend</span></code>,
+<code class="docutils literal notranslate"><span class="pre">audobject</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">audresample</span></code></p></li>
+<li><p>Changed: require <code class="docutils literal notranslate"><span class="pre">audformat&gt;=0.10.0</span></code></p></li>
+<li><p>Changed: rename <code class="docutils literal notranslate"><span class="pre">audb.load_original_to()</span></code> to <code class="docutils literal notranslate"><span class="pre">audb.load_to()</span></code></p></li>
+<li><p>Changed: shorten flavor ID in cache</p></li>
+<li><p>Changed: filter operations and <code class="docutils literal notranslate"><span class="pre">only_metadata</span></code> no longer part
+of <code class="docutils literal notranslate"><span class="pre">audb.Flavor</span></code></p></li>
+<li><p>Deprecated: <code class="docutils literal notranslate"><span class="pre">include</span></code> and <code class="docutils literal notranslate"><span class="pre">excldue</span></code> arguments</p></li>
+<li><p>Fixed: looking for latest version across repositories</p></li>
+<li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">Flavor.destination</span></code> for nested paths</p></li>
+<li><p>Fixed: allow for cross-backend dependencies for <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code></p></li>
+<li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.remove_media()</span></code> can now be called several times</p></li>
+</ul>
+</section>
+<section id="version-0-92-1-2021-03-19">
+<h2>Version 0.92.1 (2021-03-19)<a class="headerlink" href="#version-0-92-1-2021-03-19" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: enforce <code class="docutils literal notranslate"><span class="pre">mixdown=False</span></code> for mono file flavors</p></li>
+<li><p>Fixed: global config file was missing in PyPI package</p></li>
+</ul>
+</section>
+<section id="version-0-92-0-2021-03-09">
+<h2>Version 0.92.0 (2021-03-09)<a class="headerlink" href="#version-0-92-0-2021-03-09" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added: configuration file</p></li>
+<li><p>Changed: use external package for backend implementations</p></li>
+</ul>
+</section>
+<section id="version-0-91-0-2021-02-19">
+<h2>Version 0.91.0 (2021-02-19)<a class="headerlink" href="#version-0-91-0-2021-02-19" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.Backend.latest_version()</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.Backend.create()</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.Backend.register()</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.lookup_repository()</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">config.REPOSITORY_PUBLISH</span></code></p></li>
+<li><p>Fixed: update <code class="docutils literal notranslate"><span class="pre">fire</span></code> dependency</p></li>
+<li><p>Fixed: remove <code class="docutils literal notranslate"><span class="pre">config.GROUP_ID</span></code></p></li>
+<li><p>Fixed: use <code class="docutils literal notranslate"><span class="pre">sphinx&gt;=3.5.1</span></code> to fix inherited attributes
+in documentation</p></li>
+</ul>
+</section>
+<section id="version-0-90-3-2021-02-01">
+<h2>Version 0.90.3 (2021-02-01)<a class="headerlink" href="#version-0-90-3-2021-02-01" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: define data types when reading dependency file</p></li>
+</ul>
+</section>
+<section id="version-0-90-2-2021-01-28">
+<h2>Version 0.90.2 (2021-01-28)<a class="headerlink" href="#version-0-90-2-2021-01-28" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">data-provate-local</span></code> to the default repositories</p></li>
+</ul>
+</section>
+<section id="version-0-90-1-2021-01-25">
+<h2>Version 0.90.1 (2021-01-25)<a class="headerlink" href="#version-0-90-1-2021-01-25" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed: CHANGELOG</p></li>
+</ul>
+</section>
+<section id="version-0-90-0-2021-01-22">
+<h2>Version 0.90.0 (2021-01-22)<a class="headerlink" href="#version-0-90-0-2021-01-22" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added: initial release</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2020-2021 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script src="_static/thebelab-helper.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

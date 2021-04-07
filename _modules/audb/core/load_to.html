@@ -1,0 +1,579 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>audb.core.load_to &mdash; audb Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    
+      
+    
+  
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../../../index.html">
+          
+            <img src="../../../_static/images/audeering.svg" class="logo" alt="audEERING"/>
+          
+          
+            <span> audb</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publish.html">Publish a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load.html">Load a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Database dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../caching.html">Caching</a></li>
+</ul>
+<p><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+</ul>
+<p><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">audb</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>audb.core.load_to</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for audb.core.load_to</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">audbackend</span>
+<span class="kn">import</span> <span class="nn">audeer</span>
+<span class="kn">import</span> <span class="nn">audformat</span>
+
+<span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
+<span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="n">latest_version</span>
+<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
+<span class="kn">from</span> <span class="nn">audb.core.utils</span> <span class="kn">import</span> <span class="n">lookup_backend</span>
+
+
+<span class="k">def</span> <span class="nf">_find_media</span><span class="p">(</span>
+        <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find altered and new media.&quot;&quot;&quot;</span>
+
+    <span class="n">media</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">deps</span><span class="o">.</span><span class="n">is_removed</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+            <span class="n">full_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">full_file</span><span class="p">):</span>
+                <span class="n">media</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
+        <span class="n">job</span><span class="p">,</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">file</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">],</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Find media&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">media</span>
+
+
+<span class="k">def</span> <span class="nf">_find_tables</span><span class="p">(</span>
+        <span class="n">db_header</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+
+    <span class="n">tables</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+        <span class="n">full_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">full_file</span><span class="p">):</span>
+            <span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">checksum</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">full_file</span><span class="p">)</span>
+            <span class="c1"># if the table already exists</span>
+            <span class="c1"># we have to compare checksum</span>
+            <span class="c1"># in case it was altered by flavor</span>
+            <span class="k">if</span> <span class="n">checksum</span> <span class="o">!=</span> <span class="n">deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+                <span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
+        <span class="n">job</span><span class="p">,</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">table</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">db_header</span><span class="o">.</span><span class="n">tables</span><span class="p">],</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Find tables&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tables</span>
+
+
+<span class="k">def</span> <span class="nf">_get_media</span><span class="p">(</span>
+        <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
+        <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">):</span>
+
+    <span class="c1"># create folder tree to avoid race condition</span>
+    <span class="c1"># in os.makedirs when files are unpacked</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">media</span><span class="p">:</span>
+        <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)))</span>
+        <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">)))</span>
+
+    <span class="c1"># figure out archives</span>
+    <span class="n">archives</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">media</span><span class="p">:</span>
+        <span class="n">archives</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">),</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">db_name</span><span class="p">,</span>
+            <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">],</span>
+            <span class="n">archive</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+    <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
+        <span class="n">job</span><span class="p">,</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">archive</span><span class="p">,</span> <span class="n">version</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">archive</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">archives</span><span class="p">],</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Get media&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_tables</span><span class="p">(</span>
+        <span class="n">tables</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
+        <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># If a pickled version of the table exists,</span>
+        <span class="c1"># we have to remove it to make sure that</span>
+        <span class="c1"># later on the new CSV tables are loaded.</span>
+        <span class="c1"># This can happen if we upgrading an existing</span>
+        <span class="c1"># database to a different version.</span>
+        <span class="n">path_pkl</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">db_root</span><span class="p">,</span> <span class="n">table</span>
+        <span class="p">)[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">PICKLE</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path_pkl</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path_pkl</span><span class="p">)</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">db_name</span><span class="p">,</span>
+            <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
+            <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">table</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
+        <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+
+    <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
+        <span class="n">job</span><span class="p">,</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">table</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">],</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Get tables&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_move_file</span><span class="p">(</span>
+        <span class="n">root_src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">root_dst</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move file to another directory.&quot;&quot;&quot;</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_src</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dst</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_remove_empty_dirs</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove directories, fails if it contains non-empty sub-folders.&quot;&quot;&quot;</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">full_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">full_file</span><span class="p">):</span>
+                <span class="n">_remove_empty_dirs</span><span class="p">(</span><span class="n">full_file</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_save_database</span><span class="p">(</span>
+        <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">storage_format</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">CSV</span><span class="p">,</span>
+        <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>
+    <span class="p">]:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+            <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">storage_format</span><span class="o">=</span><span class="n">storage_format</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;*.</span><span class="si">{</span><span class="n">storage_format</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">)</span>
+            <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="load_to"><a class="viewcode-back" href="../../../api.html#audb.load_to">[docs]</a><span class="k">def</span> <span class="nf">load_to</span><span class="p">(</span>
+        <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database to directory.</span>
+
+<span class="sd">    Loads the original state of the database</span>
+<span class="sd">    to a custom directory.</span>
+<span class="sd">    No conversion or filtering will be applied.</span>
+<span class="sd">    If the target folder already contains</span>
+<span class="sd">    some version of the database,</span>
+<span class="sd">    it will upgrade to the requested version.</span>
+<span class="sd">    Unchanged files will be skipped.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        root: target directory</span>
+<span class="sd">        name: name of database</span>
+<span class="sd">        version: version string, latest if ``None``</span>
+<span class="sd">        num_workers: number of parallel jobs or 1 for sequential</span>
+<span class="sd">            processing. If ``None`` will be set to the number of</span>
+<span class="sd">            processors on the machine multiplied by 5</span>
+<span class="sd">        verbose: show debug messages</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        database object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">backend</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+
+    <span class="n">db_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">safe_path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">db_root</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span>
+
+    <span class="c1"># remove files with a wrong checksum</span>
+    <span class="c1"># to ensure we load correct version</span>
+    <span class="n">update</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
+    <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
+    <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span><span class="p">)</span>
+    <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+    <span class="n">deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
+    <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
+    <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+            <span class="n">full_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">full_file</span><span class="p">):</span>
+                <span class="n">checksum</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">full_file</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">checksum</span> <span class="o">!=</span> <span class="n">deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">full_file</span><span class="p">)</span>
+
+    <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
+    <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
+
+    <span class="c1"># load database header</span>
+
+    <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+    <span class="n">local_header</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+    <span class="n">backend</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">local_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+    <span class="n">db_header</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># get altered and new tables</span>
+
+    <span class="n">db_header</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">header_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">tables</span> <span class="o">=</span> <span class="n">_find_tables</span><span class="p">(</span><span class="n">db_header</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="n">_get_tables</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span>
+                <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1"># load database</span>
+
+    <span class="c1"># move header to root and load database ...</span>
+    <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">db_root</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyboardInterrupt</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># make sure to remove header if user interrupts</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">))</span>
+        <span class="k">raise</span>
+    <span class="c1"># afterwards remove header to avoid the database</span>
+    <span class="c1"># can be loaded before download is complete</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">))</span>
+
+    <span class="c1"># get altered and new media files</span>
+
+    <span class="n">media</span> <span class="o">=</span> <span class="n">_find_media</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="n">_get_media</span><span class="p">(</span><span class="n">media</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span>
+               <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1"># save dependencies</span>
+
+    <span class="n">dep_path_tmp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
+    <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dep_path_tmp</span><span class="p">)</span>
+    <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
+
+    <span class="c1"># save database and remove the temporal directory</span>
+    <span class="c1"># to signal all files were correctly loaded</span>
+
+    <span class="n">_save_database</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">_remove_empty_dirs</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s1">&#39;Could not remove temporary directory, &#39;</span>
+            <span class="s1">&#39;probably there are some leftover files.&#39;</span>
+            <span class="s1">&#39;This should not happen.&#39;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">db</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2020-2021 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script src="../../../_static/thebelab-helper.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="../../../_static/katex_autorenderer.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

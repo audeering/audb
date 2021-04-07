@@ -1,0 +1,938 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Publish a database &mdash; audb Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Load a database" href="load.html" />
+    <link rel="prev" title="Overview" href="overview.html" />
+    
+      
+    
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="index.html">
+          
+            <img src="_static/images/audeering.svg" class="logo" alt="audEERING"/>
+          
+          
+            <span> audb</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Publish a database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#create-a-database">Create a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#publish-the-first-version">Publish the first version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#update-a-database">Update a database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#real-world-example">Real world example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Load a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependencies.html">Database dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a></li>
+</ul>
+<p><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+<p><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">audb</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Publish a database</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/audeering/audb/blob/v1.0.0/docs/publish.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<section id="publish-a-database">
+<span id="publish"></span><h1>Publish a database<a class="headerlink" href="#publish-a-database" title="Permalink to this headline">¶</a></h1>
+<p>To publish a database we need to first create
+and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.10.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
+Afterwards we publish the database to a <a class="reference internal" href="api.html#audb.Repository" title="audb.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>.
+Finally,
+we add more files
+and release a new version.</p>
+<section id="create-a-database">
+<h2>Create a database<a class="headerlink" href="#create-a-database" title="Permalink to this headline">¶</a></h2>
+<p>The first one can be done by the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.10.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module,
+which let you easily create a database:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audformat.testing</span>
+
+<span class="n">build_dir</span> <span class="o">=</span> <span class="s1">&#39;./age-test-1.0.0&#39;</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">create_db</span><span class="p">(</span><span class="n">minimal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;age-test&#39;</span>
+<span class="n">db</span><span class="o">.</span><span class="n">license</span> <span class="o">=</span> <span class="s1">&#39;CC0-1.0&#39;</span>
+<span class="n">db</span><span class="o">.</span><span class="n">schemes</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Scheme</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">minimum</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">maximum</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">audformat</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">,</span>
+    <span class="n">table_id</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span>
+    <span class="n">index_type</span><span class="o">=</span><span class="s1">&#39;filewise&#39;</span><span class="p">,</span>
+    <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span>
+    <span class="n">num_files</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">audformat</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">create_audio_files</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">build_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>This results in the following database:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>name: age-test
+source: internal
+usage: unrestricted
+languages: [deu, eng]
+license: CC0-1.0
+schemes:
+  age: {dtype: int, minimum: 20, maximum: 90}
+tables:
+  age:
+    type: filewise
+    columns:
+      age: {scheme_id: age}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Containing a few random annotations.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+    </tr>
+    <tr>
+      <th>file</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>audio/001.wav</th>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>audio/002.wav</th>
+      <td>62</td>
+    </tr>
+    <tr>
+      <th>audio/003.wav</th>
+      <td>88</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>In a next step we save the database to a folder.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">build_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+</section>
+<section id="publish-the-first-version">
+<h2>Publish the first version<a class="headerlink" href="#publish-the-first-version" title="Permalink to this headline">¶</a></h2>
+<p>We define a repository on the <a class="reference external" href="https://audeering.github.io/audbackend/api.html#audbackend.FileSystem" title="(in audbackend v0.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.FileSystem</span></code></a> backend
+to publish the database to.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audb</span>
+
+<span class="n">repository</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;data-local&#39;</span><span class="p">,</span>
+    <span class="n">host</span><span class="o">=</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;file-system&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>Then we select the folder,
+where the database is stored,
+and pick a version for publishing it.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">build_dir</span><span class="p">,</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>It returns a <a class="reference internal" href="api.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> object
+that specifies
+which files are part of the database
+in which archives they are stored,
+and information about audio metadata.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>archive</th>
+      <th>bit_depth</th>
+      <th>channels</th>
+      <th>...</th>
+      <th>sampling_rate</th>
+      <th>type</th>
+      <th>version</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>db.age.csv</th>
+      <td>age</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0.0</td>
+    </tr>
+    <tr>
+      <th>audio/001.wav</th>
+      <td>436c65ec-1e42-f9de-2708-ecafe07e827e</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.0.0</td>
+    </tr>
+    <tr>
+      <th>audio/002.wav</th>
+      <td>fda7e4d6-f2b2-4cff-cab5-906ef5d57607</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.0.0</td>
+    </tr>
+    <tr>
+      <th>audio/003.wav</th>
+      <td>e26ef45d-bdc1-6153-bdc4-852d83806e4a</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.0.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>4 rows × 10 columns</p>
+</div></div></div>
+</div>
+<p>We can compare this with the files stored in the repository.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">def</span> <span class="nf">list_files</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indent</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="si">}</span><span class="s1">/&#39;</span><span class="p">)</span>
+        <span class="n">subindent</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subindent</span><span class="si">}{</span><span class="n">f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">list_files</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>data/
+  data-local/
+    age-test/
+      meta/
+        age/
+          1.0.0/
+            age-1.0.0.zip
+      db/
+        1.0.0/
+          db-1.0.0.yaml
+          db-1.0.0.zip
+      media/
+        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
+          1.0.0/
+            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
+        436c65ec-1e42-f9de-2708-ecafe07e827e/
+          1.0.0/
+            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
+        fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
+          1.0.0/
+            fda7e4d6-f2b2-4cff-cab5-906ef5d57607-1.0.0.zip
+</pre></div>
+</div>
+</div>
+</div>
+<p>As you can see all media files are stored inside the <code class="file docutils literal notranslate"><span class="pre">media/</span></code> folder,
+all tables inside the <code class="file docutils literal notranslate"><span class="pre">meta/</span></code> folder,
+the database header inside the <code class="file docutils literal notranslate"><span class="pre">db/</span></code> folder
+as <code class="file docutils literal notranslate"><span class="pre">db-1.0.0.yaml</span></code>,
+and the database dependency file inside the <code class="file docutils literal notranslate"><span class="pre">db/</span></code> folder
+inside <code class="file docutils literal notranslate"><span class="pre">db-1.0.0.zip</span></code>.</p>
+<p>To load the database,
+or see which databases are available in your repository,
+we need to tell <a class="reference internal" href="api.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> that it should use our repository
+instead of its default ones.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span><span class="n">repository</span><span class="p">]</span>
+<span class="n">audb</span><span class="o">.</span><span class="n">available</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>backend</th>
+      <th>host</th>
+      <th>repository</th>
+      <th>version</th>
+    </tr>
+    <tr>
+      <th>name</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>age-test</th>
+      <td>file-system</td>
+      <td>./data</td>
+      <td>data-local</td>
+      <td>1.0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="update-a-database">
+<h2>Update a database<a class="headerlink" href="#update-a-database" title="Permalink to this headline">¶</a></h2>
+<p>In a next step we will add another file with age annotation
+to the database.
+As a first step we load
+the previous version
+of the database
+to a new folder.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">build_dir</span> <span class="o">=</span> <span class="s1">&#39;./age-test-1.1.0&#39;</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_to</span><span class="p">(</span><span class="n">build_dir</span><span class="p">,</span> <span class="s1">&#39;age-test&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>Then we extend the age table by another file (<code class="file docutils literal notranslate"><span class="pre">audio/004.wav</span></code>)
+and add the age annotation of 22 to it.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">filewise_index</span><span class="p">([</span><span class="s1">&#39;audio/004.wav&#39;</span><span class="p">])</span>
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend_index</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">][</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="mi">22</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+<span class="n">audformat</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">create_audio_files</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">build_dir</span><span class="p">)</span>
+
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+    </tr>
+    <tr>
+      <th>file</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>audio/001.wav</th>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>audio/002.wav</th>
+      <td>62</td>
+    </tr>
+    <tr>
+      <th>audio/003.wav</th>
+      <td>88</td>
+    </tr>
+    <tr>
+      <th>audio/004.wav</th>
+      <td>22</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Now we overwrite the table stored in the database build folder.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">build_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>Publishing works as before,
+but this time we have to specify a version where our update should be based on.
+<a class="reference internal" href="api.html#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a> will then automatically figure out
+which files have changed
+and will only publish those.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+    <span class="n">build_dir</span><span class="p">,</span>
+    <span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">repository</span><span class="p">,</span>
+    <span class="n">previous_version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">deps</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>archive</th>
+      <th>bit_depth</th>
+      <th>channels</th>
+      <th>...</th>
+      <th>sampling_rate</th>
+      <th>type</th>
+      <th>version</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>db.age.csv</th>
+      <td>age</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>audio/001.wav</th>
+      <td>436c65ec-1e42-f9de-2708-ecafe07e827e</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.0.0</td>
+    </tr>
+    <tr>
+      <th>audio/002.wav</th>
+      <td>fda7e4d6-f2b2-4cff-cab5-906ef5d57607</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.0.0</td>
+    </tr>
+    <tr>
+      <th>audio/003.wav</th>
+      <td>e26ef45d-bdc1-6153-bdc4-852d83806e4a</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.0.0</td>
+    </tr>
+    <tr>
+      <th>audio/004.wav</th>
+      <td>ef4d1e81-6488-95cf-a165-604d1e47d575</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.1.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 10 columns</p>
+</div></div></div>
+</div>
+<p>It has just uploaded a new version of the table,
+and the new media files.
+For the other media files,
+it just <a class="reference internal" href="dependencies.html#database-dependencies"><span class="std std-ref">depends on the previous published version</span></a>.
+We can again inspect the repository.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">list_files</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>data/
+  data-local/
+    age-test/
+      meta/
+        age/
+          1.1.0/
+            age-1.1.0.zip
+          1.0.0/
+            age-1.0.0.zip
+      db/
+        1.1.0/
+          db-1.1.0.yaml
+          db-1.1.0.zip
+        1.0.0/
+          db-1.0.0.yaml
+          db-1.0.0.zip
+      media/
+        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
+          1.0.0/
+            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
+        436c65ec-1e42-f9de-2708-ecafe07e827e/
+          1.0.0/
+            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
+        fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
+          1.0.0/
+            fda7e4d6-f2b2-4cff-cab5-906ef5d57607-1.0.0.zip
+        ef4d1e81-6488-95cf-a165-604d1e47d575/
+          1.1.0/
+            ef4d1e81-6488-95cf-a165-604d1e47d575-1.1.0.zip
+</pre></div>
+</div>
+</div>
+</div>
+<p>And check which databases are available.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">available</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>backend</th>
+      <th>host</th>
+      <th>repository</th>
+      <th>version</th>
+    </tr>
+    <tr>
+      <th>name</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>age-test</th>
+      <td>file-system</td>
+      <td>./data</td>
+      <td>data-local</td>
+      <td>1.0.0</td>
+    </tr>
+    <tr>
+      <th>age-test</th>
+      <td>file-system</td>
+      <td>./data</td>
+      <td>data-local</td>
+      <td>1.1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>As you can even <a class="reference external" href="https://audeering.github.io/audformat/update-database.html">update one database by another one</a>,
+you could automate the update step
+and let a database grow every day.</p>
+</section>
+<section id="real-world-example">
+<h2>Real world example<a class="headerlink" href="#real-world-example" title="Permalink to this headline">¶</a></h2>
+<p>We published a version of a small German acted emotional speech databases
+called <a class="reference external" href="http://emodb.bilderbar.info/start.html">emodb</a>
+in the default Artifactory repository of <a class="reference internal" href="api.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a>.
+You can find the example code at
+and can continue at <a class="reference internal" href="load.html#load"><span class="std std-ref">Load a database</span></a>
+to see how to load and use a database.</p>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="load.html" class="btn btn-neutral float-right" title="Load a database" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2020-2021 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script src="_static/thebelab-helper.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

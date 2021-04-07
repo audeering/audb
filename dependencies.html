@@ -1,0 +1,461 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Database dependencies &mdash; audb Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration" href="configuration.html" />
+    <link rel="prev" title="Load a database" href="load.html" />
+    
+      
+    
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="index.html">
+          
+            <img src="_static/images/audeering.svg" class="logo" alt="audEERING"/>
+          
+          
+            <span> audb</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publish.html">Publish a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Load a database</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Database dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a></li>
+</ul>
+<p><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+<p><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">audb</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Database dependencies</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/audeering/audb/blob/v1.0.0/docs/dependencies.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<section id="database-dependencies">
+<span id="id1"></span><h1>Database dependencies<a class="headerlink" href="#database-dependencies" title="Permalink to this headline">¶</a></h1>
+<p>Media and table files of databases are stored
+in archive files.
+A database can also reuse an archive file
+from a previous version of a database
+if its content hasn’t changed.</p>
+<p>We keep track of those dependencies
+and store some additional metadata about the audio files
+like duration and number of channels
+in a dependency table in a file <code class="file docutils literal notranslate"><span class="pre">db.csv</span></code>
+for every version of a database.</p>
+<p>You request a <a class="reference internal" href="api.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> object with:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>You can see all entries with</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>archive</th>
+      <th>bit_depth</th>
+      <th>channels</th>
+      <th>...</th>
+      <th>sampling_rate</th>
+      <th>type</th>
+      <th>version</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>db.emotion.csv</th>
+      <td>emotion</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>db.files.csv</th>
+      <td>files</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>wav/03a01Fa.wav</th>
+      <td>c1f5cc6f-6d00-348a-ba3b-4adaa2436aad</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>wav/03a01Nc.wav</th>
+      <td>d40b53dd-8f0d-d5d3-42e7-8ad7ea6a05a6</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>wav/03a01Wa.wav</th>
+      <td>9b62bc9b-a68e-7e38-6ed1-f4a16ac18511</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>wav/16b10Lb.wav</th>
+      <td>dd7f81c7-5b31-5b82-a211-c1a6bc08cdee</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>wav/16b10Tb.wav</th>
+      <td>955bfc13-9ada-54e1-90df-e58c2d8f682d</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>wav/16b10Td.wav</th>
+      <td>fac322ad-b5b1-7660-c83e-6237578d4ff8</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>wav/16b10Wa.wav</th>
+      <td>d9020da7-5c34-a676-1bdd-84d5966c21ed</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.1.0</td>
+    </tr>
+    <tr>
+      <th>wav/16b10Wb.wav</th>
+      <td>c23da8c7-c9fd-7d04-df92-3e1446260c28</td>
+      <td>16</td>
+      <td>1</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>1</td>
+      <td>1.1.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>537 rows × 10 columns</p>
+</div></div></div>
+</div>
+<p>or request certain aspects, e.g.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;wav/03a01Fa.wav&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>1.89825
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="load.html" class="btn btn-neutral float-left" title="Load a database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2020-2021 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script src="_static/thebelab-helper.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,948 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Load a database &mdash; audb Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Database dependencies" href="dependencies.html" />
+    <link rel="prev" title="Publish a database" href="publish.html" />
+    
+      
+    
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="index.html">
+          
+            <img src="_static/images/audeering.svg" class="logo" alt="audEERING"/>
+          
+          
+            <span> audb</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publish.html">Publish a database</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Load a database</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#media-conversion-and-flavors">Media conversion and flavors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metadata-and-header-only">Metadata and header only</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loading-on-demand">Loading on demand</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dependencies.html">Database dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a></li>
+</ul>
+<p><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+<p><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">audb</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Load a database</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/audeering/audb/blob/v1.0.0/docs/load.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<section id="load-a-database">
+<span id="load"></span><h1>Load a database<a class="headerlink" href="#load-a-database" title="Permalink to this headline">¶</a></h1>
+<p>To load a database you only need its name.
+However,
+we recommend to specify its version as well.
+This is not needed,
+as <a class="reference internal" href="api.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> searches automatically
+for the latest available version,
+but it will ensure your code returns the same data,
+even if a new version of the database is published.</p>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="api.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> will download the data,
+store them in a cache folder,
+and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.10.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
+The most important content of that object
+are the database tables:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>emotion:
+  type: filewise
+  columns:
+    emotion: {scheme_id: emotion, rater_id: gold}
+    emotion.confidence: {scheme_id: confidence, rater_id: gold}
+files:
+  type: filewise
+  columns:
+    duration: {scheme_id: duration}
+    speaker: {scheme_id: speaker}
+    transcription: {scheme_id: transcription}
+</pre></div>
+</div>
+</div>
+</div>
+<p>They contain the annotations of the database,
+and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;emotion&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>emotion</th>
+      <th>emotion.confidence</th>
+    </tr>
+    <tr>
+      <th>file</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Fa.wav</th>
+      <td>happiness</td>
+      <td>0.90</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Nc.wav</th>
+      <td>neutral</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Wa.wav</th>
+      <td>anger</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Td.wav</th>
+      <td>sadness</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Wa.wav</th>
+      <td>anger</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Wb.wav</th>
+      <td>anger</td>
+      <td>1.00</td>
+    </tr>
+  </tbody>
+</table>
+<p>535 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">][</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+    </tr>
+    <tr>
+      <th>file</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Fa.wav</th>
+      <td>0 days 00:00:01.898250</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Nc.wav</th>
+      <td>0 days 00:00:01.611250</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Wa.wav</th>
+      <td>0 days 00:00:01.877812500</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Td.wav</th>
+      <td>0 days 00:00:03.934187500</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Wa.wav</th>
+      <td>0 days 00:00:02.414125</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Wb.wav</th>
+      <td>0 days 00:00:02.522499999</td>
+    </tr>
+  </tbody>
+</table>
+<p>535 rows × 1 columns</p>
+</div></div></div>
+</div>
+<p>As you can see the index of the returned object
+holds the path to the corresponding media files.</p>
+<p>For a full overview how to handle the database object
+we refer the reader to the <a class="reference external" href="https://audeering.github.io/audformat/accessing-data.html">corresponding audformat documentation</a>.
+We also recommend to make you familiar
+how to <a class="reference external" href="https://audeering.github.io/audformat/combine-tables.html">combine tables</a>
+and how to <a class="reference external" href="https://audeering.github.io/audformat/map-scheme.html">map labels</a>.</p>
+<p>Here,
+we continue with discussing
+<a class="reference internal" href="#media-conversion-and-flavors"><span class="std std-ref">Media conversion and flavors</span></a>,
+how to load <a class="reference internal" href="#metadata"><span class="std std-ref">Metadata and header only</span></a>,
+and <a class="reference internal" href="#filter"><span class="std std-ref">Loading on demand</span></a>.</p>
+<section id="media-conversion-and-flavors">
+<span id="id1"></span><h2>Media conversion and flavors<a class="headerlink" href="#media-conversion-and-flavors" title="Permalink to this headline">¶</a></h2>
+<p>When loading a database,
+audio files can be automatically converted.
+This creates a new flavor of the database,
+represented by <a class="reference internal" href="api.html#audb.Flavor" title="audb.Flavor"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Flavor</span></code></a>.
+The following properties can be changed:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">bit_depth</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">8</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">16</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">24</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">32 (WAV only)</span>
+<span class="nt">format</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="s">&#39;wav&#39;</span>
+  <span class="p p-Indicator">-</span> <span class="s">&#39;flac&#39;</span>
+<span class="nt">channels</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0</span>        <span class="c1"># select first channel</span>
+  <span class="p p-Indicator">-</span> <span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span> <span class="nv">-1</span><span class="p p-Indicator">]</span>  <span class="c1"># select first and last channel</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="nt">mixdown</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="nt">sampling_rate</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">8000</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">16000</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">22500</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">44100</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">48000</span>
+</pre></div>
+</div>
+<p>The next example will convert the original files
+to FLAC with a sampling rate of 44100 Hz.
+For each flavor a sub-folder will be created
+inside the <a class="reference internal" href="caching.html#caching"><span class="std std-ref">cache</span></a>.</p>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;flac&#39;</span><span class="p">,</span>
+    <span class="n">sampling_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The new audio format is included in the flavor of the converted database:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;audb&#39;</span><span class="p">][</span><span class="s1">&#39;flavor&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;bit_depth&#39;: None,
+ &#39;channels&#39;: None,
+ &#39;format&#39;: &#39;flac&#39;,
+ &#39;mixdown&#39;: False,
+ &#39;sampling_rate&#39;: 44100}
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can list all available flavors and their locations in the cache with:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">cached</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">,</span> <span class="s1">&#39;sampling_rate&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>version</th>
+      <th>complete</th>
+      <th>sampling_rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/9c872f39</th>
+      <td>emodb</td>
+      <td>1.1.0</td>
+      <td>False</td>
+      <td>44100.0</td>
+    </tr>
+    <tr>
+      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b</th>
+      <td>emodb</td>
+      <td>1.1.0</td>
+      <td>False</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The entry <code class="docutils literal notranslate"><span class="pre">'complete'</span></code> tells you if a database flavor is completely cached,
+or if some table or media files are still missing.</p>
+</section>
+<section id="metadata-and-header-only">
+<span id="metadata"></span><h2>Metadata and header only<a class="headerlink" href="#metadata-and-header-only" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to request only metadata
+(header and annotations)
+of a database.
+In that case media files are not loaded,
+but all the tables and the header:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>For databases with many annotations,
+this can still take some time.
+If you are only interested in header information,
+you can use <a class="reference internal" href="api-info.html#audb.info.header" title="audb.info.header"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.info.header()</span></code></a>.
+Or if you are only interested
+in parts of the header,
+like table definitions:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span>
+    <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>emotion:
+  type: filewise
+  columns:
+    emotion: {scheme_id: emotion, rater_id: gold}
+    emotion.confidence: {scheme_id: confidence, rater_id: gold}
+files:
+  type: filewise
+  columns:
+    duration: {scheme_id: duration}
+    speaker: {scheme_id: speaker}
+    transcription: {scheme_id: transcription}
+</pre></div>
+</div>
+</div>
+</div>
+<p>And to get the total duration of all media files:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span>
+    <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Timedelta(&#39;0 days 00:24:47.092187500&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>See <a class="reference internal" href="api-info.html#module-audb.info" title="audb.info"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb.info</span></code></a> for a list of all available options.</p>
+</section>
+<section id="loading-on-demand">
+<span id="filter"></span><h2>Loading on demand<a class="headerlink" href="#loading-on-demand" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to request only
+specific tables or media of a database.</p>
+<p>For instance, many databases are organized
+into <em>train</em>, <em>dev</em>, and <em>test</em> splits.
+Hence,
+to evaluate the performance of a machine learning model,
+we don’t have to download the full database,
+but only the table(s) and media of the <em>test</em> set.</p>
+<p>Or, if we want the data of a specific speaker,
+we can do the following.
+First, we download the table with information
+about the speakers (here <code class="docutils literal notranslate"><span class="pre">db['files']</span></code>):</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">tables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">],</span>
+    <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">tables</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>files:
+  type: filewise
+  columns:
+    duration: {scheme_id: duration}
+    speaker: {scheme_id: speaker}
+    transcription: {scheme_id: transcription}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note,
+that we set <code class="docutils literal notranslate"><span class="pre">only_metadata=True</span></code>
+since we only need the labels at the moment.
+By setting <code class="docutils literal notranslate"><span class="pre">full_path=False</span></code>
+we further ensure that the paths
+in the table index are relative
+and therefore match the paths on the backend.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">speaker</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">][</span><span class="s1">&#39;speaker&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="n">speaker</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+    </tr>
+    <tr>
+      <th>file</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>wav/03a01Fa.wav</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>wav/03a01Nc.wav</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>wav/03a01Wa.wav</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>wav/16b10Td.wav</th>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>wav/16b10Wa.wav</th>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>wav/16b10Wb.wav</th>
+      <td>16</td>
+    </tr>
+  </tbody>
+</table>
+<p>535 rows × 1 columns</p>
+</div></div></div>
+</div>
+<p>Now, we use the column with speaker IDs
+to get a list of media files
+that belong to speaker 3.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">media</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">speaker</span> <span class="o">==</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">media</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>file</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>wav/03a01Fa.wav</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>wav/03a01Nc.wav</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>wav/03a01Wa.wav</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>wav/03b10Nc.wav</td>
+    </tr>
+    <tr>
+      <th>47</th>
+      <td>wav/03b10Wb.wav</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <td>wav/03b10Wc.wav</td>
+    </tr>
+  </tbody>
+</table>
+<p>49 rows × 1 columns</p>
+</div></div></div>
+</div>
+<p>Finally, we load the database again
+and use the list to request
+only the data of this speaker.</p>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">media</span><span class="o">=</span><span class="n">media</span><span class="p">,</span>
+    <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This will also remove
+entries of other speakers
+from the tables.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;emotion&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>emotion</th>
+      <th>emotion.confidence</th>
+    </tr>
+    <tr>
+      <th>file</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>wav/03a01Fa.wav</th>
+      <td>happiness</td>
+      <td>0.90</td>
+    </tr>
+    <tr>
+      <th>wav/03a01Nc.wav</th>
+      <td>neutral</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>wav/03a01Wa.wav</th>
+      <td>anger</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>wav/03b10Nc.wav</th>
+      <td>neutral</td>
+      <td>0.80</td>
+    </tr>
+    <tr>
+      <th>wav/03b10Wb.wav</th>
+      <td>anger</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <th>wav/03b10Wc.wav</th>
+      <td>anger</td>
+      <td>1.00</td>
+    </tr>
+  </tbody>
+</table>
+<p>49 rows × 2 columns</p>
+</div></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dependencies.html" class="btn btn-neutral float-right" title="Database dependencies" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="publish.html" class="btn btn-neutral float-left" title="Publish a database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2020-2021 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script src="_static/thebelab-helper.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

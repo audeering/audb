@@ -1,0 +1,1374 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>audb &mdash; audb Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="audb.info" href="api-info.html" />
+    <link rel="prev" title="Caching" href="caching.html" />
+    
+      
+    
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="index.html">
+          
+            <img src="_static/images/audeering.svg" class="logo" alt="audEERING"/>
+          
+          
+            <span> audb</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publish.html">Publish a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Load a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependencies.html">Database dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a></li>
+</ul>
+<p><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">audb</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#available">available</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cached">cached</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#default-cache-root">default_cache_root</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exists">exists</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#flavor">Flavor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#flavor-path">flavor_path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#latest-version">latest_version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load">load</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-to">load_to</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#publish">publish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#remove-media">remove_media</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#repository">Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#versions">versions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+<p><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">audb</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>audb</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/audeering/audb/blob/v1.0.0/docs/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-audb">
+<span id="audb"></span><h1>audb<a class="headerlink" href="#module-audb" title="Permalink to this headline">¶</a></h1>
+<section id="available">
+<h2>available<a class="headerlink" href="#available" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.available">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">available</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latest_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.available" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all databases that are available to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>latest_only</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – keep only latest version</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>table with name, version and private flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="cached">
+<h2>cached<a class="headerlink" href="#cached" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.cached">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">cached</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#cached"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.cached" title="Permalink to this definition">¶</a></dt>
+<dd><p>List available databases in the cache.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
+If not set <a class="reference internal" href="#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
+<li><p><strong>shared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – list shared databases</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>cached databases</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="config">
+<h2>config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="audb.config">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">config</span></code><a class="reference internal" href="_modules/audb/core/config.html#config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get/set configuration values for the <a class="reference internal" href="#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> module.</p>
+<p>The configuration values are read in during module import
+from the <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">configuration file</span></a>
+<code class="file docutils literal notranslate"><span class="pre">~/.audb.yaml</span></code>.</p>
+<p>You can change the configuration values after import,
+by setting the attributes directly.</p>
+<p>The <a class="reference internal" href="caching.html#caching"><span class="std std-ref">caching</span></a> related configuration values
+can be overwritten by environment variables.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+<span class="go">&#39;~/audb&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s1">&#39;~/caches/audb&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+<span class="go">&#39;~/caches/audb&#39;</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt id="audb.config.CACHE_ROOT">
+<code class="sig-name descname"><span class="pre">CACHE_ROOT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'~/audb'</span></em><a class="headerlink" href="#audb.config.CACHE_ROOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default user cache folder.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.config.REPOSITORIES">
+<code class="sig-name descname"><span class="pre">REPOSITORIES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[Repository('data-public',</span> <span class="pre">'https://audeering.jfrog.io/artifactory',</span> <span class="pre">'artifactory'),</span> <span class="pre">Repository('data-local',</span> <span class="pre">'~/audb-host',</span> <span class="pre">'file-system')]</span></em><a class="headerlink" href="#audb.config.REPOSITORIES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repositories, will be iterated in given order.</p>
+<p>A repository is defined by the object <a class="reference internal" href="#audb.Repository" title="audb.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>,
+containing the following attributes:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#audb.Repository.name" title="audb.Repository.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.Repository.name</span></code></a>: repository name, e.g. <code class="docutils literal notranslate"><span class="pre">'data-local'</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">aub2.Repository.backend</span></code>: backend name, e.g. <code class="docutils literal notranslate"><span class="pre">'artifactory'</span></code></p></li>
+<li><p><a class="reference internal" href="#audb.Repository.host" title="audb.Repository.host"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.Repository.host</span></code></a>: host name,
+e.g. <code class="docutils literal notranslate"><span class="pre">'https://artifactory.audeering.com/artifactory'</span></code></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.config.SHARED_CACHE_ROOT">
+<code class="sig-name descname"><span class="pre">SHARED_CACHE_ROOT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'/data/audb'</span></em><a class="headerlink" href="#audb.config.SHARED_CACHE_ROOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shared cache folder.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="audb.Dependencies">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">Dependencies</span></code><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hold dependencies of a database.</p>
+<dl class="py method">
+<dt id="audb.Dependencies.__call__">
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create dependency table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>table with dependencies</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.__contains__">
+<code class="sig-name descname"><span class="pre">__contains__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.__contains__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if file exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if a dependency to the file exists</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.__getitem__">
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>File information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list with meta information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.Dependencies.__weakref__">
+<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#audb.Dependencies.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.add_media">
+<code class="sig-name descname"><span class="pre">add_media</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">archive</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checksum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.add_media"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.add_media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add media file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – root directory</p></li>
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p></li>
+<li><p><strong>archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – archive name without extension</p></li>
+<li><p><strong>checksum</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – checksum of file</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.add_meta">
+<code class="sig-name descname"><span class="pre">add_meta</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">archive</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checksum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.add_meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.add_meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add table file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p></li>
+<li><p><strong>archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – archive name without extension</p></li>
+<li><p><strong>checksum</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – checksum of file</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.archive">
+<code class="sig-name descname"><span class="pre">archive</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.archive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of archive the file belongs to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>archive name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.archives">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">archives</span></code><a class="headerlink" href="#audb.Dependencies.archives" title="Permalink to this definition">¶</a></dt>
+<dd><p>All archives (table and media).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of archives</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.bit_depth">
+<code class="sig-name descname"><span class="pre">bit_depth</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.bit_depth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.bit_depth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bit depth of media file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>bit depth</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.channels">
+<code class="sig-name descname"><span class="pre">channels</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.channels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of channels of media file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>number of channels</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.checksum">
+<code class="sig-name descname"><span class="pre">checksum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.checksum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.checksum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checksum of file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>checksum of file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.data">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">data</span></code><a class="headerlink" href="#audb.Dependencies.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get table data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary with table entries</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.duration">
+<code class="sig-name descname"><span class="pre">duration</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Duration of file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>duration in seconds</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.files">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">files</span></code><a class="headerlink" href="#audb.Dependencies.files" title="Permalink to this definition">¶</a></dt>
+<dd><p>All files (table and media).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of files</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.format">
+<code class="sig-name descname"><span class="pre">format</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format of file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>file format (always lower case)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.is_removed">
+<code class="sig-name descname"><span class="pre">is_removed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.is_removed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.is_removed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if file is marked as removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if file was removed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.load">
+<code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read dependencies from CSV file.</p>
+<p>Clears existing dependencies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.media">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">media</span></code><a class="headerlink" href="#audb.Dependencies.media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Media files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of media</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.remove">
+<code class="sig-name descname"><span class="pre">remove</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mark file as removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.removed_media">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">removed_media</span></code><a class="headerlink" href="#audb.Dependencies.removed_media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removed media files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of media</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.sampling_rate">
+<code class="sig-name descname"><span class="pre">sampling_rate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.sampling_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.sampling_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sampling rate of media file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>sampling rate in Hz</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.save">
+<code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write dependencies to CSV file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.table_ids">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">table_ids</span></code><a class="headerlink" href="#audb.Dependencies.table_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table IDs.</p>
+<p>Like <a class="reference internal" href="#audb.Dependencies.tables" title="audb.Dependencies.tables"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.Dependencies.tables()</span></code></a>,
+but only returns the table ID,
+i.e. <code class="docutils literal notranslate"><span class="pre">db.&lt;id&gt;.csv</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of table IDs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.tables">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">tables</span></code><a class="headerlink" href="#audb.Dependencies.tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tables files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of tables</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.type">
+<code class="sig-name descname"><span class="pre">type</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DependType</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Dependencies.version">
+<code class="sig-name descname"><span class="pre">version</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies.version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>version string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="default-cache-root">
+<h2>default_cache_root<a class="headerlink" href="#default-cache-root" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.default_cache_root">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">default_cache_root</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#default_cache_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.default_cache_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default cache folder.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">shared</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+returns the path specified
+by the environment variable
+<code class="docutils literal notranslate"><span class="pre">AUDB_SHARED_CACHE_ROOT</span></code>
+or
+<code class="docutils literal notranslate"><span class="pre">audb.config.SHARED_CACHE_ROOT</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">shared</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>,
+returns the path specified
+by the environment variable
+<code class="docutils literal notranslate"><span class="pre">AUDB_CACHE_ROOT</span></code>
+or
+<code class="docutils literal notranslate"><span class="pre">audb.config.CACHE_ROOT</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>shared</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> returns path to shared cache folder</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>path normalized by <a class="reference external" href="https://audeering.github.io/audeer/api-audeer.html#audeer.safe_path" title="(in audeer vv1.12.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audeer.safe_path()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="id1">
+<h2>dependencies<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.dependencies">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">dependencies</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Database dependencies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dependencies</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dependency object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="exists">
+<h2>exists<a class="headerlink" href="#exists" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.exists">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">exists</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if specified database flavor exists in local cache folder.</p>
+<p>Does not yet return <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>,
+but <code class="docutils literal notranslate"><span class="pre">None</span></code> or path to flavor.
+Nonetheless,
+it can still be used with an if-statement:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">audb</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span> <span class="n">mixdown</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;emodb v1.1.0 </span><span class="si">{mono}</span><span class="s1"> cached&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Does not check for any flavor of the requested database in the cache,
+but only for a particular flavor.
+Note, that using only the name, e.g. <code class="docutils literal notranslate"><span class="pre">audb.exists('emodb')</span></code>
+is also a single flavor.</p>
+<p>To list all available flavors of a particular database, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">cached</span><span class="p">()</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name == &quot;emodb&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version string, latest if <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>bit_depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – bit depth, one of <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">24</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code></p></li>
+<li><p><strong>channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – channel selection, see <a class="reference external" href="https://audeering.github.io/audresample/api.html#audresample.remix" title="(in audresample vv0.1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audresample.remix()</span></code></a></p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – file format, one of <code class="docutils literal notranslate"><span class="pre">'flac'</span></code>, <code class="docutils literal notranslate"><span class="pre">'wav'</span></code></p></li>
+<li><p><strong>mixdown</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – apply mono mix-down</p></li>
+<li><p><strong>sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sampling rate in Hz, one of
+<code class="docutils literal notranslate"><span class="pre">8000</span></code>, <code class="docutils literal notranslate"><span class="pre">16000</span></code>, <code class="docutils literal notranslate"><span class="pre">22500</span></code>, <code class="docutils literal notranslate"><span class="pre">44100</span></code>, <code class="docutils literal notranslate"><span class="pre">48000</span></code></p></li>
+<li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
+If not set <a class="reference internal" href="#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if database flavor exists</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="flavor">
+<h2>Flavor<a class="headerlink" href="#flavor" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="audb.Flavor">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">Flavor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/flavor.html#Flavor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Flavor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Database flavor.</p>
+<p>Helper class used by <a class="reference internal" href="#audb.load" title="audb.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.load()</span></code></a>
+to convert media files to the desired format.
+It stores the meta information about a flavor
+and offers a convenient way to convert files to it.</p>
+<p>As the following example shows,
+it can also be used to convert files that are not part of database:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">original_file</span> <span class="o">=</span> <span class="s1">&#39;/org/path/file.flac&#39;</span>
+<span class="n">converted_file</span> <span class="o">=</span> <span class="s1">&#39;/new/path/file.wav&#39;</span>
+
+<span class="c1"># convert file to 16 kHz</span>
+<span class="n">flavor</span> <span class="o">=</span> <span class="n">Flavor</span><span class="p">(</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
+<span class="n">flavor</span><span class="p">(</span><span class="n">original_file</span><span class="p">,</span> <span class="n">converted_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bit_depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sample precision, one of <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">24</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code></p></li>
+<li><p><strong>channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – channel selection, see <a class="reference external" href="https://audeering.github.io/audresample/api.html#audresample.remix" title="(in audresample vv0.1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audresample.remix()</span></code></a></p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – file format, one of <code class="docutils literal notranslate"><span class="pre">'flac'</span></code>, <code class="docutils literal notranslate"><span class="pre">'wav'</span></code></p></li>
+<li><p><strong>mixdown</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – apply mono mix-down on selection</p></li>
+<li><p><strong>sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sampling rate in Hz, one of
+<code class="docutils literal notranslate"><span class="pre">8000</span></code>, <code class="docutils literal notranslate"><span class="pre">16000</span></code>, <code class="docutils literal notranslate"><span class="pre">22500</span></code>, <code class="docutils literal notranslate"><span class="pre">44100</span></code>, <code class="docutils literal notranslate"><span class="pre">48000</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="audb.Flavor.__call__">
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/flavor.html#Flavor.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Flavor.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert file to flavor.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>, <code class="docutils literal notranslate"><span class="pre">channels</span></code> or <code class="docutils literal notranslate"><span class="pre">sampling_rate</span></code>
+of source signal are known, they can be provided.
+Otherwise, they will be computed using <a class="reference external" href="https://audeering.github.io/audiofile/api.html#module-audiofile" title="(in audiofile vv0.4.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to input file</p></li>
+<li><p><strong>dst_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to output file</p></li>
+<li><p><strong>src_bit_depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – bit depth</p></li>
+<li><p><strong>src_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of channels</p></li>
+<li><p><strong>src_sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sampling rate in Hz</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – if extension of output file does not match the
+    format of the flavor</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – if a conversion is requested,
+    but no output format is specified,
+    and the input format is not WAV or FLAC</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.Flavor.bit_depth">
+<code class="sig-name descname"><span class="pre">bit_depth</span></code><a class="headerlink" href="#audb.Flavor.bit_depth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample precision.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.Flavor.channels">
+<code class="sig-name descname"><span class="pre">channels</span></code><a class="headerlink" href="#audb.Flavor.channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Selected channels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Flavor.destination">
+<code class="sig-name descname"><span class="pre">destination</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/flavor.html#Flavor.destination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Flavor.destination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return converted file path.</p>
+<p>The file path will only change if the file is converted to a different
+format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to input file</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>path to output file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.Flavor.format">
+<code class="sig-name descname"><span class="pre">format</span></code><a class="headerlink" href="#audb.Flavor.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>File format.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.Flavor.mixdown">
+<code class="sig-name descname"><span class="pre">mixdown</span></code><a class="headerlink" href="#audb.Flavor.mixdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply mixdown.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Flavor.path">
+<code class="sig-name descname"><span class="pre">path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/flavor.html#Flavor.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Flavor.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flavor path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – database name</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>relative path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.Flavor.sampling_rate">
+<code class="sig-name descname"><span class="pre">sampling_rate</span></code><a class="headerlink" href="#audb.Flavor.sampling_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sampling rate in Hz.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="audb.Flavor.short_id">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">short_id</span></code><a class="headerlink" href="#audb.Flavor.short_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short flavor ID.</p>
+<p>This just truncates the ID
+to its last eight characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="flavor-path">
+<h2>flavor_path<a class="headerlink" href="#flavor-path" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.flavor_path">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">flavor_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#flavor_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.flavor_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flavor cache path.</p>
+<p>Returns the path under which <a class="reference internal" href="#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> stores a specific
+flavor of a database in the cache folder, that is:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/&lt;version&gt;/&lt;flavor-id&gt;/</span></code></p>
+</div></blockquote>
+<p>Note that the returned path is relative.
+To get the absolute path, do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+    <span class="n">audb</span><span class="o">.</span><span class="n">flavor_path</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
+<li><p><strong>bit_depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – bit depth, one of <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">24</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code></p></li>
+<li><p><strong>channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – channel selection, see <a class="reference external" href="https://audeering.github.io/audresample/api.html#audresample.remix" title="(in audresample vv0.1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audresample.remix()</span></code></a></p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – file format, one of <code class="docutils literal notranslate"><span class="pre">'flac'</span></code>, <code class="docutils literal notranslate"><span class="pre">'wav'</span></code></p></li>
+<li><p><strong>mixdown</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – apply mono mix-down</p></li>
+<li><p><strong>sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sampling rate in Hz, one of
+<code class="docutils literal notranslate"><span class="pre">8000</span></code>, <code class="docutils literal notranslate"><span class="pre">16000</span></code>, <code class="docutils literal notranslate"><span class="pre">22500</span></code>, <code class="docutils literal notranslate"><span class="pre">44100</span></code>, <code class="docutils literal notranslate"><span class="pre">48000</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>flavor path relative to cache folder</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="latest-version">
+<h2>latest_version<a class="headerlink" href="#latest-version" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.latest_version">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">latest_version</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#latest_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.latest_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Latest version of database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – name of database</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>version string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="load">
+<h2>load<a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.load">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/load.html#load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load database.</p>
+<p>Loads meta and media files of a database to the local cache and returns
+a <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.10.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
+<p>When working with data,
+we often make assumptions about the media files.
+For instance, we expect that audio files are
+have a specific sampling rate.
+By setting
+<code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>, <code class="docutils literal notranslate"><span class="pre">channels</span></code>, <code class="docutils literal notranslate"><span class="pre">format</span></code>, <code class="docutils literal notranslate"><span class="pre">mixdown</span></code>, and <code class="docutils literal notranslate"><span class="pre">sampling_rate</span></code>
+we can request a specific flavor of the database.
+In that case media files are automatically converted to the desired
+properties (see also <a class="reference internal" href="#audb.Flavor" title="audb.Flavor"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Flavor</span></code></a>).</p>
+<p>It is possible to filter meta and media files with the arguments
+<code class="docutils literal notranslate"><span class="pre">tables</span></code> and <code class="docutils literal notranslate"><span class="pre">media</span></code>.
+Note that only media files with at least one reference are loaded.
+I.e. filtering meta files, may also remove media files.
+Likewise, references to missing media files will be removed, too.
+I.e. filtering media files, may also remove entries from the meta files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version string, latest if <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>only_metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – load only metadata</p></li>
+<li><p><strong>bit_depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – bit depth, one of <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">24</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code></p></li>
+<li><p><strong>channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – channel selection, see <a class="reference external" href="https://audeering.github.io/audresample/api.html#audresample.remix" title="(in audresample vv0.1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audresample.remix()</span></code></a>.
+Note that media files with too few channels
+will be first upsampled by repeating the existing channels.
+E.g. <code class="docutils literal notranslate"><span class="pre">channels=[0,</span> <span class="pre">1]</span></code> upsamples all mono files to stereo,
+and <code class="docutils literal notranslate"><span class="pre">channels=[1]</span></code> returns the second channel
+of all multi-channel files
+and all mono files.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – file format, one of <code class="docutils literal notranslate"><span class="pre">'flac'</span></code>, <code class="docutils literal notranslate"><span class="pre">'wav'</span></code></p></li>
+<li><p><strong>mixdown</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – apply mono mix-down</p></li>
+<li><p><strong>sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sampling rate in Hz, one of
+<code class="docutils literal notranslate"><span class="pre">8000</span></code>, <code class="docutils literal notranslate"><span class="pre">16000</span></code>, <code class="docutils literal notranslate"><span class="pre">22500</span></code>, <code class="docutils literal notranslate"><span class="pre">44100</span></code>, <code class="docutils literal notranslate"><span class="pre">48000</span></code></p></li>
+<li><p><strong>tables</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – include only tables matching the regular expression or
+provided in the list</p></li>
+<li><p><strong>media</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – include only media matching the regular expression or
+provided in the list</p></li>
+<li><p><strong>removed_media</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – keep rows that reference removed media</p></li>
+<li><p><strong>full_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – replace relative with absolute file paths</p></li>
+<li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
+If not set <a class="reference internal" href="#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of parallel jobs or 1 for sequential
+processing. If <code class="docutils literal notranslate"><span class="pre">None</span></code> will be set to the number of
+processors on the machine multiplied by 5</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show debug messages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>database object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="load-to">
+<h2>load_to<a class="headerlink" href="#load-to" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.load_to">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">load_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/load_to.html#load_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.load_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load database to directory.</p>
+<p>Loads the original state of the database
+to a custom directory.
+No conversion or filtering will be applied.
+If the target folder already contains
+some version of the database,
+it will upgrade to the requested version.
+Unchanged files will be skipped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – target directory</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version string, latest if <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of parallel jobs or 1 for sequential
+processing. If <code class="docutils literal notranslate"><span class="pre">None</span></code> will be set to the number of
+processors on the machine multiplied by 5</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show debug messages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>database object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="publish">
+<h2>publish<a class="headerlink" href="#publish" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.publish">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">publish</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repository</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">archives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/publish.html#publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.publish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish database.</p>
+<p>A database can have dependencies
+to files of an older version of itself.
+E.g. you might add a few new files to an existing database
+and publish as a new version.
+<a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a> will upload then only the new files
+and store dependencies on the already published files.</p>
+<p>To allow for dependencies
+you first have to load the version of the database
+that the new version should depend on
+with <a class="reference internal" href="#audb.load_to" title="audb.load_to"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load_to()</span></code></a> to <code class="docutils literal notranslate"><span class="pre">db_root</span></code>.
+Afterwards you make your changes to that folder
+and run <a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a>.
+<a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a> will then check
+that the version of the files inside that folder
+match the version given by <code class="docutils literal notranslate"><span class="pre">previous_version</span></code>.</p>
+<p>Setting <code class="docutils literal notranslate"><span class="pre">previous_version=None</span></code> allows you
+to start from scratch and upload all files
+even if an older versions exist.
+In this case you don’t call <a class="reference internal" href="#audb.load_to" title="audb.load_to"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load_to()</span></code></a>
+before running <a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – root directory of database</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
+<li><p><strong>repository</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Repository</span></code>) – name of repository</p></li>
+<li><p><strong>archives</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – dictionary mapping files to archive names.
+Can be used to bundle files into archives.
+Name must not include an extension</p></li>
+<li><p><strong>previous_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – specifies the version
+this publication should be based on.
+If <code class="docutils literal notranslate"><span class="pre">'latest'</span></code>
+it will use automatically the latest published version
+or <code class="docutils literal notranslate"><span class="pre">None</span></code>
+if no version was published.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> it assumes you start from scratch.</p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of parallel jobs or 1 for sequential
+processing. If <code class="docutils literal notranslate"><span class="pre">None</span></code> will be set to the number of
+processors on the machine multiplied by 5</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show debug messages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dependencies</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dependency object</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – if version already exists</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – if database tables reference non-existing files</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – if database in <code class="docutils literal notranslate"><span class="pre">db_root</span></code> depends on other version
+    as indicated by <code class="docutils literal notranslate"><span class="pre">previous_version</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="remove-media">
+<h2>remove_media<a class="headerlink" href="#remove-media" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.remove_media">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">remove_media</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#remove_media"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.remove_media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove media from all versions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
+<li><p><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – list of files that should be removed</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show debug messages</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="repository">
+<h2>Repository<a class="headerlink" href="#repository" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="audb.Repository">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">Repository</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/repository.html#Repository"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository object.</p>
+<p>It stores all information
+needed to address a repository:
+the repository name,
+host,
+and backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository name</p></li>
+<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository host</p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository backend</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Repository</span><span class="p">(</span><span class="s1">&#39;data-local&#39;</span><span class="p">,</span> <span class="s1">&#39;/data&#39;</span><span class="p">,</span> <span class="s1">&#39;file-system&#39;</span><span class="p">)</span>
+<span class="go">Repository(&#39;data-local&#39;, &#39;/data&#39;, &#39;file-system&#39;)</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt id="audb.Repository.backend">
+<code class="sig-name descname"><span class="pre">backend</span></code><a class="headerlink" href="#audb.Repository.backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository backend.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.Repository.host">
+<code class="sig-name descname"><span class="pre">host</span></code><a class="headerlink" href="#audb.Repository.host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository host.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="audb.Repository.name">
+<code class="sig-name descname"><span class="pre">name</span></code><a class="headerlink" href="#audb.Repository.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository name.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="id2">
+<h2>repository<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.repository">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">repository</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/utils.html#repository"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.repository" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repository that stores the requested database.</p>
+<p>If the database is stored in several repositories,
+only the first one is returned.
+The order of the repositories to look for the database
+is given by <a class="reference internal" href="#audb.config.REPOSITORIES" title="audb.config.REPOSITORIES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.REPOSITORIES</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – database name</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Repository</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>repository that contains the database</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – if database is not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="versions">
+<h2>versions<a class="headerlink" href="#versions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="audb.versions">
+<code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">versions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#versions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Available versions of database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of versions</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api-info.html" class="btn btn-neutral float-right" title="audb.info" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="caching.html" class="btn btn-neutral float-left" title="Caching" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2020-2021 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script src="_static/thebelab-helper.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
