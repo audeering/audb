@@ -21,12 +21,12 @@ from audb.core.utils import (
 
 def available(
         *,
-        latest_only: bool = False,
+        only_latest: bool = False,
 ) -> pd.DataFrame:
     r"""List all databases that are available to the user.
 
     Args:
-        latest_only: keep only latest version
+        only_latest: keep only latest version
 
     Returns:
         table with name, version and private flag
@@ -56,7 +56,7 @@ def available(
         match[name]['version'] = audeer.sort_versions(
             match[name]['version']
         )
-        if latest_only:
+        if only_latest:
             match[name]['version'] = [match[name]['version'][-1]]
 
     data = []
