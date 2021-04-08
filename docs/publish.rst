@@ -39,9 +39,8 @@ and release a new version.
 Create a database
 -----------------
 
-
-The first one can be done by the :mod:`audformat.testing` module,
-which let you easily create a database:
+We can create an example database
+with the :mod:`audformat.testing` module.
 
 .. jupyter-execute::
 
@@ -62,7 +61,7 @@ which let you easily create a database:
     )
     audformat.testing.create_audio_files(db, build_dir)
 
-This results in the following database:
+This results in the following database.
 
 .. jupyter-execute::
 
@@ -177,7 +176,7 @@ and add the age annotation of 22 to it.
 
     db['age'].get()
 
-Now we overwrite the table stored in the database build folder.
+We save it to the database build folder and overwrite the old table.
 
 .. jupyter-execute::
 
