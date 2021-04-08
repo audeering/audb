@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.3 (2021-04-08)
+--------------------------
+
+* Fixed: docstring of ``audb.exists()`` falsely claimed that it was not
+  returning a boolean
+* Fixed: several typos in documentation
+
+
 Version 1.0.2 (2021-04-07)
 --------------------------
 
