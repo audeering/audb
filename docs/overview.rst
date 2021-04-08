@@ -30,7 +30,7 @@ by using the :mod:`audbackend` package
 to communicate with the underlying backend.
 At the moment,
 it supports to store the data
-on a folder on a local file system,
+in a folder on a local file system,
 or inside a `Generic repository`_
 on an `Artifactory server`_.
 
