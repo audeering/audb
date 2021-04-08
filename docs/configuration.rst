@@ -22,7 +22,7 @@ The default settings are:
 After loading :mod:`audb`
 they can be accessed
 or changed
-using :class:`audb.config`:
+using :class:`audb.config`.
 
 .. jupyter-execute::
 
