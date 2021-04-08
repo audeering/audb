@@ -70,9 +70,9 @@ When publishing your data
 with :func:`audb.publish`
 the following operations are performed:
 
-1. calculates :ref:`database dependencies <database-dependencies>`
-2. packs the files into ZIP archives
-3. uploads all files to the backend
+1. calculate :ref:`database dependencies <database-dependencies>`
+2. pack the files into ZIP archives
+3. upload all files to the backend
 
 .. graphviz:: pics/publish.dot
 
@@ -84,14 +84,14 @@ In the process of loading data
 with :func:`audb.load`
 the following operations are performed:
 
-1. finds the backends where the database is stored
-2. finds the latest version of a database (optional)
-3. calculates :ref:`database dependencies <database-dependencies>`
-4. downloads archive files from the selected backend (e.g. Artifactory)
-5. unpacks the archive files
-6. inspects and :ref:`converts <media-conversion-and-flavors>`
+1. find the backends where the database is stored
+2. find the latest version of a database (optional)
+3. calculate :ref:`database dependencies <database-dependencies>`
+4. download archive files from the selected backend
+5. unpack the archive files
+6. inspect and :ref:`convert <media-conversion-and-flavors>`
    the audio files (optional)
-7. stores the data in a :ref:`cache <caching>` folder
+7. store the data in a :ref:`cache <caching>` folder
 
 .. graphviz:: pics/load.dot
 
