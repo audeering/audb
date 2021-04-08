@@ -43,7 +43,7 @@ objects.
 For example,
 to store all your data
 on your local disk under :file:`/data/data-local`
-you would use the following repository:
+you would use the following repository.
 
 .. jupyter-execute::
     :hide-code:
@@ -58,7 +58,7 @@ you would use the following repository:
         backend='file-system',
     )
 
-The default repositories are stored in :attr:`audb.config.REPOSITORIES`
+The default repositories are configured in :attr:`audb.config.REPOSITORIES`
 and can be managed best
 by specifying them in the :ref:`configuration`.
 
