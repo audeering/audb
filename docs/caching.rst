@@ -27,14 +27,8 @@ By default it is located at
 
 and is meant to be shared by several users.
 
-Please use the shared folder only
-for all databases with public access level.
-
 The second cache folder should be
 accessible to you only.
-It is reserved for databases that
-are not relevant to other users or
-databases that have private access level.
 By default it points to
 
 .. jupyter-execute::
@@ -47,20 +41,20 @@ and afterwards in your local cache folder.
 
 There are four ways to change the default locations:
 
-1. By setting the argument ``cache_root`` during a function call, e.g:
+1. By setting the argument ``cache_root`` during a function call, e.g
 
 .. code-block:: python
 
     audb.load('emodb', ..., cache_root='/cache/root/audb')
 
-2. System-wide by setting the following system variables:
+2. System-wide by setting the following system variables
 
 .. code-block:: bash
 
     export AUDB_CACHE_ROOT=/new/local/cache/audb
     export AUDB_SHARED_CACHE_ROOT=/new/shared/cache/audb
 
-3. Program-wide by overwriting the default values in :class:`audb.config`:
+3. Program-wide by overwriting the default values in :class:`audb.config`
 
 .. jupyter-execute::
 
