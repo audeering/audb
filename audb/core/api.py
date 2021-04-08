@@ -226,16 +226,6 @@ def exists(
 ) -> bool:
     r"""Check if specified database flavor exists in local cache folder.
 
-    Does not yet return ``True`` or ``False``,
-    but ``None`` or path to flavor.
-    Nonetheless,
-    it can still be used with an if-statement:
-
-    .. code-block::
-
-        if audb.exists('emodb', version='1.1.0', mixdown=True):
-            print('emodb v1.1.0 {mono} cached')
-
     Does not check for any flavor of the requested database in the cache,
     but only for a particular flavor.
     Note, that using only the name, e.g. ``audb.exists('emodb')``
