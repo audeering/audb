@@ -6,7 +6,7 @@ Quickstart
 The most common task is to load a database
 with :func:`audb.load`.
 
-Let's first see which databases are available to load:
+Let's first see which databases are available to load.
 
 .. jupyter-execute::
 
@@ -18,7 +18,7 @@ As you can see we provide the emodb_ database
 as small example database,
 which we `have published`_
 to our `public Artifactory server`_.
-Let's load the database:
+Let's load the database.
 
 .. Load with only_metadata=True in the background
 .. jupyter-execute::
@@ -44,14 +44,14 @@ as an :class:`audformat.Database` object.
 
 Each database comes with a description,
 which is a good starting point
-to learn what the database is all about:
+to learn what the database is all about.
 
 .. jupyter-execute::
 
     db.description
 
 The annotations of a database are stored in
-tables represented by :class:`audformat.Table`:
+tables represented by :class:`audformat.Table`.
 
 .. jupyter-execute::
 
@@ -63,14 +63,14 @@ describing its content.
 For example,
 to get an idea about the emotion annotations
 stored in the ``emotion`` column,
-we can inspect the corresponding scheme:
+we can inspect the corresponding scheme.
 
 .. jupyter-execute::
 
     db.schemes['emotion']
 
 Finally, we get the actual annotations
-as a :class:`pandas.DataFrame`:
+as a :class:`pandas.DataFrame`.
 
 .. jupyter-execute::
 

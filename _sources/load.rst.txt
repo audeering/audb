@@ -59,20 +59,20 @@ even if a new version of the database is published.
 store them in a cache folder,
 and return the database as an :class:`audformat.Database` object.
 The most important content of that object
-are the database tables:
+are the database tables.
 
 .. jupyter-execute::
 
     db.tables
 
 They contain the annotations of the database,
-and can be requested as a :class:`pandas.DataFrame`:
+and can be requested as a :class:`pandas.DataFrame`.
 
 .. jupyter-execute::
 
     db['emotion'].get()
 
-Or you can directly request single columns as :class:`pandas.Series`:
+Or you can directly request single columns as :class:`pandas.Series`.
 
 .. jupyter-execute::
 
@@ -103,7 +103,7 @@ When loading a database,
 audio files can be automatically converted.
 This creates a new flavor of the database,
 represented by :class:`audb.Flavor`.
-The following properties can be changed:
+The following properties can be changed.
 
 .. code-block:: yaml
 
@@ -157,7 +157,8 @@ inside the :ref:`cache <caching>`.
         verbose=False,
     )
 
-The new audio format is included in the flavor of the converted database:
+The flavor information of a database is stored
+inside the ``db.meta['audb']`` dictionary.
 
 .. jupyter-execute::
 
@@ -168,7 +169,7 @@ You can list all available flavors and their locations in the cache with:
 .. jupyter-execute::
 
     df = audb.cached()
-    df[['name', 'version', 'complete', 'sampling_rate']]
+    df[['name', 'version', 'complete', 'format', 'sampling_rate']]
 
 The entry ``'complete'`` tells you if a database flavor is completely cached,
 or if some table or media files are still missing.
@@ -183,7 +184,7 @@ It is possible to request only metadata
 (header and annotations)
 of a database.
 In that case media files are not loaded,
-but all the tables and the header:
+but all the tables and the header.
 
 .. jupyter-execute::
 
@@ -200,7 +201,8 @@ If you are only interested in header information,
 you can use :func:`audb.info.header`.
 Or if you are only interested
 in parts of the header,
-like table definitions:
+have a look at the :mod:`audb.info` module.
+It can list all table definitions.
 
 .. jupyter-execute::
 
@@ -209,7 +211,7 @@ like table definitions:
         version='1.1.0',
     )
 
-And to get the total duration of all media files:
+Or get the total duration of all media files.
 
 .. jupyter-execute::
 

@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.0.2
+                v1.0.3
               </div>
             
           
@@ -172,7 +172,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.0.2/docs/dependencies.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.0.3/docs/dependencies.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -202,7 +202,8 @@ and store some additional metadata about the audio files
 like duration and number of channels
 in a dependency table in a file <code class="file docutils literal notranslate"><span class="pre">db.csv</span></code>
 for every version of a database.</p>
-<p>You request a <a class="reference internal" href="api.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> object with:</p>
+<p>You request a <a class="reference internal" href="api.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> object with
+<a class="reference internal" href="api.html#audb.dependencies" title="audb.dependencies"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.dependencies()</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">)</span>
@@ -212,7 +213,7 @@ for every version of a database.</p>
 <div class="cell_output docutils container">
 </div>
 </div>
-<p>You can see all entries with</p>
+<p>You can see all entries by calling the returned object.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span><span class="p">()</span>
@@ -363,7 +364,7 @@ for every version of a database.</p>
 <p>537 rows × 10 columns</p>
 </div></div></div>
 </div>
-<p>or request certain aspects, e.g.</p>
+<p>You can also use it to request certain aspects, e.g.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;wav/03a01Fa.wav&#39;</span><span class="p">)</span>
@@ -376,6 +377,7 @@ for every version of a database.</p>
 </div>
 </div>
 </div>
+<p>See <a class="reference internal" href="api.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> for all available methods.</p>
 </div>
 
 
@@ -401,7 +403,7 @@ for every version of a database.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

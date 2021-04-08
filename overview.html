@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.0.2
+                v1.0.3
               </div>
             
           
@@ -177,7 +177,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.0.2/docs/overview.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.0.3/docs/overview.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -217,7 +217,7 @@ by using the <a class="reference external" href="https://audeering.github.io/aud
 to communicate with the underlying backend.
 At the moment,
 it supports to store the data
-on a folder on a local file system,
+in a folder on a local file system,
 or inside a <a class="reference external" href="https://www.jfrog.com/confluence/display/JFROG/Repository+Management#RepositoryManagement-GenericRepositories">Generic repository</a>
 on an <a class="reference external" href="https://jfrog.com/artifactory/">Artifactory server</a>.</p>
 <p>You could easily expand this,
@@ -228,7 +228,7 @@ objects.
 For example,
 to store all your data
 on your local disk under <code class="file docutils literal notranslate"><span class="pre">/data/data-local</span></code>
-you would use the following repository:</p>
+you would use the following repository.</p>
 <div class="jupyter_cell docutils container">
 <div class="cell_output docutils container">
 </div>
@@ -246,7 +246,7 @@ you would use the following repository:</p>
 <div class="cell_output docutils container">
 </div>
 </div>
-<p>The default repositories are stored in <a class="reference internal" href="api.html#audb.config.REPOSITORIES" title="audb.config.REPOSITORIES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code></a>
+<p>The default repositories are configured in <a class="reference internal" href="api.html#audb.config.REPOSITORIES" title="audb.config.REPOSITORIES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code></a>
 and can be managed best
 by specifying them in the <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">Configuration</span></a>.</p>
 </div>
@@ -256,9 +256,9 @@ by specifying them in the <a class="reference internal" href="configuration.html
 with <a class="reference internal" href="api.html#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a>
 the following operations are performed:</p>
 <ol class="arabic simple">
-<li><p>calculates <a class="reference internal" href="dependencies.html#database-dependencies"><span class="std std-ref">database dependencies</span></a></p></li>
-<li><p>packs the files into ZIP archives</p></li>
-<li><p>uploads all files to the backend</p></li>
+<li><p>calculate <a class="reference internal" href="dependencies.html#database-dependencies"><span class="std std-ref">database dependencies</span></a></p></li>
+<li><p>pack the files into ZIP archives</p></li>
+<li><p>upload all files to the backend</p></li>
 </ol>
 <div class="graphviz"><object data="_images/graphviz-8dea1ba13cbaf3cad29360f1648d646dc82667d8.svg" type="image/svg+xml" class="graphviz">
 <p class="warning">digraph G {
@@ -307,14 +307,14 @@ the following operations are performed:</p>
 with <a class="reference internal" href="api.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>
 the following operations are performed:</p>
 <ol class="arabic simple">
-<li><p>finds the backends where the database is stored</p></li>
-<li><p>finds the latest version of a database (optional)</p></li>
-<li><p>calculates <a class="reference internal" href="dependencies.html#database-dependencies"><span class="std std-ref">database dependencies</span></a></p></li>
-<li><p>downloads archive files from the selected backend (e.g. Artifactory)</p></li>
-<li><p>unpacks the archive files</p></li>
-<li><p>inspects and <a class="reference internal" href="load.html#media-conversion-and-flavors"><span class="std std-ref">converts</span></a>
+<li><p>find the backends where the database is stored</p></li>
+<li><p>find the latest version of a database (optional)</p></li>
+<li><p>calculate <a class="reference internal" href="dependencies.html#database-dependencies"><span class="std std-ref">database dependencies</span></a></p></li>
+<li><p>download archive files from the selected backend</p></li>
+<li><p>unpack the archive files</p></li>
+<li><p>inspect and <a class="reference internal" href="load.html#media-conversion-and-flavors"><span class="std std-ref">convert</span></a>
 the audio files (optional)</p></li>
-<li><p>stores the data in a <a class="reference internal" href="caching.html#caching"><span class="std std-ref">cache</span></a> folder</p></li>
+<li><p>store the data in a <a class="reference internal" href="caching.html#caching"><span class="std std-ref">cache</span></a> folder</p></li>
 </ol>
 <div class="graphviz"><object data="_images/graphviz-886b2b7938a5abf0b460aa8871c14888e954a791.svg" type="image/svg+xml" class="graphviz">
 <p class="warning">digraph G {
@@ -383,7 +383,7 @@ the audio files (optional)</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

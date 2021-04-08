@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.0.2
+                v1.0.3
               </div>
             
           
@@ -191,7 +191,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.0.2/docs/api.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.0.3/docs/api.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -760,14 +760,6 @@ or
 <dt id="audb.exists">
 <code class="sig-prename descclassname"><span class="pre">audb.</span></code><code class="sig-name descname"><span class="pre">exists</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/api.html#exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if specified database flavor exists in local cache folder.</p>
-<p>Does not yet return <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>,
-but <code class="docutils literal notranslate"><span class="pre">None</span></code> or path to flavor.
-Nonetheless,
-it can still be used with an if-statement:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">audb</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span> <span class="n">mixdown</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;emodb v1.1.0 </span><span class="si">{mono}</span><span class="s1"> cached&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
 <p>Does not check for any flavor of the requested database in the cache,
 but only for a particular flavor.
 Note, that using only the name, e.g. <code class="docutils literal notranslate"><span class="pre">audb.exists('emodb')</span></code>
@@ -1314,7 +1306,7 @@ is given by <a class="reference internal" href="#audb.config.REPOSITORIES" title
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

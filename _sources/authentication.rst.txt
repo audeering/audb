@@ -7,7 +7,7 @@ You could use `anonymous access`_,
 but we would only recommend it for downloading public data.
 
 To authenticate
-users have to store their credentials in :file:`~/.artifactory_python.cfg`:
+users have to store their credentials in :file:`~/.artifactory_python.cfg`.
 
 .. code-block:: cfg
 
@@ -15,7 +15,7 @@ users have to store their credentials in :file:`~/.artifactory_python.cfg`:
     username = MY_USERNAME
     password = MY_API_KEY
 
-Alternatively, they can export them as environment variables:
+Alternatively, they can export them as environment variables.
 
 .. code-block:: bash
 

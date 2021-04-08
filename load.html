@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.0.2
+                v1.0.3
               </div>
             
           
@@ -177,7 +177,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.0.2/docs/load.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.0.3/docs/load.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -220,7 +220,7 @@ even if a new version of the database is published.</p>
 store them in a cache folder,
 and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.10.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
 The most important content of that object
-are the database tables:</p>
+are the database tables.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
@@ -244,7 +244,7 @@ files:
 </div>
 </div>
 <p>They contain the annotations of the database,
-and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>:</p>
+and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;emotion&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -320,7 +320,7 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
 <p>535 rows × 2 columns</p>
 </div></div></div>
 </div>
-<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>:</p>
+<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">][</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -405,7 +405,7 @@ and <a class="reference internal" href="#filter"><span class="std std-ref">Loadi
 audio files can be automatically converted.
 This creates a new flavor of the database,
 represented by <a class="reference internal" href="api.html#audb.Flavor" title="audb.Flavor"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Flavor</span></code></a>.
-The following properties can be changed:</p>
+The following properties can be changed.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">bit_depth</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">8</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">16</span>
@@ -446,7 +446,8 @@ inside the <a class="reference internal" href="caching.html#caching"><span class
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>The new audio format is included in the flavor of the converted database:</p>
+<p>The flavor information of a database is stored
+inside the <code class="docutils literal notranslate"><span class="pre">db.meta['audb']</span></code> dictionary.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;audb&#39;</span><span class="p">][</span><span class="s1">&#39;flavor&#39;</span><span class="p">]</span>
@@ -467,7 +468,7 @@ inside the <a class="reference internal" href="caching.html#caching"><span class
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">cached</span><span class="p">()</span>
-<span class="n">df</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">,</span> <span class="s1">&#39;sampling_rate&#39;</span><span class="p">]]</span>
+<span class="n">df</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="s1">&#39;sampling_rate&#39;</span><span class="p">]]</span>
 </pre></div>
 </div>
 </div>
@@ -493,6 +494,7 @@ inside the <a class="reference internal" href="caching.html#caching"><span class
       <th>name</th>
       <th>version</th>
       <th>complete</th>
+      <th>format</th>
       <th>sampling_rate</th>
     </tr>
   </thead>
@@ -502,6 +504,7 @@ inside the <a class="reference internal" href="caching.html#caching"><span class
       <td>emodb</td>
       <td>1.1.0</td>
       <td>False</td>
+      <td>flac</td>
       <td>44100.0</td>
     </tr>
     <tr>
@@ -509,6 +512,7 @@ inside the <a class="reference internal" href="caching.html#caching"><span class
       <td>emodb</td>
       <td>1.1.0</td>
       <td>False</td>
+      <td>None</td>
       <td>None</td>
     </tr>
   </tbody>
@@ -524,7 +528,7 @@ or if some table or media files are still missing.</p>
 (header and annotations)
 of a database.
 In that case media files are not loaded,
-but all the tables and the header:</p>
+but all the tables and the header.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
@@ -545,7 +549,8 @@ If you are only interested in header information,
 you can use <a class="reference internal" href="api-info.html#audb.info.header" title="audb.info.header"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.info.header()</span></code></a>.
 Or if you are only interested
 in parts of the header,
-like table definitions:</p>
+have a look at the <a class="reference internal" href="api-info.html#module-audb.info" title="audb.info"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb.info</span></code></a> module.
+It can list all table definitions.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span>
@@ -571,7 +576,7 @@ files:
 </div>
 </div>
 </div>
-<p>And to get the total duration of all media files:</p>
+<p>Or get the total duration of all media files.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span>
@@ -888,7 +893,7 @@ from the tables.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
