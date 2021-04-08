@@ -41,7 +41,7 @@ and afterwards in your local cache folder.
 
 There are four ways to change the default locations:
 
-1. By setting the argument ``cache_root`` during a function call, e.g
+1. By setting the argument ``cache_root`` during a function call, e.g.
 
 .. code-block:: python
 
