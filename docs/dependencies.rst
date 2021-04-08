@@ -26,20 +26,23 @@ like duration and number of channels
 in a dependency table in a file :file:`db.csv`
 for every version of a database.
 
-You request a :class:`audb.Dependencies` object with:
+You request a :class:`audb.Dependencies` object with
+:func:`audb.dependencies`.
 
 .. jupyter-execute::
 
     deps = audb.dependencies('emodb', version='1.1.0')
 
-You can see all entries with
+You can see all entries by calling the returned object.
 
 .. jupyter-execute::
 
     deps()
 
-or request certain aspects, e.g.
+You can also use it to request certain aspects, e.g.
 
 .. jupyter-execute::
 
     deps.duration('wav/03a01Fa.wav')
+
+See :class:`audb.Dependencies` for all available methods.
