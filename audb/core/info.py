@@ -117,7 +117,7 @@ def duration(
     """
     deps = dependencies(name, version=version)
     return pd.to_timedelta(
-        sum([deps.duration(file) for file in deps.media]),
+        deps()['duration'].sum(),
         unit='s',
     )
 
