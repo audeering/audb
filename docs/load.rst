@@ -211,7 +211,7 @@ It can list all table definitions.
         version='1.1.0',
     )
 
-Or get the total duration of all media files:
+Or get the total duration of all media files.
 
 .. jupyter-execute::
 
