@@ -331,7 +331,6 @@ def sampling_rates(
     return set(
         [
             deps.sampling_rate(file) for file in deps.media
-            if deps.sampling_rate(file)
         ]
     )
 
