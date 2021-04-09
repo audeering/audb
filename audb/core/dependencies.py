@@ -347,7 +347,7 @@ class Dependencies:
             sampling rate in Hz
 
         """
-        return self[file][define.DependField.SAMPLING_RATE] or 0
+        return self[file][define.DependField.SAMPLING_RATE]
 
     def save(self, path: str):
         r"""Write dependencies to CSV file.
