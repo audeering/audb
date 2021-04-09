@@ -224,7 +224,7 @@ class Dependencies:
         """
         return self[file][define.DependField.ARCHIVE]
 
-    def bit_depth(self, file: str) -> typing.Optional[int]:
+    def bit_depth(self, file: str) -> int:
         r"""Bit depth of media file.
 
         Args:
@@ -234,9 +234,9 @@ class Dependencies:
             bit depth
 
         """
-        return self[file][define.DependField.BIT_DEPTH] or None
+        return self[file][define.DependField.BIT_DEPTH] or 0
 
-    def channels(self, file: str) -> typing.Optional[int]:
+    def channels(self, file: str) -> int:
         r"""Number of channels of media file.
 
         Args:
@@ -246,7 +246,7 @@ class Dependencies:
             number of channels
 
         """
-        return self[file][define.DependField.CHANNELS] or None
+        return self[file][define.DependField.CHANNELS] or 0
 
     def checksum(self, file: str) -> str:
         r"""Checksum of file.
@@ -260,7 +260,7 @@ class Dependencies:
         """
         return self[file][define.DependField.CHECKSUM]
 
-    def duration(self, file: str) -> typing.Optional[float]:
+    def duration(self, file: str) -> float:
         r"""Duration of file.
 
         Args:
@@ -270,7 +270,7 @@ class Dependencies:
             duration in seconds
 
         """
-        return self[file][define.DependField.DURATION] or None
+        return self[file][define.DependField.DURATION] or 0.0
 
     def format(self, file: str) -> str:
         r"""Format of file.
@@ -337,7 +337,7 @@ class Dependencies:
         """
         self._data[file][define.DependField.REMOVED] = 1
 
-    def sampling_rate(self, file: str) -> typing.Optional[int]:
+    def sampling_rate(self, file: str) -> int:
         r"""Sampling rate of media file.
 
         Args:
@@ -347,7 +347,7 @@ class Dependencies:
             sampling rate in Hz
 
         """
-        return self[file][define.DependField.SAMPLING_RATE] or None
+        return self[file][define.DependField.SAMPLING_RATE] or 0
 
     def save(self, path: str):
         r"""Write dependencies to CSV file.
