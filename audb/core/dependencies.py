@@ -270,7 +270,7 @@ class Dependencies:
             duration in seconds
 
         """
-        return self[file][define.DependField.DURATION] or 0.0
+        return self[file][define.DependField.DURATION]
 
     def format(self, file: str) -> str:
         r"""Format of file.
