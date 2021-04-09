@@ -52,7 +52,6 @@ def bit_depths(
     return set(
         [
             deps.bit_depth(file) for file in deps.media
-            if deps.bit_depth(file)
         ]
     )
 
@@ -76,7 +75,6 @@ def channels(
     return set(
         [
             deps.channels(file) for file in deps.media
-            if deps.channels(file)
         ]
     )
 
@@ -117,7 +115,7 @@ def duration(
     """
     deps = dependencies(name, version=version)
     return pd.to_timedelta(
-        deps()['duration'].sum(),
+        sum([deps.duration(file) for file in deps.media]),
         unit='s',
     )
 
@@ -333,7 +331,6 @@ def sampling_rates(
     return set(
         [
             deps.sampling_rate(file) for file in deps.media
-            if deps.sampling_rate(file)
         ]
     )
 
