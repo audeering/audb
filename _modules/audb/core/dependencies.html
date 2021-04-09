@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.0.3
+                v1.0.4
               </div>
             
           
@@ -407,7 +407,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">ARCHIVE</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Dependencies.bit_depth"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.bit_depth">[docs]</a>    <span class="k">def</span> <span class="nf">bit_depth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<div class="viewcode-block" id="Dependencies.bit_depth"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.bit_depth">[docs]</a>    <span class="k">def</span> <span class="nf">bit_depth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bit depth of media file.</span>
 
 <span class="sd">        Args:</span>
@@ -417,9 +417,9 @@
 <span class="sd">            bit depth</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">BIT_DEPTH</span><span class="p">]</span> <span class="ow">or</span> <span class="kc">None</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">BIT_DEPTH</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Dependencies.channels"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.channels">[docs]</a>    <span class="k">def</span> <span class="nf">channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<div class="viewcode-block" id="Dependencies.channels"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.channels">[docs]</a>    <span class="k">def</span> <span class="nf">channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Number of channels of media file.</span>
 
 <span class="sd">        Args:</span>
@@ -429,7 +429,7 @@
 <span class="sd">            number of channels</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">CHANNELS</span><span class="p">]</span> <span class="ow">or</span> <span class="kc">None</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">CHANNELS</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Dependencies.checksum"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.checksum">[docs]</a>    <span class="k">def</span> <span class="nf">checksum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checksum of file.</span>
@@ -443,7 +443,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">CHECKSUM</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Dependencies.duration"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.duration">[docs]</a>    <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<div class="viewcode-block" id="Dependencies.duration"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.duration">[docs]</a>    <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Duration of file.</span>
 
 <span class="sd">        Args:</span>
@@ -453,7 +453,7 @@
 <span class="sd">            duration in seconds</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">DURATION</span><span class="p">]</span> <span class="ow">or</span> <span class="kc">None</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">DURATION</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Dependencies.format"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Format of file.</span>
@@ -520,7 +520,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">REMOVED</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
 
-<div class="viewcode-block" id="Dependencies.sampling_rate"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.sampling_rate">[docs]</a>    <span class="k">def</span> <span class="nf">sampling_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<div class="viewcode-block" id="Dependencies.sampling_rate"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.sampling_rate">[docs]</a>    <span class="k">def</span> <span class="nf">sampling_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sampling rate of media file.</span>
 
 <span class="sd">        Args:</span>
@@ -530,7 +530,7 @@
 <span class="sd">            sampling rate in Hz</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">SAMPLING_RATE</span><span class="p">]</span> <span class="ow">or</span> <span class="kc">None</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">SAMPLING_RATE</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Dependencies.save"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write dependencies to CSV file.</span>
@@ -586,7 +586,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
