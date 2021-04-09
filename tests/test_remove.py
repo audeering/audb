@@ -134,5 +134,5 @@ def test_remove(publish_db, format):
 
         # Make sure calling it again doesn't raise error
         audb.remove_media(DB_NAME, remove)
-        # remove db from cache to ensure we always get a fresh copy
-        shutil.rmtree(db.meta['audb']['root'])
+        # remove db cache to ensure we always get a fresh copy
+        shutil.rmtree(pytest.CACHE_ROOT)

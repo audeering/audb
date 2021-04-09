@@ -9,7 +9,6 @@ import audformat
 
 from audb.core import define
 from audb.core.api import dependencies
-from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.repository import Repository
 
@@ -289,13 +288,17 @@ def publish(
 
     # dependencies do not match version
     if previous_version is not None and len(deps) > 0:
-        with tempfile.TemporaryDirectory() as tmp_dir:
+        with tempfile.TemporaryDirectory() as tmp_root:
             previous_deps_path = os.path.join(
-                tmp_dir,
+                tmp_root,
                 define.DEPENDENCIES_FILE,
             )
-            previous_deps = dependencies(db.name, version=previous_version)
-            previous_deps.save(previous_deps_path)
+            archive = backend.join(db.name, define.DB)
+            backend.get_archive(
+                archive,
+                tmp_root,
+                previous_version,
+            )
             if audbackend.md5(deps_path) != audbackend.md5(previous_deps_path):
                 raise RuntimeError(
                     f"You want to depend on '{previous_version}' "

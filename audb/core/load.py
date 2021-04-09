@@ -11,6 +11,7 @@ import audformat
 from audb.core import define
 from audb.core.api import (
     default_cache_root,
+    dependencies,
     latest_version,
 )
 from audb.core.dependencies import Dependencies
@@ -109,23 +110,6 @@ def _database_root(
     audeer.mkdir(db_root_tmp)
 
     return db_root, db_root_tmp
-
-
-def _dependencies(
-        db_root: str,
-        db_root_tmp: str,
-        name: str,
-        version: str,
-        backend: audbackend.Backend,
-) -> Dependencies:
-    deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
-    if not os.path.exists(deps_path):
-        archive = backend.join(name, define.DB)
-        backend.get_archive(archive, db_root_tmp, version)
-        _move_file(db_root_tmp, db_root, define.DEPENDENCIES_FILE)
-    deps = Dependencies()
-    deps.load(deps_path)
-    return deps
 
 
 def _fix_media_ext(
@@ -503,6 +487,7 @@ def load(
     if version is None:
         version = latest_version(name)
     backend = lookup_backend(name, version)
+    deps = dependencies(name, version=version, cache_root=cache_root)
 
     flavor = Flavor(
         channels=channels,
@@ -511,7 +496,6 @@ def load(
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
     )
-
     db_root, db_root_tmp = _database_root(name, version, flavor, cache_root)
 
     if verbose:  # pragma: no cover
@@ -520,7 +504,6 @@ def load(
 
     db = _database_header(db_root, db_root_tmp, name, version, flavor, backend)
     db_is_complete = _database_is_complete(db)
-    deps = _dependencies(db_root, db_root_tmp, name, version, backend)
 
     if 'include' in kwargs or 'exclude' in kwargs:  # pragma: no cover
         include = None
