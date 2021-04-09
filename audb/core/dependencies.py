@@ -246,7 +246,7 @@ class Dependencies:
             number of channels
 
         """
-        return self[file][define.DependField.CHANNELS] or 0
+        return self[file][define.DependField.CHANNELS]
 
     def checksum(self, file: str) -> str:
         r"""Checksum of file.
