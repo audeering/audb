@@ -52,7 +52,6 @@ def bit_depths(
     return set(
         [
             deps.bit_depth(file) for file in deps.media
-            if deps.bit_depth(file)
         ]
     )
 
@@ -76,7 +75,6 @@ def channels(
     return set(
         [
             deps.channels(file) for file in deps.media
-            if deps.channels(file)
         ]
     )
 
