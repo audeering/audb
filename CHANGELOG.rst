@@ -7,6 +7,18 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.4 (2021-04-09)
+--------------------------
+
+* Changed: ``audb.Dependencies.bit_depth()`` now always returns an integer
+* Changed: ``audb.Dependencies.channels()`` now always returns an integer
+* Changed: ``audb.Dependencies.duration()`` now always returns a float
+* Changed: ``audb.Dependencies.sampling_rate()`` now always returns an integer
+* Fixed: ``audb.info.duration()`` for databases that contain files with a
+  duration of 0s
+* Fixed: remove dependency to ``fire`` package
+
+
 Version 1.0.3 (2021-04-08)
 --------------------------
 
