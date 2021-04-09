@@ -234,7 +234,7 @@ class Dependencies:
             bit depth
 
         """
-        return self[file][define.DependField.BIT_DEPTH] or 0
+        return self[file][define.DependField.BIT_DEPTH]
 
     def channels(self, file: str) -> int:
         r"""Number of channels of media file.
