@@ -114,7 +114,8 @@ def cached(
 
             # Skip old audb cache (e.g. 1 as flavor)
             files = audeer.list_file_names(version_path)
-            if len(files) > 1:  # pragma: no cover
+            deps_path = os.path.join(version_path, define.DEPENDENCIES_FILE)
+            if deps_path not in files:  # pragma: no cover
                 continue
 
             for flavor_id_path in flavor_id_paths:
