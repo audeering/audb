@@ -179,6 +179,7 @@ def publish(
         *,
         archives: typing.Mapping[str, str] = None,
         previous_version: typing.Optional[str] = 'latest',
+        cache_root: str = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
 ) -> Dependencies:
@@ -221,6 +222,8 @@ def publish(
             or ``None``
             if no version was published.
             If ``None`` it assumes you start from scratch.
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
@@ -288,17 +291,17 @@ def publish(
 
     # dependencies do not match version
     if previous_version is not None and len(deps) > 0:
-        with tempfile.TemporaryDirectory() as tmp_root:
+        with tempfile.TemporaryDirectory() as tmp_dir:
             previous_deps_path = os.path.join(
-                tmp_root,
+                tmp_dir,
                 define.DEPENDENCIES_FILE,
             )
-            archive = backend.join(db.name, define.DB)
-            backend.get_archive(
-                archive,
-                tmp_root,
-                previous_version,
+            previous_deps = dependencies(
+                db.name,
+                version=previous_version,
+                cache_root=cache_root,
             )
+            previous_deps.save(previous_deps_path)
             if audbackend.md5(deps_path) != audbackend.md5(previous_deps_path):
                 raise RuntimeError(
                     f"You want to depend on '{previous_version}' "

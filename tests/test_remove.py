@@ -100,6 +100,9 @@ def test_remove(publish_db, format):
             DB_FILES['2.0.0'][0],  # new
     ):
 
+        # remove db cache to ensure we always get a fresh copy
+        shutil.rmtree(pytest.CACHE_ROOT)
+
         audb.remove_media(DB_NAME, remove)
 
         for removed_media in [False, True]:
@@ -134,5 +137,3 @@ def test_remove(publish_db, format):
 
         # Make sure calling it again doesn't raise error
         audb.remove_media(DB_NAME, remove)
-        # remove db cache to ensure we always get a fresh copy
-        shutil.rmtree(pytest.CACHE_ROOT)
