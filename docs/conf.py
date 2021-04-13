@@ -81,7 +81,11 @@ html_title = title
 
 
 # cache databases to avoid progress bar in code examples
-
+audb.config.REPOSITORIES = audb.Repository(
+    name='data-public',
+    host='https://audeering.jfrog.io/artifactory',
+    backend='artifactory',
+)
 if not audb.exists('emodb', version='1.1.0'):
     print('Pre-caching emodb v1.1.0')
     audb.load(
