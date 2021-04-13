@@ -1,19 +1,25 @@
 r"""Get information from database headers.
 
-Instead of caching the header (:file:`db.yaml`)
-of a database first locally to inspect it,
-the functions under :mod:`audb.info`
-provide you direct access to this information.
-
-So instead of running:
-
+.. Specify repository to overwrite local config files
 .. jupyter-execute::
-    :stderr:
     :hide-code:
     :hide-output:
 
     import audb
 
+    audb.config.REPOSITORIES = [
+        audb.Repository(
+            name='data-public',
+            host='https://audeering.jfrog.io/artifactory',
+            backend='artifactory',
+        )
+    ]
+
+.. Pre-load data without being verbose
+.. jupyter-execute::
+    :stderr:
+    :hide-code:
+    :hide-output:
 
     audb.load(
         'emodb',
@@ -22,6 +28,12 @@ So instead of running:
         verbose=False,
     )
 
+Instead of caching the header (:file:`db.yaml`)
+of a database first locally to inspect it,
+the functions under :mod:`audb.info`
+provide you direct access to this information.
+
+So instead of running:
 
 .. jupyter-execute::
 
