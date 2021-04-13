@@ -9,7 +9,6 @@ import audformat
 
 from audb.core import define
 from audb.core.api import dependencies
-from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.repository import Repository
 
@@ -180,6 +179,7 @@ def publish(
         *,
         archives: typing.Mapping[str, str] = None,
         previous_version: typing.Optional[str] = 'latest',
+        cache_root: str = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
 ) -> Dependencies:
@@ -222,6 +222,9 @@ def publish(
             or ``None``
             if no version was published.
             If ``None`` it assumes you start from scratch.
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used.
+            Only used to read the dependencies of the previous version
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
@@ -294,7 +297,11 @@ def publish(
                 tmp_dir,
                 define.DEPENDENCIES_FILE,
             )
-            previous_deps = dependencies(db.name, version=previous_version)
+            previous_deps = dependencies(
+                db.name,
+                version=previous_version,
+                cache_root=cache_root,
+            )
             previous_deps.save(previous_deps_path)
             if audbackend.md5(deps_path) != audbackend.md5(previous_deps_path):
                 raise RuntimeError(

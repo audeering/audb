@@ -1,7 +1,7 @@
 import os
+import shutil
 import tempfile
 import typing
-import warnings
 
 import pandas as pd
 
@@ -113,7 +113,9 @@ def cached(
             flavor_id_paths = audeer.list_dir_names(version_path)
 
             # Skip old audb cache (e.g. 1 as flavor)
-            if audeer.list_file_names(version_path):  # pragma: no cover
+            files = audeer.list_file_names(version_path)
+            deps_path = os.path.join(version_path, define.DEPENDENCIES_FILE)
+            if deps_path not in files:  # pragma: no cover
                 continue
 
             for flavor_id_path in flavor_id_paths:
@@ -183,12 +185,15 @@ def dependencies(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> Dependencies:
     r"""Database dependencies.
 
     Args:
         name: name of database
         version: version string
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         dependency object
@@ -198,16 +203,39 @@ def dependencies(
         version = latest_version(name)
     backend = lookup_backend(name, version)
 
-    with tempfile.TemporaryDirectory() as root:
-        archive = backend.join(name, define.DB)
-        deps_path = backend.get_archive(
-            archive,
-            root,
-            version,
-        )[0]
-        deps_path = os.path.join(root, deps_path)
-        deps = Dependencies()
-        deps.load(deps_path)
+    cache_roots = [
+        default_cache_root(True),  # check shared cache first
+        default_cache_root(False),
+    ] if cache_root is None else [cache_root]
+    for cache_root in cache_roots:
+        deps_root = audeer.safe_path(
+            os.path.join(
+                cache_root,
+                name,
+                version,
+            )
+        )
+        if os.path.exists(deps_root):
+            break
+
+    audeer.mkdir(deps_root)
+    deps_path = os.path.join(deps_root, define.DEPENDENCIES_FILE)
+
+    if not os.path.exists(deps_path):
+        with tempfile.TemporaryDirectory() as tmp_root:
+            archive = backend.join(name, define.DB)
+            backend.get_archive(
+                archive,
+                tmp_root,
+                version,
+            )
+            shutil.move(
+                os.path.join(tmp_root, define.DEPENDENCIES_FILE),
+                deps_path,
+            )
+
+    deps = Dependencies()
+    deps.load(deps_path)
 
     return deps
 

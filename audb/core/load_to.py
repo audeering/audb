@@ -7,7 +7,10 @@ import audeer
 import audformat
 
 from audb.core import define
-from audb.core.api import latest_version
+from audb.core.api import (
+    dependencies,
+    latest_version,
+)
 from audb.core.dependencies import Dependencies
 from audb.core.utils import lookup_backend
 
@@ -211,6 +214,7 @@ def load_to(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
 ) -> audformat.Database:
@@ -228,6 +232,9 @@ def load_to(
         root: target directory
         name: name of database
         version: version string, latest if ``None``
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used.
+            Only used to read the dependencies of the requested version
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
@@ -248,11 +255,7 @@ def load_to(
     # to ensure we load correct version
     update = os.path.exists(db_root) and os.listdir(db_root)
     audeer.mkdir(db_root)
-    archive = backend.join(name, define.DB)
-    backend.get_archive(archive, db_root, version)
-    deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
-    deps = Dependencies()
-    deps.load(deps_path)
+    deps = dependencies(name, version=version, cache_root=cache_root)
     if update:
         for file in deps.files:
             full_file = os.path.join(db_root, file)
