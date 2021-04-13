@@ -223,7 +223,8 @@ def publish(
             if no version was published.
             If ``None`` it assumes you start from scratch.
         cache_root: cache folder where databases are stored.
-            If not set :meth:`audb.default_cache_root` is used
+            If not set :meth:`audb.default_cache_root` is used.
+            Only used to read the dependencies of the previous version
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
