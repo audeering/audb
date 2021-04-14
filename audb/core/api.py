@@ -67,6 +67,7 @@ def available(
     else:
         # Sort by version
         df = df.sort_values(by=['version'], key=audeer.sort_versions)
+    df = df.sort_values(by=['name'])
     return df.set_index('name')
 
 
