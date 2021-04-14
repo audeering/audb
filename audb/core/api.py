@@ -32,8 +32,7 @@ def available(
         table with name, version and private flag
 
     """
-
-    match = {}
+    databases = []
     for repository in config.REPOSITORIES:
         pattern = f'*/{define.DB}/*/{define.DB}-*.yaml'
         backend = audbackend.create(
@@ -43,38 +42,33 @@ def available(
         )
         for p in backend.glob(pattern):
             name, _, version, _ = p.split('/')[-4:]
-            if name not in match:
-                match[name] = {
-                    'backend': repository.backend,
-                    'host': repository.host,
-                    'repository': repository.name,
-                    'version': [],
-                }
-            match[name]['version'].append(version)
-
-    for name in match:
-        match[name]['version'] = audeer.sort_versions(
-            match[name]['version']
-        )
-        if only_latest:
-            match[name]['version'] = [match[name]['version'][-1]]
-
-    data = []
-    for name in match:
-        for v in match[name]['version']:
-            data.append(
+            databases.append(
                 [
                     name,
-                    match[name]['backend'],
-                    match[name]['host'],
-                    match[name]['repository'],
-                    v,
+                    repository.backend,
+                    repository.host,
+                    repository.name,
+                    version,
                 ]
             )
-    return pd.DataFrame.from_records(
-        data,
+
+    df = pd.DataFrame.from_records(
+        databases,
         columns=['name', 'backend', 'host', 'repository', 'version'],
-    ).set_index('name')
+    )
+    if only_latest:
+        # Pick latest version for every database, see
+        # https://stackoverflow.com/a/53842408
+        df = df[
+            df['version'] == df.groupby('name')['version'].transform(
+                lambda x: audeer.sort_versions(x)[-1]
+            )
+        ]
+    else:
+        # Sort by version
+        df = df.sort_values(by=['version'], key=audeer.sort_versions)
+    df = df.sort_values(by=['name'])
+    return df.set_index('name')
 
 
 def cached(
