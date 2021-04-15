@@ -51,7 +51,7 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        self._df = {}
+        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -271,7 +271,7 @@ class Dependencies:
             path: path to file
 
         """
-        self._df = {}
+        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
         path = audeer.safe_path(path)
         if os.path.exists(path):
             # Data type of dependency columns
