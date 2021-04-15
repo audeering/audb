@@ -325,7 +325,7 @@ class Dependencies:
                 dtype=dtype_mapping,
             )
             self._data = {
-                file: list(row) for file, row in df.iterrows()
+                row.Index: list(row)[1:] for row in df.itertuples()
             }
 
     def remove(self, file: str):
