@@ -29,7 +29,7 @@ class Dependencies:
             columns=list(define.DEPEND_FIELD_NAMES.values()),
         )
 
-    def __contains__(self, file: str):
+    def __contains__(self, file: str) -> bool:
         r"""Check if file exists.
 
         Args:
