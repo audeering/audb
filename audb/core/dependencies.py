@@ -259,17 +259,20 @@ class Dependencies:
         return self[file][define.DependField.REMOVED] != 0
 
     def load(self, path: str):
-        r"""Read dependencies from CSV file.
+        r"""Read dependencies from file.
 
         Clears existing dependencies.
 
         Args:
-            path: path to file
+            path: path to file.
+                File extension can be ``csv`` or ``pkl``.
 
         """
         self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
         path = audeer.safe_path(path)
-        if os.path.exists(path):
+        if path.endswith('pkl') and os.path.exists(path):
+            self._df = pd.read_pickle(path, compression='xz')
+        elif path.endswith('csv') and os.path.exists(path):
             # Data type of dependency columns
             dtype_mapping = {
                 name: dtype for name, dtype in zip(
@@ -300,14 +303,18 @@ class Dependencies:
         return self[file][define.DependField.SAMPLING_RATE]
 
     def save(self, path: str):
-        r"""Write dependencies to CSV file.
+        r"""Write dependencies to file.
 
         Args:
-            path: path to file
+            path: path to file.
+                File extension can be ``csv`` or ``pkl``.
 
         """
         path = audeer.safe_path(path)
-        self._df.to_csv(path)
+        if path.endswith('csv'):
+            self._df.to_csv(path)
+        elif path.endswith('pkl'):
+            self._df.to_pickle(path, compression='xz')
 
     def type(self, file: str) -> define.DependType:
         r"""Type of file.
