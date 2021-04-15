@@ -213,8 +213,13 @@ def dependencies(
             break
 
     audeer.mkdir(deps_root)
-    deps_path = os.path.join(deps_root, define.DEPENDENCIES_FILE)
+    ext = audeer.file_extension(define.DEPENDENCIES_FILE)
+    deps_path = os.path.join(
+        deps_root,
+        define.DEPENDENCIES_FILE[:-len(ext)] + 'pkl',
+    )
 
+    deps = Dependencies()
     if not os.path.exists(deps_path):
         with tempfile.TemporaryDirectory() as tmp_root:
             archive = backend.join(name, define.DB)
@@ -223,13 +228,10 @@ def dependencies(
                 tmp_root,
                 version,
             )
-            shutil.move(
-                os.path.join(tmp_root, define.DEPENDENCIES_FILE),
-                deps_path,
-            )
-
-    deps = Dependencies()
-    deps.load(deps_path)
+            deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
+            deps.save(deps_path)
+    else:
+        deps.load(deps_path)
 
     return deps
 
