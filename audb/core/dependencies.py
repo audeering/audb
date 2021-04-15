@@ -72,7 +72,7 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        return file in self._df
+        return file in self._df.index
 
     def __getitem__(self, file: str) -> typing.List:
         r"""File information.
@@ -84,7 +84,7 @@ class Dependencies:
             list with meta information
 
         """
-        return self._df.loc[file]
+        return list(self._df.loc[file])
 
     def __len__(self) -> int:
         return len(self._data)
@@ -112,6 +112,7 @@ class Dependencies:
 
         """
         return {row.Index: list(row)[1:] for row in self._df.itertuples()}
+        # return {file: self[file] for file in self.files}
 
     @property
     def files(self) -> typing.List[str]:
@@ -417,4 +418,5 @@ class Dependencies:
             file: relative file path
 
         """
-        self._df.loc[file, define.DependField.REMOVED] = 1
+        removed_column = define.DEPEND_FIELD_NAMES[define.DependField.REMOVED]
+        self._df.at[file, removed_column] = 1
