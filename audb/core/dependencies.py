@@ -51,7 +51,7 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        self._data = {}
+        self._df = {}
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -60,11 +60,7 @@ class Dependencies:
             table with dependencies
 
         """
-        return pd.DataFrame.from_dict(
-            self._data,
-            orient='index',
-            columns=list(define.DEPEND_FIELD_NAMES.values()),
-        )
+        return self._df
 
     def __contains__(self, file: str) -> bool:
         r"""Check if file is part of dependencies.
@@ -76,7 +72,7 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        return file in self._data
+        return file in self._df
 
     def __getitem__(self, file: str) -> typing.List:
         r"""File information.
@@ -88,7 +84,7 @@ class Dependencies:
             list with meta information
 
         """
-        return self._data[file]
+        return self._df.loc[file]
 
     def __len__(self) -> int:
         return len(self._data)
@@ -115,7 +111,7 @@ class Dependencies:
             dictionary with table entries
 
         """
-        return self._data
+        return {row.Index: list(row)[1:] for row in self._df.itertuples()}
 
     @property
     def files(self) -> typing.List[str]:
@@ -125,7 +121,7 @@ class Dependencies:
             list of files
 
         """
-        return list(self._data)
+        return list(self._df.index)
 
     @property
     def media(self) -> typing.List[str]:
@@ -275,7 +271,7 @@ class Dependencies:
             path: path to file
 
         """
-        self._data = {}
+        self._df = {}
         path = audeer.safe_path(path)
         if os.path.exists(path):
             # Data type of dependency columns
@@ -288,15 +284,12 @@ class Dependencies:
             # Data type of index
             index = 0
             dtype_mapping[index] = str
-            df = pd.read_csv(
+            self._df = pd.read_csv(
                 path,
                 index_col=index,
                 na_filter=False,
                 dtype=dtype_mapping,
             )
-            self._data = {
-                file: list(row) for file, row in df.iterrows()
-            }
 
     def sampling_rate(self, file: str) -> int:
         r"""Sampling rate of media file.
@@ -318,7 +311,7 @@ class Dependencies:
 
         """
         path = audeer.safe_path(path)
-        self().to_csv(path)
+        self._df.to_csv(path)
 
     def type(self, file: str) -> define.DependType:
         r"""Type of file.
@@ -373,7 +366,7 @@ class Dependencies:
             duration = audiofile.duration(path)
             sampling_rate = audiofile.sampling_rate(path)
 
-        self.data[file] = [
+        self._df.loc[file] = [
             archive,
             bit_depth,
             channels,
@@ -404,7 +397,7 @@ class Dependencies:
         """
         format = audeer.file_extension(file).lower()
 
-        self.data[file] = [
+        self._df.loc[file] = [
             archive,                 # archive
             0,                       # bit_depth
             0,                       # channels
@@ -424,4 +417,4 @@ class Dependencies:
             file: relative file path
 
         """
-        self._data[file][define.DependField.REMOVED] = 1
+        self._df.loc[file, define.DependField.REMOVED] = 1
