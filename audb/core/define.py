@@ -11,6 +11,7 @@ HEADER_FILE = f'{DB}.yaml'
 
 # Dependencies
 DEPENDENCIES_FILE = f'{DB}.csv'
+CACHED_DEPENDENCIES_FILE = f'{DB}.pkl'
 
 
 class DependField:

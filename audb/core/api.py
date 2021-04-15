@@ -109,8 +109,12 @@ def cached(
             # Skip old audb cache (e.g. 1 as flavor)
             files = audeer.list_file_names(version_path)
             deps_path = os.path.join(version_path, define.DEPENDENCIES_FILE)
-            if deps_path not in files:  # pragma: no cover
-                continue
+            deps_path_cached = os.path.join(
+                version_path,
+                define.CACHED_DEPENDENCIES_FILE,
+            )
+            if deps_path not in files and deps_path_cached not in files:
+                continue  # pragma: no cover
 
             for flavor_id_path in flavor_id_paths:
                 flavor_id = os.path.basename(flavor_id_path)
@@ -213,11 +217,7 @@ def dependencies(
             break
 
     audeer.mkdir(deps_root)
-    ext = audeer.file_extension(define.DEPENDENCIES_FILE)
-    deps_path = os.path.join(
-        deps_root,
-        define.DEPENDENCIES_FILE[:-len(ext)] + 'pkl',
-    )
+    deps_path = os.path.join(deps_root, define.CACHED_DEPENDENCIES_FILE)
 
     deps = Dependencies()
     if not os.path.exists(deps_path):
