@@ -1,6 +1,7 @@
 import os
 import typing
 
+import pandas
 import pandas as pd
 
 import audeer
@@ -118,7 +119,6 @@ class Dependencies:
 
         """
         return {row.Index: list(row)[1:] for row in self._df.itertuples()}
-        # return {file: self[file] for file in self.files}
 
     @property
     def files(self) -> typing.List[str]:
@@ -233,6 +233,15 @@ class Dependencies:
         """
         return self[file][define.DependField.CHECKSUM]
 
+    def drop(self, file: str):
+        r"""Drop file from table.
+
+        Args:
+            file: relative file path
+
+        """
+        self._df.drop(file, inplace=True)
+
     def duration(self, file: str) -> float:
         r"""Duration of file.
 
@@ -319,6 +328,24 @@ class Dependencies:
         """
         path = audeer.safe_path(path)
         self._df.to_csv(path)
+
+    def set_value(
+            self,
+            file: str,
+            field: typing.Union[int, str],
+            value: typing.Any,
+    ):
+        r"""Set field to a new value.
+
+        Args:
+            file: relative file path
+            field: field index or name
+            value: new value
+
+        """
+        if isinstance(field, int):
+            field = define.DEPEND_FIELD_NAMES[field]
+        self._df.at[file, field] = value
 
     def type(self, file: str) -> define.DependType:
         r"""Type of file.

@@ -27,7 +27,7 @@ def _find_tables(
 
     db_tables = [f'db.{table}.csv' for table in db.tables]
     for file in set(deps.tables) - set(db_tables):
-        deps.data.pop(file)
+        deps.drop(file)
 
     tables = []
 
@@ -39,8 +39,8 @@ def _find_tables(
             deps._add_meta(file, table, checksum, version)
             tables.append(table)
         elif checksum != deps.checksum(file):
-            deps.data[file][define.DependField.CHECKSUM] = checksum
-            deps.data[file][define.DependField.VERSION] = version
+            deps.set_value(file, define.DependField.CHECKSUM, checksum)
+            deps.set_value(file, define.DependField.VERSION, version)
             tables.append(table)
 
     audeer.run_tasks(
@@ -70,7 +70,7 @@ def _find_media(
     db_media = db.files
     for file in set(deps.media) - set(db_media):
         media.add(deps.archive(file))
-        deps.data.pop(file)
+        deps.drop(file)
 
     # update version of altered media and insert new ones
 
@@ -86,7 +86,7 @@ def _find_media(
         elif not deps.removed(file):
             checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
-                archive = deps.data[file][define.DependField.ARCHIVE]
+                archive = deps.archive(file)
                 deps._add_media(db_root, file, archive, checksum, version)
 
     audeer.run_tasks(
@@ -122,7 +122,7 @@ def _put_media(
     def job(archive):
         if archive in map_media_to_files:
             for file in map_media_to_files[archive]:
-                deps.data[file][define.DependField.VERSION] = version
+                deps.set_value(file, define.DependField.VERSION, version)
             archive_file = backend.join(
                 db_name,
                 define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
