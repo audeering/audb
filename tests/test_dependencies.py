@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import pytest
 
@@ -5,7 +7,7 @@ import audb
 
 
 ENTRIES = {
-    'db.csv': [
+    'db.files.csv': [
         'archive1',
         0,
         0,
@@ -56,21 +58,21 @@ def deps():
 def test_init():
     deps = audb.Dependencies()
     expected_columns = audb.core.define.DEPEND_FIELD_NAMES.values()
-    assert deps._df.columns == expected_columns
+    assert list(deps._df.columns) == list(expected_columns)
 
 
 def test_call(deps):
-    assert deps() == deps._df
+    pd.testing.assert_frame_equal(deps(), deps._df)
 
 
 def test_contains(deps):
-    assert 'db.csv' in deps
+    assert 'db.files.csv' in deps
     assert 'file.wav' in deps
     assert 'not.csv' not in deps
 
 
 def test_get_item(deps):
-    assert deps['db.csv'] == ENTRIES['db.csv']
+    assert deps['db.files.csv'] == ENTRIES['db.files.csv']
     assert deps['file.wav'] == ENTRIES['file.wav']
 
 
@@ -83,7 +85,7 @@ def test_data(deps):
 
 
 def test_files(deps):
-    assert deps.files == list(ENTRIES.values())
+    assert deps.files == list(ENTRIES.keys())
 
 
 def test_media(deps):
@@ -91,6 +93,116 @@ def test_media(deps):
 
 
 def test_removed_media(deps):
-    assert deps.removed_media == [
-        get_entries(audb.core.define.DependField.REMOVED)[1]
+    assert deps.removed_media == []
+
+
+def test_table_ids(deps):
+    assert deps.table_ids == ['files']
+
+
+def test_tables(deps):
+    assert deps.tables == ['db.files.csv']
+
+
+def test_add_media(deps):
+    deps.add_media(
+        'root',
+        'file.mp3',
+        'archive3',
+        '7c1f6b568f7221ab968a705fd5e7477b',
+        '1.0.0',
+    )
+    assert 'file.mp3' in deps._df.index
+    assert deps._df.loc['file.mp3']['archive'] == 'archive3'
+
+
+def test_add_meta(deps):
+    deps.add_meta(
+        'db.segments.csv',
+        'archive4',
+        'ebd3d5e2ec352bed24117e23f1c5c375',
+        '1.0.0',
+    )
+    assert 'db.segments.csv' in deps._df.index
+    assert deps._df.loc['db.segments.csv']['archive'] == 'archive4'
+
+
+def test_archive(deps):
+    assert deps.archive('file.wav') == ENTRIES['file.wav'][
+        audb.core.define.DependField.ARCHIVE
     ]
+
+
+def test_bit_depth(deps):
+    assert deps.bit_depth('file.wav') == ENTRIES['file.wav'][
+        audb.core.define.DependField.BIT_DEPTH
+    ]
+
+
+def test_channels(deps):
+    assert deps.channels('file.wav') == ENTRIES['file.wav'][
+        audb.core.define.DependField.CHANNELS
+    ]
+
+
+def test_checksum(deps):
+    assert deps.checksum('file.wav') == ENTRIES['file.wav'][
+        audb.core.define.DependField.CHECKSUM
+    ]
+
+
+def test_duration(deps):
+    assert deps.duration('file.wav') == ENTRIES['file.wav'][
+        audb.core.define.DependField.DURATION
+    ]
+
+
+def test_format(deps):
+    assert deps.format('file.wav') == ENTRIES['file.wav'][
+        audb.core.define.DependField.FORMAT
+    ]
+
+
+def test_is_removed(deps):
+    assert not deps.is_removed('file.wav')
+
+
+def test_load_save(deps):
+    deps_file = 'deps.csv'
+    deps.save(deps_file)
+    deps2 = audb.Dependencies()
+    deps2.load(deps_file)
+    pd.testing.assert_frame_equal(deps(), deps2())
+    os.remove(deps_file)
+
+
+def test_remove(deps):
+    deps.remove('file.wav')
+    assert 'file.wav' in deps.files
+    assert deps.is_removed('file.wav')
+
+
+def test_sampling_rate(deps):
+    assert deps.sampling_rate('file.wav') == ENTRIES['file.wav'][
+        audb.core.define.DependField.SAMPLING_RATE
+    ]
+
+
+def test_type(deps):
+    assert deps.type('file.wav') == ENTRIES['file.wav'][
+        audb.core.define.DependField.TYPE
+    ]
+
+
+def test_version(deps):
+    assert deps.version('file.wav') == ENTRIES['file.wav'][
+        audb.core.define.DependField.VERSION
+    ]
+
+
+def test_len(deps):
+    assert len(deps) == len(ENTRIES)
+
+
+def test_str(deps):
+    assert str(deps) == deps._df.to_string()
