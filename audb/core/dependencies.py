@@ -51,7 +51,13 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
+        data = {}
+        for name, dtype in zip(
+                define.DEPEND_FIELD_NAMES.values(),
+                define.DEPEND_FIELD_DTYPES.values(),
+        ):
+            data[name] = pd.Series(dtype=dtype)
+        self._df = pd.DataFrame(data)
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
