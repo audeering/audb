@@ -1,4 +1,5 @@
 import os
+import pickle
 import typing
 
 import pandas as pd
@@ -308,29 +309,30 @@ class Dependencies:
         """
         self._data = {}
         path = audeer.safe_path(path)
-        if path.endswith('pkl') and os.path.exists(path):
-            df = pd.read_pickle(path, compression='xz')
-        elif path.endswith('csv') and os.path.exists(path):
-            # Data type of dependency columns
-            dtype_mapping = {
-                name: dtype for name, dtype in zip(
-                    define.DEPEND_FIELD_NAMES.values(),
-                    define.DEPEND_FIELD_DTYPES.values(),
+        if os.path.exists(path):
+            if path.endswith('pkl'):
+                with open(path, 'rb') as fp:
+                    self._data = pickle.load(fp)
+            elif path.endswith('csv'):
+                # Data type of dependency columns
+                dtype_mapping = {
+                    name: dtype for name, dtype in zip(
+                        define.DEPEND_FIELD_NAMES.values(),
+                        define.DEPEND_FIELD_DTYPES.values(),
+                    )
+                }
+                # Data type of index
+                index = 0
+                dtype_mapping[index] = str
+                df = pd.read_csv(
+                    path,
+                    index_col=index,
+                    na_filter=False,
+                    dtype=dtype_mapping,
                 )
-            }
-            # Data type of index
-            index = 0
-            dtype_mapping[index] = str
-            df = pd.read_csv(
-                path,
-                index_col=index,
-                na_filter=False,
-                dtype=dtype_mapping,
-            )
-        if 'df' in locals():
-            self._data = {
-                file: list(row) for file, row in df.iterrows()
-            }
+                self._data = {
+                    row.Index: list(row)[1:] for row in df.itertuples()
+                }
 
     def remove(self, file: str):
         r"""Mark file as removed.
@@ -365,7 +367,8 @@ class Dependencies:
         if path.endswith('csv'):
             self().to_csv(path)
         elif path.endswith('pkl'):
-            self().to_pickle(path, compression='xz')
+            with open(path, 'wb') as fp:
+                pickle.dump(self._data, fp)
 
     def type(self, file: str) -> define.DependType:
         r"""Type of file.
