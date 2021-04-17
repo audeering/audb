@@ -29,13 +29,13 @@ def _cached_versions(
         version: str,
         flavor: Flavor,
         cache_root: typing.Optional[str],
-) -> typing.Dict[str, typing.Tuple[str, Dependencies]]:
+) -> typing.Sequence[typing.Tuple[LooseVersion, str, Dependencies]]:
     r"""Find other cached versions of same flavor."""
 
     df = cached(cache_root=cache_root)
     df = df[df.name == name]
 
-    cached_versions = {}
+    cached_versions = []
     for flavor_root, row in df.iterrows():
         if row['flavor_id'] == flavor.short_id:
             if row['version'] == version:
@@ -45,12 +45,53 @@ def _cached_versions(
                 version=row['version'],
                 cache_root=cache_root,
             )
-            cached_versions[row['version']] = (
-                flavor_root,
-                deps,
+            # as it is more likely we find files
+            # in newer versions, push them to front
+            cached_versions.insert(
+                0,
+                (
+                    LooseVersion(row['version']),
+                    flavor_root,
+                    deps,
+                ),
             )
 
     return cached_versions
+
+
+def _cached_files(
+        files: typing.Sequence[str],
+        deps: Dependencies,
+        cached_versions: typing.Sequence[
+            typing.Tuple[LooseVersion, str, Dependencies],
+        ],
+        verbose: bool,
+) -> (typing.Sequence[typing.Union[str, str]], typing.Sequence[str]):
+    r"""Find cached files."""
+
+    cached_files = []
+    missing_files = []
+
+    for file in audeer.progress_bar(
+            files,
+            desc='Cached files',
+            disable=not verbose,
+    ):
+        found = False
+        file_version = LooseVersion(deps.version(file))
+        for cache_version, cache_root, cache_deps in cached_versions:
+            if cache_version >= file_version:
+                if deps.checksum(file) == cache_deps.checksum(file):
+                    path = os.path.join(cache_root, file)
+                    if os.path.exists(path):
+                        found = True
+                        break
+        if found:
+            cached_files.append((cache_root, file))
+        else:
+            missing_files.append(file)
+
+    return cached_files, missing_files
 
 
 def _copy_file(
@@ -67,72 +108,6 @@ def _copy_file(
     audeer.mkdir(os.path.dirname(dst_path))
     shutil.copy(src_path, tmp_path)
     _move_file(root_tmp, root_dst, file)
-
-
-def _copy_media(
-        media: typing.Sequence[str],
-        db_root: str,
-        db_root_tmp: str,
-        deps: Dependencies,
-        cached_versions: typing.Dict[str, typing.Tuple[str, Dependencies]],
-        verbose: bool,
-) -> typing.Sequence[str]:
-    r"""Copy media from cache."""
-
-    new_media = []
-    for file in audeer.progress_bar(
-            media,
-            desc='Copy media',
-            disable=not verbose,
-    ):
-        file_version = LooseVersion(deps.version(file))
-        found = False
-        for cache_version, (cache_root, cache_deps) in cached_versions.items():
-            if LooseVersion(cache_version) >= file_version:
-                if deps.checksum(file) == cache_deps.checksum(file):
-                    path = os.path.join(cache_root, file)
-                    if os.path.exists(path):
-                        _copy_file(file, cache_root, db_root_tmp, db_root)
-                        found = True
-                        break
-        if not found:
-            new_media.append(file)
-
-    return new_media
-
-
-def _copy_tables(
-        tables: typing.Sequence[str],
-        db_root: str,
-        db_root_tmp: str,
-        deps: Dependencies,
-        cached_versions: typing.Dict[str, typing.Tuple[str, Dependencies]],
-        verbose: bool,
-) -> typing.Sequence[str]:
-    r"""Copy tables from cache."""
-
-    new_tables = []
-    for file in audeer.progress_bar(
-            tables,
-            desc='Copy table',
-            disable=not verbose,
-    ):
-        file_version = LooseVersion(deps.version(file))
-        found = False
-        for cache_version, (cache_root, cache_deps) in cached_versions.items():
-            if LooseVersion(cache_version) >= file_version:
-                if deps.checksum(file) == cache_deps.checksum(file):
-                    path = os.path.join(cache_root, file)
-                    if os.path.exists(path):
-                        file_pkl = file[:-3] + 'pkl'
-                        _copy_file(file, cache_root, db_root_tmp, db_root)
-                        _copy_file(file_pkl, cache_root, db_root_tmp, db_root)
-                        found = True
-                        break
-        if not found:
-            new_tables.append(file)
-
-    return new_tables
 
 
 def _database_check_complete(
@@ -270,35 +245,7 @@ def _full_path(
             )
 
 
-def _include_exclude_mapping(
-        deps: Dependencies,
-        include: typing.Optional[typing.Union[str, typing.Sequence[str]]],
-        exclude: typing.Optional[typing.Union[str, typing.Sequence[str]]],
-) -> typing.Sequence[str]:
-
-    media = None
-
-    if include is not None:
-        archives = set([deps.archive(f) for f in deps.media])
-        if isinstance(include, str):
-            pattern = re.compile(include)
-            include = [a for a in archives if pattern.search(a)]
-        media = [x for x in deps.media if deps.archive(x) in include]
-
-    if media is None:
-        media = deps.media
-
-    if exclude is not None:
-        archives = set([deps.archive(f) for f in deps.media])
-        if isinstance(exclude, str):
-            pattern = re.compile(exclude)
-            exclude = [a for a in archives if pattern.search(a)]
-        media = [x for x in media if deps.archive(x) not in exclude]
-
-    return media
-
-
-def _load_media(
+def _get_media_from_backend(
         db: audformat.Database,
         media: typing.Sequence[str],
         db_root: str,
@@ -374,7 +321,41 @@ def _load_media(
     )
 
 
-def _load_tables(
+def _get_media_from_cache(
+        media: typing.Sequence[str],
+        db_root: str,
+        db_root_tmp: str,
+        deps: Dependencies,
+        cached_versions: typing.Sequence[
+            typing.Tuple[LooseVersion, str, Dependencies]
+        ],
+        num_workers: int,
+        verbose: bool,
+) -> typing.Sequence[str]:
+    r"""Copy media from cache."""
+
+    cached_media, missing_media = _cached_files(
+        media,
+        deps,
+        cached_versions,
+        verbose,
+    )
+
+    def job(cache_root: str, file: str):
+        _copy_file(file, cache_root, db_root_tmp, db_root)
+
+    audeer.run_tasks(
+        job,
+        params=[([root, file], {}) for root, file in cached_media],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Copy media',
+    )
+
+    return missing_media
+
+
+def _get_tables_from_backend(
         db: audformat.Database,
         tables: typing.Sequence[str],
         db_root: str,
@@ -419,6 +400,73 @@ def _load_tables(
     )
 
 
+def _get_tables_from_cache(
+        tables: typing.Sequence[str],
+        db_root: str,
+        db_root_tmp: str,
+        deps: Dependencies,
+        cached_versions: typing.Sequence[
+            typing.Tuple[LooseVersion, str, Dependencies]
+        ],
+        num_workers: int,
+        verbose: bool,
+) -> typing.Sequence[str]:
+    r"""Copy tables from cache."""
+
+    cached_tables, missing_tables = _cached_files(
+        tables,
+        deps,
+        cached_versions,
+        verbose,
+    )
+
+    def job(cache_root: str, file: str):
+        file_pkl = _replace_ext(
+            file,
+            audformat.define.TableStorageFormat.PICKLE,
+        )
+        _copy_file(file, cache_root, db_root_tmp, db_root)
+        _copy_file(file_pkl, cache_root, db_root_tmp, db_root)
+
+    audeer.run_tasks(
+        job,
+        params=[([root, file], {}) for root, file in cached_tables],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Copy tables',
+    )
+
+    return missing_tables
+
+
+def _include_exclude_mapping(
+        deps: Dependencies,
+        include: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        exclude: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+) -> typing.Sequence[str]:
+
+    media = None
+
+    if include is not None:
+        archives = set([deps.archive(f) for f in deps.media])
+        if isinstance(include, str):
+            pattern = re.compile(include)
+            include = [a for a in archives if pattern.search(a)]
+        media = [x for x in deps.media if deps.archive(x) in include]
+
+    if media is None:
+        media = deps.media
+
+    if exclude is not None:
+        archives = set([deps.archive(f) for f in deps.media])
+        if isinstance(exclude, str):
+            pattern = re.compile(exclude)
+            exclude = [a for a in archives if pattern.search(a)]
+        media = [x for x in media if deps.archive(x) not in exclude]
+
+    return media
+
+
 def _media(
         db: audformat.Database,
         media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
@@ -436,29 +484,29 @@ def _media(
     return media
 
 
-def _missing_tables(
-        db_root: str,
-        tables: typing.Sequence[str],
-) -> typing.Sequence[str]:
-    missing_tables = []
-    for table in tables:
-        file = f'db.{table}.csv'
-        path = os.path.join(db_root, file)
-        if not os.path.exists(path):
-            missing_tables.append(file)
-    return missing_tables
-
-
 def _missing_media(
         db_root: str,
         media: typing.Sequence[str],
 ) -> typing.Sequence[str]:
     missing_media = []
-    for file in media:
+    for file in audeer.progress_bar(media, desc='Missing media'):
         path = os.path.join(db_root, file)
         if not os.path.exists(path):
             missing_media.append(file)
     return missing_media
+
+
+def _missing_tables(
+        db_root: str,
+        tables: typing.Sequence[str],
+) -> typing.Sequence[str]:
+    missing_tables = []
+    for table in audeer.progress_bar(tables, desc='Missing tables'):
+        file = f'db.{table}.csv'
+        path = os.path.join(db_root, file)
+        if not os.path.exists(path):
+            missing_tables.append(file)
+    return missing_tables
 
 
 def _move_file(
@@ -494,6 +542,15 @@ def _remove_media(
             num_workers=num_workers,
             verbose=verbose,
         )
+
+
+def _replace_ext(
+        file: str,
+        new_ext: str,
+) -> str:
+    file, _ = os.path.splitext(file)
+    file = f'{file}.{new_ext}'
+    return file
 
 
 def _tables(
@@ -646,14 +703,33 @@ def load(
     if not db_is_complete:
         missing_tables = _missing_tables(db_root, requested_tables)
         if missing_tables:
-            cached_versions = _cached_versions(name, version, flavor,
-                                               cache_root)
+            if cached_versions is None:
+                cached_versions = _cached_versions(
+                    name,
+                    version,
+                    flavor,
+                    cache_root,
+                )
             if cached_versions:
-                missing_tables = _copy_tables(missing_tables, db_root,
-                                              db_root_tmp, deps,
-                                              cached_versions, verbose)
-            _load_tables(db, missing_tables, db_root, db_root_tmp, deps,
-                         backend, num_workers, verbose)
+                missing_tables = _get_tables_from_cache(
+                    missing_tables,
+                    db_root,
+                    db_root_tmp,
+                    deps,
+                    cached_versions,
+                    num_workers,
+                    verbose,
+                )
+            _get_tables_from_backend(
+                db,
+                missing_tables,
+                db_root,
+                db_root_tmp,
+                deps,
+                backend,
+                num_workers,
+                verbose,
+            )
 
     # filter tables
     if tables is not None:
@@ -671,14 +747,33 @@ def load(
         missing_media = _missing_media(db_root, requested_media)
         if missing_media:
             if cached_versions is None:
-                cached_versions = _cached_versions(name, version, flavor,
-                                                   cache_root)
+                cached_versions = _cached_versions(
+                    name,
+                    version,
+                    flavor,
+                    cache_root,
+                )
             if cached_versions:
-                missing_media = _copy_media(missing_media, db_root,
-                                            db_root_tmp, deps,
-                                            cached_versions, verbose)
-            _load_media(db, missing_media, db_root, db_root_tmp, flavor, deps,
-                        backend, num_workers, verbose)
+                missing_media = _get_media_from_cache(
+                    missing_media,
+                    db_root,
+                    db_root_tmp,
+                    deps,
+                    cached_versions,
+                    num_workers,
+                    verbose,
+                )
+            _get_media_from_backend(
+                db,
+                missing_media,
+                db_root,
+                db_root_tmp,
+                flavor,
+                deps,
+                backend,
+                num_workers,
+                verbose,
+            )
 
     # fix media extension in tables
     if flavor.format is not None:
