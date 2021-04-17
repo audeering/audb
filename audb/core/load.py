@@ -487,9 +487,14 @@ def _media(
 def _missing_media(
         db_root: str,
         media: typing.Sequence[str],
+        verbose: bool,
 ) -> typing.Sequence[str]:
     missing_media = []
-    for file in audeer.progress_bar(media, desc='Missing media'):
+    for file in audeer.progress_bar(
+            media,
+            desc='Missing media',
+            disable=not verbose
+    ):
         path = os.path.join(db_root, file)
         if not os.path.exists(path):
             missing_media.append(file)
@@ -499,9 +504,14 @@ def _missing_media(
 def _missing_tables(
         db_root: str,
         tables: typing.Sequence[str],
+        verbose: bool,
 ) -> typing.Sequence[str]:
     missing_tables = []
-    for table in audeer.progress_bar(tables, desc='Missing tables'):
+    for table in audeer.progress_bar(
+            tables,
+            desc='Missing tables',
+            disable=not verbose,
+    ):
         file = f'db.{table}.csv'
         path = os.path.join(db_root, file)
         if not os.path.exists(path):
@@ -701,7 +711,11 @@ def load(
 
     # load missing tables
     if not db_is_complete:
-        missing_tables = _missing_tables(db_root, requested_tables)
+        missing_tables = _missing_tables(
+            db_root,
+            requested_tables,
+            verbose,
+        )
         if missing_tables:
             if cached_versions is None:
                 cached_versions = _cached_versions(
@@ -744,7 +758,11 @@ def load(
 
     # load missing media
     if not db_is_complete and not only_metadata:
-        missing_media = _missing_media(db_root, requested_media)
+        missing_media = _missing_media(
+            db_root,
+            requested_media,
+            verbose,
+        )
         if missing_media:
             if cached_versions is None:
                 cached_versions = _cached_versions(
