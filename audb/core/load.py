@@ -421,7 +421,7 @@ def _get_tables_from_cache(
     )
 
     def job(cache_root: str, file: str):
-        file_pkl = _replace_ext(
+        file_pkl = audeer.replace_file_extension(
             file,
             audformat.define.TableStorageFormat.PICKLE,
         )
@@ -552,15 +552,6 @@ def _remove_media(
             num_workers=num_workers,
             verbose=verbose,
         )
-
-
-def _replace_ext(
-        file: str,
-        new_ext: str,
-) -> str:
-    file, _ = os.path.splitext(file)
-    file = f'{file}.{new_ext}'
-    return file
 
 
 def _tables(
