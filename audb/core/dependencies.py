@@ -150,7 +150,7 @@ class Dependencies:
 
         """
         select = [
-            file for file in self.media if self.is_removed(file)
+            file for file in self.media if self.removed(file)
         ]
         return select
 
@@ -254,7 +254,7 @@ class Dependencies:
         """
         return self[file][define.DependField.FORMAT]
 
-    def is_removed(self, file: str) -> bool:
+    def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
 
         Args:
