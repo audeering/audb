@@ -19,7 +19,6 @@ def _find_tables(
         db_root: str,
         version: str,
         deps: Dependencies,
-        num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
     r"""Update tables."""
@@ -31,28 +30,20 @@ def _find_tables(
         deps.drop(file)
 
     tables = []
-    lock = threading.Lock()
-
-    def job(table: str):
-
+    for table in audeer.progress_bar(
+            db.tables,
+            desc='Find tables',
+            disable=not verbose,
+    ):
         file = f'db.{table}.csv'
         checksum = audbackend.md5(os.path.join(db_root, file))
-        with lock:
-            if file not in deps:
-                deps._add_meta(file, table, checksum, version)
-                tables.append(table)
-            elif checksum != deps.checksum(file):
-                deps.set_value(file, define.DependField.CHECKSUM, checksum)
-                deps.set_value(file, define.DependField.VERSION, version)
-                tables.append(table)
-
-    audeer.run_tasks(
-        job,
-        params=[([table], {}) for table in db.tables],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Find tables',
-    )
+        if file not in deps:
+            deps._add_meta(file, table, checksum, version)
+            tables.append(table)
+        elif checksum != deps.checksum(file):
+            deps.set_value(file, define.DependField.CHECKSUM, checksum)
+            deps.set_value(file, define.DependField.VERSION, version)
+            tables.append(table)
 
     return tables
 
@@ -63,7 +54,6 @@ def _find_media(
         version: str,
         deps: Dependencies,
         archives: typing.Mapping[str, str],
-        num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.Set[str]:
 
@@ -77,31 +67,24 @@ def _find_media(
 
     # update version of altered media and insert new ones
 
-    lock = threading.Lock()
-
-    def job(file):
+    for file in audeer.progress_bar(
+            db_media,
+            desc='Find media',
+            disable=not verbose,
+    ):
         path = os.path.join(db_root, file)
-        with lock:
-            if file not in deps:
-                checksum = audbackend.md5(path)
-                if file in archives:
-                    archive = archives[file]
-                else:
-                    archive = audeer.uid(from_string=file.replace('\\', '/'))
+        if file not in deps:
+            checksum = audbackend.md5(path)
+            if file in archives:
+                archive = archives[file]
+            else:
+                archive = audeer.uid(from_string=file.replace('\\', '/'))
+            deps._add_media(db_root, file, archive, checksum, version)
+        elif not deps.is_removed(file):
+            checksum = audbackend.md5(path)
+            if checksum != deps.checksum(file):
+                archive = deps.archive(file)
                 deps._add_media(db_root, file, archive, checksum, version)
-            elif not deps.removed(file):
-                checksum = audbackend.md5(path)
-                if checksum != deps.checksum(file):
-                    archive = deps.archive(file)
-                    deps._add_media(db_root, file, archive, checksum, version)
-
-    audeer.run_tasks(
-        job,
-        params=[([file], {}) for file in db_media],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Find media',
-    )
 
     return media
 
@@ -359,24 +342,14 @@ def publish(
     archives = archives or {}
 
     # publish tables
-    tables = _find_tables(
-        db, db_root, version, deps,
-        num_workers, verbose,
-    )
-    _put_tables(
-        tables, db_root, db.name, version, backend,
-        num_workers, verbose,
-    )
+    tables = _find_tables(db, db_root, version, deps, verbose)
+    _put_tables(tables, db_root, db.name, version, backend, num_workers,
+                verbose)
 
     # publish media
-    media = _find_media(
-        db, db_root, version, deps, archives,
-        num_workers, verbose,
-    )
-    _put_media(
-        media, db_root, db.name, version, deps, backend,
-        num_workers, verbose,
-    )
+    media = _find_media(db, db_root, version, deps, archives, verbose)
+    _put_media(media, db_root, db.name, version, deps, backend, num_workers,
+               verbose)
 
     # publish dependencies and header
     deps.save(deps_path)
