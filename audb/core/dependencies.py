@@ -10,14 +10,50 @@ from audb.core import define
 
 
 class Dependencies:
-    r"""Hold dependencies of a database.
+    r"""Dependencies of a database.
 
-    """
+    This gathers all files a database contains
+    and metadata about them
+    in a single onbject.
+    The metadata contain information
+    about the single files
+    like duration,
+    but also what version of the file is required.
+
+    The dependencies of a database can be requested with
+    :func:`audb.dependencies`.
+
+    Example:
+        >>> deps = Dependencies()
+        >>> deps()
+        Empty DataFrame
+        Columns: [archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version]
+        Index: []
+        >>> # Request dependencies for emodb 1.1.0
+        >>> deps = audb.dependencies('emodb', version='1.1.0')
+        >>> # List all files or archives
+        >>> deps.files[:3]
+        ['db.emotion.csv', 'db.files.csv', 'wav/03a01Fa.wav']
+        >>> deps.archives[:2]
+        ['005d2b91-5317-0c80-d602-6d55f0323f8c', '014f82d8-3491-fd00-7397-c3b2ac3b2875']
+        >>> # Access a column as a property for a given file
+        >>> deps.archive('wav/03a01Fa.wav')
+        'c1f5cc6f-6d00-348a-ba3b-4adaa2436aad'
+        >>> deps.duration('wav/03a01Fa.wav')
+        1.89825
+        >>> deps.is_removed('wav/03a01Fa.wav')
+        False
+        >>> # Check if a file is part of the dependencies
+        >>> 'wav/03a01Fa.wav' in deps
+        True
+
+    """  # noqa: E501
+
     def __init__(self):
         self._data = {}
 
     def __call__(self) -> pd.DataFrame:
-        r"""Create dependency table.
+        r"""Return dependencies as a table.
 
         Returns:
             table with dependencies
@@ -30,7 +66,7 @@ class Dependencies:
         )
 
     def __contains__(self, file: str) -> bool:
-        r"""Check if file exists.
+        r"""Check if file is part of dependencies.
 
         Args:
             file: relative file path
