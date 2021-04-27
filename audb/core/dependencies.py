@@ -1,7 +1,7 @@
 import os
+import threading
 import typing
 
-import pandas
 import pandas as pd
 
 import audeer
@@ -59,6 +59,7 @@ class Dependencies:
         ):
             data[name] = pd.Series(dtype=dtype)
         self._df = pd.DataFrame(data)
+        self._lock = threading.Lock()
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -240,7 +241,8 @@ class Dependencies:
             file: relative file path
 
         """
-        self._df.drop(file, inplace=True)
+        with self._lock:
+            self._df.drop(file, inplace=True)
 
     def duration(self, file: str) -> float:
         r"""Duration of file.
@@ -345,7 +347,8 @@ class Dependencies:
         """
         if isinstance(field, int):
             field = define.DEPEND_FIELD_NAMES[field]
-        self._df.at[file, field] = value
+        with self._lock:
+            self._df.at[file, field] = value
 
     def type(self, file: str) -> define.DependType:
         r"""Type of file.
