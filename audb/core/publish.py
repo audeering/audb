@@ -1,6 +1,7 @@
 import collections
 import os
 import tempfile
+import threading
 import typing
 
 import audbackend
@@ -30,18 +31,20 @@ def _find_tables(
         deps.drop(file)
 
     tables = []
+    lock = threading.Lock()
 
     def job(table: str):
 
         file = f'db.{table}.csv'
         checksum = audbackend.md5(os.path.join(db_root, file))
-        if file not in deps:
-            deps._add_meta(file, table, checksum, version)
-            tables.append(table)
-        elif checksum != deps.checksum(file):
-            deps.set_value(file, define.DependField.CHECKSUM, checksum)
-            deps.set_value(file, define.DependField.VERSION, version)
-            tables.append(table)
+        with lock:
+            if file not in deps:
+                deps._add_meta(file, table, checksum, version)
+                tables.append(table)
+            elif checksum != deps.checksum(file):
+                deps.set_value(file, define.DependField.CHECKSUM, checksum)
+                deps.set_value(file, define.DependField.VERSION, version)
+                tables.append(table)
 
     audeer.run_tasks(
         job,
@@ -74,20 +77,23 @@ def _find_media(
 
     # update version of altered media and insert new ones
 
+    lock = threading.Lock()
+
     def job(file):
         path = os.path.join(db_root, file)
-        if file not in deps:
-            checksum = audbackend.md5(path)
-            if file in archives:
-                archive = archives[file]
-            else:
-                archive = audeer.uid(from_string=file.replace('\\', '/'))
-            deps._add_media(db_root, file, archive, checksum, version)
-        elif not deps.removed(file):
-            checksum = audbackend.md5(path)
-            if checksum != deps.checksum(file):
-                archive = deps.archive(file)
+        with lock:
+            if file not in deps:
+                checksum = audbackend.md5(path)
+                if file in archives:
+                    archive = archives[file]
+                else:
+                    archive = audeer.uid(from_string=file.replace('\\', '/'))
                 deps._add_media(db_root, file, archive, checksum, version)
+            elif not deps.removed(file):
+                checksum = audbackend.md5(path)
+                if checksum != deps.checksum(file):
+                    archive = deps.archive(file)
+                    deps._add_media(db_root, file, archive, checksum, version)
 
     audeer.run_tasks(
         job,
@@ -119,10 +125,13 @@ def _put_media(
             if deps.version(file) == version:
                 media.add(deps.archive(file))
 
+    lock = threading.Lock()
+
     def job(archive):
         if archive in map_media_to_files:
             for file in map_media_to_files[archive]:
-                deps.set_value(file, define.DependField.VERSION, version)
+                with lock:
+                    deps.set_value(file, define.DependField.VERSION, version)
             archive_file = backend.join(
                 db_name,
                 define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
