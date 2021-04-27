@@ -24,6 +24,8 @@ DB_ROOT_VERSION = {
     ['1.0.0', '2.0.0', '2.1.0', '3.0.0', '4.0.0', '5.0.0']
 }
 
+NUM_WORKERS = 1
+
 
 def clear_root(root: str):
     root = audeer.safe_path(root)
@@ -112,7 +114,7 @@ def test_invalid_archives(name):
             '1.0.1',
             pytest.PUBLISH_REPOSITORY,
             archives=archives,
-            num_workers=pytest.NUM_WORKERS,
+            num_workers=NUM_WORKERS,
             verbose=False,
         )
 
@@ -158,7 +160,7 @@ def test_publish(version):
         pytest.PUBLISH_REPOSITORY,
         archives=archives,
         previous_version=None,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=NUM_WORKERS,
         verbose=False,
     )
     backend = audb.core.utils.lookup_backend(DB_NAME, version)
@@ -174,7 +176,7 @@ def test_publish(version):
         DB_NAME,
         version=version,
         full_path=False,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=NUM_WORKERS,
     )
     assert db.name == DB_NAME
 
@@ -292,7 +294,7 @@ def test_publish_error_messages():
                 version,
                 pytest.PUBLISH_REPOSITORY,
                 previous_version=None,
-                num_workers=pytest.NUM_WORKERS,
+                num_workers=NUM_WORKERS,
                 verbose=False,
             )
 
@@ -306,7 +308,7 @@ def test_update_database():
         DB_ROOT_VERSION[version],
         DB_NAME,
         version=start_version,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=NUM_WORKERS,
         verbose=False,
     )
 
@@ -334,7 +336,7 @@ def test_update_database():
             version,
             pytest.PUBLISH_REPOSITORY,
             previous_version=previous_version,
-            num_workers=pytest.NUM_WORKERS,
+            num_workers=NUM_WORKERS,
             verbose=False,
         )
 
@@ -344,7 +346,7 @@ def test_update_database():
         DB_ROOT_VERSION[version],
         DB_NAME,
         version=start_version,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=NUM_WORKERS,
         verbose=False,
     )
     # Remove one file as in version 3.0.0
@@ -375,7 +377,7 @@ def test_update_database():
             version,
             pytest.PUBLISH_REPOSITORY,
             previous_version=previous_version,
-            num_workers=pytest.NUM_WORKERS,
+            num_workers=NUM_WORKERS,
             verbose=False,
         )
 
@@ -392,7 +394,7 @@ def test_update_database():
             version,
             pytest.PUBLISH_REPOSITORY,
             previous_version=previous_version,
-            num_workers=pytest.NUM_WORKERS,
+            num_workers=NUM_WORKERS,
             verbose=False,
         )
 
@@ -402,7 +404,7 @@ def test_update_database():
         version,
         pytest.PUBLISH_REPOSITORY,
         previous_version=previous_version,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=NUM_WORKERS,
         verbose=False,
     )
 
@@ -417,14 +419,14 @@ def test_update_database():
         DB_NAME,
         version=version,
         full_path=False,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=NUM_WORKERS,
         verbose=False,
     )
     db2 = audb.load(
         DB_NAME,
         version='3.0.0',
         full_path=False,
-        num_workers=pytest.NUM_WORKERS,
+        num_workers=NUM_WORKERS,
         verbose=False,
     )
     db1.meta['audb'] = {}
