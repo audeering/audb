@@ -98,7 +98,7 @@ class Dependencies:
 
         """
         archives = [self.archive(file) for file in self.files]
-        return list(set(archives))
+        return sorted(list(set(archives)))
 
     @property
     def data(self) -> typing.Dict[str, typing.List]:
