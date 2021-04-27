@@ -41,6 +41,7 @@ So instead of running:
         'emodb',
         version='1.1.0',
         only_metadata=True,
+        verbose=False,
     )
     db.tables
 
