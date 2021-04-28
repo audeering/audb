@@ -51,7 +51,13 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        self._data = {}
+        data = {}
+        for name, dtype in zip(
+                define.DEPEND_FIELD_NAMES.values(),
+                define.DEPEND_FIELD_DTYPES.values(),
+        ):
+            data[name] = pd.Series(dtype=dtype)
+        self._df = pd.DataFrame(data)
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -60,11 +66,7 @@ class Dependencies:
             table with dependencies
 
         """
-        return pd.DataFrame.from_dict(
-            self._data,
-            orient='index',
-            columns=list(define.DEPEND_FIELD_NAMES.values()),
-        )
+        return self._df
 
     def __contains__(self, file: str) -> bool:
         r"""Check if file is part of dependencies.
@@ -76,7 +78,7 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        return file in self._data
+        return file in self._df.index
 
     def __getitem__(self, file: str) -> typing.List:
         r"""File information.
@@ -88,13 +90,13 @@ class Dependencies:
             list with meta information
 
         """
-        return self._data[file]
+        return list(self._df.loc[file])
 
     def __len__(self) -> int:
-        return len(self._data)
+        return len(self._df)
 
     def __str__(self) -> str:
-        return self().to_string()
+        return self._df.to_string()
 
     @property
     def archives(self) -> typing.List[str]:
@@ -108,16 +110,6 @@ class Dependencies:
         return sorted(list(set(archives)))
 
     @property
-    def data(self) -> typing.Dict[str, typing.List]:
-        r"""Get table data.
-
-        Returns:
-            dictionary with table entries
-
-        """
-        return self._data
-
-    @property
     def files(self) -> typing.List[str]:
         r"""All files (table and media).
 
@@ -125,7 +117,7 @@ class Dependencies:
             list of files
 
         """
-        return list(self._data)
+        return list(self._df.index)
 
     @property
     def media(self) -> typing.List[str]:
@@ -275,7 +267,7 @@ class Dependencies:
             path: path to file
 
         """
-        self._data = {}
+        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
         path = audeer.safe_path(path)
         if os.path.exists(path):
             # Data type of dependency columns
@@ -288,15 +280,12 @@ class Dependencies:
             # Data type of index
             index = 0
             dtype_mapping[index] = str
-            df = pd.read_csv(
+            self._df = pd.read_csv(
                 path,
                 index_col=index,
                 na_filter=False,
                 dtype=dtype_mapping,
             )
-            self._data = {
-                file: list(row) for file, row in df.iterrows()
-            }
 
     def sampling_rate(self, file: str) -> int:
         r"""Sampling rate of media file.
@@ -318,7 +307,7 @@ class Dependencies:
 
         """
         path = audeer.safe_path(path)
-        self().to_csv(path)
+        self._df.to_csv(path)
 
     def type(self, file: str) -> define.DependType:
         r"""Type of file.
@@ -348,11 +337,15 @@ class Dependencies:
             self,
             root: str,
             file: str,
-            archive: str,
-            checksum: str,
             version: str,
+            archive: str = None,
+            checksum: str = None,
     ):
-        r"""Add media file.
+        r"""Add or update media file.
+
+        If you want to update only the version
+        of an unaltered media file,
+        don't specify ``archive`` and ``checksum``.
 
         Args:
             root: root directory
@@ -364,16 +357,26 @@ class Dependencies:
         """
         format = audeer.file_extension(file).lower()
 
-        bit_depth = channels = sampling_rate = 0
-        duration = 0.0
-        if format in define.FORMATS:
-            path = os.path.join(root, file)
-            bit_depth = audiofile.bit_depth(path)
-            channels = audiofile.channels(path)
-            duration = audiofile.duration(path)
-            sampling_rate = audiofile.sampling_rate(path)
+        if archive is None:
+            archive = self.archive(file)
 
-        self.data[file] = [
+        if checksum is None:
+            checksum = self.checksum(file)
+            bit_depth = self.bit_depth(file)
+            channels = self.channels(file)
+            duration = self.duration(file)
+            sampling_rate = self.sampling_rate(file)
+        else:
+            bit_depth = channels = sampling_rate = 0
+            duration = 0.0
+            if format in define.FORMATS:
+                path = os.path.join(root, file)
+                bit_depth = audiofile.bit_depth(path)
+                channels = audiofile.channels(path)
+                duration = audiofile.duration(path)
+                sampling_rate = audiofile.sampling_rate(path)
+
+        self._df.loc[file] = [
             archive,
             bit_depth,
             channels,
@@ -389,11 +392,11 @@ class Dependencies:
     def _add_meta(
             self,
             file: str,
+            version: str,
             archive: str,
             checksum: str,
-            version: str,
     ):
-        r"""Add table file.
+        r"""Add or update table file.
 
         Args:
             file: relative file path
@@ -404,7 +407,7 @@ class Dependencies:
         """
         format = audeer.file_extension(file).lower()
 
-        self.data[file] = [
+        self._df.loc[file] = [
             archive,                 # archive
             0,                       # bit_depth
             0,                       # channels
@@ -417,6 +420,15 @@ class Dependencies:
             version,                 # version
         ]
 
+    def _drop(self, file: str):
+        r"""Drop file from table.
+
+        Args:
+            file: relative file path
+
+        """
+        self._df.drop(file, inplace=True)
+
     def _remove(self, file: str):
         r"""Mark file as removed.
 
@@ -424,4 +436,5 @@ class Dependencies:
             file: relative file path
 
         """
-        self._data[file][define.DependField.REMOVED] = 1
+        removed_column = define.DEPEND_FIELD_NAMES[define.DependField.REMOVED]
+        self._df.at[file, removed_column] = 1
