@@ -27,7 +27,7 @@ def _find_media(
     media = []
 
     def job(file: str):
-        if not deps.is_removed(file):
+        if not deps.removed(file):
             full_file = os.path.join(db_root, file)
             if not os.path.exists(full_file):
                 media.append(file)

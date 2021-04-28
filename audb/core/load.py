@@ -123,7 +123,7 @@ def _database_check_complete(
             if not os.path.exists(os.path.join(db_root, table)):
                 return False
         for media in deps.media:
-            if not deps.is_removed(media):
+            if not deps.removed(media):
                 path = os.path.join(db_root, media)
                 path = flavor.destination(path)
                 if not os.path.exists(path):

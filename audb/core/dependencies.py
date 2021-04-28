@@ -42,7 +42,7 @@ class Dependencies:
         'c1f5cc6f-6d00-348a-ba3b-4adaa2436aad'
         >>> deps.duration('wav/03a01Fa.wav')
         1.89825
-        >>> deps.is_removed('wav/03a01Fa.wav')
+        >>> deps.removed('wav/03a01Fa.wav')
         False
         >>> # Check if a file is part of the dependencies
         >>> 'wav/03a01Fa.wav' in deps
@@ -150,7 +150,7 @@ class Dependencies:
 
         """
         select = [
-            file for file in self.media if self.is_removed(file)
+            file for file in self.media if self.removed(file)
         ]
         return select
 
@@ -254,7 +254,7 @@ class Dependencies:
         """
         return self[file][define.DependField.FORMAT]
 
-    def is_removed(self, file: str) -> bool:
+    def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
 
         Args:
