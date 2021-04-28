@@ -36,7 +36,7 @@ def _find_tables(
         file = f'db.{table}.csv'
         checksum = audbackend.md5(os.path.join(db_root, file))
         if file not in deps:
-            deps.add_meta(file, table, checksum, version)
+            deps._add_meta(file, table, checksum, version)
             tables.append(table)
         elif checksum != deps.checksum(file):
             deps.data[file][define.DependField.CHECKSUM] = checksum
