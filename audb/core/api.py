@@ -451,7 +451,7 @@ def remove_media(
                             )
 
                     # mark file as removed
-                    deps.remove(file)
+                    deps._remove(file)
                     upload = True
 
             # upload dependencies

@@ -261,15 +261,6 @@ class Dependencies:
                 file: list(row) for file, row in df.iterrows()
             }
 
-    def remove(self, file: str):
-        r"""Mark file as removed.
-
-        Args:
-            file: relative file path
-
-        """
-        self._data[file][define.DependField.REMOVED] = 1
-
     def sampling_rate(self, file: str) -> int:
         r"""Sampling rate of media file.
 
@@ -388,3 +379,12 @@ class Dependencies:
             define.DependType.META,  # type
             version,                 # version
         ]
+
+    def _remove(self, file: str):
+        r"""Mark file as removed.
+
+        Args:
+            file: relative file path
+
+        """
+        self._data[file][define.DependField.REMOVED] = 1
