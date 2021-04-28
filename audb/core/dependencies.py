@@ -145,37 +145,6 @@ class Dependencies:
         ]
         return select
 
-    def add_meta(
-            self,
-            file: str,
-            archive: str,
-            checksum: str,
-            version: str,
-    ):
-        r"""Add table file.
-
-        Args:
-            file: relative file path
-            archive: archive name without extension
-            checksum: checksum of file
-            version: version string
-
-        """
-        format = audeer.file_extension(file).lower()
-
-        self.data[file] = [
-            archive,                 # archive
-            0,                       # bit_depth
-            0,                       # channels
-            checksum,                # checksum
-            0.0,                     # duration
-            format,                  # format
-            0,                       # removed
-            0,                       # sampling_rate
-            define.DependType.META,  # type
-            version,                 # version
-        ]
-
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
 
@@ -387,4 +356,35 @@ class Dependencies:
             sampling_rate,
             define.DependType.MEDIA,
             version,
+        ]
+
+    def _add_meta(
+            self,
+            file: str,
+            archive: str,
+            checksum: str,
+            version: str,
+    ):
+        r"""Add table file.
+
+        Args:
+            file: relative file path
+            archive: archive name without extension
+            checksum: checksum of file
+            version: version string
+
+        """
+        format = audeer.file_extension(file).lower()
+
+        self.data[file] = [
+            archive,                 # archive
+            0,                       # bit_depth
+            0,                       # channels
+            checksum,                # checksum
+            0.0,                     # duration
+            format,                  # format
+            0,                       # removed
+            0,                       # sampling_rate
+            define.DependType.META,  # type
+            version,                 # version
         ]
