@@ -10,8 +10,12 @@ def add_audb_with_public_data(doctest_namespace):
     Some tests in the docstrings need access to the emodb database.
     As all the unit tests defined under ``tests/*``
     should not be able to see the public repository
-    as the number of available databases would then not be deterministic,
-    we have to add the extra ``conftest.py`` file here instead.
+    as the number of available databases would then not be deterministic.
+    We provide this access here
+    with the help of the ``doctest_namespace`` fixture.
+
+    The ``conftest.py`` file has to be in the same folder
+    as the code file where the docstring is defined.
 
     """
     audb.config.REPOSITORIES = [
