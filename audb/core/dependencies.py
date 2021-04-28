@@ -37,7 +37,7 @@ class Dependencies:
         ['db.emotion.csv', 'db.files.csv', 'wav/03a01Fa.wav']
         >>> deps.archives[:2]
         ['005d2b91-5317-0c80-d602-6d55f0323f8c', '014f82d8-3491-fd00-7397-c3b2ac3b2875']
-        >>> # Access a column for a given file
+        >>> # Access properties for a given file
         >>> deps.archive('wav/03a01Fa.wav')
         'c1f5cc6f-6d00-348a-ba3b-4adaa2436aad'
         >>> deps.duration('wav/03a01Fa.wav')
