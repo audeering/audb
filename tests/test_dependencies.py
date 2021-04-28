@@ -136,8 +136,8 @@ def test_format(deps):
     ]
 
 
-def test_is_removed(deps):
-    assert not deps.is_removed('file.wav')
+def test_removed(deps):
+    assert not deps.removed('file.wav')
 
 
 def test_load_save(deps):
@@ -152,7 +152,7 @@ def test_load_save(deps):
 def test_remove(deps):
     deps._remove('file.wav')
     assert 'file.wav' in deps.files
-    assert deps.is_removed('file.wav')
+    assert deps.removed('file.wav')
 
 
 def test_sampling_rate(deps):
