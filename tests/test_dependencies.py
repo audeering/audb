@@ -80,10 +80,6 @@ def test_archives(deps):
     assert deps.archives == get_entries(audb.core.define.DependField.ARCHIVE)
 
 
-def test_data(deps):
-    assert deps.data == ENTRIES
-
-
 def test_files(deps):
     assert deps.files == list(ENTRIES.keys())
 

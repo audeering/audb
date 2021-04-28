@@ -110,16 +110,6 @@ class Dependencies:
         return sorted(list(set(archives)))
 
     @property
-    def data(self) -> typing.Dict[str, typing.List]:
-        r"""Get table data.
-
-        Returns:
-            dictionary with table entries
-
-        """
-        return {row.Index: list(row)[1:] for row in self._df.itertuples()}
-
-    @property
     def files(self) -> typing.List[str]:
         r"""All files (table and media).
 
