@@ -93,10 +93,10 @@ class Dependencies:
         return list(self._df.loc[file])
 
     def __len__(self) -> int:
-        return len(self._data)
+        return len(self._df)
 
     def __str__(self) -> str:
-        return self().to_string()
+        return self._df.to_string()
 
     @property
     def archives(self) -> typing.List[str]:

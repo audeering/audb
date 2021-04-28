@@ -105,7 +105,7 @@ def test_tables(deps):
 
 
 def test_add_media(deps):
-    deps.add_media(
+    deps._add_media(
         'root',
         'file.mp3',
         'archive3',
@@ -117,7 +117,7 @@ def test_add_media(deps):
 
 
 def test_add_meta(deps):
-    deps.add_meta(
+    deps._add_meta(
         'db.segments.csv',
         'archive4',
         'ebd3d5e2ec352bed24117e23f1c5c375',
@@ -177,7 +177,7 @@ def test_load_save(deps):
 
 
 def test_remove(deps):
-    deps.remove('file.wav')
+    deps._remove('file.wav')
     assert 'file.wav' in deps.files
     assert deps.is_removed('file.wav')
 
