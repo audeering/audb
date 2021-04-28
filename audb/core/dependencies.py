@@ -232,15 +232,6 @@ class Dependencies:
         """
         return self[file][define.DependField.CHECKSUM]
 
-    def drop(self, file: str):
-        r"""Drop file from table.
-
-        Args:
-            file: relative file path
-
-        """
-        self._df.drop(file, inplace=True)
-
     def duration(self, file: str) -> float:
         r"""Duration of file.
 
@@ -438,6 +429,15 @@ class Dependencies:
             define.DependType.META,  # type
             version,                 # version
         ]
+
+    def _drop(self, file: str):
+        r"""Drop file from table.
+
+        Args:
+            file: relative file path
+
+        """
+        self._df.drop(file, inplace=True)
 
     def _remove(self, file: str):
         r"""Mark file as removed.

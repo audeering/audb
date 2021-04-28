@@ -27,7 +27,7 @@ def _find_tables(
 
     db_tables = [f'db.{table}.csv' for table in db.tables]
     for file in set(deps.tables) - set(db_tables):
-        deps.drop(file)
+        deps._drop(file)
 
     tables = []
     for table in audeer.progress_bar(
@@ -59,7 +59,7 @@ def _find_media(
     db_media = db.files
     for file in set(deps.media) - set(db_media):
         media.add(deps.archive(file))
-        deps.drop(file)
+        deps._drop(file)
 
     # update version of altered media and insert new ones
 
