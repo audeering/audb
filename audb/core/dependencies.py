@@ -16,7 +16,7 @@ class Dependencies:
     a database contains
     and metadata about them
     in a single object.
-    The metadata contain information
+    The metadata contains information
     about the single files
     like duration,
     but also what version of the file is required.
