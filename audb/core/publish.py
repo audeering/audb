@@ -37,12 +37,8 @@ def _find_tables(
     ):
         file = f'db.{table}.csv'
         checksum = audbackend.md5(os.path.join(db_root, file))
-        if file not in deps:
-            deps._add_meta(file, table, checksum, version)
-            tables.append(table)
-        elif checksum != deps.checksum(file):
-            deps.set_value(file, define.DependField.CHECKSUM, checksum)
-            deps.set_value(file, define.DependField.VERSION, version)
+        if file not in deps or checksum != deps.checksum(file):
+            deps._add_meta(file, version, table, checksum)
             tables.append(table)
 
     return tables
@@ -79,12 +75,12 @@ def _find_media(
                 archive = archives[file]
             else:
                 archive = audeer.uid(from_string=file.replace('\\', '/'))
-            deps._add_media(db_root, file, archive, checksum, version)
+            deps._add_media(db_root, file, version, archive, checksum)
         elif not deps.is_removed(file):
             checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.archive(file)
-                deps._add_media(db_root, file, archive, checksum, version)
+                deps._add_media(db_root, file, version, archive, checksum)
 
     return media
 
@@ -114,7 +110,7 @@ def _put_media(
         if archive in map_media_to_files:
             for file in map_media_to_files[archive]:
                 with lock:
-                    deps.set_value(file, define.DependField.VERSION, version)
+                    deps._add_media(db_root, file, version)
             archive_file = backend.join(
                 db_name,
                 define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],

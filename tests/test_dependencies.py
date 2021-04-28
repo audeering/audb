@@ -104,29 +104,6 @@ def test_tables(deps):
     assert deps.tables == ['db.files.csv']
 
 
-def test_add_media(deps):
-    deps._add_media(
-        'root',
-        'file.mp3',
-        'archive3',
-        '7c1f6b568f7221ab968a705fd5e7477b',
-        '1.0.0',
-    )
-    assert 'file.mp3' in deps._df.index
-    assert deps._df.loc['file.mp3']['archive'] == 'archive3'
-
-
-def test_add_meta(deps):
-    deps._add_meta(
-        'db.segments.csv',
-        'archive4',
-        'ebd3d5e2ec352bed24117e23f1c5c375',
-        '1.0.0',
-    )
-    assert 'db.segments.csv' in deps._df.index
-    assert deps._df.loc['db.segments.csv']['archive'] == 'archive4'
-
-
 def test_archive(deps):
     assert deps.archive('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.ARCHIVE

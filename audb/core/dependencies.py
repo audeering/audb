@@ -328,24 +328,6 @@ class Dependencies:
         path = audeer.safe_path(path)
         self._df.to_csv(path)
 
-    def set_value(
-            self,
-            file: str,
-            field: typing.Union[int, str],
-            value: typing.Any,
-    ):
-        r"""Set field to a new value.
-
-        Args:
-            file: relative file path
-            field: field index or name
-            value: new value
-
-        """
-        if isinstance(field, int):
-            field = define.DEPEND_FIELD_NAMES[field]
-        self._df.at[file, field] = value
-
     def type(self, file: str) -> define.DependType:
         r"""Type of file.
 
@@ -374,11 +356,15 @@ class Dependencies:
             self,
             root: str,
             file: str,
-            archive: str,
-            checksum: str,
             version: str,
+            archive: str = None,
+            checksum: str = None,
     ):
-        r"""Add media file.
+        r"""Add or update media file.
+
+        If you want to update only the version
+        of an unaltered media file,
+        don't specify ``archive`` and ``checksum``.
 
         Args:
             root: root directory
@@ -390,14 +376,24 @@ class Dependencies:
         """
         format = audeer.file_extension(file).lower()
 
-        bit_depth = channels = sampling_rate = 0
-        duration = 0.0
-        if format in define.FORMATS:
-            path = os.path.join(root, file)
-            bit_depth = audiofile.bit_depth(path)
-            channels = audiofile.channels(path)
-            duration = audiofile.duration(path)
-            sampling_rate = audiofile.sampling_rate(path)
+        if archive is None:
+            archive = self.archive(file)
+
+        if checksum is None:
+            checksum = self.checksum(file)
+            bit_depth = self.bit_depth(file)
+            channels = self.channels(file)
+            duration = self.duration(file)
+            sampling_rate = self.sampling_rate(file)
+        else:
+            bit_depth = channels = sampling_rate = 0
+            duration = 0.0
+            if format in define.FORMATS:
+                path = os.path.join(root, file)
+                bit_depth = audiofile.bit_depth(path)
+                channels = audiofile.channels(path)
+                duration = audiofile.duration(path)
+                sampling_rate = audiofile.sampling_rate(path)
 
         self._df.loc[file] = [
             archive,
@@ -415,11 +411,11 @@ class Dependencies:
     def _add_meta(
             self,
             file: str,
+            version: str,
             archive: str,
             checksum: str,
-            version: str,
     ):
-        r"""Add table file.
+        r"""Add or update table file.
 
         Args:
             file: relative file path
