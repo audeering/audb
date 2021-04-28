@@ -82,12 +82,12 @@ def _find_media(
                 archive = archives[file]
             else:
                 archive = audeer.uid(from_string=file.replace('\\', '/'))
-            deps.add_media(db_root, file, archive, checksum, version)
+            deps._add_media(db_root, file, archive, checksum, version)
         elif not deps.is_removed(file):
             checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.data[file][define.DependField.ARCHIVE]
-                deps.add_media(db_root, file, archive, checksum, version)
+                deps._add_media(db_root, file, archive, checksum, version)
 
     audeer.run_tasks(
         job,

@@ -53,6 +53,12 @@ class Dependencies:
         """
         return self._data[file]
 
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def __str__(self) -> str:
+        return self().to_string()
+
     @property
     def archives(self) -> typing.List[str]:
         r"""All archives (table and media).
@@ -138,48 +144,6 @@ class Dependencies:
             if self.type(file) == define.DependType.META
         ]
         return select
-
-    def add_media(
-            self,
-            root: str,
-            file: str,
-            archive: str,
-            checksum: str,
-            version: str,
-    ):
-        r"""Add media file.
-
-        Args:
-            root: root directory
-            file: relative file path
-            archive: archive name without extension
-            checksum: checksum of file
-            version: version string
-
-        """
-        format = audeer.file_extension(file).lower()
-
-        bit_depth = channels = sampling_rate = 0
-        duration = 0.0
-        if format in define.FORMATS:
-            path = os.path.join(root, file)
-            bit_depth = audiofile.bit_depth(path)
-            channels = audiofile.channels(path)
-            duration = audiofile.duration(path)
-            sampling_rate = audiofile.sampling_rate(path)
-
-        self.data[file] = [
-            archive,
-            bit_depth,
-            channels,
-            checksum,
-            duration,
-            format,
-            0,  # removed
-            sampling_rate,
-            define.DependType.MEDIA,
-            version,
-        ]
 
     def add_meta(
             self,
@@ -383,8 +347,44 @@ class Dependencies:
         """
         return self[file][define.DependField.VERSION]
 
-    def __len__(self) -> int:
-        return len(self._data)
+    def _add_media(
+            self,
+            root: str,
+            file: str,
+            archive: str,
+            checksum: str,
+            version: str,
+    ):
+        r"""Add media file.
 
-    def __str__(self) -> str:
-        return self().to_string()
+        Args:
+            root: root directory
+            file: relative file path
+            archive: archive name without extension
+            checksum: checksum of file
+            version: version string
+
+        """
+        format = audeer.file_extension(file).lower()
+
+        bit_depth = channels = sampling_rate = 0
+        duration = 0.0
+        if format in define.FORMATS:
+            path = os.path.join(root, file)
+            bit_depth = audiofile.bit_depth(path)
+            channels = audiofile.channels(path)
+            duration = audiofile.duration(path)
+            sampling_rate = audiofile.sampling_rate(path)
+
+        self.data[file] = [
+            archive,
+            bit_depth,
+            channels,
+            checksum,
+            duration,
+            format,
+            0,  # removed
+            sampling_rate,
+            define.DependType.MEDIA,
+            version,
+        ]
