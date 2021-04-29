@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                v1.0.4
+                v1.1.0
               </div>
             
           
@@ -119,6 +119,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1-0-2021-04-29">Version 1.1.0 (2021-04-29)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-0-4-2021-04-09">Version 1.0.4 (2021-04-09)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-0-3-2021-04-08">Version 1.0.3 (2021-04-08)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-0-2-2021-04-07">Version 1.0.2 (2021-04-07)</a></li>
@@ -186,7 +187,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.0.4/docs/changelog.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.0/docs/changelog.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -205,6 +206,24 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<div class="section" id="version-1-1-0-2021-04-29">
+<h2>Version 1.1.0 (2021-04-29)<a class="headerlink" href="#version-1-1-0-2021-04-29" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies._remove()</span></code></p></li>
+<li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies</span></code> internally uses <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> instead of <code class="docutils literal notranslate"><span class="pre">dict</span></code></p></li>
+<li><p>Changed: store dependencies with pickle to speed up loading</p></li>
+<li><p>Changed: versions of the same flavor share dependency file</p></li>
+<li><p>Changed: if possible <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code> copies tables and media files from other versions in the cache</p></li>
+<li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies._add_media()</span></code> is now private</p></li>
+<li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies._add_meta()</span></code> is now private</p></li>
+<li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies.is_removed</span></code> renamed to <code class="docutils literal notranslate"><span class="pre">audb.Dependencies.removed</span></code></p></li>
+<li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code> considers format when searching the cache</p></li>
+<li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code> considers format when resolving missing media</p></li>
+<li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.available()</span></code> correctly returns versions of the same database from multiple repositories</p></li>
+<li><p>Fixed: add missing link to <code class="docutils literal notranslate"><span class="pre">emodb</span></code> example repository</p></li>
+<li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies.data</span></code></p></li>
+</ul>
+</div>
 <div class="section" id="version-1-0-4-2021-04-09">
 <h2>Version 1.0.4 (2021-04-09)<a class="headerlink" href="#version-1-0-4-2021-04-09" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -358,7 +377,7 @@ in documentation</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

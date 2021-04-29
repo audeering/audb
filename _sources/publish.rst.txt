@@ -227,6 +227,7 @@ We published a version of a small German acted emotional speech databases
 called emodb_
 in the default Artifactory repository of :mod:`audb`.
 You can find the example code at
+https://github.com/audeering/emodb
 and can continue at :ref:`load`
 to see how to load and use a database.
 

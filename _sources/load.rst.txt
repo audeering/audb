@@ -1,9 +1,23 @@
-.. Specify pandas format output in cells
+.. Specify repository to overwrite local config files
 .. jupyter-execute::
     :hide-code:
     :hide-output:
 
     import audb
+
+    audb.config.REPOSITORIES = [
+        audb.Repository(
+            name='data-public',
+            host='https://audeering.jfrog.io/artifactory',
+            backend='artifactory',
+        )
+    ]
+
+.. Specify pandas format output in cells
+.. jupyter-execute::
+    :hide-code:
+    :hide-output:
+
     import pandas as pd
 
 

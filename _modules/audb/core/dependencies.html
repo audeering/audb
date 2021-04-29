@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.0.4
+                v1.1.0
               </div>
             
           
@@ -181,7 +181,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audb.core.dependencies</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -193,27 +194,66 @@
 
 
 <div class="viewcode-block" id="Dependencies"><a class="viewcode-back" href="../../../api.html#audb.Dependencies">[docs]</a><span class="k">class</span> <span class="nc">Dependencies</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Hold dependencies of a database.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dependencies of a database.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    :class:`audb.Dependencies` gathers all files</span>
+<span class="sd">    a database contains</span>
+<span class="sd">    and metadata about them</span>
+<span class="sd">    in a single object.</span>
+<span class="sd">    The metadata contains information</span>
+<span class="sd">    about the single files</span>
+<span class="sd">    like duration,</span>
+<span class="sd">    but also what version of the file is required.</span>
+
+<span class="sd">    The dependencies of a database can be requested with</span>
+<span class="sd">    :func:`audb.dependencies`.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; deps = Dependencies()</span>
+<span class="sd">        &gt;&gt;&gt; deps()</span>
+<span class="sd">        Empty DataFrame</span>
+<span class="sd">        Columns: [archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version]</span>
+<span class="sd">        Index: []</span>
+<span class="sd">        &gt;&gt;&gt; # Request dependencies for emodb 1.1.0</span>
+<span class="sd">        &gt;&gt;&gt; deps = audb.dependencies(&#39;emodb&#39;, version=&#39;1.1.0&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # List all files or archives</span>
+<span class="sd">        &gt;&gt;&gt; deps.files[:3]</span>
+<span class="sd">        [&#39;db.emotion.csv&#39;, &#39;db.files.csv&#39;, &#39;wav/03a01Fa.wav&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; deps.archives[:2]</span>
+<span class="sd">        [&#39;005d2b91-5317-0c80-d602-6d55f0323f8c&#39;, &#39;014f82d8-3491-fd00-7397-c3b2ac3b2875&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; # Access properties for a given file</span>
+<span class="sd">        &gt;&gt;&gt; deps.archive(&#39;wav/03a01Fa.wav&#39;)</span>
+<span class="sd">        &#39;c1f5cc6f-6d00-348a-ba3b-4adaa2436aad&#39;</span>
+<span class="sd">        &gt;&gt;&gt; deps.duration(&#39;wav/03a01Fa.wav&#39;)</span>
+<span class="sd">        1.89825</span>
+<span class="sd">        &gt;&gt;&gt; deps.removed(&#39;wav/03a01Fa.wav&#39;)</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; # Check if a file is part of the dependencies</span>
+<span class="sd">        &gt;&gt;&gt; &#39;wav/03a01Fa.wav&#39; in deps</span>
+<span class="sd">        True</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_DTYPES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+        <span class="p">):</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Dependencies.__call__"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create dependency table.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return dependencies as a table.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            table with dependencies</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span>
-            <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span>
-            <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span></div>
 
-<div class="viewcode-block" id="Dependencies.__contains__"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.__contains__">[docs]</a>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if file exists.</span>
+<div class="viewcode-block" id="Dependencies.__contains__"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.__contains__">[docs]</a>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if file is part of dependencies.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file: relative file path</span>
@@ -222,7 +262,7 @@
 <span class="sd">            ``True`` if a dependency to the file exists</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span></div>
+        <span class="k">return</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span></div>
 
 <div class="viewcode-block" id="Dependencies.__getitem__"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;File information.</span>
@@ -234,7 +274,13 @@
 <span class="sd">            list with meta information</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">file</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">file</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">archives</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -245,17 +291,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">archives</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">]</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">archives</span><span class="p">))</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">]:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get table data.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            dictionary with table entries</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">archives</span><span class="p">)))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -265,7 +301,7 @@
 <span class="sd">            list of files</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">media</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -290,7 +326,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">select</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">file</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">media</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_removed</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="n">file</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">media</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">removed</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">select</span>
 
@@ -321,79 +357,6 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">select</span>
-
-<div class="viewcode-block" id="Dependencies.add_media"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.add_media">[docs]</a>    <span class="k">def</span> <span class="nf">add_media</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add media file.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            root: root directory</span>
-<span class="sd">            file: relative file path</span>
-<span class="sd">            archive: archive name without extension</span>
-<span class="sd">            checksum: checksum of file</span>
-<span class="sd">            version: version string</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-
-        <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">channels</span> <span class="o">=</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">duration</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">if</span> <span class="nb">format</span> <span class="ow">in</span> <span class="n">define</span><span class="o">.</span><span class="n">FORMATS</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-            <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="n">channels</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">channels</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="n">duration</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">archive</span><span class="p">,</span>
-            <span class="n">bit_depth</span><span class="p">,</span>
-            <span class="n">channels</span><span class="p">,</span>
-            <span class="n">checksum</span><span class="p">,</span>
-            <span class="n">duration</span><span class="p">,</span>
-            <span class="nb">format</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># removed</span>
-            <span class="n">sampling_rate</span><span class="p">,</span>
-            <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">,</span>
-        <span class="p">]</span></div>
-
-<div class="viewcode-block" id="Dependencies.add_meta"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.add_meta">[docs]</a>    <span class="k">def</span> <span class="nf">add_meta</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add table file.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            file: relative file path</span>
-<span class="sd">            archive: archive name without extension</span>
-<span class="sd">            checksum: checksum of file</span>
-<span class="sd">            version: version string</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">archive</span><span class="p">,</span>                 <span class="c1"># archive</span>
-            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># bit_depth</span>
-            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># channels</span>
-            <span class="n">checksum</span><span class="p">,</span>                <span class="c1"># checksum</span>
-            <span class="mf">0.0</span><span class="p">,</span>                     <span class="c1"># duration</span>
-            <span class="nb">format</span><span class="p">,</span>                  <span class="c1"># format</span>
-            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># removed</span>
-            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># sampling_rate</span>
-            <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">,</span>  <span class="c1"># type</span>
-            <span class="n">version</span><span class="p">,</span>                 <span class="c1"># version</span>
-        <span class="p">]</span></div>
 
 <div class="viewcode-block" id="Dependencies.archive"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.archive">[docs]</a>    <span class="k">def</span> <span class="nf">archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Name of archive the file belongs to.</span>
@@ -467,7 +430,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">FORMAT</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Dependencies.is_removed"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.is_removed">[docs]</a>    <span class="k">def</span> <span class="nf">is_removed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="Dependencies.removed"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.removed">[docs]</a>    <span class="k">def</span> <span class="nf">removed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if file is marked as removed.</span>
 
 <span class="sd">        Args:</span>
@@ -480,17 +443,36 @@
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">REMOVED</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="Dependencies.load"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read dependencies from CSV file.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read dependencies from file.</span>
 
 <span class="sd">        Clears existing dependencies.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            path: path to file</span>
+<span class="sd">            path: path to file.</span>
+<span class="sd">                File extension can be ``csv`` or ``pkl``.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if file extension is not ``csv`` or ``pkl``</span>
+<span class="sd">            FileNotFoundError: if ``path`` does not exists</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">safe_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">extension</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="s1">&#39;pkl&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;File extension of &#39;path&#39; has to be &#39;csv&#39; or &#39;pkl&#39; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;not &#39;</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">,</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">),</span>
+                <span class="n">path</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;pkl&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;csv&#39;</span><span class="p">:</span>
             <span class="c1"># Data type of dependency columns</span>
             <span class="n">dtype_mapping</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">name</span><span class="p">:</span> <span class="n">dtype</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
@@ -501,24 +483,12 @@
             <span class="c1"># Data type of index</span>
             <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">dtype_mapping</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
                 <span class="n">path</span><span class="p">,</span>
                 <span class="n">index_col</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
                 <span class="n">na_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_mapping</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">file</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
-            <span class="p">}</span></div>
-
-<div class="viewcode-block" id="Dependencies.remove"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mark file as removed.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            file: relative file path</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">REMOVED</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dependencies.sampling_rate"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.sampling_rate">[docs]</a>    <span class="k">def</span> <span class="nf">sampling_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sampling rate of media file.</span>
@@ -533,14 +503,18 @@
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">SAMPLING_RATE</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Dependencies.save"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write dependencies to CSV file.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write dependencies to file.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            path: path to file</span>
+<span class="sd">            path: path to file.</span>
+<span class="sd">                File extension can be ``csv`` or ``pkl``.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">safe_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">()</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;pkl&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dependencies.type"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.type">[docs]</a>    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type of file.</span>
@@ -566,11 +540,111 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">file</span><span class="p">][</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">VERSION</span><span class="p">]</span></div>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_add_media</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add or update media file.</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="p">()</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span></div>
+<span class="sd">        If you want to update only the version</span>
+<span class="sd">        of an unaltered media file,</span>
+<span class="sd">        don&#39;t specify ``archive`` and ``checksum``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            root: root directory</span>
+<span class="sd">            file: relative file path</span>
+<span class="sd">            archive: archive name without extension</span>
+<span class="sd">            checksum: checksum of file</span>
+<span class="sd">            version: version string</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">archive</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">archive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">checksum</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">checksum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="n">bit_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="n">channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">channels</span> <span class="o">=</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">if</span> <span class="nb">format</span> <span class="ow">in</span> <span class="n">define</span><span class="o">.</span><span class="n">FORMATS</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">channels</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">channels</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">duration</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">archive</span><span class="p">,</span>
+            <span class="n">bit_depth</span><span class="p">,</span>
+            <span class="n">channels</span><span class="p">,</span>
+            <span class="n">checksum</span><span class="p">,</span>
+            <span class="n">duration</span><span class="p">,</span>
+            <span class="nb">format</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># removed</span>
+            <span class="n">sampling_rate</span><span class="p">,</span>
+            <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_add_meta</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add or update table file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file: relative file path</span>
+<span class="sd">            archive: archive name without extension</span>
+<span class="sd">            checksum: checksum of file</span>
+<span class="sd">            version: version string</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">archive</span><span class="p">,</span>                 <span class="c1"># archive</span>
+            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># bit_depth</span>
+            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># channels</span>
+            <span class="n">checksum</span><span class="p">,</span>                <span class="c1"># checksum</span>
+            <span class="mf">0.0</span><span class="p">,</span>                     <span class="c1"># duration</span>
+            <span class="nb">format</span><span class="p">,</span>                  <span class="c1"># format</span>
+            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># removed</span>
+            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># sampling_rate</span>
+            <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">,</span>  <span class="c1"># type</span>
+            <span class="n">version</span><span class="p">,</span>                 <span class="c1"># version</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drop file from table.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file: relative file path</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mark file as removed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file: relative file path</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">removed_column</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">REMOVED</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">file</span><span class="p">,</span> <span class="n">removed_column</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
 </pre></div>
 
            </div>
@@ -586,7 +660,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
