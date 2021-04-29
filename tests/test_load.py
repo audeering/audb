@@ -161,6 +161,13 @@ def fixture_publish_db():
 
 
 @pytest.mark.parametrize(
+    'format',
+    [
+        None,
+        'flac',
+    ]
+)
+@pytest.mark.parametrize(
     'version',
     [
         '1.0.0',
@@ -174,13 +181,18 @@ def fixture_publish_db():
         ),
     ]
 )
-def test_load(version):
+def test_load(format, version):
 
-    assert not audb.exists(DB_NAME, version=version)
+    assert not audb.exists(
+        DB_NAME,
+        version=version,
+        format=format,
+    )
 
     db = audb.load(
         DB_NAME,
         version=version,
+        format=format,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
@@ -194,6 +206,11 @@ def test_load(version):
     else:
         resolved_version = version
     db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
+
+    if format is not None:
+        db_original.map_files(
+            lambda x: audeer.replace_file_extension(x, format)
+        )
 
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:
