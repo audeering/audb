@@ -534,18 +534,10 @@ def _move_file(
 def _remove_media(
         db: audformat.Database,
         deps: Dependencies,
-        flavor: Flavor,
         num_workers: int,
         verbose: bool,
 ):
-    removed_files = []
-    for file in deps.removed_media:
-        if flavor.format is not None:
-            # Rename removed media file to requested format
-            name, _ = os.path.splitext(file)
-            file = f'{name}.{flavor.format}'
-        removed_files.append(file)
-
+    removed_files = deps.removed_media
     if removed_files:
         db.drop_files(
             removed_files,
@@ -784,16 +776,16 @@ def load(
                 verbose,
             )
 
-    # fix media extension in tables
-    if flavor.format is not None:
-        _fix_media_ext(db.tables.values(), flavor.format, num_workers, verbose)
-
     # filter media
     if media is not None or tables is not None:
         db.pick_files(requested_media)
 
     if not removed_media:
-        _remove_media(db, deps, flavor, num_workers, verbose)
+        _remove_media(db, deps, num_workers, verbose)
+
+    # fix media extension in tables
+    if flavor.format is not None:
+        _fix_media_ext(db.tables.values(), flavor.format, num_workers, verbose)
 
     # convert to full path
     if full_path:

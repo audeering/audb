@@ -169,9 +169,10 @@ def test_include_and_exclude(include, exclude, expected_files):
 
 
 @pytest.mark.parametrize(
-    'media, expected_files',
+    'media, format, expected_files',
     [
         (
+            None,
             None,
             ['audio/000.wav', 'audio/001.wav',
              'audio/010.wav', 'audio/011.wav',
@@ -179,22 +180,31 @@ def test_include_and_exclude(include, exclude, expected_files):
         ),
         (
             [],
+            None,
             [],
         ),
         (
             ['audio/000.wav', 'audio/001.wav'],
+            None,
             ['audio/000.wav', 'audio/001.wav'],
         ),
         (
+            ['audio/000.wav', 'audio/001.wav'],
+            'flac',
+            ['audio/000.flac', 'audio/001.flac'],
+        ),
+        (
             r'.*0\.wav',
+            None,
             ['audio/000.wav', 'audio/010.wav', 'audio/1/020.wav'],
         ),
     ]
 )
-def test_media(media, expected_files):
+def test_media(media, format, expected_files):
     db = audb.load(
         DB_NAME,
         media=media,
+        format=format,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
@@ -204,9 +214,10 @@ def test_media(media, expected_files):
 
 
 @pytest.mark.parametrize(
-    'tables, expected_tables, expected_files',
+    'tables, format, expected_tables, expected_files',
     [
         (
+            None,
             None,
             ['dev', 'test', 'train'],
             ['audio/000.wav', 'audio/001.wav',
@@ -215,32 +226,44 @@ def test_media(media, expected_files):
         ),
         (
             'test',
+            None,
             ['test'],
             ['audio/000.wav', 'audio/001.wav'],
         ),
         (
             't.*',
+            None,
             ['test', 'train'],
             ['audio/000.wav', 'audio/001.wav',
              'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
             ['dev', 'train'],
+            None,
             ['dev', 'train'],
             ['audio/010.wav', 'audio/011.wav',
              'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
+            ['dev', 'train'],
+            'flac',
+            ['dev', 'train'],
+            ['audio/010.flac', 'audio/011.flac',
+             'audio/1/020.flac', 'audio/2/021.flac'],
+        ),
+        (
             'bad',
+            None,
             [],
             [],
         ),
     ]
 )
-def test_tables(tables, expected_tables, expected_files):
+def test_tables(tables, format, expected_tables, expected_files):
     db = audb.load(
         DB_NAME,
         tables=tables,
+        format=format,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
