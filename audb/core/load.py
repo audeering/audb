@@ -540,7 +540,7 @@ def _remove_media(
     removed_files = deps.removed_media
     if removed_files:
         db.drop_files(
-            deps.removed_media,
+            removed_files,
             num_workers=num_workers,
             verbose=verbose,
         )
