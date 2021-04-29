@@ -1,3 +1,4 @@
+import errno
 import os
 import typing
 
@@ -267,12 +268,28 @@ class Dependencies:
             path: path to file.
                 File extension can be ``csv`` or ``pkl``.
 
+        Raises:
+            ValueError: if file extension is not ``csv`` or ``pkl``
+            FileNotFoundError: if ``path`` does not exists
+
         """
         self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
         path = audeer.safe_path(path)
-        if path.endswith('pkl') and os.path.exists(path):
+        extension = audeer.file_extension(path)
+        if extension not in ['csv', 'pkl']:
+            raise ValueError(
+                f"File extension of 'path' has to be 'csv' or 'pkl' "
+                f"not '{extension}'"
+            )
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                errno.ENOENT,
+                os.strerror(errno.ENOENT),
+                path,
+            )
+        if extension == 'pkl':
             self._df = pd.read_pickle(path)
-        elif path.endswith('csv') and os.path.exists(path):
+        elif extension == 'csv':
             # Data type of dependency columns
             dtype_mapping = {
                 name: dtype for name, dtype in zip(

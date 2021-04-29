@@ -147,6 +147,11 @@ def test_load_save(deps):
     deps2.load(deps_file)
     pd.testing.assert_frame_equal(deps(), deps2())
     os.remove(deps_file)
+    # Wrong extension or file missng
+    with pytest.raises(ValueError, match=r".*'txt'.*"):
+        deps2.load('deps.txt')
+    with pytest.raises(FileNotFoundError):
+        deps.load(deps_file)
 
 
 def test_remove(deps):
