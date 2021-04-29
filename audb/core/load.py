@@ -496,9 +496,9 @@ def _missing_media(
             desc='Missing media',
             disable=not verbose
     ):
-        if flavor.format is not None:
-            file = audeer.replace_file_extension(file, flavor.format)
         path = os.path.join(db_root, file)
+        if flavor.format is not None:
+            path = audeer.replace_file_extension(path, flavor.format)
         if not os.path.exists(path):
             missing_media.append(file)
     return missing_media
