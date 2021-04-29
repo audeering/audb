@@ -7,6 +7,24 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.0 (2021-04-29)
+--------------------------
+
+* Added: ``audb.Dependencies._remove()``
+* Changed: ``audb.Dependencies`` internally uses ``pd.DataFrame`` instead of ``dict``
+* Changed: store dependencies with pickle to speed up loading
+* Changed: versions of the same flavor share dependency file
+* Changed: if possible ``audb.load()`` copies tables and media files from other versions in the cache
+* Changed: ``audb.Dependencies._add_media()`` is now private
+* Changed: ``audb.Dependencies._add_meta()`` is now private
+* Changed: ``audb.Dependencies.is_removed`` renamed to ``audb.Dependencies.removed``
+* Fixed: ``audb.load()`` considers format when searching the cache
+* Fixed: ``audb.load()`` considers format when resolving missing media
+* Fixed: ``audb.available()`` correctly returns versions of the same database from multiple repositories
+* Fixed: add missing link to ``emodb`` example repository
+* Removed: ``audb.Dependencies.data``
+
+
 Version 1.0.4 (2021-04-09)
 --------------------------
 
