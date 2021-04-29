@@ -487,6 +487,7 @@ def _media(
 def _missing_media(
         db_root: str,
         media: typing.Sequence[str],
+        flavor: Flavor,
         verbose: bool,
 ) -> typing.Sequence[str]:
     missing_media = []
@@ -495,6 +496,8 @@ def _missing_media(
             desc='Missing media',
             disable=not verbose
     ):
+        if flavor.format is not None:
+            file = audeer.replace_file_extension(file, flavor.format)
         path = os.path.join(db_root, file)
         if not os.path.exists(path):
             missing_media.append(file)
@@ -752,6 +755,7 @@ def load(
         missing_media = _missing_media(
             db_root,
             requested_media,
+            flavor,
             verbose,
         )
         if missing_media:
