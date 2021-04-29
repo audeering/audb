@@ -271,7 +271,7 @@ class Dependencies:
         self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
         path = audeer.safe_path(path)
         if path.endswith('pkl') and os.path.exists(path):
-            self._df = pd.read_pickle(path, compression='xz')
+            self._df = pd.read_pickle(path)
         elif path.endswith('csv') and os.path.exists(path):
             # Data type of dependency columns
             dtype_mapping = {
@@ -314,7 +314,7 @@ class Dependencies:
         if path.endswith('csv'):
             self._df.to_csv(path)
         elif path.endswith('pkl'):
-            self._df.to_pickle(path, compression='xz')
+            self._df.to_pickle(path)
 
     def type(self, file: str) -> define.DependType:
         r"""Type of file.
