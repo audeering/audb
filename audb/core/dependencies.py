@@ -1,3 +1,4 @@
+import errno
 import os
 import typing
 
@@ -259,17 +260,36 @@ class Dependencies:
         return self[file][define.DependField.REMOVED] != 0
 
     def load(self, path: str):
-        r"""Read dependencies from CSV file.
+        r"""Read dependencies from file.
 
         Clears existing dependencies.
 
         Args:
-            path: path to file
+            path: path to file.
+                File extension can be ``csv`` or ``pkl``.
+
+        Raises:
+            ValueError: if file extension is not ``csv`` or ``pkl``
+            FileNotFoundError: if ``path`` does not exists
 
         """
         self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
         path = audeer.safe_path(path)
-        if os.path.exists(path):
+        extension = audeer.file_extension(path)
+        if extension not in ['csv', 'pkl']:
+            raise ValueError(
+                f"File extension of 'path' has to be 'csv' or 'pkl' "
+                f"not '{extension}'"
+            )
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                errno.ENOENT,
+                os.strerror(errno.ENOENT),
+                path,
+            )
+        if extension == 'pkl':
+            self._df = pd.read_pickle(path)
+        elif extension == 'csv':
             # Data type of dependency columns
             dtype_mapping = {
                 name: dtype for name, dtype in zip(
@@ -300,14 +320,18 @@ class Dependencies:
         return self[file][define.DependField.SAMPLING_RATE]
 
     def save(self, path: str):
-        r"""Write dependencies to CSV file.
+        r"""Write dependencies to file.
 
         Args:
-            path: path to file
+            path: path to file.
+                File extension can be ``csv`` or ``pkl``.
 
         """
         path = audeer.safe_path(path)
-        self._df.to_csv(path)
+        if path.endswith('csv'):
+            self._df.to_csv(path)
+        elif path.endswith('pkl'):
+            self._df.to_pickle(path)
 
     def type(self, file: str) -> define.DependType:
         r"""Type of file.

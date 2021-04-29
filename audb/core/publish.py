@@ -254,7 +254,8 @@ def publish(
     # load database and dependencies
     deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
     deps = Dependencies()
-    deps.load(deps_path)
+    if os.path.exists(deps_path):
+        deps.load(deps_path)
 
     # check if database folder depends on the right version
 

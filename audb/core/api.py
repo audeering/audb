@@ -109,8 +109,17 @@ def cached(
             # Skip old audb cache (e.g. 1 as flavor)
             files = audeer.list_file_names(version_path)
             deps_path = os.path.join(version_path, define.DEPENDENCIES_FILE)
-            if deps_path not in files:  # pragma: no cover
-                continue
+            deps_path_cached = os.path.join(
+                version_path,
+                define.CACHED_DEPENDENCIES_FILE,
+            )
+            if deps_path not in files and deps_path_cached not in files:
+                # Skip all cache entries
+                # that don't contain a db.csv or db.pkl file
+                # as those stem from audb<1.0.0.
+                # We only look for db.csv
+                # as we switched to db.pkl with audb>=1.0.5
+                continue  # pragma: no cover
 
             for flavor_id_path in flavor_id_paths:
                 flavor_id = os.path.basename(flavor_id_path)
@@ -213,8 +222,9 @@ def dependencies(
             break
 
     audeer.mkdir(deps_root)
-    deps_path = os.path.join(deps_root, define.DEPENDENCIES_FILE)
+    deps_path = os.path.join(deps_root, define.CACHED_DEPENDENCIES_FILE)
 
+    deps = Dependencies()
     if not os.path.exists(deps_path):
         with tempfile.TemporaryDirectory() as tmp_root:
             archive = backend.join(name, define.DB)
@@ -223,13 +233,10 @@ def dependencies(
                 tmp_root,
                 version,
             )
-            shutil.move(
-                os.path.join(tmp_root, define.DEPENDENCIES_FILE),
-                deps_path,
-            )
-
-    deps = Dependencies()
-    deps.load(deps_path)
+            deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
+            deps.save(deps_path)
+    else:
+        deps.load(deps_path)
 
     return deps
 
