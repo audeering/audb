@@ -53,7 +53,7 @@ def parse_deprecated_load_arguments(
         media: typing.Union[str, typing.Sequence[str]],
         deps: Dependencies,
         kwargs,
-) -> typing.List[
+) -> typing.Tuple[
     typing.Optional[typing.List[int]],
     bool,
     typing.Optional[typing.List[str]],
