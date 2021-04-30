@@ -107,7 +107,8 @@ class Dependencies:
             list of archives
 
         """
-        archives = [self.archive(file) for file in self.files]
+        df = self()
+        archives = list(df.archive.values)
         return sorted(list(set(archives)))
 
     @property
@@ -128,11 +129,12 @@ class Dependencies:
             list of media
 
         """
-        select = [
-            file for file in self.files
-            if self.type(file) == define.DependType.MEDIA
-        ]
-        return select
+        df = self()
+        return list(
+            df[
+                df['type'] == define.DependType.MEDIA
+            ].index
+        )
 
     @property
     def removed_media(self) -> typing.List[str]:
@@ -142,10 +144,13 @@ class Dependencies:
             list of media
 
         """
-        select = [
-            file for file in self.media if self.removed(file)
-        ]
-        return select
+        df = self()
+        return list(
+            df[
+                (df['type'] == define.DependType.MEDIA)
+                & (df['removed'] == 1)
+            ].index
+        )
 
     @property
     def table_ids(self) -> typing.List[str]:
@@ -169,11 +174,10 @@ class Dependencies:
             list of tables
 
         """
-        select = [
-            file for file in self.files
-            if self.type(file) == define.DependType.META
-        ]
-        return select
+        df = self()
+        return list(
+            df[df['type'] == define.DependType.META].index
+        )
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
