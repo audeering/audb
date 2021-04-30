@@ -76,7 +76,7 @@ def mix_mapping(
     if warn:
         warnings.warn(
             "Argument 'mix' is deprecated "
-            "and will be removed with version '1.1.0'. "
+            "and will be removed with version '1.2.0'. "
             "Use 'channels' and 'mixdown' instead.",
             category=UserWarning,
             stacklevel=2,

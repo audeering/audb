@@ -689,7 +689,7 @@ def load(
             include = kwargs['include']
             warnings.warn(
                 "Argument 'include' is deprecated "
-                "and will be removed with version '1.1.0'. "
+                "and will be removed with version '1.2.0'. "
                 "Use 'media' instead.",
                 category=UserWarning,
                 stacklevel=2,
@@ -699,7 +699,7 @@ def load(
             exclude = kwargs['exclude']
             warnings.warn(
                 "Argument 'exclude' is deprecated "
-                "and will be removed with version '1.1.0'. "
+                "and will be removed with version '1.2.0'. "
                 "Use 'media' instead.",
                 category=UserWarning,
                 stacklevel=2,
