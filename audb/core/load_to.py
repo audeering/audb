@@ -279,8 +279,6 @@ def load_to(
 
     db_header.save(db_root_tmp, header_only=True)
     tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
-    if backend is None:
-        backend = lookup_backend(name, version)
     _get_tables(tables, db_root, db_root_tmp, name, deps, backend,
                 num_workers, verbose)
 
