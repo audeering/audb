@@ -583,6 +583,7 @@ def load(
         name: str,
         *,
         version: str = None,
+        only_media: bool = False,
         only_metadata: bool = False,
         bit_depth: int = None,
         channels: typing.Union[int, typing.Sequence[int]] = None,
@@ -623,7 +624,8 @@ def load(
     Args:
         name: name of database
         version: version string, latest if ``None``
-        only_metadata: load only metadata
+        only_metadata: load only metadata (tables), no media files
+        only_media: load only media files, no tables
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`.
             Note that media files with too few channels
@@ -711,7 +713,7 @@ def load(
     requested_tables = _tables(deps, tables)
 
     # load missing tables
-    if not db_is_complete:
+    if not db_is_complete or not only_media:
         missing_tables = _missing_tables(
             db_root,
             requested_tables,
@@ -752,8 +754,9 @@ def load(
         db.pick_tables(requested_tables)
 
     # load tables
-    for table in requested_tables:
-        db[table].load(os.path.join(db_root, f'db.{table}'))
+    if not only_media:
+        for table in requested_tables:
+            db[table].load(os.path.join(db_root, f'db.{table}'))
 
     # filter media
     requested_media = _media(db, media)
