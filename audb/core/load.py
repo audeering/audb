@@ -156,58 +156,6 @@ def _database_is_complete(
     return complete
 
 
-def _database_header(
-        db_root: str,
-        db_root_tmp: str,
-        name: str,
-        version: str,
-        flavor: Flavor,
-        backend: audbackend.Backend,
-) -> audformat.Database:
-    local_header = os.path.join(db_root, define.HEADER_FILE)
-    if not os.path.exists(local_header):
-        local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
-        remote_header = backend.join(name, define.HEADER_FILE)
-        backend.get_file(remote_header, local_header, version)
-        db = audformat.Database.load(db_root_tmp, load_data=False)
-        db.meta['audb'] = {
-            'root': db_root,
-            'version': version,
-            'flavor': flavor.arguments,
-            'complete': False,
-        }
-        db.save(db_root_tmp, header_only=True)
-        _move_file(db_root_tmp, db_root, define.HEADER_FILE)
-    return audformat.Database.load(db_root, load_data=False)
-
-
-def _database_root(
-        name: str,
-        version: str,
-        flavor: Flavor,
-        cache_root: typing.Optional[str],
-) -> (str, str):
-    cache_roots = [
-        default_cache_root(True),  # check shared cache first
-        default_cache_root(False),
-    ] if cache_root is None else [cache_root]
-    for cache_root in cache_roots:
-        db_root = audeer.safe_path(
-            os.path.join(
-                cache_root,
-                flavor.path(name, version),
-            )
-        )
-        if os.path.exists(db_root):
-            break
-
-    db_root_tmp = db_root + '~'
-    audeer.mkdir(db_root)
-    audeer.mkdir(db_root_tmp)
-
-    return db_root, db_root_tmp
-
-
 def _fix_media_ext(
         tables: typing.Sequence[audformat.Table],
         format: str,
@@ -548,6 +496,64 @@ def _tables(
     return tables
 
 
+def database_cache_folder(
+        name: str,
+        version: str,
+        flavor: Flavor,
+        cache_root: typing.Optional[str],
+) -> str:
+    r"""Create and return database cache folder.
+
+    Args:
+        name: name of database
+        version: version of database
+        flavor: flavor of database
+        cache_root: path to cache folder
+
+    Returns:
+        path to cache folder
+
+    """
+    if cache_root is None:
+        cache_roots = [
+            default_cache_root(True),  # check shared cache first
+            default_cache_root(False),
+        ]
+    else:
+        cache_roots = [cache_root]
+    for cache_root in cache_roots:
+        db_root = audeer.safe_path(
+            os.path.join(
+                cache_root,
+                flavor.path(name, version),
+            )
+        )
+        if os.path.exists(db_root):
+            break
+
+    audeer.mkdir(db_root)
+    return db_root
+
+
+def database_tmp_folder(
+        cache_root: str,
+) -> str:
+    r"""Create and return temporary database cache folder.
+
+    The temporary cache folder is created under ``cache_root + '~'``.
+
+    Args:
+        cache_root: oath to cache folder
+
+    Returns:
+        path to temporary cache folder
+
+    """
+    tmp_root = cache_root + '~'
+    tmp_root = audeer.mkdir(tmp_root)
+    return tmp_root
+
+
 def load(
         name: str,
         *,
@@ -645,13 +651,22 @@ def load(
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
     )
-    db_root, db_root_tmp = _database_root(name, version, flavor, cache_root)
+    db_root = database_cache_folder(name, version, flavor, cache_root)
+    db_root_tmp = database_tmp_folder(db_root)
 
     if verbose:  # pragma: no cover
         print(f'Get:   {name} v{version}')
         print(f'Cache: {db_root}')
 
-    db = _database_header(db_root, db_root_tmp, name, version, flavor, backend)
+    # Start with database header without tables
+    db, backend = load_header(
+        db_root,
+        name,
+        version,
+        flavor=flavor,
+        add_audb_meta=True,
+    )
+
     db_is_complete = _database_is_complete(db)
 
     # filter tables
@@ -683,16 +698,19 @@ def load(
                     num_workers,
                     verbose,
                 )
-            _get_tables_from_backend(
-                db,
-                missing_tables,
-                db_root,
-                db_root_tmp,
-                deps,
-                backend,
-                num_workers,
-                verbose,
-            )
+            if missing_tables:
+                if backend is None:
+                    backend = lookup_backend(name, version)
+                _get_tables_from_backend(
+                    db,
+                    missing_tables,
+                    db_root,
+                    db_root_tmp,
+                    deps,
+                    backend,
+                    num_workers,
+                    verbose,
+                )
 
     # filter tables
     if tables is not None:
@@ -732,17 +750,20 @@ def load(
                     num_workers,
                     verbose,
                 )
-            _get_media_from_backend(
-                db,
-                missing_media,
-                db_root,
-                db_root_tmp,
-                flavor,
-                deps,
-                backend,
-                num_workers,
-                verbose,
-            )
+            if missing_media:
+                if backend is None:
+                    backend = lookup_backend(name, version)
+                _get_media_from_backend(
+                    db,
+                    missing_media,
+                    db_root,
+                    db_root_tmp,
+                    flavor,
+                    deps,
+                    backend,
+                    num_workers,
+                    verbose,
+                )
 
     # filter media
     if media is not None or tables is not None:
@@ -767,3 +788,50 @@ def load(
         shutil.rmtree(db_root_tmp)
 
     return db
+
+
+def load_header(
+        db_root: str,
+        name: str,
+        version: str,
+        *,
+        flavor: Flavor = None,
+        add_audb_meta: bool = False,
+) -> typing.Tuple[audformat.Database, typing.Optional[audbackend.Backend]]:
+    r"""Load database header from folder or backend.
+
+    If the database header cannot be found in ``db_root``
+    it will search for the backend that contains the database,
+    load it from there,
+    and store it in ``db_root``.
+
+    Args:
+        db_root: folder of database
+        name: name of database
+        version: version of database
+        flavor: flavor of database,
+            needed if ``add_audb_meta`` is True
+        add_audb_meta: if ``True`` it adds an ``audb`` meta entry
+            to the database header before storing it in cache
+
+    """
+    backend = None
+    local_header = os.path.join(db_root, define.HEADER_FILE)
+    if not os.path.exists(local_header):
+        backend = lookup_backend(name, version)
+        remote_header = backend.join(name, define.HEADER_FILE)
+        if add_audb_meta:
+            db_root_tmp = database_tmp_folder(db_root)
+            local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
+        backend.get_file(remote_header, local_header, version)
+        if add_audb_meta:
+            db = audformat.Database.load(db_root_tmp, load_data=False)
+            db.meta['audb'] = {
+                'root': db_root,
+                'version': version,
+                'flavor': flavor.arguments,
+                'complete': False,
+            }
+            db.save(db_root_tmp, header_only=True)
+            _move_file(db_root_tmp, db_root, define.HEADER_FILE)
+    return audformat.Database.load(db_root, load_data=False), backend
