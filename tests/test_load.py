@@ -160,6 +160,17 @@ def fixture_publish_db():
     clear_root(pytest.FILE_SYSTEM_HOST)
 
 
+def test_database_cache_folder():
+    cache_root = os.path.join(pytest.CACHE_ROOT, 'cache')
+    db_root = audb.core.load.database_cache_folder(
+        DB_NAME,
+        '1.0.0',
+        audb.Flavor(),
+        cache_root=cache_root,
+    )
+    assert db_root.startswith(audeer.safe_path(cache_root))
+
+
 @pytest.mark.parametrize(
     'format',
     [

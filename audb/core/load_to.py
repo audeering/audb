@@ -250,7 +250,6 @@ def load_to(
     """
     if version is None:
         version = latest_version(name)
-    backend = lookup_backend(name, version)
 
     db_root = audeer.safe_path(root)
     db_root_tmp = database_tmp_folder(db_root)
@@ -268,16 +267,19 @@ def load_to(
                 if checksum != deps.checksum(file):
                     os.remove(full_file)
 
-    # load database header without tables
+    # load database header without tables from backend
 
-    db_header, backend = load_header(db_root_tmp, name, version)
+    db_header, backend = load_header(
+        db_root_tmp,
+        name,
+        version,
+        overwrite=True,
+    )
 
     # get altered and new tables
 
     db_header.save(db_root_tmp, header_only=True)
     tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
-    if backend is None:
-        backend = lookup_backend(name, version)
     _get_tables(tables, db_root, db_root_tmp, name, deps, backend,
                 num_workers, verbose)
 

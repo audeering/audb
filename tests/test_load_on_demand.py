@@ -131,6 +131,23 @@ def test_load_on_demand():
     pd.testing.assert_index_equal(db.files, db_original['table1'].files)
     assert not db.meta['audb']['complete']
 
+    # Remove table to force downloading from backend again
+    os.remove(os.path.join(db.meta['audb']['root'], 'db.table1.csv'))
+    os.remove(os.path.join(db.meta['audb']['root'], 'db.table1.pkl'))
+
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        only_metadata=True,
+        full_path=False,
+        verbose=False,
+    )
+
+    assert db['table1'] == db_original['table1']
+    assert db['table2'] == db_original['table2']
+    pd.testing.assert_index_equal(db.files, db_original.files)
+    assert not db.meta['audb']['complete']
+
     db = audb.load(
         DB_NAME,
         version=DB_VERSION,
