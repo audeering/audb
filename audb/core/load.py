@@ -817,6 +817,9 @@ def load_header(
         overwrite: always load header from backend
             and overwrite the one found in ``db_root``
 
+    Returns:
+        database header and backend
+
     """
     backend = None
     local_header = os.path.join(db_root, define.HEADER_FILE)
