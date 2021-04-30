@@ -107,8 +107,7 @@ class Dependencies:
             list of archives
 
         """
-        df = self()
-        archives = list(df.archive.values)
+        archives = list(self._df.archive.values)
         return sorted(list(set(archives)))
 
     @property
@@ -129,10 +128,9 @@ class Dependencies:
             list of media
 
         """
-        df = self()
         return list(
-            df[
-                df['type'] == define.DependType.MEDIA
+            self._df[
+                self._df['type'] == define.DependType.MEDIA
             ].index
         )
 
@@ -144,11 +142,10 @@ class Dependencies:
             list of media
 
         """
-        df = self()
         return list(
-            df[
-                (df['type'] == define.DependType.MEDIA)
-                & (df['removed'] == 1)
+            self._df[
+                (self._df['type'] == define.DependType.MEDIA)
+                & (self._df['removed'] == 1)
             ].index
         )
 
@@ -174,9 +171,10 @@ class Dependencies:
             list of tables
 
         """
-        df = self()
         return list(
-            df[df['type'] == define.DependType.META].index
+            self._df[
+                self._df['type'] == define.DependType.META
+            ].index
         )
 
     def archive(self, file: str) -> str:
