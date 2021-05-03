@@ -79,16 +79,17 @@ def _cached_files(
         file_version = LooseVersion(deps.version(file))
         for cache_version, cache_root, cache_deps in cached_versions:
             if cache_version >= file_version:
-                if deps.checksum(file) == cache_deps.checksum(file):
-                    path = os.path.join(cache_root, file)
-                    if flavor.format is not None:
-                        path = audeer.replace_file_extension(
-                            path,
-                            flavor.format,
-                        )
-                    if os.path.exists(path):
-                        found = True
-                        break
+                if file in cache_deps:
+                    if deps.checksum(file) == cache_deps.checksum(file):
+                        path = os.path.join(cache_root, file)
+                        if flavor and flavor.format is not None:
+                            path = audeer.replace_file_extension(
+                                path,
+                                flavor.format,
+                            )
+                        if os.path.exists(path):
+                            found = True
+                            break
         if found:
             if flavor.format is not None:
                 file = audeer.replace_file_extension(
@@ -258,7 +259,7 @@ def _get_media_from_backend(
         media: typing.Sequence[str],
         db_root: str,
         db_root_tmp: str,
-        flavor: typing.Optional[Flavor],
+        flavor: Flavor,
         deps: Dependencies,
         backend: audbackend.Backend,
         num_workers: typing.Optional[int],
