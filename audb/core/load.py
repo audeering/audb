@@ -3,7 +3,6 @@ import os
 import re
 import shutil
 import typing
-import warnings
 
 import audbackend
 import audeer
@@ -16,12 +15,10 @@ from audb.core.api import (
     dependencies,
     latest_version,
 )
+from audb.core.backward import parse_deprecated_load_arguments
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
-from audb.core.utils import (
-    lookup_backend,
-    mix_mapping,
-)
+from audb.core.utils import lookup_backend
 
 
 def _cached_versions(
@@ -454,34 +451,6 @@ def _get_tables_from_cache(
     return missing_tables
 
 
-def _include_exclude_mapping(
-        deps: Dependencies,
-        include: typing.Optional[typing.Union[str, typing.Sequence[str]]],
-        exclude: typing.Optional[typing.Union[str, typing.Sequence[str]]],
-) -> typing.Sequence[str]:
-
-    media = None
-
-    if include is not None:
-        archives = set([deps.archive(f) for f in deps.media])
-        if isinstance(include, str):
-            pattern = re.compile(include)
-            include = [a for a in archives if pattern.search(a)]
-        media = [x for x in deps.media if deps.archive(x) in include]
-
-    if media is None:
-        media = deps.media
-
-    if exclude is not None:
-        archives = set([deps.archive(f) for f in deps.media])
-        if isinstance(exclude, str):
-            pattern = re.compile(exclude)
-            exclude = [a for a in archives if pattern.search(a)]
-        media = [x for x in media if deps.archive(x) not in exclude]
-
-    return media
-
-
 def _media(
         db: audformat.Database,
         media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
@@ -653,18 +622,20 @@ def load(
         database object
 
     """
-    if (
-            channels is None
-            and not mixdown
-            and 'mix' in kwargs
-    ):  # pragma: no cover
-        mix = kwargs['mix']
-        channels, mixdown = mix_mapping(mix)
-
     if version is None:
         version = latest_version(name)
-    backend = lookup_backend(name, version)
     deps = dependencies(name, version=version, cache_root=cache_root)
+
+    # backward compatibility to audb<1.0.0
+    channels, mixdown, media = parse_deprecated_load_arguments(
+        channels,
+        mixdown,
+        media,
+        deps,
+        kwargs,
+    )
+
+    backend = lookup_backend(name, version)
     cached_versions = None
 
     flavor = Flavor(
@@ -682,30 +653,6 @@ def load(
 
     db = _database_header(db_root, db_root_tmp, name, version, flavor, backend)
     db_is_complete = _database_is_complete(db)
-
-    if 'include' in kwargs or 'exclude' in kwargs:  # pragma: no cover
-        include = None
-        if 'include' in kwargs:
-            include = kwargs['include']
-            warnings.warn(
-                "Argument 'include' is deprecated "
-                "and will be removed with version '1.2.0'. "
-                "Use 'media' instead.",
-                category=UserWarning,
-                stacklevel=2,
-            )
-        exclude = None
-        if 'exclude' in kwargs:  # pragma: no cover
-            exclude = kwargs['exclude']
-            warnings.warn(
-                "Argument 'exclude' is deprecated "
-                "and will be removed with version '1.2.0'. "
-                "Use 'media' instead.",
-                category=UserWarning,
-                stacklevel=2,
-            )
-        if include is not None or exclude is not None:
-            media = _include_exclude_mapping(deps, include, exclude)
 
     # filter tables
     requested_tables = _tables(deps, tables)
