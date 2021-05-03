@@ -91,7 +91,7 @@ def _cached_files(
                             found = True
                             break
         if found:
-            if flavor.format is not None:
+            if flavor and flavor.format is not None:
                 file = audeer.replace_file_extension(
                     file,
                     flavor.format,
