@@ -62,7 +62,7 @@ def _cached_files(
         cached_versions: typing.Sequence[
             typing.Tuple[LooseVersion, str, Dependencies],
         ],
-        flavor: Flavor,
+        flavor: typing.Optional[Flavor],
         verbose: bool,
 ) -> (typing.Sequence[typing.Union[str, str]], typing.Sequence[str]):
     r"""Find cached files."""
@@ -418,7 +418,6 @@ def _get_tables_from_cache(
         cached_versions: typing.Sequence[
             typing.Tuple[LooseVersion, str, Dependencies]
         ],
-        flavor: Flavor,
         num_workers: int,
         verbose: bool,
 ) -> typing.Sequence[str]:
@@ -428,7 +427,7 @@ def _get_tables_from_cache(
         tables,
         deps,
         cached_versions,
-        flavor,
+        None,
         verbose,
     )
 
@@ -679,7 +678,6 @@ def load(
                     db_root_tmp,
                     deps,
                     cached_versions,
-                    flavor,
                     num_workers,
                     verbose,
                 )
