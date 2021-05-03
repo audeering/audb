@@ -259,7 +259,7 @@ def _get_media_from_backend(
         media: typing.Sequence[str],
         db_root: str,
         db_root_tmp: str,
-        flavor: Flavor,
+        flavor: typing.Optional[Flavor],
         deps: Dependencies,
         backend: audbackend.Backend,
         num_workers: typing.Optional[int],
