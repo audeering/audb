@@ -203,7 +203,7 @@ def _full_path(
 
 
 def _get_media_from_backend(
-        db: audformat.Database,
+        name: str,
         media: typing.Sequence[str],
         db_root: str,
         db_root_tmp: str,
@@ -242,7 +242,7 @@ def _get_media_from_backend(
 
     def job(archive: str, version: str):
         archive = backend.join(
-            db.name,
+            name,
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
             archive,
         )
@@ -758,7 +758,7 @@ def load(
                 if backend is None:
                     backend = lookup_backend(name, version)
                 _get_media_from_backend(
-                    db,
+                    name,
                     missing_media,
                     db_root,
                     db_root_tmp,
@@ -953,7 +953,7 @@ def load_media(
                 if backend is None:
                     backend = lookup_backend(name, version)
                 _get_media_from_backend(
-                    db,
+                    name,
                     missing_media,
                     db_root,
                     db_root_tmp,
