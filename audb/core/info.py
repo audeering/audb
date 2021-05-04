@@ -1,35 +1,38 @@
-import os
-import tempfile
 import typing
 
 import pandas as pd
 
 import audformat
 
-from audb.core import define
 from audb.core.api import (
     dependencies,
     latest_version,
 )
-from audb.core.utils import lookup_backend
+from audb.core.load import (
+    database_cache_folder,
+    load_header,
+)
 
 
 def author(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> str:
     """Author(s) of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         author(s) of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.author
 
 
@@ -83,18 +86,21 @@ def description(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> str:
     """Description of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         description of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.description
 
 
@@ -151,16 +157,15 @@ def header(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> audformat.Database:
     r"""Load header of database.
-
-    Downloads the :file:`db.yaml` to a temporal directory,
-    loads the database header and returns it.
-    Does not write to the :mod:`audb` cache folders.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         database object without table data
@@ -168,18 +173,8 @@ def header(
     """
     if version is None:
         version = latest_version(name)
-    backend = lookup_backend(name, version)
-
-    with tempfile.TemporaryDirectory() as root:
-        remote_header = backend.join(name, define.HEADER_FILE)
-        local_header = os.path.join(root, define.HEADER_FILE)
-        backend.get_file(
-            remote_header,
-            local_header,
-            version,
-        )
-        db = audformat.Database.load(root, load_data=False)
-
+    db_root = database_cache_folder(name, version, cache_root)
+    db, _ = load_header(db_root, name, version)
     return db
 
 
@@ -187,18 +182,21 @@ def languages(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> typing.List[str]:
     """Languages of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         languages of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.languages
 
 
@@ -206,18 +204,21 @@ def license(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> str:
     """License of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         license of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.license
 
 
@@ -225,18 +226,21 @@ def license_url(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> str:
     """License URL of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         license URL of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.license_url
 
 
@@ -244,18 +248,21 @@ def media(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> typing.Dict:
     """Audio and video media of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         media of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.media
 
 
@@ -263,18 +270,21 @@ def meta(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> typing.Dict:
     """Meta information of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         meta information of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.meta
 
 
@@ -282,18 +292,21 @@ def organization(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> str:
     """Organization responsible for database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         organization responsible for database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.organization
 
 
@@ -301,18 +314,21 @@ def raters(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> typing.Dict:
     """Raters contributed to database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         raters of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.raters
 
 
@@ -343,18 +359,21 @@ def schemes(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> typing.Dict:
     """Schemes of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         schemes of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.schemes
 
 
@@ -362,18 +381,21 @@ def source(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> str:
     """Source of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         source of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.source
 
 
@@ -381,18 +403,21 @@ def splits(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> typing.Dict:
     """Splits of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         splits of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.splits
 
 
@@ -400,18 +425,21 @@ def tables(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> typing.Dict:
     """Tables of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         tables of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.tables
 
 
@@ -419,16 +447,19 @@ def usage(
         name: str,
         *,
         version: str = None,
+        cache_root: str = None,
 ) -> str:
     """Usage of database.
 
     Args:
         name: name of database
         version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         usage of database
 
     """
-    db = header(name, version=version)
+    db = header(name, version=version, cache_root=cache_root)
     return db.usage
