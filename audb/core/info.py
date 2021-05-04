@@ -144,7 +144,7 @@ def formats(
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     df = deps()
-    return set(df[df.type == define.DependType.MEDIA]['format'].values)
+    return set(df[df.type == define.DependType.MEDIA]['format'])
 
 
 def header(
@@ -336,7 +336,7 @@ def sampling_rates(
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     df = deps()
-    return set(df[df.type == define.DependType.MEDIA]['sampling_rate'].values)
+    return set(df[df.type == define.DependType.MEDIA]['sampling_rate'])
 
 
 def schemes(
