@@ -162,12 +162,18 @@ def fixture_publish_db():
 
 def test_database_cache_folder():
     cache_root = os.path.join(pytest.CACHE_ROOT, 'cache')
+    version = '1.0.0'
     db_root = audb.core.load.database_cache_folder(
         DB_NAME,
-        '1.0.0',
+        version,
         cache_root,
     )
-    assert db_root.startswith(audeer.safe_path(cache_root))
+    expected_db_root = os.path.join(
+        cache_root,
+        DB_NAME,
+        version,
+    )
+    assert db_root == expected_db_root
 
 
 @pytest.mark.parametrize(

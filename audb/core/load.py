@@ -523,7 +523,11 @@ def database_cache_folder(
         cache_roots = [cache_root]
     for cache_root in cache_roots:
         if flavor is None:
-            db_root = cache_root
+            db_root = os.path.join(
+                cache_root,
+                name,
+                version,
+            )
         else:
             db_root = os.path.join(
                 cache_root,
