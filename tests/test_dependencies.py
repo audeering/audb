@@ -144,7 +144,7 @@ def test_format(deps):
 
 def test_removed(deps):
     assert not deps.removed('file.wav')
-    assert type (deps.removed('file.wav')) == bool
+    assert type(deps.removed('file.wav')) == bool
 
 
 def test_load_save(deps):
