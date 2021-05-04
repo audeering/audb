@@ -302,6 +302,8 @@ def test_load_media(version, media, format):
     assert paths == expected_paths
 
     # Clear cache to force loading from other cache
+    if version is None:
+        version = audb.latest_version(DB_NAME)
     cache_root = audb.core.load.database_cache_folder(
         DB_NAME,
         version,
