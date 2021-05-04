@@ -312,7 +312,21 @@ def test_load_media(version, media, format):
     assert paths == expected_paths
 
     # Clear cache to force loading from other cache
-    cache_root = audb.core.load.database_cache_folder
+    cache_root = audb.core.load.database_cache_folder(
+        DB_NAME,
+        version,
+        audb.Flavor(format=format),
+        cache_root=pytest.CACHE_ROOT,
+    )
+    shutil.rmtree(cache_root)
+    paths2 = audb.load_media(
+        DB_NAME,
+        media,
+        version=version,
+        format=format,
+        verbose=False,
+    )
+    assert path2 == path
 
 
 @pytest.mark.parametrize(
