@@ -845,3 +845,123 @@ def load_header(
             db.save(db_root_tmp, header_only=True)
             _move_file(db_root_tmp, db_root, define.HEADER_FILE)
     return audformat.Database.load(db_root, load_data=False), backend
+
+
+def load_media(
+        name: str,
+        media: typing.Union[str, typing.Sequence[str]],
+        *,
+        version: str = None,
+        bit_depth: int = None,
+        channels: typing.Union[int, typing.Sequence[int]] = None,
+        format: str = None,
+        mixdown: bool = False,
+        sampling_rate: int = None,
+        cache_root: str = None,
+        num_workers: typing.Optional[int] = 1,
+        verbose: bool = True,
+) -> typing.List:
+    r"""Load media file(s).
+
+    Args:
+        name: name of database
+        media: load media files matching the regular expression
+            or provided in the list
+        version: version of database
+        bit_depth: bit depth, one of ``16``, ``24``, ``32``
+        channels: channel selection, see :func:`audresample.remix`.
+            Note that media files with too few channels
+            will be first upsampled by repeating the existing channels.
+            E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,
+            and ``channels=[1]`` returns the second channel
+            of all multi-channel files
+            and all mono files.
+        format: file format, one of ``'flac'``, ``'wav'``
+        mixdown: apply mono mix-down
+        sampling_rate: sampling rate in Hz, one of
+            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+        num_workers: number of parallel jobs or 1 for sequential
+            processing. If ``None`` will be set to the number of
+            processors on the machine multiplied by 5
+        verbose: show debug messages
+
+    Returns:
+        paths to media files
+
+    """
+    if version is None:
+        version = latest_version(name)
+    media = audeer.to_list(media)
+    deps = dependencies(name, version=version, cache_root=cache_root)
+
+    cached_versions = None
+
+    flavor = Flavor(
+        channels=channels,
+        format=format,
+        mixdown=mixdown,
+        bit_depth=bit_depth,
+        sampling_rate=sampling_rate,
+    )
+    db_root = database_cache_folder(name, version, flavor, cache_root)
+    db_root_tmp = database_tmp_folder(db_root)
+
+    if verbose:  # pragma: no cover
+        print(f'Get:   {name} v{version}')
+        print(f'Cache: {db_root}')
+
+    # Start with database header without tables
+    db, backend = load_header(
+        db_root,
+        name,
+        version,
+        flavor=flavor,
+    )
+
+    db_is_complete = _database_is_complete(db)
+
+    # load missing media
+    if not db_is_complete:
+        missing_media = _missing_media(
+            db_root,
+            media,
+            flavor,
+            verbose,
+        )
+        if missing_media:
+            if cached_versions is None:
+                cached_versions = _cached_versions(
+                    name,
+                    version,
+                    flavor,
+                    cache_root,
+                )
+            if cached_versions:
+                missing_media = _get_media_from_cache(
+                    missing_media,
+                    db_root,
+                    db_root_tmp,
+                    deps,
+                    cached_versions,
+                    flavor,
+                    num_workers,
+                    verbose,
+                )
+            if missing_media:
+                if backend is None:
+                    backend = lookup_backend(name, version)
+                _get_media_from_backend(
+                    db,
+                    missing_media,
+                    db_root,
+                    db_root_tmp,
+                    flavor,
+                    deps,
+                    backend,
+                    num_workers,
+                    verbose,
+                )
+
+    return [os.path.join(db_root, m) for m in media]

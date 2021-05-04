@@ -63,6 +63,11 @@ load
 
 .. autofunction:: load
 
+load_media
+----------
+
+.. autofunction:: load_media
+
 load_to
 -------
 
