@@ -896,6 +896,13 @@ def load_media(
     media = audeer.to_list(media)
     deps = dependencies(name, version=version, cache_root=cache_root)
 
+    available_files = deps.media
+    for media_file in media:
+        if media_file not in available_files:
+            raise ValueError(
+                f"Could not find '{media_file}' in {name} {version}"
+            )
+
     cached_versions = None
 
     flavor = Flavor(
@@ -905,7 +912,7 @@ def load_media(
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
     )
-    db_root = database_cache_folder(name, version, flavor, cache_root)
+    db_root = database_cache_folder(name, version, cache_root, flavor)
     db_root_tmp = database_tmp_folder(db_root)
 
     if verbose:  # pragma: no cover

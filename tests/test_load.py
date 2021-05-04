@@ -268,9 +268,15 @@ def test_load(format, version):
             'audio/001.wav',
             'wav',
         ),
-        (
+        pytest.param(
             '1.0.0',
             ['audio/001.flac', 'audio/002.flac'],
+            'flac',
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        (
+            '1.0.0',
+            ['audio/001.wav', 'audio/002.wav'],
             'flac',
         ),
         (
@@ -289,34 +295,18 @@ def test_load_media(version, media, format):
         format=format,
         verbose=False,
     )
-    if format is not None:
-        expected_paths = [
-            audeer.replace_file_extension(p, format)
-            for p in paths
-        ]
-    else:
-        expected_paths = paths
-    if format is None:
-        expected_paths = [
-            os.path.join(pytest.CACHE_ROOT, p)
-            for p in paths
-        ]
-    else:
-        expected_paths = [
-            os.path.join(
-                pytest.CACHE_ROOT,
-                audeer.replace_file_extension(p, format)
-            )
-            for p in paths
-        ]
+    expected_paths = [
+        os.path.join(pytest.CACHE_ROOT, p)
+        for p in paths
+    ]
     assert paths == expected_paths
 
     # Clear cache to force loading from other cache
     cache_root = audb.core.load.database_cache_folder(
         DB_NAME,
         version,
+        pytest.CACHE_ROOT,
         audb.Flavor(format=format),
-        cache_root=pytest.CACHE_ROOT,
     )
     shutil.rmtree(cache_root)
     paths2 = audb.load_media(
@@ -326,7 +316,7 @@ def test_load_media(version, media, format):
         format=format,
         verbose=False,
     )
-    assert path2 == path
+    assert paths2 == paths
 
 
 @pytest.mark.parametrize(
