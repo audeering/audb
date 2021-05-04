@@ -119,7 +119,7 @@ def duration(
     deps = dependencies(name, version=version, cache_root=cache_root)
     df = deps()
     return pd.to_timedelta(
-        sum([df[df.type == define.DependType.MEDIA]['duration']]),
+        df[df.type == define.DependType.MEDIA]['duration'].sum(),
         unit='s',
     )
 
@@ -144,7 +144,7 @@ def formats(
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     df = deps()
-    return set([df[df.type == define.DependType.MEDIA]['format']])
+    return set(df[df.type == define.DependType.MEDIA]['format'].values)
 
 
 def header(
@@ -336,7 +336,7 @@ def sampling_rates(
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     df = deps()
-    return set([df[df.type == define.DependType.MEDIA]['sampling_rate']])
+    return set(df[df.type == define.DependType.MEDIA]['sampling_rate'].values)
 
 
 def schemes(
