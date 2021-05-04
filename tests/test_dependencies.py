@@ -104,40 +104,47 @@ def test_archive(deps):
     assert deps.archive('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.ARCHIVE
     ]
+    assert type(deps.archive('file.wav')) == str
 
 
 def test_bit_depth(deps):
     assert deps.bit_depth('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.BIT_DEPTH
     ]
+    assert type(deps.bit_depth('file.wav')) == int
 
 
 def test_channels(deps):
     assert deps.channels('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.CHANNELS
     ]
+    assert type(deps.channels('file.wav')) == int
 
 
 def test_checksum(deps):
     assert deps.checksum('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.CHECKSUM
     ]
+    assert type(deps.checksum('file.wav')) == str
 
 
 def test_duration(deps):
     assert deps.duration('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.DURATION
     ]
+    assert type(deps.duration('file.wav')) == float
 
 
 def test_format(deps):
     assert deps.format('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.FORMAT
     ]
+    assert type(deps.format('file.wav')) == str
 
 
 def test_removed(deps):
     assert not deps.removed('file.wav')
+    assert type(deps.removed('file.wav')) == bool
 
 
 def test_load_save(deps):
@@ -164,18 +171,21 @@ def test_sampling_rate(deps):
     assert deps.sampling_rate('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.SAMPLING_RATE
     ]
+    assert type(deps.sampling_rate('file.wav')) == int
 
 
 def test_type(deps):
     assert deps.type('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.TYPE
     ]
+    assert type(deps.type('file.wav')) == int
 
 
 def test_version(deps):
     assert deps.version('file.wav') == ENTRIES['file.wav'][
         audb.core.define.DependField.VERSION
     ]
+    assert type(deps.version('file.wav')) == str
 
 
 def test_len(deps):

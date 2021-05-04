@@ -107,7 +107,7 @@ class Dependencies:
             list of archives
 
         """
-        archives = [self.archive(file) for file in self.files]
+        archives = self._df.archive.to_list()
         return sorted(list(set(archives)))
 
     @property
@@ -128,11 +128,11 @@ class Dependencies:
             list of media
 
         """
-        select = [
-            file for file in self.files
-            if self.type(file) == define.DependType.MEDIA
-        ]
-        return select
+        return list(
+            self._df[
+                self._df['type'] == define.DependType.MEDIA
+            ].index
+        )
 
     @property
     def removed_media(self) -> typing.List[str]:
@@ -142,10 +142,12 @@ class Dependencies:
             list of media
 
         """
-        select = [
-            file for file in self.media if self.removed(file)
-        ]
-        return select
+        return list(
+            self._df[
+                (self._df['type'] == define.DependType.MEDIA)
+                & (self._df['removed'] == 1)
+            ].index
+        )
 
     @property
     def table_ids(self) -> typing.List[str]:
@@ -169,11 +171,11 @@ class Dependencies:
             list of tables
 
         """
-        select = [
-            file for file in self.files
-            if self.type(file) == define.DependType.META
-        ]
-        return select
+        return list(
+            self._df[
+                self._df['type'] == define.DependType.META
+            ].index
+        )
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
@@ -185,7 +187,7 @@ class Dependencies:
             archive name
 
         """
-        return self[file][define.DependField.ARCHIVE]
+        return self._df.archive[file]
 
     def bit_depth(self, file: str) -> int:
         r"""Bit depth of media file.
@@ -197,7 +199,7 @@ class Dependencies:
             bit depth
 
         """
-        return self[file][define.DependField.BIT_DEPTH]
+        return int(self._df.bit_depth[file])
 
     def channels(self, file: str) -> int:
         r"""Number of channels of media file.
@@ -209,7 +211,7 @@ class Dependencies:
             number of channels
 
         """
-        return self[file][define.DependField.CHANNELS]
+        return int(self._df.channels[file])
 
     def checksum(self, file: str) -> str:
         r"""Checksum of file.
@@ -221,7 +223,7 @@ class Dependencies:
             checksum of file
 
         """
-        return self[file][define.DependField.CHECKSUM]
+        return self._df.checksum[file]
 
     def duration(self, file: str) -> float:
         r"""Duration of file.
@@ -233,7 +235,7 @@ class Dependencies:
             duration in seconds
 
         """
-        return self[file][define.DependField.DURATION]
+        return float(self._df.duration[file])
 
     def format(self, file: str) -> str:
         r"""Format of file.
@@ -245,19 +247,7 @@ class Dependencies:
             file format (always lower case)
 
         """
-        return self[file][define.DependField.FORMAT]
-
-    def removed(self, file: str) -> bool:
-        r"""Check if file is marked as removed.
-
-        Args:
-            file: relative file path
-
-        Returns:
-            ``True`` if file was removed
-
-        """
-        return self[file][define.DependField.REMOVED] != 0
+        return self._df.format[file]
 
     def load(self, path: str):
         r"""Read dependencies from file.
@@ -307,6 +297,18 @@ class Dependencies:
                 dtype=dtype_mapping,
             )
 
+    def removed(self, file: str) -> bool:
+        r"""Check if file is marked as removed.
+
+        Args:
+            file: relative file path
+
+        Returns:
+            ``True`` if file was removed
+
+        """
+        return bool(self._df.removed[file])
+
     def sampling_rate(self, file: str) -> int:
         r"""Sampling rate of media file.
 
@@ -317,7 +319,7 @@ class Dependencies:
             sampling rate in Hz
 
         """
-        return self[file][define.DependField.SAMPLING_RATE]
+        return int(self._df.sampling_rate[file])
 
     def save(self, path: str):
         r"""Write dependencies to file.
@@ -333,7 +335,7 @@ class Dependencies:
         elif path.endswith('pkl'):
             self._df.to_pickle(path)
 
-    def type(self, file: str) -> define.DependType:
+    def type(self, file: str) -> int:
         r"""Type of file.
 
         Args:
@@ -343,7 +345,7 @@ class Dependencies:
             type
 
         """
-        return self[file][define.DependField.TYPE]
+        return int(self._df.type[file])
 
     def version(self, file: str) -> str:
         r"""Version of file.
@@ -355,7 +357,7 @@ class Dependencies:
             version string
 
         """
-        return self[file][define.DependField.VERSION]
+        return self._df.version[file]
 
     def _add_media(
             self,
@@ -460,5 +462,4 @@ class Dependencies:
             file: relative file path
 
         """
-        removed_column = define.DEPEND_FIELD_NAMES[define.DependField.REMOVED]
-        self._df.at[file, removed_column] = 1
+        self._df.at[file, 'removed'] = 1
