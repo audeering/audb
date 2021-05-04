@@ -107,7 +107,7 @@ class Dependencies:
             list of archives
 
         """
-        archives = list(self._df.archive.values)
+        archives = self._df.archive.to_list()
         return sorted(list(set(archives)))
 
     @property
