@@ -181,11 +181,11 @@ def test_database_cache_folder():
 @pytest.mark.parametrize(
     'version',
     [
+        None,  # 3.0.0
         '1.0.0',
         '1.1.0',
         '1.1.1',
         '2.0.0',
-        None,  # 3.0.0
         pytest.param(
             '4.0.0',
             marks=pytest.mark.xfail(raises=RuntimeError),

@@ -62,7 +62,7 @@ def _cached_files(
         cached_versions: typing.Sequence[
             typing.Tuple[LooseVersion, str, Dependencies],
         ],
-        flavor: Flavor,
+        flavor: typing.Optional[Flavor],
         verbose: bool,
 ) -> (typing.Sequence[typing.Union[str, str]], typing.Sequence[str]):
     r"""Find cached files."""
@@ -79,18 +79,19 @@ def _cached_files(
         file_version = LooseVersion(deps.version(file))
         for cache_version, cache_root, cache_deps in cached_versions:
             if cache_version >= file_version:
-                if deps.checksum(file) == cache_deps.checksum(file):
-                    path = os.path.join(cache_root, file)
-                    if flavor.format is not None:
-                        path = audeer.replace_file_extension(
-                            path,
-                            flavor.format,
-                        )
-                    if os.path.exists(path):
-                        found = True
-                        break
+                if file in cache_deps:
+                    if deps.checksum(file) == cache_deps.checksum(file):
+                        path = os.path.join(cache_root, file)
+                        if flavor and flavor.format is not None:
+                            path = audeer.replace_file_extension(
+                                path,
+                                flavor.format,
+                            )
+                        if os.path.exists(path):
+                            found = True
+                            break
         if found:
-            if flavor.format is not None:
+            if flavor and flavor.format is not None:
                 file = audeer.replace_file_extension(
                     file,
                     flavor.format,
@@ -366,7 +367,6 @@ def _get_tables_from_cache(
         cached_versions: typing.Sequence[
             typing.Tuple[LooseVersion, str, Dependencies]
         ],
-        flavor: Flavor,
         num_workers: int,
         verbose: bool,
 ) -> typing.Sequence[str]:
@@ -376,7 +376,7 @@ def _get_tables_from_cache(
         tables,
         deps,
         cached_versions,
-        flavor,
+        None,
         verbose,
     )
 
@@ -693,7 +693,6 @@ def load(
                     db_root_tmp,
                     deps,
                     cached_versions,
-                    flavor,
                     num_workers,
                     verbose,
                 )
