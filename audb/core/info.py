@@ -1,12 +1,9 @@
-import os
-import tempfile
 import typing
 
 import pandas as pd
 
 import audformat
 
-from audb.core import define
 from audb.core.api import (
     dependencies,
     latest_version,
@@ -15,7 +12,6 @@ from audb.core.load import (
     database_cache_folder,
     load_header,
 )
-from audb.core.utils import lookup_backend
 
 
 def author(
