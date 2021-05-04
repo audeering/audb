@@ -1,6 +1,6 @@
-docutils<0.17  # until https://github.com/sphinx-doc/sphinx/pull/9053 is released
+docutils
 jupyter-sphinx
-sphinx >=3.5.1
+sphinx >=3.5.4
 sphinx-audeering-theme >=1.0.12
 sphinx-autodoc-typehints
 sphinx-copybutton
