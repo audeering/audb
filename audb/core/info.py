@@ -4,6 +4,7 @@ import pandas as pd
 
 import audformat
 
+from audb.core import define
 from audb.core.api import (
     dependencies,
     latest_version,
