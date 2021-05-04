@@ -11,7 +11,10 @@ from audb.core.api import (
     dependencies,
     latest_version,
 )
-from audb.core.load import load_header
+from audb.core.load import (
+    database_cache_folder,
+    load_header,
+)
 from audb.core.utils import lookup_backend
 
 
@@ -182,7 +185,7 @@ def header(
     """
     if version is None:
         version = latest_version(name)
-    db_root = database_cache_folder(name, version, Flavor(), cache_root)
+    db_root = database_cache_folder(name, version, cache_root)
     db, _ = load_header(db_root, name, version)
     return db
 

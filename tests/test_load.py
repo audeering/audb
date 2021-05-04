@@ -165,8 +165,7 @@ def test_database_cache_folder():
     db_root = audb.core.load.database_cache_folder(
         DB_NAME,
         '1.0.0',
-        audb.Flavor(),
-        cache_root=cache_root,
+        cache_root,
     )
     assert db_root.startswith(audeer.safe_path(cache_root))
 

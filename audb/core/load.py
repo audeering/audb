@@ -499,16 +499,16 @@ def _tables(
 def database_cache_folder(
         name: str,
         version: str,
-        flavor: Flavor,
-        cache_root: typing.Optional[str],
+        cache_root: str = None,
+        flavor: Flavor = None,
 ) -> str:
     r"""Create and return database cache folder.
 
     Args:
         name: name of database
         version: version of database
-        flavor: flavor of database
         cache_root: path to cache folder
+        flavor: flavor of database
 
     Returns:
         path to cache folder
@@ -522,12 +522,14 @@ def database_cache_folder(
     else:
         cache_roots = [cache_root]
     for cache_root in cache_roots:
-        db_root = audeer.safe_path(
-            os.path.join(
+        if flavor is None:
+            db_root = cache_root
+        else:
+            db_root = os.path.join(
                 cache_root,
                 flavor.path(name, version),
             )
-        )
+        db_root = audeer.safe_path(db_root)
         if os.path.exists(db_root):
             break
 
@@ -650,7 +652,7 @@ def load(
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
     )
-    db_root = database_cache_folder(name, version, flavor, cache_root)
+    db_root = database_cache_folder(name, version, cache_root, flavor)
     db_root_tmp = database_tmp_folder(db_root)
 
     if verbose:  # pragma: no cover
