@@ -918,6 +918,7 @@ def load_media(
         name,
         version,
         flavor=flavor,
+        add_audb_meta=True,
     )
 
     db_is_complete = _database_is_complete(db)
