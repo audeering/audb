@@ -543,7 +543,7 @@ def database_tmp_folder(
     The temporary cache folder is created under ``cache_root + '~'``.
 
     Args:
-        cache_root: oath to cache folder
+        cache_root: path to cache folder
 
     Returns:
         path to temporary cache folder
