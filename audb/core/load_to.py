@@ -16,7 +16,6 @@ from audb.core.load import (
     database_tmp_folder,
     load_header,
 )
-from audb.core.utils import lookup_backend
 
 
 def _find_media(
