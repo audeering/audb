@@ -12,7 +12,10 @@ from audb.core.api import (
     latest_version,
 )
 from audb.core.dependencies import Dependencies
-from audb.core.utils import lookup_backend
+from audb.core.load import (
+    database_tmp_folder,
+    load_header,
+)
 
 
 def _find_media(
@@ -246,10 +249,9 @@ def load_to(
     """
     if version is None:
         version = latest_version(name)
-    backend = lookup_backend(name, version)
 
     db_root = audeer.safe_path(root)
-    db_root_tmp = db_root + '~'
+    db_root_tmp = database_tmp_folder(db_root)
 
     # remove files with a wrong checksum
     # to ensure we load correct version
@@ -264,15 +266,14 @@ def load_to(
                 if checksum != deps.checksum(file):
                     os.remove(full_file)
 
-    audeer.mkdir(db_root)
-    audeer.mkdir(db_root_tmp)
+    # load database header without tables from backend
 
-    # load database header
-
-    remote_header = backend.join(name, define.HEADER_FILE)
-    local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
-    backend.get_file(remote_header, local_header, version)
-    db_header = audformat.Database.load(db_root_tmp, load_data=False)
+    db_header, backend = load_header(
+        db_root_tmp,
+        name,
+        version,
+        overwrite=True,
+    )
 
     # get altered and new tables
 

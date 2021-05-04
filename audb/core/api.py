@@ -204,7 +204,6 @@ def dependencies(
     """
     if version is None:
         version = latest_version(name)
-    backend = lookup_backend(name, version)
 
     cache_roots = [
         default_cache_root(True),  # check shared cache first
@@ -226,6 +225,7 @@ def dependencies(
 
     deps = Dependencies()
     if not os.path.exists(deps_path):
+        backend = lookup_backend(name, version)
         with tempfile.TemporaryDirectory() as tmp_root:
             archive = backend.join(name, define.DB)
             backend.get_archive(
