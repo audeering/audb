@@ -641,7 +641,6 @@ def load(
         kwargs,
     )
 
-    backend = lookup_backend(name, version)
     cached_versions = None
 
     flavor = Flavor(
