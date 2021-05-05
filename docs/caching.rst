@@ -18,14 +18,35 @@ Next time your request it again,
 :mod:`audb` will directly load the database from there.
 
 :mod:`audb` distinguishes two :file:`<cache>` folders.
-A system wide shared cache folder.
-By default it is located at
+A system wide shared cache folder and a user cache folder.
+
+
+Shared cache
+------------
+
+By default the shared cache is located at
 
 .. jupyter-execute::
 
     audb.default_cache_root(shared=True)
 
 and is meant to be shared by several users.
+
+In order to provide read and write access
+to all users to the shared cache folder,
+they need to be in the same group
+and you have to `adjust the rights`_
+of the shared cache folder with
+
+.. code-block:: bash
+
+    $ chmod 775 /data/audb  # set right of cache folder
+    $ chmod g+s /data/audb  # content inherits group ownership
+    $ setfacl -d -m u::rwx,g::rwx,o::rx- /data/audb  # content inherits rights
+
+
+User cache
+----------
 
 The second cache folder should be
 accessible to you only.
@@ -38,6 +59,10 @@ By default it points to
 When you request a database with :meth:`audb.load`,
 :mod:`audb` first looks for it in the shared cache folder
 and afterwards in your local cache folder.
+
+
+Changing cache locations
+------------------------
 
 There are four ways to change the default locations:
 
