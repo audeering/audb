@@ -39,7 +39,6 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinx_copybutton',
-    'sphinxcontrib.programoutput',
     'jupyter_sphinx',
 ]
 
