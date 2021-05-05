@@ -911,8 +911,7 @@ def load_media(
 
     Args:
         name: name of database
-        media: load media files matching the regular expression
-            or provided in the list
+        media: load media files provided in the list
         version: version of database
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`.
