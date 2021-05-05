@@ -399,6 +399,75 @@ def _get_tables_from_cache(
     return missing_tables
 
 
+def _load_media(
+        media: typing.Sequence[str],
+        backend: audbackend.Backend,
+        db_root: str,
+        db_root_tmp: str,
+        name: str,
+        version: str,
+        cached_versions: typing.Optional[
+            typing.Sequence[typing.Tuple[LooseVersion, str, Dependencies]]
+        ],
+        deps: Dependencies,
+        flavor: Flavor,
+        cache_root: str,
+        num_workers: int,
+        verbose: bool,
+):
+    r"""Load media files to cache.
+
+    All media files not existing in cache yet
+    are copied from the corresponding flavor cache
+    folder of other versions of the database
+    or are downloaded from the backend.
+
+    """
+    print(db_root)
+    print(media)
+    print(flavor)
+    print(verbose)
+    missing_media = _missing_media(
+        db_root,
+        media,
+        flavor,
+        verbose,
+    )
+    if missing_media:
+        if cached_versions is None:
+            cached_versions = _cached_versions(
+                name,
+                version,
+                flavor,
+                cache_root,
+            )
+        if cached_versions:
+            missing_media = _get_media_from_cache(
+                missing_media,
+                db_root,
+                db_root_tmp,
+                deps,
+                cached_versions,
+                flavor,
+                num_workers,
+                verbose,
+            )
+        if missing_media:
+            if backend is None:
+                backend = lookup_backend(name, version)
+            _get_media_from_backend(
+                name,
+                missing_media,
+                db_root,
+                db_root_tmp,
+                flavor,
+                deps,
+                backend,
+                num_workers,
+                verbose,
+            )
+
+
 def _media(
         db: audformat.Database,
         media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
@@ -729,45 +798,20 @@ def load(
 
     # load missing media
     if not db_is_complete and not only_metadata:
-        missing_media = _missing_media(
-            db_root,
+        _load_media(
             requested_media,
+            backend,
+            db_root,
+            db_root_tmp,
+            name,
+            version,
+            cached_versions,
+            deps,
             flavor,
+            cache_root,
+            num_workers,
             verbose,
         )
-        if missing_media:
-            if cached_versions is None:
-                cached_versions = _cached_versions(
-                    name,
-                    version,
-                    flavor,
-                    cache_root,
-                )
-            if cached_versions:
-                missing_media = _get_media_from_cache(
-                    missing_media,
-                    db_root,
-                    db_root_tmp,
-                    deps,
-                    cached_versions,
-                    flavor,
-                    num_workers,
-                    verbose,
-                )
-            if missing_media:
-                if backend is None:
-                    backend = lookup_backend(name, version)
-                _get_media_from_backend(
-                    name,
-                    missing_media,
-                    db_root,
-                    db_root_tmp,
-                    flavor,
-                    deps,
-                    backend,
-                    num_workers,
-                    verbose,
-                )
 
     # filter media
     if media is not None or tables is not None:
@@ -891,9 +935,12 @@ def load_media(
         paths to media files
 
     """
+    media = audeer.to_list(media)
+    if len(media) == 0:
+        return []
+
     if version is None:
         version = latest_version(name)
-    media = audeer.to_list(media)
     deps = dependencies(name, version=version, cache_root=cache_root)
 
     available_files = deps.media
@@ -932,44 +979,19 @@ def load_media(
 
     # load missing media
     if not db_is_complete:
-        missing_media = _missing_media(
-            db_root,
+        _load_media(
             media,
+            backend,
+            db_root,
+            db_root_tmp,
+            name,
+            version,
+            cached_versions,
+            deps,
             flavor,
+            cache_root,
+            num_workers,
             verbose,
         )
-        if missing_media:
-            if cached_versions is None:
-                cached_versions = _cached_versions(
-                    name,
-                    version,
-                    flavor,
-                    cache_root,
-                )
-            if cached_versions:
-                missing_media = _get_media_from_cache(
-                    missing_media,
-                    db_root,
-                    db_root_tmp,
-                    deps,
-                    cached_versions,
-                    flavor,
-                    num_workers,
-                    verbose,
-                )
-            if missing_media:
-                if backend is None:
-                    backend = lookup_backend(name, version)
-                _get_media_from_backend(
-                    name,
-                    missing_media,
-                    db_root,
-                    db_root_tmp,
-                    flavor,
-                    deps,
-                    backend,
-                    num_workers,
-                    verbose,
-                )
 
     return [os.path.join(db_root, m) for m in media]
