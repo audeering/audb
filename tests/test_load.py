@@ -265,6 +265,11 @@ def test_load(format, version):
     [
         (
             '1.0.0',
+            [],
+            None,
+        ),
+        (
+            '1.0.0',
             'audio/001.wav',
             'wav',
         ),
