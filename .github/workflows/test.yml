@@ -23,6 +23,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Cache emodb
+      uses: actions/cache@v2
+      with:
+        path: ~/audb
+        key: emodb-ubuntu
+      if: matrix.os == 'ubuntu-18.04'
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -33,6 +40,10 @@ jobs:
         sudo apt-get update
         sudo apt-get install --no-install-recommends --yes libsndfile1 sox
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-18.04'
+
+    - name: Show cache content
+      run: tree ~/audb
+      if: matrix.os == 'ubuntu-18.04'
 
     - name: Install dependencies
       run: |
