@@ -32,7 +32,11 @@ def author(
     Returns:
         author(s) of database
 
-    """
+    Example:
+        >>> author('emodb', version='1.1.0')
+        'Felix Burkhardt, Astrid Paeschke, Miriam Rolfes, Walter Sendlmeier, Benjamin Weiss'
+
+    """  # noqa: E501
     db = header(name, version=version, cache_root=cache_root)
     return db.author
 
@@ -53,6 +57,10 @@ def bit_depths(
 
     Returns:
         bit depths
+
+    Example:
+        >>> bit_depths('emodb', version='1.1.0')
+        {16}
 
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
@@ -77,6 +85,10 @@ def channels(
     Returns:
         channel numbers
 
+    Example:
+        >>> channels('emodb', version='1.1.0')
+        {1}
+
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     df = deps()
@@ -100,6 +112,11 @@ def description(
     Returns:
         description of database
 
+    Example:
+        >>> desc = description('emodb', version='1.1.0')
+        >>> desc.split('.')[0]  # show first sentence
+        'Berlin Database of Emotional Speech'
+
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.description
@@ -121,6 +138,10 @@ def duration(
 
     Returns:
         duration
+
+    Example:
+        >>> duration('emodb', version='1.1.0')
+        Timedelta('0 days 00:24:47.092187500')
 
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
@@ -148,6 +169,10 @@ def formats(
     Returns:
         format
 
+    Example:
+        >>> formats('emodb', version='1.1.0')
+        {'wav'}
+
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     df = deps()
@@ -170,6 +195,11 @@ def header(
 
     Returns:
         database object without table data
+
+    Example:
+        >>> db = header('emodb', version='1.1.0')
+        >>> db.name
+        'emodb'
 
     """
     if version is None:
@@ -196,6 +226,10 @@ def languages(
     Returns:
         languages of database
 
+    Example:
+        >>> languages('emodb', version='1.1.0')
+        ['deu']
+
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.languages
@@ -217,6 +251,10 @@ def license(
 
     Returns:
         license of database
+
+    Example:
+        >>> license('emodb', version='1.1.0')
+        'CC0-1.0'
 
     """
     db = header(name, version=version, cache_root=cache_root)
@@ -240,6 +278,10 @@ def license_url(
     Returns:
         license URL of database
 
+    Example:
+        >>> license_url('emodb', version='1.1.0')
+        'https://creativecommons.org/publicdomain/zero/1.0/'
+
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.license_url
@@ -261,6 +303,11 @@ def media(
 
     Returns:
         media of database
+
+    Example:
+        >>> media('emodb', version='1.1.0')
+        microphone:
+            {type: other, format: wav, channels: 1, sampling_rate: 16000}
 
     """
     db = header(name, version=version, cache_root=cache_root)
@@ -284,6 +331,11 @@ def meta(
     Returns:
         meta information of database
 
+    Example:
+        >>> meta('emodb', version='1.1.0')
+        pdf:
+            http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&rep=rep1&type=pdf
+
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.meta
@@ -305,6 +357,10 @@ def organization(
 
     Returns:
         organization responsible for database
+
+    Example:
+        >>> organization('emodb', version='1.1.0')
+        'audEERING'
 
     """
     db = header(name, version=version, cache_root=cache_root)
@@ -328,6 +384,11 @@ def raters(
     Returns:
         raters of database
 
+    Example:
+        >>> raters('emodb', version='1.1.0')
+        gold:
+            {type: human}
+
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.raters
@@ -349,6 +410,10 @@ def sampling_rates(
 
     Returns:
         sampling rates
+
+    Example:
+        >>> sampling_rates('emodb', version='1.1.0')
+        {16000}
 
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
@@ -373,6 +438,10 @@ def schemes(
     Returns:
         schemes of database
 
+    Example:
+        >>> list(schemes('emodb', version='1.1.0'))
+        ['confidence', 'duration', 'emotion', 'speaker', 'transcription']
+
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.schemes
@@ -394,6 +463,10 @@ def source(
 
     Returns:
         source of database
+
+    Example:
+        >>> source('emodb', version='1.1.0')
+        'http://emodb.bilderbar.info/download/download.zip'
 
     """
     db = header(name, version=version, cache_root=cache_root)
@@ -417,6 +490,10 @@ def splits(
     Returns:
         splits of database
 
+    Example:
+        >>> splits('emodb', version='1.1.0')
+
+
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.splits
@@ -439,6 +516,10 @@ def tables(
     Returns:
         tables of database
 
+    Example:
+        >>> list(tables('emodb', version='1.1.0'))
+        ['emotion', 'files']
+
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.tables
@@ -460,6 +541,10 @@ def usage(
 
     Returns:
         usage of database
+
+    Example:
+        >>> usage('emodb', version='1.1.0')
+        'unrestricted'
 
     """
     db = header(name, version=version, cache_root=cache_root)
