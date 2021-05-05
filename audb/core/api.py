@@ -131,8 +131,6 @@ def cached(
                         flavor_id_path,
                         load_data=False,
                     )
-                    print(flavor_id_path)
-                    print(db)
                     flavor = db.meta['audb']['flavor']
                     complete = db.meta['audb']['complete']
                     data[flavor_id_path] = {

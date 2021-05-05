@@ -423,10 +423,6 @@ def _load_media(
     or are downloaded from the backend.
 
     """
-    print(db_root)
-    print(media)
-    print(flavor)
-    print(verbose)
     missing_media = _missing_media(
         db_root,
         media,
