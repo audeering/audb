@@ -51,6 +51,7 @@ jobs:
 
     - name: Test with pytest
       run: |
+        ls ~/audb
         python -m pytest
 
     - name: Upload coverage to Codecov
