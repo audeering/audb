@@ -42,9 +42,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-18.04'
 
     - name: Show cache content
-      run: |
-        rm -rf ~/audb/emodb/1.1.0
-        tree ~/audb
+      run: tree ~/audb
       if: matrix.os == 'ubuntu-18.04'
 
     - name: Install dependencies
