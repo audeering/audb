@@ -4,4 +4,3 @@ sphinx >=3.5.4
 sphinx-audeering-theme >=1.0.12
 sphinx-autodoc-typehints
 sphinx-copybutton
-sphinxcontrib-programoutput
