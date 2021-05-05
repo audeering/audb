@@ -45,7 +45,7 @@ You request a :class:`audb.Dependencies` object with
 
 .. jupyter-execute::
 
-    deps = audb.dependencies('emodb', version='1.1.0')
+    deps = audb.dependencies('emodb', version='1.1.1')
 
 You can see all entries by calling the returned object.
 
