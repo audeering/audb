@@ -41,14 +41,14 @@ Let's load the database.
 
     db = audb.load(
         'emodb',
-        version='1.1.0',
+        version='1.1.1',
         only_metadata=True,
         verbose=False,
     )
 
 .. code-block:: python
 
-    db = audb.load('emodb', version='1.1.0', verbose=False)
+    db = audb.load('emodb', version='1.1.1', verbose=False)
 
 This downloads the database header,
 all the media files,

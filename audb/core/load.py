@@ -943,13 +943,13 @@ def load_media(
         >>> paths = load_media(
         ...     'emodb',
         ...     ['wav/03a01Fa.wav'],
-        ...     version='1.1.0',
+        ...     version='1.1.1',
         ...     format='flac',
         ...     verbose=False,
         ... )
         >>> cache_root = audb.default_cache_root()
         >>> [p[len(cache_root):] for p in paths]
-        ['/emodb/1.1.0/40bb2241/wav/03a01Fa.flac']
+        ['/emodb/1.1.1/40bb2241/wav/03a01Fa.flac']
 
     """
     media = audeer.to_list(media)
