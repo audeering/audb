@@ -17,6 +17,7 @@ from audb.core.flavor import Flavor
 from audb.core.load import (
     load,
     load_media,
+    load_table,
 )
 from audb.core.load_to import load_to
 from audb.core.publish import publish

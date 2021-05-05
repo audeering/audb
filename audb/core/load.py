@@ -4,6 +4,8 @@ import re
 import shutil
 import typing
 
+import pandas as pd
+
 import audbackend
 import audeer
 import audformat
@@ -464,6 +466,68 @@ def _load_media(
             )
 
 
+def _load_tables(
+        tables: typing.Sequence[str],
+        backend: audbackend.Backend,
+        db_root: str,
+        db_root_tmp: str,
+        db: audformat.Database,
+        version: str,
+        cached_versions: typing.Optional[
+            typing.Sequence[typing.Tuple[LooseVersion, str, Dependencies]]
+        ],
+        deps: Dependencies,
+        flavor: Flavor,
+        cache_root: str,
+        num_workers: int,
+        verbose: bool,
+):
+    r"""Load table files to cache.
+
+    All table files not existing in cache yet
+    are copied from the corresponding flavor cache
+    folder of other versions of the database
+    or are downloaded from the backend.
+
+    """
+    missing_tables = _missing_tables(
+        db_root,
+        tables,
+        verbose,
+    )
+    if missing_tables:
+        if cached_versions is None:
+            cached_versions = _cached_versions(
+                db.name,
+                version,
+                flavor,
+                cache_root,
+            )
+        if cached_versions:
+            missing_tables = _get_tables_from_cache(
+                missing_tables,
+                db_root,
+                db_root_tmp,
+                deps,
+                cached_versions,
+                num_workers,
+                verbose,
+            )
+        if missing_tables:
+            if backend is None:
+                backend = lookup_backend(db.name, version)
+            _get_tables_from_backend(
+                db,
+                missing_tables,
+                db_root,
+                db_root_tmp,
+                deps,
+                backend,
+                num_workers,
+                verbose,
+            )
+
+
 def _media(
         db: audformat.Database,
         media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
@@ -744,42 +808,20 @@ def load(
 
     # load missing tables
     if not db_is_complete:
-        missing_tables = _missing_tables(
-            db_root,
+        _load_tables(
             requested_tables,
+            backend,
+            db_root,
+            db_root_tmp,
+            db,
+            version,
+            cached_versions,
+            deps,
+            flavor,
+            cache_root,
+            num_workers,
             verbose,
         )
-        if missing_tables:
-            if cached_versions is None:
-                cached_versions = _cached_versions(
-                    name,
-                    version,
-                    flavor,
-                    cache_root,
-                )
-            if cached_versions:
-                missing_tables = _get_tables_from_cache(
-                    missing_tables,
-                    db_root,
-                    db_root_tmp,
-                    deps,
-                    cached_versions,
-                    num_workers,
-                    verbose,
-                )
-            if missing_tables:
-                if backend is None:
-                    backend = lookup_backend(name, version)
-                _get_tables_from_backend(
-                    db,
-                    missing_tables,
-                    db_root,
-                    db_root_tmp,
-                    deps,
-                    backend,
-                    num_workers,
-                    verbose,
-                )
 
     # filter tables
     if tables is not None:
@@ -1015,3 +1057,96 @@ def load_media(
         media = [audeer.replace_file_extension(m, format) for m in media]
 
     return [os.path.join(db_root, m) for m in media]
+
+
+def load_table(
+        name: str,
+        table: str,
+        *,
+        version: str = None,
+        cache_root: str = None,
+        num_workers: typing.Optional[int] = 1,
+        verbose: bool = True,
+) -> pd.DataFrame:
+    r"""Load a database table.
+
+    If you are only interested in an original table
+    from a database
+    you can use :func:`audb.load_table`
+    instead of :func:`audb.load`.
+
+    Args:
+        name: name of database
+        table: load table from database
+
+    Returns:
+        database table
+
+    Raises:
+        ValueError: if a table is requested
+            that is not part of the database
+
+    Example:
+        >>> df = load_table(
+        ...     'emodb',
+        ...     'emotion',
+        ...     version='1.1.1',
+        ...     verbose=False,
+        ... )
+        >>> df[:3]
+                           emotion  emotion.confidence
+        file
+        wav/03a01Fa.wav  happiness                0.90
+        wav/03a01Nc.wav    neutral                1.00
+        wav/03a01Wa.wav      anger                0.95
+
+    """
+    if version is None:
+        version = latest_version(name)
+    deps = dependencies(name, version=version, cache_root=cache_root)
+
+    if table not in deps.table_ids:
+        raise ValueError(
+            f"Could not find table '{table}' in {name} {version}"
+        )
+
+    cached_versions = None
+
+    db_root = database_cache_folder(name, version, cache_root)
+    db_root_tmp = database_tmp_folder(db_root)
+
+    if verbose:  # pragma: no cover
+        print(f'Get:   {name} v{version}')
+        print(f'Cache: {db_root}')
+
+    # Start with database header without tables
+    db, backend = load_header(
+        db_root,
+        name,
+        version,
+    )
+
+    # Load table
+    table_file = os.path.join(db_root, f'db.{table}')
+    if not (
+            os.path.exists(f'{table_file}.csv')
+            or os.path.exists(f'{table_file}.pkl')
+    ):
+        _load_tables(
+            [table],
+            backend,
+            db_root,
+            db_root_tmp,
+            db,
+            version,
+            cached_versions,
+            deps,
+            Flavor(),
+            cache_root,
+            num_workers,
+            verbose,
+        )
+    table = audformat.Table()
+    table.load(table_file)
+
+    return table._df
