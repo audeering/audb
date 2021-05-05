@@ -935,6 +935,10 @@ def load_media(
     Returns:
         paths to media files
 
+    Raises:
+        ValueError: if a media file is requested
+            that is not part of the database
+
     """
     media = audeer.to_list(media)
     if len(media) == 0:
