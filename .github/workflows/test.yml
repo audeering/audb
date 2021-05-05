@@ -41,6 +41,10 @@ jobs:
         sudo apt-get install --no-install-recommends --yes libsndfile1 sox
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-18.04'
 
+    - name: Show cache content
+      run: tree ~/audb
+      if: matrix.os == 'ubuntu-18.04'
+
     - name: Install dependencies
       run: |
         python -V
@@ -51,7 +55,6 @@ jobs:
 
     - name: Test with pytest
       run: |
-        ls ~/audb
         python -m pytest
 
     - name: Upload coverage to Codecov
