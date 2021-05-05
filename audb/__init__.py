@@ -14,7 +14,10 @@ from audb.core.backward import get_default_cache_root
 from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
-from audb.core.load import load
+from audb.core.load import (
+    load,
+    load_media,
+)
 from audb.core.load_to import load_to
 from audb.core.publish import publish
 from audb.core.repository import Repository

@@ -203,7 +203,7 @@ def _full_path(
 
 
 def _get_media_from_backend(
-        db: audformat.Database,
+        name: str,
         media: typing.Sequence[str],
         db_root: str,
         db_root_tmp: str,
@@ -242,7 +242,7 @@ def _get_media_from_backend(
 
     def job(archive: str, version: str):
         archive = backend.join(
-            db.name,
+            name,
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
             archive,
         )
@@ -397,6 +397,71 @@ def _get_tables_from_cache(
     )
 
     return missing_tables
+
+
+def _load_media(
+        media: typing.Sequence[str],
+        backend: audbackend.Backend,
+        db_root: str,
+        db_root_tmp: str,
+        name: str,
+        version: str,
+        cached_versions: typing.Optional[
+            typing.Sequence[typing.Tuple[LooseVersion, str, Dependencies]]
+        ],
+        deps: Dependencies,
+        flavor: Flavor,
+        cache_root: str,
+        num_workers: int,
+        verbose: bool,
+):
+    r"""Load media files to cache.
+
+    All media files not existing in cache yet
+    are copied from the corresponding flavor cache
+    folder of other versions of the database
+    or are downloaded from the backend.
+
+    """
+    missing_media = _missing_media(
+        db_root,
+        media,
+        flavor,
+        verbose,
+    )
+    if missing_media:
+        if cached_versions is None:
+            cached_versions = _cached_versions(
+                name,
+                version,
+                flavor,
+                cache_root,
+            )
+        if cached_versions:
+            missing_media = _get_media_from_cache(
+                missing_media,
+                db_root,
+                db_root_tmp,
+                deps,
+                cached_versions,
+                flavor,
+                num_workers,
+                verbose,
+            )
+        if missing_media:
+            if backend is None:
+                backend = lookup_backend(name, version)
+            _get_media_from_backend(
+                name,
+                missing_media,
+                db_root,
+                db_root_tmp,
+                flavor,
+                deps,
+                backend,
+                num_workers,
+                verbose,
+            )
 
 
 def _media(
@@ -729,45 +794,20 @@ def load(
 
     # load missing media
     if not db_is_complete and not only_metadata:
-        missing_media = _missing_media(
-            db_root,
+        _load_media(
             requested_media,
+            backend,
+            db_root,
+            db_root_tmp,
+            name,
+            version,
+            cached_versions,
+            deps,
             flavor,
+            cache_root,
+            num_workers,
             verbose,
         )
-        if missing_media:
-            if cached_versions is None:
-                cached_versions = _cached_versions(
-                    name,
-                    version,
-                    flavor,
-                    cache_root,
-                )
-            if cached_versions:
-                missing_media = _get_media_from_cache(
-                    missing_media,
-                    db_root,
-                    db_root_tmp,
-                    deps,
-                    cached_versions,
-                    flavor,
-                    num_workers,
-                    verbose,
-                )
-            if missing_media:
-                if backend is None:
-                    backend = lookup_backend(name, version)
-                _get_media_from_backend(
-                    db,
-                    missing_media,
-                    db_root,
-                    db_root_tmp,
-                    flavor,
-                    deps,
-                    backend,
-                    num_workers,
-                    verbose,
-                )
 
     # filter media
     if media is not None or tables is not None:
@@ -845,3 +885,133 @@ def load_header(
             db.save(db_root_tmp, header_only=True)
             _move_file(db_root_tmp, db_root, define.HEADER_FILE)
     return audformat.Database.load(db_root, load_data=False), backend
+
+
+def load_media(
+        name: str,
+        media: typing.Union[str, typing.Sequence[str]],
+        *,
+        version: str = None,
+        bit_depth: int = None,
+        channels: typing.Union[int, typing.Sequence[int]] = None,
+        format: str = None,
+        mixdown: bool = False,
+        sampling_rate: int = None,
+        cache_root: str = None,
+        num_workers: typing.Optional[int] = 1,
+        verbose: bool = True,
+) -> typing.List:
+    r"""Load media file(s).
+
+    If you are only interested in media files
+    and not the corresponding tables,
+    you should use :func:`audb.load_media`
+    instead of :func:`audb.load`
+    as it is faster.
+
+    Args:
+        name: name of database
+        media: load media files provided in the list
+        version: version of database
+        bit_depth: bit depth, one of ``16``, ``24``, ``32``
+        channels: channel selection, see :func:`audresample.remix`.
+            Note that media files with too few channels
+            will be first upsampled by repeating the existing channels.
+            E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,
+            and ``channels=[1]`` returns the second channel
+            of all multi-channel files
+            and all mono files.
+        format: file format, one of ``'flac'``, ``'wav'``
+        mixdown: apply mono mix-down
+        sampling_rate: sampling rate in Hz, one of
+            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+        num_workers: number of parallel jobs or 1 for sequential
+            processing. If ``None`` will be set to the number of
+            processors on the machine multiplied by 5
+        verbose: show debug messages
+
+    Returns:
+        paths to media files
+
+    Raises:
+        ValueError: if a media file is requested
+            that is not part of the database
+
+    Example:
+        >>> paths = load_media(
+        ...     'emodb',
+        ...     ['wav/03a01Fa.wav'],
+        ...     version='1.1.0',
+        ...     format='flac',
+        ...     verbose=False,
+        ... )
+        >>> cache_root = audb.default_cache_root()
+        >>> [p[len(cache_root):] for p in paths]
+        ['/emodb/1.1.0/40bb2241/wav/03a01Fa.flac']
+
+    """
+    media = audeer.to_list(media)
+    if len(media) == 0:
+        return []
+
+    if version is None:
+        version = latest_version(name)
+    deps = dependencies(name, version=version, cache_root=cache_root)
+
+    available_files = deps.media
+    for media_file in media:
+        if media_file not in available_files:
+            raise ValueError(
+                f"Could not find '{media_file}' in {name} {version}"
+            )
+
+    cached_versions = None
+
+    flavor = Flavor(
+        channels=channels,
+        format=format,
+        mixdown=mixdown,
+        bit_depth=bit_depth,
+        sampling_rate=sampling_rate,
+    )
+    db_root = database_cache_folder(name, version, cache_root, flavor)
+    db_root_tmp = database_tmp_folder(db_root)
+
+    if verbose:  # pragma: no cover
+        print(f'Get:   {name} v{version}')
+        print(f'Cache: {db_root}')
+
+    # Start with database header without tables
+    db, backend = load_header(
+        db_root,
+        name,
+        version,
+        flavor=flavor,
+        add_audb_meta=True,
+    )
+
+    db_is_complete = _database_is_complete(db)
+
+    # load missing media
+    if not db_is_complete:
+        _load_media(
+            media,
+            backend,
+            db_root,
+            db_root_tmp,
+            name,
+            version,
+            cached_versions,
+            deps,
+            flavor,
+            cache_root,
+            num_workers,
+            verbose,
+        )
+
+    if format is not None:
+        media = [audeer.replace_file_extension(m, format) for m in media]
+
+    return [os.path.join(db_root, m) for m in media]
