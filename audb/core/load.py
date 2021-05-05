@@ -990,4 +990,7 @@ def load_media(
             verbose,
         )
 
+    if format is not None:
+        media = [audeer.replace_file_extension(m, format) for m in media]
+
     return [os.path.join(db_root, m) for m in media]

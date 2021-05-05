@@ -304,6 +304,11 @@ def test_load_media(version, media, format):
         os.path.join(pytest.CACHE_ROOT, p)
         for p in paths
     ]
+    if format is not None:
+        expected_paths = [
+            audeer.replace_file_extension(p, format)
+            for p in expected_paths
+        ]
     assert paths == expected_paths
 
     # Clear cache to force loading from other cache
