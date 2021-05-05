@@ -903,6 +903,12 @@ def load_media(
 ) -> typing.List:
     r"""Load media file(s).
 
+    If you are only interested in media files
+    and not the corresponding tables,
+    you should use :func:`audb.load_media`
+    instead of :func:`audb.load`
+    as it is faster.
+
     Args:
         name: name of database
         media: load media files matching the regular expression
