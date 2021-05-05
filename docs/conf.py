@@ -86,25 +86,27 @@ audb.config.REPOSITORIES = [
         backend='artifactory',
     )
 ]
-if not audb.exists('emodb', version='1.1.0'):
-    print('Pre-caching emodb v1.1.0')
+name = 'emodb'
+version = '1.1.1'
+if not audb.exists(name, version=version):
+    print(f'Pre-caching {name} v{version}')
     audb.load(
-        'emodb',
-        version='1.1.0',
+        name,
+        version=version,
         num_workers=5,
         only_metadata=True,
         verbose=False,
     )
 if not audb.exists(
-        'emodb',
-        version='1.1.0',
+        name,
+        version=version,
         format='flac',
         sampling_rate=44100,
 ):
-    print('Pre-caching emodb v1.1.0 {flac, 44100Hz}')
+    print(f'Pre-caching {name} v{version} {{flac, 44100Hz}}')
     audb.load(
-        'emodb',
-        version='1.1.0',
+        name,
+        version=version,
         format='flac',
         sampling_rate=44100,
         num_workers=5,
