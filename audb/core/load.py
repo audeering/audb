@@ -1083,6 +1083,12 @@ def load_table(
     Args:
         name: name of database
         table: load table from database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+        num_workers: number of parallel jobs or 1 for sequential
+            processing. If ``None`` will be set to the number of
+            processors on the machine multiplied by 5
+        verbose: show debug messages
 
     Returns:
         database table
