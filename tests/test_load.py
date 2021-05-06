@@ -332,6 +332,51 @@ def test_load_media(version, media, format):
 
 
 @pytest.mark.parametrize(
+    'version, table',
+    [
+        (
+            '1.0.0',
+            'emotion',
+        ),
+        pytest.param(
+            '1.0.0',
+            'non-existing-table',
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        (
+            None,
+            'emotion',
+        ),
+    ]
+)
+def test_load_table(version, table):
+
+    df = audb.load_table(
+        DB_NAME,
+        table,
+        version=version,
+        verbose=False,
+    )
+    if version is None:
+        expected_files = [
+            'audio/001.wav',
+            'audio/002.wav',
+            'audio/003.wav',
+            'audio/004.wav',
+        ]
+    elif version == '1.0.0':
+        expected_files = [
+            'audio/001.wav',
+            'audio/002.wav',
+            'audio/003.wav',
+            'audio/004.wav',
+            'audio/005.wav',
+        ]
+    files = sorted(list(set(df.index.get_level_values('file'))))
+    assert files == expected_files
+
+
+@pytest.mark.parametrize(
     'version',
     [
         None,
