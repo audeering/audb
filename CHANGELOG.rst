@@ -7,6 +7,21 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.2 (2021-05-06)
+--------------------------
+
+* Added: ``audb.load_media()``
+* Added: ``audb.load_table()``
+* Added: documentation on how to configure access rights
+  for shared cache folder
+* Changed: speedup ``audb.Dependencies`` methods
+* Changed: speedup ``audb.info`` functions
+* Changed: ``audb.info`` uses cache as well
+* Changed: use emodb 1.1.1 in documentation
+* Changed: depend on ``audformat>=0.11.0``
+* Fixed: allow ``audb.load()`` to work offline if database is cached
+
+
 Version 1.1.1 (2021-04-30)
 --------------------------
 
