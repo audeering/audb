@@ -945,11 +945,13 @@ def load_media(
 ) -> typing.List:
     r"""Load media file(s).
 
-    If you are only interested in media files
+    If you are interested in media files
     and not the corresponding tables,
-    you should use :func:`audb.load_media`
-    instead of :func:`audb.load`
-    as it is faster.
+    you can use :func:`audb.load_media`
+    to load them.
+    This will not download any table files
+    to your disk,
+    but share the cache with :func:`audb.load`.
 
     Args:
         name: name of database
