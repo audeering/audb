@@ -34,8 +34,6 @@
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
   <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Database dependencies" href="dependencies.html" />
@@ -74,7 +72,7 @@
             
             
               <div class="version">
-                v1.1.1
+                1.1.1
               </div>
             
           
@@ -177,7 +175,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.1/docs/load.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.2/docs/load.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -215,14 +213,14 @@ even if a new version of the database is published.</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="api.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> will download the data,
 store them in a cache folder,
-and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.10.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
+and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.11.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
 The most important content of that object
 are the database tables.</p>
 <div class="jupyter_cell jupyter_container docutils container">
@@ -285,17 +283,17 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
   </thead>
   <tbody>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Fa.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/03a01Fa.wav</th>
       <td>happiness</td>
       <td>0.90</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Nc.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/03a01Nc.wav</th>
       <td>neutral</td>
       <td>1.00</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Wa.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/03a01Wa.wav</th>
       <td>anger</td>
       <td>0.95</td>
     </tr>
@@ -305,17 +303,17 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
       <td>...</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Td.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/16b10Td.wav</th>
       <td>sadness</td>
       <td>0.95</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Wa.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/16b10Wa.wav</th>
       <td>anger</td>
       <td>1.00</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Wb.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/16b10Wb.wav</th>
       <td>anger</td>
       <td>1.00</td>
     </tr>
@@ -359,15 +357,15 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
   </thead>
   <tbody>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Fa.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/03a01Fa.wav</th>
       <td>0 days 00:00:01.898250</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Nc.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/03a01Nc.wav</th>
       <td>0 days 00:00:01.611250</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/03a01Wa.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/03a01Wa.wav</th>
       <td>0 days 00:00:01.877812500</td>
     </tr>
     <tr>
@@ -375,15 +373,15 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
       <td>...</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Td.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/16b10Td.wav</th>
       <td>0 days 00:00:03.934187500</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Wa.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/16b10Wa.wav</th>
       <td>0 days 00:00:02.414125</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b/wav/16b10Wb.wav</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b/wav/16b10Wb.wav</th>
       <td>0 days 00:00:02.522499999</td>
     </tr>
   </tbody>
@@ -443,7 +441,7 @@ inside the <a class="reference internal" href="caching.html#caching"><span class
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">,</span>
     <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;flac&#39;</span><span class="p">,</span>
     <span class="n">sampling_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -504,17 +502,17 @@ inside the <code class="docutils literal notranslate"><span class="pre">db.meta[
   </thead>
   <tbody>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/9c872f39</th>
+      <th>/home/runner/audb/emodb/1.1.1/9c872f39</th>
       <td>emodb</td>
-      <td>1.1.0</td>
+      <td>1.1.1</td>
       <td>False</td>
       <td>flac</td>
       <td>44100.0</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.1.0/d3b62a9b</th>
+      <th>/home/runner/audb/emodb/1.1.1/d3b62a9b</th>
       <td>emodb</td>
-      <td>1.1.0</td>
+      <td>1.1.1</td>
       <td>False</td>
       <td>None</td>
       <td>None</td>
@@ -537,7 +535,7 @@ but all the tables and the header.</p>
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">,</span>
     <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
@@ -559,7 +557,7 @@ It can list all table definitions.</p>
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -585,7 +583,7 @@ files:
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -616,7 +614,7 @@ about the speakers (here <code class="docutils literal notranslate"><span class=
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">,</span>
     <span class="n">tables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">],</span>
     <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -786,7 +784,7 @@ only the data of this speaker.</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">,</span>
     <span class="n">media</span><span class="o">=</span><span class="n">media</span><span class="p">,</span>
     <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -897,7 +895,7 @@ from the tables.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/04/30 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -935,9 +933,6 @@ from the tables.</p>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
         <script src="_static/thebelab-helper.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
-        <script src="_static/katex_autorenderer.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     
