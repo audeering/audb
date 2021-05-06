@@ -1070,10 +1070,13 @@ def load_table(
 ) -> pd.DataFrame:
     r"""Load a database table.
 
-    If you are only interested in an original table
+    If you are interested in a single table
     from a database
     you can use :func:`audb.load_table`
-    instead of :func:`audb.load`.
+    to directly load it.
+    This will not download any media files
+    to your disk,
+    but share the cache with :func:`audb.load`.
 
     Args:
         name: name of database
