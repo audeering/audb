@@ -202,7 +202,7 @@ def publish(
         repository: name of repository
         archives: dictionary mapping files to archive names.
             Can be used to bundle files into archives.
-            Name must not include an extension
+            Archive name must not include an extension
         previous_version: specifies the version
             this publication should be based on.
             If ``'latest'``
