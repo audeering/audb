@@ -53,6 +53,7 @@ jobs:
 
     - name: Show cache content
       run: tree ~/audb
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-18.04'
 
     - name: Install dependencies
       run: |
