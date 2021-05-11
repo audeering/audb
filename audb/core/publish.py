@@ -222,6 +222,7 @@ def publish(
         dependency object
 
     Raises:
+        ValueError: if database containes no author
         RuntimeError: if version already exists
         RuntimeError: if database tables reference non-existing files
         RuntimeError: if database in ``db_root`` depends on other version
@@ -229,6 +230,9 @@ def publish(
 
     """
     db = audformat.Database.load(db_root, load_data=False)
+
+    if db.author is None:
+        raise ValueError(f"The database '{db.name}' has to specify an author.")
 
     backend = audbackend.create(
         repository.backend,

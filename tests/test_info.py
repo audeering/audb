@@ -19,6 +19,7 @@ DB_NAME = f'test_info-{pytest.ID}'
 DB_VERSION = '1.0.0'
 DB = audformat.Database(
     DB_NAME,
+    author=pytest.AUTHOR,
     source='https://audeering.github.io/audb/',
     usage=audformat.define.Usage.UNRESTRICTED,
     languages=['de', 'English'],

@@ -21,7 +21,7 @@ DB_NAME = f'test_publish-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
-    ['1.0.0', '2.0.0', '2.1.0', '3.0.0', '4.0.0', '5.0.0']
+    ['1.0.0', '2.0.0', '2.1.0', '3.0.0', '4.0.0', '5.0.0', '5.1.0']
 }
 
 
@@ -43,6 +43,7 @@ def fixture_publish_db():
     # create db
 
     db = audformat.testing.create_db(minimal=True)
+    db.author = pytest.AUTHOR
     db.name = DB_NAME
     db.schemes['scheme'] = audformat.Scheme(
         labels=['positive', 'neutral', 'negative']
@@ -90,6 +91,10 @@ def fixture_publish_db():
     )
     assert len(db.files) > 20
     db.save(DB_ROOT_VERSION['5.0.0'])
+
+    # Safe version without author
+    db.author = None
+    db.save(DB_ROOT_VERSION['5.1.0'])
 
     yield
 
@@ -139,6 +144,13 @@ def test_invalid_archives(name):
             marks=pytest.mark.xfail(
                 raises=RuntimeError,
                 reason='Files missing (more than 20)',
+            ),
+        ),
+        pytest.param(
+            '5.1.0',
+            marks=pytest.mark.xfail(
+                raises=ValueError,
+                reason='db.author missing',
             ),
         ),
     ]

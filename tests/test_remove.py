@@ -44,6 +44,7 @@ def publish_db():
 
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
+    db.author = pytest.AUTHOR
     db['files'] = audformat.Table(audformat.filewise_index(DB_FILES['1.0.0']))
 
     # publish 1.0.0

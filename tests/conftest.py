@@ -15,6 +15,7 @@ pytest.ROOT = audeer.safe_path(
     )
 )
 
+pytest.AUTHOR = 'J. Wagner, H. Wierstorf'
 pytest.BACKEND = 'file-system'
 pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
 pytest.FILE_SYSTEM_HOST = os.path.join(pytest.ROOT, 'repo')

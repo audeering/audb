@@ -37,6 +37,7 @@ def fixture_publish_db():
 
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
+    db.author = pytest.AUTHOR
     db.schemes['scheme'] = audformat.Scheme(
         labels=['some', 'test', 'labels']
     )

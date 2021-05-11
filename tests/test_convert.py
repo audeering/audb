@@ -61,6 +61,7 @@ def fixture_publish_db():
 
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
+    db.author = pytest.AUTHOR
     db['files'] = audformat.Table(audformat.filewise_index(list(DB_FILES)))
     db['files']['original'] = audformat.Column()
     db['files']['original'].set(list(DB_FILES))
