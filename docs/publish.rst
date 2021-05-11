@@ -50,6 +50,7 @@ with the :mod:`audformat.testing` module.
 
     db = audformat.testing.create_db(minimal=True)
     db.name = 'age-test'
+    db.author = 'J. Wagner, H. Wierstorf'
     db.license = 'CC0-1.0'
     db.schemes['age'] = audformat.Scheme('int', minimum=20, maximum=90)
     audformat.testing.add_table(
