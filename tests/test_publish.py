@@ -92,7 +92,7 @@ def fixture_publish_db():
     assert len(db.files) > 20
     db.save(DB_ROOT_VERSION['5.0.0'])
 
-    # Safe version without author
+    # Store version without author
     db.author = None
     db.save(DB_ROOT_VERSION['5.1.0'])
 
