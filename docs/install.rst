@@ -29,7 +29,7 @@ e.g.
 
 .. code-block:: bash
 
-    $ sudo apt-get install ffmpeg mediainfo sox
+    $ sudo apt-get install ffmpeg mediainfo sox libsox-fmt-mp3
 
 
 .. _libsndfile: https://github.com/libsndfile/libsndfile
