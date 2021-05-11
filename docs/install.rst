@@ -34,9 +34,6 @@ Under Ubuntu this can be achieved with
 Under Windows you have to install those libraries manually,
 and ensure that they are added to the ``PATH`` variable.
 
-.. code-block:: bash
-
-    $ brew install sox ffmpeg 
 
 .. _libsndfile: https://github.com/libsndfile/libsndfile
 .. _ffmpeg: https://www.ffmpeg.org/
