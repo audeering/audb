@@ -59,7 +59,6 @@ def fixture_publish_db():
 
     # publish 1.0.0
 
-    db.save(DB_ROOT)
     audb.publish(
         DB_ROOT,
         DB_VERSION,

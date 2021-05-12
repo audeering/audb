@@ -232,15 +232,6 @@ def publish(
     """
     db = audformat.Database.load(db_root, load_data=False)
 
-    if not db.is_portable:
-        raise RuntimeError(
-            f"The database '{db.name}' employs file paths "
-            f"in its tables, that contain absolute paths "
-            f"or use '.' or '..' to address a folder. "
-            f"Please replace those paths by relative paths "
-            f"and folder names instead of dots."
-        )
-
     backend = audbackend.create(
         repository.backend,
         repository.host,
@@ -320,6 +311,15 @@ def publish(
 
     # load database from folder
     db = audformat.Database.load(db_root)
+
+    if not db.is_portable:
+        raise RuntimeError(
+            f"The database '{db.name}' employs file paths "
+            f"in its tables, that contain absolute paths "
+            f"or use '.' or '..' to address a folder. "
+            f"Please replace those paths by relative paths "
+            f"and folder names instead of dots."
+        )
 
     # check all files referenced in a table exists
     missing_files = [

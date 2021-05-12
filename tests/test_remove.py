@@ -48,8 +48,8 @@ def publish_db():
 
     # publish 1.0.0
 
-    audformat.testing.create_audio_files(db, DB_ROOT)
     db.save(DB_ROOT)
+    audformat.testing.create_audio_files(db, DB_ROOT)
     archives = {
         db.files[0]: 'bundle',
         db.files[1]: 'bundle',
@@ -68,8 +68,8 @@ def publish_db():
         audformat.filewise_index(DB_FILES['2.0.0']),
         inplace=True,
     )
-    audformat.testing.create_audio_files(db, DB_ROOT)
     db.save(DB_ROOT)
+    audformat.testing.create_audio_files(db, DB_ROOT)
     audb.publish(
         DB_ROOT,
         '2.0.0',

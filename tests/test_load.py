@@ -66,8 +66,8 @@ def fixture_publish_db():
 
     # publish 1.0.0
 
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
     db.save(DB_ROOT_VERSION['1.0.0'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb.publish(
         DB_ROOT_VERSION['1.0.0'],
@@ -84,8 +84,8 @@ def fixture_publish_db():
         columns={'label': ('scheme', None)}
     )
 
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.0'])
     db.save(DB_ROOT_VERSION['1.1.0'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.0'])
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['1.0.0'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
@@ -101,8 +101,8 @@ def fixture_publish_db():
 
     db['train'].df['label'][0] = None
 
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.1'])
     db.save(DB_ROOT_VERSION['1.1.1'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.1'])
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
@@ -116,6 +116,7 @@ def fixture_publish_db():
 
     # publish 2.0.0, alter and remove media
 
+    db.save(DB_ROOT_VERSION['2.0.0'])
     audformat.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
     file = os.path.join(DB_ROOT_VERSION['2.0.0'], db.files[0])
     y, sr = audiofile.read(file)
@@ -124,8 +125,8 @@ def fixture_publish_db():
     file = db.files[-1]
     db.pick_files(lambda x: x != file)
     os.remove(audeer.safe_path(os.path.join(DB_ROOT_VERSION['2.0.0'], file)))
-
     db.save(DB_ROOT_VERSION['2.0.0'])
+
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
@@ -141,8 +142,8 @@ def fixture_publish_db():
 
     db.drop_tables('train')
 
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['3.0.0'])
     db.save(DB_ROOT_VERSION['3.0.0'])
+    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['3.0.0'])
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['3.0.0'], 'db.csv'),
