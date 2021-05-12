@@ -232,7 +232,7 @@ def publish(
     """
     db = audformat.Database.load(db_root, load_data=False)
 
-    if not db.is_portable():
+    if not db.is_portable:
         raise RuntimeError(
             f"The database '{db.name}' employs file paths "
             f"in its tables, that contain absolute paths "
