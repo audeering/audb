@@ -314,11 +314,10 @@ def publish(
 
     if not db.is_portable:
         raise RuntimeError(
-            f"The database '{db.name}' employs file paths "
-            f"in its tables, that contain absolute paths "
-            f"or use '.' or '..' to address a folder. "
-            f"Please replace those paths by relative paths "
-            f"and folder names instead of dots."
+            'Some files in the tables have absolute paths '
+            'or use '.' or '..' to address a folder. '
+            'Please replace those paths by relative paths '
+            'and use folder names instead of dots.'
         )
 
     # check all files referenced in a table exists
