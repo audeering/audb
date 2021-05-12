@@ -59,9 +59,11 @@ with the :mod:`audformat.testing` module.
         columns='age',
         num_files=3,
     )
+    db.save(build_dir)
     audformat.testing.create_audio_files(db, build_dir)
 
-This results in the following database.
+This results in the following database,
+stored under :file:`build_dir`.
 
 .. jupyter-execute::
 
@@ -72,12 +74,6 @@ Containing a few random annotations.
 .. jupyter-execute::
 
     db['age'].get()
-
-In a next step we save the database to a folder.
-
-.. jupyter-execute::
-
-    db.save(build_dir)
 
 
 Publish the first version
