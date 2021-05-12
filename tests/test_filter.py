@@ -76,7 +76,7 @@ def fixture_publish_db():
         ends=ends,
     )
     db.save(DB_ROOT)
-    audformat.testing.create_audio_files(db, DB_ROOT)
+    audformat.testing.create_audio_files(db)
 
     # publish db
 

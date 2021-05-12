@@ -49,7 +49,7 @@ def publish_db():
     # publish 1.0.0
 
     db.save(DB_ROOT)
-    audformat.testing.create_audio_files(db, DB_ROOT)
+    audformat.testing.create_audio_files(db)
     archives = {
         db.files[0]: 'bundle',
         db.files[1]: 'bundle',
@@ -69,7 +69,7 @@ def publish_db():
         inplace=True,
     )
     db.save(DB_ROOT)
-    audformat.testing.create_audio_files(db, DB_ROOT)
+    audformat.testing.create_audio_files(db)
     audb.publish(
         DB_ROOT,
         '2.0.0',

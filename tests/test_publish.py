@@ -67,19 +67,19 @@ def fixture_publish_db():
         DB_ROOT_VERSION['1.0.0'],
         storage_format=audformat.define.TableStorageFormat.PICKLE,
     )
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
+    audformat.testing.create_audio_files(db)
 
     # Extend version 2.0.0 by a new file
     new_file = os.path.join('audio', 'new.wav')
     db['files'].extend_index(audformat.filewise_index(new_file), inplace=True)
     db.save(DB_ROOT_VERSION['2.0.0'])
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
+    audformat.testing.create_audio_files(db)
 
     # Remove one file in version 3.0.0
     remove_file = os.path.join('audio', '001.wav')
     db.drop_files(remove_file)
     db.save(DB_ROOT_VERSION['3.0.0'])
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['3.0.0'])
+    audformat.testing.create_audio_files(db)
 
     # Store without audio files in version 4.0.0
     db.save(DB_ROOT_VERSION['4.0.0'])
@@ -114,7 +114,7 @@ def fixture_publish_db():
         index=audformat.filewise_index(db.files[:4]),
     )
     db.save(DB_ROOT_VERSION['6.0.0'])
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['6.0.0'])
+    audformat.testing.create_audio_files(db)
     db.map_files(lambda x: os.path.join(db.root, x))  # make paths absolute
     db.save(DB_ROOT_VERSION['6.0.0'])
 

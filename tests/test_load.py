@@ -67,7 +67,7 @@ def fixture_publish_db():
     # publish 1.0.0
 
     db.save(DB_ROOT_VERSION['1.0.0'])
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
+    audformat.testing.create_audio_files(db)
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb.publish(
         DB_ROOT_VERSION['1.0.0'],
@@ -85,7 +85,7 @@ def fixture_publish_db():
     )
 
     db.save(DB_ROOT_VERSION['1.1.0'])
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.0'])
+    audformat.testing.create_audio_files(db)
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['1.0.0'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
@@ -102,7 +102,7 @@ def fixture_publish_db():
     db['train'].df['label'][0] = None
 
     db.save(DB_ROOT_VERSION['1.1.1'])
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.1.1'])
+    audformat.testing.create_audio_files(db)
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
@@ -117,7 +117,7 @@ def fixture_publish_db():
     # publish 2.0.0, alter and remove media
 
     db.save(DB_ROOT_VERSION['2.0.0'])
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
+    audformat.testing.create_audio_files(db)
     file = os.path.join(DB_ROOT_VERSION['2.0.0'], db.files[0])
     y, sr = audiofile.read(file)
     y[0] = 1
@@ -143,7 +143,7 @@ def fixture_publish_db():
     db.drop_tables('train')
 
     db.save(DB_ROOT_VERSION['3.0.0'])
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['3.0.0'])
+    audformat.testing.create_audio_files(db)
     shutil.copy(
         os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
         os.path.join(DB_ROOT_VERSION['3.0.0'], 'db.csv'),

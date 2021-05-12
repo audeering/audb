@@ -60,7 +60,7 @@ with the :mod:`audformat.testing` module.
         num_files=3,
     )
     db.save(build_dir)
-    audformat.testing.create_audio_files(db, build_dir)
+    audformat.testing.create_audio_files(db)
 
 This results in the following database,
 stored under :file:`build_dir`.
@@ -178,7 +178,7 @@ and add a new audio file.
 .. jupyter-execute::
 
     db.save(build_dir)
-    audformat.testing.create_audio_files(db, build_dir)
+    audformat.testing.create_audio_files(db)
 
 Publishing works as before,
 but this time we have to specify a version where our update should be based on.
