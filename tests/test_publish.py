@@ -21,7 +21,7 @@ DB_NAME = f'test_publish-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
-    ['1.0.0', '2.0.0', '2.1.0', '3.0.0', '4.0.0', '5.0.0']
+    ['1.0.0', '2.0.0', '2.1.0', '3.0.0', '4.0.0', '5.0.0', '6.0.0']
 }
 
 
@@ -63,23 +63,23 @@ def fixture_publish_db():
         ['adam', 'adam', '11', '11'],
         index=audformat.filewise_index(db.files[:4]),
     )
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['1.0.0'])
     db.save(
         DB_ROOT_VERSION['1.0.0'],
         storage_format=audformat.define.TableStorageFormat.PICKLE,
     )
+    audformat.testing.create_audio_files(db)
 
     # Extend version 2.0.0 by a new file
     new_file = os.path.join('audio', 'new.wav')
     db['files'].extend_index(audformat.filewise_index(new_file), inplace=True)
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['2.0.0'])
     db.save(DB_ROOT_VERSION['2.0.0'])
+    audformat.testing.create_audio_files(db)
 
     # Remove one file in version 3.0.0
     remove_file = os.path.join('audio', '001.wav')
     db.drop_files(remove_file)
-    audformat.testing.create_audio_files(db, DB_ROOT_VERSION['3.0.0'])
     db.save(DB_ROOT_VERSION['3.0.0'])
+    audformat.testing.create_audio_files(db)
 
     # Store without audio files in version 4.0.0
     db.save(DB_ROOT_VERSION['4.0.0'])
@@ -90,6 +90,33 @@ def fixture_publish_db():
     )
     assert len(db.files) > 20
     db.save(DB_ROOT_VERSION['5.0.0'])
+
+    # Make database non-portable in version 6.0.0
+    db = audformat.testing.create_db(minimal=True)
+    db.name = DB_NAME
+    db.schemes['scheme'] = audformat.Scheme(
+        labels=['positive', 'neutral', 'negative']
+    )
+    audformat.testing.add_table(
+        db,
+        'emotion',
+        audformat.define.IndexType.SEGMENTED,
+        num_files=5,
+        columns={'emotion': ('scheme', None)}
+    )
+    db.schemes['speaker'] = audformat.Scheme(
+        labels=['adam', '11']
+    )
+    db['files'] = audformat.Table(db.files)
+    db['files']['speaker'] = audformat.Column(scheme_id='speaker')
+    db['files']['speaker'].set(
+        ['adam', 'adam', '11', '11'],
+        index=audformat.filewise_index(db.files[:4]),
+    )
+    db.save(DB_ROOT_VERSION['6.0.0'])
+    audformat.testing.create_audio_files(db)
+    db.map_files(lambda x: os.path.join(db.root, x))  # make paths absolute
+    db.save(DB_ROOT_VERSION['6.0.0'])
 
     yield
 
@@ -141,11 +168,20 @@ def test_invalid_archives(name):
                 reason='Files missing (more than 20)',
             ),
         ),
+        pytest.param(
+            '6.0.0',
+            marks=pytest.mark.xfail(
+                raises=RuntimeError,
+                reason='Database not portable',
+            ),
+        ),
     ]
 )
 def test_publish(version):
 
     db = audformat.Database.load(DB_ROOT_VERSION[version])
+    print(db.is_portable)
+    print(db.files)
 
     if not audb.versions(DB_NAME):
         with pytest.raises(RuntimeError):

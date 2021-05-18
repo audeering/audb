@@ -55,11 +55,10 @@ def fixture_publish_db():
         num_files=[1, 2, 3],
     )
     db.save(DB_ROOT)
-    audformat.testing.create_audio_files(db, DB_ROOT)
+    audformat.testing.create_audio_files(db)
 
     # publish 1.0.0
 
-    db.save(DB_ROOT)
     audb.publish(
         DB_ROOT,
         DB_VERSION,

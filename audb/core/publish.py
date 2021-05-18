@@ -226,6 +226,8 @@ def publish(
         RuntimeError: if database tables reference non-existing files
         RuntimeError: if database in ``db_root`` depends on other version
             as indicated by ``previous_version``
+        RuntimeError: if database is not portable,
+            see :meth:`audformat.Database.is_portable`
 
     """
     db = audformat.Database.load(db_root, load_data=False)
@@ -309,6 +311,14 @@ def publish(
 
     # load database from folder
     db = audformat.Database.load(db_root)
+
+    if not db.is_portable:
+        raise RuntimeError(
+            "Some files in the tables have absolute paths "
+            "or use '.' or '..' to address a folder. "
+            "Please replace those paths by relative paths "
+            "and use folder names instead of dots."
+        )
 
     # check all files referenced in a table exists
     missing_files = [
