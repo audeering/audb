@@ -59,9 +59,11 @@ with the :mod:`audformat.testing` module.
         columns='age',
         num_files=3,
     )
-    audformat.testing.create_audio_files(db, build_dir)
+    db.save(build_dir)
+    audformat.testing.create_audio_files(db)
 
-This results in the following database.
+This results in the following database,
+stored under :file:`build_dir`.
 
 .. jupyter-execute::
 
@@ -72,12 +74,6 @@ Containing a few random annotations.
 .. jupyter-execute::
 
     db['age'].get()
-
-In a next step we save the database to a folder.
-
-.. jupyter-execute::
-
-    db.save(build_dir)
 
 
 Publish the first version
@@ -172,15 +168,17 @@ and add the age annotation of 22 to it.
     index = audformat.filewise_index(['audio/004.wav'])
     db['age'].extend_index(index, inplace=True)
     db['age']['age'].set([22], index=index)
-    audformat.testing.create_audio_files(db, build_dir)
 
     db['age'].get()
 
-We save it to the database build folder and overwrite the old table.
+We save it to the database build folder,
+overwrite the old table,
+and add a new audio file.
 
 .. jupyter-execute::
 
     db.save(build_dir)
+    audformat.testing.create_audio_files(db)
 
 Publishing works as before,
 but this time we have to specify a version where our update should be based on.

@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Installation &mdash; audb Documentation</title>
@@ -30,6 +31,8 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
@@ -170,7 +173,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.2/docs/install.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.3/docs/install.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -184,7 +187,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
+  <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>To install <a class="reference internal" href="api.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> run:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="c1"># Create and activate Python virtual environment, e.g.</span>
@@ -193,7 +196,26 @@ $ <span class="c1"># source ${HOME}/.envs/audb/bin/activate</span>
 $ pip install audb
 </pre></div>
 </div>
+<p><a class="reference internal" href="api.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> uses <a class="reference external" href="https://audeering.github.io/audiofile/api.html#module-audiofile" title="(in audiofile vv0.4.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a> to access media files,
+which supports WAV, FLAC, OGG out of the box.
+<a class="reference external" href="https://audeering.github.io/audiofile/api.html#module-audiofile" title="(in audiofile vv0.4.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a> requires the <a class="reference external" href="https://github.com/libsndfile/libsndfile">libsndfile</a> C library,
+which should be installed on most systems.
+Under Ubuntu you can install it with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install libsndfile1
+</pre></div>
 </div>
+<p>In order to handle all possible audio files,
+please make sure <a class="reference external" href="https://www.ffmpeg.org/">ffmpeg</a>,
+<a class="reference external" href="http://sox.sourceforge.net/">sox</a>,
+and <a class="reference external" href="https://mediaarea.net/en/MediaInfo/">mediainfo</a>
+are installed on your system.
+Under Ubuntu this can be achieved with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install ffmpeg mediainfo sox libsox-fmt-mp3
+</pre></div>
+</div>
+<p>Under Windows you have to install those libraries manually,
+and ensure that they are added to the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> variable.</p>
+</section>
 
 
            </div>
@@ -218,7 +240,7 @@ $ pip install audb
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -250,6 +272,7 @@ $ pip install audb
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>

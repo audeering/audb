@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Quickstart &mdash; audb Documentation</title>
@@ -30,6 +31,8 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
@@ -170,7 +173,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.2/docs/quickstart.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.3/docs/quickstart.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -188,7 +191,7 @@
 <div class="cell_output docutils container">
 </div>
 </div>
-<div class="section" id="quickstart">
+<section id="quickstart">
 <span id="id1"></span><h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
 <p>The most common task is to load a database
 with <a class="reference internal" href="api.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
@@ -269,7 +272,7 @@ all the media files,
 and tables with annotations
 to a caching folder on your machine.
 The database is then returned
-as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.11.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
+as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.11.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
 <p>Each database comes with a description,
 which is a good starting point
 to learn what the database is all about.</p>
@@ -286,7 +289,7 @@ to learn what the database is all about.</p>
 </div>
 </div>
 <p>The annotations of a database are stored in
-tables represented by <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Table" title="(in audformat vv0.11.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Table</span></code></a>.</p>
+tables represented by <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Table" title="(in audformat vv0.11.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Table</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
@@ -309,8 +312,8 @@ files:
 </div>
 </div>
 </div>
-<p>Each table contains columns (<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Column" title="(in audformat vv0.11.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Column</span></code></a>)
-that have corresponding schemes (<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Scheme" title="(in audformat vv0.11.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Scheme</span></code></a>)
+<p>Each table contains columns (<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Column" title="(in audformat vv0.11.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Column</span></code></a>)
+that have corresponding schemes (<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Scheme" title="(in audformat vv0.11.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Scheme</span></code></a>)
 describing its content.
 For example,
 to get an idea about the emotion annotations
@@ -387,7 +390,7 @@ as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/s
 </table>
 </div></div></div>
 </div>
-</div>
+</section>
 
 
            </div>
@@ -412,7 +415,7 @@ as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/s
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -444,6 +447,7 @@ as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/s
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>

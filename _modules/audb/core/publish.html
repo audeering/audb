@@ -30,6 +30,8 @@
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/jupyter-sphinx.css" type="text/css" />
@@ -383,7 +385,7 @@
 <span class="sd">        repository: name of repository</span>
 <span class="sd">        archives: dictionary mapping files to archive names.</span>
 <span class="sd">            Can be used to bundle files into archives.</span>
-<span class="sd">            Name must not include an extension</span>
+<span class="sd">            Archive name must not include an extension</span>
 <span class="sd">        previous_version: specifies the version</span>
 <span class="sd">            this publication should be based on.</span>
 <span class="sd">            If ``&#39;latest&#39;``</span>
@@ -407,6 +409,8 @@
 <span class="sd">        RuntimeError: if database tables reference non-existing files</span>
 <span class="sd">        RuntimeError: if database in ``db_root`` depends on other version</span>
 <span class="sd">            as indicated by ``previous_version``</span>
+<span class="sd">        RuntimeError: if database is not portable,</span>
+<span class="sd">            see :meth:`audformat.Database.is_portable`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -491,6 +495,14 @@
     <span class="c1"># load database from folder</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">db</span><span class="o">.</span><span class="n">is_portable</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Some files in the tables have absolute paths &quot;</span>
+            <span class="s2">&quot;or use &#39;.&#39; or &#39;..&#39; to address a folder. &quot;</span>
+            <span class="s2">&quot;Please replace those paths by relative paths &quot;</span>
+            <span class="s2">&quot;and use folder names instead of dots.&quot;</span>
+        <span class="p">)</span>
+
     <span class="c1"># check all files referenced in a table exists</span>
     <span class="n">missing_files</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">files</span>
@@ -563,7 +575,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -595,6 +607,7 @@
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
