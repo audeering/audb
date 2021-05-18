@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.3 (2021-05-18)
+--------------------------
+
+* Added: discussion of needed system packages for handling audio files
+  in the documentation
+* Changed: allow only to publish portable databases
+* Fixed: macOS support by relying on new ``audresample`` version
+
+
 Version 1.1.2 (2021-05-06)
 --------------------------
 
