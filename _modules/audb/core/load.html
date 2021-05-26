@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.1.4
+                v1.1.5
               </div>
             
           
@@ -215,6 +215,12 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find other cached versions of same flavor.&quot;&quot;&quot;</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">cached</span><span class="p">(</span><span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">)</span>
+    <span class="c1"># If no explicit cache root is given,</span>
+    <span class="c1"># we look into the private and shared one.</span>
+    <span class="c1"># This fixes https://github.com/audeering/audb/issues/101</span>
+    <span class="k">if</span> <span class="n">cache_root</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">True</span><span class="p">)):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">df</span><span class="p">,</span> <span class="n">cached</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">]</span>
 
     <span class="n">cached_versions</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1359,7 +1365,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/19 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
