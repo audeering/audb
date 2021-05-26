@@ -318,3 +318,33 @@ def test_sampling_rate(sampling_rate):
                 audiofile.sampling_rate(original_file)
         else:
             assert audiofile.sampling_rate(converted_file) == sampling_rate
+
+
+def test_empty_cache():
+    # Avoid failing searching for other versions
+    # if cache is empty
+    # https://github.com/audeering/audb/issues/101
+    # First load to shared cache
+    audb.load(
+        DB_NAME,
+        sampling_rate=8000,
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+        only_metadata=True,
+        tables='files',
+        cache_root=pytest.SHARED_CACHE_ROOT,
+    )
+    # Now try to load same version to private cache
+    # to force audb.cached() to return empty dataframe
+    clear_root(pytest.CACHE_ROOT)
+    audeer.mkdir(pytest.CACHE_ROOT)
+    audb.load(
+        DB_NAME,
+        sampling_rate=8000,
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+        only_metadata=True,
+        tables='segments',
+    )

@@ -31,10 +31,15 @@ def _cached_versions(
 ) -> typing.Sequence[typing.Tuple[LooseVersion, str, Dependencies]]:
     r"""Find other cached versions of same flavor."""
 
+    cached_versions = []
+
     df = cached(cache_root=cache_root)
+    if df.empty:
+        return cached_versions
+
+    # Limit to the requested database
     df = df[df.name == name]
 
-    cached_versions = []
     for flavor_root, row in df.iterrows():
         if row['flavor_id'] == flavor.short_id:
             if row['version'] == version:
