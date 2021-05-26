@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.5 (2021-05-26)
+--------------------------
+
+* Fixed: ``audb.load()`` raises now error for wrong keyword argument
+* Fixed: look also in shared cache for partial loaded databases
+
+
 Version 1.1.4 (2021-05-19)
 --------------------------
 
