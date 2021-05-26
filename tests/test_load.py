@@ -177,6 +177,11 @@ def test_database_cache_folder():
     assert db_root == expected_db_root
 
 
+def test_load_wrong_argument():
+    with pytest.raises(TypeError):
+        audb.load(DB_NAME, typo='1.0.0')
+
+
 @pytest.mark.parametrize(
     'format',
     [

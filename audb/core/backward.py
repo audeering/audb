@@ -83,7 +83,14 @@ def parse_deprecated_load_arguments(
         mixdown: updated mixdown argument
         media: updated media argument
 
+    Raises:
+        TypeError: if a non-matching keyword argument was given
+
     """
+    for key in kwargs:
+        if key not in ['mix', 'include', 'exclude']:
+            raise TypeError(f"Got an unexpected keyword argument '{key}'")
+
     # Map 'mix'
     if (
             channels is None
