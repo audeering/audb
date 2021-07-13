@@ -21,8 +21,8 @@ from audb.core.load import (
 )
 from audb.core.load_to import load_to
 from audb.core.publish import publish
-from audb.core.repository import Repository
 from audb.core.utils import repository
+from audbackend import Repository
 
 
 __all__ = []
