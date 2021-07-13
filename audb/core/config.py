@@ -9,6 +9,7 @@ from audb.core.define import (
     CONFIG_FILE,
     USER_CONFIG_FILE,
 )
+from audb.core.repository import Repository
 
 
 def load_configuration_file(config_file: str):
@@ -94,7 +95,7 @@ class config:
     r"""Default user cache folder."""
 
     REPOSITORIES = [
-        audbackend.Repository(r['name'], r['host'], r['backend'])
+        Repository(r['name'], r['host'], r['backend'])
         for r in global_config['repositories']
     ]
     r"""Repositories, will be iterated in given order.
