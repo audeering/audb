@@ -11,7 +11,6 @@ import audformat
 from audb.core import define
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
-from audb.core.repository import Repository
 
 
 def _find_tables(
@@ -163,7 +162,7 @@ def _put_tables(
 def publish(
         db_root: str,
         version: str,
-        repository: Repository,
+        repository: audbackend.Repository,
         *,
         archives: typing.Mapping[str, str] = None,
         previous_version: typing.Optional[str] = 'latest',

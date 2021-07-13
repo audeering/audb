@@ -4,7 +4,6 @@ import warnings
 import audbackend
 
 from audb.core.config import config
-from audb.core.repository import Repository
 
 
 def lookup_backend(
@@ -36,7 +35,7 @@ def lookup_backend(
 def repository(
         name: str,
         version: str,
-) -> Repository:
+) -> audbackend.Repository:
     r"""Return repository that stores the requested database.
 
     If the database is stored in several repositories,
@@ -107,7 +106,7 @@ def mix_mapping(
 def _lookup(
         name: str,
         version: str,
-) -> typing.Tuple[Repository, audbackend.Backend]:
+) -> typing.Tuple[audbackend.Repository, audbackend.Backend]:
     r"""Helper function to look up database in all repositories.
 
     Returns repository, version and backend object.
