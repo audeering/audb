@@ -2,7 +2,6 @@ import os
 
 import oyaml as yaml
 
-import audbackend
 import audeer
 
 from audb.core.define import (
