@@ -177,12 +177,19 @@ def _fix_media_ext(
         cur_ext = r'\.[a-zA-Z0-9]+$'  # match file extension
         new_ext = f'.{format}'
         if table.is_filewise:
-            table.df.index = table.df.index.str.replace(cur_ext, new_ext)
+            table.df.index = table.df.index.str.replace(
+                cur_ext,
+                new_ext,
+                regex=True,
+            )
         else:
-            table.df.index.set_levels(
-                table.df.index.levels[0].str.replace(cur_ext, new_ext),
-                'file',
-                inplace=True,
+            table.df.index = table.df.index.set_levels(
+                table.df.index.levels[0].str.replace(
+                    cur_ext,
+                    new_ext,
+                    regex=True,
+                ),
+                level='file',
             )
 
     audeer.run_tasks(
