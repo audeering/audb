@@ -212,8 +212,9 @@ def _full_path(
             table.df.index = root + table.df.index
             table.df.index.name = 'file'
         elif len(table.df.index) > 0:
-            table.df.index.set_levels(
-                root + table.df.index.levels[0], 'file', inplace=True,
+            table.df.index = table.df.index.set_levels(
+                root + table.df.index.levels[0],
+                level='file',
             )
 
 
