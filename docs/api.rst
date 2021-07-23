@@ -93,6 +93,7 @@ Repository
 
 .. autoclass:: Repository
     :members:
+    :inherited-members:
 
 repository
 ----------
