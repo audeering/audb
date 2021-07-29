@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Publish a database &mdash; audb Documentation</title>
@@ -75,7 +74,7 @@
             
             
               <div class="version">
-                v1.1.5
+                v1.1.6
               </div>
             
           
@@ -99,7 +98,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
@@ -117,13 +116,13 @@
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Development</span></p>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -179,7 +178,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.5/docs/publish.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.6/docs/publish.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -201,18 +200,18 @@
 <div class="cell_output docutils container">
 </div>
 </div>
-<section id="publish-a-database">
+<div class="section" id="publish-a-database">
 <span id="publish"></span><h1>Publish a database<a class="headerlink" href="#publish-a-database" title="Permalink to this headline">¶</a></h1>
 <p>To publish a database we need to first create
-and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.11.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
+and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.11.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
 Afterwards we publish the database to a <a class="reference internal" href="api.html#audb.Repository" title="audb.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>.
 Finally,
 we add more files
 and release a new version.</p>
-<section id="create-a-database">
+<div class="section" id="create-a-database">
 <h2>Create a database<a class="headerlink" href="#create-a-database" title="Permalink to this headline">¶</a></h2>
 <p>We can create an example database
-with the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.11.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
+with the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.11.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audformat.testing</span>
@@ -299,24 +298,24 @@ tables:
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>56</td>
+      <td>57</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>67</td>
+      <td>40</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>38</td>
+      <td>73</td>
     </tr>
   </tbody>
 </table>
 </div></div></div>
 </div>
-</section>
-<section id="publish-the-first-version">
+</div>
+<div class="section" id="publish-the-first-version">
 <h2>Publish the first version<a class="headerlink" href="#publish-the-first-version" title="Permalink to this headline">¶</a></h2>
-<p>We define a repository on the <a class="reference external" href="https://audeering.github.io/audbackend/api.html#audbackend.FileSystem" title="(in audbackend v0.3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.FileSystem</span></code></a> backend
+<p>We define a repository on the <a class="reference external" href="https://audeering.github.io/audbackend/api.html#audbackend.FileSystem" title="(in audbackend v0.3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.FileSystem</span></code></a> backend
 to publish the database to.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
@@ -454,8 +453,8 @@ and information about audio metadata.</p>
     age-test/
       db/
         1.0.0/
-          db-1.0.0.yaml
           db-1.0.0.zip
+          db-1.0.0.yaml
       media/
         fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
           1.0.0/
@@ -535,8 +534,8 @@ instead of its default ones.</p>
 </table>
 </div></div></div>
 </div>
-</section>
-<section id="update-a-database">
+</div>
+<div class="section" id="update-a-database">
 <h2>Update a database<a class="headerlink" href="#update-a-database" title="Permalink to this headline">¶</a></h2>
 <p>In a next step we will add another file with age annotation
 to the database.
@@ -595,15 +594,15 @@ and add the age annotation of 22 to it.</p>
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>56</td>
+      <td>57</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>67</td>
+      <td>40</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>38</td>
+      <td>73</td>
     </tr>
     <tr>
       <th>audio/004.wav</th>
@@ -744,31 +743,31 @@ We can again inspect the repository.</p>
   data-local/
     age-test/
       db/
-        1.0.0/
-          db-1.0.0.yaml
-          db-1.0.0.zip
         1.1.0/
           db-1.1.0.zip
           db-1.1.0.yaml
+        1.0.0/
+          db-1.0.0.zip
+          db-1.0.0.yaml
       media/
         fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
           1.0.0/
             fda7e4d6-f2b2-4cff-cab5-906ef5d57607-1.0.0.zip
+        ef4d1e81-6488-95cf-a165-604d1e47d575/
+          1.1.0/
+            ef4d1e81-6488-95cf-a165-604d1e47d575-1.1.0.zip
         e26ef45d-bdc1-6153-bdc4-852d83806e4a/
           1.0.0/
             e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
         436c65ec-1e42-f9de-2708-ecafe07e827e/
           1.0.0/
             436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
-        ef4d1e81-6488-95cf-a165-604d1e47d575/
-          1.1.0/
-            ef4d1e81-6488-95cf-a165-604d1e47d575-1.1.0.zip
       meta/
         age/
-          1.0.0/
-            age-1.0.0.zip
           1.1.0/
             age-1.1.0.zip
+          1.0.0/
+            age-1.0.0.zip
 </pre></div>
 </div>
 </div>
@@ -818,14 +817,14 @@ We can again inspect the repository.</p>
       <td>file-system</td>
       <td>./data</td>
       <td>data-local</td>
-      <td>1.0.0</td>
+      <td>1.1.0</td>
     </tr>
     <tr>
       <th>age-test</th>
       <td>file-system</td>
       <td>./data</td>
       <td>data-local</td>
-      <td>1.1.0</td>
+      <td>1.0.0</td>
     </tr>
   </tbody>
 </table>
@@ -834,8 +833,8 @@ We can again inspect the repository.</p>
 <p>As you can even <a class="reference external" href="https://audeering.github.io/audformat/update-database.html">update one database by another one</a>,
 you could automate the update step
 and let a database grow every day.</p>
-</section>
-<section id="real-world-example">
+</div>
+<div class="section" id="real-world-example">
 <h2>Real world example<a class="headerlink" href="#real-world-example" title="Permalink to this headline">¶</a></h2>
 <p>We published a version of a small German acted emotional speech databases
 called <a class="reference external" href="http://emodb.bilderbar.info/start.html">emodb</a>
@@ -848,8 +847,8 @@ to see how to load and use a database.</p>
 <div class="cell_output docutils container">
 </div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
@@ -874,7 +873,7 @@ to see how to load and use a database.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

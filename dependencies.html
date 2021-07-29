@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Database dependencies &mdash; audb Documentation</title>
@@ -75,7 +74,7 @@
             
             
               <div class="version">
-                v1.1.5
+                v1.1.6
               </div>
             
           
@@ -99,25 +98,28 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="publish.html">Publish a database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="load.html">Load a database</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Database dependencies</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Database dependencies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#duration-of-a-database">Duration of a database</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Development</span></p>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -173,7 +175,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.5/docs/dependencies.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.6/docs/dependencies.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -195,7 +197,7 @@
 <div class="cell_output docutils container">
 </div>
 </div>
-<section id="database-dependencies">
+<div class="section" id="database-dependencies">
 <span id="id1"></span><h1>Database dependencies<a class="headerlink" href="#database-dependencies" title="Permalink to this headline">¶</a></h1>
 <p>Media and table files of databases are stored
 in archive files.
@@ -383,7 +385,102 @@ for every version of a database.</p>
 </div>
 </div>
 <p>See <a class="reference internal" href="api.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> for all available methods.</p>
-</section>
+<div class="section" id="duration-of-a-database">
+<h2>Duration of a database<a class="headerlink" href="#duration-of-a-database" title="Permalink to this headline">¶</a></h2>
+<p>If your database contains only WAV or FLAC files,
+we store the duration in seconds of every file
+in the database dependency table.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span>
+<span class="n">df</span><span class="o">.</span><span class="n">duration</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>db.emotion.csv     0.000000
+db.files.csv       0.000000
+wav/03a01Fa.wav    1.898250
+wav/03a01Nc.wav    1.611250
+wav/03a01Wa.wav    1.877813
+wav/03a02Fc.wav    2.006250
+wav/03a02Nc.wav    1.439812
+wav/03a02Ta.wav    1.735688
+wav/03a02Wb.wav    2.123625
+wav/03a02Wc.wav    1.498063
+Name: duration, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>For those databases
+you can get their overall duration with:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Timedelta(&#39;0 days 00:24:47.092187500&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>The duration of parts of a database
+can be calculated
+by first loading the dependency table
+and filter for the selected media files.
+The following calculates the duration
+of the first ten files in the <em>emotion</em> table
+of the emodb database.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="s1">&#39;emotion&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">files</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="n">duration_in_sec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">])</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">duration_in_sec</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Timedelta(&#39;0 days 00:00:17.392437500&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>If your table is a segmented table,
+and you would like to get the duration
+of its segments
+that contain a label
+you can use <a class="reference external" href="https://audeering.github.io/audformat/api-utils.html#audformat.utils.duration" title="(in audformat vv0.11.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
+which calculates the duration
+from the <code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> entries.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s1">&#39;database-with-segmented-tables&#39;</span><span class="p">,</span> <span class="s1">&#39;segmented-table&#39;</span><span class="p">)</span>
+<span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Or you can count the duration of all segments within your database.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;database-with-segmented-tables&#39;</span><span class="p">,</span> <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If your database contains files
+for which no duration information is stored
+in the dependency table of the database,
+like MP4 files,
+you have to download the database first
+and use <a class="reference external" href="https://audeering.github.io/audformat/api-utils.html#audformat.utils.duration" title="(in audformat vv0.11.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
+to calculate the duration on the fly.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;database-with-videos&#39;</span><span class="p">)</span>
+<span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
 
 
            </div>
@@ -408,7 +505,7 @@ for every version of a database.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.1.5
+                v1.1.6
               </div>
             
           
@@ -96,7 +96,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
@@ -108,13 +108,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../caching.html">Caching</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">audb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api-info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Development</span></p>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
@@ -360,12 +360,19 @@
         <span class="n">cur_ext</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\.[a-zA-Z0-9]+$&#39;</span>  <span class="c1"># match file extension</span>
         <span class="n">new_ext</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">is_filewise</span><span class="p">:</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">cur_ext</span><span class="p">,</span> <span class="n">new_ext</span><span class="p">)</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                <span class="n">cur_ext</span><span class="p">,</span>
+                <span class="n">new_ext</span><span class="p">,</span>
+                <span class="n">regex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span>
-                <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">cur_ext</span><span class="p">,</span> <span class="n">new_ext</span><span class="p">),</span>
-                <span class="s1">&#39;file&#39;</span><span class="p">,</span>
-                <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="n">cur_ext</span><span class="p">,</span>
+                    <span class="n">new_ext</span><span class="p">,</span>
+                    <span class="n">regex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">level</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span>
             <span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
@@ -388,8 +395,9 @@
             <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">root</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span>
             <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;file&#39;</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span>
-                <span class="n">root</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span>
+                <span class="n">root</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">level</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span>
             <span class="p">)</span>
 
 
@@ -1365,7 +1373,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

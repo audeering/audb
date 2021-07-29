@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Load a database &mdash; audb Documentation</title>
@@ -75,7 +74,7 @@
             
             
               <div class="version">
-                v1.1.5
+                v1.1.6
               </div>
             
           
@@ -99,7 +98,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
@@ -116,13 +115,13 @@
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caching.html">Caching</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Development</span></p>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -178,7 +177,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.5/docs/load.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.6/docs/load.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -200,7 +199,7 @@
 <div class="cell_output docutils container">
 </div>
 </div>
-<section id="load-a-database">
+<div class="section" id="load-a-database">
 <span id="load"></span><h1>Load a database<a class="headerlink" href="#load-a-database" title="Permalink to this headline">¶</a></h1>
 <p>To load a database you only need its name.
 However,
@@ -223,7 +222,7 @@ even if a new version of the database is published.</p>
 </div>
 <p><a class="reference internal" href="api.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> will download the data,
 store them in a cache folder,
-and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.11.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
+and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.11.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
 The most important content of that object
 are the database tables.</p>
 <div class="jupyter_cell jupyter_container docutils container">
@@ -249,7 +248,7 @@ files:
 </div>
 </div>
 <p>They contain the annotations of the database,
-and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
+and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;emotion&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -325,7 +324,7 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
 <p>535 rows × 2 columns</p>
 </div></div></div>
 </div>
-<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
+<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">][</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -404,7 +403,7 @@ we continue with discussing
 <a class="reference internal" href="#media-conversion-and-flavors"><span class="std std-ref">Media conversion and flavors</span></a>,
 how to load <a class="reference internal" href="#metadata"><span class="std std-ref">Metadata and header only</span></a>,
 and <a class="reference internal" href="#filter"><span class="std std-ref">Loading on demand</span></a>.</p>
-<section id="media-conversion-and-flavors">
+<div class="section" id="media-conversion-and-flavors">
 <span id="id1"></span><h2>Media conversion and flavors<a class="headerlink" href="#media-conversion-and-flavors" title="Permalink to this headline">¶</a></h2>
 <p>When loading a database,
 audio files can be automatically converted.
@@ -526,8 +525,8 @@ inside the <code class="docutils literal notranslate"><span class="pre">db.meta[
 </div>
 <p>The entry <code class="docutils literal notranslate"><span class="pre">'complete'</span></code> tells you if a database flavor is completely cached,
 or if some table or media files are still missing.</p>
-</section>
-<section id="metadata-and-header-only">
+</div>
+<div class="section" id="metadata-and-header-only">
 <span id="metadata"></span><h2>Metadata and header only<a class="headerlink" href="#metadata-and-header-only" title="Permalink to this headline">¶</a></h2>
 <p>It is possible to request only metadata
 (header and annotations)
@@ -598,8 +597,8 @@ files:
 </div>
 </div>
 <p>See <a class="reference internal" href="api-info.html#module-audb.info" title="audb.info"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb.info</span></code></a> for a list of all available options.</p>
-</section>
-<section id="loading-on-demand">
+</div>
+<div class="section" id="loading-on-demand">
 <span id="filter"></span><h2>Loading on demand<a class="headerlink" href="#loading-on-demand" title="Permalink to this headline">¶</a></h2>
 <p>It is possible to request only
 specific tables or media of a database.</p>
@@ -872,8 +871,8 @@ from the tables.</p>
 <p>49 rows × 2 columns</p>
 </div></div></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
@@ -898,7 +897,7 @@ from the tables.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

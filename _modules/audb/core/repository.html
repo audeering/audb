@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.1.5
+                v1.1.6
               </div>
             
           
@@ -96,7 +96,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
@@ -108,13 +108,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../authentication.html">Authentication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../caching.html">Caching</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">audb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api-info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Development</span></p>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
@@ -181,46 +181,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audb.core.repository</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../../api.html#audb.Repository">[docs]</a><span></span><span class="k">class</span> <span class="nc">Repository</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository object.</span>
+<span></span><span class="kn">import</span> <span class="nn">audbackend</span>
 
-<span class="sd">    It stores all information</span>
-<span class="sd">    needed to address a repository:</span>
-<span class="sd">    the repository name,</span>
-<span class="sd">    host,</span>
-<span class="sd">    and backend.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        name: repository name</span>
-<span class="sd">        host: repository host</span>
-<span class="sd">        backend: repository backend</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; Repository(&#39;data-local&#39;, &#39;/data&#39;, &#39;file-system&#39;)</span>
-<span class="sd">        Repository(&#39;data-local&#39;, &#39;/data&#39;, &#39;file-system&#39;)</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">host</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository name.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository host.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository backend.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Repository(&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;)&quot;</span>
-        <span class="p">)</span></div>
+<div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../../api.html#audb.Repository">[docs]</a><span class="k">class</span> <span class="nc">Repository</span><span class="p">(</span><span class="n">audbackend</span><span class="o">.</span><span class="n">Repository</span><span class="p">):</span>
+    <span class="vm">__doc__</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Repository</span><span class="o">.</span><span class="vm">__doc__</span>
+    <span class="k">pass</span></div>
 </pre></div>
 
            </div>
@@ -236,7 +202,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/05/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
