@@ -100,15 +100,24 @@ of the emodb database.
     pd.to_timedelta(duration_in_sec, unit='s')
 
 If your table is a segmented table,
-and you would like to get the duration of its segments
+and you would like to get the duration
+of its segments
+that contain a label
 you can use :func:`audformat.utils.duration`,
 which calculates the duration
 from the ``start`` and ``end`` entries.
 
 .. code-block:: python
 
-    df = audb.load('database-with-segmented-tables', 'segmented-table')
-    audformat.utils.duration(df)
+    df = audb.load_table('database-with-segmented-tables', 'segmented-table')
+    audformat.utils.duration(df.dropna())
+
+Or you can count the duration of all segments within your database.
+
+.. code-block:: python
+
+    db = audb.load('database-with-segmented-tables', only_metadata=True)
+    audformat.utils.duration(db.segments)
 
 If your database contains files
 for which no duration information is stored
