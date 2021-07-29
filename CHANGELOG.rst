@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.6 (2021-07-29)
+--------------------------
+
+* Added: documentation sub-section on database duration info
+* Fixed: made compatible with future versions of ``pandas``
+* Fixed: missing ``audb.Repository`` documentation
+
+
 Version 1.1.5 (2021-05-26)
 --------------------------
 
