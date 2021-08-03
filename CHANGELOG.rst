@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.7 (2021-08-03)
+--------------------------
+
+* Fixed: store metadata in dependency table for non SND formats
+  like MP3 and MP4 files
+
+
 Version 1.1.6 (2021-07-29)
 --------------------------
 
