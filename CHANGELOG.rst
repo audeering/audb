@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.8 (2021-08-03)
+--------------------------
+
+* Fixed: set ``bit_depth`` to ``0`` instead of ``None``
+  for non SND formats in the dependency table
+
+
 Version 1.1.7 (2021-08-03)
 --------------------------
 
