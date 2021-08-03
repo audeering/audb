@@ -396,7 +396,7 @@ class Dependencies:
             try:
                 path = os.path.join(root, file)
                 bit_depth = audiofile.bit_depth(path)
-                if bit_depth is None:  # pragme: nocover (non SND files)
+                if bit_depth is None:  # pragma: nocover (non SND files)
                     bit_depth = 0
                 channels = audiofile.channels(path)
                 duration = audiofile.duration(path)
