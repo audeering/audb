@@ -393,14 +393,19 @@ class Dependencies:
             duration = self.duration(file)
             sampling_rate = self.sampling_rate(file)
         else:
-            bit_depth = channels = sampling_rate = 0
-            duration = 0.0
-            if format in define.FORMATS:
+            try:
                 path = os.path.join(root, file)
                 bit_depth = audiofile.bit_depth(path)
                 channels = audiofile.channels(path)
                 duration = audiofile.duration(path)
                 sampling_rate = audiofile.sampling_rate(path)
+            except FileNotFoundError:  # pragma: nocover
+                # If sox or mediafile are not installed
+                # we get a FileNotFoundError error
+                raise RuntimeError(
+                    f"sox and mediainfo have to be installed "
+                    f"to publish '{format}' media files."
+                )
 
         self._df.loc[file] = [
             archive,
