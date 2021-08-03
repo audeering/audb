@@ -228,6 +228,8 @@ def publish(
             as indicated by ``previous_version``
         RuntimeError: if database is not portable,
             see :meth:`audformat.Database.is_portable`
+        RuntimeError: if non-standard formats like MP3 and MP4 are published,
+            but sox and/or mediafile is not installed
 
     """
     db = audformat.Database.load(db_root, load_data=False)
