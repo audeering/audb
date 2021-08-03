@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.1.6
+                v1.1.7
               </div>
             
           
@@ -193,7 +193,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.6/docs/api.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.7/docs/api.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -823,7 +823,7 @@ it can also be used to convert files that are not part of database:</p>
 <dd><p>Convert file to flavor.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>, <code class="docutils literal notranslate"><span class="pre">channels</span></code> or <code class="docutils literal notranslate"><span class="pre">sampling_rate</span></code>
 of source signal are known, they can be provided.
-Otherwise, they will be computed using <a class="reference external" href="https://audeering.github.io/audiofile/api.html#module-audiofile" title="(in audiofile vv0.4.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a>.</p>
+Otherwise, they will be computed using <a class="reference external" href="https://audeering.github.io/audiofile/api.html#module-audiofile" title="(in audiofile vv0.4.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1282,6 +1282,8 @@ processors on the machine multiplied by 5</p></li>
     as indicated by <code class="docutils literal notranslate"><span class="pre">previous_version</span></code></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – if database is not portable,
     see <code class="xref py py-meth docutils literal notranslate"><span class="pre">audformat.Database.is_portable()</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – if non-standard formats like MP3 and MP4 are published,
+    but sox and/or mediafile is not installed</p></li>
 </ul>
 </dd>
 </dl>
@@ -1427,7 +1429,7 @@ is given by <a class="reference internal" href="#audb.config.REPOSITORIES" title
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.1.6
+                v1.1.7
               </div>
             
           
@@ -576,14 +576,19 @@
             <span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
             <span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">channels</span> <span class="o">=</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">duration</span> <span class="o">=</span> <span class="mf">0.0</span>
-            <span class="k">if</span> <span class="nb">format</span> <span class="ow">in</span> <span class="n">define</span><span class="o">.</span><span class="n">FORMATS</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
                 <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
                 <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
                 <span class="n">channels</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">channels</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
                 <span class="n">duration</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
                 <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>  <span class="c1"># pragma: nocover</span>
+                <span class="c1"># If sox or mediafile are not installed</span>
+                <span class="c1"># we get a FileNotFoundError error</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;sox and mediainfo have to be installed &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;to publish &#39;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2">&#39; media files.&quot;</span>
+                <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">archive</span><span class="p">,</span>
@@ -661,7 +666,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/07/29 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
