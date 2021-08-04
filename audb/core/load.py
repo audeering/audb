@@ -31,12 +31,12 @@ def _cached_versions(
 ) -> typing.Sequence[typing.Tuple[LooseVersion, str, Dependencies]]:
     r"""Find other cached versions of same flavor."""
 
-    df = cached(cache_root=cache_root)
+    df = cached(cache_root=cache_root, name=name)
     # If no explicit cache root is given,
     # we look into the private and shared one.
     # This fixes https://github.com/audeering/audb/issues/101
     if cache_root is None and os.path.exists(default_cache_root(shared=True)):
-        df = pd.concat((df, cached(shared=True)))
+        df = pd.concat((df, cached(name=name, shared=True)))
 
     df = df[df.name == name]
 
