@@ -19,3 +19,16 @@ os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 )
 def test_cache_root(shared, expected):
     assert audb.default_cache_root(shared=shared) == expected
+
+
+def test_empty_shared_cache():
+    # Handle non-existing cache folder
+    # See https://github.com/audeering/audb/issues/125
+    assert not os.path.exists(audeer.safe_path(pytest.SHARED_CACHE_ROOT))
+    df = audb.cached(shared=True)
+    assert len(df) == 0
+    # Handle empty shared cache folder
+    # See https://github.com/audeering/audb/issues/126
+    audeer.mkdir(pytest.SHARED_CACHE_ROOT)
+    df = audb.cached(shared=True)
+    assert 'name' in df.columns

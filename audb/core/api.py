@@ -91,7 +91,21 @@ def cached(
         cache_root or default_cache_root(shared=shared)
     )
 
-    data = {}
+    columns = [
+        'name',
+        'flavor_id',
+        'version',
+        'complete',
+        'bit_depth',
+        'channels',
+        'format',
+        'mixdown',
+        'sampling_rate',
+    ]
+    df = pd.DataFrame([], columns=columns)
+
+    if not os.path.exists(cache_root):
+        return df
 
     database_paths = audeer.list_dir_names(cache_root)
     for database_path in database_paths:
@@ -133,15 +147,18 @@ def cached(
                     )
                     flavor = db.meta['audb']['flavor']
                     complete = db.meta['audb']['complete']
-                    data[flavor_id_path] = {
-                        'name': database,
-                        'flavor_id': flavor_id,
-                        'version': version,
-                        'complete': complete,
-                    }
-                    data[flavor_id_path].update(flavor)
+                    df.loc[flavor_id_path] = [
+                        database,
+                        flavor_id,
+                        version,
+                        complete,
+                        flavor['bit_depth'],
+                        flavor['channels'],
+                        flavor['format'],
+                        flavor['mixdown'],
+                        flavor['sampling_rate'],
+                    ]
 
-    df = pd.DataFrame.from_dict(data, orient='index', dtype='object')
     # Replace NaN with None
     return df.where(pd.notnull(df), None)
 
