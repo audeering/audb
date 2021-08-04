@@ -32,3 +32,14 @@ def test_empty_shared_cache():
     audeer.mkdir(pytest.SHARED_CACHE_ROOT)
     df = audb.cached(shared=True)
     assert 'name' in df.columns
+
+
+def test_cached_name():
+    # Here we only have emodb available.
+    # A test using more published databases
+    # is executed in test_publish.py
+    df = audb.cached(name='emodb')
+    assert len(df) > 0
+    assert set(df['name']) == set(['emodb'])
+    df = audb.cached(name='non-existent')
+    assert len(df) == 0

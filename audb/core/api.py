@@ -74,6 +74,7 @@ def available(
 def cached(
         cache_root: str = None,
         *,
+        name: str = None,
         shared: bool = False,
 ) -> pd.DataFrame:
     r"""List available databases in the cache.
@@ -81,6 +82,9 @@ def cached(
     Args:
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
+        name: name of database.
+            If provided,
+            it will show only cached versions of that database
         shared: list shared databases
 
     Returns:
@@ -110,6 +114,11 @@ def cached(
     database_paths = audeer.list_dir_names(cache_root)
     for database_path in database_paths:
         database = os.path.basename(database_path)
+
+        # Limit to databases of given name
+        if name is not None and database != name:
+            continue
+
         version_paths = audeer.list_dir_names(database_path)
         for version_path in version_paths:
             version = os.path.basename(version_path)
@@ -281,7 +290,7 @@ def exists(
 
     .. code-block::
 
-        audb.cached().query('name == "emodb"')
+        audb.cached(name='emodb')
 
     Args:
         name: name of database
