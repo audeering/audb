@@ -32,3 +32,11 @@ def test_empty_shared_cache():
     audeer.mkdir(pytest.SHARED_CACHE_ROOT)
     df = audb.cached(shared=True)
     assert 'name' in df.columns
+
+
+def test_cached_name():
+    df = audb.cached(name='emodb')
+    assert len(df) > 0
+    assert set(df['name']) == set(['emodb'])
+    df = audb.cached(name='non-existent')
+    assert len(df) == 0

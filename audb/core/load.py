@@ -38,8 +38,6 @@ def _cached_versions(
     if cache_root is None and os.path.exists(default_cache_root(shared=True)):
         df = pd.concat((df, cached(name=name, shared=True)))
 
-    df = df[df.name == name]
-
     cached_versions = []
     for flavor_root, row in df.iterrows():
         if row['flavor_id'] == flavor.short_id:
