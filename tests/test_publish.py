@@ -466,3 +466,12 @@ def test_update_database():
     db1.meta['audb'] = {}
     db2.meta['audb'] = {}
     assert db1 == db2
+
+
+def test_cached():
+    # Check first that we have different database names available
+    df = audb.cached()
+    names = list(set(df.name))
+    assert len(names) > 1
+    df = audb.cached(name=names[0])
+    assert set(df.name) == set([names[0]])

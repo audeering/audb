@@ -35,6 +35,9 @@ def test_empty_shared_cache():
 
 
 def test_cached_name():
+    # Here we only have emodb available.
+    # A test using more published databases
+    # is executed in test_publish.py
     df = audb.cached(name='emodb')
     assert len(df) > 0
     assert set(df['name']) == set(['emodb'])
