@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.1.8
+                v1.1.9
               </div>
             
           
@@ -178,7 +178,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.8/docs/publish.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.9/docs/publish.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -203,7 +203,7 @@
 <div class="section" id="publish-a-database">
 <span id="publish"></span><h1>Publish a database<a class="headerlink" href="#publish-a-database" title="Permalink to this headline">¶</a></h1>
 <p>To publish a database we need to first create
-and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.11.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
+and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.11.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
 Afterwards we publish the database to a <a class="reference internal" href="api.html#audb.Repository" title="audb.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>.
 Finally,
 we add more files
@@ -211,7 +211,7 @@ and release a new version.</p>
 <div class="section" id="create-a-database">
 <h2>Create a database<a class="headerlink" href="#create-a-database" title="Permalink to this headline">¶</a></h2>
 <p>We can create an example database
-with the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.11.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
+with the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.11.4)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audformat.testing</span>
@@ -298,15 +298,15 @@ tables:
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>22</td>
+      <td>30</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>84</td>
+      <td>55</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>34</td>
+      <td>40</td>
     </tr>
   </tbody>
 </table>
@@ -315,7 +315,7 @@ tables:
 </div>
 <div class="section" id="publish-the-first-version">
 <h2>Publish the first version<a class="headerlink" href="#publish-the-first-version" title="Permalink to this headline">¶</a></h2>
-<p>We define a repository on the <a class="reference external" href="https://audeering.github.io/audbackend/api.html#audbackend.FileSystem" title="(in audbackend v0.3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.FileSystem</span></code></a> backend
+<p>We define a repository on the <a class="reference external" href="https://audeering.github.io/audbackend/api.html#audbackend.FileSystem" title="(in audbackend v0.3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.FileSystem</span></code></a> backend
 to publish the database to.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
@@ -594,15 +594,15 @@ and add the age annotation of 22 to it.</p>
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>22</td>
+      <td>30</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>84</td>
+      <td>55</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>34</td>
+      <td>40</td>
     </tr>
     <tr>
       <th>audio/004.wav</th>
@@ -817,14 +817,14 @@ We can again inspect the repository.</p>
       <td>file-system</td>
       <td>./data</td>
       <td>data-local</td>
-      <td>1.1.0</td>
+      <td>1.0.0</td>
     </tr>
     <tr>
       <th>age-test</th>
       <td>file-system</td>
       <td>./data</td>
       <td>data-local</td>
-      <td>1.0.0</td>
+      <td>1.1.0</td>
     </tr>
   </tbody>
 </table>
@@ -873,7 +873,7 @@ to see how to load and use a database.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

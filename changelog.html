@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                v1.1.8
+                v1.1.9
               </div>
             
           
@@ -119,6 +119,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1-9-2021-08-05">Version 1.1.9 (2021-08-05)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-1-8-2021-08-03">Version 1.1.8 (2021-08-03)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-1-7-2021-08-03">Version 1.1.7 (2021-08-03)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-1-6-2021-07-29">Version 1.1.6 (2021-07-29)</a></li>
@@ -195,7 +196,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.8/docs/changelog.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.9/docs/changelog.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -214,6 +215,17 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<div class="section" id="version-1-1-9-2021-08-05">
+<h2>Version 1.1.9 (2021-08-05)<a class="headerlink" href="#version-1-1-9-2021-08-05" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">name</span></code> argument to <code class="docutils literal notranslate"><span class="pre">audb.cached()</span></code>
+to limit search to given database name</p></li>
+<li><p>Changed: speedup <code class="docutils literal notranslate"><span class="pre">audb.available()</span></code> by 100%</p></li>
+<li><p>Changed: use <code class="docutils literal notranslate"><span class="pre">audiofile.duration(...,</span> <span class="pre">sloppy=True)</span></code>
+for estimating durations for dependency files</p></li>
+<li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.cached()</span></code> for empty or missing shared cache</p></li>
+</ul>
+</div>
 <div class="section" id="version-1-1-8-2021-08-03">
 <h2>Version 1.1.8 (2021-08-03)<a class="headerlink" href="#version-1-1-8-2021-08-03" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -450,7 +462,7 @@ in documentation</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

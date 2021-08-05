@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.1.8
+                v1.1.9
               </div>
             
           
@@ -175,7 +175,7 @@
         
             
             
-              <a href="https://github.com/audeering/audb/blob/v1.1.8/docs/dependencies.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/audeering/audb/blob/v1.1.9/docs/dependencies.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -456,7 +456,7 @@ of the emodb database.</p>
 and you would like to get the duration
 of its segments
 that contain a label
-you can use <a class="reference external" href="https://audeering.github.io/audformat/api-utils.html#audformat.utils.duration" title="(in audformat vv0.11.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
+you can use <a class="reference external" href="https://audeering.github.io/audformat/api-utils.html#audformat.utils.duration" title="(in audformat vv0.11.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
 which calculates the duration
 from the <code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> entries.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s1">&#39;database-with-segmented-tables&#39;</span><span class="p">,</span> <span class="s1">&#39;segmented-table&#39;</span><span class="p">)</span>
@@ -473,7 +473,7 @@ for which no duration information is stored
 in the dependency table of the database,
 like MP4 files,
 you have to download the database first
-and use <a class="reference external" href="https://audeering.github.io/audformat/api-utils.html#audformat.utils.duration" title="(in audformat vv0.11.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
+and use <a class="reference external" href="https://audeering.github.io/audformat/api-utils.html#audformat.utils.duration" title="(in audformat vv0.11.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
 to calculate the duration on the fly.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;database-with-videos&#39;</span><span class="p">)</span>
 <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -505,7 +505,7 @@ to calculate the duration on the fly.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
