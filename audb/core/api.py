@@ -41,7 +41,7 @@ def available(
         )
         try:
             names = backend.ls('')
-        except FileNotFoundError:  # pragma: nocover
+        except FileNotFoundError:
             # Handle missing repos
             continue
         for name in names:
@@ -57,7 +57,7 @@ def available(
                             version,
                         ]
                     )
-            except FileNotFoundError:  # pragma: nocover
+            except FileNotFoundError:
                 # Handle broken databases
                 continue
 
