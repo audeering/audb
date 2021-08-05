@@ -399,7 +399,7 @@ class Dependencies:
                 if bit_depth is None:  # pragma: nocover (non SND files)
                     bit_depth = 0
                 channels = audiofile.channels(path)
-                duration = audiofile.duration(path)
+                duration = audiofile.duration(path, sloppy=True)
                 sampling_rate = audiofile.sampling_rate(path)
             except FileNotFoundError:  # pragma: nocover
                 # If sox or mediafile are not installed
