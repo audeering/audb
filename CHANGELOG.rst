@@ -7,6 +7,17 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.9 (2021-08-05)
+--------------------------
+
+* Added: ``name`` argument to ``audb.cached()``
+  to limit search to given database name
+* Changed: speedup ``audb.available()`` by 100%
+* Changed: use ``audiofile.duration(..., sloppy=True)``
+  for estimating durations for dependency files
+* Fixed: ``audb.cached()`` for empty or missing shared cache
+
+
 Version 1.1.8 (2021-08-03)
 --------------------------
 
