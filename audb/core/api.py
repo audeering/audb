@@ -34,23 +34,32 @@ def available(
     """
     databases = []
     for repository in config.REPOSITORIES:
-        pattern = f'*/{define.DB}/*/{define.DB}-*.yaml'
         backend = audbackend.create(
             repository.backend,
             repository.host,
             repository.name,
         )
-        for p in backend.glob(pattern):
-            name, _, version, _ = p.split('/')[-4:]
-            databases.append(
-                [
-                    name,
-                    repository.backend,
-                    repository.host,
-                    repository.name,
-                    version,
-                ]
-            )
+        try:
+            names = backend.ls('')
+        except FileNotFoundError:
+            # Handle missing repos
+            continue
+        for name in names:
+            try:
+                versions = backend.ls(f'{name}/{define.DB}')
+                for version in versions:
+                    databases.append(
+                        [
+                            name,
+                            repository.backend,
+                            repository.host,
+                            repository.name,
+                            version,
+                        ]
+                    )
+            except FileNotFoundError:
+                # Handle broken databases
+                continue
 
     df = pd.DataFrame.from_records(
         databases,
