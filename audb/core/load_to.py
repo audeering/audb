@@ -325,4 +325,7 @@ def load_to(
             'This should not happen.'
         )
 
+    # Force root to not point to tmp folder
+    db._root = db_root
+
     return db
