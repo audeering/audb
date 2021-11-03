@@ -408,6 +408,7 @@ def test_load_to(version):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
+    assert db.root == db_root
 
     if version is None:
         version = audb.latest_version(DB_NAME)
