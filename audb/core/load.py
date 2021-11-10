@@ -163,6 +163,21 @@ def _database_is_complete(
     return complete
 
 
+def _files_duration(
+        db: audformat.Database,
+        deps: Dependencies,
+        format: typing.Optional[str],
+):
+    for file in db.files:
+        full_file = os.path.join(db.root, file)
+        dur = deps.duration(file)
+        if dur > 0:  # only store if duration > 0
+            dur = pd.to_timedelta(dur, unit='s')
+            if format is not None:
+                full_file = audeer.replace_file_extension(full_file, format)
+            db._files_duration[full_file] = dur
+
+
 def _fix_media_ext(
         tables: typing.Sequence[audformat.Table],
         format: str,
@@ -869,6 +884,9 @@ def load(
 
     if not removed_media:
         _remove_media(db, deps, num_workers, verbose)
+
+    # set file durations
+    _files_duration(db, deps, flavor.format)
 
     # fix media extension in tables
     if flavor.format is not None:
