@@ -179,7 +179,7 @@ def _files_duration(
     field = define.DEPEND_FIELD_NAMES[define.DependField.DURATION]
     durs = deps._df.loc[files][field]
     durs = durs[durs > 0]
-    durs = pd.to_timedelta(durs)
+    durs = pd.to_timedelta(durs, unit='s')
     durs.index = durs.index.map(fix_file)
     db._files_duration = durs.to_dict()
 
