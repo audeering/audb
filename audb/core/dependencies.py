@@ -359,13 +359,10 @@ class Dependencies:
         """
         return self._df.version[file]
 
-    def _add_media(
+    def _add_or_update_media(
             self,
             root: str,
-            file: str,
-            version: str,
-            archive: str = None,
-            checksum: str = None,
+            media: typing.Sequence[typing.Tuple[str, str, str, str]],
     ):
         r"""Add or update media file.
 
@@ -375,52 +372,79 @@ class Dependencies:
 
         Args:
             root: root directory
-            file: relative file path
-            archive: archive name without extension
-            checksum: checksum of file
-            version: version string
-
-        """
-        format = audeer.file_extension(file).lower()
-
-        if archive is None:
-            archive = self.archive(file)
-
-        if checksum is None:
-            checksum = self.checksum(file)
-            bit_depth = self.bit_depth(file)
-            channels = self.channels(file)
-            duration = self.duration(file)
-            sampling_rate = self.sampling_rate(file)
-        else:
-            try:
-                path = os.path.join(root, file)
-                bit_depth = audiofile.bit_depth(path)
-                if bit_depth is None:  # pragma: nocover (non SND files)
-                    bit_depth = 0
-                channels = audiofile.channels(path)
-                duration = audiofile.duration(path, sloppy=True)
-                sampling_rate = audiofile.sampling_rate(path)
-            except FileNotFoundError:  # pragma: nocover
-                # If sox or mediafile are not installed
-                # we get a FileNotFoundError error
-                raise RuntimeError(
-                    f"sox and mediainfo have to be installed "
-                    f"to publish '{format}' media files."
+            media: list of tuples with (
+                    relative file path,
+                    version string,
+                    archive name without extension,
+                    checksum,
                 )
 
-        self._df.loc[file] = [
-            archive,
-            bit_depth,
-            channels,
-            checksum,
-            duration,
-            format,
-            0,  # removed
-            sampling_rate,
-            define.DependType.MEDIA,
-            version,
-        ]
+        """
+        if not media:
+            return
+
+        files = []
+        rows = []
+
+        for file, version, archive, checksum in media:
+
+            format = audeer.file_extension(file).lower()
+
+            if archive is None:
+                archive = self.archive(file)
+
+            if checksum is None:
+                checksum = self.checksum(file)
+                bit_depth = self.bit_depth(file)
+                channels = self.channels(file)
+                duration = self.duration(file)
+                sampling_rate = self.sampling_rate(file)
+            else:
+                try:
+                    path = os.path.join(root, file)
+                    bit_depth = audiofile.bit_depth(path)
+                    if bit_depth is None:  # pragma: nocover (non SND files)
+                        bit_depth = 0
+                    channels = audiofile.channels(path)
+                    duration = audiofile.duration(path, sloppy=True)
+                    sampling_rate = audiofile.sampling_rate(path)
+                except FileNotFoundError:  # pragma: nocover
+                    # If sox or mediafile are not installed
+                    # we get a FileNotFoundError error
+                    raise RuntimeError(
+                        f"sox and mediainfo have to be installed "
+                        f"to publish '{format}' media files."
+                    )
+
+            row = (
+                archive,
+                bit_depth,
+                channels,
+                checksum,
+                duration,
+                format,
+                0,  # removed
+                sampling_rate,
+                define.DependType.MEDIA,
+                version,
+            )
+            rows.append(row)
+            files.append(file)
+
+        df = pd.DataFrame.from_records(
+            rows,
+            index=files,
+            columns=define.DEPEND_FIELD_NAMES.values(),
+        )
+
+        mask = df.index.isin(self._df.index)
+
+        # unfortunately, we cannot use update()
+        # as is does not preserve dtypes at the moment:
+        # https://github.com/pandas-dev/pandas/issues/4094
+        # self._df.update(df[mask])
+        self._df[self._df.index.isin(df.index)] = df[mask]
+        self._df = self._df.append(df[~mask])
 
     def _add_meta(
             self,
