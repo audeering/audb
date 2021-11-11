@@ -50,6 +50,7 @@ def _find_media(
         version: str,
         deps: Dependencies,
         archives: typing.Mapping[str, str],
+        num_workers: int,
         verbose: bool,
 ) -> typing.Set[str]:
 
@@ -63,11 +64,7 @@ def _find_media(
 
     # update version of altered media and insert new ones
 
-    for file in audeer.progress_bar(
-            db_media,
-            desc='Find media',
-            disable=not verbose,
-    ):
+    def job(file):
         path = os.path.join(db_root, file)
         if file not in deps:
             checksum = audbackend.md5(path)
@@ -75,12 +72,22 @@ def _find_media(
                 archive = archives[file]
             else:
                 archive = audeer.uid(from_string=file.replace('\\', '/'))
-            deps._add_media(db_root, file, version, archive, checksum)
+            update_media.append((file, version, archive, checksum))
         elif not deps.removed(file):
             checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.archive(file)
-                deps._add_media(db_root, file, version, archive, checksum)
+                update_media.append((file, version, archive, checksum))
+
+    update_media = []
+    audeer.run_tasks(
+        job,
+        params=[([file], {}) for file in db_media],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Find media',
+    )
+    deps._add_or_update_media(db_root, update_media)
 
     return media
 
@@ -104,33 +111,34 @@ def _put_media(
             if deps.version(file) == version:
                 media.add(deps.archive(file))
 
-    lock = threading.Lock()
-
-    def job(archive):
-        if archive in map_media_to_files:
-            for file in map_media_to_files[archive]:
-                with lock:
-                    deps._add_media(db_root, file, version)
-            archive_file = backend.join(
-                db_name,
-                define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-                archive,
-            )
-            backend.put_archive(
-                db_root,
-                map_media_to_files[archive],
-                archive_file,
-                version,
-            )
-
     # upload new and altered archives if it contains at least one file
-    audeer.run_tasks(
-        job,
-        params=[([archive], {}) for archive in media],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Put media',
-    )
+    if media:
+
+        def job(archive):
+            if archive in map_media_to_files:
+                for file in map_media_to_files[archive]:
+                    update_media.append((file, version, None, None))
+                archive_file = backend.join(
+                    db_name,
+                    define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
+                    archive,
+                )
+                backend.put_archive(
+                    db_root,
+                    map_media_to_files[archive],
+                    archive_file,
+                    version,
+                )
+
+        update_media = []
+        audeer.run_tasks(
+            job,
+            params=[([archive], {}) for archive in media],
+            num_workers=num_workers,
+            progress_bar=verbose,
+            task_description='Put media',
+        )
+        deps._add_or_update_media(db_root, update_media)
 
 
 def _put_tables(
@@ -356,7 +364,8 @@ def publish(
                 verbose)
 
     # publish media
-    media = _find_media(db, db_root, version, deps, archives, verbose)
+    media = _find_media(db, db_root, version, deps, archives, num_workers,
+                        verbose)
     _put_media(media, db_root, db.name, version, deps, backend, num_workers,
                verbose)
 

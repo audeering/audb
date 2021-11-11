@@ -180,8 +180,6 @@ def test_invalid_archives(name):
 def test_publish(version):
 
     db = audformat.Database.load(DB_ROOT_VERSION[version])
-    print(db.is_portable)
-    print(db.files)
 
     if not audb.versions(DB_NAME):
         with pytest.raises(RuntimeError):
@@ -338,7 +336,7 @@ def test_update_database():
     version = '2.1.0'
     start_version = '2.0.0'
 
-    db = audb.load_to(
+    audb.load_to(
         DB_ROOT_VERSION[version],
         DB_NAME,
         version=start_version,
@@ -353,7 +351,6 @@ def test_update_database():
         audb.core.define.DEPENDENCIES_FILE,
     )
     os.remove(dep_file)
-    print(audeer.list_file_names(DB_ROOT_VERSION[version]))
     error_msg = (
         f"You want to depend on '{previous_version}' "
         f"of {DB_NAME}, "
