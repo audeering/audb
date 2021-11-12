@@ -359,92 +359,37 @@ class Dependencies:
         """
         return self._df.version[file]
 
-    def _add_or_update_media(
+    def _add_media(
             self,
-            root: str,
-            media: typing.Sequence[typing.Tuple[str, str, str, str]],
+            values: typing.Sequence[
+                typing.Tuple[
+                    str,    # file
+                    str,    # archive
+                    int,    # bit_depth
+                    int,    # channels
+                    str,    # checksum
+                    float,  # duration
+                    str,    # format
+                    int,    # removed
+                    float,  # sampling_rate
+                    int,    # type
+                    str,    # version
+                ]
+            ],
     ):
-        r"""Add or update media file.
-
-        If you want to update only the version
-        of an unaltered media file,
-        don't specify ``archive`` and ``checksum``.
+        r"""Add media files.
 
         Args:
-            root: root directory
-            media: list of tuples with (
-                    relative file path,
-                    version string,
-                    archive name without extension,
-                    checksum,
-                )
+            values: list of tuples,
+                where each tuple holds the values of a new media entry
 
         """
-        if not media:
-            return
-
-        files = []
-        rows = []
-
-        for file, version, archive, checksum in media:
-
-            format = audeer.file_extension(file).lower()
-
-            if archive is None:
-                archive = self.archive(file)
-
-            if checksum is None:
-                checksum = self.checksum(file)
-                bit_depth = self.bit_depth(file)
-                channels = self.channels(file)
-                duration = self.duration(file)
-                sampling_rate = self.sampling_rate(file)
-            else:
-                try:
-                    path = os.path.join(root, file)
-                    bit_depth = audiofile.bit_depth(path)
-                    if bit_depth is None:  # pragma: nocover (non SND files)
-                        bit_depth = 0
-                    channels = audiofile.channels(path)
-                    duration = audiofile.duration(path, sloppy=True)
-                    sampling_rate = audiofile.sampling_rate(path)
-                except FileNotFoundError:  # pragma: nocover
-                    # If sox or mediafile are not installed
-                    # we get a FileNotFoundError error
-                    raise RuntimeError(
-                        f"sox and mediainfo have to be installed "
-                        f"to publish '{format}' media files."
-                    )
-
-            row = (
-                archive,
-                bit_depth,
-                channels,
-                checksum,
-                duration,
-                format,
-                0,  # removed
-                sampling_rate,
-                define.DependType.MEDIA,
-                version,
-            )
-            rows.append(row)
-            files.append(file)
-
         df = pd.DataFrame.from_records(
-            rows,
-            index=files,
-            columns=define.DEPEND_FIELD_NAMES.values(),
-        )
+            values,
+            columns=['file'] + list(define.DEPEND_FIELD_NAMES.values()),
+        ).set_index('file')
 
-        mask = df.index.isin(self._df.index)
-
-        # unfortunately, we cannot use update()
-        # as is does not preserve dtypes at the moment:
-        # https://github.com/pandas-dev/pandas/issues/4094
-        # self._df.update(df[mask])
-        self._df[self._df.index.isin(df.index)] = df[mask]
-        self._df = self._df.append(df[~mask])
+        self._df = self._df.append(df)
 
     def _add_meta(
             self,
@@ -494,3 +439,50 @@ class Dependencies:
 
         """
         self._df.at[file, 'removed'] = 1
+
+    def _update_media(
+            self,
+            values: typing.Sequence[
+                typing.Tuple[
+                    str,    # file
+                    str,    # archive
+                    int,    # bit_depth
+                    int,    # channels
+                    str,    # checksum
+                    float,  # duration
+                    str,    # format
+                    int,    # removed
+                    float,  # sampling_rate
+                    int,    # type
+                    str,    # version
+                ]
+            ],
+    ):
+        r"""Update media files.
+
+        Args:
+            values: list of tuples,
+                where each tuple holds the new values for a media entry
+
+        """
+        df = pd.DataFrame.from_records(
+            values,
+            columns=['file'] + list(define.DEPEND_FIELD_NAMES.values()),
+        ).set_index('file')
+
+        self._df.loc[df.index] = df
+
+    def _update_media_version(
+            self,
+            files: typing.Sequence[str],
+            version: str,
+    ):
+        r"""Update version of media files.
+
+        Args:
+            files: relative file paths
+            version: version string
+
+        """
+        field = define.DEPEND_FIELD_NAMES[define.DependField.VERSION]
+        self._df.loc[files, field] = version

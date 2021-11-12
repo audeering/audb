@@ -1,12 +1,12 @@
 import collections
 import os
 import tempfile
-import threading
 import typing
 
 import audbackend
 import audeer
 import audformat
+import audiofile
 
 from audb.core import define
 from audb.core.api import dependencies
@@ -72,13 +72,28 @@ def _find_media(
                 archive = archives[file]
             else:
                 archive = audeer.uid(from_string=file.replace('\\', '/'))
-            update_media.append((file, version, archive, checksum))
+            values = _media_values(
+                db_root,
+                file,
+                version,
+                archive,
+                checksum,
+            )
+            add_media.append(values)
         elif not deps.removed(file):
             checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.archive(file)
-                update_media.append((file, version, archive, checksum))
+                values = _media_values(
+                    db_root,
+                    file,
+                    version,
+                    archive,
+                    checksum,
+                )
+                update_media.append(values)
 
+    add_media = []
     update_media = []
     audeer.run_tasks(
         job,
@@ -87,9 +102,54 @@ def _find_media(
         progress_bar=verbose,
         task_description='Find media',
     )
-    deps._add_or_update_media(db_root, update_media)
+    if update_media:
+        deps._update_media(update_media)
+    if add_media:
+        deps._add_media(add_media)
 
     return media
+
+
+def _media_values(
+        root: str,
+        file: str,
+        version: str,
+        archive: str,
+        checksum: str,
+) -> typing.Tuple[str, str, int, int, str, float, str, int, float, int, str]:
+    r"""Return values of a media entry in dependencies."""
+
+    format = audeer.file_extension(file).lower()
+
+    try:
+        path = os.path.join(root, file)
+        bit_depth = audiofile.bit_depth(path)
+        if bit_depth is None:  # pragma: nocover (non SND files)
+            bit_depth = 0
+        channels = audiofile.channels(path)
+        duration = audiofile.duration(path, sloppy=True)
+        sampling_rate = audiofile.sampling_rate(path)
+    except FileNotFoundError:  # pragma: nocover
+        # If sox or mediafile are not installed
+        # we get a FileNotFoundError error
+        raise RuntimeError(
+            f"sox and mediainfo have to be installed "
+            f"to publish '{format}' media files."
+        )
+
+    return (
+        file,
+        archive,
+        bit_depth,
+        channels,
+        checksum,
+        duration,
+        format,
+        0,  # removed
+        sampling_rate,
+        define.DependType.MEDIA,
+        version,
+    )
 
 
 def _put_media(
@@ -117,7 +177,7 @@ def _put_media(
         def job(archive):
             if archive in map_media_to_files:
                 for file in map_media_to_files[archive]:
-                    update_media.append((file, version, None, None))
+                    update_media.append(file)
                 archive_file = backend.join(
                     db_name,
                     define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
@@ -138,7 +198,7 @@ def _put_media(
             progress_bar=verbose,
             task_description='Put media',
         )
-        deps._add_or_update_media(db_root, update_media)
+        deps._update_media_version(update_media, version)
 
 
 def _put_tables(
