@@ -168,6 +168,7 @@ def _files_duration(
         deps: Dependencies,
         files: typing.Sequence[str],
         full_path: bool,
+        format: typing.Optional[str],
 ):
     field = define.DEPEND_FIELD_NAMES[define.DependField.DURATION]
     durs = deps._df.loc[files][field]
@@ -602,7 +603,7 @@ def _tables(
 
 
 def _update_path(
-        db: audformat.Database,
+        tables: typing.Sequence,
         root: str = None,
         format: str = None,
         num_workers: int = 1,
@@ -611,7 +612,7 @@ def _update_path(
     r"""Change the file path in all tables.
 
     Args:
-        db: database
+        tables: sequence of table like objects
         root: root to add to path
         format: format to change to in path
         num_workers: number of workers to use
@@ -633,15 +634,15 @@ def _update_path(
             # Change format and add root
             def job(table):
                 if table.is_filewise:
-                    table.df.index = root + table.df.index.str.replace(
+                    table._df.index = root + table._df.index.str.replace(
                         cur_ext,
                         new_ext,
                         regex=True,
                     )
-                    table.df.index.name = 'file'
+                    table._df.index.name = 'file'
                 else:
-                    table.df.index = table.df.index.set_levels(
-                        root + table.df.index.levels[0].str.replace(
+                    table._df.index = table._df.index.set_levels(
+                        root + table._df.index.levels[0].str.replace(
                             cur_ext,
                             new_ext,
                             regex=True,
@@ -654,15 +655,15 @@ def _update_path(
             # Change format
             def job(table):
                 if table.is_filewise:
-                    table.df.index = table.df.index.str.replace(
+                    table._df.index = table._df.index.str.replace(
                         cur_ext,
                         new_ext,
                         regex=True,
                     )
-                    table.df.index.name = 'file'
+                    table._df.index.name = 'file'
                 else:
-                    table.df.index = table.df.index.set_levels(
-                        table.df.index.levels[0].str.replace(
+                    table._df.index = table._df.index.set_levels(
+                        table._df.index.levels[0].str.replace(
                             cur_ext,
                             new_ext,
                             regex=True,
@@ -677,11 +678,11 @@ def _update_path(
             # Change root
             def job(table):
                 if table.is_filewise:
-                    table.df.index = root + table.df.index
-                    table.df.index.name = 'file'
+                    table._df.index = root + table._df.index
+                    table._df.index.name = 'file'
                 elif len(table.df.index) > 0:
-                    table.df.index = table.df.index.set_levels(
-                        root + table.df.index.levels[0],
+                    table._df.index = table._df.index.set_levels(
+                        root + table._df.index.levels[0],
                         level='file',
                     )
 
@@ -692,7 +693,7 @@ def _update_path(
 
     audeer.run_tasks(
         job,
-        params=[([table], {}) for table in db.tables.values()],
+        params=[([table], {}) for table in tables],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Update file path',
@@ -932,15 +933,18 @@ def load(
     if not removed_media:
         _remove_media(db, deps, num_workers, verbose)
 
-    # Adjust full paths and extensions in tables
+    # Adjust full paths and extensions in tables and deps
     if full_path:
         root = db_root
     else:
         root = None
-    _update_path(db, root, flavor.format, num_workers, verbose)
+    # Let deps mimick a table object to adjust path entries as well
+    deps.is_filewise = True
+    tables = [table for table in db.tables.values()] + [deps]
+    _update_path(tables, root, flavor.format, num_workers, verbose)
 
     # set file durations
-    _files_duration(db, deps, requested_media, full_path)
+    _files_duration(db, deps, db.files, full_path, flavor.format)
 
     # check if database is now complete
     if not db_is_complete:
