@@ -176,7 +176,7 @@ def _files_duration(
     if format is not None:
         cur_ext = re.compile(r'\.[a-zA-Z0-9]+$')  # match file extension
         new_ext = f'.{format}'
-        durs.index = durs.index.str.sub(cur_ext, new_ext)
+        durs.index = durs.index.str.replace(cur_ext, new_ext, regex=True)
     durs.index = db.root + os.path.sep + durs.index
     db._files_duration = durs.to_dict()
 
