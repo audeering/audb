@@ -173,13 +173,11 @@ def _files_duration(
     durs = deps._df.loc[files][field]
     durs = durs[durs > 0]
     durs = pd.to_timedelta(durs, unit='s')
-    root = db.root + os.path.sep
     if format is not None:
         cur_ext = re.compile(r'\.[a-zA-Z0-9]+$')  # match file extension
         new_ext = f'.{format}'
-        durs.index = root + durs.index.str.sub(cur_ext, new_ext)
-    else:
-        durs.index = root + durs.index
+        durs.index = durs.index.str.sub(cur_ext, new_ext)
+    durs.index = db.root + os.path.sep + durs.index
     db._files_duration = durs.to_dict()
 
 
