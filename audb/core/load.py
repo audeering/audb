@@ -167,7 +167,7 @@ def _files_duration(
         db: audformat.Database,
         deps: Dependencies,
         files: typing.Sequence[str],
-        format: typing.Optional[str],
+        full_path: bool,
 ):
     field = define.DEPEND_FIELD_NAMES[define.DependField.DURATION]
     durs = deps._df.loc[files][field]
@@ -932,15 +932,15 @@ def load(
     if not removed_media:
         _remove_media(db, deps, num_workers, verbose)
 
-    # set file durations
-    _files_duration(db, deps, requested_media, flavor.format)
-
     # Adjust full paths and extensions in tables
     if full_path:
         root = db_root
     else:
         root = None
     _update_path(db, root, flavor.format, num_workers, verbose)
+
+    # set file durations
+    _files_duration(db, deps, requested_media, full_path)
 
     # check if database is now complete
     if not db_is_complete:
