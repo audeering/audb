@@ -167,7 +167,6 @@ def _files_duration(
         db: audformat.Database,
         deps: Dependencies,
         files: typing.Sequence[str],
-        full_path: bool,
         format: typing.Optional[str],
 ):
     field = define.DEPEND_FIELD_NAMES[define.DependField.DURATION]
@@ -695,7 +694,7 @@ def _update_path(
         job,
         params=[([table], {}) for table in tables],
         num_workers=num_workers,
-        progress_bar=verbose,
+        progress_bar=False,
         task_description='Update file path',
     )
 
@@ -938,13 +937,10 @@ def load(
         root = db_root
     else:
         root = None
-    # Let deps mimick a table object to adjust path entries as well
-    deps.is_filewise = True
-    tables = [table for table in db.tables.values()] + [deps]
-    _update_path(tables, root, flavor.format, num_workers, verbose)
+    _update_path(db.tables.values(), root, flavor.format, num_workers, verbose)
 
     # set file durations
-    _files_duration(db, deps, db.files, full_path, flavor.format)
+    _files_duration(db, deps, requested_media, flavor.format)
 
     # check if database is now complete
     if not db_is_complete:
