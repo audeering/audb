@@ -618,77 +618,18 @@ def _update_path(
         verbose: if ``True`` show progress bar
 
     """
-    # The solution implemente here are faster
-    # than using db.map_files()
 
-    if root is not None:
-        root = root + os.path.sep
-
-    if format is not None:
-        cur_ext = r'\.[a-zA-Z0-9]+$'  # match file extension
-        new_ext = f'.{format}'
-
+    def job(table):
         if root is not None:
-
-            # Change format and add root
-            def job(table):
-                if table.is_filewise:
-                    table._df.index = root + table._df.index.str.replace(
-                        cur_ext,
-                        new_ext,
-                        regex=True,
-                    )
-                    table._df.index.name = 'file'
-                else:
-                    table._df.index = table._df.index.set_levels(
-                        root + table._df.index.levels[0].str.replace(
-                            cur_ext,
-                            new_ext,
-                            regex=True,
-                        ),
-                        level='file',
-                    )
-
-        else:
-
-            # Change format
-            def job(table):
-                if table.is_filewise:
-                    table._df.index = table._df.index.str.replace(
-                        cur_ext,
-                        new_ext,
-                        regex=True,
-                    )
-                    table._df.index.name = 'file'
-                else:
-                    table._df.index = table._df.index.set_levels(
-                        table._df.index.levels[0].str.replace(
-                            cur_ext,
-                            new_ext,
-                            regex=True,
-                        ),
-                        level='file',
-                    )
-
-    else:
-
-        if root is not None:
-
-            # Change root
-            def job(table):
-                if table.is_filewise:
-                    table._df.index = root + table._df.index
-                    table._df.index.name = 'file'
-                elif len(table.df.index) > 0:
-                    table._df.index = table._df.index.set_levels(
-                        root + table._df.index.levels[0],
-                        level='file',
-                    )
-
-        else:
-
-            # No change needed
-            return
+            table._df.index = audformat.utils.expand_file_path(
+                table._df.index,
+                root,
+            )
+        if format is not None:
+            table._df.index = audformat.utils.replace_file_extension(
+                table._df.index,
+                format,
+            )
 
     audeer.run_tasks(
         job,
