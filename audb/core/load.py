@@ -635,7 +635,7 @@ def _update_path(
         job,
         params=[([table], {}) for table in tables],
         num_workers=num_workers,
-        progress_bar=False,
+        progress_bar=verbose,
         task_description='Update file path',
     )
 
