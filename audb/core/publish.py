@@ -14,6 +14,26 @@ from audb.core.dependencies import Dependencies
 from audb.core.repository import Repository
 
 
+def _check_for_duplicates(
+        db: audformat.Database,
+        num_workers: int,
+        verbose: bool,
+):
+    r"""Ensures tables do not contain duplicated index entries."""
+
+    def job(table):
+        audformat.assert_no_duplicates(table._df)
+
+    tables = db.tables.values()
+    audeer.run_tasks(
+        job,
+        params=[([table], {}) for table in tables],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Check tables for duplicates',
+    )
+
+
 def _find_tables(
         db: audformat.Database,
         db_root: str,
@@ -380,8 +400,9 @@ def publish(
                 )
 
     # load database from folder
-    db = audformat.Database.load(db_root)
+    db = audformat.Database.load(db_root, load_data=True)
 
+    # check all tables are conform with audformat
     if not db.is_portable:
         raise RuntimeError(
             "Some files in the tables have absolute paths "
@@ -389,6 +410,7 @@ def publish(
             "Please replace those paths by relative paths "
             "and use folder names instead of dots."
         )
+    _check_for_duplicates(db, num_workers, verbose)
 
     # check all files referenced in a table exists
     missing_files = [
