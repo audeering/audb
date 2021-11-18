@@ -877,10 +877,6 @@ def load(
         _remove_media(db, deps, num_workers, verbose)
 
     # Adjust full paths and file extensions in tables
-    if full_path:
-        root = db_root
-    else:
-        root = None
     _update_path(db, db_root, full_path, flavor.format, num_workers, verbose)
 
     # set file durations
