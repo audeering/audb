@@ -61,7 +61,7 @@
 
           <a href="../../../index.html">
           
-            <img src="../../../_static/images/audeering.svg" class="logo" alt="audEERING"/>
+            <img src="../../../_static/images/audeering.png" class="logo" alt="audEERING"/>
           
           
             <span> audb</span>
@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.1.9
+                v1.2.1
               </div>
             
           
@@ -141,40 +141,14 @@
         
         <div class="rst-content">
         
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-        
       <li>audb.core.dependencies</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -544,66 +518,35 @@
 
     <span class="k">def</span> <span class="nf">_add_media</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># file</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># archive</span>
+                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># bit_depth</span>
+                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># channels</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># checksum</span>
+                    <span class="nb">float</span><span class="p">,</span>  <span class="c1"># duration</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># format</span>
+                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># removed</span>
+                    <span class="nb">float</span><span class="p">,</span>  <span class="c1"># sampling_rate</span>
+                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># type</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># version</span>
+                <span class="p">]</span>
+            <span class="p">],</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add or update media file.</span>
-
-<span class="sd">        If you want to update only the version</span>
-<span class="sd">        of an unaltered media file,</span>
-<span class="sd">        don&#39;t specify ``archive`` and ``checksum``.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add media files.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            root: root directory</span>
-<span class="sd">            file: relative file path</span>
-<span class="sd">            archive: archive name without extension</span>
-<span class="sd">            checksum: checksum of file</span>
-<span class="sd">            version: version string</span>
+<span class="sd">            values: list of tuples,</span>
+<span class="sd">                where each tuple holds the values of a new media entry</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
+            <span class="n">values</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">archive</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">archive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">checksum</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">checksum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="n">bit_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="n">channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-                <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">bit_depth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: nocover (non SND files)</span>
-                    <span class="n">bit_depth</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">channels</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">channels</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-                <span class="n">duration</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sloppy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>  <span class="c1"># pragma: nocover</span>
-                <span class="c1"># If sox or mediafile are not installed</span>
-                <span class="c1"># we get a FileNotFoundError error</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;sox and mediainfo have to be installed &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;to publish &#39;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2">&#39; media files.&quot;</span>
-                <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">archive</span><span class="p">,</span>
-            <span class="n">bit_depth</span><span class="p">,</span>
-            <span class="n">channels</span><span class="p">,</span>
-            <span class="n">checksum</span><span class="p">,</span>
-            <span class="n">duration</span><span class="p">,</span>
-            <span class="nb">format</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># removed</span>
-            <span class="n">sampling_rate</span><span class="p">,</span>
-            <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">,</span>
-        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_add_meta</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -652,7 +595,54 @@
 <span class="sd">            file: relative file path</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;removed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;removed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_update_media</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># file</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># archive</span>
+                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># bit_depth</span>
+                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># channels</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># checksum</span>
+                    <span class="nb">float</span><span class="p">,</span>  <span class="c1"># duration</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># format</span>
+                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># removed</span>
+                    <span class="nb">float</span><span class="p">,</span>  <span class="c1"># sampling_rate</span>
+                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># type</span>
+                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># version</span>
+                <span class="p">]</span>
+            <span class="p">],</span>
+    <span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update media files.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            values: list of tuples,</span>
+<span class="sd">                where each tuple holds the new values for a media entry</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
+            <span class="n">values</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">_update_media_version</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update version of media files.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            files: relative file paths</span>
+<span class="sd">            version: version string</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">VERSION</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">files</span><span class="p">,</span> <span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span></div>
 </pre></div>
 
            </div>
@@ -668,7 +658,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

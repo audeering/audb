@@ -61,7 +61,7 @@
 
           <a href="../../../index.html">
           
-            <img src="../../../_static/images/audeering.svg" class="logo" alt="audEERING"/>
+            <img src="../../../_static/images/audeering.png" class="logo" alt="audEERING"/>
           
           
             <span> audb</span>
@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.1.9
+                v1.2.1
               </div>
             
           
@@ -141,40 +141,14 @@
         
         <div class="rst-content">
         
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-        
       <li>audb.core.load</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -346,57 +320,21 @@
     <span class="k">return</span> <span class="n">complete</span>
 
 
-<span class="k">def</span> <span class="nf">_fix_media_ext</span><span class="p">(</span>
-        <span class="n">tables</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">audformat</span><span class="o">.</span><span class="n">Table</span><span class="p">],</span>
-        <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-<span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">):</span>
-        <span class="c1"># Faster solution then using db.map_files()</span>
-        <span class="n">cur_ext</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\.[a-zA-Z0-9]+$&#39;</span>  <span class="c1"># match file extension</span>
-        <span class="n">new_ext</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">is_filewise</span><span class="p">:</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-                <span class="n">cur_ext</span><span class="p">,</span>
-                <span class="n">new_ext</span><span class="p">,</span>
-                <span class="n">regex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span>
-                <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-                    <span class="n">cur_ext</span><span class="p">,</span>
-                    <span class="n">new_ext</span><span class="p">,</span>
-                    <span class="n">regex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="n">level</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span>
-            <span class="p">)</span>
-
-    <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
-        <span class="n">job</span><span class="p">,</span>
-        <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">table</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">],</span>
-        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
-        <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-        <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Fix format&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_full_path</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">_files_duration</span><span class="p">(</span>
         <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
-        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
+        <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 <span class="p">):</span>
-    <span class="c1"># Faster solution then using db.map_files()</span>
-    <span class="n">root</span> <span class="o">=</span> <span class="n">db_root</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span>
-    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">is_filewise</span><span class="p">:</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">root</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;file&#39;</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span>
-                <span class="n">root</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">level</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span>
-            <span class="p">)</span>
+    <span class="n">field</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependField</span><span class="o">.</span><span class="n">DURATION</span><span class="p">]</span>
+    <span class="n">durs</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">files</span><span class="p">][</span><span class="n">field</span><span class="p">]</span>
+    <span class="n">durs</span> <span class="o">=</span> <span class="n">durs</span><span class="p">[</span><span class="n">durs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">durs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">durs</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+    <span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;file&#39;</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">durs</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span><span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+    <span class="n">durs</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_file_path</span><span class="p">(</span><span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">_files_duration</span> <span class="o">=</span> <span class="n">durs</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">_get_media_from_backend</span><span class="p">(</span>
@@ -820,6 +758,50 @@
     <span class="k">return</span> <span class="n">tables</span>
 
 
+<span class="k">def</span> <span class="nf">_update_path</span><span class="p">(</span>
+        <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+        <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">full_path</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Change the file path in all tables.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db: database object</span>
+<span class="sd">        root: root to add to path</span>
+<span class="sd">        full_path: if ``True`` expand file path with ``root``</span>
+<span class="sd">        format: file extension to change to in path</span>
+<span class="sd">        num_workers: number of workers to use</span>
+<span class="sd">        verbose: if ``True`` show progress bar</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_path</span> <span class="ow">and</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">full_path</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_file_path</span><span class="p">(</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">root</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="nb">format</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="n">tables</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
+        <span class="n">job</span><span class="p">,</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">table</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">],</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Update file path&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">database_cache_folder</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1053,13 +1035,11 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">removed_media</span><span class="p">:</span>
         <span class="n">_remove_media</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
-    <span class="c1"># fix media extension in tables</span>
-    <span class="k">if</span> <span class="n">flavor</span><span class="o">.</span><span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">_fix_media_ext</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">flavor</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="c1"># Adjust full paths and file extensions in tables</span>
+    <span class="n">_update_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">full_path</span><span class="p">,</span> <span class="n">flavor</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
-    <span class="c1"># convert to full path</span>
-    <span class="k">if</span> <span class="n">full_path</span><span class="p">:</span>
-        <span class="n">_full_path</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">)</span>
+    <span class="c1"># set file durations</span>
+    <span class="n">_files_duration</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">requested_media</span><span class="p">,</span> <span class="n">flavor</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
 
     <span class="c1"># check if database is now complete</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">db_is_complete</span><span class="p">:</span>
@@ -1371,7 +1351,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

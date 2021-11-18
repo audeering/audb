@@ -62,7 +62,7 @@
 
           <a href="index.html">
           
-            <img src="_static/images/audeering.svg" class="logo" alt="audEERING"/>
+            <img src="_static/images/audeering.png" class="logo" alt="audEERING"/>
           
           
             <span> audb</span>
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                v1.1.9
+                v1.2.1
               </div>
             
           
@@ -119,6 +119,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-2-1-2021-11-18">Version 1.2.1 (2021-11-18)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-2-0-2021-11-18">Version 1.2.0 (2021-11-18)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-1-9-2021-08-05">Version 1.1.9 (2021-08-05)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-1-8-2021-08-03">Version 1.1.8 (2021-08-03)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-1-7-2021-08-03">Version 1.1.7 (2021-08-03)</a></li>
@@ -167,44 +169,14 @@
         
         <div class="rst-content">
         
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
       <li>Changelog</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-            
-            
-              <a href="https://github.com/audeering/audb/blob/v1.1.9/docs/changelog.rst" class="fa fa-github"> Edit on GitHub</a>
-            
-          
-        
+              <a href="https://github.com/audeering/audb/" class="fa fa-github"> GitHub</a>
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -215,6 +187,27 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<div class="section" id="version-1-2-1-2021-11-18">
+<h2>Version 1.2.1 (2021-11-18)<a class="headerlink" href="#version-1-2-1-2021-11-18" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed: build documentation inside the release process with Python 3.8</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-2-0-2021-11-18">
+<h2>Version 1.2.0 (2021-11-18)<a class="headerlink" href="#version-1-2-0-2021-11-18" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added: support for Python 3.9</p></li>
+<li><p>Added: store file duration of the database
+in the duration cache of <code class="docutils literal notranslate"><span class="pre">audformat.Database</span></code></p></li>
+<li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code> now raises an error
+if a table contains duplicated index entries</p></li>
+<li><p>Fixed: several speed ups when loading or publishing a database</p></li>
+<li><p>Fixed: the <code class="docutils literal notranslate"><span class="pre">root</span></code> attribute of the returned database object
+from <code class="docutils literal notranslate"><span class="pre">audb.load_to()</span></code> does now point to the correct folder
+and not the temporal folder</p></li>
+<li><p>Removed: support for Python 3.6</p></li>
+</ul>
+</div>
 <div class="section" id="version-1-1-9-2021-08-05">
 <h2>Version 1.1.9 (2021-08-05)<a class="headerlink" href="#version-1-1-9-2021-08-05" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -462,7 +455,7 @@ in documentation</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/08/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
