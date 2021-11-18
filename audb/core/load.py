@@ -620,6 +620,8 @@ def _update_path(
         verbose: if ``True`` show progress bar
 
     """
+    if not full_path and format is None:
+        return
 
     def job(table):
         if full_path:
