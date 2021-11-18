@@ -180,59 +180,6 @@ def _files_duration(
     db._files_duration = durs.to_dict()
 
 
-def _fix_media_ext(
-        tables: typing.Sequence[audformat.Table],
-        format: str,
-        num_workers: typing.Optional[int],
-        verbose: bool,
-):
-
-    def job(table):
-        # Faster solution then using db.map_files()
-        cur_ext = r'\.[a-zA-Z0-9]+$'  # match file extension
-        new_ext = f'.{format}'
-        if table.is_filewise:
-            table.df.index = table.df.index.str.replace(
-                cur_ext,
-                new_ext,
-                regex=True,
-            )
-        else:
-            table.df.index = table.df.index.set_levels(
-                table.df.index.levels[0].str.replace(
-                    cur_ext,
-                    new_ext,
-                    regex=True,
-                ),
-                level='file',
-            )
-
-    audeer.run_tasks(
-        job,
-        params=[([table], {}) for table in tables],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Fix format',
-    )
-
-
-def _full_path(
-        db: audformat.Database,
-        db_root: str,
-):
-    # Faster solution then using db.map_files()
-    root = db_root + os.path.sep
-    for table in db.tables.values():
-        if table.is_filewise:
-            table.df.index = root + table.df.index
-            table.df.index.name = 'file'
-        elif len(table.df.index) > 0:
-            table.df.index = table.df.index.set_levels(
-                root + table.df.index.levels[0],
-                level='file',
-            )
-
-
 def _get_media_from_backend(
         name: str,
         media: typing.Sequence[str],
@@ -654,6 +601,50 @@ def _tables(
     return tables
 
 
+def _update_path(
+        db: audformat.Database,
+        root: str,
+        full_path: bool,
+        format: typing.Optional[str],
+        num_workers: int,
+        verbose: bool,
+):
+    r"""Change the file path in all tables.
+
+    Args:
+        db: database object
+        root: root to add to path
+        full_path: if ``True`` expand file path with ``root``
+        format: file extension to change to in path
+        num_workers: number of workers to use
+        verbose: if ``True`` show progress bar
+
+    """
+    if not full_path and format is None:
+        return
+
+    def job(table):
+        if full_path:
+            table._df.index = audformat.utils.expand_file_path(
+                table._df.index,
+                root,
+            )
+        if format is not None:
+            table._df.index = audformat.utils.replace_file_extension(
+                table._df.index,
+                format,
+            )
+
+    tables = db.tables.values()
+    audeer.run_tasks(
+        job,
+        params=[([table], {}) for table in tables],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Update file path',
+    )
+
+
 def database_cache_folder(
         name: str,
         version: str,
@@ -887,16 +878,11 @@ def load(
     if not removed_media:
         _remove_media(db, deps, num_workers, verbose)
 
+    # Adjust full paths and file extensions in tables
+    _update_path(db, db_root, full_path, flavor.format, num_workers, verbose)
+
     # set file durations
     _files_duration(db, deps, requested_media, flavor.format)
-
-    # fix media extension in tables
-    if flavor.format is not None:
-        _fix_media_ext(db.tables.values(), flavor.format, num_workers, verbose)
-
-    # convert to full path
-    if full_path:
-        _full_path(db, db_root)
 
     # check if database is now complete
     if not db_is_complete:

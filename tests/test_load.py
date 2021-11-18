@@ -264,6 +264,7 @@ def test_load(format, version):
         DB_NAME,
         version=version,
         full_path=True,
+        format=format,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
