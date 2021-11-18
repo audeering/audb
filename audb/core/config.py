@@ -103,7 +103,7 @@ class config:
     containing the following attributes:
 
     * :attr:`audb.Repository.name`: repository name, e.g. ``'data-local'``
-    * :attr:`aub2.Repository.backend`: backend name, e.g. ``'artifactory'``
+    * :attr:`audb.Repository.backend`: backend name, e.g. ``'artifactory'``
     * :attr:`audb.Repository.host`: host name,
       e.g. ``'https://artifactory.audeering.com/artifactory'``
 
