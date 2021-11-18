@@ -602,25 +602,27 @@ def _tables(
 
 
 def _update_path(
-        tables: typing.Sequence,
-        root: str = None,
-        format: str = None,
-        num_workers: int = 1,
-        verbose: bool = False,
+        db: audformat.Database,
+        root: str,
+        full_path: bool,
+        format: typing.Optional[str],
+        num_workers: int,
+        verbose: bool,
 ):
     r"""Change the file path in all tables.
 
     Args:
-        tables: sequence of table like objects
+        db: database object
         root: root to add to path
-        format: format to change to in path
+        full_path: if ``True`` expand file path with ``root``
+        format: file extension to change to in path
         num_workers: number of workers to use
         verbose: if ``True`` show progress bar
 
     """
 
     def job(table):
-        if root is not None:
+        if full_path:
             table._df.index = audformat.utils.expand_file_path(
                 table._df.index,
                 root,
@@ -631,6 +633,7 @@ def _update_path(
                 format,
             )
 
+    tables = db.tables.values()
     audeer.run_tasks(
         job,
         params=[([table], {}) for table in tables],
@@ -873,12 +876,13 @@ def load(
     if not removed_media:
         _remove_media(db, deps, num_workers, verbose)
 
-    # Adjust full paths and extensions in tables and deps
+    # Adjust full paths and file extensions in tables
     if full_path:
         root = db_root
     else:
         root = None
     _update_path(db.tables.values(), root, flavor.format, num_workers, verbose)
+    _update_path(db, db_root, full_path, flavor.format, num_workers, verbose)
 
     # set file durations
     _files_duration(db, deps, requested_media, flavor.format)
