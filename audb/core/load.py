@@ -881,7 +881,6 @@ def load(
         root = db_root
     else:
         root = None
-    _update_path(db.tables.values(), root, flavor.format, num_workers, verbose)
     _update_path(db, db_root, full_path, flavor.format, num_workers, verbose)
 
     # set file durations
