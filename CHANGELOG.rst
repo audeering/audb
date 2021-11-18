@@ -7,6 +7,21 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.0 (2021-11-18)
+--------------------------
+
+* Added: support for Python 3.9
+* Added: store file duration of the database
+  in the duration cache of ``audformat.Database``
+* Changed: ``audb.publish()`` now raises an error
+  if a table contains duplicated index entries
+* Fixed: several speed ups when loading or publishing a database
+* Fixed: the ``root`` attribute of the returned database object
+  from ``audb.load_to()`` does now point to the correct folder
+  and not the temporal folder
+* Removed: support for Python 3.6
+
+
 Version 1.1.9 (2021-08-05)
 --------------------------
 
