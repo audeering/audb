@@ -201,8 +201,11 @@ def _save_database(
         audformat.define.TableStorageFormat.PICKLE,
     ]:
         db.save(
-            db_root_tmp, storage_format=storage_format,
-            num_workers=num_workers, verbose=verbose,
+            db_root_tmp,
+            storage_format=storage_format,
+            update_other_formats=False,
+            num_workers=num_workers,
+            verbose=verbose,
         )
         _move_file(db_root_tmp, db_root, define.HEADER_FILE)
         for path in glob.glob(
