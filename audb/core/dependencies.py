@@ -13,8 +13,7 @@ from audb.core import define
 class Dependencies:
     r"""Dependencies of a database.
 
-    :class:`audb.Dependencies` gathers all files
-    a database contains
+    :class:`audb.Dependencies` gathers all database files
     and metadata about them
     in a single object.
     The metadata contains information
@@ -256,7 +255,7 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv`` or ``pkl``.
+                File extension can be ``csv`` or ``pkl``
 
         Raises:
             ValueError: if file extension is not ``csv`` or ``pkl``
@@ -326,7 +325,7 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv`` or ``pkl``.
+                File extension can be ``csv`` or ``pkl``
 
         """
         path = audeer.safe_path(path)

@@ -21,7 +21,8 @@ class Flavor(audobject.Object):
     and offers a convenient way to convert files to it.
 
     As the following example shows,
-    it can also be used to convert files that are not part of database:
+    it can also be used to convert files
+    that are not part of a database:
 
     .. code-block::  python
 

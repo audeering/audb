@@ -274,9 +274,6 @@ def publish(
     with :func:`audb.load_to` to ``db_root``.
     Afterwards you make your changes to that folder
     and run :func:`audb.publish`.
-    :func:`audb.publish` will then check
-    that the version of the files inside that folder
-    match the version given by ``previous_version``.
 
     Setting ``previous_version=None`` allows you
     to start from scratch and upload all files
@@ -299,7 +296,7 @@ def publish(
             it will use automatically the latest published version
             or ``None``
             if no version was published.
-            If ``None`` it assumes you start from scratch.
+            If ``None`` it assumes you start from scratch
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used.
             Only used to read the dependencies of the previous version
