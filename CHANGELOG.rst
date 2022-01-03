@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.2 (2022-01-03)
+--------------------------
+
+* Fixed: small improvements to API documentation
+* Fixed: speed up ``audb.load_to()`` storing of CSV files
+
+
 Version 1.2.1 (2021-11-18)
 --------------------------
 
