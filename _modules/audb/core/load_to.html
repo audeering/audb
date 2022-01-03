@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.1
+                v1.2.2
               </div>
             
           
@@ -358,8 +358,11 @@
         <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>
     <span class="p">]:</span>
         <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-            <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">storage_format</span><span class="o">=</span><span class="n">storage_format</span><span class="p">,</span>
-            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">db_root_tmp</span><span class="p">,</span>
+            <span class="n">storage_format</span><span class="o">=</span><span class="n">storage_format</span><span class="p">,</span>
+            <span class="n">update_other_formats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
@@ -501,7 +504,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -509,7 +512,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2021 audEERING GmbH
+      &copy; 2020-2022 audEERING GmbH
     </p>
   </div> 
 

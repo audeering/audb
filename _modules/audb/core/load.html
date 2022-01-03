@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.1
+                v1.2.2
               </div>
             
           
@@ -890,19 +890,19 @@
 <span class="sd">    Loads meta and media files of a database to the local cache and returns</span>
 <span class="sd">    a :class:`audformat.Database` object.</span>
 
-<span class="sd">    When working with data,</span>
-<span class="sd">    we often make assumptions about the media files.</span>
-<span class="sd">    For instance, we expect that audio files are</span>
-<span class="sd">    have a specific sampling rate.</span>
 <span class="sd">    By setting</span>
-<span class="sd">    ``bit_depth``, ``channels``, ``format``, ``mixdown``, and ``sampling_rate``</span>
+<span class="sd">    ``bit_depth``,</span>
+<span class="sd">    ``channels``,</span>
+<span class="sd">    ``format``,</span>
+<span class="sd">    ``mixdown``,</span>
+<span class="sd">    and ``sampling_rate``</span>
 <span class="sd">    we can request a specific flavor of the database.</span>
 <span class="sd">    In that case media files are automatically converted to the desired</span>
 <span class="sd">    properties (see also :class:`audb.Flavor`).</span>
 
 <span class="sd">    It is possible to filter meta and media files with the arguments</span>
 <span class="sd">    ``tables`` and ``media``.</span>
-<span class="sd">    Note that only media files with at least one reference are loaded.</span>
+<span class="sd">    Only media files with at least one reference are loaded.</span>
 <span class="sd">    I.e. filtering meta files, may also remove media files.</span>
 <span class="sd">    Likewise, references to missing media files will be removed, too.</span>
 <span class="sd">    I.e. filtering media files, may also remove entries from the meta files.</span>
@@ -918,7 +918,7 @@
 <span class="sd">            E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,</span>
 <span class="sd">            and ``channels=[1]`` returns the second channel</span>
 <span class="sd">            of all multi-channel files</span>
-<span class="sd">            and all mono files.</span>
+<span class="sd">            and all mono files</span>
 <span class="sd">        format: file format, one of ``&#39;flac&#39;``, ``&#39;wav&#39;``</span>
 <span class="sd">        mixdown: apply mono mix-down</span>
 <span class="sd">        sampling_rate: sampling rate in Hz, one of</span>
@@ -1139,7 +1139,7 @@
 <span class="sd">            E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,</span>
 <span class="sd">            and ``channels=[1]`` returns the second channel</span>
 <span class="sd">            of all multi-channel files</span>
-<span class="sd">            and all mono files.</span>
+<span class="sd">            and all mono files</span>
 <span class="sd">        format: file format, one of ``&#39;flac&#39;``, ``&#39;wav&#39;``</span>
 <span class="sd">        mixdown: apply mono mix-down</span>
 <span class="sd">        sampling_rate: sampling rate in Hz, one of</span>
@@ -1351,7 +1351,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1359,7 +1359,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2021 audEERING GmbH
+      &copy; 2020-2022 audEERING GmbH
     </p>
   </div> 
 

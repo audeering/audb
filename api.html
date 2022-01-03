@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.2.1
+                v1.2.2
               </div>
             
           
@@ -190,7 +190,7 @@
 <dd class="field-odd"><p><strong>only_latest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – keep only latest version</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>table with name, version and private flag</p>
@@ -217,7 +217,7 @@ it will show only cached versions of that database</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>cached databases</p>
@@ -234,10 +234,10 @@ it will show only cached versions of that database</p></li>
 <dd><p>Get/set configuration values for the <a class="reference internal" href="#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> module.</p>
 <p>The configuration values are read in during module import
 from the <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">configuration file</span></a>
-<code class="file docutils literal notranslate"><span class="pre">~/.audb.yaml</span></code>.</p>
-<p>You can change the configuration values after import,
-by setting the attributes directly.</p>
-<p>The <a class="reference internal" href="caching.html#caching"><span class="std std-ref">caching</span></a> related configuration values
+<code class="file docutils literal notranslate"><span class="pre">~/.audb.yaml</span></code>.
+You can change the configuration values after import,
+by setting the attributes directly.
+The <a class="reference internal" href="caching.html#caching"><span class="std std-ref">caching</span></a> related configuration values
 can be overwritten by environment variables.</p>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
@@ -261,7 +261,7 @@ can be overwritten by environment variables.</p>
 containing the following attributes:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#audb.Repository.name" title="audb.Repository.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.Repository.name</span></code></a>: repository name, e.g. <code class="docutils literal notranslate"><span class="pre">'data-local'</span></code></p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">aub2.Repository.backend</span></code>: backend name, e.g. <code class="docutils literal notranslate"><span class="pre">'artifactory'</span></code></p></li>
+<li><p><a class="reference internal" href="#audb.Repository.backend" title="audb.Repository.backend"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.Repository.backend</span></code></a>: backend name, e.g. <code class="docutils literal notranslate"><span class="pre">'artifactory'</span></code></p></li>
 <li><p><a class="reference internal" href="#audb.Repository.host" title="audb.Repository.host"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.Repository.host</span></code></a>: host name,
 e.g. <code class="docutils literal notranslate"><span class="pre">'https://artifactory.audeering.com/artifactory'</span></code></p></li>
 </ul>
@@ -282,8 +282,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">'https://artif
 <dt class="sig sig-object py" id="audb.Dependencies">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">Dependencies</span></span><a class="reference internal" href="_modules/audb/core/dependencies.html#Dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dependencies of a database.</p>
-<p><a class="reference internal" href="#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> gathers all files
-a database contains
+<p><a class="reference internal" href="#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> gathers all database files
 and metadata about them
 in a single object.
 The metadata contains information
@@ -323,7 +322,7 @@ but also what version of the file is required.</p>
 <dd><p>Return dependencies as a table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>table with dependencies</p>
@@ -509,7 +508,7 @@ but also what version of the file is required.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to file.
-File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code> or <code class="docutils literal notranslate"><span class="pre">pkl</span></code>.</p>
+File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code> or <code class="docutils literal notranslate"><span class="pre">pkl</span></code></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
@@ -589,7 +588,7 @@ File extension can be <code class="docutils literal notranslate"><span class="pr
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to file.
-File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code> or <code class="docutils literal notranslate"><span class="pre">pkl</span></code>.</p>
+File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code> or <code class="docutils literal notranslate"><span class="pre">pkl</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -688,7 +687,7 @@ or
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>path normalized by <a class="reference external" href="https://audeering.github.io/audeer/api-audeer.html#audeer.safe_path" title="(in audeer vv1.16.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audeer.safe_path()</span></code></a></p>
+<dd class="field-odd"><p>path normalized by <a class="reference external" href="https://audeering.github.io/audeer/api-audeer.html#audeer.safe_path" title="(in audeer vv1.17.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audeer.safe_path()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -769,7 +768,8 @@ to convert media files to the desired format.
 It stores the meta information about a flavor
 and offers a convenient way to convert files to it.</p>
 <p>As the following example shows,
-it can also be used to convert files that are not part of database:</p>
+it can also be used to convert files
+that are not part of a database:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">original_file</span> <span class="o">=</span> <span class="s1">&#39;/org/path/file.flac&#39;</span>
 <span class="n">converted_file</span> <span class="o">=</span> <span class="s1">&#39;/new/path/file.wav&#39;</span>
 
@@ -796,7 +796,7 @@ it can also be used to convert files that are not part of database:</p>
 <dd><p>Convert file to flavor.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>, <code class="docutils literal notranslate"><span class="pre">channels</span></code> or <code class="docutils literal notranslate"><span class="pre">sampling_rate</span></code>
 of source signal are known, they can be provided.
-Otherwise, they will be computed using <a class="reference external" href="https://audeering.github.io/audiofile/api.html#module-audiofile" title="(in audiofile vv1.0.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a>.</p>
+Otherwise, they will be computed using <a class="reference external" href="https://audeering.github.io/audiofile/api.html#module-audiofile" title="(in audiofile vv1.0.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -974,18 +974,18 @@ To get the absolute path, do:</p>
 <dd><p>Load database.</p>
 <p>Loads meta and media files of a database to the local cache and returns
 a <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.12.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
-<p>When working with data,
-we often make assumptions about the media files.
-For instance, we expect that audio files are
-have a specific sampling rate.
-By setting
-<code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>, <code class="docutils literal notranslate"><span class="pre">channels</span></code>, <code class="docutils literal notranslate"><span class="pre">format</span></code>, <code class="docutils literal notranslate"><span class="pre">mixdown</span></code>, and <code class="docutils literal notranslate"><span class="pre">sampling_rate</span></code>
+<p>By setting
+<code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>,
+<code class="docutils literal notranslate"><span class="pre">channels</span></code>,
+<code class="docutils literal notranslate"><span class="pre">format</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mixdown</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">sampling_rate</span></code>
 we can request a specific flavor of the database.
 In that case media files are automatically converted to the desired
 properties (see also <a class="reference internal" href="#audb.Flavor" title="audb.Flavor"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Flavor</span></code></a>).</p>
 <p>It is possible to filter meta and media files with the arguments
 <code class="docutils literal notranslate"><span class="pre">tables</span></code> and <code class="docutils literal notranslate"><span class="pre">media</span></code>.
-Note that only media files with at least one reference are loaded.
+Only media files with at least one reference are loaded.
 I.e. filtering meta files, may also remove media files.
 Likewise, references to missing media files will be removed, too.
 I.e. filtering media files, may also remove entries from the meta files.</p>
@@ -1002,7 +1002,7 @@ will be first upsampled by repeating the existing channels.
 E.g. <code class="docutils literal notranslate"><span class="pre">channels=[0,</span> <span class="pre">1]</span></code> upsamples all mono files to stereo,
 and <code class="docutils literal notranslate"><span class="pre">channels=[1]</span></code> returns the second channel
 of all multi-channel files
-and all mono files.</p></li>
+and all mono files</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – file format, one of <code class="docutils literal notranslate"><span class="pre">'flac'</span></code>, <code class="docutils literal notranslate"><span class="pre">'wav'</span></code></p></li>
 <li><p><strong>mixdown</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – apply mono mix-down</p></li>
 <li><p><strong>sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sampling rate in Hz, one of
@@ -1057,7 +1057,7 @@ will be first upsampled by repeating the existing channels.
 E.g. <code class="docutils literal notranslate"><span class="pre">channels=[0,</span> <span class="pre">1]</span></code> upsamples all mono files to stereo,
 and <code class="docutils literal notranslate"><span class="pre">channels=[1]</span></code> returns the second channel
 of all multi-channel files
-and all mono files.</p></li>
+and all mono files</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – file format, one of <code class="docutils literal notranslate"><span class="pre">'flac'</span></code>, <code class="docutils literal notranslate"><span class="pre">'wav'</span></code></p></li>
 <li><p><strong>mixdown</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – apply mono mix-down</p></li>
 <li><p><strong>sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sampling rate in Hz, one of
@@ -1124,7 +1124,7 @@ processors on the machine multiplied by 5</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>database table</p>
@@ -1207,10 +1207,7 @@ you first have to load the version of the database
 that the new version should depend on
 with <a class="reference internal" href="#audb.load_to" title="audb.load_to"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load_to()</span></code></a> to <code class="docutils literal notranslate"><span class="pre">db_root</span></code>.
 Afterwards you make your changes to that folder
-and run <a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a>.
-<a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a> will then check
-that the version of the files inside that folder
-match the version given by <code class="docutils literal notranslate"><span class="pre">previous_version</span></code>.</p>
+and run <a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a>.</p>
 <p>Setting <code class="docutils literal notranslate"><span class="pre">previous_version=None</span></code> allows you
 to start from scratch and upload all files
 even if an older versions exist.
@@ -1223,7 +1220,9 @@ before running <a class="reference internal" href="#audb.publish" title="audb.pu
 <li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
 <li><p><strong>repository</strong> (<a class="reference internal" href="#audb.Repository" title="audb.core.repository.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repository</span></code></a>) – name of repository</p></li>
 <li><p><strong>archives</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – dictionary mapping files to archive names.
-Can be used to bundle files into archives.
+Can be used to bundle files into archives,
+which will speed up communication with the server
+if the database contains many small files.
 Archive name must not include an extension</p></li>
 <li><p><strong>previous_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – specifies the version
 this publication should be based on.
@@ -1231,7 +1230,7 @@ If <code class="docutils literal notranslate"><span class="pre">'latest'</span><
 it will use automatically the latest published version
 or <code class="docutils literal notranslate"><span class="pre">None</span></code>
 if no version was published.
-If <code class="docutils literal notranslate"><span class="pre">None</span></code> it assumes you start from scratch.</p></li>
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> it assumes you start from scratch</p></li>
 <li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
 If not set <a class="reference internal" href="#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used.
 Only used to read the dependencies of the previous version</p></li>
@@ -1402,7 +1401,7 @@ is given by <a class="reference internal" href="#audb.config.REPOSITORIES" title
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1410,7 +1409,7 @@ is given by <a class="reference internal" href="#audb.config.REPOSITORIES" title
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2021 audEERING GmbH
+      &copy; 2020-2022 audEERING GmbH
     </p>
   </div> 
 

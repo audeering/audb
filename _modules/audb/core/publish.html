@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.1
+                v1.2.2
               </div>
             
           
@@ -431,9 +431,6 @@
 <span class="sd">    with :func:`audb.load_to` to ``db_root``.</span>
 <span class="sd">    Afterwards you make your changes to that folder</span>
 <span class="sd">    and run :func:`audb.publish`.</span>
-<span class="sd">    :func:`audb.publish` will then check</span>
-<span class="sd">    that the version of the files inside that folder</span>
-<span class="sd">    match the version given by ``previous_version``.</span>
 
 <span class="sd">    Setting ``previous_version=None`` allows you</span>
 <span class="sd">    to start from scratch and upload all files</span>
@@ -446,7 +443,9 @@
 <span class="sd">        version: version string</span>
 <span class="sd">        repository: name of repository</span>
 <span class="sd">        archives: dictionary mapping files to archive names.</span>
-<span class="sd">            Can be used to bundle files into archives.</span>
+<span class="sd">            Can be used to bundle files into archives,</span>
+<span class="sd">            which will speed up communication with the server</span>
+<span class="sd">            if the database contains many small files.</span>
 <span class="sd">            Archive name must not include an extension</span>
 <span class="sd">        previous_version: specifies the version</span>
 <span class="sd">            this publication should be based on.</span>
@@ -454,7 +453,7 @@
 <span class="sd">            it will use automatically the latest published version</span>
 <span class="sd">            or ``None``</span>
 <span class="sd">            if no version was published.</span>
-<span class="sd">            If ``None`` it assumes you start from scratch.</span>
+<span class="sd">            If ``None`` it assumes you start from scratch</span>
 <span class="sd">        cache_root: cache folder where databases are stored.</span>
 <span class="sd">            If not set :meth:`audb.default_cache_root` is used.</span>
 <span class="sd">            Only used to read the dependencies of the previous version</span>
@@ -642,7 +641,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -650,7 +649,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2021 audEERING GmbH
+      &copy; 2020-2022 audEERING GmbH
     </p>
   </div> 
 

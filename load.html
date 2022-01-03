@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.2.1
+                v1.2.2
               </div>
             
           
@@ -218,7 +218,7 @@ files:
 </div>
 </div>
 <p>They contain the annotations of the database,
-and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
+and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;emotion&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -294,7 +294,7 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
 <p>535 rows × 2 columns</p>
 </div></div></div>
 </div>
-<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
+<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">][</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -380,27 +380,27 @@ audio files can be automatically converted.
 This creates a new flavor of the database,
 represented by <a class="reference internal" href="api.html#audb.Flavor" title="audb.Flavor"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Flavor</span></code></a>.
 The following properties can be changed.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">bit_depth</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">8</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">16</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">24</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">32 (WAV only)</span>
-<span class="nt">format</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="s">&#39;wav&#39;</span>
-  <span class="p p-Indicator">-</span> <span class="s">&#39;flac&#39;</span>
-<span class="nt">channels</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0</span>        <span class="c1"># select first channel</span>
-  <span class="p p-Indicator">-</span> <span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span> <span class="nv">-1</span><span class="p p-Indicator">]</span>  <span class="c1"># select first and last channel</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">...</span>
-<span class="nt">mixdown</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="nt">sampling_rate</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">8000</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">16000</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">22500</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">44100</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">48000</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">bit_depth</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">24</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32 (WAV only)</span><span class="w"></span>
+<span class="nt">format</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;wav&#39;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;flac&#39;</span><span class="w"></span>
+<span class="nt">channels</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">        </span><span class="c1"># select first channel</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-1</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># select first and last channel</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"></span>
+<span class="nt">mixdown</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="nt">sampling_rate</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16000</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22500</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">44100</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">48000</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The next example will convert the original files
@@ -867,7 +867,7 @@ from the tables.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2021/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -875,7 +875,7 @@ from the tables.</p>
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2021 audEERING GmbH
+      &copy; 2020-2022 audEERING GmbH
     </p>
   </div> 
 
