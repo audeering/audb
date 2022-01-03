@@ -733,19 +733,19 @@ def load(
     Loads meta and media files of a database to the local cache and returns
     a :class:`audformat.Database` object.
 
-    When working with data,
-    we often make assumptions about the media files.
-    For instance, we expect that audio files are
-    have a specific sampling rate.
     By setting
-    ``bit_depth``, ``channels``, ``format``, ``mixdown``, and ``sampling_rate``
+    ``bit_depth``,
+    ``channels``,
+    ``format``,
+    ``mixdown``,
+    and ``sampling_rate``
     we can request a specific flavor of the database.
     In that case media files are automatically converted to the desired
     properties (see also :class:`audb.Flavor`).
 
     It is possible to filter meta and media files with the arguments
     ``tables`` and ``media``.
-    Note that only media files with at least one reference are loaded.
+    Only media files with at least one reference are loaded.
     I.e. filtering meta files, may also remove media files.
     Likewise, references to missing media files will be removed, too.
     I.e. filtering media files, may also remove entries from the meta files.
@@ -761,7 +761,7 @@ def load(
             E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,
             and ``channels=[1]`` returns the second channel
             of all multi-channel files
-            and all mono files.
+            and all mono files
         format: file format, one of ``'flac'``, ``'wav'``
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
@@ -982,7 +982,7 @@ def load_media(
             E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,
             and ``channels=[1]`` returns the second channel
             of all multi-channel files
-            and all mono files.
+            and all mono files
         format: file format, one of ``'flac'``, ``'wav'``
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of

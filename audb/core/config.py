@@ -73,10 +73,8 @@ class config:
     The configuration values are read in during module import
     from the :ref:`configuration file <configuration>`
     :file:`~/.audb.yaml`.
-
     You can change the configuration values after import,
     by setting the attributes directly.
-
     The :ref:`caching <caching>` related configuration values
     can be overwritten by environment variables.
 
