@@ -289,7 +289,9 @@ def publish(
         version: version string
         repository: name of repository
         archives: dictionary mapping files to archive names.
-            Can be used to bundle files into archives.
+            Can be used to bundle files into archives,
+            which will speed up communication with the server
+            if the database contains many small files.
             Archive name must not include an extension
         previous_version: specifies the version
             this publication should be based on.
