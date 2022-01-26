@@ -165,7 +165,7 @@ def test_include_and_exclude(include, exclude, expected_files):
             num_workers=pytest.NUM_WORKERS,
             verbose=False,
         )
-    assert list(db.files) == expected_files
+    assert sorted(list(db.files)) == expected_files
 
 
 @pytest.mark.parametrize(
@@ -209,7 +209,7 @@ def test_media(media, format, expected_files):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    assert list(db.files) == expected_files
+    assert sorted(list(db.files)) == expected_files
     assert list(db.tables) == ['dev', 'test', 'train']
 
 
@@ -269,4 +269,4 @@ def test_tables(tables, format, expected_tables, expected_files):
         verbose=False,
     )
     assert list(db.tables) == expected_tables
-    assert list(db.files) == expected_files
+    assert sorted(list(db.files)) == expected_files
