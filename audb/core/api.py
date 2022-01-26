@@ -470,6 +470,10 @@ def latest_version(
     Returns:
         version string
 
+    Example:
+        >>> latest_version('emodb')
+        '1.1.1'
+
     """
     vs = versions(name)
     if not vs:
