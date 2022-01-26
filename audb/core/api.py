@@ -582,6 +582,10 @@ def versions(
     Returns:
         list of versions
 
+    Example:
+        >>> versions('emodb')
+        ['1.1.0', '1.1.1']
+
     """
     vs = []
     for repository in config.REPOSITORIES:
