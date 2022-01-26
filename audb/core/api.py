@@ -29,7 +29,8 @@ def available(
         only_latest: include only latest version of database
 
     Returns:
-        table with name, backend, host, repository, and version
+        table with database name as index,
+        and backend, host, repository, version as columns
 
     Example:
         >>> audb.available(only_latest=True)
