@@ -93,7 +93,7 @@ def cached(
         name: str = None,
         shared: bool = False,
 ) -> pd.DataFrame:
-    r"""List available databases in the cache.
+    r"""List available databases and flavors in the cache.
 
     Args:
         cache_root: cache folder where databases are stored.
@@ -101,12 +101,44 @@ def cached(
         name: name of database.
             If provided,
             it will show only cached versions of that database
-        shared: list shared databases
+        shared: include databases from shared cache
 
     Returns:
-        cached databases
+        cached databases as a dataframe,
+        with the cache path as index entries,
+        and name,
+        flavor_id,
+        version,
+        complete,
+        bit_depth,
+        channels,
+        format,
+        mixdown,
+        sampling_rate
+        as columns
 
-    """
+    Example:
+        >>> db = audb.load(
+        ...     'emodb',
+        ...     version='1.1.1',
+        ...     only_metadata=True,
+        ...     full_path=False,
+        ...     verbose=False,
+        ... )
+        >>> df = cached()
+        >>> for column in df.columns:
+        ...     print(f'{column}: {df[column].values[0]}')
+        name: emodb
+        flavor_id: d3b62a9b
+        version: 1.1.1
+        complete: False
+        bit_depth: None
+        channels: None
+        format: None
+        mixdown: False
+        sampling_rate: None
+
+    """  # noqa: E501
     cache_root = audeer.safe_path(
         cache_root or default_cache_root(shared=shared)
     )
