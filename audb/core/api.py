@@ -491,6 +491,11 @@ def remove_media(
 ):
     r"""Remove media from all versions.
 
+    Be careful,
+    this removes files from all published versions
+    on all backends.
+    Those files can not be restored afterwards.
+
     Args:
         name: name of database
         files: list of files that should be removed
