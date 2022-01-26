@@ -104,8 +104,8 @@ def cached(
         shared: include databases from shared cache
 
     Returns:
-        cached databases as a dataframe,
-        with the cache path as index entries,
+        cached databases
+        with cache path as index,
         and name,
         flavor_id,
         version,
@@ -268,12 +268,17 @@ def dependencies(
 
     Args:
         name: name of database
-        version: version string
+        version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         dependency object
+
+    Example:
+        >>> deps = dependencies('emodb', version='1.1.1')
+        >>> deps.version('db.emotion.csv')
+        '1.1.0'
 
     """
     if version is None:
