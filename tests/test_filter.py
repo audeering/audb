@@ -117,35 +117,47 @@ def fixture_clear_cache():
         (
             None,
             None,
-            ['audio/000.wav', 'audio/001.wav',
-             'audio/010.wav', 'audio/011.wav',
-             'audio/1/020.wav', 'audio/2/021.wav'],
+            [
+                'audio/010.wav', 'audio/011.wav',
+                'audio/000.wav', 'audio/001.wav',
+                'audio/1/020.wav', 'audio/2/021.wav',
+            ],
         ),
         (
             't.*',
             None,
-            ['audio/000.wav', 'audio/001.wav',
-             'audio/1/020.wav', 'audio/2/021.wav'],
+            [
+                'audio/000.wav', 'audio/001.wav',
+                'audio/1/020.wav', 'audio/2/021.wav',
+            ],
         ),
         (
             None,
             't.*',
-            ['audio/010.wav', 'audio/011.wav'],
+            [
+                'audio/010.wav', 'audio/011.wav',
+            ],
         ),
         (
             't.*',
             'train',
-            ['audio/000.wav', 'audio/001.wav'],
+            [
+                'audio/000.wav', 'audio/001.wav',
+            ],
         ),
         (
             ['test'],
             None,
-            ['audio/000.wav', 'audio/001.wav'],
+            [
+                'audio/000.wav', 'audio/001.wav',
+            ],
         ),
         (
             None,
             ['train', 'dev'],
-            ['audio/000.wav', 'audio/001.wav'],
+            [
+                'audio/000.wav', 'audio/001.wav',
+            ],
         ),
         (
             'test',
@@ -165,7 +177,7 @@ def test_include_and_exclude(include, exclude, expected_files):
             num_workers=pytest.NUM_WORKERS,
             verbose=False,
         )
-    assert sorted(list(db.files)) == expected_files
+    assert list(db.files) == expected_files
 
 
 @pytest.mark.parametrize(
@@ -174,9 +186,11 @@ def test_include_and_exclude(include, exclude, expected_files):
         (
             None,
             None,
-            ['audio/000.wav', 'audio/001.wav',
-             'audio/010.wav', 'audio/011.wav',
-             'audio/1/020.wav', 'audio/2/021.wav'],
+            [
+                'audio/010.wav', 'audio/011.wav',
+                'audio/000.wav', 'audio/001.wav',
+                'audio/1/020.wav', 'audio/2/021.wav',
+            ],
         ),
         (
             [],
@@ -196,7 +210,7 @@ def test_include_and_exclude(include, exclude, expected_files):
         (
             r'.*0\.wav',
             None,
-            ['audio/000.wav', 'audio/010.wav', 'audio/1/020.wav'],
+            ['audio/010.wav', 'audio/000.wav', 'audio/1/020.wav'],
         ),
     ]
 )
@@ -209,7 +223,7 @@ def test_media(media, format, expected_files):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    assert sorted(list(db.files)) == expected_files
+    assert list(db.files) == expected_files
     assert list(db.tables) == ['dev', 'test', 'train']
 
 
@@ -220,36 +234,46 @@ def test_media(media, format, expected_files):
             None,
             None,
             ['dev', 'test', 'train'],
-            ['audio/000.wav', 'audio/001.wav',
-             'audio/010.wav', 'audio/011.wav',
-             'audio/1/020.wav', 'audio/2/021.wav'],
+            [
+                'audio/010.wav', 'audio/011.wav',
+                'audio/000.wav', 'audio/001.wav',
+                'audio/1/020.wav', 'audio/2/021.wav',
+            ],
         ),
         (
             'test',
             None,
             ['test'],
-            ['audio/000.wav', 'audio/001.wav'],
+            [
+                'audio/000.wav', 'audio/001.wav',
+            ],
         ),
         (
             't.*',
             None,
             ['test', 'train'],
-            ['audio/000.wav', 'audio/001.wav',
-             'audio/1/020.wav', 'audio/2/021.wav'],
+            [
+                'audio/000.wav', 'audio/001.wav',
+                'audio/1/020.wav', 'audio/2/021.wav',
+            ],
         ),
         (
             ['dev', 'train'],
             None,
             ['dev', 'train'],
-            ['audio/010.wav', 'audio/011.wav',
-             'audio/1/020.wav', 'audio/2/021.wav'],
+            [
+                'audio/010.wav', 'audio/011.wav',
+                'audio/1/020.wav', 'audio/2/021.wav',
+            ],
         ),
         (
             ['dev', 'train'],
             'flac',
             ['dev', 'train'],
-            ['audio/010.flac', 'audio/011.flac',
-             'audio/1/020.flac', 'audio/2/021.flac'],
+            [
+                'audio/010.flac', 'audio/011.flac',
+                'audio/1/020.flac', 'audio/2/021.flac',
+            ],
         ),
         (
             'bad',
@@ -269,4 +293,4 @@ def test_tables(tables, format, expected_tables, expected_files):
         verbose=False,
     )
     assert list(db.tables) == expected_tables
-    assert sorted(list(db.files)) == expected_files
+    assert list(db.files) == expected_files
