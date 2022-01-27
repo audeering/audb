@@ -500,7 +500,7 @@ def remove_media(
     Be careful,
     this removes files from all published versions
     on all backends.
-    Those files can not be restored afterwards.
+    Those files cannot be restored afterwards.
 
     Args:
         name: name of database
