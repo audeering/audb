@@ -26,12 +26,19 @@ def available(
     r"""List all databases that are available to the user.
 
     Args:
-        only_latest: keep only latest version
+        only_latest: include only latest version of database
 
     Returns:
-        table with name, version and private flag
+        table with database name as index,
+        and backend, host, repository, version as columns
 
-    """
+    Example:
+        >>> audb.available(only_latest=True)
+                   backend                                    host   repository version
+        name
+        emodb  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.1.1
+
+    """  # noqa: E501
     databases = []
     for repository in config.REPOSITORIES:
         backend = audbackend.create(
