@@ -126,17 +126,16 @@ def cached(
         ...     verbose=False,
         ... )
         >>> df = cached()
-        >>> for column in df.columns:
-        ...     print(f'{column}: {df[column].values[0]}')
-        name: emodb
-        flavor_id: d3b62a9b
-        version: 1.1.1
-        complete: False
-        bit_depth: None
-        channels: None
-        format: None
-        mixdown: False
-        sampling_rate: None
+        >>> print(df.iloc[0].to_string())
+        name                emodb
+        flavor_id        d3b62a9b
+        version             1.1.1
+        complete            False
+        bit_depth            None
+        channels             None
+        format               None
+        mixdown             False
+        sampling_rate        None
 
     """  # noqa: E501
     cache_root = audeer.safe_path(
