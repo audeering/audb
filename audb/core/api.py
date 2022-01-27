@@ -361,6 +361,12 @@ def exists(
         ``True`` if database flavor exists
 
     Example:
+        >>> db = audb.load(
+        ...     'emodb',
+        ...     version='1.1.1',
+        ...     only_metadata=True,
+        ...     verbose=False,
+        ... )
         >>> audb.exists('emodb', version='1.1.1')
         True
         >>> audb.exists('emodb', version='1.1.1', format='wav')
