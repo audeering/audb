@@ -54,7 +54,11 @@ def repository(
     Raises:
         RuntimeError: if database is not found
 
-    """
+    Example:
+        >>> audb.repository('emodb', '1.1.1')
+        Repository('data-public', 'https://audeering.jfrog.io/artifactory', 'artifactory')
+
+    """  # noqa: E501
     return _lookup(name, version)[0]
 
 

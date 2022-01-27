@@ -782,6 +782,17 @@ def load(
     Returns:
         database object
 
+    Example:
+        >>> db = audb.load(
+        ...     'emodb',
+        ...     version='1.1.1',
+        ...     only_metadata=True,
+        ...     full_path=False,
+        ...     verbose=False,
+        ... )
+        >>> list(db.tables)
+        ['emotion', 'files']
+
     """
     if version is None:
         version = latest_version(name)

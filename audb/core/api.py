@@ -93,7 +93,7 @@ def cached(
         name: str = None,
         shared: bool = False,
 ) -> pd.DataFrame:
-    r"""List available databases in the cache.
+    r"""List available databases and flavors in the cache.
 
     Args:
         cache_root: cache folder where databases are stored.
@@ -101,12 +101,43 @@ def cached(
         name: name of database.
             If provided,
             it will show only cached versions of that database
-        shared: list shared databases
+        shared: include databases from shared cache
 
     Returns:
         cached databases
+        with cache path as index,
+        and name,
+        flavor_id,
+        version,
+        complete,
+        bit_depth,
+        channels,
+        format,
+        mixdown,
+        sampling_rate
+        as columns
 
-    """
+    Example:
+        >>> db = audb.load(
+        ...     'emodb',
+        ...     version='1.1.1',
+        ...     only_metadata=True,
+        ...     full_path=False,
+        ...     verbose=False,
+        ... )
+        >>> df = cached()
+        >>> print(df.iloc[0].to_string())
+        name                emodb
+        flavor_id        d3b62a9b
+        version             1.1.1
+        complete            False
+        bit_depth            None
+        channels             None
+        format               None
+        mixdown             False
+        sampling_rate        None
+
+    """  # noqa: E501
     cache_root = audeer.safe_path(
         cache_root or default_cache_root(shared=shared)
     )
@@ -236,12 +267,17 @@ def dependencies(
 
     Args:
         name: name of database
-        version: version string
+        version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
     Returns:
         dependency object
+
+    Example:
+        >>> deps = dependencies('emodb', version='1.1.1')
+        >>> deps.version('db.emotion.csv')
+        '1.1.0'
 
     """
     if version is None:
@@ -323,6 +359,18 @@ def exists(
     Returns:
         ``True`` if database flavor exists
 
+    Example:
+        >>> db = audb.load(
+        ...     'emodb',
+        ...     version='1.1.1',
+        ...     only_metadata=True,
+        ...     verbose=False,
+        ... )
+        >>> audb.exists('emodb', version='1.1.1')
+        True
+        >>> audb.exists('emodb', version='1.1.1', format='wav')
+        False
+
     """
     # Map mix to channels and mixdown
     if (
@@ -400,6 +448,10 @@ def flavor_path(
     Returns:
         flavor path relative to cache folder
 
+    Example:
+        >>> flavor_path('emodb', version='1.1.1')
+        'emodb/1.1.1/d3b62a9b'
+
     """
     flavor = Flavor(
         channels=channels,
@@ -423,6 +475,10 @@ def latest_version(
     Returns:
         version string
 
+    Example:
+        >>> latest_version('emodb')
+        '1.1.1'
+
     """
     vs = versions(name)
     if not vs:
@@ -439,6 +495,11 @@ def remove_media(
         verbose: bool = False,
 ):
     r"""Remove media from all versions.
+
+    Be careful,
+    this removes files from all published versions
+    on all backends.
+    Those files cannot be restored afterwards.
 
     Args:
         name: name of database
@@ -525,6 +586,10 @@ def versions(
 
     Returns:
         list of versions
+
+    Example:
+        >>> versions('emodb')
+        ['1.1.0', '1.1.1']
 
     """
     vs = []
