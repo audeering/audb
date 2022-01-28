@@ -277,10 +277,8 @@ class Dependencies:
                 path,
             )
         if extension == 'pkl':
-            self._df = pd.read_pickle(
-                path,
-                protocol=4,  # supported by Python >= 3.4
-            )
+            self._df = pd.read_pickle(path)
+
         elif extension == 'csv':
             # Data type of dependency columns
             dtype_mapping = {
@@ -335,7 +333,10 @@ class Dependencies:
         if path.endswith('csv'):
             self._df.to_csv(path)
         elif path.endswith('pkl'):
-            self._df.to_pickle(path)
+            self._df.to_pickle(
+                path,
+                protocol=4,  # supported by Python >= 3.4
+            )
 
     def type(self, file: str) -> int:
         r"""Type of file.
