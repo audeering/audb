@@ -8,6 +8,7 @@ from audb.core.api import (
     flavor_path,
     latest_version,
     remove_media,
+    repository,
     versions,
 )
 from audb.core.backward import get_default_cache_root
@@ -22,7 +23,6 @@ from audb.core.load import (
 from audb.core.load_to import load_to
 from audb.core.publish import publish
 from audb.core.repository import Repository
-from audb.core.utils import repository
 
 
 __all__ = []

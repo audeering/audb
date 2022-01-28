@@ -33,35 +33,6 @@ def lookup_backend(
     return _lookup(name, version)[1]
 
 
-def repository(
-        name: str,
-        version: str,
-) -> Repository:
-    r"""Return repository that stores the requested database.
-
-    If the database is stored in several repositories,
-    only the first one is returned.
-    The order of the repositories to look for the database
-    is given by :attr:`config.REPOSITORIES`.
-
-    Args:
-        name: database name
-        version: version string
-
-    Returns:
-        repository that contains the database
-
-    Raises:
-        RuntimeError: if database is not found
-
-    Example:
-        >>> audb.repository('emodb', '1.1.1')
-        Repository('data-public', 'https://audeering.jfrog.io/artifactory', 'artifactory')
-
-    """  # noqa: E501
-    return _lookup(name, version)[0]
-
-
 def mix_mapping(
         mix: str,
         warn: bool = True,
