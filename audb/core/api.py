@@ -304,7 +304,9 @@ def dependencies(
     deps_path = os.path.join(deps_root, define.CACHED_DEPENDENCIES_FILE)
 
     deps = Dependencies()
-    if not os.path.exists(deps_path):
+    try:
+        deps.load(deps_path)
+    except (FileNotFoundError, ValueError, EOFError):
         backend = lookup_backend(name, version)
         with tempfile.TemporaryDirectory() as tmp_root:
             archive = backend.join(name, define.DB)
@@ -315,8 +317,6 @@ def dependencies(
             )
             deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
             deps.save(deps_path)
-    else:
-        deps.load(deps_path)
 
     return deps
 
