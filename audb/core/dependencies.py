@@ -277,7 +277,10 @@ class Dependencies:
                 path,
             )
         if extension == 'pkl':
-            self._df = pd.read_pickle(path)
+            self._df = pd.read_pickle(
+                path,
+                protocol=4,  # supported by Python >= 3.4
+            )
         elif extension == 'csv':
             # Data type of dependency columns
             dtype_mapping = {
