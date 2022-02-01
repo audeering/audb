@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.2.2
+                v1.2.3
               </div>
             
           
@@ -241,7 +241,7 @@ all the media files,
 and tables with annotations
 to a caching folder on your machine.
 The database is then returned
-as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.12.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
+as an <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.13.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
 <p>Each database comes with a description,
 which is a good starting point
 to learn what the database is all about.</p>
@@ -258,7 +258,7 @@ to learn what the database is all about.</p>
 </div>
 </div>
 <p>The annotations of a database are stored in
-tables represented by <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Table" title="(in audformat vv0.12.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Table</span></code></a>.</p>
+tables represented by <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Table" title="(in audformat vv0.13.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Table</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
@@ -281,8 +281,8 @@ files:
 </div>
 </div>
 </div>
-<p>Each table contains columns (<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Column" title="(in audformat vv0.12.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Column</span></code></a>)
-that have corresponding schemes (<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Scheme" title="(in audformat vv0.12.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Scheme</span></code></a>)
+<p>Each table contains columns (<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Column" title="(in audformat vv0.13.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Column</span></code></a>)
+that have corresponding schemes (<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Scheme" title="(in audformat vv0.13.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Scheme</span></code></a>)
 describing its content.
 For example,
 to get an idea about the emotion annotations
@@ -303,7 +303,7 @@ labels: [anger, boredom, disgust, fear, happiness, sadness, neutral]
 </div>
 </div>
 <p>Finally, we get the actual annotations
-as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.3.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
+as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;emotion&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>  <span class="c1"># get table</span>
@@ -384,7 +384,7 @@ as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/s
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

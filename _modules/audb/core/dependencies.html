@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.2
+                v1.2.3
               </div>
             
           
@@ -489,7 +489,10 @@
         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;pkl&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span>
+                <span class="n">protocol</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># supported by Python &gt;= 3.4</span>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dependencies.type"><a class="viewcode-back" href="../../../api.html#audb.Dependencies.type">[docs]</a>    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type of file.</span>
@@ -657,7 +660,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.2.2
+                v1.2.3
               </div>
             
           
@@ -173,7 +173,7 @@
 <div class="section" id="publish-a-database">
 <span id="publish"></span><h1>Publish a database<a class="headerlink" href="#publish-a-database" title="Permalink to this headline">¶</a></h1>
 <p>To publish a database we need to first create
-and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.12.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
+and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.13.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
 Afterwards we publish the database to a <a class="reference internal" href="api.html#audb.Repository" title="audb.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>.
 Finally,
 we add more files
@@ -181,7 +181,7 @@ and release a new version.</p>
 <div class="section" id="create-a-database">
 <h2>Create a database<a class="headerlink" href="#create-a-database" title="Permalink to this headline">¶</a></h2>
 <p>We can create an example database
-with the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.12.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
+with the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.13.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audformat.testing</span>
@@ -268,15 +268,15 @@ tables:
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>56</td>
+      <td>68</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>60</td>
+      <td>77</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>73</td>
+      <td>41</td>
     </tr>
   </tbody>
 </table>
@@ -421,24 +421,24 @@ and information about audio metadata.</p>
 <div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>data/
   data-local/
     age-test/
-      db/
-        1.0.0/
-          db-1.0.0.zip
-          db-1.0.0.yaml
       media/
-        436c65ec-1e42-f9de-2708-ecafe07e827e/
-          1.0.0/
-            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
-        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
-          1.0.0/
-            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
         fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
           1.0.0/
             fda7e4d6-f2b2-4cff-cab5-906ef5d57607-1.0.0.zip
+        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
+          1.0.0/
+            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
+        436c65ec-1e42-f9de-2708-ecafe07e827e/
+          1.0.0/
+            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
       meta/
         age/
           1.0.0/
             age-1.0.0.zip
+      db/
+        1.0.0/
+          db-1.0.0.zip
+          db-1.0.0.yaml
 </pre></div>
 </div>
 </div>
@@ -564,15 +564,15 @@ and add the age annotation of 22 to it.</p>
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>56</td>
+      <td>68</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>60</td>
+      <td>77</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>73</td>
+      <td>41</td>
     </tr>
     <tr>
       <th>audio/004.wav</th>
@@ -712,32 +712,32 @@ We can again inspect the repository.</p>
 <div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>data/
   data-local/
     age-test/
-      db/
-        1.0.0/
-          db-1.0.0.zip
-          db-1.0.0.yaml
-        1.1.0/
-          db-1.1.0.yaml
-          db-1.1.0.zip
       media/
-        436c65ec-1e42-f9de-2708-ecafe07e827e/
-          1.0.0/
-            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
-        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
-          1.0.0/
-            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
         fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
           1.0.0/
             fda7e4d6-f2b2-4cff-cab5-906ef5d57607-1.0.0.zip
+        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
+          1.0.0/
+            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
         ef4d1e81-6488-95cf-a165-604d1e47d575/
           1.1.0/
             ef4d1e81-6488-95cf-a165-604d1e47d575-1.1.0.zip
+        436c65ec-1e42-f9de-2708-ecafe07e827e/
+          1.0.0/
+            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
       meta/
         age/
-          1.0.0/
-            age-1.0.0.zip
           1.1.0/
             age-1.1.0.zip
+          1.0.0/
+            age-1.0.0.zip
+      db/
+        1.1.0/
+          db-1.1.0.yaml
+          db-1.1.0.zip
+        1.0.0/
+          db-1.0.0.zip
+          db-1.0.0.yaml
 </pre></div>
 </div>
 </div>
@@ -843,7 +843,7 @@ to see how to load and use a database.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

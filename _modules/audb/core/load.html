@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.2
+                v1.2.3
               </div>
             
           
@@ -939,6 +939,17 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        database object</span>
 
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; db = audb.load(</span>
+<span class="sd">        ...     &#39;emodb&#39;,</span>
+<span class="sd">        ...     version=&#39;1.1.1&#39;,</span>
+<span class="sd">        ...     only_metadata=True,</span>
+<span class="sd">        ...     full_path=False,</span>
+<span class="sd">        ...     verbose=False,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; list(db.tables)</span>
+<span class="sd">        [&#39;emotion&#39;, &#39;files&#39;]</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -1351,7 +1362,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/01/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
