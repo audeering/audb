@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.3 (2022-02-01)
+--------------------------
+
+* Added: more examples to the API docstrings
+* Changed: depend on ``audformat>=0.13.2``
+* Changed: use pickle protocol-4 for caching dependencies
+
+
 Version 1.2.2 (2022-01-03)
 --------------------------
 
