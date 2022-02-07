@@ -306,7 +306,8 @@ def dependencies(
     deps = Dependencies()
     try:
         deps.load(deps_path)
-    except (FileNotFoundError, ValueError, EOFError):
+    except (AttributeError, FileNotFoundError, ValueError, EOFError):
+        # If loading pickled cached file fails, load again from backend
         backend = lookup_backend(name, version)
         with tempfile.TemporaryDirectory() as tmp_root:
             archive = backend.join(name, define.DB)
