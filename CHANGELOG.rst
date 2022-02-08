@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.4 (2022-02-07)
+--------------------------
+
+* Changed: depend on ``audformat>=0.13.3``
+* Fixed: conversion of pickle protocol 5 files to pickle protocol 4 in cache
+
+
 Version 1.2.3 (2022-02-01)
 --------------------------
 
