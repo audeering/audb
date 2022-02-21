@@ -81,6 +81,18 @@ def mix_mapping(
     return channels, mixdown
 
 
+def mkdir_tree(
+        files: typing.Sequence[str],
+        root: str,
+):
+    r"""Helper function to create folder tree."""
+    folders = set()
+    for file in files:
+        folders.add(os.path.dirname(file))
+    for folder in folders:
+        audeer.mkdir(os.path.join(root, folder))
+
+
 def _lookup(
         name: str,
         version: str,
@@ -108,15 +120,3 @@ def _lookup(
         f'for database '
         f"'{name}'."
     )
-
-
-def _mkdir_tree(
-        files: typing.Sequence[str],
-        root: str,
-):
-    r"""Helper function to create folder tree."""
-    folders = set()
-    for file in files:
-        folders.add(os.path.dirname(file))
-    for folder in folders:
-        audeer.mkdir(os.path.join(root, folder))

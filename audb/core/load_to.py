@@ -94,8 +94,8 @@ def _get_media(
 
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
-    utils._mkdir_tree(media, db_root)
-    utils._mkdir_tree(media, db_root_tmp)
+    utils.mkdir_tree(media, db_root)
+    utils.mkdir_tree(media, db_root_tmp)
 
     # figure out archives
     archives = set()

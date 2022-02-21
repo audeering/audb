@@ -215,8 +215,8 @@ def _get_media_from_backend(
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
     # using multi-processing
-    utils._mkdir_tree(media, db_root)
-    utils._mkdir_tree(media, db_root_tmp)
+    utils.mkdir_tree(media, db_root)
+    utils.mkdir_tree(media, db_root_tmp)
 
     def job(archive: str, version: str):
         archive = backend.join(
