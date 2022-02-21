@@ -11,6 +11,7 @@ import audeer
 import audformat
 
 from audb.core import define
+from audb.core import utils
 from audb.core.api import (
     cached,
     default_cache_root,
@@ -214,9 +215,8 @@ def _get_media_from_backend(
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
     # using multi-processing
-    for file in media:
-        audeer.mkdir(os.path.dirname(os.path.join(db_root, file)))
-        audeer.mkdir(os.path.dirname(os.path.join(db_root_tmp, file)))
+    utils.mkdir_tree(media, db_root)
+    utils.mkdir_tree(media, db_root_tmp)
 
     def job(archive: str, version: str):
         archive = backend.join(

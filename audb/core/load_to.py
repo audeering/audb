@@ -7,6 +7,7 @@ import audeer
 import audformat
 
 from audb.core import define
+from audb.core import utils
 from audb.core.api import (
     dependencies,
     latest_version,
@@ -93,9 +94,8 @@ def _get_media(
 
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
-    for file in media:
-        audeer.mkdir(os.path.dirname(os.path.join(db_root, file)))
-        audeer.mkdir(os.path.dirname(os.path.join(db_root_tmp, file)))
+    utils.mkdir_tree(media, db_root)
+    utils.mkdir_tree(media, db_root_tmp)
 
     # figure out archives
     archives = set()

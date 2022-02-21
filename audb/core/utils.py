@@ -1,7 +1,9 @@
+import os
 import typing
 import warnings
 
 import audbackend
+import audeer
 
 from audb.core.config import config
 from audb.core.repository import Repository
@@ -77,6 +79,18 @@ def mix_mapping(
             "is no longer supported."
         )
     return channels, mixdown
+
+
+def mkdir_tree(
+        files: typing.Sequence[str],
+        root: str,
+):
+    r"""Helper function to create folder tree."""
+    folders = set()
+    for file in files:
+        folders.add(os.path.dirname(file))
+    for folder in folders:
+        audeer.mkdir(os.path.join(root, folder))
 
 
 def _lookup(
