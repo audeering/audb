@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.5 (2022-02-23)
+--------------------------
+
+* Fixed: make moving of local files Windows compatible
+* Fixed: create folder tree more efficiently when loading to cache
+
+
 Version 1.2.4 (2022-02-07)
 --------------------------
 
