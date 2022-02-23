@@ -565,7 +565,7 @@ def _move_file(
         file: str,
 ):
     r"""Move file to another directory."""
-    shutil.move(
+    os.replace(
         os.path.join(root_src, file),
         os.path.join(root_dst, file),
     )
