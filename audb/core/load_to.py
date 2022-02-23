@@ -169,7 +169,7 @@ def _move_file(
 ):
     r"""Move file to another directory."""
 
-    os.rename(
+    os.replace(
         os.path.join(root_src, file),
         os.path.join(root_dst, file),
     )
