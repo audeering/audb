@@ -158,8 +158,6 @@ def test_load_save(deps):
     deps.save(deps_file)
     deps2 = audb.Dependencies()
     deps2.load(deps_file)
-    print(deps())
-    print(deps2())
     pd.testing.assert_frame_equal(deps(), deps2())
     os.remove(deps_file)
     # Wrong extension or file missng
