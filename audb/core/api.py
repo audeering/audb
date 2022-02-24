@@ -441,8 +441,8 @@ def flavor_path(
         flavor path relative to cache folder
 
     Example:
-        >>> flavor_path('emodb', version='1.1.1')
-        'emodb/1.1.1/d3b62a9b'
+        >>> flavor_path('emodb', version='1.1.1').split(os.path.sep)
+        ['emodb', '1.1.1', 'd3b62a9b']
 
     """
     flavor = Flavor(
