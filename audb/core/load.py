@@ -1009,7 +1009,8 @@ def load_media(
         ...     format='flac',
         ...     verbose=False,
         ... )
-        >>> paths[0].split(os.path.sep)[-5:]
+        >>> path = os.path.normpath(paths[0])
+        >>> path.split(os.path.sep)[-5:]
         ['emodb', '1.1.1', '40bb2241', 'wav', '03a01Fa.flac']
 
     """
