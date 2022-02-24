@@ -405,9 +405,10 @@ def publish(
     if not db.is_portable:
         raise RuntimeError(
             "Some files in the tables have absolute paths "
-            "or use '.' or '..' to address a folder. "
-            "Please replace those paths by relative paths "
-            "and use folder names instead of dots."
+            "or use '\\', '.', '..' in its path. "
+            "Please replace those paths by relative paths, "
+            "use folder names instead of dots, "
+            "and avoid Windows path notation."
         )
     _check_for_duplicates(db, num_workers, verbose)
 
