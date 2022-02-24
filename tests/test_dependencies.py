@@ -52,7 +52,7 @@ def deps():
         columns=audb.core.define.DEPEND_FIELD_NAMES.values(),
         index=list(ENTRIES.keys()),
     )
-    # Ensure corerct dtype
+    # Ensure correct dtype
     for name, dtype in zip(
             audb.core.define.DEPEND_FIELD_NAMES.values(),
             audb.core.define.DEPEND_FIELD_DTYPES.values(),
