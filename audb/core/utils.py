@@ -35,6 +35,18 @@ def lookup_backend(
     return _lookup(name, version)[1]
 
 
+def move_file(
+        root_src: str,
+        root_dst: str,
+        file: str,
+):
+    r"""Move file to another directory."""
+    os.replace(
+        os.path.join(root_src, file),
+        os.path.join(root_dst, file),
+    )
+
+
 def mkdir_tree(
         files: typing.Sequence[str],
         root: str,

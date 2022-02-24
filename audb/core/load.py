@@ -122,7 +122,7 @@ def _copy_file(
     audeer.mkdir(os.path.dirname(tmp_path))
     audeer.mkdir(os.path.dirname(dst_path))
     shutil.copy(src_path, tmp_path)
-    _move_file(root_tmp, root_dst, file)
+    utils.move_file(root_tmp, root_dst, file)
 
 
 def _database_check_complete(
@@ -150,7 +150,7 @@ def _database_check_complete(
         db_original = audformat.Database.load(db_root, load_data=False)
         db_original.meta['audb']['complete'] = True
         db_original.save(db_root_tmp, header_only=True)
-        _move_file(db_root_tmp, db_root, define.HEADER_FILE)
+        utils.move_file(db_root_tmp, db_root, define.HEADER_FILE)
 
 
 def _database_is_complete(
@@ -244,7 +244,7 @@ def _get_media_from_backend(
                 if src_path != dst_path:
                     os.remove(src_path)
 
-            _move_file(db_root_tmp, db_root, file)
+            utils.move_file(db_root_tmp, db_root, file)
 
     audeer.run_tasks(
         job,
@@ -325,7 +325,8 @@ def _get_tables_from_backend(
             audformat.define.TableStorageFormat.PICKLE,
             audformat.define.TableStorageFormat.CSV,
         ]:
-            _move_file(db_root_tmp, db_root, f'db.{table_id}.{storage_format}')
+            file = f'db.{table_id}.{storage_format}'
+            utils.move_file(db_root_tmp, db_root, file)
 
     audeer.run_tasks(
         job,
@@ -556,18 +557,6 @@ def _missing_tables(
         if not os.path.exists(path):
             missing_tables.append(file)
     return missing_tables
-
-
-def _move_file(
-        root_src: str,
-        root_dst: str,
-        file: str,
-):
-    r"""Move file to another directory."""
-    os.replace(
-        os.path.join(root_src, file),
-        os.path.join(root_dst, file),
-    )
 
 
 def _remove_media(
@@ -943,7 +932,7 @@ def load_header(
                 'complete': False,
             }
             db.save(db_root_tmp, header_only=True)
-            _move_file(db_root_tmp, db_root, define.HEADER_FILE)
+            utils.move_file(db_root_tmp, db_root, define.HEADER_FILE)
     return audformat.Database.load(db_root, load_data=False), backend
 
 

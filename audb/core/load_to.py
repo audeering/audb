@@ -112,7 +112,7 @@ def _get_media(
         )
         files = backend.get_archive(archive, db_root_tmp, version)
         for file in files:
-            _move_file(db_root_tmp, db_root, file)
+            utils.move_file(db_root_tmp, db_root, file)
 
     audeer.run_tasks(
         job,
@@ -151,7 +151,7 @@ def _get_tables(
             deps.archive(table),
         )
         backend.get_archive(archive, db_root_tmp, deps.version(table))
-        _move_file(db_root_tmp, db_root, table)
+        utils.move_file(db_root_tmp, db_root, table)
 
     audeer.run_tasks(
         job,
@@ -159,19 +159,6 @@ def _get_tables(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Get tables',
-    )
-
-
-def _move_file(
-        root_src: str,
-        root_dst: str,
-        file: str,
-):
-    r"""Move file to another directory."""
-
-    os.replace(
-        os.path.join(root_src, file),
-        os.path.join(root_dst, file),
     )
 
 
@@ -207,12 +194,12 @@ def _save_database(
             num_workers=num_workers,
             verbose=verbose,
         )
-        _move_file(db_root_tmp, db_root, define.HEADER_FILE)
+        utils.move_file(db_root_tmp, db_root, define.HEADER_FILE)
         for path in glob.glob(
                 os.path.join(db_root_tmp, f'*.{storage_format}')
         ):
             file = os.path.relpath(path, db_root_tmp)
-            _move_file(db_root_tmp, db_root, file)
+            utils.move_file(db_root_tmp, db_root, file)
 
 
 def load_to(
@@ -288,7 +275,7 @@ def load_to(
     # load database
 
     # move header to root and load database ...
-    _move_file(db_root_tmp, db_root, define.HEADER_FILE)
+    utils.move_file(db_root_tmp, db_root, define.HEADER_FILE)
     try:
         db = audformat.Database.load(
             db_root,
@@ -313,7 +300,7 @@ def load_to(
 
     dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCIES_FILE)
     deps.save(dep_path_tmp)
-    _move_file(db_root_tmp, db_root, define.DEPENDENCIES_FILE)
+    utils.move_file(db_root_tmp, db_root, define.DEPENDENCIES_FILE)
 
     # save database and remove the temporal directory
     # to signal all files were correctly loaded
