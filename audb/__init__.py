@@ -11,7 +11,6 @@ from audb.core.api import (
     repository,
     versions,
 )
-from audb.core.backward import get_default_cache_root
 from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor

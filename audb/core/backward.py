@@ -11,14 +11,6 @@ from audb.core.dependencies import Dependencies
 from audb.core.utils import mix_mapping
 
 
-@audeer.deprecated(
-    removal_version='1.2.0',
-    alternative='default_cache_root',
-)
-def get_default_cache_root() -> str:
-    return default_cache_root()
-
-
 def include_exclude_mapping(
         deps: Dependencies,
         include: typing.Optional[typing.Union[str, typing.Sequence[str]]],
