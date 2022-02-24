@@ -18,7 +18,6 @@ from audb.core.api import (
     dependencies,
     latest_version,
 )
-from audb.core.backward import parse_deprecated_load_arguments
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
 from audb.core.utils import lookup_backend
@@ -726,7 +725,6 @@ def load(
         cache_root: str = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
-        **kwargs,
 ) -> audformat.Database:
     r"""Load database.
 
@@ -797,15 +795,6 @@ def load(
     if version is None:
         version = latest_version(name)
     deps = dependencies(name, version=version, cache_root=cache_root)
-
-    # backward compatibility to audb<1.0.0
-    channels, mixdown, media = parse_deprecated_load_arguments(
-        channels,
-        mixdown,
-        media,
-        deps,
-        kwargs,
-    )
 
     cached_versions = None
 
