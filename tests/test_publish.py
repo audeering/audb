@@ -70,13 +70,13 @@ def fixture_publish_db():
     audformat.testing.create_audio_files(db)
 
     # Extend version 2.0.0 by a new file
-    new_file = os.path.join('audio', 'new.wav')
+    new_file = 'audio/new.wav'
     db['files'].extend_index(audformat.filewise_index(new_file), inplace=True)
     db.save(DB_ROOT_VERSION['2.0.0'])
     audformat.testing.create_audio_files(db)
 
     # Remove one file in version 3.0.0
-    remove_file = os.path.join('audio', '001.wav')
+    remove_file = 'audio/001.wav'
     db.drop_files(remove_file)
     db.save(DB_ROOT_VERSION['3.0.0'])
     audformat.testing.create_audio_files(db)
@@ -131,7 +131,7 @@ def fixture_publish_db():
 def test_invalid_archives(name):
 
     archives = {
-        os.path.join('audio', '001.wav'): name
+        'audio/001.wav': name
     }
     with pytest.raises(ValueError):
         audb.publish(
@@ -258,12 +258,12 @@ def test_publish(version):
         (
             '2.0.0',
             '1.0.0',
-            [os.path.join('audio', 'new.wav')],
+            ['audio/new.wav'],
         ),
         (
             '2.0.0',
             '3.0.0',
-            [os.path.join('audio', '001.wav')],
+            ['audio/001.wav'],
         ),
         (
             '3.0.0',
@@ -273,12 +273,12 @@ def test_publish(version):
         (
             '1.0.0',
             '3.0.0',
-            [os.path.join('audio', '001.wav')],
+            ['audio/001.wav'],
         ),
         (
             '3.0.0',
             '1.0.0',
-            [os.path.join('audio', 'new.wav')],
+            ['audio/new.wav'],
         ),
     ]
 )
@@ -381,7 +381,7 @@ def test_update_database():
         verbose=False,
     )
     # Remove one file as in version 3.0.0
-    remove_file = os.path.join('audio', '001.wav')
+    remove_file = 'audio/001.wav'
     remove_path = os.path.join(DB_ROOT_VERSION[version], remove_file)
     os.remove(remove_path)
     db.drop_files(remove_file)
