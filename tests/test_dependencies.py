@@ -52,6 +52,12 @@ def deps():
         columns=audb.core.define.DEPEND_FIELD_NAMES.values(),
         index=list(ENTRIES.keys()),
     )
+    # Ensure corerct dtype
+    for name, dtype in zip(
+            audb.core.define.DEPEND_FIELD_NAMES.values(),
+            audb.core.define.DEPEND_FIELD_DTYPES.values(),
+    ):
+        deps._df[name] = deps._df[name].astype(dtype)
     return deps
 
 
