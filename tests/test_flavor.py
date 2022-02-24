@@ -44,7 +44,7 @@ def test_init(bit_depth, channels, format, mixdown, sampling_rate):
         sampling_rate=sampling_rate,
     )
     flavor_s = flavor.to_yaml_s()
-    flavor_2 = audobject.Object.from_yaml_s(flavor_s)
+    flavor_2 = audobject.from_yaml_s(flavor_s)
     assert isinstance(flavor_2, audb.Flavor)
     assert flavor.id == flavor_2.id
 
