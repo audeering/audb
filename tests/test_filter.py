@@ -112,63 +112,6 @@ def fixture_clear_cache():
 
 
 @pytest.mark.parametrize(
-    'include, exclude, expected_files',
-    [
-        (
-            None,
-            None,
-            ['audio/000.wav', 'audio/001.wav',
-             'audio/010.wav', 'audio/011.wav',
-             'audio/1/020.wav', 'audio/2/021.wav'],
-        ),
-        (
-            't.*',
-            None,
-            ['audio/000.wav', 'audio/001.wav',
-             'audio/1/020.wav', 'audio/2/021.wav'],
-        ),
-        (
-            None,
-            't.*',
-            ['audio/010.wav', 'audio/011.wav'],
-        ),
-        (
-            't.*',
-            'train',
-            ['audio/000.wav', 'audio/001.wav'],
-        ),
-        (
-            ['test'],
-            None,
-            ['audio/000.wav', 'audio/001.wav'],
-        ),
-        (
-            None,
-            ['train', 'dev'],
-            ['audio/000.wav', 'audio/001.wav'],
-        ),
-        (
-            'test',
-            'test',
-            [],
-        ),
-    ]
-)
-def test_include_and_exclude(include, exclude, expected_files):
-    # Test for backward compatibility
-    with pytest.warns(UserWarning):
-        db = audb.load(
-            DB_NAME,
-            include=include,
-            exclude=exclude,
-            full_path=False,
-            num_workers=pytest.NUM_WORKERS,
-            verbose=False,
-        )
-    assert list(db.files) == expected_files
-
-
-@pytest.mark.parametrize(
     'media, format, expected_files',
     [
         (

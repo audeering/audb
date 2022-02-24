@@ -16,7 +16,6 @@ from audb.core.flavor import Flavor
 from audb.core.repository import Repository
 from audb.core.utils import (
     lookup_backend,
-    mix_mapping,
     _lookup,
 )
 
@@ -332,7 +331,6 @@ def exists(
     mixdown: bool = False,
     sampling_rate: int = None,
     cache_root: str = None,
-    **kwargs,
 ) -> bool:
     r"""Check if specified database flavor exists in local cache folder.
 
@@ -375,15 +373,6 @@ def exists(
         False
 
     """
-    # Map mix to channels and mixdown
-    if (
-            channels is None
-            and not mixdown
-            and 'mix' in kwargs
-    ):  # pragma: no cover
-        mix = kwargs['mix']
-        channels, mixdown = mix_mapping(mix)
-
     if version is None:
         version = latest_version(name)
 
