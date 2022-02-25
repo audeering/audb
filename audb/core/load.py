@@ -1009,8 +1009,7 @@ def load_media(
         ...     format='flac',
         ...     verbose=False,
         ... )
-        >>> path = os.path.normpath(paths[0])
-        >>> path.split(os.path.sep)[-5:]
+        >>> paths[0].split(os.path.sep)[-5:]
         ['emodb', '1.1.1', '40bb2241', 'wav', '03a01Fa.flac']
 
     """
@@ -1076,7 +1075,7 @@ def load_media(
     if format is not None:
         media = [audeer.replace_file_extension(m, format) for m in media]
 
-    return [os.path.join(db_root, m) for m in media]
+    return [os.path.join(db_root, os.path.normpath(m)) for m in media]
 
 
 def load_table(
