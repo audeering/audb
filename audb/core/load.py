@@ -625,7 +625,7 @@ def _update_path(
     def job(table):
         if full_path:
             table._df.index = audformat.utils.expand_file_path(
-                table._df.index,
+                table._df.index.map(os.path.normpath),
                 root,
             )
         if format is not None:
