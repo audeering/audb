@@ -176,6 +176,12 @@ def _files_duration(
     durs.index.name = 'file'
     if format is not None:
         durs.index = audformat.utils.replace_file_extension(durs.index, format)
+    # Norm file path under Windows to include `\`
+    if os.name == 'nt':  # pragma: nocover as tested in Windows runner
+        durs.index = audformat.utils.map_file_path(
+            durs.index,
+            os.path.normpath,
+        )
     durs.index = audformat.utils.expand_file_path(durs.index, db.root)
     db._files_duration = durs.to_dict()
 
