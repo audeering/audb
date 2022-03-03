@@ -224,7 +224,7 @@ def test_load(format, version):
     assert audb.exists(DB_NAME, version=version)
 
     files_duration = {
-        os.path.join(db_root, file): pd.to_timedelta(
+        os.path.join(db_root, os.path.normpath(file)): pd.to_timedelta(
             audiofile.duration(os.path.join(db_root, file)), unit='s')
         for file in db.files
     }
