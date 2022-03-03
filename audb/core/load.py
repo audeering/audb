@@ -122,7 +122,10 @@ def _copy_file(
     audeer.mkdir(os.path.dirname(tmp_path))
     audeer.mkdir(os.path.dirname(dst_path))
     shutil.copy(src_path, tmp_path)
-    _move_file(root_tmp, root_dst, file)
+    audeer.move_file(
+        os.path.join(root_tmp, file),
+        os.path.join(root_dst, file),
+    )
 
 
 def _database_check_complete(
@@ -150,7 +153,10 @@ def _database_check_complete(
         db_original = audformat.Database.load(db_root, load_data=False)
         db_original.meta['audb']['complete'] = True
         db_original.save(db_root_tmp, header_only=True)
-        _move_file(db_root_tmp, db_root, define.HEADER_FILE)
+        audeer.move_file(
+            os.path.join(db_root_tmp, define.HEADER_FILE),
+            os.path.join(db_root, define.HEADER_FILE),
+        )
 
 
 def _database_is_complete(
@@ -250,7 +256,10 @@ def _get_media_from_backend(
                 if src_path != dst_path:
                     os.remove(src_path)
 
-            _move_file(db_root_tmp, db_root, file)
+            audeer.move_file(
+                os.path.join(db_root_tmp, file),
+                os.path.join(db_root, file),
+            )
 
     audeer.run_tasks(
         job,
@@ -331,7 +340,11 @@ def _get_tables_from_backend(
             audformat.define.TableStorageFormat.PICKLE,
             audformat.define.TableStorageFormat.CSV,
         ]:
-            _move_file(db_root_tmp, db_root, f'db.{table_id}.{storage_format}')
+            file = f'db.{table_id}.{storage_format}'
+            audeer.move_file(
+                os.path.join(db_root_tmp, file),
+                os.path.join(db_root, file),
+            )
 
     audeer.run_tasks(
         job,
@@ -564,18 +577,6 @@ def _missing_tables(
     return missing_tables
 
 
-def _move_file(
-        root_src: str,
-        root_dst: str,
-        file: str,
-):
-    r"""Move file to another directory."""
-    os.replace(
-        os.path.join(root_src, file),
-        os.path.join(root_dst, file),
-    )
-
-
 def _remove_media(
         db: audformat.Database,
         deps: Dependencies,
@@ -683,17 +684,16 @@ def database_cache_folder(
         cache_roots = [cache_root]
     for cache_root in cache_roots:
         if flavor is None:
-            db_root = os.path.join(
+            db_root = audeer.path(
                 cache_root,
                 name,
                 version,
             )
         else:
-            db_root = os.path.join(
+            db_root = audeer.path(
                 cache_root,
                 flavor.path(name, version),
             )
-        db_root = audeer.safe_path(db_root)
         if os.path.exists(db_root):
             break
 
@@ -955,7 +955,10 @@ def load_header(
                 'complete': False,
             }
             db.save(db_root_tmp, header_only=True)
-            _move_file(db_root_tmp, db_root, define.HEADER_FILE)
+            audeer.move_file(
+                os.path.join(db_root_tmp, define.HEADER_FILE),
+                os.path.join(db_root, define.HEADER_FILE),
+            )
     return audformat.Database.load(db_root, load_data=False), backend
 
 

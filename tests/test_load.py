@@ -26,7 +26,7 @@ DB_ROOT_VERSION = {
 
 
 def clear_root(root: str):
-    root = audeer.safe_path(root)
+    root = audeer.path(root)
     if os.path.exists(root):
         shutil.rmtree(root)
 
@@ -124,7 +124,7 @@ def fixture_publish_db():
     audiofile.write(file, y, sr)
     file = db.files[-1]
     db.pick_files(lambda x: x != file)
-    os.remove(audeer.safe_path(os.path.join(DB_ROOT_VERSION['2.0.0'], file)))
+    os.remove(audeer.path(DB_ROOT_VERSION['2.0.0'], file))
     db.save(DB_ROOT_VERSION['2.0.0'])
 
     shutil.copy(

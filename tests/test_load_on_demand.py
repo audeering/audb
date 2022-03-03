@@ -23,7 +23,7 @@ DB_VERSION = '1.0.0'
 
 
 def clear_root(root: str):
-    root = audeer.safe_path(root)
+    root = audeer.path(root)
     if os.path.exists(root):
         shutil.rmtree(root)
 
