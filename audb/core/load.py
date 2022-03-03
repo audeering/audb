@@ -625,9 +625,15 @@ def _update_path(
     def job(table):
         if full_path:
             table._df.index = audformat.utils.expand_file_path(
-                table._df.index.map(os.path.normpath),
+                table._df.index,
                 root,
             )
+            # Norm file path under Windows to include `\`
+            if os.name == 'nt':  # pragma: nocover as tested in Windows runner
+                table._df.index = audformat.utils.map_file_path(
+                    table._df.index,
+                    os.path.normpath,
+                )
         if format is not None:
             table._df.index = audformat.utils.replace_file_extension(
                 table._df.index,
