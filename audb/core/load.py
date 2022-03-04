@@ -1,4 +1,3 @@
-from distutils.version import LooseVersion
 import os
 import re
 import shutil
@@ -28,7 +27,7 @@ def _cached_versions(
         version: str,
         flavor: Flavor,
         cache_root: typing.Optional[str],
-) -> typing.Sequence[typing.Tuple[LooseVersion, str, Dependencies]]:
+) -> typing.Sequence[typing.Tuple[audeer.LooseVersion, str, Dependencies]]:
     r"""Find other cached versions of same flavor."""
 
     df = cached(cache_root=cache_root, name=name)
@@ -53,7 +52,7 @@ def _cached_versions(
             cached_versions.insert(
                 0,
                 (
-                    LooseVersion(row['version']),
+                    audeer.LooseVersion(row['version']),
                     flavor_root,
                     deps,
                 ),
@@ -66,7 +65,7 @@ def _cached_files(
         files: typing.Sequence[str],
         deps: Dependencies,
         cached_versions: typing.Sequence[
-            typing.Tuple[LooseVersion, str, Dependencies],
+            typing.Tuple[audeer.LooseVersion, str, Dependencies],
         ],
         flavor: typing.Optional[Flavor],
         verbose: bool,
@@ -82,7 +81,7 @@ def _cached_files(
             disable=not verbose,
     ):
         found = False
-        file_version = LooseVersion(deps.version(file))
+        file_version = audeer.LooseVersion(deps.version(file))
         for cache_version, cache_root, cache_deps in cached_versions:
             if cache_version >= file_version:
                 if file in cache_deps:
@@ -276,7 +275,7 @@ def _get_media_from_cache(
         db_root_tmp: str,
         deps: Dependencies,
         cached_versions: typing.Sequence[
-            typing.Tuple[LooseVersion, str, Dependencies]
+            typing.Tuple[audeer.LooseVersion, str, Dependencies]
         ],
         flavor: Flavor,
         num_workers: int,
@@ -361,7 +360,7 @@ def _get_tables_from_cache(
         db_root_tmp: str,
         deps: Dependencies,
         cached_versions: typing.Sequence[
-            typing.Tuple[LooseVersion, str, Dependencies]
+            typing.Tuple[audeer.LooseVersion, str, Dependencies]
         ],
         num_workers: int,
         verbose: bool,
@@ -403,7 +402,9 @@ def _load_media(
         name: str,
         version: str,
         cached_versions: typing.Optional[
-            typing.Sequence[typing.Tuple[LooseVersion, str, Dependencies]]
+            typing.Sequence[
+                typing.Tuple[audeer.LooseVersion, str, Dependencies]
+            ]
         ],
         deps: Dependencies,
         flavor: Flavor,
@@ -468,7 +469,9 @@ def _load_tables(
         db: audformat.Database,
         version: str,
         cached_versions: typing.Optional[
-            typing.Sequence[typing.Tuple[LooseVersion, str, Dependencies]]
+            typing.Sequence[
+                typing.Tuple[audeer.LooseVersion, str, Dependencies],
+            ]
         ],
         deps: Dependencies,
         flavor: Flavor,
