@@ -21,19 +21,19 @@ DB_NAME = f'test_convert-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 
 DB_FILES = {
-    os.path.join('audio', 'file1.wav'): {
+    'audio/file1.wav': {
         'bit_depth': 16,
         'channels': 1,
         'format': 'wav',
         'sampling_rate': 8000,
     },
-    os.path.join('audio', 'file2.wav'): {
+    'audio/file2.wav': {
         'bit_depth': 24,
         'channels': 2,
         'format': 'wav',
         'sampling_rate': 16000,
     },
-    os.path.join('audio', 'file3.flac'): {
+    'audio/file3.flac': {
         'bit_depth': 8,
         'channels': 3,
         'format': 'flac',

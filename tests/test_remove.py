@@ -18,12 +18,12 @@ DB_NAME = f'test_remove-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_FILES = {
     '1.0.0': [
-        os.path.join('audio', 'bundle1.wav'),
-        os.path.join('audio', 'bundle2.wav'),
-        os.path.join('audio', 'single.wav'),
+        'audio/bundle1.wav',
+        'audio/bundle2.wav',
+        'audio/single.wav',
     ],
     '2.0.0': [
-        os.path.join('audio', 'new.wav'),
+        'audio/new.wav',
     ],
 }
 

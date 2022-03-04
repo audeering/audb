@@ -224,7 +224,7 @@ def test_load(format, version):
     assert audb.exists(DB_NAME, version=version)
 
     files_duration = {
-        os.path.join(db_root, file): pd.to_timedelta(
+        os.path.join(db_root, os.path.normpath(file)): pd.to_timedelta(
             audiofile.duration(os.path.join(db_root, file)), unit='s')
         for file in db.files
     }
@@ -274,7 +274,8 @@ def test_load(format, version):
         assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
 
     files_duration = {
-        file: pd.to_timedelta(audiofile.duration(file), unit='s')
+        os.path.normpath(file):
+        pd.to_timedelta(audiofile.duration(file), unit='s')
         for file in db.files
     }
     assert db._files_duration == files_duration

@@ -176,6 +176,12 @@ def _files_duration(
     durs.index.name = 'file'
     if format is not None:
         durs.index = audformat.utils.replace_file_extension(durs.index, format)
+    # Norm file path under Windows to include `\`
+    if os.name == 'nt':  # pragma: nocover as tested in Windows runner
+        durs.index = audformat.utils.map_file_path(
+            durs.index,
+            os.path.normpath,
+        )
     durs.index = audformat.utils.expand_file_path(durs.index, db.root)
     db._files_duration = durs.to_dict()
 
@@ -628,6 +634,12 @@ def _update_path(
                 table._df.index,
                 root,
             )
+            # Norm file path under Windows to include `\`
+            if os.name == 'nt':  # pragma: nocover as tested in Windows runner
+                table._df.index = audformat.utils.map_file_path(
+                    table._df.index,
+                    os.path.normpath,
+                )
         if format is not None:
             table._df.index = audformat.utils.replace_file_extension(
                 table._df.index,
@@ -1009,9 +1021,8 @@ def load_media(
         ...     format='flac',
         ...     verbose=False,
         ... )
-        >>> cache_root = audb.default_cache_root()
-        >>> [p[len(cache_root):] for p in paths]
-        ['/emodb/1.1.1/40bb2241/wav/03a01Fa.flac']
+        >>> paths[0].split(os.path.sep)[-5:]
+        ['emodb', '1.1.1', '40bb2241', 'wav', '03a01Fa.flac']
 
     """
     media = audeer.to_list(media)
@@ -1076,7 +1087,7 @@ def load_media(
     if format is not None:
         media = [audeer.replace_file_extension(m, format) for m in media]
 
-    return [os.path.join(db_root, m) for m in media]
+    return [os.path.join(db_root, os.path.normpath(m)) for m in media]
 
 
 def load_table(
