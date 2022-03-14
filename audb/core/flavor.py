@@ -248,8 +248,8 @@ class Flavor(audobject.Object):
                 and the input format is not WAV or FLAC
 
         """
-        src_path = audeer.safe_path(src_path)
-        dst_path = audeer.safe_path(dst_path)
+        src_path = audeer.path(src_path)
+        dst_path = audeer.path(dst_path)
 
         # verify that extension matches the output format
         src_ext = audeer.file_extension(src_path).lower()

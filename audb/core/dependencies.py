@@ -263,7 +263,7 @@ class Dependencies:
 
         """
         self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
-        path = audeer.safe_path(path)
+        path = audeer.path(path)
         extension = audeer.file_extension(path)
         if extension not in ['csv', 'pkl']:
             raise ValueError(
@@ -328,7 +328,7 @@ class Dependencies:
                 File extension can be ``csv`` or ``pkl``
 
         """
-        path = audeer.safe_path(path)
+        path = audeer.path(path)
         if path.endswith('csv'):
             self._df.to_csv(path)
         elif path.endswith('pkl'):

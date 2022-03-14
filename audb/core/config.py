@@ -61,7 +61,7 @@ def load_configuration_file(config_file: str):
 # Read in configuration from global and user file
 root = os.path.dirname(os.path.realpath(__file__))
 global_config_file = os.path.join(root, CONFIG_FILE)
-user_config_file = audeer.safe_path(USER_CONFIG_FILE)
+user_config_file = audeer.path(USER_CONFIG_FILE)
 global_config = load_configuration_file(global_config_file)
 user_config = load_configuration_file(user_config_file)
 global_config.update(user_config)

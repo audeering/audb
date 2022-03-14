@@ -8,11 +8,9 @@ import audb
 import audeer
 
 
-pytest.ROOT = audeer.safe_path(
-    os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        'tmp',
-    )
+pytest.ROOT = audeer.path(
+    os.path.dirname(os.path.realpath(__file__)),
+    'tmp',
 )
 
 pytest.BACKEND = 'file-system'

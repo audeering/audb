@@ -13,8 +13,8 @@ os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 @pytest.mark.parametrize(
     'shared, expected',
     [
-        (False, audeer.safe_path(pytest.CACHE_ROOT)),
-        (True, audeer.safe_path(pytest.SHARED_CACHE_ROOT)),
+        (False, audeer.path(pytest.CACHE_ROOT)),
+        (True, audeer.path(pytest.SHARED_CACHE_ROOT)),
     ]
 )
 def test_cache_root(shared, expected):
@@ -24,7 +24,7 @@ def test_cache_root(shared, expected):
 def test_empty_shared_cache():
     # Handle non-existing cache folder
     # See https://github.com/audeering/audb/issues/125
-    assert not os.path.exists(audeer.safe_path(pytest.SHARED_CACHE_ROOT))
+    assert not os.path.exists(audeer.path(pytest.SHARED_CACHE_ROOT))
     df = audb.cached(shared=True)
     assert len(df) == 0
     # Handle empty shared cache folder

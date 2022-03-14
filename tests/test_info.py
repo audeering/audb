@@ -37,7 +37,7 @@ DB_ROOT = os.path.join(pytest.ROOT, 'db')
 
 
 def clear_root(root: str):
-    root = audeer.safe_path(root)
+    root = audeer.path(root)
     if os.path.exists(root):
         shutil.rmtree(root)
 

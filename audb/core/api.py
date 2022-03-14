@@ -139,7 +139,7 @@ def cached(
         sampling_rate        None
 
     """  # noqa: E501
-    cache_root = audeer.safe_path(
+    cache_root = audeer.path(
         cache_root or default_cache_root(shared=shared)
     )
 
@@ -242,7 +242,7 @@ def default_cache_root(
         shared: if ``True`` returns path to shared cache folder
 
     Returns:
-        path normalized by :func:`audeer.safe_path`
+        path normalized by :func:`audeer.path`
 
     """
     if shared:
@@ -255,7 +255,7 @@ def default_cache_root(
             os.environ.get('AUDB_CACHE_ROOT')
             or config.CACHE_ROOT
         )
-    return audeer.safe_path(cache)
+    return audeer.path(cache)
 
 
 def dependencies(
@@ -289,12 +289,10 @@ def dependencies(
         default_cache_root(False),
     ] if cache_root is None else [cache_root]
     for cache_root in cache_roots:
-        deps_root = audeer.safe_path(
-            os.path.join(
-                cache_root,
-                name,
-                version,
-            )
+        deps_root = audeer.path(
+            cache_root,
+            name,
+            version,
         )
         if os.path.exists(deps_root):
             break
@@ -391,9 +389,7 @@ def exists(
         default_cache_root(False),
     ] if cache_root is None else [cache_root]
     for cache_root in cache_roots:
-        db_root = audeer.safe_path(
-            os.path.join(cache_root, relative_flavor_path)
-        )
+        db_root = audeer.path(cache_root, relative_flavor_path)
         if os.path.exists(db_root):
             return True
 
