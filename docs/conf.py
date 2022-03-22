@@ -87,7 +87,7 @@ audb.config.REPOSITORIES = [
     )
 ]
 database_name = 'emodb'
-database_version = '1.1.1'
+database_version = '1.2.0'
 if not audb.exists(database_name, version=database_version):
     print(f'Pre-caching {database_name} v{database_version}')
     audb.load(
