@@ -27,7 +27,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/audb
-        key: emodb-1.1.1-1
+        key: emodb-1.2.0
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
