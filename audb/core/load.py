@@ -130,7 +130,6 @@ def _copy_file(
 def _database_check_complete(
         db: audformat.Database,
         db_root: str,
-        db_root_tmp: str,
         flavor: Flavor,
         deps: Dependencies,
 ):
@@ -148,6 +147,7 @@ def _database_check_complete(
         return complete
 
     if check():
+        db_root_tmp = database_tmp_folder(db_root)
         db.meta['audb']['complete'] = True
         db_original = audformat.Database.load(db_root, load_data=False)
         db_original.meta['audb']['complete'] = True
@@ -156,6 +156,7 @@ def _database_check_complete(
             os.path.join(db_root_tmp, define.HEADER_FILE),
             os.path.join(db_root, define.HEADER_FILE),
         )
+        audeer.rmdir(db_root_tmp)
 
 
 def _database_is_complete(
@@ -195,7 +196,6 @@ def _get_media_from_backend(
         name: str,
         media: typing.Sequence[str],
         db_root: str,
-        db_root_tmp: str,
         flavor: typing.Optional[Flavor],
         deps: Dependencies,
         backend: audbackend.Backend,
@@ -225,6 +225,7 @@ def _get_media_from_backend(
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
     # using multi-processing
+    db_root_tmp = database_tmp_folder(db_root)
     utils.mkdir_tree(media, db_root)
     utils.mkdir_tree(media, db_root_tmp)
 
@@ -268,11 +269,12 @@ def _get_media_from_backend(
         task_description='Load media',
     )
 
+    audeer.rmdir(db_root_tmp)
+
 
 def _get_media_from_cache(
         media: typing.Sequence[str],
         db_root: str,
-        db_root_tmp: str,
         deps: Dependencies,
         cached_versions: typing.Sequence[
             typing.Tuple[audeer.LooseVersion, str, Dependencies]
@@ -290,6 +292,7 @@ def _get_media_from_cache(
         flavor,
         verbose,
     )
+    db_root_tmp = database_tmp_folder(db_root)
 
     def job(cache_root: str, file: str):
         _copy_file(file, cache_root, db_root_tmp, db_root)
@@ -302,6 +305,8 @@ def _get_media_from_cache(
         task_description='Copy media',
     )
 
+    audeer.rmdir(db_root_tmp)
+
     return missing_media
 
 
@@ -309,13 +314,13 @@ def _get_tables_from_backend(
         db: audformat.Database,
         tables: typing.Sequence[str],
         db_root: str,
-        db_root_tmp: str,
         deps: Dependencies,
         backend: audbackend.Backend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
     r"""Load tables from backend."""
+    db_root_tmp = database_tmp_folder(db_root)
 
     def job(table: str):
         archive = backend.join(
@@ -353,11 +358,12 @@ def _get_tables_from_backend(
         task_description='Load tables',
     )
 
+    audeer.rmdir(db_root_tmp)
+
 
 def _get_tables_from_cache(
         tables: typing.Sequence[str],
         db_root: str,
-        db_root_tmp: str,
         deps: Dependencies,
         cached_versions: typing.Sequence[
             typing.Tuple[audeer.LooseVersion, str, Dependencies]
@@ -374,6 +380,7 @@ def _get_tables_from_cache(
         None,
         verbose,
     )
+    db_root_tmp = database_tmp_folder(db_root)
 
     def job(cache_root: str, file: str):
         file_pkl = audeer.replace_file_extension(
@@ -391,6 +398,8 @@ def _get_tables_from_cache(
         task_description='Copy tables',
     )
 
+    audeer.rmdir(db_root_tmp)
+
     return missing_tables
 
 
@@ -398,7 +407,6 @@ def _load_media(
         media: typing.Sequence[str],
         backend: audbackend.Backend,
         db_root: str,
-        db_root_tmp: str,
         name: str,
         version: str,
         cached_versions: typing.Optional[
@@ -438,7 +446,6 @@ def _load_media(
             missing_media = _get_media_from_cache(
                 missing_media,
                 db_root,
-                db_root_tmp,
                 deps,
                 cached_versions,
                 flavor,
@@ -452,7 +459,6 @@ def _load_media(
                 name,
                 missing_media,
                 db_root,
-                db_root_tmp,
                 flavor,
                 deps,
                 backend,
@@ -465,7 +471,6 @@ def _load_tables(
         tables: typing.Sequence[str],
         backend: audbackend.Backend,
         db_root: str,
-        db_root_tmp: str,
         db: audformat.Database,
         version: str,
         cached_versions: typing.Optional[
@@ -504,7 +509,6 @@ def _load_tables(
             missing_tables = _get_tables_from_cache(
                 missing_tables,
                 db_root,
-                db_root_tmp,
                 deps,
                 cached_versions,
                 num_workers,
@@ -517,7 +521,6 @@ def _load_tables(
                 db,
                 missing_tables,
                 db_root,
-                db_root_tmp,
                 deps,
                 backend,
                 num_workers,
@@ -822,7 +825,6 @@ def load(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_folder(name, version, cache_root, flavor)
-    db_root_tmp = database_tmp_folder(db_root)
 
     if verbose:  # pragma: no cover
         print(f'Get:   {name} v{version}')
@@ -848,7 +850,6 @@ def load(
             requested_tables,
             backend,
             db_root,
-            db_root_tmp,
             db,
             version,
             cached_versions,
@@ -876,7 +877,6 @@ def load(
             requested_media,
             backend,
             db_root,
-            db_root_tmp,
             name,
             version,
             cached_versions,
@@ -902,10 +902,7 @@ def load(
 
     # check if database is now complete
     if not db_is_complete:
-        _database_check_complete(db, db_root, db_root_tmp, flavor, deps)
-
-    if os.path.exists(db_root_tmp):
-        shutil.rmtree(db_root_tmp)
+        _database_check_complete(db, db_root, flavor, deps)
 
     return db
 
@@ -963,6 +960,7 @@ def load_header(
                 os.path.join(db_root_tmp, define.HEADER_FILE),
                 os.path.join(db_root, define.HEADER_FILE),
             )
+            audeer.rmdir(db_root_tmp)
     return audformat.Database.load(db_root, load_data=False), backend
 
 
@@ -1057,7 +1055,6 @@ def load_media(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_folder(name, version, cache_root, flavor)
-    db_root_tmp = database_tmp_folder(db_root)
 
     if verbose:  # pragma: no cover
         print(f'Get:   {name} v{version}')
@@ -1080,7 +1077,6 @@ def load_media(
             media,
             backend,
             db_root,
-            db_root_tmp,
             name,
             version,
             cached_versions,
@@ -1160,7 +1156,6 @@ def load_table(
     cached_versions = None
 
     db_root = database_cache_folder(name, version, cache_root)
-    db_root_tmp = database_tmp_folder(db_root)
 
     if verbose:  # pragma: no cover
         print(f'Get:   {name} v{version}')
@@ -1183,7 +1178,6 @@ def load_table(
             [table],
             backend,
             db_root,
-            db_root_tmp,
             db,
             version,
             cached_versions,
