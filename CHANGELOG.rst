@@ -7,6 +7,22 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.6 (2022-04-01)
+--------------------------
+
+* Changed: use emodb v1.2.0 for examples and tests
+* Changed: depend on ``audobject>=0.5.0``
+* Changed: depend on ``audformat>=0.14.0``
+* Changed: depend on ``audeer>=1.18.0``
+* Fixed: depend on ``audbackend>=0.3.15``
+  to avoid the possibility of an error
+  when requesting versions of a database
+* Fixed: add full Windows support and tests
+* Fixed: only create tmp folder when needed in ``audb.load()``
+* Removed: ``include``/``exclude`` keyword arguments
+* Removed: ``audb.get_default_cache_root()``
+
+
 Version 1.2.5 (2022-02-23)
 --------------------------
 
