@@ -23,6 +23,7 @@ DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
     ['1.0.0', '2.0.0', '2.1.0', '3.0.0', '4.0.0', '5.0.0', '6.0.0']
 }
+LONG_PATH = '/'.join(['audio'] * 50) + '/new.wav'
 
 
 def clear_root(root: str):
@@ -69,9 +70,8 @@ def fixture_publish_db():
     )
     audformat.testing.create_audio_files(db)
 
-    # Extend version 2.0.0 by a new file
-    new_file = 'audio/new.wav'
-    db['files'].extend_index(audformat.filewise_index(new_file), inplace=True)
+    # Extend version 2.0.0 by a new file with a path >260 characters
+    db['files'].extend_index(audformat.filewise_index(LONG_PATH), inplace=True)
     db.save(DB_ROOT_VERSION['2.0.0'])
     audformat.testing.create_audio_files(db)
 
@@ -258,7 +258,7 @@ def test_publish(version):
         (
             '2.0.0',
             '1.0.0',
-            ['audio/new.wav'],
+            [LONG_PATH],
         ),
         (
             '2.0.0',
@@ -278,7 +278,7 @@ def test_publish(version):
         (
             '3.0.0',
             '1.0.0',
-            ['audio/new.wav'],
+            [LONG_PATH],
         ),
     ]
 )
@@ -306,13 +306,13 @@ def test_publish_error_messages():
             error_msg = (
                 "5 files are referenced in tables that cannot be found. "
                 "Missing files are: '['audio/002.wav', 'audio/003.wav', "
-                "'audio/004.wav', 'audio/005.wav', 'audio/new.wav']'."
+                f"'audio/004.wav', 'audio/005.wav', '{LONG_PATH}']'."
             )
         elif version == '5.0.0':
             error_msg = (
                 "25 files are referenced in tables that cannot be found. "
                 "Missing files are: '['audio/002.wav', 'audio/003.wav', "
-                "'audio/004.wav', 'audio/005.wav', 'audio/new.wav', "
+                f"'audio/004.wav', 'audio/005.wav', '{LONG_PATH}', "
                 "'file0.wav', 'file1.wav', 'file10.wav', 'file11.wav', "
                 "'file12.wav', 'file13.wav', 'file14.wav', 'file15.wav', "
                 "'file16.wav', 'file17.wav', 'file18.wav', 'file19.wav', "
