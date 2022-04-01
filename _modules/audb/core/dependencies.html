@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.5
+                v1.2.6
               </div>
             
           
@@ -187,8 +187,8 @@
 <span class="sd">        Empty DataFrame</span>
 <span class="sd">        Columns: [archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version]</span>
 <span class="sd">        Index: []</span>
-<span class="sd">        &gt;&gt;&gt; # Request dependencies for emodb 1.1.1</span>
-<span class="sd">        &gt;&gt;&gt; deps = audb.dependencies(&#39;emodb&#39;, version=&#39;1.1.1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Request dependencies for emodb 1.2.0</span>
+<span class="sd">        &gt;&gt;&gt; deps = audb.dependencies(&#39;emodb&#39;, version=&#39;1.2.0&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; # List all files or archives</span>
 <span class="sd">        &gt;&gt;&gt; deps.files[:3]</span>
 <span class="sd">        [&#39;db.emotion.csv&#39;, &#39;db.files.csv&#39;, &#39;wav/03a01Fa.wav&#39;]</span>
@@ -420,7 +420,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">safe_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">extension</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="s1">&#39;pkl&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -485,7 +485,7 @@
 <span class="sd">                File extension can be ``csv`` or ``pkl``</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">safe_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;pkl&#39;</span><span class="p">):</span>
@@ -660,7 +660,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -700,7 +700,7 @@
         <script src="../../../_static/copybutton.js"></script>
         <script src="../../../_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     
 
   

@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.5
+                v1.2.6
               </div>
             
           
@@ -562,9 +562,10 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">db</span><span class="o">.</span><span class="n">is_portable</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="s2">&quot;Some files in the tables have absolute paths &quot;</span>
-            <span class="s2">&quot;or use &#39;.&#39; or &#39;..&#39; to address a folder. &quot;</span>
-            <span class="s2">&quot;Please replace those paths by relative paths &quot;</span>
-            <span class="s2">&quot;and use folder names instead of dots.&quot;</span>
+            <span class="s2">&quot;or use &#39;</span><span class="se">\\</span><span class="s2">&#39;, &#39;.&#39;, &#39;..&#39; in its path. &quot;</span>
+            <span class="s2">&quot;Please replace those paths by relative paths, &quot;</span>
+            <span class="s2">&quot;use folder names instead of dots, &quot;</span>
+            <span class="s2">&quot;and avoid Windows path notation.&quot;</span>
         <span class="p">)</span>
     <span class="n">_check_for_duplicates</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
@@ -641,7 +642,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -681,7 +682,7 @@
         <script src="../../../_static/copybutton.js"></script>
         <script src="../../../_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     
 
   

@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                v1.2.5
+                v1.2.6
               </div>
             
           
@@ -119,6 +119,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-2-6-2022-04-01">Version 1.2.6 (2022-04-01)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-2-5-2022-02-23">Version 1.2.5 (2022-02-23)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-2-4-2022-02-07">Version 1.2.4 (2022-02-07)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-2-3-2022-02-01">Version 1.2.3 (2022-02-01)</a></li>
@@ -191,6 +192,22 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<div class="section" id="version-1-2-6-2022-04-01">
+<h2>Version 1.2.6 (2022-04-01)<a class="headerlink" href="#version-1-2-6-2022-04-01" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: use emodb v1.2.0 for examples and tests</p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audobject&gt;=0.5.0</span></code></p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audformat&gt;=0.14.0</span></code></p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audeer&gt;=1.18.0</span></code></p></li>
+<li><p>Fixed: depend on <code class="docutils literal notranslate"><span class="pre">audbackend&gt;=0.3.15</span></code>
+to avoid the possibility of an error
+when requesting versions of a database</p></li>
+<li><p>Fixed: add full Windows support and tests</p></li>
+<li><p>Fixed: only create tmp folder when needed in <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code></p></li>
+<li><p>Removed: <code class="docutils literal notranslate"><span class="pre">include</span></code>/<code class="docutils literal notranslate"><span class="pre">exclude</span></code> keyword arguments</p></li>
+<li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audb.get_default_cache_root()</span></code></p></li>
+</ul>
+</div>
 <div class="section" id="version-1-2-5-2022-02-23">
 <h2>Version 1.2.5 (2022-02-23)<a class="headerlink" href="#version-1-2-5-2022-02-23" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -488,7 +505,7 @@ in documentation</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -528,7 +545,7 @@ in documentation</p></li>
         <script src="_static/copybutton.js"></script>
         <script src="_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     
 
   

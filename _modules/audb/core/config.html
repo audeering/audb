@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.5
+                v1.2.6
               </div>
             
           
@@ -218,7 +218,7 @@
 <span class="c1"># Read in configuration from global and user file</span>
 <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
 <span class="n">global_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">CONFIG_FILE</span><span class="p">)</span>
-<span class="n">user_config_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">safe_path</span><span class="p">(</span><span class="n">USER_CONFIG_FILE</span><span class="p">)</span>
+<span class="n">user_config_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">USER_CONFIG_FILE</span><span class="p">)</span>
 <span class="n">global_config</span> <span class="o">=</span> <span class="n">load_configuration_file</span><span class="p">(</span><span class="n">global_config_file</span><span class="p">)</span>
 <span class="n">user_config</span> <span class="o">=</span> <span class="n">load_configuration_file</span><span class="p">(</span><span class="n">user_config_file</span><span class="p">)</span>
 <span class="n">global_config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user_config</span><span class="p">)</span>
@@ -281,7 +281,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -321,7 +321,7 @@
         <script src="../../../_static/copybutton.js"></script>
         <script src="../../../_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     
 
   

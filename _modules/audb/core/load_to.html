@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.5
+                v1.2.6
               </div>
             
           
@@ -269,7 +269,10 @@
         <span class="p">)</span>
         <span class="n">files</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-            <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+            <span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
         <span class="n">job</span><span class="p">,</span>
@@ -308,7 +311,10 @@
             <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">table</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
-        <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+        <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">table</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">table</span><span class="p">),</span>
+        <span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
         <span class="n">job</span><span class="p">,</span>
@@ -316,19 +322,6 @@
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Get tables&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_move_file</span><span class="p">(</span>
-        <span class="n">root_src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">root_dst</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move file to another directory.&quot;&quot;&quot;</span>
-
-    <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_src</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dst</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
     <span class="p">)</span>
 
 
@@ -364,12 +357,18 @@
             <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+        <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">),</span>
+        <span class="p">)</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;*.</span><span class="si">{</span><span class="n">storage_format</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">)</span>
-            <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+            <span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_to"><a class="viewcode-back" href="../../../api.html#audb.load_to">[docs]</a><span class="k">def</span> <span class="nf">load_to</span><span class="p">(</span>
@@ -410,7 +409,7 @@
     <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="n">db_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">safe_path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="n">db_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
     <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_folder</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="c1"># remove files with a wrong checksum</span>
@@ -445,7 +444,10 @@
     <span class="c1"># load database</span>
 
     <span class="c1"># move header to root and load database ...</span>
-    <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+    <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">),</span>
+    <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
             <span class="n">db_root</span><span class="p">,</span>
@@ -470,7 +472,10 @@
 
     <span class="n">dep_path_tmp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
     <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dep_path_tmp</span><span class="p">)</span>
-    <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
+    <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+        <span class="n">dep_path_tmp</span><span class="p">,</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">),</span>
+    <span class="p">)</span>
 
     <span class="c1"># save database and remove the temporal directory</span>
     <span class="c1"># to signal all files were correctly loaded</span>
@@ -504,7 +509,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -544,7 +549,7 @@
         <script src="../../../_static/copybutton.js"></script>
         <script src="../../../_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     
 
   

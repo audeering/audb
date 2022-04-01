@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.5
+                v1.2.6
               </div>
             
           
@@ -155,8 +155,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audb.core.load</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">distutils.version</span> <span class="kn">import</span> <span class="n">LooseVersion</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">typing</span>
@@ -175,7 +174,6 @@
     <span class="n">dependencies</span><span class="p">,</span>
     <span class="n">latest_version</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">audb.core.backward</span> <span class="kn">import</span> <span class="n">parse_deprecated_load_arguments</span>
 <span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.flavor</span> <span class="kn">import</span> <span class="n">Flavor</span>
 <span class="kn">from</span> <span class="nn">audb.core.utils</span> <span class="kn">import</span> <span class="n">lookup_backend</span>
@@ -186,7 +184,7 @@
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">]]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">]]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find other cached versions of same flavor.&quot;&quot;&quot;</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">cached</span><span class="p">(</span><span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
@@ -211,7 +209,7 @@
             <span class="n">cached_versions</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
                 <span class="mi">0</span><span class="p">,</span>
                 <span class="p">(</span>
-                    <span class="n">LooseVersion</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]),</span>
+                    <span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]),</span>
                     <span class="n">flavor_root</span><span class="p">,</span>
                     <span class="n">deps</span><span class="p">,</span>
                 <span class="p">),</span>
@@ -224,7 +222,7 @@
         <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">cached_versions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
-            <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">],</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">],</span>
         <span class="p">],</span>
         <span class="n">flavor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Flavor</span><span class="p">],</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -240,7 +238,7 @@
             <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">file_version</span> <span class="o">=</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+        <span class="n">file_version</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">cache_version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">cache_deps</span> <span class="ow">in</span> <span class="n">cached_versions</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">cache_version</span> <span class="o">&gt;=</span> <span class="n">file_version</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">cache_deps</span><span class="p">:</span>
@@ -280,13 +278,15 @@
     <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">))</span>
     <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dst_path</span><span class="p">))</span>
     <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">)</span>
-    <span class="n">_move_file</span><span class="p">(</span><span class="n">root_tmp</span><span class="p">,</span> <span class="n">root_dst</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dst</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_database_check_complete</span><span class="p">(</span>
         <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span><span class="p">,</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
 <span class="p">):</span>
@@ -304,11 +304,16 @@
         <span class="k">return</span> <span class="n">complete</span>
 
     <span class="k">if</span> <span class="n">check</span><span class="p">():</span>
+        <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_folder</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
         <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;audb&#39;</span><span class="p">][</span><span class="s1">&#39;complete&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">db_original</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">db_original</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;audb&#39;</span><span class="p">][</span><span class="s1">&#39;complete&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">db_original</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">header_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+        <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_database_is_complete</span><span class="p">(</span>
@@ -334,6 +339,12 @@
     <span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;file&#39;</span>
     <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">durs</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span><span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+    <span class="c1"># Norm file path under Windows to include `\`</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>  <span class="c1"># pragma: nocover as tested in Windows runner</span>
+        <span class="n">durs</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">map_file_path</span><span class="p">(</span>
+            <span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="n">durs</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_file_path</span><span class="p">(</span><span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
     <span class="n">db</span><span class="o">.</span><span class="n">_files_duration</span> <span class="o">=</span> <span class="n">durs</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 
@@ -342,7 +353,6 @@
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">flavor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Flavor</span><span class="p">],</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
@@ -372,6 +382,7 @@
     <span class="c1"># create folder tree to avoid race condition</span>
     <span class="c1"># in os.makedirs when files are unpacked</span>
     <span class="c1"># using multi-processing</span>
+    <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_folder</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
     <span class="n">utils</span><span class="o">.</span><span class="n">mkdir_tree</span><span class="p">(</span><span class="n">media</span><span class="p">,</span> <span class="n">db_root</span><span class="p">)</span>
     <span class="n">utils</span><span class="o">.</span><span class="n">mkdir_tree</span><span class="p">(</span><span class="n">media</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">)</span>
 
@@ -402,7 +413,10 @@
                 <span class="k">if</span> <span class="n">src_path</span> <span class="o">!=</span> <span class="n">dst_path</span><span class="p">:</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">src_path</span><span class="p">)</span>
 
-            <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+            <span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
         <span class="n">job</span><span class="p">,</span>
@@ -412,14 +426,15 @@
         <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Load media&#39;</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">_get_media_from_cache</span><span class="p">(</span>
         <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">cached_versions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
-            <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">]</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">]</span>
         <span class="p">],</span>
         <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -434,6 +449,7 @@
         <span class="n">flavor</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_folder</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">_copy_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">)</span>
@@ -446,6 +462,8 @@
         <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Copy media&#39;</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">missing_media</span>
 
 
@@ -453,13 +471,13 @@
         <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
         <span class="n">tables</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load tables from backend.&quot;&quot;&quot;</span>
+    <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_folder</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
@@ -483,7 +501,11 @@
             <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>
             <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">CSV</span><span class="p">,</span>
         <span class="p">]:</span>
-            <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table_id</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">storage_format</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table_id</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">storage_format</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+            <span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
         <span class="n">job</span><span class="p">,</span>
@@ -493,14 +515,15 @@
         <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Load tables&#39;</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">_get_tables_from_cache</span><span class="p">(</span>
         <span class="n">tables</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">cached_versions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
-            <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">]</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">]</span>
         <span class="p">],</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -514,6 +537,7 @@
         <span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_folder</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">file_pkl</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span>
@@ -531,6 +555,8 @@
         <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Copy tables&#39;</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">missing_tables</span>
 
 
@@ -538,11 +564,12 @@
         <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">cached_versions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
-            <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">]]</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">]</span>
+            <span class="p">]</span>
         <span class="p">],</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span><span class="p">,</span>
@@ -576,7 +603,6 @@
             <span class="n">missing_media</span> <span class="o">=</span> <span class="n">_get_media_from_cache</span><span class="p">(</span>
                 <span class="n">missing_media</span><span class="p">,</span>
                 <span class="n">db_root</span><span class="p">,</span>
-                <span class="n">db_root_tmp</span><span class="p">,</span>
                 <span class="n">deps</span><span class="p">,</span>
                 <span class="n">cached_versions</span><span class="p">,</span>
                 <span class="n">flavor</span><span class="p">,</span>
@@ -590,7 +616,6 @@
                 <span class="n">name</span><span class="p">,</span>
                 <span class="n">missing_media</span><span class="p">,</span>
                 <span class="n">db_root</span><span class="p">,</span>
-                <span class="n">db_root_tmp</span><span class="p">,</span>
                 <span class="n">flavor</span><span class="p">,</span>
                 <span class="n">deps</span><span class="p">,</span>
                 <span class="n">backend</span><span class="p">,</span>
@@ -603,11 +628,12 @@
         <span class="n">tables</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">cached_versions</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
-            <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">]]</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
+                <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">],</span>
+            <span class="p">]</span>
         <span class="p">],</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span><span class="p">,</span>
@@ -640,7 +666,6 @@
             <span class="n">missing_tables</span> <span class="o">=</span> <span class="n">_get_tables_from_cache</span><span class="p">(</span>
                 <span class="n">missing_tables</span><span class="p">,</span>
                 <span class="n">db_root</span><span class="p">,</span>
-                <span class="n">db_root_tmp</span><span class="p">,</span>
                 <span class="n">deps</span><span class="p">,</span>
                 <span class="n">cached_versions</span><span class="p">,</span>
                 <span class="n">num_workers</span><span class="p">,</span>
@@ -653,7 +678,6 @@
                 <span class="n">db</span><span class="p">,</span>
                 <span class="n">missing_tables</span><span class="p">,</span>
                 <span class="n">db_root</span><span class="p">,</span>
-                <span class="n">db_root_tmp</span><span class="p">,</span>
                 <span class="n">deps</span><span class="p">,</span>
                 <span class="n">backend</span><span class="p">,</span>
                 <span class="n">num_workers</span><span class="p">,</span>
@@ -716,18 +740,6 @@
     <span class="k">return</span> <span class="n">missing_tables</span>
 
 
-<span class="k">def</span> <span class="nf">_move_file</span><span class="p">(</span>
-        <span class="n">root_src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">root_dst</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move file to another directory.&quot;&quot;&quot;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_src</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dst</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
-    <span class="p">)</span>
-
-
 <span class="k">def</span> <span class="nf">_remove_media</span><span class="p">(</span>
         <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
@@ -786,6 +798,12 @@
                 <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
                 <span class="n">root</span><span class="p">,</span>
             <span class="p">)</span>
+            <span class="c1"># Norm file path under Windows to include `\`</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>  <span class="c1"># pragma: nocover as tested in Windows runner</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">map_file_path</span><span class="p">(</span>
+                    <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">,</span>
+                <span class="p">)</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span>
                 <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
@@ -829,17 +847,16 @@
         <span class="n">cache_roots</span> <span class="o">=</span> <span class="p">[</span><span class="n">cache_root</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">cache_root</span> <span class="ow">in</span> <span class="n">cache_roots</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">flavor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">db_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">db_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
                 <span class="n">cache_root</span><span class="p">,</span>
                 <span class="n">name</span><span class="p">,</span>
                 <span class="n">version</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">db_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">db_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
                 <span class="n">cache_root</span><span class="p">,</span>
                 <span class="n">flavor</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">),</span>
             <span class="p">)</span>
-        <span class="n">db_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">safe_path</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">db_root</span><span class="p">):</span>
             <span class="k">break</span>
 
@@ -883,7 +900,6 @@
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database.</span>
 
@@ -942,7 +958,8 @@
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; db = audb.load(</span>
 <span class="sd">        ...     &#39;emodb&#39;,</span>
-<span class="sd">        ...     version=&#39;1.1.1&#39;,</span>
+<span class="sd">        ...     version=&#39;1.2.0&#39;,</span>
+<span class="sd">        ...     tables=[&#39;emotion&#39;, &#39;files&#39;],</span>
 <span class="sd">        ...     only_metadata=True,</span>
 <span class="sd">        ...     full_path=False,</span>
 <span class="sd">        ...     verbose=False,</span>
@@ -955,15 +972,6 @@
         <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     <span class="n">deps</span> <span class="o">=</span> <span class="n">dependencies</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">)</span>
 
-    <span class="c1"># backward compatibility to audb&lt;1.0.0</span>
-    <span class="n">channels</span><span class="p">,</span> <span class="n">mixdown</span><span class="p">,</span> <span class="n">media</span> <span class="o">=</span> <span class="n">parse_deprecated_load_arguments</span><span class="p">(</span>
-        <span class="n">channels</span><span class="p">,</span>
-        <span class="n">mixdown</span><span class="p">,</span>
-        <span class="n">media</span><span class="p">,</span>
-        <span class="n">deps</span><span class="p">,</span>
-        <span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span>
-
     <span class="n">cached_versions</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">flavor</span> <span class="o">=</span> <span class="n">Flavor</span><span class="p">(</span>
@@ -974,7 +982,6 @@
         <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">db_root</span> <span class="o">=</span> <span class="n">database_cache_folder</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">flavor</span><span class="p">)</span>
-    <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_folder</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Get:   </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -1000,7 +1007,6 @@
             <span class="n">requested_tables</span><span class="p">,</span>
             <span class="n">backend</span><span class="p">,</span>
             <span class="n">db_root</span><span class="p">,</span>
-            <span class="n">db_root_tmp</span><span class="p">,</span>
             <span class="n">db</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
             <span class="n">cached_versions</span><span class="p">,</span>
@@ -1028,7 +1034,6 @@
             <span class="n">requested_media</span><span class="p">,</span>
             <span class="n">backend</span><span class="p">,</span>
             <span class="n">db_root</span><span class="p">,</span>
-            <span class="n">db_root_tmp</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
             <span class="n">cached_versions</span><span class="p">,</span>
@@ -1054,10 +1059,7 @@
 
     <span class="c1"># check if database is now complete</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">db_is_complete</span><span class="p">:</span>
-        <span class="n">_database_check_complete</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">deps</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">):</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
+        <span class="n">_database_check_complete</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">flavor</span><span class="p">,</span> <span class="n">deps</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">db</span></div>
 
@@ -1111,7 +1113,11 @@
                 <span class="s1">&#39;complete&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">header_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">_move_file</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">backend</span>
 
 
@@ -1173,13 +1179,12 @@
 <span class="sd">        &gt;&gt;&gt; paths = load_media(</span>
 <span class="sd">        ...     &#39;emodb&#39;,</span>
 <span class="sd">        ...     [&#39;wav/03a01Fa.wav&#39;],</span>
-<span class="sd">        ...     version=&#39;1.1.1&#39;,</span>
+<span class="sd">        ...     version=&#39;1.2.0&#39;,</span>
 <span class="sd">        ...     format=&#39;flac&#39;,</span>
 <span class="sd">        ...     verbose=False,</span>
 <span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; cache_root = audb.default_cache_root()</span>
-<span class="sd">        &gt;&gt;&gt; [p[len(cache_root):] for p in paths]</span>
-<span class="sd">        [&#39;/emodb/1.1.1/40bb2241/wav/03a01Fa.flac&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; paths[0].split(os.path.sep)[-5:]</span>
+<span class="sd">        [&#39;emodb&#39;, &#39;1.2.0&#39;, &#39;40bb2241&#39;, &#39;wav&#39;, &#39;03a01Fa.flac&#39;]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">media</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">media</span><span class="p">)</span>
@@ -1207,7 +1212,6 @@
         <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">db_root</span> <span class="o">=</span> <span class="n">database_cache_folder</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">flavor</span><span class="p">)</span>
-    <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_folder</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Get:   </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -1230,7 +1234,6 @@
             <span class="n">media</span><span class="p">,</span>
             <span class="n">backend</span><span class="p">,</span>
             <span class="n">db_root</span><span class="p">,</span>
-            <span class="n">db_root_tmp</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
             <span class="n">cached_versions</span><span class="p">,</span>
@@ -1244,7 +1247,7 @@
     <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">media</span> <span class="o">=</span> <span class="p">[</span><span class="n">audeer</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">media</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">media</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">m</span><span class="p">))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">media</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="load_table"><a class="viewcode-back" href="../../../api.html#audb.load_table">[docs]</a><span class="k">def</span> <span class="nf">load_table</span><span class="p">(</span>
@@ -1287,7 +1290,7 @@
 <span class="sd">        &gt;&gt;&gt; df = load_table(</span>
 <span class="sd">        ...     &#39;emodb&#39;,</span>
 <span class="sd">        ...     &#39;emotion&#39;,</span>
-<span class="sd">        ...     version=&#39;1.1.1&#39;,</span>
+<span class="sd">        ...     version=&#39;1.2.0&#39;,</span>
 <span class="sd">        ...     verbose=False,</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; df[:3]</span>
@@ -1310,7 +1313,6 @@
     <span class="n">cached_versions</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">db_root</span> <span class="o">=</span> <span class="n">database_cache_folder</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">)</span>
-    <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_folder</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Get:   </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -1333,7 +1335,6 @@
             <span class="p">[</span><span class="n">table</span><span class="p">],</span>
             <span class="n">backend</span><span class="p">,</span>
             <span class="n">db_root</span><span class="p">,</span>
-            <span class="n">db_root_tmp</span><span class="p">,</span>
             <span class="n">db</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
             <span class="n">cached_versions</span><span class="p">,</span>
@@ -1362,7 +1363,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/02/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1402,7 +1403,7 @@
         <script src="../../../_static/copybutton.js"></script>
         <script src="../../../_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     
 
   
