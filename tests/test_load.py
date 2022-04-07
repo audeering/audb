@@ -30,25 +30,6 @@ def clear_root(root: str):
 
 
 @pytest.fixture(
-    scope='function',
-    autouse=True,
-)
-def ensure_tmp_folder_deleted():
-    """Fixture to test that the ~ tmp folder gets deleted.
-
-    audb.load() first loads files to a folder
-    named after the database
-    and appended by ``'~'``.
-    This folder should be deleted in the end.
-
-    """
-    yield
-
-    dirs = audeer.list_dir_names(pytest.CACHE_ROOT, recursive=True)
-    assert len([d for d in dirs if d.endswith('~')]) == 0
-
-
-@pytest.fixture(
     scope='module',
     autouse=True,
 )
