@@ -403,6 +403,43 @@ def _get_tables_from_cache(
     return missing_tables
 
 
+def _load_header(
+        db_root: str,
+        name: str,
+        version: str,
+        flavor: Flavor = None,
+        add_audb_meta: bool = False,
+        overwrite: bool = False,
+) -> typing.Tuple[audformat.Database, typing.Optional[audbackend.Backend]]:
+    r"""Load database header from folder or backend."""
+
+    backend = None
+    local_header = os.path.join(db_root, define.HEADER_FILE)
+    if overwrite or not os.path.exists(local_header):
+        backend = lookup_backend(name, version)
+        remote_header = backend.join(name, define.HEADER_FILE)
+        if add_audb_meta:
+            db_root_tmp = database_tmp_folder(db_root)
+            local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
+        backend.get_file(remote_header, local_header, version)
+        if add_audb_meta:
+            db = audformat.Database.load(db_root_tmp, load_data=False)
+            db.meta['audb'] = {
+                'root': db_root,
+                'version': version,
+                'flavor': flavor.arguments,
+                'complete': False,
+            }
+            db.save(db_root_tmp, header_only=True)
+            audeer.move_file(
+                os.path.join(db_root_tmp, define.HEADER_FILE),
+                os.path.join(db_root, define.HEADER_FILE),
+            )
+            audeer.rmdir(db_root_tmp)
+
+    return audformat.Database.load(db_root, load_data=False), backend
+
+
 def _load_media(
         media: typing.Sequence[str],
         backend: audbackend.Backend,
@@ -831,12 +868,13 @@ def load(
         print(f'Cache: {db_root}')
 
     # Start with database header without tables
-    db, backend = load_header(
+    db, backend = _load_header(
         db_root,
         name,
         version,
-        flavor=flavor,
-        add_audb_meta=True,
+        flavor,
+        True,
+        False,
     )
 
     db_is_complete = _database_is_complete(db)
@@ -938,30 +976,14 @@ def load_header(
         database header and backend
 
     """
-    backend = None
-    local_header = os.path.join(db_root, define.HEADER_FILE)
-    if overwrite or not os.path.exists(local_header):
-        backend = lookup_backend(name, version)
-        remote_header = backend.join(name, define.HEADER_FILE)
-        if add_audb_meta:
-            db_root_tmp = database_tmp_folder(db_root)
-            local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
-        backend.get_file(remote_header, local_header, version)
-        if add_audb_meta:
-            db = audformat.Database.load(db_root_tmp, load_data=False)
-            db.meta['audb'] = {
-                'root': db_root,
-                'version': version,
-                'flavor': flavor.arguments,
-                'complete': False,
-            }
-            db.save(db_root_tmp, header_only=True)
-            audeer.move_file(
-                os.path.join(db_root_tmp, define.HEADER_FILE),
-                os.path.join(db_root, define.HEADER_FILE),
-            )
-            audeer.rmdir(db_root_tmp)
-    return audformat.Database.load(db_root, load_data=False), backend
+    return _load_header(
+        db_root,
+        name,
+        version,
+        flavor,
+        add_audb_meta,
+        overwrite,
+    )
 
 
 def load_media(
@@ -1061,12 +1083,13 @@ def load_media(
         print(f'Cache: {db_root}')
 
     # Start with database header without tables
-    db, backend = load_header(
+    db, backend = _load_header(
         db_root,
         name,
         version,
-        flavor=flavor,
-        add_audb_meta=True,
+        flavor,
+        True,
+        False,
     )
 
     db_is_complete = _database_is_complete(db)
@@ -1162,10 +1185,13 @@ def load_table(
         print(f'Cache: {db_root}')
 
     # Start with database header without tables
-    db, backend = load_header(
+    db, backend = _load_header(
         db_root,
         name,
         version,
+        None,
+        False,
+        False,
     )
 
     # Load table
