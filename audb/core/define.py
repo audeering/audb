@@ -8,6 +8,7 @@ USER_CONFIG_FILE = '~/.audb.yaml'
 # Database
 DB = 'db'
 HEADER_FILE = f'{DB}.yaml'
+LOCK_FILE = '.lock'
 
 # Dependencies
 DEPENDENCIES_FILE = f'{DB}.csv'
