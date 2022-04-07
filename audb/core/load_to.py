@@ -329,7 +329,7 @@ def load_to(
     except OSError:  # pragma: no cover
         raise RuntimeError(
             'Could not remove temporary directory, '
-            'probably there are some leftover files.'
+            'probably there are some leftover files. '
             'This should not happen.'
         )
 
