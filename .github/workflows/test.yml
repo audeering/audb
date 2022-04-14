@@ -12,13 +12,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macOS-latest, windows-latest ]
-        python-version: [3.8]
+        os: [ ubuntu-latest, macOS-latest, windows-latest ]
+        python-version: [ 3.8 ]
+        tasks: [ tests ]
         include:
           - os: ubuntu-latest
             python-version: 3.7
+            tasks: tests
           - os: ubuntu-latest
             python-version: 3.9
+            tasks: tests
+          - os: ubuntu-latest
+            python-version: 3.8
+            tasks: docs
 
     steps:
     - uses: actions/checkout@v2
@@ -34,53 +40,60 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    # Remove apt repos that are known to break from time to time
-    # See https://github.com/actions/virtual-environments/issues/323
-    - name: Remove broken apt repos [Ubuntu]
-      run: |
-        for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
-
-    - name: Prepare Ubuntu
+    - name: Ubuntu - install libsndfile
       run: |
         sudo apt-get update
-        sudo apt-get install --no-install-recommends --yes libsndfile1 sox
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
+        sudo apt-get install --no-install-recommends --yes libsndfile1
+      if: matrix.os == 'ubuntu-latest'
 
-    - name: Prepare OSX
-      run: brew install sox
-      if: matrix.os == 'macOS-latest'
-
-    - name: Windows
-      run: choco install sox.portable
-      if: matrix.os == 'windows-latest'
-
-    - name: Show cache content
-      run: tree ~/audb
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
-
-    - name: Install dependencies
+    - name: Install package
       run: |
-        python -V
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install -r docs/requirements.txt
-        pip install -r tests/requirements.txt
+
+    # TESTS
+    - name: Ubuntu - install ffmpeg/mediainfo
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends --yes ffmpeg mediainfo
+      if: matrix.tasks == 'tests' && matrix.os == 'ubuntu-latest'
+
+    - name: OSX - install ffmpeg/mediainfo
+      run: brew install ffmpeg mediainfo
+      if: matrix.tasks == 'tests' && matrix.os == 'macOS-latest'
+
+    - name: Windows - install ffmpeg/mediainfo
+      run: choco install ffmpeg mediainfo-cli
+      if: matrix.tasks == 'tests' && matrix.os == 'windows-latest'
+
+    - name: Install tests requirements
+      run: pip install -r tests/requirements.txt
+      if: matrix.tasks == 'tests'
 
     - name: Test with pytest
-      run: |
-        python -m pytest
+      run: python -m pytest
+      if: matrix.tasks == 'tests'
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.tasks == 'tests' && matrix.os == 'ubuntu-latest'
+
+      # DOCS
+    - name: Ubuntu - install graphviz
+      run: sudo apt-get install --yes graphviz
+      if: matrix.tasks == 'docs'
+
+    - name: Install docs requirements
+      run: pip install -r docs/requirements.txt
+      if: matrix.tasks == 'docs'
 
     - name: Test building documentation
-      run: |
-        sudo apt-get install --yes graphviz
-        python -m sphinx docs/ docs/_build/ -b html -W
-        # python -m sphinx docs/ build/sphinx/html -b linkcheck
-      if: matrix.os == 'ubuntu-20.04'
+      run: python -m sphinx docs/ docs/_build/ -b html -W
+      if: matrix.tasks == 'docs'
+
+    - name: Check links in documentation
+      run: python -m sphinx docs/ docs/_build/ -b linkcheck -W
+      if: matrix.tasks == 'docs'

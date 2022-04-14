@@ -56,6 +56,10 @@ intersphinx_mapping = {
 }
 linkcheck_ignore = [
     'https://gitlab.audeering.com',
+    (  # This is a permalink, which provides a false-positive result
+        'https://github.com/audeering/audbackend/blob/'
+        'edd23462799ae9052a43cdd045698f78e19dbcaf'
+    ),
 ]
 # Ignore package dependencies during building the docs
 # This fixes URL link issues with pandas and sphinx_autodoc_typehints
