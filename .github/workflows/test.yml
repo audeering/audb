@@ -34,18 +34,18 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Set up conda
-      uses: s-weigand/setup-conda@v1
-      with:
-        activate-conda: false  # don't switch Python version
+    #- name: Set up conda
+    #  uses: s-weigand/setup-conda@v1
+    #  with:
+    #    activate-conda: false  # don't switch Python version
 
-    - name: Install sox using conda
-      # MP3 support under Linux and macOS, see
-      # https://github.com/conda-forge/sox-feedstock/pull/18
-      run: |
-        conda config --add channels conda-forge
-        conda config --set channel_priority strict
-        conda install sox 
+    #- name: Install sox using conda
+    #  # MP3 support under Linux and macOS, see
+    #  # https://github.com/conda-forge/sox-feedstock/pull/18
+    #  run: |
+    #    conda config --add channels conda-forge
+    #    conda config --set channel_priority strict
+    #    conda install sox 
 
     ## Remove apt repos that are known to break from time to time
     ## See https://github.com/actions/virtual-environments/issues/323
@@ -57,16 +57,16 @@ jobs:
     - name: Prepare Ubuntu
       run: |
         sudo apt-get update
-        sudo apt-get install --no-install-recommends --yes libsndfile1
+        sudo apt-get install --no-install-recommends --yes libsndfile1 ffmpeg
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
 
-    #- name: Prepare OSX
-    #  run: brew install sox
-    #  if: matrix.os == 'macOS-latest'
+    - name: Prepare OSX
+      run: brew install ffmpeg
+      if: matrix.os == 'macOS-latest'
 
-    #- name: Windows
-    #  run: choco install sox.portable
-    #  if: matrix.os == 'windows-latest'
+    - name: Windows
+      run: choco install ffmpeg
+      if: matrix.os == 'windows-latest'
 
     - name: Show cache content
       run: tree ~/audb
