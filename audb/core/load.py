@@ -1151,7 +1151,7 @@ def load_media(
     )
     db_root = database_cache_folder(name, version, cache_root, flavor)
     db_lock_path = database_lock_path(db_root)
-    result = None
+    files = None
 
     try:
         with filelock.FileLock(db_lock_path, timeout=timeout):
@@ -1192,14 +1192,14 @@ def load_media(
                 media = [
                     audeer.replace_file_extension(m, format) for m in media
                 ]
-            result = [
+            files = [
                 os.path.join(db_root, os.path.normpath(m)) for m in media
             ]
 
     except filelock.Timeout:
         pass
 
-    return result
+    return files
 
 
 def load_table(
@@ -1271,7 +1271,7 @@ def load_table(
 
     db_root = database_cache_folder(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
-    result = None
+    df = None
 
     try:
         with filelock.FileLock(db_lock_path, timeout=timeout):
@@ -1311,9 +1311,9 @@ def load_table(
                 )
             table = audformat.Table()
             table.load(table_file)
-            result = table._df
+            df = table._df
 
     except filelock.Timeout:
         pass
 
-    return result
+    return df
