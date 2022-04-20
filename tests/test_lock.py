@@ -5,6 +5,7 @@ import time
 import pandas as pd
 import pytest
 
+import audbackend
 import audformat.testing
 import audeer
 import audiofile
@@ -12,9 +13,33 @@ import audiofile
 import audb
 
 
+class SlowFileSystem(audbackend.FileSystem):
+    r"""Emulate a slow file system.
+
+    Introduces a short delay when getting a file from the backend.
+    Helps to reach the timeout in the tests.
+
+    """
+    def _get_file(self, *args):
+        time.sleep(0.1)
+        super()._get_file(*args)
+
+
+audbackend.register(
+    'slow-file-system',
+    SlowFileSystem,
+)
+
+
 os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
 os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-audb.config.REPOSITORIES = pytest.REPOSITORIES
+audb.config.REPOSITORIES = [
+    audb.Repository(
+        name=pytest.REPOSITORY_NAME,
+        host=pytest.FILE_SYSTEM_HOST,
+        backend='slow-file-system',
+    ),
+]
 
 
 DB_NAME = f'test_lock-{pytest.ID}'
