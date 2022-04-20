@@ -21,7 +21,7 @@ class SlowFileSystem(audbackend.FileSystem):
 
     """
     def _get_file(self, *args):
-        time.sleep(0.1)
+        time.sleep(5)
         super()._get_file(*args)
 
 
