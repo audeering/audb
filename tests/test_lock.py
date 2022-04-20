@@ -124,6 +124,9 @@ def load_db(timeout):
 )
 def test_lock_load(multiprocessing, num_workers, timeout, expected):
 
+    if multiprocessing and os.name == 'nt':
+        return
+
     warns = not multiprocessing and num_workers != expected
     with pytest.warns(
             UserWarning if warns else None,
@@ -164,6 +167,9 @@ def load_header(timeout):
     ]
 )
 def test_lock_load_header(multiprocessing, num_workers, timeout, expected):
+
+    if multiprocessing and os.name == 'nt':
+        return
 
     warns = not multiprocessing and num_workers != expected
     with pytest.warns(
@@ -208,6 +214,9 @@ def load_media(timeout):
 )
 def test_lock_load_media(multiprocessing, num_workers, timeout, expected):
 
+    if multiprocessing and os.name == 'nt':
+        return
+
     warns = not multiprocessing and num_workers != expected
     with pytest.warns(
             UserWarning if warns else None,
@@ -250,6 +259,9 @@ def load_table(timeout):
     ]
 )
 def test_lock_load_table(multiprocessing, num_workers, timeout, expected):
+    
+    if multiprocessing and os.name == 'nt':
+        return
 
     warns = not multiprocessing and num_workers != expected
     with pytest.warns(
