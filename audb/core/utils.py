@@ -76,6 +76,7 @@ def _lookup(
         f"'{name}'."
     )
 
+
 def timeout_warning():
     warnings.warn(
         define.TIMEOUT_MSG,
