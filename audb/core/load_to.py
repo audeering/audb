@@ -16,7 +16,7 @@ from audb.core.dependencies import Dependencies
 from audb.core.load import (
     database_lock_path,
     database_tmp_folder,
-    load_header,
+    _load_header,
 )
 
 
@@ -271,7 +271,7 @@ def load_to(
 
     # load database header without tables from backend
 
-    db_header, backend = load_header(
+    db_header, backend = _load_header(
         db_root_tmp,
         name,
         version,
@@ -325,7 +325,6 @@ def load_to(
     # to signal all files were correctly loaded
 
     _save_database(db, db_root, db_root_tmp, num_workers, verbose)
-    os.remove(database_lock_path(db_root_tmp))
     try:
         _remove_empty_dirs(db_root_tmp)
     except OSError:  # pragma: no cover
