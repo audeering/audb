@@ -259,7 +259,7 @@ def load_table(timeout):
     ]
 )
 def test_lock_load_table(multiprocessing, num_workers, timeout, expected):
-    
+
     if multiprocessing and os.name == 'nt':
         return
 
