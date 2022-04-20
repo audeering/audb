@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 import time
 
 import pandas as pd
@@ -131,7 +132,7 @@ def load_db(timeout):
 )
 def test_lock_load(multiprocessing, num_workers, timeout, expected):
 
-    if multiprocessing and os.name == 'nt':
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
     warns = not multiprocessing and num_workers != expected
@@ -176,7 +177,7 @@ def load_header(timeout):
 )
 def test_lock_load_header(multiprocessing, num_workers, timeout, expected):
 
-    if multiprocessing and os.name == 'nt':
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
     warns = not multiprocessing and num_workers != expected
@@ -222,7 +223,7 @@ def load_media(timeout):
 )
 def test_lock_load_media(multiprocessing, num_workers, timeout, expected):
 
-    if multiprocessing and os.name == 'nt':
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
     warns = not multiprocessing and num_workers != expected
@@ -268,7 +269,7 @@ def load_table(timeout):
 )
 def test_lock_load_table(multiprocessing, num_workers, timeout, expected):
 
-    if multiprocessing and os.name == 'nt':
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
     warns = not multiprocessing and num_workers != expected
