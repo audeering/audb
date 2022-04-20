@@ -71,7 +71,7 @@ jobs:
       if: matrix.tasks == 'tests'
 
     - name: Test with pytest
-      run: python -m pytest -s tests/test_lock.py::test_lock_load_header
+      run: python -m pytest -s
       if: matrix.tasks == 'tests'
 
     - name: Upload coverage to Codecov
