@@ -21,7 +21,7 @@ class SlowFileSystem(audbackend.FileSystem):
 
     """
     def _get_file(self, *args):
-        time.sleep(0.5)
+        time.sleep(1)
         super()._get_file(*args)
 
 
@@ -156,7 +156,7 @@ def load_header(timeout):
         (2, 0, 1),
     ]
 )
-def test_lock_header(multiprocessing, num_workers, timeout, expected):
+def test_lock_load_header(multiprocessing, num_workers, timeout, expected):
 
     result = audeer.run_tasks(
         load_header,
