@@ -6,8 +6,8 @@ import pandas as pd
 import pytest
 
 import audbackend
-import audformat.testing
 import audeer
+import audformat.testing
 import audiofile
 
 import audb
@@ -110,7 +110,8 @@ def load_db(timeout):
 @pytest.mark.parametrize(
     'multiprocessing',
     [
-        (False, True),
+        False,
+        True,
     ]
 )
 @pytest.mark.parametrize(
@@ -123,12 +124,17 @@ def load_db(timeout):
 )
 def test_lock_load(multiprocessing, num_workers, timeout, expected):
 
-    result = audeer.run_tasks(
-        load_db,
-        [([timeout], {})] * num_workers,
-        num_workers=num_workers,
-        multiprocessing=multiprocessing,
-    )
+    warns = not multiprocessing and num_workers != expected
+    with pytest.warns(
+            UserWarning if warns else None,
+            match=audb.core.define.TIMEOUT_MSG,
+    ):
+        result = audeer.run_tasks(
+            load_db,
+            [([timeout], {})] * num_workers,
+            num_workers=num_workers,
+            multiprocessing=multiprocessing,
+        )
     result = [x for x in result if x is not None]
 
     assert len(result) == expected
@@ -145,7 +151,8 @@ def load_header(timeout):
 @pytest.mark.parametrize(
     'multiprocessing',
     [
-        (False, True),
+        False,
+        True,
     ]
 )
 @pytest.mark.parametrize(
@@ -158,12 +165,17 @@ def load_header(timeout):
 )
 def test_lock_load_header(multiprocessing, num_workers, timeout, expected):
 
-    result = audeer.run_tasks(
-        load_header,
-        [([timeout], {})] * num_workers,
-        num_workers=num_workers,
-        multiprocessing=multiprocessing,
-    )
+    warns = not multiprocessing and num_workers != expected
+    with pytest.warns(
+            UserWarning if warns else None,
+            match=audb.core.define.TIMEOUT_MSG,
+    ):
+        result = audeer.run_tasks(
+            load_header,
+            [([timeout], {})] * num_workers,
+            num_workers=num_workers,
+            multiprocessing=multiprocessing,
+        )
     result = [x for x in result if x is not None]
 
     assert len(result) == expected
@@ -182,7 +194,8 @@ def load_media(timeout):
 @pytest.mark.parametrize(
     'multiprocessing',
     [
-        (False, True),
+        False,
+        True,
     ]
 )
 @pytest.mark.parametrize(
@@ -195,12 +208,17 @@ def load_media(timeout):
 )
 def test_lock_load_media(multiprocessing, num_workers, timeout, expected):
 
-    result = audeer.run_tasks(
-        load_media,
-        [([timeout], {})] * num_workers,
-        num_workers=num_workers,
-        multiprocessing=multiprocessing,
-    )
+    warns = not multiprocessing and num_workers != expected
+    with pytest.warns(
+            UserWarning if warns else None,
+            match=audb.core.define.TIMEOUT_MSG,
+    ):
+        result = audeer.run_tasks(
+            load_media,
+            [([timeout], {})] * num_workers,
+            num_workers=num_workers,
+            multiprocessing=multiprocessing,
+        )
     result = [x for x in result if x is not None]
 
     assert len(result) == expected
@@ -219,7 +237,8 @@ def load_table(timeout):
 @pytest.mark.parametrize(
     'multiprocessing',
     [
-        (False, True),
+        False,
+        True,
     ]
 )
 @pytest.mark.parametrize(
@@ -232,12 +251,17 @@ def load_table(timeout):
 )
 def test_lock_load_table(multiprocessing, num_workers, timeout, expected):
 
-    result = audeer.run_tasks(
-        load_table,
-        [([timeout], {})] * num_workers,
-        num_workers=num_workers,
-        multiprocessing=multiprocessing,
-    )
+    warns = not multiprocessing and num_workers != expected
+    with pytest.warns(
+            UserWarning if warns else None,
+            match=audb.core.define.TIMEOUT_MSG,
+    ):
+        result = audeer.run_tasks(
+            load_table,
+            [([timeout], {})] * num_workers,
+            num_workers=num_workers,
+            multiprocessing=multiprocessing,
+        )
     result = [x for x in result if x is not None]
 
     assert len(result) == expected

@@ -9,6 +9,7 @@ USER_CONFIG_FILE = '~/.audb.yaml'
 DB = 'db'
 HEADER_FILE = f'{DB}.yaml'
 LOCK_FILE = '.lock'
+TIMEOUT_MSG = 'Lock could not be acquired. Timeout exceeded.'
 
 # Dependencies
 DEPENDENCIES_FILE = f'{DB}.csv'

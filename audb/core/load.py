@@ -954,7 +954,7 @@ def load(
                 )
 
     except filelock.Timeout:
-        pass
+        utils.timeout_warning()
 
     return db
 
@@ -1012,7 +1012,7 @@ def load_header(
                 overwrite,
             )
     except filelock.Timeout:
-        pass
+        utils.timeout_warning()
 
     return db, backend
 
@@ -1197,7 +1197,7 @@ def load_media(
             ]
 
     except filelock.Timeout:
-        pass
+        utils.timeout_warning()
 
     return files
 
@@ -1314,6 +1314,6 @@ def load_table(
             df = table._df
 
     except filelock.Timeout:
-        pass
+        utils.timeout_warning()
 
     return df
