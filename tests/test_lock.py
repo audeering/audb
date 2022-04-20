@@ -17,11 +17,11 @@ class SlowFileSystem(audbackend.FileSystem):
     r"""Emulate a slow file system.
 
     Introduces a short delay when getting a file from the backend.
-    Helps to reach the timeout in the tests.
+    This ensures that timeouts are reached in the tests.
 
     """
     def _get_file(self, *args):
-        time.sleep(0.1)
+        time.sleep(0.5)
         super()._get_file(*args)
 
 
