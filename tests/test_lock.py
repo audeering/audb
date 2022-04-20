@@ -21,7 +21,7 @@ class SlowFileSystem(audbackend.FileSystem):
 
     """
     def _get_file(self, *args):
-        time.sleep(5)
+        time.sleep(1)
         super()._get_file(*args)
 
 
@@ -144,11 +144,14 @@ def test_lock_load(multiprocessing, num_workers, timeout, expected):
 
 
 def load_header(timeout):
-    return audb.info.header(
+    t = time.time()
+    result = audb.info.header(
         DB_NAME,
         version=DB_VERSION,
         timeout=timeout,
     )
+    print(f'\ntimeout={timeout}\nexceeded={time.time()-t}')
+    return result
 
 
 @pytest.mark.parametrize(
@@ -163,7 +166,7 @@ def load_header(timeout):
     [
         (2, -1, 2),
         (2, 9999, 2),
-        # (2, 0, 1),
+        (2, 0, 1),
     ]
 )
 def test_lock_load_header(multiprocessing, num_workers, timeout, expected):
