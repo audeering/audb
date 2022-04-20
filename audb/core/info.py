@@ -184,7 +184,7 @@ def header(
         *,
         version: str = None,
         cache_root: str = None,
-) -> typing.Optional[audformat.Database]:
+) -> audformat.Database:
     r"""Load header of database.
 
     Args:
