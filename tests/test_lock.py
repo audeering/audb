@@ -101,6 +101,7 @@ def fixture_publish_db():
 
 
 def load_db(timeout):
+    print(f'repositories={audb.config.REPOSITORIES}')
     print(audb.repository(DB_NAME, DB_VERSION))
     return audb.load(
         DB_NAME,
