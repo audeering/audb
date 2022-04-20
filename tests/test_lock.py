@@ -35,13 +35,20 @@ audbackend.register(
 
 os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
 os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-audb.config.REPOSITORIES = [
-    audb.Repository(
-        name=pytest.REPOSITORY_NAME,
-        host=pytest.FILE_SYSTEM_HOST,
-        backend='slow-file-system',
-    ),
-]
+
+
+@pytest.fixture(
+    scope='session',
+    autouse=True,
+)
+def fixture_set_repositories():
+    audb.config.REPOSITORIES = [
+        audb.Repository(
+            name=pytest.REPOSITORY_NAME,
+            host=pytest.FILE_SYSTEM_HOST,
+            backend='slow-file-system',
+        ),
+    ]
 
 
 DB_NAME = f'test_lock-{pytest.ID}'
