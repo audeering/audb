@@ -21,9 +21,7 @@ class SlowFileSystem(audbackend.FileSystem):
 
     """
     def _get_file(self, *args):
-        t = time.time()
-        time.sleep(1)
-        print(f'\nsleep={time.time() - t}')
+        time.sleep(0.1)
         super()._get_file(*args)
 
 
@@ -108,8 +106,6 @@ def fixture_publish_db():
 
 
 def load_db(timeout):
-    print(f'repositories={audb.config.REPOSITORIES}')
-    print(audb.repository(DB_NAME, DB_VERSION))
     return audb.load(
         DB_NAME,
         version=DB_VERSION,
@@ -155,13 +151,11 @@ def test_lock_load(multiprocessing, num_workers, timeout, expected):
 
 
 def load_header(timeout):
-    t = time.time()
     result = audb.info.header(
         DB_NAME,
         version=DB_VERSION,
         timeout=timeout,
     )
-    print(f'\ntimeout={timeout}\nexceeded={time.time()-t}')
     return result
 
 
