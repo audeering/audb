@@ -161,6 +161,7 @@ def _database_check_complete(
                 os.path.join(db_root_tmp, define.HEADER_FILE),
                 os.path.join(db_root, define.HEADER_FILE),
             )
+
         audeer.rmdir(db_root_tmp)
 
 
