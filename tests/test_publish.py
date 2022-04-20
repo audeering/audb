@@ -209,6 +209,7 @@ def test_publish(version):
         version=version,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
+        verbose=False,
     )
     assert db.name == DB_NAME
 
