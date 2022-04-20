@@ -16,7 +16,7 @@ from audb.core.dependencies import Dependencies
 from audb.core.load import (
     database_lock_path,
     database_tmp_folder,
-    _load_header,
+    load_header_wo_lock,
 )
 
 
@@ -271,7 +271,7 @@ def load_to(
 
     # load database header without tables from backend
 
-    db_header, backend = _load_header(
+    db_header, backend = load_header_wo_lock(
         db_root_tmp,
         name,
         version,
