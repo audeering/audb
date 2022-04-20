@@ -154,11 +154,10 @@ def test_lock_load(multiprocessing, num_workers, timeout, expected):
     assert len(result) == expected
 
 
-def load_header(timeout):
+def load_header():
     result = audb.info.header(
         DB_NAME,
         version=DB_VERSION,
-        timeout=timeout,
     )
     return result
 
@@ -171,14 +170,12 @@ def load_header(timeout):
     ]
 )
 @pytest.mark.parametrize(
-    'num_workers, timeout, expected',
+    'num_workers',
     [
-        (2, -1, 2),
-        (2, 9999, 2),
-        (2, 0, 1),
+        10,
     ]
 )
-def test_lock_load_header(multiprocessing, num_workers, timeout, expected):
+def test_lock_load_header(multiprocessing, num_workers):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -186,20 +183,14 @@ def test_lock_load_header(multiprocessing, num_workers, timeout, expected):
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
-    warns = not multiprocessing and num_workers != expected
-    with pytest.warns(
-            UserWarning if warns else None,
-            match=audb.core.define.TIMEOUT_MSG,
-    ):
-        result = audeer.run_tasks(
-            load_header,
-            [([timeout], {})] * num_workers,
-            num_workers=num_workers,
-            multiprocessing=multiprocessing,
-        )
-    result = [x for x in result if x is not None]
+    result = audeer.run_tasks(
+        load_header,
+        [([], {})] * num_workers,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
 
-    assert len(result) == expected
+    assert len(result) == num_workers
 
 
 def load_media(timeout):
