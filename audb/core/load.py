@@ -1011,7 +1011,7 @@ def load_header(
                 add_audb_meta,
                 overwrite,
             )
-    except filelock.Timeout:
+    except filelock.Timeout:  # pragma: no cover
         utils.timeout_warning()
 
     return db, backend
