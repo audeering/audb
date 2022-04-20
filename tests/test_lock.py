@@ -23,9 +23,7 @@ DB_VERSION = '1.0.0'
 
 
 def clear_root(root: str):
-    root = audeer.path(root)
-    if os.path.exists(root):
-        shutil.rmtree(root)
+    audeer.rmdir(root)
 
 
 @pytest.fixture(
