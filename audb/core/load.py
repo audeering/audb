@@ -1027,7 +1027,7 @@ def load_header(
         overwrite: always load header from backend
             and overwrite the one found in ``db_root``
         timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``None`` is
+            accessing the database. If timeout is reached, ``(None, None)`` is
             returned. If timeout < 0 the method will block until the
             database can be accessed
 
