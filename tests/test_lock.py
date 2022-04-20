@@ -132,6 +132,9 @@ def load_db(timeout):
 )
 def test_lock_load(multiprocessing, num_workers, timeout, expected):
 
+    # avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
@@ -177,6 +180,9 @@ def load_header(timeout):
 )
 def test_lock_load_header(multiprocessing, num_workers, timeout, expected):
 
+    # avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
@@ -223,6 +229,9 @@ def load_media(timeout):
 )
 def test_lock_load_media(multiprocessing, num_workers, timeout, expected):
 
+    # avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
@@ -269,6 +278,9 @@ def load_table(timeout):
 )
 def test_lock_load_table(multiprocessing, num_workers, timeout, expected):
 
+    # avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
