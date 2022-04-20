@@ -71,7 +71,7 @@ jobs:
       if: matrix.tasks == 'tests'
 
     - name: Test with pytest
-      run: python -m pytest -s
+      run: python -m pytest
       if: matrix.tasks == 'tests'
 
     - name: Upload coverage to Codecov
