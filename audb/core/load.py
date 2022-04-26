@@ -732,7 +732,7 @@ def database_lock_path(
 ) -> str:
     r"""Create and return path to database lock file.
 
-    The lock file ``.db.lock`` is created under ``db_root``.
+    The lock file ``.lock`` is created under ``db_root``.
 
     Args:
         db_root: path to database cache folder
@@ -741,27 +741,7 @@ def database_lock_path(
         path to lock file
 
     """
-    lock_path = audeer.path(db_root, define.DB_LOCK_FILE)
-    if not os.path.exists(lock_path):
-        audeer.touch(lock_path)
-    return lock_path
-
-
-def header_lock_path(
-        db_root: str,
-) -> str:
-    r"""Create and return path to header lock file.
-
-    The lock file ``.header.lock`` is created under ``db_root``.
-
-    Args:
-        db_root: path to database cache folder
-
-    Returns:
-        path to lock file
-
-    """
-    lock_path = audeer.path(db_root, define.HEADER_LOCK_FILE)
+    lock_path = audeer.path(db_root, define.LOCK_FILE)
     if not os.path.exists(lock_path):
         audeer.touch(lock_path)
     return lock_path
@@ -874,21 +854,21 @@ def load(
     db_lock_path = database_lock_path(db_root)
     db = None
 
-    if verbose:  # pragma: no cover
-        print(f'Get:   {name} v{version}')
-        print(f'Cache: {db_root}')
-
     try:
         with filelock.FileLock(db_lock_path, timeout=timeout):
 
+            if verbose:  # pragma: no cover
+                print(f'Get:   {name} v{version}')
+                print(f'Cache: {db_root}')
+
             # Start with database header without tables
-            db, backend = load_header(
+            db, backend = load_header_wo_lock(
                 db_root,
                 name,
                 version,
-                flavor=flavor,
-                add_audb_meta=True,
-                overwrite=False,
+                flavor,
+                True,
+                False,
             )
 
             db_is_complete = _database_is_complete(db)
@@ -987,7 +967,11 @@ def load_header(
         flavor: Flavor = None,
         add_audb_meta: bool = False,
         overwrite: bool = False,
-) -> typing.Tuple[audformat.Database, audbackend.Backend]:
+        timeout: float = -1,
+) -> typing.Tuple[
+    typing.Optional[audformat.Database],
+    typing.Optional[audbackend.Backend],
+]:
     r"""Load database header from folder or backend.
 
     If the database header cannot be found in ``db_root``
@@ -1005,23 +989,30 @@ def load_header(
             to the database header before storing it in cache
         overwrite: always load header from backend
             and overwrite the one found in ``db_root``
+        timeout: maximum wait time if another thread or process is already
+            accessing the database. If timeout is reached, ``(None, None)`` is
+            returned. If timeout < 0 the method will block until the
+            database can be accessed
 
     Returns:
         database header and backend
 
     """
-    lock_path = header_lock_path(db_root)
+    db_lock_path = database_lock_path(db_root)
     db, backend = None, None
 
-    with filelock.FileLock(lock_path):
-        db, backend = load_header_wo_lock(
-            db_root,
-            name,
-            version,
-            flavor,
-            add_audb_meta,
-            overwrite,
-        )
+    try:
+        with filelock.FileLock(db_lock_path, timeout=timeout):
+            db, backend = load_header_wo_lock(
+                db_root,
+                name,
+                version,
+                flavor,
+                add_audb_meta,
+                overwrite,
+            )
+    except filelock.Timeout:
+        utils.timeout_warning()
 
     return db, backend
 
@@ -1034,11 +1025,8 @@ def load_header_wo_lock(
         add_audb_meta: bool = False,
         overwrite: bool = False,
 ) -> typing.Tuple[audformat.Database, typing.Optional[audbackend.Backend]]:
-    r"""Load database header from folder or backend.
+    r"""Load database header from folder or backend."""
 
-    Unlike load_header() Does not acquire lock.
-
-    """
     backend = None
     local_header = os.path.join(db_root, define.HEADER_FILE)
     if overwrite or not os.path.exists(local_header):
@@ -1165,21 +1153,21 @@ def load_media(
     db_lock_path = database_lock_path(db_root)
     files = None
 
-    if verbose:  # pragma: no cover
-        print(f'Get:   {name} v{version}')
-        print(f'Cache: {db_root}')
-
     try:
         with filelock.FileLock(db_lock_path, timeout=timeout):
 
+            if verbose:  # pragma: no cover
+                print(f'Get:   {name} v{version}')
+                print(f'Cache: {db_root}')
+
             # Start with database header without tables
-            db, backend = load_header(
+            db, backend = load_header_wo_lock(
                 db_root,
                 name,
                 version,
-                flavor=flavor,
-                add_audb_meta=True,
-                overwrite=False,
+                flavor,
+                True,
+                False,
             )
 
             db_is_complete = _database_is_complete(db)
@@ -1285,21 +1273,21 @@ def load_table(
     db_lock_path = database_lock_path(db_root)
     df = None
 
-    if verbose:  # pragma: no cover
-        print(f'Get:   {name} v{version}')
-        print(f'Cache: {db_root}')
-
     try:
         with filelock.FileLock(db_lock_path, timeout=timeout):
 
+            if verbose:  # pragma: no cover
+                print(f'Get:   {name} v{version}')
+                print(f'Cache: {db_root}')
+
             # Start with database header without tables
-            db, backend = load_header(
+            db, backend = load_header_wo_lock(
                 db_root,
                 name,
                 version,
-                flavor=None,
-                add_audb_meta=False,
-                overwrite=False,
+                None,
+                False,
+                False,
             )
 
             # Load table

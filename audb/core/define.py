@@ -7,9 +7,8 @@ USER_CONFIG_FILE = '~/.audb.yaml'
 
 # Database
 DB = 'db'
-DB_LOCK_FILE = '.db.lock'
 HEADER_FILE = f'{DB}.yaml'
-HEADER_LOCK_FILE = '.header.lock'
+LOCK_FILE = '.lock'
 TIMEOUT_MSG = 'Lock could not be acquired. Timeout exceeded.'
 
 # Dependencies
