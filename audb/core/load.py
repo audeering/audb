@@ -862,13 +862,12 @@ def load(
                 print(f'Cache: {db_root}')
 
             # Start with database header without tables
-            db, backend = load_header_wo_lock(
+            db, backend = load_header(
                 db_root,
                 name,
                 version,
-                flavor,
-                True,
-                False,
+                flavor=flavor,
+                add_audb_meta=True,
             )
 
             db_is_complete = _database_is_complete(db)
@@ -964,63 +963,6 @@ def load_header(
         name: str,
         version: str,
         *,
-        flavor: Flavor = None,
-        add_audb_meta: bool = False,
-        overwrite: bool = False,
-        timeout: float = -1,
-) -> typing.Tuple[
-    typing.Optional[audformat.Database],
-    typing.Optional[audbackend.Backend],
-]:
-    r"""Load database header from folder or backend.
-
-    If the database header cannot be found in ``db_root``
-    it will search for the backend that contains the database,
-    load it from there,
-    and store it in ``db_root``.
-
-    Args:
-        db_root: folder of database
-        name: name of database
-        version: version of database
-        flavor: flavor of database,
-            needed if ``add_audb_meta`` is True
-        add_audb_meta: if ``True`` it adds an ``audb`` meta entry
-            to the database header before storing it in cache
-        overwrite: always load header from backend
-            and overwrite the one found in ``db_root``
-        timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``(None, None)`` is
-            returned. If timeout < 0 the method will block until the
-            database can be accessed
-
-    Returns:
-        database header and backend
-
-    """
-    db_lock_path = database_lock_path(db_root)
-    db, backend = None, None
-
-    try:
-        with filelock.FileLock(db_lock_path, timeout=timeout):
-            db, backend = load_header_wo_lock(
-                db_root,
-                name,
-                version,
-                flavor,
-                add_audb_meta,
-                overwrite,
-            )
-    except filelock.Timeout:
-        utils.timeout_warning()
-
-    return db, backend
-
-
-def load_header_wo_lock(
-        db_root: str,
-        name: str,
-        version: str,
         flavor: Flavor = None,
         add_audb_meta: bool = False,
         overwrite: bool = False,
@@ -1161,13 +1103,12 @@ def load_media(
                 print(f'Cache: {db_root}')
 
             # Start with database header without tables
-            db, backend = load_header_wo_lock(
+            db, backend = load_header(
                 db_root,
                 name,
                 version,
-                flavor,
-                True,
-                False,
+                flavor=flavor,
+                add_audb_meta=True,
             )
 
             db_is_complete = _database_is_complete(db)
@@ -1281,13 +1222,10 @@ def load_table(
                 print(f'Cache: {db_root}')
 
             # Start with database header without tables
-            db, backend = load_header_wo_lock(
+            db, backend = load_header(
                 db_root,
                 name,
                 version,
-                None,
-                False,
-                False,
             )
 
             # Load table

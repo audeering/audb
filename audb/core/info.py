@@ -184,8 +184,7 @@ def header(
         *,
         version: str = None,
         cache_root: str = None,
-        timeout: float = -1,
-) -> typing.Optional[audformat.Database]:
+) -> audformat.Database:
     r"""Load header of database.
 
     Args:
@@ -193,10 +192,6 @@ def header(
         version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
-        timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``None`` is
-            returned. If timeout < 0 the method will block until the
-            database can be accessed
 
     Returns:
         database object without table data
@@ -210,7 +205,7 @@ def header(
     if version is None:
         version = latest_version(name)
     db_root = database_cache_folder(name, version, cache_root)
-    db, _ = load_header(db_root, name, version, timeout=timeout)
+    db, _ = load_header(db_root, name, version)
     return db
 
 
