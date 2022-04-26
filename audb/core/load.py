@@ -967,8 +967,28 @@ def load_header(
         add_audb_meta: bool = False,
         overwrite: bool = False,
 ) -> typing.Tuple[audformat.Database, typing.Optional[audbackend.Backend]]:
-    r"""Load database header from folder or backend."""
+    r"""Load database header from folder or backend.
 
+    If the database header cannot be found in ``db_root``
+    it will search for the backend that contains the database,
+    load it from there,
+    and store it in ``db_root``.
+
+    Args:
+        db_root: folder of database
+        name: name of database
+        version: version of database
+        flavor: flavor of database,
+            needed if ``add_audb_meta`` is True
+        add_audb_meta: if ``True`` it adds an ``audb`` meta entry
+            to the database header before storing it in cache
+        overwrite: always load header from backend
+            and overwrite the one found in ``db_root``
+
+    Returns:
+        database header and backend
+
+    """
     backend = None
     local_header = os.path.join(db_root, define.HEADER_FILE)
     if overwrite or not os.path.exists(local_header):
