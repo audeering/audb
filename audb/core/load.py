@@ -148,19 +148,15 @@ def _database_check_complete(
         return complete
 
     if check():
-
         db_root_tmp = database_tmp_folder(db_root)
         db.meta['audb']['complete'] = True
         db_original = audformat.Database.load(db_root, load_data=False)
         db_original.meta['audb']['complete'] = True
         db_original.save(db_root_tmp, header_only=True)
-
-        lock_file = header_lock_path(db_root)
-        with filelock.FileLock(lock_file):
-            audeer.move_file(
-                os.path.join(db_root_tmp, define.HEADER_FILE),
-                os.path.join(db_root, define.HEADER_FILE),
-            )
+        audeer.move_file(
+            os.path.join(db_root_tmp, define.HEADER_FILE),
+            os.path.join(db_root, define.HEADER_FILE),
+        )
         audeer.rmdir(db_root_tmp)
 
 
