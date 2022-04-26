@@ -14,7 +14,6 @@ from audb.core.api import (
 )
 from audb.core.dependencies import Dependencies
 from audb.core.load import (
-    database_lock_path,
     database_tmp_folder,
     load_header,
 )
