@@ -7,7 +7,7 @@ from audb.core.config import config
 from audb.core.flavor import Flavor
 
 
-def database_cache_folder(
+def database_cache_root(
         name: str,
         version: str,
         cache_root: str = None,
@@ -72,7 +72,7 @@ def database_lock_path(
     return lock_path
 
 
-def database_tmp_folder(
+def database_tmp_root(
         db_root: str,
 ) -> str:
     r"""Create and return temporary database cache folder.

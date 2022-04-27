@@ -12,7 +12,7 @@ import audformat
 
 from audb.core import define
 from audb.core.cache import (
-    database_cache_folder,
+    database_cache_root,
     database_lock_path,
     default_cache_root,
 )
@@ -252,7 +252,7 @@ def dependencies(
     if version is None:
         version = latest_version(name)
 
-    db_root = database_cache_folder(
+    db_root = database_cache_root(
         name,
         version,
         cache_root=cache_root,

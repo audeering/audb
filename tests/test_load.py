@@ -188,7 +188,7 @@ def fixture_publish_db():
 def test_database_cache_folder():
     cache_root = os.path.join(pytest.CACHE_ROOT, 'cache')
     version = '1.0.0'
-    db_root = audb.core.load.database_cache_folder(
+    db_root = audb.core.load.database_cache_root(
         DB_NAME,
         version,
         cache_root,
@@ -359,7 +359,7 @@ def test_load_media(version, media, format):
     # Clear cache to force loading from other cache
     if version is None:
         version = audb.latest_version(DB_NAME)
-    cache_root = audb.core.load.database_cache_folder(
+    cache_root = audb.core.load.database_cache_root(
         DB_NAME,
         version,
         pytest.CACHE_ROOT,

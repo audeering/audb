@@ -18,9 +18,9 @@ from audb.core.api import (
     latest_version,
 )
 from audb.core.cache import (
-    database_cache_folder,
+    database_cache_root,
     database_lock_path,
-    database_tmp_folder,
+    database_tmp_root,
     default_cache_root,
 )
 from audb.core.dependencies import Dependencies
@@ -153,7 +153,7 @@ def _database_check_complete(
         return complete
 
     if check():
-        db_root_tmp = database_tmp_folder(db_root)
+        db_root_tmp = database_tmp_root(db_root)
         db.meta['audb']['complete'] = True
         db_original = audformat.Database.load(db_root, load_data=False)
         db_original.meta['audb']['complete'] = True
@@ -231,7 +231,7 @@ def _get_media_from_backend(
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
     # using multi-processing
-    db_root_tmp = database_tmp_folder(db_root)
+    db_root_tmp = database_tmp_root(db_root)
     utils.mkdir_tree(media, db_root)
     utils.mkdir_tree(media, db_root_tmp)
 
@@ -298,7 +298,7 @@ def _get_media_from_cache(
         flavor,
         verbose,
     )
-    db_root_tmp = database_tmp_folder(db_root)
+    db_root_tmp = database_tmp_root(db_root)
 
     def job(cache_root: str, file: str):
         _copy_file(file, cache_root, db_root_tmp, db_root)
@@ -326,7 +326,7 @@ def _get_tables_from_backend(
         verbose: bool,
 ):
     r"""Load tables from backend."""
-    db_root_tmp = database_tmp_folder(db_root)
+    db_root_tmp = database_tmp_root(db_root)
 
     def job(table: str):
         archive = backend.join(
@@ -386,7 +386,7 @@ def _get_tables_from_cache(
         None,
         verbose,
     )
-    db_root_tmp = database_tmp_folder(db_root)
+    db_root_tmp = database_tmp_root(db_root)
 
     def job(cache_root: str, file: str):
         file_pkl = audeer.replace_file_extension(
@@ -772,7 +772,7 @@ def load(
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
     )
-    db_root = database_cache_folder(name, version, cache_root, flavor)
+    db_root = database_cache_root(name, version, cache_root, flavor)
     db_lock_path = database_lock_path(db_root)
     db = None
 
@@ -917,7 +917,7 @@ def load_header(
         backend = lookup_backend(name, version)
         remote_header = backend.join(name, define.HEADER_FILE)
         if add_audb_meta:
-            db_root_tmp = database_tmp_folder(db_root)
+            db_root_tmp = database_tmp_root(db_root)
             local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
         backend.get_file(remote_header, local_header, version)
         if add_audb_meta:
@@ -1033,7 +1033,7 @@ def load_media(
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
     )
-    db_root = database_cache_folder(name, version, cache_root, flavor)
+    db_root = database_cache_root(name, version, cache_root, flavor)
     db_lock_path = database_lock_path(db_root)
     files = None
 
@@ -1147,7 +1147,7 @@ def load_table(
 
     cached_versions = None
 
-    db_root = database_cache_folder(name, version, cache_root)
+    db_root = database_cache_root(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
 
     with filelock.FileLock(db_lock_path):

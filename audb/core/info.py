@@ -8,7 +8,7 @@ import audformat
 from audb.core import define
 from audb.core.api import (
     dependencies,
-    database_cache_folder,
+    database_cache_root,
     database_lock_path,
     latest_version,
 )
@@ -205,7 +205,7 @@ def header(
     if version is None:
         version = latest_version(name)
 
-    db_root = database_cache_folder(name, version, cache_root)
+    db_root = database_cache_root(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
 
     with filelock.FileLock(db_lock_path):
