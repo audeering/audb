@@ -3,6 +3,7 @@ import shutil
 import tempfile
 import typing
 
+import filelock
 import pandas as pd
 
 import audbackend
@@ -10,6 +11,11 @@ import audeer
 import audformat
 
 from audb.core import define
+from audb.core.cache import (
+    database_cache_root,
+    database_lock_path,
+    default_cache_root,
+)
 from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
@@ -220,44 +226,6 @@ def cached(
     return df.where(pd.notnull(df), None)
 
 
-def default_cache_root(
-        shared=False,
-) -> str:
-    r"""Default cache folder.
-
-    If ``shared`` is ``True``,
-    returns the path specified
-    by the environment variable
-    ``AUDB_SHARED_CACHE_ROOT``
-    or
-    ``audb.config.SHARED_CACHE_ROOT``.
-    If ``shared`` is ``False``,
-    returns the path specified
-    by the environment variable
-    ``AUDB_CACHE_ROOT``
-    or
-    ``audb.config.CACHE_ROOT``.
-
-    Args:
-        shared: if ``True`` returns path to shared cache folder
-
-    Returns:
-        path normalized by :func:`audeer.path`
-
-    """
-    if shared:
-        cache = (
-            os.environ.get('AUDB_SHARED_CACHE_ROOT')
-            or config.SHARED_CACHE_ROOT
-        )
-    else:
-        cache = (
-            os.environ.get('AUDB_CACHE_ROOT')
-            or config.CACHE_ROOT
-        )
-    return audeer.path(cache)
-
-
 def dependencies(
         name: str,
         *,
@@ -284,37 +252,31 @@ def dependencies(
     if version is None:
         version = latest_version(name)
 
-    cache_roots = [
-        default_cache_root(True),  # check shared cache first
-        default_cache_root(False),
-    ] if cache_root is None else [cache_root]
-    for cache_root in cache_roots:
-        deps_root = audeer.path(
-            cache_root,
-            name,
-            version,
-        )
-        if os.path.exists(deps_root):
-            break
-
-    audeer.mkdir(deps_root)
-    deps_path = os.path.join(deps_root, define.CACHED_DEPENDENCIES_FILE)
+    db_root = database_cache_root(
+        name,
+        version,
+        cache_root=cache_root,
+    )
+    db_lock_path = database_lock_path(db_root)
+    deps_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
 
     deps = Dependencies()
-    try:
-        deps.load(deps_path)
-    except (AttributeError, FileNotFoundError, ValueError, EOFError):
-        # If loading pickled cached file fails, load again from backend
-        backend = lookup_backend(name, version)
-        with tempfile.TemporaryDirectory() as tmp_root:
-            archive = backend.join(name, define.DB)
-            backend.get_archive(
-                archive,
-                tmp_root,
-                version,
-            )
-            deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
-            deps.save(deps_path)
+
+    with filelock.FileLock(db_lock_path):
+        try:
+            deps.load(deps_path)
+        except (AttributeError, FileNotFoundError, ValueError, EOFError):
+            # If loading pickled cached file fails, load again from backend
+            backend = lookup_backend(name, version)
+            with tempfile.TemporaryDirectory() as tmp_root:
+                archive = backend.join(name, define.DB)
+                backend.get_archive(
+                    archive,
+                    tmp_root,
+                    version,
+                )
+                deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
+                deps.save(deps_path)
 
     return deps
 

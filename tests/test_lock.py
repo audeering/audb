@@ -54,6 +54,20 @@ DB_NAME = f'test_lock-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_VERSION = '1.0.0'
 
+DB_LOCK_PATH = audeer.path(
+    pytest.CACHE_ROOT,
+    DB_NAME,
+    DB_VERSION,
+    '.lock',
+)
+DB_FLAVOR_LOCK_PATH = audeer.path(
+    pytest.CACHE_ROOT,
+    DB_NAME,
+    DB_VERSION,
+    audb.Flavor().short_id,
+    '.lock',
+)
+
 
 def clear_root(root: str):
     audeer.rmdir(root)
@@ -106,6 +120,98 @@ def fixture_publish_db():
     clear_root(pytest.FILE_SYSTEM_HOST)
 
 
+def load_deps():
+    return audb.dependencies(
+        DB_NAME,
+        version=DB_VERSION,
+    )
+
+
+@pytest.mark.parametrize(
+    'multiprocessing',
+    [
+        False,
+        True,
+    ],
+)
+@pytest.mark.parametrize(
+    'num_workers',
+    [
+        10,
+    ]
+)
+def test_lock_dependencies(multiprocessing, num_workers):
+
+    # avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
+        return
+
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+    result = audeer.run_tasks(
+        load_deps,
+        [([], {})] * num_workers,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+
+    assert len(result) == num_workers
+
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+
+def load_header():
+    return audb.info.header(
+        DB_NAME,
+        version=DB_VERSION,
+    )
+
+
+@pytest.mark.parametrize(
+    'multiprocessing',
+    [
+        False,
+        True,
+    ],
+)
+@pytest.mark.parametrize(
+    'num_workers',
+    [
+        10,
+    ]
+)
+def test_lock_header(multiprocessing, num_workers):
+
+    # avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
+        return
+
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+    result = audeer.run_tasks(
+        load_header,
+        [([], {})] * num_workers,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+
+    assert len(result) == num_workers
+
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+
 def load_db(timeout):
     return audb.load(
         DB_NAME,
@@ -138,6 +244,9 @@ def test_lock_load(multiprocessing, num_workers, timeout, expected):
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
     warns = not multiprocessing and num_workers != expected
     with pytest.warns(
             UserWarning if warns else None,
@@ -152,6 +261,11 @@ def test_lock_load(multiprocessing, num_workers, timeout, expected):
     result = [x for x in result if x is not None]
 
     assert len(result) == expected
+
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_media(timeout):
@@ -187,6 +301,9 @@ def test_lock_load_media(multiprocessing, num_workers, timeout, expected):
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
     warns = not multiprocessing and num_workers != expected
     with pytest.warns(
             UserWarning if warns else None,
@@ -202,13 +319,17 @@ def test_lock_load_media(multiprocessing, num_workers, timeout, expected):
 
     assert len(result) == expected
 
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert os.path.exists(DB_FLAVOR_LOCK_PATH)
 
-def load_table(timeout):
+
+def load_table():
     return audb.load_table(
         DB_NAME,
         'table',
         version=DB_VERSION,
-        timeout=timeout,
         verbose=False,
     )
 
@@ -218,17 +339,15 @@ def load_table(timeout):
     [
         False,
         True,
-    ]
+    ],
 )
 @pytest.mark.parametrize(
-    'num_workers, timeout, expected',
+    'num_workers',
     [
-        (2, -1, 2),
-        (2, 9999, 2),
-        (2, 0, 1),
+        10,
     ]
 )
-def test_lock_load_table(multiprocessing, num_workers, timeout, expected):
+def test_lock_load_table(multiprocessing, num_workers):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -236,17 +355,19 @@ def test_lock_load_table(multiprocessing, num_workers, timeout, expected):
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
-    warns = not multiprocessing and num_workers != expected
-    with pytest.warns(
-            UserWarning if warns else None,
-            match=audb.core.define.TIMEOUT_MSG,
-    ):
-        result = audeer.run_tasks(
-            load_table,
-            [([timeout], {})] * num_workers,
-            num_workers=num_workers,
-            multiprocessing=multiprocessing,
-        )
-    result = [x for x in result if x is not None]
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
-    assert len(result) == expected
+    result = audeer.run_tasks(
+        load_table,
+        [([], {})] * num_workers,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+
+    assert len(result) == num_workers
+
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert not os.path.exists(DB_FLAVOR_LOCK_PATH)

@@ -14,9 +14,14 @@ from audb.core import define
 from audb.core import utils
 from audb.core.api import (
     cached,
-    default_cache_root,
     dependencies,
     latest_version,
+)
+from audb.core.cache import (
+    database_cache_root,
+    database_lock_path,
+    database_tmp_root,
+    default_cache_root,
 )
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
@@ -148,7 +153,7 @@ def _database_check_complete(
         return complete
 
     if check():
-        db_root_tmp = database_tmp_folder(db_root)
+        db_root_tmp = database_tmp_root(db_root)
         db.meta['audb']['complete'] = True
         db_original = audformat.Database.load(db_root, load_data=False)
         db_original.meta['audb']['complete'] = True
@@ -226,7 +231,7 @@ def _get_media_from_backend(
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
     # using multi-processing
-    db_root_tmp = database_tmp_folder(db_root)
+    db_root_tmp = database_tmp_root(db_root)
     utils.mkdir_tree(media, db_root)
     utils.mkdir_tree(media, db_root_tmp)
 
@@ -293,7 +298,7 @@ def _get_media_from_cache(
         flavor,
         verbose,
     )
-    db_root_tmp = database_tmp_folder(db_root)
+    db_root_tmp = database_tmp_root(db_root)
 
     def job(cache_root: str, file: str):
         _copy_file(file, cache_root, db_root_tmp, db_root)
@@ -321,7 +326,7 @@ def _get_tables_from_backend(
         verbose: bool,
 ):
     r"""Load tables from backend."""
-    db_root_tmp = database_tmp_folder(db_root)
+    db_root_tmp = database_tmp_root(db_root)
 
     def job(table: str):
         archive = backend.join(
@@ -381,7 +386,7 @@ def _get_tables_from_cache(
         None,
         verbose,
     )
-    db_root_tmp = database_tmp_folder(db_root)
+    db_root_tmp = database_tmp_root(db_root)
 
     def job(cache_root: str, file: str):
         file_pkl = audeer.replace_file_extension(
@@ -664,89 +669,6 @@ def _update_path(
     )
 
 
-def database_cache_folder(
-        name: str,
-        version: str,
-        cache_root: str = None,
-        flavor: Flavor = None,
-) -> str:
-    r"""Create and return database cache folder.
-
-    Args:
-        name: name of database
-        version: version of database
-        cache_root: path to cache folder
-        flavor: flavor of database
-
-    Returns:
-        path to cache folder
-
-    """
-    if cache_root is None:
-        cache_roots = [
-            default_cache_root(True),  # check shared cache first
-            default_cache_root(False),
-        ]
-    else:
-        cache_roots = [cache_root]
-    for cache_root in cache_roots:
-        if flavor is None:
-            db_root = audeer.path(
-                cache_root,
-                name,
-                version,
-            )
-        else:
-            db_root = audeer.path(
-                cache_root,
-                flavor.path(name, version),
-            )
-        if os.path.exists(db_root):
-            break
-
-    audeer.mkdir(db_root)
-    return db_root
-
-
-def database_tmp_folder(
-        db_root: str,
-) -> str:
-    r"""Create and return temporary database cache folder.
-
-    The temporary cache folder is created under ``db_root + '~'``.
-
-    Args:
-        db_root: path to database cache folder
-
-    Returns:
-        path to temporary cache folder
-
-    """
-    tmp_root = db_root + '~'
-    tmp_root = audeer.mkdir(tmp_root)
-    return tmp_root
-
-
-def database_lock_path(
-        db_root: str,
-) -> str:
-    r"""Create and return path to database lock file.
-
-    The lock file ``.lock`` is created under ``db_root``.
-
-    Args:
-        db_root: path to database cache folder
-
-    Returns:
-        path to lock file
-
-    """
-    lock_path = audeer.path(db_root, define.LOCK_FILE)
-    if not os.path.exists(lock_path):
-        audeer.touch(lock_path)
-    return lock_path
-
-
 def load(
         name: str,
         *,
@@ -850,7 +772,7 @@ def load(
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
     )
-    db_root = database_cache_folder(name, version, cache_root, flavor)
+    db_root = database_cache_root(name, version, cache_root, flavor)
     db_lock_path = database_lock_path(db_root)
     db = None
 
@@ -995,7 +917,7 @@ def load_header(
         backend = lookup_backend(name, version)
         remote_header = backend.join(name, define.HEADER_FILE)
         if add_audb_meta:
-            db_root_tmp = database_tmp_folder(db_root)
+            db_root_tmp = database_tmp_root(db_root)
             local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
         backend.get_file(remote_header, local_header, version)
         if add_audb_meta:
@@ -1111,7 +1033,7 @@ def load_media(
         bit_depth=bit_depth,
         sampling_rate=sampling_rate,
     )
-    db_root = database_cache_folder(name, version, cache_root, flavor)
+    db_root = database_cache_root(name, version, cache_root, flavor)
     db_lock_path = database_lock_path(db_root)
     files = None
 
@@ -1170,9 +1092,8 @@ def load_table(
         version: str = None,
         cache_root: str = None,
         num_workers: typing.Optional[int] = 1,
-        timeout: float = -1,
         verbose: bool = True,
-) -> typing.Optional[pd.DataFrame]:
+) -> pd.DataFrame:
     r"""Load a database table.
 
     If you are interested in a single table
@@ -1191,10 +1112,6 @@ def load_table(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``None`` is
-            returned. If timeout < 0 the method will block until the
-            database can be accessed
         verbose: show debug messages
 
     Returns:
@@ -1230,48 +1147,42 @@ def load_table(
 
     cached_versions = None
 
-    db_root = database_cache_folder(name, version, cache_root)
+    db_root = database_cache_root(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
-    df = None
 
-    try:
-        with filelock.FileLock(db_lock_path, timeout=timeout):
+    with filelock.FileLock(db_lock_path):
 
-            if verbose:  # pragma: no cover
-                print(f'Get:   {name} v{version}')
-                print(f'Cache: {db_root}')
+        if verbose:  # pragma: no cover
+            print(f'Get:   {name} v{version}')
+            print(f'Cache: {db_root}')
 
-            # Start with database header without tables
-            db, backend = load_header(
+        # Start with database header without tables
+        db, backend = load_header(
+            db_root,
+            name,
+            version,
+        )
+
+        # Load table
+        table_file = os.path.join(db_root, f'db.{table}')
+        if not (
+                os.path.exists(f'{table_file}.csv')
+                or os.path.exists(f'{table_file}.pkl')
+        ):
+            _load_tables(
+                [table],
+                backend,
                 db_root,
-                name,
+                db,
                 version,
+                cached_versions,
+                deps,
+                Flavor(),
+                cache_root,
+                num_workers,
+                verbose,
             )
+        table = audformat.Table()
+        table.load(table_file)
 
-            # Load table
-            table_file = os.path.join(db_root, f'db.{table}')
-            if not (
-                    os.path.exists(f'{table_file}.csv')
-                    or os.path.exists(f'{table_file}.pkl')
-            ):
-                _load_tables(
-                    [table],
-                    backend,
-                    db_root,
-                    db,
-                    version,
-                    cached_versions,
-                    deps,
-                    Flavor(),
-                    cache_root,
-                    num_workers,
-                    verbose,
-                )
-            table = audformat.Table()
-            table.load(table_file)
-            df = table._df
-
-    except filelock.Timeout:
-        utils.timeout_warning()
-
-    return df
+    return table._df

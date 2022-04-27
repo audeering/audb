@@ -14,7 +14,7 @@ from audb.core.api import (
 )
 from audb.core.dependencies import Dependencies
 from audb.core.load import (
-    database_tmp_folder,
+    database_tmp_root,
     load_header,
 )
 
@@ -253,7 +253,7 @@ def load_to(
         version = latest_version(name)
 
     db_root = audeer.path(root)
-    db_root_tmp = database_tmp_folder(db_root)
+    db_root_tmp = database_tmp_root(db_root)
 
     # remove files with a wrong checksum
     # to ensure we load correct version
