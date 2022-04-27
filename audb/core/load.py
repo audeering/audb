@@ -415,11 +415,6 @@ def _load_media(
         db_root: str,
         name: str,
         version: str,
-        cached_versions: typing.Optional[
-            typing.Sequence[
-                typing.Tuple[audeer.LooseVersion, str, Dependencies]
-            ]
-        ],
         deps: Dependencies,
         flavor: Flavor,
         cache_root: str,
@@ -441,13 +436,12 @@ def _load_media(
         verbose,
     )
     if missing_media:
-        if cached_versions is None:
-            cached_versions = _cached_versions(
-                name,
-                version,
-                flavor,
-                cache_root,
-            )
+        cached_versions = _cached_versions(
+            name,
+            version,
+            flavor,
+            cache_root,
+        )
         if cached_versions:
             missing_media = _get_media_from_cache(
                 missing_media,
@@ -479,11 +473,6 @@ def _load_tables(
         db_root: str,
         db: audformat.Database,
         version: str,
-        cached_versions: typing.Optional[
-            typing.Sequence[
-                typing.Tuple[audeer.LooseVersion, str, Dependencies],
-            ]
-        ],
         deps: Dependencies,
         flavor: Flavor,
         cache_root: str,
@@ -504,13 +493,12 @@ def _load_tables(
         verbose,
     )
     if missing_tables:
-        if cached_versions is None:
-            cached_versions = _cached_versions(
-                db.name,
-                version,
-                flavor,
-                cache_root,
-            )
+        cached_versions = _cached_versions(
+            db.name,
+            version,
+            flavor,
+            cache_root,
+        )
         if cached_versions:
             missing_tables = _get_tables_from_cache(
                 missing_tables,
@@ -763,8 +751,6 @@ def load(
         version = latest_version(name)
     deps = dependencies(name, version=version, cache_root=cache_root)
 
-    cached_versions = None
-
     flavor = Flavor(
         channels=channels,
         format=format,
@@ -805,7 +791,6 @@ def load(
                     db_root,
                     db,
                     version,
-                    cached_versions,
                     deps,
                     flavor,
                     cache_root,
@@ -832,7 +817,6 @@ def load(
                     db_root,
                     name,
                     version,
-                    cached_versions,
                     deps,
                     flavor,
                     cache_root,
@@ -1024,8 +1008,6 @@ def load_media(
                 f"Could not find '{media_file}' in {name} {version}"
             )
 
-    cached_versions = None
-
     flavor = Flavor(
         channels=channels,
         format=format,
@@ -1063,7 +1045,6 @@ def load_media(
                     db_root,
                     name,
                     version,
-                    cached_versions,
                     deps,
                     flavor,
                     cache_root,
@@ -1145,8 +1126,6 @@ def load_table(
             f"Could not find table '{table}' in {name} {version}"
         )
 
-    cached_versions = None
-
     db_root = database_cache_root(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
 
@@ -1175,7 +1154,6 @@ def load_table(
                 db_root,
                 db,
                 version,
-                cached_versions,
                 deps,
                 Flavor(),
                 cache_root,
