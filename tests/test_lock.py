@@ -68,6 +68,7 @@ DB_FLAVOR_LOCK_PATH = audeer.path(
     '.lock',
 )
 
+
 def clear_root(root: str):
     audeer.rmdir(root)
 
@@ -117,6 +118,88 @@ def fixture_publish_db():
 
     clear_root(DB_ROOT)
     clear_root(pytest.FILE_SYSTEM_HOST)
+
+
+def load_deps():
+    return audb.dependencies(
+        DB_NAME,
+        version=DB_VERSION,
+    )
+
+
+@pytest.mark.parametrize(
+    'multiprocessing',
+    [
+        False,
+        True,
+    ],
+)
+@pytest.mark.parametrize(
+    'num_workers',
+    [
+        10,
+    ]
+)
+def test_lock_dependencies(multiprocessing, num_workers):
+
+    # avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
+        return
+
+    assert not os.path.exists(DB_LOCK_PATH)
+
+    result = audeer.run_tasks(
+        load_deps,
+        [([], {})] * num_workers,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+
+    assert len(result) == num_workers
+    assert os.path.exists(DB_LOCK_PATH)
+
+
+def load_header():
+    return audb.info.header(
+        DB_NAME,
+        version=DB_VERSION,
+    )
+
+
+@pytest.mark.parametrize(
+    'multiprocessing',
+    [
+        False,
+        True,
+    ],
+)
+@pytest.mark.parametrize(
+    'num_workers',
+    [
+        10,
+    ]
+)
+def test_lock_header(multiprocessing, num_workers):
+
+    # avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
+        return
+
+    assert not os.path.exists(DB_LOCK_PATH)
+
+    result = audeer.run_tasks(
+        load_header,
+        [([], {})] * num_workers,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+
+    assert len(result) == num_workers
+    assert os.path.exists(DB_LOCK_PATH)
 
 
 def load_db(timeout):
@@ -170,7 +253,6 @@ def test_lock_load(multiprocessing, num_workers, timeout, expected):
     assert len(result) == expected
     assert os.path.exists(DB_LOCK_PATH)
     assert os.path.exists(DB_FLAVOR_LOCK_PATH)
-
 
 
 def load_media(timeout):
