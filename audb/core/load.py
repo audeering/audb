@@ -14,12 +14,14 @@ from audb.core import define
 from audb.core import utils
 from audb.core.api import (
     cached,
+    dependencies,
+    latest_version,
+)
+from audb.core.cache import (
     database_cache_folder,
     database_lock_path,
     database_tmp_folder,
     default_cache_root,
-    dependencies,
-    latest_version,
 )
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor

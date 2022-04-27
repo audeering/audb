@@ -2,7 +2,6 @@ from audb import info
 from audb.core.api import (
     available,
     cached,
-    default_cache_root,
     dependencies,
     exists,
     flavor_path,
@@ -11,6 +10,7 @@ from audb.core.api import (
     repository,
     versions,
 )
+from audb.core.cache import default_cache_root
 from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
