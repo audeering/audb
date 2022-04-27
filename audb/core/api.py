@@ -3,6 +3,7 @@ import shutil
 import tempfile
 import typing
 
+import filelock
 import pandas as pd
 
 import audbackend
@@ -373,23 +374,26 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
+    db_lock_path = database_lock_path(db_root)
     deps_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
 
     deps = Dependencies()
-    try:
-        deps.load(deps_path)
-    except (AttributeError, FileNotFoundError, ValueError, EOFError):
-        # If loading pickled cached file fails, load again from backend
-        backend = lookup_backend(name, version)
-        with tempfile.TemporaryDirectory() as tmp_root:
-            archive = backend.join(name, define.DB)
-            backend.get_archive(
-                archive,
-                tmp_root,
-                version,
-            )
-            deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
-            deps.save(deps_path)
+
+    with filelock.FileLock(db_lock_path):
+        try:
+            deps.load(deps_path)
+        except (AttributeError, FileNotFoundError, ValueError, EOFError):
+            # If loading pickled cached file fails, load again from backend
+            backend = lookup_backend(name, version)
+            with tempfile.TemporaryDirectory() as tmp_root:
+                archive = backend.join(name, define.DB)
+                backend.get_archive(
+                    archive,
+                    tmp_root,
+                    version,
+                )
+                deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
+                deps.save(deps_path)
 
     return deps
 
