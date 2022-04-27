@@ -368,21 +368,12 @@ def dependencies(
     if version is None:
         version = latest_version(name)
 
-    cache_roots = [
-        default_cache_root(True),  # check shared cache first
-        default_cache_root(False),
-    ] if cache_root is None else [cache_root]
-    for cache_root in cache_roots:
-        deps_root = audeer.path(
-            cache_root,
-            name,
-            version,
-        )
-        if os.path.exists(deps_root):
-            break
-
-    audeer.mkdir(deps_root)
-    deps_path = os.path.join(deps_root, define.CACHED_DEPENDENCIES_FILE)
+    db_root = database_cache_folder(
+        name,
+        version,
+        cache_root=cache_root,
+    )
+    deps_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
 
     deps = Dependencies()
     try:
