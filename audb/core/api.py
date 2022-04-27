@@ -442,7 +442,7 @@ def remove_media(
         name: str,
         files: typing.Union[str, typing.Sequence[str]],
         *,
-        verbose: bool = False,
+        verbose: bool = True,
 ):
     r"""Remove media from all versions.
 
@@ -472,6 +472,7 @@ def remove_media(
                 archive,
                 db_root,
                 version,
+                verbose=verbose,
             )[0]
             deps_path = os.path.join(db_root, deps_path)
             deps = Dependencies()
@@ -498,6 +499,7 @@ def remove_media(
                             remote_archive,
                             db_root,
                             version,
+                            verbose=verbose,
                         )
                         # skip if file was already deleted
                         if file in files_in_archive:
@@ -508,6 +510,7 @@ def remove_media(
                                 files_in_archive,
                                 remote_archive,
                                 version,
+                                verbose=verbose,
                             )
 
                     # mark file as removed
@@ -523,6 +526,7 @@ def remove_media(
                     define.DEPENDENCIES_FILE,
                     remote_archive,
                     version,
+                    verbose=verbose,
                 )
 
 
