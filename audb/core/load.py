@@ -14,6 +14,9 @@ from audb.core import define
 from audb.core import utils
 from audb.core.api import (
     cached,
+    database_cache_folder,
+    database_lock_path,
+    database_tmp_folder,
     default_cache_root,
     dependencies,
     latest_version,
@@ -662,89 +665,6 @@ def _update_path(
         progress_bar=verbose,
         task_description='Update file path',
     )
-
-
-def database_cache_folder(
-        name: str,
-        version: str,
-        cache_root: str = None,
-        flavor: Flavor = None,
-) -> str:
-    r"""Create and return database cache folder.
-
-    Args:
-        name: name of database
-        version: version of database
-        cache_root: path to cache folder
-        flavor: flavor of database
-
-    Returns:
-        path to cache folder
-
-    """
-    if cache_root is None:
-        cache_roots = [
-            default_cache_root(True),  # check shared cache first
-            default_cache_root(False),
-        ]
-    else:
-        cache_roots = [cache_root]
-    for cache_root in cache_roots:
-        if flavor is None:
-            db_root = audeer.path(
-                cache_root,
-                name,
-                version,
-            )
-        else:
-            db_root = audeer.path(
-                cache_root,
-                flavor.path(name, version),
-            )
-        if os.path.exists(db_root):
-            break
-
-    audeer.mkdir(db_root)
-    return db_root
-
-
-def database_tmp_folder(
-        db_root: str,
-) -> str:
-    r"""Create and return temporary database cache folder.
-
-    The temporary cache folder is created under ``db_root + '~'``.
-
-    Args:
-        db_root: path to database cache folder
-
-    Returns:
-        path to temporary cache folder
-
-    """
-    tmp_root = db_root + '~'
-    tmp_root = audeer.mkdir(tmp_root)
-    return tmp_root
-
-
-def database_lock_path(
-        db_root: str,
-) -> str:
-    r"""Create and return path to database lock file.
-
-    The lock file ``.lock`` is created under ``db_root``.
-
-    Args:
-        db_root: path to database cache folder
-
-    Returns:
-        path to lock file
-
-    """
-    lock_path = audeer.path(db_root, define.LOCK_FILE)
-    if not os.path.exists(lock_path):
-        audeer.touch(lock_path)
-    return lock_path
 
 
 def load(
