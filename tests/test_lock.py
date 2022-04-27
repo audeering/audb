@@ -159,8 +159,11 @@ def test_lock_dependencies(multiprocessing, num_workers):
     )
 
     assert len(result) == num_workers
-    assert os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_header():
@@ -202,8 +205,11 @@ def test_lock_header(multiprocessing, num_workers):
     )
 
     assert len(result) == num_workers
-    assert os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_db(timeout):
@@ -255,8 +261,11 @@ def test_lock_load(multiprocessing, num_workers, timeout, expected):
     result = [x for x in result if x is not None]
 
     assert len(result) == expected
-    assert os.path.exists(DB_LOCK_PATH)
-    assert os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_media(timeout):
@@ -309,8 +318,11 @@ def test_lock_load_media(multiprocessing, num_workers, timeout, expected):
     result = [x for x in result if x is not None]
 
     assert len(result) == expected
-    assert os.path.exists(DB_LOCK_PATH)
-    assert os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_table():
@@ -354,5 +366,8 @@ def test_lock_load_table(multiprocessing, num_workers):
     )
 
     assert len(result) == num_workers
-    assert os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+    # Windows removes the lock files
+    if not sys.platform == 'win32':
+        assert os.path.exists(DB_LOCK_PATH)
+        assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
