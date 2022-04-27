@@ -149,6 +149,7 @@ def test_lock_dependencies(multiprocessing, num_workers):
         return
 
     assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
     result = audeer.run_tasks(
         load_deps,
@@ -159,6 +160,7 @@ def test_lock_dependencies(multiprocessing, num_workers):
 
     assert len(result) == num_workers
     assert os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_header():
@@ -190,6 +192,7 @@ def test_lock_header(multiprocessing, num_workers):
         return
 
     assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
     result = audeer.run_tasks(
         load_header,
@@ -200,6 +203,7 @@ def test_lock_header(multiprocessing, num_workers):
 
     assert len(result) == num_workers
     assert os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_db(timeout):
@@ -340,6 +344,7 @@ def test_lock_load_table(multiprocessing, num_workers):
         return
 
     assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
     result = audeer.run_tasks(
         load_table,
@@ -350,3 +355,4 @@ def test_lock_load_table(multiprocessing, num_workers):
 
     assert len(result) == num_workers
     assert os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
