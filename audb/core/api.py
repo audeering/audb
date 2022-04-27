@@ -442,7 +442,7 @@ def remove_media(
         name: str,
         files: typing.Union[str, typing.Sequence[str]],
         *,
-        verbose: bool = True,
+        verbose: bool = False,
 ):
     r"""Remove media from all versions.
 
