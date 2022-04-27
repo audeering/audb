@@ -1090,9 +1090,8 @@ def load_table(
         version: str = None,
         cache_root: str = None,
         num_workers: typing.Optional[int] = 1,
-        timeout: float = -1,
         verbose: bool = True,
-) -> typing.Optional[pd.DataFrame]:
+) -> pd.DataFrame:
     r"""Load a database table.
 
     If you are interested in a single table
@@ -1111,10 +1110,6 @@ def load_table(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``None`` is
-            returned. If timeout < 0 the method will block until the
-            database can be accessed
         verbose: show debug messages
 
     Returns:
@@ -1152,46 +1147,40 @@ def load_table(
 
     db_root = database_cache_folder(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
-    df = None
 
-    try:
-        with filelock.FileLock(db_lock_path, timeout=timeout):
+    with filelock.FileLock(db_lock_path):
 
-            if verbose:  # pragma: no cover
-                print(f'Get:   {name} v{version}')
-                print(f'Cache: {db_root}')
+        if verbose:  # pragma: no cover
+            print(f'Get:   {name} v{version}')
+            print(f'Cache: {db_root}')
 
-            # Start with database header without tables
-            db, backend = load_header(
+        # Start with database header without tables
+        db, backend = load_header(
+            db_root,
+            name,
+            version,
+        )
+
+        # Load table
+        table_file = os.path.join(db_root, f'db.{table}')
+        if not (
+                os.path.exists(f'{table_file}.csv')
+                or os.path.exists(f'{table_file}.pkl')
+        ):
+            _load_tables(
+                [table],
+                backend,
                 db_root,
-                name,
+                db,
                 version,
+                cached_versions,
+                deps,
+                Flavor(),
+                cache_root,
+                num_workers,
+                verbose,
             )
+        table = audformat.Table()
+        table.load(table_file)
 
-            # Load table
-            table_file = os.path.join(db_root, f'db.{table}')
-            if not (
-                    os.path.exists(f'{table_file}.csv')
-                    or os.path.exists(f'{table_file}.pkl')
-            ):
-                _load_tables(
-                    [table],
-                    backend,
-                    db_root,
-                    db,
-                    version,
-                    cached_versions,
-                    deps,
-                    Flavor(),
-                    cache_root,
-                    num_workers,
-                    verbose,
-                )
-            table = audformat.Table()
-            table.load(table_file)
-            df = table._df
-
-    except filelock.Timeout:
-        utils.timeout_warning()
-
-    return df
+    return table._df
