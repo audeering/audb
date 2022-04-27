@@ -5,6 +5,7 @@ import warnings
 import audbackend
 import audeer
 
+from audb.core import define
 from audb.core.config import config
 from audb.core.repository import Repository
 
@@ -73,4 +74,11 @@ def _lookup(
         f'{version} '
         f'for database '
         f"'{name}'."
+    )
+
+
+def timeout_warning():
+    warnings.warn(
+        define.TIMEOUT_MSG,
+        category=UserWarning,
     )

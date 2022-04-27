@@ -14,7 +14,14 @@ import audb
 
 os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
 os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-audb.config.REPOSITORIES = pytest.REPOSITORIES
+
+
+@pytest.fixture(
+    scope='session',
+    autouse=True,
+)
+def fixture_set_repositories():
+    audb.config.REPOSITORIES = pytest.REPOSITORIES
 
 
 DB_NAME = f'test_publish-{pytest.ID}'
@@ -209,6 +216,7 @@ def test_publish(version):
         version=version,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
+        verbose=False,
     )
     assert db.name == DB_NAME
 
