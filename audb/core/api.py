@@ -479,7 +479,11 @@ def remove_media(
             deps.load(deps_path)
             upload = False
 
-            for file in files:
+            for file in audeer.progress_bar(
+                files,
+                disable=not verbose,
+                desc='Remove media',
+            ):
                 if file in deps.media:
                     archive = deps.archive(file)
 
@@ -499,7 +503,6 @@ def remove_media(
                             remote_archive,
                             db_root,
                             version,
-                            verbose=verbose,
                         )
                         # skip if file was already deleted
                         if file in files_in_archive:
@@ -510,7 +513,6 @@ def remove_media(
                                 files_in_archive,
                                 remote_archive,
                                 version,
-                                verbose=verbose,
                             )
 
                     # mark file as removed
