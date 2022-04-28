@@ -231,6 +231,7 @@ def dependencies(
         *,
         version: str = None,
         cache_root: str = None,
+        verbose: bool = False,
 ) -> Dependencies:
     r"""Database dependencies.
 
@@ -239,6 +240,7 @@ def dependencies(
         version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
+        verbose: show debug messages
 
     Returns:
         dependency object
@@ -274,6 +276,7 @@ def dependencies(
                     archive,
                     tmp_root,
                     version,
+                    verbose=verbose,
                 )
                 deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
                 deps.save(deps_path)

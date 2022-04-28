@@ -259,7 +259,12 @@ def load_to(
     # to ensure we load correct version
     update = os.path.exists(db_root) and os.listdir(db_root)
     audeer.mkdir(db_root)
-    deps = dependencies(name, version=version, cache_root=cache_root)
+    deps = dependencies(
+        name,
+        version=version,
+        cache_root=cache_root,
+        verbose=verbose,
+    )
     if update:
         for file in deps.files:
             full_file = os.path.join(db_root, file)

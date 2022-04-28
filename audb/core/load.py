@@ -761,7 +761,12 @@ def load(
     """
     if version is None:
         version = latest_version(name)
-    deps = dependencies(name, version=version, cache_root=cache_root)
+    deps = dependencies(
+        name,
+        version=version,
+        cache_root=cache_root,
+        verbose=verbose,
+    )
 
     cached_versions = None
 
@@ -1015,7 +1020,12 @@ def load_media(
 
     if version is None:
         version = latest_version(name)
-    deps = dependencies(name, version=version, cache_root=cache_root)
+    deps = dependencies(
+        name,
+        version=version,
+        cache_root=cache_root,
+        verbose=verbose,
+    )
 
     available_files = deps.media
     for media_file in media:
@@ -1138,7 +1148,12 @@ def load_table(
     """
     if version is None:
         version = latest_version(name)
-    deps = dependencies(name, version=version, cache_root=cache_root)
+    deps = dependencies(
+        name,
+        version=version,
+        cache_root=cache_root,
+        verbose=verbose,
+    )
 
     if table not in deps.table_ids:
         raise ValueError(

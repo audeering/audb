@@ -381,6 +381,7 @@ def publish(
                 db.name,
                 version=previous_version,
                 cache_root=cache_root,
+                verbose=verbose,
             )
             previous_deps.save(previous_deps_path)
             if audbackend.md5(deps_path) != audbackend.md5(previous_deps_path):
