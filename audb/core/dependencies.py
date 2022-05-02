@@ -391,7 +391,7 @@ class Dependencies:
             columns=['file'] + list(define.DEPEND_FIELD_NAMES.values()),
         ).set_index('file')
 
-        self._df = self._df.append(df)
+        self._df = pd.concat([self._df, df])
 
     def _add_meta(
             self,
