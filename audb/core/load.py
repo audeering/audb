@@ -28,12 +28,17 @@ from audb.core.flavor import Flavor
 from audb.core.utils import lookup_backend
 
 
+CachedVersions = typing.Sequence[
+    typing.Tuple[audeer.LooseVersion, str, Dependencies],
+]
+
+
 def _cached_versions(
         name: str,
         version: str,
         flavor: Flavor,
         cache_root: typing.Optional[str],
-) -> typing.Sequence[typing.Tuple[audeer.LooseVersion, str, Dependencies]]:
+) -> CachedVersions:
     r"""Find other cached versions of same flavor."""
 
     df = cached(cache_root=cache_root, name=name)
@@ -70,9 +75,7 @@ def _cached_versions(
 def _cached_files(
         files: typing.Sequence[str],
         deps: Dependencies,
-        cached_versions: typing.Sequence[
-            typing.Tuple[audeer.LooseVersion, str, Dependencies],
-        ],
+        cached_versions: CachedVersions,
         flavor: typing.Optional[Flavor],
         verbose: bool,
 ) -> (typing.Sequence[typing.Union[str, str]], typing.Sequence[str]):
@@ -282,9 +285,7 @@ def _get_media_from_cache(
         media: typing.Sequence[str],
         db_root: str,
         deps: Dependencies,
-        cached_versions: typing.Sequence[
-            typing.Tuple[audeer.LooseVersion, str, Dependencies]
-        ],
+        cached_versions: CachedVersions,
         flavor: Flavor,
         num_workers: int,
         verbose: bool,
@@ -371,9 +372,7 @@ def _get_tables_from_cache(
         tables: typing.Sequence[str],
         db_root: str,
         deps: Dependencies,
-        cached_versions: typing.Sequence[
-            typing.Tuple[audeer.LooseVersion, str, Dependencies]
-        ],
+        cached_versions: CachedVersions,
         num_workers: int,
         verbose: bool,
 ) -> typing.Sequence[str]:
@@ -415,17 +414,13 @@ def _load_media(
         db_root: str,
         name: str,
         version: str,
-        cached_versions: typing.Optional[
-            typing.Sequence[
-                typing.Tuple[audeer.LooseVersion, str, Dependencies]
-            ]
-        ],
+        cached_versions: typing.Optional[CachedVersions],
         deps: Dependencies,
         flavor: Flavor,
         cache_root: str,
         num_workers: int,
         verbose: bool,
-):
+) -> typing.Optional[CachedVersions]:
     r"""Load media files to cache.
 
     All media files not existing in cache yet
@@ -472,6 +467,8 @@ def _load_media(
                 verbose,
             )
 
+    return cached_versions
+
 
 def _load_tables(
         tables: typing.Sequence[str],
@@ -479,17 +476,13 @@ def _load_tables(
         db_root: str,
         db: audformat.Database,
         version: str,
-        cached_versions: typing.Optional[
-            typing.Sequence[
-                typing.Tuple[audeer.LooseVersion, str, Dependencies],
-            ]
-        ],
+        cached_versions: typing.Optional[CachedVersions],
         deps: Dependencies,
         flavor: Flavor,
         cache_root: str,
         num_workers: int,
         verbose: bool,
-):
+) -> typing.Optional[CachedVersions]:
     r"""Load table files to cache.
 
     All table files not existing in cache yet
@@ -532,6 +525,8 @@ def _load_tables(
                 num_workers,
                 verbose,
             )
+
+    return cached_versions
 
 
 def _media(
@@ -804,7 +799,7 @@ def load(
 
             # load missing tables
             if not db_is_complete:
-                _load_tables(
+                cached_versions = _load_tables(
                     requested_tables,
                     backend,
                     db_root,
@@ -831,7 +826,7 @@ def load(
 
             # load missing media
             if not db_is_complete and not only_metadata:
-                _load_media(
+                cached_versions = _load_media(
                     requested_media,
                     backend,
                     db_root,
@@ -1034,8 +1029,6 @@ def load_media(
                 f"Could not find '{media_file}' in {name} {version}"
             )
 
-    cached_versions = None
-
     flavor = Flavor(
         channels=channels,
         format=format,
@@ -1073,7 +1066,7 @@ def load_media(
                     db_root,
                     name,
                     version,
-                    cached_versions,
+                    None,
                     deps,
                     flavor,
                     cache_root,
@@ -1160,8 +1153,6 @@ def load_table(
             f"Could not find table '{table}' in {name} {version}"
         )
 
-    cached_versions = None
-
     db_root = database_cache_root(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
 
@@ -1190,7 +1181,7 @@ def load_table(
                 db_root,
                 db,
                 version,
-                cached_versions,
+                None,
                 deps,
                 Flavor(),
                 cache_root,
