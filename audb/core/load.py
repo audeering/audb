@@ -1029,8 +1029,6 @@ def load_media(
                 f"Could not find '{media_file}' in {name} {version}"
             )
 
-    cached_versions = None
-
     flavor = Flavor(
         channels=channels,
         format=format,
@@ -1062,13 +1060,13 @@ def load_media(
 
             # load missing media
             if not db_is_complete:
-                cached_versions = _load_media(
+                _load_media(
                     media,
                     backend,
                     db_root,
                     name,
                     version,
-                    cached_versions,
+                    None,
                     deps,
                     flavor,
                     cache_root,
@@ -1155,8 +1153,6 @@ def load_table(
             f"Could not find table '{table}' in {name} {version}"
         )
 
-    cached_versions = None
-
     db_root = database_cache_root(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
 
@@ -1179,13 +1175,13 @@ def load_table(
                 os.path.exists(f'{table_file}.csv')
                 or os.path.exists(f'{table_file}.pkl')
         ):
-            cached_versions = _load_tables(
+            _load_tables(
                 [table],
                 backend,
                 db_root,
                 db,
                 version,
-                cached_versions,
+                None,
                 deps,
                 Flavor(),
                 cache_root,
