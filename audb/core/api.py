@@ -475,13 +475,18 @@ def remove_media(
                 archive,
                 db_root,
                 version,
+                verbose=verbose,
             )[0]
             deps_path = os.path.join(db_root, deps_path)
             deps = Dependencies()
             deps.load(deps_path)
             upload = False
 
-            for file in files:
+            for file in audeer.progress_bar(
+                files,
+                disable=not verbose,
+                desc=f'Remove media from v{version}',
+            ):
                 if file in deps.media:
                     archive = deps.archive(file)
 
@@ -526,6 +531,7 @@ def remove_media(
                     define.DEPENDENCIES_FILE,
                     remote_archive,
                     version,
+                    verbose=verbose,
                 )
 
 
