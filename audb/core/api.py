@@ -264,7 +264,7 @@ def dependencies(
 
     deps = Dependencies()
 
-    with filelock.FileLock(db_lock_path):
+    with filelock.SoftFileLock(db_lock_path):
         try:
             deps.load(deps_path)
         except (AttributeError, FileNotFoundError, ValueError, EOFError):

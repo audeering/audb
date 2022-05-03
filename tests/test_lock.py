@@ -32,20 +32,38 @@ audbackend.register(
 )
 
 
+class CrashFileSystem(audbackend.FileSystem):
+    r"""Emulate a file system that crashes.
+
+    Raises an exception when getting a file from the backend.
+
+    """
+    def _get_file(self, *args):
+        assert os.path.exists(DB_FLAVOR_LOCK_PATH) or \
+               os.path.exists(DB_LOCK_PATH)
+        raise RuntimeError()
+
+
+audbackend.register(
+    'crash-file-system',
+    CrashFileSystem,
+)
+
+
 os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
 os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 
 
 @pytest.fixture(
-    scope='session',
+    scope='function',
     autouse=True,
 )
-def fixture_set_repositories():
+def fixture_set_repositories(request):
     audb.config.REPOSITORIES = [
         audb.Repository(
             name=pytest.REPOSITORY_NAME,
             host=pytest.FILE_SYSTEM_HOST,
-            backend='slow-file-system',
+            backend=request.param,
         ),
     ]
 
@@ -128,6 +146,11 @@ def load_deps():
 
 
 @pytest.mark.parametrize(
+    'fixture_set_repositories',
+    ['slow-file-system'],
+    indirect=True,
+)
+@pytest.mark.parametrize(
     'multiprocessing',
     [
         False,
@@ -140,7 +163,8 @@ def load_deps():
         10,
     ]
 )
-def test_lock_dependencies(multiprocessing, num_workers):
+def test_lock_dependencies(fixture_set_repositories, multiprocessing,
+                           num_workers):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -160,10 +184,8 @@ def test_lock_dependencies(multiprocessing, num_workers):
 
     assert len(result) == num_workers
 
-    # Windows removes the lock files
-    if not sys.platform == 'win32':
-        assert os.path.exists(DB_LOCK_PATH)
-        assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_header():
@@ -173,6 +195,11 @@ def load_header():
     )
 
 
+@pytest.mark.parametrize(
+    'fixture_set_repositories',
+    ['slow-file-system'],
+    indirect=True,
+)
 @pytest.mark.parametrize(
     'multiprocessing',
     [
@@ -186,7 +213,7 @@ def load_header():
         10,
     ]
 )
-def test_lock_header(multiprocessing, num_workers):
+def test_lock_header(fixture_set_repositories, multiprocessing, num_workers):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -206,10 +233,8 @@ def test_lock_header(multiprocessing, num_workers):
 
     assert len(result) == num_workers
 
-    # Windows removes the lock files
-    if not sys.platform == 'win32':
-        assert os.path.exists(DB_LOCK_PATH)
-        assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_db(timeout):
@@ -221,6 +246,11 @@ def load_db(timeout):
     )
 
 
+@pytest.mark.parametrize(
+    'fixture_set_repositories',
+    ['slow-file-system'],
+    indirect=True,
+)
 @pytest.mark.parametrize(
     'multiprocessing',
     [
@@ -236,7 +266,8 @@ def load_db(timeout):
         (2, 0, 1),
     ]
 )
-def test_lock_load(multiprocessing, num_workers, timeout, expected):
+def test_lock_load(fixture_set_repositories, multiprocessing, num_workers,
+                   timeout, expected):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -262,10 +293,37 @@ def test_lock_load(multiprocessing, num_workers, timeout, expected):
 
     assert len(result) == expected
 
-    # Windows removes the lock files
-    if not sys.platform == 'win32':
-        assert os.path.exists(DB_LOCK_PATH)
-        assert os.path.exists(DB_FLAVOR_LOCK_PATH)
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+
+@pytest.mark.parametrize(
+    'fixture_set_repositories',
+    ['crash-file-system'],
+    indirect=True,
+)
+def test_lock_load_crash(fixture_set_repositories):
+
+    repositories_tmp = audb.config.REPOSITORIES
+
+    audb.config.REPOSITORIES = [
+        audb.Repository(
+            name=pytest.REPOSITORY_NAME,
+            host=pytest.FILE_SYSTEM_HOST,
+            backend='crash-file-system',
+        ),
+    ]
+
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+    with pytest.raises(RuntimeError):
+        load_db(-1)
+
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+    audb.config.REPOSITORIES = repositories_tmp
 
 
 def load_media(timeout):
@@ -278,6 +336,11 @@ def load_media(timeout):
     )
 
 
+@pytest.mark.parametrize(
+    'fixture_set_repositories',
+    ['slow-file-system'],
+    indirect=True,
+)
 @pytest.mark.parametrize(
     'multiprocessing',
     [
@@ -293,7 +356,8 @@ def load_media(timeout):
         (2, 0, 1),
     ]
 )
-def test_lock_load_media(multiprocessing, num_workers, timeout, expected):
+def test_lock_load_media(fixture_set_repositories, multiprocessing,
+                         num_workers, timeout, expected):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -319,10 +383,8 @@ def test_lock_load_media(multiprocessing, num_workers, timeout, expected):
 
     assert len(result) == expected
 
-    # Windows removes the lock files
-    if not sys.platform == 'win32':
-        assert os.path.exists(DB_LOCK_PATH)
-        assert os.path.exists(DB_FLAVOR_LOCK_PATH)
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_table():
@@ -334,6 +396,11 @@ def load_table():
     )
 
 
+@pytest.mark.parametrize(
+    'fixture_set_repositories',
+    ['slow-file-system'],
+    indirect=True,
+)
 @pytest.mark.parametrize(
     'multiprocessing',
     [
@@ -347,7 +414,8 @@ def load_table():
         10,
     ]
 )
-def test_lock_load_table(multiprocessing, num_workers):
+def test_lock_load_table(fixture_set_repositories, multiprocessing,
+                         num_workers):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -367,7 +435,5 @@ def test_lock_load_table(multiprocessing, num_workers):
 
     assert len(result) == num_workers
 
-    # Windows removes the lock files
-    if not sys.platform == 'win32':
-        assert os.path.exists(DB_LOCK_PATH)
-        assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
