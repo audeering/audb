@@ -208,7 +208,7 @@ def header(
     db_root = database_cache_root(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
 
-    with filelock.FileLock(db_lock_path):
+    with filelock.SoftFileLock(db_lock_path):
         db, _ = load_header(db_root, name, version)
 
     return db

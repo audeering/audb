@@ -66,10 +66,7 @@ def database_lock_path(
         path to lock file
 
     """
-    lock_path = audeer.path(root, define.LOCK_FILE)
-    if not os.path.exists(lock_path):
-        audeer.touch(lock_path)
-    return lock_path
+    return audeer.path(root, define.LOCK_FILE)
 
 
 def database_tmp_root(

@@ -781,7 +781,7 @@ def load(
     )
 
     try:
-        with filelock.FileLock(db_lock_path, timeout=timeout):
+        with filelock.SoftFileLock(db_lock_path, timeout=timeout):
 
             # Start with database header without tables
             db, backend = load_header(
@@ -1046,7 +1046,7 @@ def load_media(
             )
 
     try:
-        with filelock.FileLock(db_lock_path, timeout=timeout):
+        with filelock.SoftFileLock(db_lock_path, timeout=timeout):
 
             # Start with database header without tables
             db, backend = load_header(
@@ -1162,7 +1162,7 @@ def load_table(
             f"Could not find table '{table}' in {name} {version}"
         )
 
-    with filelock.FileLock(db_lock_path):
+    with filelock.SoftFileLock(db_lock_path):
 
         # Start with database header without tables
         db, backend = load_header(
