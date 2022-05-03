@@ -40,7 +40,7 @@ def clear_root(root: str):
     scope='function',
     autouse=True,
 )
-def ensure_tmp_folder_deleted():
+def fixture_ensure_tmp_folder_deleted():
     """Fixture to test that the ~ tmp folder gets deleted.
 
     audb.load() first loads files to a folder

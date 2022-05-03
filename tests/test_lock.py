@@ -58,6 +58,18 @@ os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
     scope='function',
     autouse=True,
 )
+def fixture_ensure_lock_file_deleted():
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+    yield
+    assert not os.path.exists(DB_LOCK_PATH)
+    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+
+
+@pytest.fixture(
+    scope='function',
+    autouse=True,
+)
 def fixture_set_repositories(request):
     audb.config.REPOSITORIES = [
         audb.Repository(
@@ -172,9 +184,6 @@ def test_lock_dependencies(fixture_set_repositories, multiprocessing,
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
-
     result = audeer.run_tasks(
         load_deps,
         [([], {})] * num_workers,
@@ -183,9 +192,6 @@ def test_lock_dependencies(fixture_set_repositories, multiprocessing,
     )
 
     assert len(result) == num_workers
-
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_header():
@@ -221,9 +227,6 @@ def test_lock_header(fixture_set_repositories, multiprocessing, num_workers):
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
-
     result = audeer.run_tasks(
         load_header,
         [([], {})] * num_workers,
@@ -232,9 +235,6 @@ def test_lock_header(fixture_set_repositories, multiprocessing, num_workers):
     )
 
     assert len(result) == num_workers
-
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_db(timeout):
@@ -275,9 +275,6 @@ def test_lock_load(fixture_set_repositories, multiprocessing, num_workers,
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
-
     warns = not multiprocessing and num_workers != expected
     with pytest.warns(
             UserWarning if warns else None,
@@ -293,9 +290,6 @@ def test_lock_load(fixture_set_repositories, multiprocessing, num_workers,
 
     assert len(result) == expected
 
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
-
 
 @pytest.mark.parametrize(
     'fixture_set_repositories',
@@ -304,14 +298,8 @@ def test_lock_load(fixture_set_repositories, multiprocessing, num_workers,
 )
 def test_lock_load_crash(fixture_set_repositories):
 
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
-
     with pytest.raises(RuntimeError):
         load_db(-1)
-
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_media(timeout):
@@ -353,9 +341,6 @@ def test_lock_load_media(fixture_set_repositories, multiprocessing,
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
-
     warns = not multiprocessing and num_workers != expected
     with pytest.warns(
             UserWarning if warns else None,
@@ -370,9 +355,6 @@ def test_lock_load_media(fixture_set_repositories, multiprocessing,
     result = [x for x in result if x is not None]
 
     assert len(result) == expected
-
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
 
 def load_table():
@@ -411,9 +393,6 @@ def test_lock_load_table(fixture_set_repositories, multiprocessing,
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
-
     result = audeer.run_tasks(
         load_table,
         [([], {})] * num_workers,
@@ -422,6 +401,3 @@ def test_lock_load_table(fixture_set_repositories, multiprocessing,
     )
 
     assert len(result) == num_workers
-
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
