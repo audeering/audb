@@ -482,7 +482,7 @@ def remove_media(
             for file in audeer.progress_bar(
                 files,
                 disable=not verbose,
-                desc='Remove media',
+                desc=f'Remove media from v{version}',
             ):
                 if file in deps.media:
                     archive = deps.archive(file)
