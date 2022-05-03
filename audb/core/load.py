@@ -535,13 +535,19 @@ def _media(
 ) -> typing.Sequence[str]:
 
     if media is None:
-        media = db.files
-    elif isinstance(media, str):
+        return db.files
+
+    if isinstance(media, str):
         pattern = re.compile(media)
-        media = []
+        requested_media = []
         for m in db.files:
             if pattern.search(m):
-                media.append(m)
+                requested_media.append(m)
+    else:
+        requested_media = media
+
+    if any([file not in db.files for file in requested_media]):
+        raise ValueError(f"Could not find media matching '{media}'")
 
     return media
 
@@ -603,15 +609,23 @@ def _tables(
         deps: Dependencies,
         tables: typing.Optional[typing.Union[str, typing.Sequence[str]]],
 ) -> typing.Sequence[str]:
+
     if tables is None:
-        tables = deps.table_ids
-    elif isinstance(tables, str):
+        return deps.table_ids
+
+    if isinstance(tables, str):
         pattern = re.compile(tables)
-        tables = []
+        requested_tables = []
         for table in deps.table_ids:
             if pattern.search(table):
-                tables.append(table)
-    return tables
+                requested_tables.append(table)
+    else:
+        requested_tables = tables
+
+    if any([table not in deps.table_ids for table in requested_tables]):
+        raise ValueError(f"Could not find table(s) matching '{tables}' ")
+
+    return requested_tables
 
 
 def _update_path(
@@ -740,6 +754,10 @@ def load(
 
     Returns:
         database object
+
+    Raises:
+        ValueError: if no table in the database matches the requested ones
+        ValueError: if no media in the database matches the requested ones
 
     Example:
         >>> db = audb.load(
