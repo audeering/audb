@@ -756,15 +756,9 @@ def load(
     """
     if version is None:
         version = latest_version(name)
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
 
+    db = None
     cached_versions = None
-
     flavor = Flavor(
         channels=channels,
         format=format,
@@ -774,14 +768,20 @@ def load(
     )
     db_root = database_cache_root(name, version, cache_root, flavor)
     db_lock_path = database_lock_path(db_root)
-    db = None
+
+    if verbose:  # pragma: no cover
+        print(f'Get:   {name} v{version}')
+        print(f'Cache: {db_root}')
+
+    deps = dependencies(
+        name,
+        version=version,
+        cache_root=cache_root,
+        verbose=verbose,
+    )
 
     try:
         with filelock.FileLock(db_lock_path, timeout=timeout):
-
-            if verbose:  # pragma: no cover
-                print(f'Get:   {name} v{version}')
-                print(f'Cache: {db_root}')
 
             # Start with database header without tables
             db, backend = load_header(
@@ -1015,6 +1015,22 @@ def load_media(
 
     if version is None:
         version = latest_version(name)
+
+    files = None
+    flavor = Flavor(
+        channels=channels,
+        format=format,
+        mixdown=mixdown,
+        bit_depth=bit_depth,
+        sampling_rate=sampling_rate,
+    )
+    db_root = database_cache_root(name, version, cache_root, flavor)
+    db_lock_path = database_lock_path(db_root)
+
+    if verbose:  # pragma: no cover
+        print(f'Get:   {name} v{version}')
+        print(f'Cache: {db_root}')
+
     deps = dependencies(
         name,
         version=version,
@@ -1029,23 +1045,8 @@ def load_media(
                 f"Could not find '{media_file}' in {name} {version}"
             )
 
-    flavor = Flavor(
-        channels=channels,
-        format=format,
-        mixdown=mixdown,
-        bit_depth=bit_depth,
-        sampling_rate=sampling_rate,
-    )
-    db_root = database_cache_root(name, version, cache_root, flavor)
-    db_lock_path = database_lock_path(db_root)
-    files = None
-
     try:
         with filelock.FileLock(db_lock_path, timeout=timeout):
-
-            if verbose:  # pragma: no cover
-                print(f'Get:   {name} v{version}')
-                print(f'Cache: {db_root}')
 
             # Start with database header without tables
             db, backend = load_header(
@@ -1141,6 +1142,14 @@ def load_table(
     """
     if version is None:
         version = latest_version(name)
+
+    db_root = database_cache_root(name, version, cache_root)
+    db_lock_path = database_lock_path(db_root)
+
+    if verbose:  # pragma: no cover
+        print(f'Get:   {name} v{version}')
+        print(f'Cache: {db_root}')
+
     deps = dependencies(
         name,
         version=version,
@@ -1153,14 +1162,7 @@ def load_table(
             f"Could not find table '{table}' in {name} {version}"
         )
 
-    db_root = database_cache_root(name, version, cache_root)
-    db_lock_path = database_lock_path(db_root)
-
     with filelock.FileLock(db_lock_path):
-
-        if verbose:  # pragma: no cover
-            print(f'Get:   {name} v{version}')
-            print(f'Cache: {db_root}')
 
         # Start with database header without tables
         db, backend = load_header(
