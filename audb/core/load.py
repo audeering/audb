@@ -536,6 +536,8 @@ def _media(
 
     if media is None:
         return db.files
+    elif not media:
+        return []
 
     if isinstance(media, str):
         pattern = re.compile(media)
@@ -546,10 +548,13 @@ def _media(
     else:
         requested_media = media
 
-    if any([file not in db.files for file in requested_media]):
+    if (
+            not requested_media
+            or any([file not in db.files for file in requested_media])
+    ):
         raise ValueError(f"Could not find media matching '{media}'")
 
-    return media
+    return requested_media
 
 
 def _missing_media(
@@ -612,6 +617,8 @@ def _tables(
 
     if tables is None:
         return deps.table_ids
+    elif not tables:
+        return []
 
     if isinstance(tables, str):
         pattern = re.compile(tables)
@@ -622,7 +629,10 @@ def _tables(
     else:
         requested_tables = tables
 
-    if any([table not in deps.table_ids for table in requested_tables]):
+    if (
+            not requested_tables
+            or any([table not in deps.table_ids for table in requested_tables])
+    ):
         raise ValueError(f"Could not find table(s) matching '{tables}' ")
 
     return requested_tables
