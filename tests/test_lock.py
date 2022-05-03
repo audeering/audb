@@ -304,16 +304,6 @@ def test_lock_load(fixture_set_repositories, multiprocessing, num_workers,
 )
 def test_lock_load_crash(fixture_set_repositories):
 
-    repositories_tmp = audb.config.REPOSITORIES
-
-    audb.config.REPOSITORIES = [
-        audb.Repository(
-            name=pytest.REPOSITORY_NAME,
-            host=pytest.FILE_SYSTEM_HOST,
-            backend='crash-file-system',
-        ),
-    ]
-
     assert not os.path.exists(DB_LOCK_PATH)
     assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
 
@@ -322,8 +312,6 @@ def test_lock_load_crash(fixture_set_repositories):
 
     assert not os.path.exists(DB_LOCK_PATH)
     assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
-
-    audb.config.REPOSITORIES = repositories_tmp
 
 
 def load_media(timeout):
