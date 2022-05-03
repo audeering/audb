@@ -134,6 +134,11 @@ def fixture_clear_cache():
             [],
         ),
         (
+            '',
+            None,
+            [],
+        ),
+        (
             ['audio/000.wav', 'audio/001.wav'],
             None,
             ['audio/000.wav', 'audio/001.wav'],
@@ -215,6 +220,12 @@ def test_media(media, format, expected_files):
         ),
         (
             [],
+            None,
+            [],
+            [],
+        ),
+        (
+            '',
             None,
             [],
             [],

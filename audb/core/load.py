@@ -536,7 +536,7 @@ def _media(
 
     if media is None:
         return db.files
-    elif not media:
+    elif len(media) == 0:
         return []
 
     if isinstance(media, str):
@@ -549,7 +549,7 @@ def _media(
         requested_media = media
 
     if (
-            not requested_media
+            len(requested_media) == 0
             or any([file not in db.files for file in requested_media])
     ):
         raise ValueError(f"Could not find media matching '{media}'")
@@ -617,7 +617,7 @@ def _tables(
 
     if tables is None:
         return deps.table_ids
-    elif not tables:
+    elif len(tables) == 0:
         return []
 
     if isinstance(tables, str):
@@ -630,7 +630,7 @@ def _tables(
         requested_tables = tables
 
     if (
-            not requested_tables
+            len(requested_tables) == 0
             or any([table not in deps.table_ids for table in requested_tables])
     ):
         raise ValueError(f"Could not find table(s) matching '{tables}' ")
