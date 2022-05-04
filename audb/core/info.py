@@ -1,6 +1,5 @@
 import typing
 
-import filelock
 import pandas as pd
 
 import audformat
@@ -13,6 +12,7 @@ from audb.core.api import (
     latest_version,
 )
 from audb.core.load import load_header
+from audb.core.lock import Lock
 
 
 def author(
@@ -208,7 +208,7 @@ def header(
     db_root = database_cache_root(name, version, cache_root)
     db_lock_path = database_lock_path(db_root)
 
-    with filelock.SoftFileLock(db_lock_path):
+    with Lock(db_lock_path):
         db, _ = load_header(db_root, name, version)
 
     return db

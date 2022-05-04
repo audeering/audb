@@ -3,7 +3,6 @@ import shutil
 import tempfile
 import typing
 
-import filelock
 import pandas as pd
 
 import audbackend
@@ -19,6 +18,7 @@ from audb.core.cache import (
 from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
+from audb.core.lock import Lock
 from audb.core.repository import Repository
 from audb.core.utils import (
     lookup_backend,
@@ -264,7 +264,7 @@ def dependencies(
 
     deps = Dependencies()
 
-    with filelock.SoftFileLock(db_lock_path):
+    with Lock(db_lock_path):
         try:
             deps.load(deps_path)
         except (AttributeError, FileNotFoundError, ValueError, EOFError):

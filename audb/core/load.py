@@ -25,6 +25,7 @@ from audb.core.cache import (
 )
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
+from audb.core.lock import Lock
 from audb.core.utils import lookup_backend
 
 
@@ -781,7 +782,7 @@ def load(
     )
 
     try:
-        with filelock.SoftFileLock(db_lock_path, timeout=timeout):
+        with Lock(db_lock_path, timeout=timeout):
 
             # Start with database header without tables
             db, backend = load_header(
@@ -1046,7 +1047,7 @@ def load_media(
             )
 
     try:
-        with filelock.SoftFileLock(db_lock_path, timeout=timeout):
+        with Lock(db_lock_path, timeout=timeout):
 
             # Start with database header without tables
             db, backend = load_header(
@@ -1162,7 +1163,7 @@ def load_table(
             f"Could not find table '{table}' in {name} {version}"
         )
 
-    with filelock.SoftFileLock(db_lock_path):
+    with Lock(db_lock_path):
 
         # Start with database header without tables
         db, backend = load_header(
