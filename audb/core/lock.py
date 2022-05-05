@@ -32,15 +32,17 @@ class FolderLock:
         """
         folders = audeer.to_list(folders)
         files = [audeer.path(folder, define.LOCK_FILE) for folder in folders]
+
         self.locks = [
-            filelock.SoftFileLock(file, timeout=timeout)
+            filelock.SoftFileLock(file)
             for file in files
         ]
+        self.timeout = timeout
 
     def __enter__(self) -> 'FolderLock':
         r"""Acquire the lock(s)."""
         for lock in self.locks:
-            lock.acquire()
+            lock.acquire(self.timeout)
         return self
 
     def __exit__(

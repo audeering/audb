@@ -1,18 +1,17 @@
 import time
 
 import filelock
-import pytest
 
 import audeer
 
 from audb.core.lock import FolderLock
 
 
-def job(lock, pre_sleep, lock_sleep):
-    time.sleep(pre_sleep)
+def job(lock, sleep_pre_lock, sleep_in_lock):
+    time.sleep(sleep_pre_lock)
     try:
         with lock:
-            time.sleep(lock_sleep)
+            time.sleep(sleep_in_lock)
     except filelock.Timeout:
         return 0
     return 1
