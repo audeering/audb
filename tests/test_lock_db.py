@@ -1,15 +1,13 @@
 import os
-import shutil
 import sys
+import threading
 import time
 
-import pandas as pd
 import pytest
 
 import audbackend
 import audeer
 import audformat.testing
-import audiofile
 
 import audb
 
@@ -39,8 +37,7 @@ class CrashFileSystem(audbackend.FileSystem):
 
     """
     def _get_file(self, *args):
-        assert os.path.exists(DB_FLAVOR_LOCK_PATH) or \
-               os.path.exists(DB_LOCK_PATH)
+        assert any([os.path.exists(path) for path in DB_LOCK_PATHS])
         raise RuntimeError()
 
 
@@ -59,11 +56,9 @@ os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
     autouse=True,
 )
 def fixture_ensure_lock_file_deleted():
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+    assert not any([os.path.exists(path) for path in DB_LOCK_PATHS])
     yield
-    assert not os.path.exists(DB_LOCK_PATH)
-    assert not os.path.exists(DB_FLAVOR_LOCK_PATH)
+    assert not any([os.path.exists(path) for path in DB_LOCK_PATHS])
 
 
 @pytest.fixture(
@@ -82,21 +77,27 @@ def fixture_set_repositories(request):
 
 DB_NAME = f'test_lock-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
-DB_VERSION = '1.0.0'
+DB_VERSIONS = ['1.0.0', '2.0.0']
 
-DB_LOCK_PATH = audeer.path(
-    pytest.CACHE_ROOT,
-    DB_NAME,
-    DB_VERSION,
-    '.lock',
-)
-DB_FLAVOR_LOCK_PATH = audeer.path(
-    pytest.CACHE_ROOT,
-    DB_NAME,
-    DB_VERSION,
-    audb.Flavor().short_id,
-    '.lock',
-)
+DB_LOCK_PATHS = []
+for version in DB_VERSIONS:
+    DB_LOCK_PATHS.append(
+        audeer.path(
+            pytest.CACHE_ROOT,
+            DB_NAME,
+            version,
+            '.lock',
+        )
+    )
+    DB_LOCK_PATHS.append(
+        audeer.path(
+            pytest.CACHE_ROOT,
+            DB_NAME,
+            version,
+            audb.Flavor().short_id,
+            '.lock',
+        )
+    )
 
 
 def clear_root(root: str):
@@ -117,6 +118,8 @@ def fixture_remove_db_from_cache():
     autouse=True,
 )
 def fixture_publish_db():
+
+    audb.config.REPOSITORIES = pytest.REPOSITORIES
 
     clear_root(DB_ROOT)
     clear_root(pytest.FILE_SYSTEM_HOST)
@@ -139,8 +142,25 @@ def fixture_publish_db():
 
     audb.publish(
         DB_ROOT,
-        DB_VERSION,
+        DB_VERSIONS[0],
         pytest.PUBLISH_REPOSITORY,
+        verbose=False,
+    )
+
+    # publish 2.0.0
+
+    audformat.testing.add_table(
+        db,
+        'empty',
+        'filewise',
+        num_files=0,
+    )
+    db.save(DB_ROOT)
+    audb.publish(
+        DB_ROOT,
+        DB_VERSIONS[1],
+        pytest.PUBLISH_REPOSITORY,
+        previous_version=DB_VERSIONS[0],
         verbose=False,
     )
 
@@ -153,7 +173,7 @@ def fixture_publish_db():
 def load_deps():
     return audb.dependencies(
         DB_NAME,
-        version=DB_VERSION,
+        version=DB_VERSIONS[0],
     )
 
 
@@ -197,7 +217,7 @@ def test_lock_dependencies(fixture_set_repositories, multiprocessing,
 def load_header():
     return audb.info.header(
         DB_NAME,
-        version=DB_VERSION,
+        version=DB_VERSIONS[0],
     )
 
 
@@ -240,7 +260,7 @@ def test_lock_header(fixture_set_repositories, multiprocessing, num_workers):
 def load_db(timeout):
     return audb.load(
         DB_NAME,
-        version=DB_VERSION,
+        version=DB_VERSIONS[0],
         timeout=timeout,
         verbose=False,
     )
@@ -302,11 +322,103 @@ def test_lock_load_crash(fixture_set_repositories):
         load_db(-1)
 
 
+@pytest.mark.parametrize(
+    'fixture_set_repositories',
+    ['file-system'],
+    indirect=True,
+)
+def test_lock_load_from_cached_versions(fixture_set_repositories):
+
+    # ensure immediate timeout if cache folder is locked
+    audb.config.CACHED_VERSIONS_TIMEOUT = 0
+
+    # load version 1.0.0
+    db_v1 = audb.load(
+        DB_NAME,
+        version=DB_VERSIONS[0],
+        verbose=False,
+    )
+
+    # load new files added in version 2.0.0
+    audb.load(
+        DB_NAME,
+        version=DB_VERSIONS[1],
+        tables='empty',
+        verbose=False,
+    )
+
+    # switch to crash backend to ensure remaining files
+    # must be copied from version 1.0.0
+    audb.config.REPOSITORIES = [
+        audb.Repository(
+            name=pytest.REPOSITORY_NAME,
+            host=pytest.FILE_SYSTEM_HOST,
+            backend='crash-file-system',
+        ),
+    ]
+
+    # lock cache folder of version 1.0.0
+    def lock_v1():
+        with audb.core.lock.FolderLock(db_v1.root):
+            event.wait()
+
+    event = threading.Event()
+    thread = threading.Thread(target=lock_v1)
+    thread.start()
+
+    # -> loading missing table from cache fails
+    with pytest.raises(RuntimeError):
+        audb.load(
+            DB_NAME,
+            version=DB_VERSIONS[1],
+            tables='table',
+            only_metadata=True,
+            verbose=False,
+        )
+
+    # release cache folder of version 1.0.0
+    event.set()
+    thread.join()
+
+    # -> loading missing table from cache succeeds
+    audb.load(
+        DB_NAME,
+        version=DB_VERSIONS[1],
+        tables='table',
+        only_metadata=True,
+        verbose=False,
+    )
+
+    # lock cache folder of version 1.0.0
+    event.clear()
+    thread = threading.Thread(target=lock_v1)
+    thread.start()
+
+    # -> loading missing media from cache fails
+    with pytest.raises(RuntimeError):
+        audb.load(
+            DB_NAME,
+            version=DB_VERSIONS[1],
+            verbose=False,
+        )
+
+    # release cache folder of version 1.0.0
+    event.set()
+    thread.join()
+
+    # -> loading missing media from cache succeeds
+    audb.load(
+        DB_NAME,
+        version=DB_VERSIONS[1],
+        verbose=False,
+    )
+
+
 def load_media(timeout):
     return audb.load_media(
         DB_NAME,
         'audio/001.wav',
-        version=DB_VERSION,
+        version=DB_VERSIONS[0],
         timeout=timeout,
         verbose=False,
     )
@@ -361,7 +473,7 @@ def load_table():
     return audb.load_table(
         DB_NAME,
         'table',
-        version=DB_VERSION,
+        version=DB_VERSIONS[0],
         verbose=False,
     )
 

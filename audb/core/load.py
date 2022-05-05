@@ -325,7 +325,7 @@ def _get_media_from_cache(
             audeer.rmdir(db_root_tmp)
 
     except filelock.Timeout:
-        pass
+        missing_media = media
 
     return missing_media
 
@@ -427,7 +427,7 @@ def _get_tables_from_cache(
             audeer.rmdir(db_root_tmp)
 
     except filelock.Timeout:
-        pass
+        missing_tables = tables
 
     return missing_tables
 
