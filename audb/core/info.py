@@ -8,11 +8,10 @@ from audb.core import define
 from audb.core.api import (
     dependencies,
     database_cache_root,
-    database_lock_path,
     latest_version,
 )
 from audb.core.load import load_header
-from audb.core.lock import Lock
+from audb.core.lock import FolderLock
 
 
 def author(
@@ -206,9 +205,8 @@ def header(
         version = latest_version(name)
 
     db_root = database_cache_root(name, version, cache_root)
-    db_lock_path = database_lock_path(db_root)
 
-    with Lock(db_lock_path):
+    with FolderLock(db_root):
         db, _ = load_header(db_root, name, version)
 
     return db

@@ -5,33 +5,39 @@ import filelock
 
 import audeer
 
+import audb.core.define as define
 
-class Lock:
+
+class FolderLock:
 
     def __init__(
             self,
-            files: typing.Union[str, typing.Sequence[str]],
+            folders: typing.Union[str, typing.Sequence[str]],
             *,
             timeout: float = -1,
     ):
-        r"""Manage one or more file locks.
+        r"""Lock one or more folders.
+
+        Waits until the locks of all folders can be acquired.
+        While a folder is locked,
+        a file '.lock' will be created inside the folder.
 
         Args:
-            files: lock file or list of lock files
+            folders: path to one or more folders that should be locked
             timeout: maximum wait time if another thread or process is already
-                accessing the database. If timeout is reached, ``None`` is
-                returned. If timeout < 0 the method will block until the
-                database can be accessed
+                accessing one or more locks. If timeout is reached,
+                ``None`` is returned. If timeout < 0 the method will block
+                until the resource can be accessed
 
         """
-        files = audeer.to_list(files)
-        files = [audeer.path(file) for file in files]
+        folders = audeer.to_list(folders)
+        files = [audeer.path(folder, define.LOCK_FILE) for folder in folders]
         self.locks = [
             filelock.SoftFileLock(file, timeout=timeout)
             for file in files
         ]
 
-    def __enter__(self) -> Lock:
+    def __enter__(self) -> 'FolderLock':
         r"""Acquire the lock(s)."""
         for lock in self.locks:
             lock.acquire()
