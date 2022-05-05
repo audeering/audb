@@ -19,12 +19,12 @@ from audb.core.api import (
 )
 from audb.core.cache import (
     database_cache_root,
-    database_lock_path,
     database_tmp_root,
     default_cache_root,
 )
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
+from audb.core.lock import FolderLock
 from audb.core.utils import lookup_backend
 
 
@@ -767,7 +767,6 @@ def load(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_root(name, version, cache_root, flavor)
-    db_lock_path = database_lock_path(db_root)
 
     if verbose:  # pragma: no cover
         print(f'Get:   {name} v{version}')
@@ -781,7 +780,7 @@ def load(
     )
 
     try:
-        with filelock.SoftFileLock(db_lock_path, timeout=timeout):
+        with FolderLock(db_root, timeout=timeout):
 
             # Start with database header without tables
             db, backend = load_header(
@@ -1025,7 +1024,6 @@ def load_media(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_root(name, version, cache_root, flavor)
-    db_lock_path = database_lock_path(db_root)
 
     if verbose:  # pragma: no cover
         print(f'Get:   {name} v{version}')
@@ -1046,7 +1044,7 @@ def load_media(
             )
 
     try:
-        with filelock.SoftFileLock(db_lock_path, timeout=timeout):
+        with FolderLock(db_root, timeout=timeout):
 
             # Start with database header without tables
             db, backend = load_header(
@@ -1144,7 +1142,6 @@ def load_table(
         version = latest_version(name)
 
     db_root = database_cache_root(name, version, cache_root)
-    db_lock_path = database_lock_path(db_root)
 
     if verbose:  # pragma: no cover
         print(f'Get:   {name} v{version}')
@@ -1162,7 +1159,7 @@ def load_table(
             f"Could not find table '{table}' in {name} {version}"
         )
 
-    with filelock.SoftFileLock(db_lock_path):
+    with FolderLock(db_root):
 
         # Start with database header without tables
         db, backend = load_header(

@@ -51,24 +51,6 @@ def database_cache_root(
     return db_root
 
 
-def database_lock_path(
-        root: str,
-) -> str:
-    r"""Create and return path to lock file.
-
-    If it does not exist yet,
-    creates a file ``.lock`` under ``root``.
-
-    Args:
-        root: path to folder
-
-    Returns:
-        path to lock file
-
-    """
-    return audeer.path(root, define.LOCK_FILE)
-
-
 def database_tmp_root(
         db_root: str,
 ) -> str:
