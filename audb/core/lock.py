@@ -24,10 +24,15 @@ class FolderLock:
 
         Args:
             folders: path to one or more folders that should be locked
-            timeout: maximum wait time if another thread or process is already
-                accessing one or more locks. If timeout is reached,
-                ``None`` is returned. If timeout < 0 the method will block
+            timeout: maximum wait time if another thread or process
+                is already accessing one or more locks.
+                If timeout is reached,
+                an exception is raised.
+                If timeout < 0 the method will block
                 until the resource can be accessed
+
+        Raises:
+            :class:`filelock.Timeout`: if a timeout is reached
 
         """
         folders = audeer.to_list(folders)
