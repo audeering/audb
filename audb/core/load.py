@@ -64,7 +64,7 @@ def _cached_versions(
                 0,
                 (
                     audeer.LooseVersion(row['version']),
-                    flavor_root,
+                    str(flavor_root),
                     deps,
                 ),
             )
@@ -286,33 +286,42 @@ def _get_media_from_cache(
         db_root: str,
         deps: Dependencies,
         cached_versions: CachedVersions,
+        timeout: float,
         flavor: Flavor,
         num_workers: int,
         verbose: bool,
 ) -> typing.Sequence[str]:
     r"""Copy media from cache."""
 
-    cached_media, missing_media = _cached_files(
-        media,
-        deps,
-        cached_versions,
-        flavor,
-        verbose,
-    )
-    db_root_tmp = database_tmp_root(db_root)
+    db_root_cached = [x[1] for x in cached_versions]
 
-    def job(cache_root: str, file: str):
-        _copy_file(file, cache_root, db_root_tmp, db_root)
+    try:
+        with FolderLock(db_root_cached, timeout=timeout):
 
-    audeer.run_tasks(
-        job,
-        params=[([root, file], {}) for root, file in cached_media],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Copy media',
-    )
+            cached_media, missing_media = _cached_files(
+                media,
+                deps,
+                cached_versions,
+                flavor,
+                verbose,
+            )
+            db_root_tmp = database_tmp_root(db_root)
 
-    audeer.rmdir(db_root_tmp)
+            def job(cache_root: str, file: str):
+                _copy_file(file, cache_root, db_root_tmp, db_root)
+
+            audeer.run_tasks(
+                job,
+                params=[([root, file], {}) for root, file in cached_media],
+                num_workers=num_workers,
+                progress_bar=verbose,
+                task_description='Copy media',
+            )
+
+            audeer.rmdir(db_root_tmp)
+
+    except filelock.Timeout:
+        pass
 
     return missing_media
 
@@ -373,37 +382,46 @@ def _get_tables_from_cache(
         db_root: str,
         deps: Dependencies,
         cached_versions: CachedVersions,
+        timeout: float,
         num_workers: int,
         verbose: bool,
 ) -> typing.Sequence[str]:
     r"""Copy tables from cache."""
 
-    cached_tables, missing_tables = _cached_files(
-        tables,
-        deps,
-        cached_versions,
-        None,
-        verbose,
-    )
-    db_root_tmp = database_tmp_root(db_root)
+    db_root_cached = [x[1] for x in cached_versions]
 
-    def job(cache_root: str, file: str):
-        file_pkl = audeer.replace_file_extension(
-            file,
-            audformat.define.TableStorageFormat.PICKLE,
-        )
-        _copy_file(file, cache_root, db_root_tmp, db_root)
-        _copy_file(file_pkl, cache_root, db_root_tmp, db_root)
+    try:
+        with FolderLock(db_root_cached, timeout=timeout):
 
-    audeer.run_tasks(
-        job,
-        params=[([root, file], {}) for root, file in cached_tables],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Copy tables',
-    )
+            cached_tables, missing_tables = _cached_files(
+                tables,
+                deps,
+                cached_versions,
+                None,
+                verbose,
+            )
+            db_root_tmp = database_tmp_root(db_root)
 
-    audeer.rmdir(db_root_tmp)
+            def job(cache_root: str, file: str):
+                file_pkl = audeer.replace_file_extension(
+                    file,
+                    audformat.define.TableStorageFormat.PICKLE,
+                )
+                _copy_file(file, cache_root, db_root_tmp, db_root)
+                _copy_file(file_pkl, cache_root, db_root_tmp, db_root)
+
+            audeer.run_tasks(
+                job,
+                params=[([root, file], {}) for root, file in cached_tables],
+                num_workers=num_workers,
+                progress_bar=verbose,
+                task_description='Copy tables',
+            )
+
+            audeer.rmdir(db_root_tmp)
+
+    except filelock.Timeout:
+        pass
 
     return missing_tables
 
@@ -415,6 +433,7 @@ def _load_media(
         name: str,
         version: str,
         cached_versions: typing.Optional[CachedVersions],
+        timeout: float,
         deps: Dependencies,
         flavor: Flavor,
         cache_root: str,
@@ -449,6 +468,7 @@ def _load_media(
                 db_root,
                 deps,
                 cached_versions,
+                timeout,
                 flavor,
                 num_workers,
                 verbose,
@@ -477,6 +497,7 @@ def _load_tables(
         db: audformat.Database,
         version: str,
         cached_versions: typing.Optional[CachedVersions],
+        timeout: float,
         deps: Dependencies,
         flavor: Flavor,
         cache_root: str,
@@ -510,6 +531,7 @@ def _load_tables(
                 db_root,
                 deps,
                 cached_versions,
+                timeout,
                 num_workers,
                 verbose,
             )
@@ -805,6 +827,7 @@ def load(
                     db,
                     version,
                     cached_versions,
+                    timeout,
                     deps,
                     flavor,
                     cache_root,
@@ -832,6 +855,7 @@ def load(
                     name,
                     version,
                     cached_versions,
+                    timeout,
                     deps,
                     flavor,
                     cache_root,
@@ -1066,6 +1090,7 @@ def load_media(
                     name,
                     version,
                     None,
+                    -1,
                     deps,
                     flavor,
                     cache_root,
@@ -1181,6 +1206,7 @@ def load_table(
                 db,
                 version,
                 None,
+                -1,
                 deps,
                 Flavor(),
                 cache_root,
