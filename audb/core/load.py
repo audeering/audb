@@ -10,6 +10,7 @@ import audbackend
 import audeer
 import audformat
 
+
 from audb.core import define
 from audb.core import utils
 from audb.core.api import (
@@ -22,6 +23,7 @@ from audb.core.cache import (
     database_tmp_root,
     default_cache_root,
 )
+from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
@@ -286,7 +288,6 @@ def _get_media_from_cache(
         db_root: str,
         deps: Dependencies,
         cached_versions: CachedVersions,
-        timeout: float,
         flavor: Flavor,
         num_workers: int,
         verbose: bool,
@@ -296,7 +297,10 @@ def _get_media_from_cache(
     db_root_cached = [x[1] for x in cached_versions]
 
     try:
-        with FolderLock(db_root_cached, timeout=timeout):
+        with FolderLock(
+                db_root_cached,
+                timeout=config.CACHED_VERSIONS_TIMEOUT,
+        ):
 
             cached_media, missing_media = _cached_files(
                 media,
@@ -382,7 +386,6 @@ def _get_tables_from_cache(
         db_root: str,
         deps: Dependencies,
         cached_versions: CachedVersions,
-        timeout: float,
         num_workers: int,
         verbose: bool,
 ) -> typing.Sequence[str]:
@@ -391,7 +394,10 @@ def _get_tables_from_cache(
     db_root_cached = [x[1] for x in cached_versions]
 
     try:
-        with FolderLock(db_root_cached, timeout=timeout):
+        with FolderLock(
+                db_root_cached,
+                timeout=config.CACHED_VERSIONS_TIMEOUT,
+        ):
 
             cached_tables, missing_tables = _cached_files(
                 tables,
@@ -433,7 +439,6 @@ def _load_media(
         name: str,
         version: str,
         cached_versions: typing.Optional[CachedVersions],
-        timeout: float,
         deps: Dependencies,
         flavor: Flavor,
         cache_root: str,
@@ -468,7 +473,6 @@ def _load_media(
                 db_root,
                 deps,
                 cached_versions,
-                timeout,
                 flavor,
                 num_workers,
                 verbose,
@@ -497,7 +501,6 @@ def _load_tables(
         db: audformat.Database,
         version: str,
         cached_versions: typing.Optional[CachedVersions],
-        timeout: float,
         deps: Dependencies,
         flavor: Flavor,
         cache_root: str,
@@ -531,7 +534,6 @@ def _load_tables(
                 db_root,
                 deps,
                 cached_versions,
-                timeout,
                 num_workers,
                 verbose,
             )
@@ -827,7 +829,6 @@ def load(
                     db,
                     version,
                     cached_versions,
-                    timeout,
                     deps,
                     flavor,
                     cache_root,
@@ -855,7 +856,6 @@ def load(
                     name,
                     version,
                     cached_versions,
-                    timeout,
                     deps,
                     flavor,
                     cache_root,
@@ -1090,7 +1090,6 @@ def load_media(
                     name,
                     version,
                     None,
-                    -1,
                     deps,
                     flavor,
                     cache_root,
@@ -1206,7 +1205,6 @@ def load_table(
                 db,
                 version,
                 None,
-                -1,
                 deps,
                 Flavor(),
                 cache_root,
