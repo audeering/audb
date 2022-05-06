@@ -8,12 +8,15 @@ USER_CONFIG_FILE = '~/.audb.yaml'
 # Database
 DB = 'db'
 HEADER_FILE = f'{DB}.yaml'
-LOCK_FILE = '.lock'
-TIMEOUT_MSG = 'Lock could not be acquired. Timeout exceeded.'
 
 # Dependencies
 DEPENDENCIES_FILE = f'{DB}.csv'
 CACHED_DEPENDENCIES_FILE = f'{DB}.pkl'
+
+# Cache lock
+CACHED_VERSIONS_TIMEOUT = 10  # Timeout to acquire access to cached versions
+LOCK_FILE = '.lock'
+TIMEOUT_MSG = 'Lock could not be acquired. Timeout exceeded.'
 
 
 class DependField:
