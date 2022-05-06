@@ -570,11 +570,11 @@ def _media(
             raise ValueError(msg)
     else:
         requested_media = media
-        for media in requested_media:
-            if media not in db.files:
+        for media_file in requested_media:
+            if media_file not in db.files:
                 msg = _error_message_missing_object(
                     'media file',
-                    [media],
+                    [media_file],
                     db.name,
                     version,
                 )
