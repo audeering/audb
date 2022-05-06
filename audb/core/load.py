@@ -545,14 +545,15 @@ def _media(
         for m in db.files:
             if pattern.search(m):
                 requested_media.append(m)
+        if len(requested_media) == 0:
+            raise ValueError(f"Could not find a media file matching '{media}'")
     else:
         requested_media = media
-
-    if (
-            len(requested_media) == 0
-            or any([file not in db.files for file in requested_media])
-    ):
-        raise ValueError(f"Could not find media matching '{media}'")
+        for media in requested_media:
+            if media not in db.files:
+                raise ValueError(
+                    f"Could not find the media file '{media}'"
+                )
 
     return requested_media
 
@@ -626,14 +627,15 @@ def _tables(
         for table in deps.table_ids:
             if pattern.search(table):
                 requested_tables.append(table)
+        if len(requested_tables) == 0:
+            raise ValueError(f"Could not find a table matching '{tables}' ")
     else:
         requested_tables = tables
-
-    if (
-            len(requested_tables) == 0
-            or any([table not in deps.table_ids for table in requested_tables])
-    ):
-        raise ValueError(f"Could not find table(s) matching '{tables}' ")
+        for table in requested_tables:
+            if table not in deps.table_ids:
+                raise ValueError(
+                    f"Could not find the table '{table}'"
+                )
 
     return requested_tables
 
