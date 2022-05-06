@@ -91,17 +91,6 @@ class config:
     CACHE_ROOT = global_config['cache_root']
     r"""Default user cache folder."""
 
-    CACHED_VERSIONS_TIMEOUT = 10
-    r"""Timeout to acquire access to cached versions.
-
-    Maximum wait time to acquire access to cached versions
-    if they are currently blocked by another thread or process.
-    If timeout is reached,
-    all missing files will be downloaded from backend instead.
-    If timeout < 0 will wait until the cache folders can be accessed.
-
-    """
-
     REPOSITORIES = [
         Repository(r['name'], r['host'], r['backend'])
         for r in global_config['repositories']

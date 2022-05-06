@@ -330,7 +330,8 @@ def test_lock_load_crash(fixture_set_repositories):
 def test_lock_load_from_cached_versions(fixture_set_repositories):
 
     # ensure immediate timeout if cache folder is locked
-    audb.config.CACHED_VERSIONS_TIMEOUT = 0
+    cached_version_timeout = audb.core.define.CACHED_VERSIONS_TIMEOUT
+    audb.core.define.CACHED_VERSIONS_TIMEOUT = 0
 
     # load version 1.0.0
     db_v1 = audb.load(
@@ -412,6 +413,9 @@ def test_lock_load_from_cached_versions(fixture_set_repositories):
         version=DB_VERSIONS[1],
         verbose=False,
     )
+
+    # reset timeout
+    audb.core.define.CACHED_VERSIONS_TIMEOUT = cached_version_timeout
 
 
 def load_media(timeout):

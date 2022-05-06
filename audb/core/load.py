@@ -22,7 +22,6 @@ from audb.core.cache import (
     database_tmp_root,
     default_cache_root,
 )
-from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
@@ -298,7 +297,7 @@ def _get_media_from_cache(
     try:
         with FolderLock(
                 db_root_cached,
-                timeout=config.CACHED_VERSIONS_TIMEOUT,
+                timeout=define.CACHED_VERSIONS_TIMEOUT,
         ):
 
             cached_media, missing_media = _cached_files(
@@ -395,7 +394,7 @@ def _get_tables_from_cache(
     try:
         with FolderLock(
                 db_root_cached,
-                timeout=config.CACHED_VERSIONS_TIMEOUT,
+                timeout=define.CACHED_VERSIONS_TIMEOUT,
         ):
 
             cached_tables, missing_tables = _cached_files(
