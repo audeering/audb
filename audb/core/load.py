@@ -766,8 +766,8 @@ def load(
         database object
 
     Raises:
-        ValueError: if no table in the database matches the requested ones
-        ValueError: if no media in the database matches the requested ones
+        ValueError: if table or media is requested
+            that is not part of the database
 
     Example:
         >>> db = audb.load(
