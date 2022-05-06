@@ -178,6 +178,20 @@ def _database_is_complete(
     return complete
 
 
+def _error_message_missing_object(
+        object_name: str,
+        missing_object: typing.Union[str, typing.Sequence],
+        db_name: str,
+        db_version: str,
+) -> str:
+    if isinstance(missing_object, str):
+        msg = f"Could not find a {object_name} matching '{missing_object}' "
+    else:
+        msg = f"Could not find the {object_name} '{missing_object[0]}' "
+    msg += f'in {db_name} v{db_version}'
+    return msg
+
+
 def _files_duration(
         db: audformat.Database,
         deps: Dependencies,
@@ -532,6 +546,7 @@ def _load_tables(
 def _media(
         db: audformat.Database,
         media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        version: str,
 ) -> typing.Sequence[str]:
 
     if media is None:
@@ -546,14 +561,24 @@ def _media(
             if pattern.search(m):
                 requested_media.append(m)
         if len(requested_media) == 0:
-            raise ValueError(f"Could not find a media file matching '{media}'")
+            msg = _error_message_missing_object(
+                'media file',
+                media,
+                db.name,
+                version,
+            )
+            raise ValueError(msg)
     else:
         requested_media = media
         for media in requested_media:
             if media not in db.files:
-                raise ValueError(
-                    f"Could not find the media file '{media}'"
+                msg = _error_message_missing_object(
+                    'media file',
+                    [media],
+                    db.name,
+                    version,
                 )
+                raise ValueError(msg)
 
     return requested_media
 
@@ -614,6 +639,8 @@ def _remove_media(
 def _tables(
         deps: Dependencies,
         tables: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        name: str,
+        version: str,
 ) -> typing.Sequence[str]:
 
     if tables is None:
@@ -628,14 +655,24 @@ def _tables(
             if pattern.search(table):
                 requested_tables.append(table)
         if len(requested_tables) == 0:
-            raise ValueError(f"Could not find a table matching '{tables}' ")
+            msg = _error_message_missing_object(
+                'table',
+                tables,
+                name,
+                version,
+            )
+            raise ValueError(msg)
     else:
         requested_tables = tables
         for table in requested_tables:
             if table not in deps.table_ids:
-                raise ValueError(
-                    f"Could not find the table '{table}'"
+                msg = _error_message_missing_object(
+                    'table',
+                    [table],
+                    name,
+                    version,
                 )
+                raise ValueError(msg)
 
     return requested_tables
 
@@ -825,7 +862,7 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # filter tables
-            requested_tables = _tables(deps, tables)
+            requested_tables = _tables(deps, tables, name, version)
 
             # load missing tables
             if not db_is_complete:
@@ -852,7 +889,7 @@ def load(
                 db[table].load(os.path.join(db_root, f'db.{table}'))
 
             # filter media
-            requested_media = _media(db, media)
+            requested_media = _media(db, media, version)
 
             # load missing media
             if not db_is_complete and not only_metadata:
@@ -1071,9 +1108,13 @@ def load_media(
     available_files = deps.media
     for media_file in media:
         if media_file not in available_files:
-            raise ValueError(
-                f"Could not find '{media_file}' in {name} {version}"
+            msg = _error_message_missing_object(
+                'media file',
+                [media_file],
+                name,
+                version,
             )
+            raise ValueError(msg)
 
     try:
         with filelock.SoftFileLock(db_lock_path, timeout=timeout):
@@ -1188,9 +1229,13 @@ def load_table(
     )
 
     if table not in deps.table_ids:
-        raise ValueError(
-            f"Could not find table '{table}' in {name} {version}"
+        msg = _error_message_missing_object(
+            'table',
+            [table],
+            name,
+            version,
         )
+        raise ValueError(msg)
 
     with filelock.SoftFileLock(db_lock_path):
 
