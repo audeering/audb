@@ -134,6 +134,11 @@ def fixture_clear_cache():
             [],
         ),
         (
+            '',
+            None,
+            [],
+        ),
+        (
             ['audio/000.wav', 'audio/001.wav'],
             None,
             ['audio/000.wav', 'audio/001.wav'],
@@ -147,6 +152,18 @@ def fixture_clear_cache():
             r'.*0\.wav',
             None,
             ['audio/000.wav', 'audio/010.wav', 'audio/1/020.wav'],
+        ),
+        pytest.param(
+            'non-existing',
+            None,
+            None,
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        pytest.param(
+            ['non-existing'],
+            None,
+            None,
+            marks=pytest.mark.xfail(raises=ValueError),
         ),
     ]
 )
@@ -202,10 +219,30 @@ def test_media(media, format, expected_files):
              'audio/1/020.flac', 'audio/2/021.flac'],
         ),
         (
-            'bad',
+            [],
             None,
             [],
             [],
+        ),
+        (
+            '',
+            None,
+            [],
+            [],
+        ),
+        pytest.param(
+            'non-existing',
+            None,
+            None,
+            None,
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        pytest.param(
+            ['non-existing'],
+            None,
+            None,
+            None,
+            marks=pytest.mark.xfail(raises=ValueError),
         ),
     ]
 )

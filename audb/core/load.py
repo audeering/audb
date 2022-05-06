@@ -175,6 +175,20 @@ def _database_is_complete(
     return complete
 
 
+def _error_message_missing_object(
+        object_name: str,
+        missing_object: typing.Union[str, typing.Sequence],
+        db_name: str,
+        db_version: str,
+) -> str:
+    if isinstance(missing_object, str):
+        msg = f"Could not find a {object_name} matching '{missing_object}' "
+    else:
+        msg = f"Could not find the {object_name} '{missing_object[0]}' "
+    msg += f'in {db_name} v{db_version}'
+    return msg
+
+
 def _files_duration(
         db: audformat.Database,
         deps: Dependencies,
@@ -551,18 +565,41 @@ def _load_tables(
 def _media(
         db: audformat.Database,
         media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        version: str,
 ) -> typing.Sequence[str]:
 
     if media is None:
-        media = db.files
-    elif isinstance(media, str):
+        return db.files
+    elif len(media) == 0:
+        return []
+
+    if isinstance(media, str):
         pattern = re.compile(media)
-        media = []
+        requested_media = []
         for m in db.files:
             if pattern.search(m):
-                media.append(m)
+                requested_media.append(m)
+        if len(requested_media) == 0:
+            msg = _error_message_missing_object(
+                'media file',
+                media,
+                db.name,
+                version,
+            )
+            raise ValueError(msg)
+    else:
+        requested_media = media
+        for media_file in requested_media:
+            if media_file not in db.files:
+                msg = _error_message_missing_object(
+                    'media file',
+                    [media_file],
+                    db.name,
+                    version,
+                )
+                raise ValueError(msg)
 
-    return media
+    return requested_media
 
 
 def _missing_media(
@@ -621,16 +658,42 @@ def _remove_media(
 def _tables(
         deps: Dependencies,
         tables: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        name: str,
+        version: str,
 ) -> typing.Sequence[str]:
+
     if tables is None:
-        tables = deps.table_ids
-    elif isinstance(tables, str):
+        return deps.table_ids
+    elif len(tables) == 0:
+        return []
+
+    if isinstance(tables, str):
         pattern = re.compile(tables)
-        tables = []
+        requested_tables = []
         for table in deps.table_ids:
             if pattern.search(table):
-                tables.append(table)
-    return tables
+                requested_tables.append(table)
+        if len(requested_tables) == 0:
+            msg = _error_message_missing_object(
+                'table',
+                tables,
+                name,
+                version,
+            )
+            raise ValueError(msg)
+    else:
+        requested_tables = tables
+        for table in requested_tables:
+            if table not in deps.table_ids:
+                msg = _error_message_missing_object(
+                    'table',
+                    [table],
+                    name,
+                    version,
+                )
+                raise ValueError(msg)
+
+    return requested_tables
 
 
 def _update_path(
@@ -760,6 +823,10 @@ def load(
     Returns:
         database object
 
+    Raises:
+        ValueError: if table or media is requested
+            that is not part of the database
+
     Example:
         >>> db = audb.load(
         ...     'emodb',
@@ -813,7 +880,7 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # filter tables
-            requested_tables = _tables(deps, tables)
+            requested_tables = _tables(deps, tables, name, version)
 
             # load missing tables
             if not db_is_complete:
@@ -840,7 +907,7 @@ def load(
                 db[table].load(os.path.join(db_root, f'db.{table}'))
 
             # filter media
-            requested_media = _media(db, media)
+            requested_media = _media(db, media, version)
 
             # load missing media
             if not db_is_complete and not only_metadata:
@@ -1058,9 +1125,13 @@ def load_media(
     available_files = deps.media
     for media_file in media:
         if media_file not in available_files:
-            raise ValueError(
-                f"Could not find '{media_file}' in {name} {version}"
+            msg = _error_message_missing_object(
+                'media file',
+                [media_file],
+                name,
+                version,
             )
+            raise ValueError(msg)
 
     try:
         with FolderLock(db_root, timeout=timeout):
@@ -1174,9 +1245,13 @@ def load_table(
     )
 
     if table not in deps.table_ids:
-        raise ValueError(
-            f"Could not find table '{table}' in {name} {version}"
+        msg = _error_message_missing_object(
+            'table',
+            [table],
+            name,
+            version,
         )
+        raise ValueError(msg)
 
     with FolderLock(db_root):
 
