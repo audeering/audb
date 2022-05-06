@@ -130,10 +130,7 @@ def _copy_file(
     audeer.mkdir(os.path.dirname(tmp_path))
     audeer.mkdir(os.path.dirname(dst_path))
     shutil.copy(src_path, tmp_path)
-    audeer.move_file(
-        os.path.join(root_tmp, file),
-        os.path.join(root_dst, file),
-    )
+    audeer.move_file(tmp_path, dst_path)
 
 
 def _database_check_complete(
