@@ -61,6 +61,7 @@ from audb.core.info import (
     channels,
     description,
     duration,
+    files,
     formats,
     header,
     languages,

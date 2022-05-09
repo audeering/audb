@@ -28,6 +28,11 @@ duration
 
 .. autofunction:: duration
 
+files
+-----
+
+.. autofunction:: files
+
 formats
 -------
 
