@@ -10,7 +10,12 @@ from audb.core.api import (
     database_cache_root,
     latest_version,
 )
-from audb.core.load import load_header
+from audb.core.load import (
+    load_header,
+    load_table,
+    _media,
+    _tables,
+)
 from audb.core.lock import FolderLock
 
 
@@ -44,6 +49,8 @@ def bit_depths(
         name: str,
         *,
         version: str = None,
+        tables: typing.Sequence = None,
+        media: typing.Sequence = None,
         cache_root: str = None,
 ) -> typing.Set[int]:
     """Media bit depth.
@@ -51,6 +58,10 @@ def bit_depths(
     Args:
         name: name of database
         version: version of database
+        tables: include only tables matching the regular expression or
+            provided in the list
+        media: include only media matching the regular expression or
+            provided in the list
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -62,9 +73,41 @@ def bit_depths(
         {16}
 
     """
+    if version is None:
+        version = latest_version(name)
+
+    requested_files = None
     deps = dependencies(name, version=version, cache_root=cache_root)
-    df = deps()
-    return set(df[df.type == define.DependType.MEDIA].bit_depth)
+
+    if tables is not None or media is not None:
+        media_files = files(name, version=version, cache_root=cache_root)
+
+    if tables is not None:
+        requested_files = []
+        requested_tables = _tables(deps, tables, name, version)
+        if len(requested_tables) != 0:
+            print(requested_tables)
+            for table in requested_tables:
+                df = load_table(
+                    name,
+                    table,
+                    version=version,
+                    cache_root=cache_root,
+                    verbose=False,
+                )
+                requested_files += [f for f in media_files if f in df.index]
+
+    if media is not None:
+        if tables is None:
+            requested_files = media_files
+        requested_media = _media(media_files, media, name, version)
+        requested_files = [f for f in requested_files if f in requested_media]
+
+    if requested_files is None:
+        df = deps()
+        return set(df[df.type == define.DependType.MEDIA].bit_depth)
+    else:
+        return set([deps.bit_depth(file) for file in requested_files])
 
 
 def channels(

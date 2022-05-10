@@ -563,38 +563,39 @@ def _load_tables(
 
 
 def _media(
-        db: audformat.Database,
+        media_files: typing.Sequence,
         media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        name: str,
         version: str,
 ) -> typing.Sequence[str]:
 
     if media is None:
-        return db.files
+        return media_files
     elif len(media) == 0:
         return []
 
     if isinstance(media, str):
         pattern = re.compile(media)
         requested_media = []
-        for m in db.files:
+        for m in media_files:
             if pattern.search(m):
                 requested_media.append(m)
         if len(requested_media) == 0:
             msg = _error_message_missing_object(
                 'media file',
                 media,
-                db.name,
+                name,
                 version,
             )
             raise ValueError(msg)
     else:
         requested_media = media
         for media_file in requested_media:
-            if media_file not in db.files:
+            if media_file not in media_files:
                 msg = _error_message_missing_object(
                     'media file',
                     [media_file],
-                    db.name,
+                    name,
                     version,
                 )
                 raise ValueError(msg)
@@ -907,7 +908,7 @@ def load(
                 db[table].load(os.path.join(db_root, f'db.{table}'))
 
             # filter media
-            requested_media = _media(db, media, version)
+            requested_media = _media(db.files, media, name, version)
 
             # load missing media
             if not db_is_complete and not only_metadata:
