@@ -562,47 +562,6 @@ def _load_tables(
     return cached_versions
 
 
-def _media(
-        media_files: typing.Sequence,
-        media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
-        name: str,
-        version: str,
-) -> typing.Sequence[str]:
-
-    if media is None:
-        return media_files
-    elif len(media) == 0:
-        return []
-
-    if isinstance(media, str):
-        pattern = re.compile(media)
-        requested_media = []
-        for m in media_files:
-            if pattern.search(m):
-                requested_media.append(m)
-        if len(requested_media) == 0:
-            msg = _error_message_missing_object(
-                'media file',
-                media,
-                name,
-                version,
-            )
-            raise ValueError(msg)
-    else:
-        requested_media = media
-        for media_file in requested_media:
-            if media_file not in media_files:
-                msg = _error_message_missing_object(
-                    'media file',
-                    [media_file],
-                    name,
-                    version,
-                )
-                raise ValueError(msg)
-
-    return requested_media
-
-
 def _missing_media(
         db_root: str,
         media: typing.Sequence[str],
@@ -656,47 +615,6 @@ def _remove_media(
         )
 
 
-def _tables(
-        deps: Dependencies,
-        tables: typing.Optional[typing.Union[str, typing.Sequence[str]]],
-        name: str,
-        version: str,
-) -> typing.Sequence[str]:
-
-    if tables is None:
-        return deps.table_ids
-    elif len(tables) == 0:
-        return []
-
-    if isinstance(tables, str):
-        pattern = re.compile(tables)
-        requested_tables = []
-        for table in deps.table_ids:
-            if pattern.search(table):
-                requested_tables.append(table)
-        if len(requested_tables) == 0:
-            msg = _error_message_missing_object(
-                'table',
-                tables,
-                name,
-                version,
-            )
-            raise ValueError(msg)
-    else:
-        requested_tables = tables
-        for table in requested_tables:
-            if table not in deps.table_ids:
-                msg = _error_message_missing_object(
-                    'table',
-                    [table],
-                    name,
-                    version,
-                )
-                raise ValueError(msg)
-
-    return requested_tables
-
-
 def _update_path(
         db: audformat.Database,
         root: str,
@@ -745,6 +663,90 @@ def _update_path(
         progress_bar=verbose,
         task_description='Update file path',
     )
+
+
+def filter_media(
+        media_files: typing.Sequence,
+        media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        name: str,
+        version: str,
+) -> typing.Sequence[str]:
+    r"""Filter database media files by requested media files."""
+
+    if media is None:
+        return media_files
+    elif len(media) == 0:
+        return []
+
+    if isinstance(media, str):
+        pattern = re.compile(media)
+        requested_media = []
+        for m in media_files:
+            if pattern.search(m):
+                requested_media.append(m)
+        if len(requested_media) == 0:
+            msg = _error_message_missing_object(
+                'media file',
+                media,
+                name,
+                version,
+            )
+            raise ValueError(msg)
+    else:
+        requested_media = media
+        for media_file in requested_media:
+            if media_file not in media_files:
+                msg = _error_message_missing_object(
+                    'media file',
+                    [media_file],
+                    name,
+                    version,
+                )
+                raise ValueError(msg)
+
+    return requested_media
+
+
+def filter_tables(
+        deps: Dependencies,
+        tables: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+        name: str,
+        version: str,
+) -> typing.Sequence[str]:
+    r"""Filter database tables by requested tables."""
+
+    if tables is None:
+        return deps.table_ids
+    elif len(tables) == 0:
+        return []
+
+    if isinstance(tables, str):
+        pattern = re.compile(tables)
+        requested_tables = []
+        for table in deps.table_ids:
+            if pattern.search(table):
+                requested_tables.append(table)
+        if len(requested_tables) == 0:
+            msg = _error_message_missing_object(
+                'table',
+                tables,
+                name,
+                version,
+            )
+            raise ValueError(msg)
+    else:
+        requested_tables = tables
+        for table in requested_tables:
+            if table not in deps.table_ids:
+                msg = _error_message_missing_object(
+                    'table',
+                    [table],
+                    name,
+                    version,
+                )
+                raise ValueError(msg)
+
+    return requested_tables
 
 
 def load(
@@ -881,7 +883,7 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # filter tables
-            requested_tables = _tables(deps, tables, name, version)
+            requested_tables = filter_tables(deps, tables, name, version)
 
             # load missing tables
             if not db_is_complete:
@@ -908,7 +910,7 @@ def load(
                 db[table].load(os.path.join(db_root, f'db.{table}'))
 
             # filter media
-            requested_media = _media(db.files, media, name, version)
+            requested_media = filter_media(db.files, media, name, version)
 
             # load missing media
             if not db_is_complete and not only_metadata:

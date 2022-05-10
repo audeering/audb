@@ -1,11 +1,13 @@
 import os
 import shutil
 
+import numpy as np
 import pandas as pd
 import pytest
 
 import audformat.testing
 import audeer
+import audiofile
 
 import audb
 
@@ -36,10 +38,31 @@ DB.media['media'] = audformat.Media()
 DB.schemes['scheme'] = audformat.Scheme()
 DB.splits['split'] = audformat.Split()
 DB.raters['rater'] = audformat.Rater()
-DB['table'] = audformat.Table(media_id='media', split_id='split')
-DB['table']['column'] = audformat.Column(
-    scheme_id='scheme', rater_id='rater',
+DB['table1'] = audformat.Table(
+    audformat.filewise_index(
+        ['f11.wav', 'f12.wav', 'f13.wav'],
+    ),
+    media_id='media',
+    split_id='split',
 )
+DB['table1']['column'] = audformat.Column(
+    scheme_id='scheme',
+    rater_id='rater',
+)
+DB['table2'] = audformat.Table(
+    audformat.segmented_index(
+        ['f21.wav', 'f22.wav', 'f22.wav'],
+        [0, 0, .5],
+        [1, .5, 1],
+    ),
+    media_id='media',
+    split_id='split',
+)
+DB['table2']['column'] = audformat.Column(
+    scheme_id='scheme',
+    rater_id='rater',
+)
+
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 
 
@@ -58,7 +81,16 @@ def fixture_publish_db():
     clear_root(DB_ROOT)
     clear_root(pytest.FILE_SYSTEM_HOST)
 
-    # create db
+    # create db + audio files
+    sampling_rate = 8000
+    audeer.mkdir(DB_ROOT)
+    for table in list(DB.tables):
+        for file in DB[table].files:
+            audiofile.write(
+                os.path.join(DB_ROOT, file),
+                np.zeros((1, sampling_rate)),
+                sampling_rate,
+            )
 
     DB.save(DB_ROOT)
 
@@ -119,16 +151,45 @@ def test_description():
     assert audb.info.description(DB_NAME) == DB.description
 
 
-def test_duration():
+@pytest.mark.parametrize(
+    'tables, media',
+    [
+        (None, None),
+        ([], None),
+        (None, []),
+        ('', ''),
+        ('table1', None),
+        (None, ['f11.wav', 'f12.wav']),
+        ('table1', ['f11.wav', 'f12.wav']),
+        # Error as tables and media do not overlap
+        pytest.param(
+            'table2',
+            ['f11.wav', 'f12.wav'],
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+    ]
+)
+def test_duration(tables, media):
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
-    assert audb.info.duration(DB_NAME) == pd.to_timedelta(
+    duration = audb.info.duration(DB_NAME, tables=tables, media=media)
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        tables=tables,
+        media=media,
+        full_path=False,
+        verbose=False,
+    )
+    print(db.files)
+    expected_duration = pd.to_timedelta(
         sum(
             [
-                deps.duration(file) for file in deps.media
+                deps.duration(file) for file in db.files
             ]
         ),
         unit='s',
     )
+    assert duration == expected_duration
 
 
 def test_formats():

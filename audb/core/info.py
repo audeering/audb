@@ -11,10 +11,10 @@ from audb.core.api import (
     latest_version,
 )
 from audb.core.load import (
+    filter_media,
+    filter_tables,
     load_header,
     load_table,
-    _media,
-    _tables,
 )
 from audb.core.lock import FolderLock
 
@@ -73,47 +73,16 @@ def bit_depths(
         {16}
 
     """
-    if version is None:
-        version = latest_version(name)
-
-    requested_files = None
-    deps = dependencies(name, version=version, cache_root=cache_root)
-
-    if tables is not None or media is not None:
-        media_files = files(name, version=version, cache_root=cache_root)
-
-    if tables is not None:
-        requested_files = []
-        requested_tables = _tables(deps, tables, name, version)
-        if len(requested_tables) != 0:
-            print(requested_tables)
-            for table in requested_tables:
-                df = load_table(
-                    name,
-                    table,
-                    version=version,
-                    cache_root=cache_root,
-                    verbose=False,
-                )
-                requested_files += [f for f in media_files if f in df.index]
-
-    if media is not None:
-        if tables is None:
-            requested_files = media_files
-        requested_media = _media(media_files, media, name, version)
-        requested_files = [f for f in requested_files if f in requested_media]
-
-    if requested_files is None:
-        df = deps()
-        return set(df[df.type == define.DependType.MEDIA].bit_depth)
-    else:
-        return set([deps.bit_depth(file) for file in requested_files])
+    df = _filter_dependencies(name, version, tables, media, cache_root)
+    return set(df[df.type == define.DependType.MEDIA].bit_depth)
 
 
 def channels(
         name: str,
         *,
         version: str = None,
+        tables: typing.Sequence = None,
+        media: typing.Sequence = None,
         cache_root: str = None,
 ) -> typing.Set[int]:
     """Media channels.
@@ -121,6 +90,10 @@ def channels(
     Args:
         name: name of database
         version: version of database
+        tables: include only tables matching the regular expression or
+            provided in the list
+        media: include only media matching the regular expression or
+            provided in the list
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -132,8 +105,7 @@ def channels(
         {1}
 
     """
-    deps = dependencies(name, version=version, cache_root=cache_root)
-    df = deps()
+    df = _filter_dependencies(name, version, tables, media, cache_root)
     return set(df[df.type == define.DependType.MEDIA].channels)
 
 
@@ -168,6 +140,8 @@ def duration(
         name: str,
         *,
         version: str = None,
+        tables: typing.Sequence = None,
+        media: typing.Sequence = None,
         cache_root: str = None,
 ) -> pd.Timedelta:
     """Total media duration.
@@ -175,6 +149,10 @@ def duration(
     Args:
         name: name of database
         version: version of database
+        tables: include only tables matching the regular expression or
+            provided in the list
+        media: include only media matching the regular expression or
+            provided in the list
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -186,8 +164,7 @@ def duration(
         Timedelta('0 days 00:24:47.092187500')
 
     """
-    deps = dependencies(name, version=version, cache_root=cache_root)
-    df = deps()
+    df = _filter_dependencies(name, version, tables, media, cache_root)
     return pd.to_timedelta(
         df[df.type == define.DependType.MEDIA].duration.sum(),
         unit='s',
@@ -224,6 +201,8 @@ def formats(
         name: str,
         *,
         version: str = None,
+        tables: typing.Sequence = None,
+        media: typing.Sequence = None,
         cache_root: str = None,
 ) -> typing.Set[str]:
     """Media formats.
@@ -231,6 +210,10 @@ def formats(
     Args:
         name: name of database
         version: version of database
+        tables: include only tables matching the regular expression or
+            provided in the list
+        media: include only media matching the regular expression or
+            provided in the list
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -242,8 +225,7 @@ def formats(
         {'wav'}
 
     """
-    deps = dependencies(name, version=version, cache_root=cache_root)
-    df = deps()
+    df = _filter_dependencies(name, version, tables, media, cache_root)
     return set(df[df.type == define.DependType.MEDIA].format)
 
 
@@ -470,6 +452,8 @@ def sampling_rates(
         name: str,
         *,
         version: str = None,
+        tables: typing.Sequence = None,
+        media: typing.Sequence = None,
         cache_root: str = None,
 ) -> typing.Set[int]:
     """Media sampling rates.
@@ -477,6 +461,10 @@ def sampling_rates(
     Args:
         name: name of database
         version: version of database
+        tables: include only tables matching the regular expression or
+            provided in the list
+        media: include only media matching the regular expression or
+            provided in the list
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -488,8 +476,7 @@ def sampling_rates(
         {16000}
 
     """
-    deps = dependencies(name, version=version, cache_root=cache_root)
-    df = deps()
+    df = _filter_dependencies(name, version, tables, media, cache_root)
     return set(df[df.type == define.DependType.MEDIA].sampling_rate)
 
 
@@ -624,3 +611,66 @@ def usage(
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.usage
+
+
+def _filter_dependencies(
+        name: str,
+        version: str,
+        tables: typing.Sequence,
+        media: typing.Sequence,
+        cache_root: str,
+) -> pd.DataFrame:
+    """Filter dependencies.
+
+    Return dependencies as dataframe
+    containing only files
+    selected by ``tables`` and ``media`` arguments.
+
+    Args:
+        name: name of database
+        version: version of database
+        tables: include only tables matching the regular expression or
+            provided in the list
+        media: include only media matching the regular expression or
+            provided in the list
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+
+    Returns:
+        filtered dependency table
+
+    """
+    if version is None:
+        version = latest_version(name)
+
+    requested_files = None
+    deps = dependencies(name, version=version, cache_root=cache_root)
+
+    if tables is not None or media is not None:
+        media_files = files(name, version=version, cache_root=cache_root)
+
+    if tables is not None:
+        requested_files = []
+        requested_tables = filter_tables(deps, tables, name, version)
+        if len(requested_tables) != 0:
+            for table in requested_tables:
+                df = load_table(
+                    name,
+                    table,
+                    version=version,
+                    cache_root=cache_root,
+                    verbose=False,
+                )
+                requested_files += [f for f in media_files if f in df.index]
+
+    if media is not None:
+        if tables is None:
+            requested_files = media_files
+        requested_media = filter_media(media_files, media, name, version)
+        requested_files = [f for f in requested_files if f in requested_media]
+
+    df = deps()
+    if requested_files is not None:
+        df = df.loc[requested_files]
+
+    return df
