@@ -162,6 +162,8 @@ def duration(
     Example:
         >>> duration('emodb', version='1.2.0')
         Timedelta('0 days 00:24:47.092187500')
+        >>> duration('emodb', version='1.2.0', media=['wav/03a01Fa.wav'])
+        Timedelta('0 days 00:00:01.898250')
 
     """
     df = _filter_dependencies(name, version, tables, media, cache_root)
