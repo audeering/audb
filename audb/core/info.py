@@ -151,6 +151,32 @@ def duration(
     )
 
 
+def files(
+        name: str,
+        *,
+        version: str = None,
+        cache_root: str = None,
+) -> typing.List[str]:
+    """Media files included in the database.
+
+    Args:
+        name: name of database
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+
+    Returns:
+        media files
+
+    Example:
+        >>> files('emodb', version='1.2.0')[:2]
+        ['wav/03a01Fa.wav', 'wav/03a01Nc.wav']
+
+    """
+    deps = dependencies(name, version=version, cache_root=cache_root)
+    return deps.media
+
+
 def formats(
         name: str,
         *,
