@@ -426,6 +426,9 @@ def latest_version(
     Returns:
         version string
 
+    Raises:
+        RuntimeError: if no version exists for the requested database
+
     Example:
         >>> latest_version('emodb')
         '1.2.0'
