@@ -51,7 +51,8 @@ You can see all entries by calling the returned object.
 
 .. jupyter-execute::
 
-    deps()
+    df = deps()
+    df.head()
 
 You can also use it to request certain aspects, e.g.
 
