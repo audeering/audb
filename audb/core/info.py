@@ -68,6 +68,10 @@ def bit_depths(
     Returns:
         bit depths
 
+    Raises:
+        ValueError: if table or media is requested
+            that is not part of the database
+
     Example:
         >>> bit_depths('emodb', version='1.2.0')
         {16}
@@ -99,6 +103,10 @@ def channels(
 
     Returns:
         channel numbers
+
+    Raises:
+        ValueError: if table or media is requested
+            that is not part of the database
 
     Example:
         >>> channels('emodb', version='1.2.0')
@@ -158,6 +166,10 @@ def duration(
 
     Returns:
         duration
+
+    Raises:
+        ValueError: if table or media is requested
+            that is not part of the database
 
     Example:
         >>> duration('emodb', version='1.2.0')
@@ -221,6 +233,10 @@ def formats(
 
     Returns:
         format
+
+    Raises:
+        ValueError: if table or media is requested
+            that is not part of the database
 
     Example:
         >>> formats('emodb', version='1.2.0')
@@ -472,6 +488,10 @@ def sampling_rates(
 
     Returns:
         sampling rates
+
+    Raises:
+        ValueError: if table or media is requested
+            that is not part of the database
 
     Example:
         >>> sampling_rates('emodb', version='1.2.0')
