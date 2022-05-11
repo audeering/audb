@@ -41,6 +41,12 @@ class Flavor(audobject.Object):
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
 
+    Raises:
+        ValueError: if a non-supported ``bit_depth``,
+            ``format``,
+            or ``sampling_rate``
+            is requested
+
     """
     def __init__(
             self,
