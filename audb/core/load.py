@@ -240,7 +240,7 @@ def _filter_media(
             )
             raise ValueError(msg)
     else:
-        filtered_media = requested_media
+        filtered_media = list(requested_media)
         for media in filtered_media:
             if media not in available_media:
                 msg = _error_message_missing_object(
@@ -282,7 +282,7 @@ def _filter_tables(
             )
             raise ValueError(msg)
     else:
-        filtered_tables = requested_tables
+        filtered_tables = list(requested_tables)
         for table in filtered_tables:
             if table not in available_tables:
                 msg = _error_message_missing_object(
