@@ -302,7 +302,7 @@ only the data of this speaker.
     db = audb.load(
         'emodb',
         version='1.2.0',
-        media=media,
+        media=list(media),
         full_path=False,
         only_metadata=True,
         verbose=False,
@@ -313,7 +313,7 @@ only the data of this speaker.
     db = audb.load(
         'emodb',
         version='1.2.0',
-        media=media,
+        media=list(media),
         full_path=False,
         verbose=False,
     )
