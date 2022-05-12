@@ -644,7 +644,7 @@ def _filter_dependencies(
 ) -> pd.DataFrame:
     """Filter dependencies.
 
-    Return dependencies as dataframe
+    Return dependencies as a :class:`pandas.DataFrame`
     containing only files
     selected by ``tables`` and ``media`` arguments.
 
