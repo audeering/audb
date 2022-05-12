@@ -255,7 +255,7 @@ def _filter_media(
 
 
 def _filter_tables(
-        available_tables: Dependencies,
+        available_tables: typing.Sequence[str],
         requested_tables: typing.Optional[
             typing.Union[str, typing.Sequence[str]]
         ],
