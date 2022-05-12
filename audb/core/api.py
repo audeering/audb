@@ -225,63 +225,6 @@ def cached(
     return df.where(pd.notnull(df), None)
 
 
-def dependencies(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
-        verbose: bool = False,
-) -> Dependencies:
-    r"""Database dependencies.
-
-    Args:
-        name: name of database
-        version: version of database
-        cache_root: cache folder where databases are stored.
-            If not set :meth:`audb.default_cache_root` is used
-        verbose: show debug messages
-
-    Returns:
-        dependency object
-
-    Example:
-        >>> deps = dependencies('emodb', version='1.2.0')
-        >>> deps.version('db.emotion.csv')
-        '1.1.0'
-
-    """
-    if version is None:
-        version = latest_version(name)
-
-    db_root = database_cache_root(
-        name,
-        version,
-        cache_root=cache_root,
-    )
-    deps_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
-
-    deps = Dependencies()
-
-    with FolderLock(db_root):
-        try:
-            deps.load(deps_path)
-        except (AttributeError, FileNotFoundError, ValueError, EOFError):
-            # If loading pickled cached file fails, load again from backend
-            backend = lookup_backend(name, version)
-            with tempfile.TemporaryDirectory() as tmp_root:
-                archive = backend.join(name, define.DB)
-                backend.get_archive(
-                    archive,
-                    tmp_root,
-                    version,
-                    verbose=verbose,
-                )
-                deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
-                deps.save(deps_path)
-
-    return deps
-
-
 def exists(
     name: str,
     *,

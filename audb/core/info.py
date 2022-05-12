@@ -6,13 +6,11 @@ import audformat
 
 from audb.core import define
 from audb.core.api import (
-    dependencies,
     database_cache_root,
     latest_version,
 )
 from audb.core.load import (
-    filter_media,
-    filter_tables,
+    dependencies,
     load_header,
     load_table,
 )
@@ -77,7 +75,14 @@ def bit_depths(
         {16}
 
     """
-    df = _filter_dependencies(name, version, tables, media, cache_root)
+    deps = dependencies(
+        name,
+        version=version,
+        tables=tables,
+        media=media,
+        cache_root=cache_root,
+    )
+    df = deps()
     return set(df[df.type == define.DependType.MEDIA].bit_depth)
 
 
@@ -113,7 +118,14 @@ def channels(
         {1}
 
     """
-    df = _filter_dependencies(name, version, tables, media, cache_root)
+    deps = dependencies(
+        name,
+        version=version,
+        tables=tables,
+        media=media,
+        cache_root=cache_root,
+    )
+    df = deps()
     return set(df[df.type == define.DependType.MEDIA].channels)
 
 
@@ -178,7 +190,14 @@ def duration(
         Timedelta('0 days 00:00:01.898250')
 
     """
-    df = _filter_dependencies(name, version, tables, media, cache_root)
+    deps = dependencies(
+        name,
+        version=version,
+        tables=tables,
+        media=media,
+        cache_root=cache_root,
+    )
+    df = deps()
     return pd.to_timedelta(
         df[df.type == define.DependType.MEDIA].duration.sum(),
         unit='s',
@@ -243,7 +262,14 @@ def formats(
         {'wav'}
 
     """
-    df = _filter_dependencies(name, version, tables, media, cache_root)
+    deps = dependencies(
+        name,
+        version=version,
+        tables=tables,
+        media=media,
+        cache_root=cache_root,
+    )
+    df = deps()
     return set(df[df.type == define.DependType.MEDIA].format)
 
 
@@ -498,7 +524,14 @@ def sampling_rates(
         {16000}
 
     """
-    df = _filter_dependencies(name, version, tables, media, cache_root)
+    deps = dependencies(
+        name,
+        version=version,
+        tables=tables,
+        media=media,
+        cache_root=cache_root,
+    )
+    df = deps()
     return set(df[df.type == define.DependType.MEDIA].sampling_rate)
 
 
@@ -633,66 +666,3 @@ def usage(
     """
     db = header(name, version=version, cache_root=cache_root)
     return db.usage
-
-
-def _filter_dependencies(
-        name: str,
-        version: str,
-        tables: typing.Sequence,
-        media: typing.Sequence,
-        cache_root: str,
-) -> pd.DataFrame:
-    """Filter dependencies.
-
-    Return dependencies as a :class:`pandas.DataFrame`
-    containing only files
-    selected by ``tables`` and ``media`` arguments.
-
-    Args:
-        name: name of database
-        version: version of database
-        tables: include only tables matching the regular expression or
-            provided in the list
-        media: include only media matching the regular expression or
-            provided in the list
-        cache_root: cache folder where databases are stored.
-            If not set :meth:`audb.default_cache_root` is used
-
-    Returns:
-        filtered dependency table
-
-    """
-    if version is None:
-        version = latest_version(name)
-
-    requested_files = None
-    deps = dependencies(name, version=version, cache_root=cache_root)
-
-    if tables is not None or media is not None:
-        media_files = files(name, version=version, cache_root=cache_root)
-
-    if tables is not None:
-        requested_files = []
-        requested_tables = filter_tables(deps, tables, name, version)
-        if len(requested_tables) != 0:
-            for table in requested_tables:
-                df = load_table(
-                    name,
-                    table,
-                    version=version,
-                    cache_root=cache_root,
-                    verbose=False,
-                )
-                requested_files += [f for f in media_files if f in df.index]
-
-    if media is not None:
-        if tables is None:
-            requested_files = media_files
-        requested_media = filter_media(media_files, media, name, version)
-        requested_files = [f for f in requested_files if f in requested_media]
-
-    df = deps()
-    if requested_files is not None:
-        df = df.loc[requested_files]
-
-    return df

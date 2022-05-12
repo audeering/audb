@@ -9,11 +9,11 @@ import audformat
 from audb.core import define
 from audb.core import utils
 from audb.core.api import (
-    dependencies,
     latest_version,
 )
 from audb.core.dependencies import Dependencies
 from audb.core.load import (
+    dependencies,
     database_tmp_root,
     load_header,
 )

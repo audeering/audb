@@ -161,12 +161,7 @@ def test_description():
         ('table1', None),
         (None, ['f11.wav', 'f12.wav']),
         ('table1', ['f11.wav', 'f12.wav']),
-        # Error as tables and media do not overlap
-        pytest.param(
-            'table2',
-            ['f11.wav', 'f12.wav'],
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
+        ('table2', ['f11.wav', 'f12.wav']),
     ]
 )
 def test_duration(tables, media):
@@ -180,7 +175,6 @@ def test_duration(tables, media):
         full_path=False,
         verbose=False,
     )
-    print(db.files)
     expected_duration = pd.to_timedelta(
         sum(
             [

@@ -81,7 +81,7 @@ def fixture_publish_db():
     db.schemes['speaker'] = audformat.Scheme(
         labels=['adam', 'eve']
     )
-    db['files'] = audformat.Table(db.files)
+    db['files'] = audformat.Table(db.files[:4])
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
         ['adam', 'adam', 'eve', 'eve'],
@@ -199,6 +199,150 @@ def test_database_cache_folder():
         version,
     )
     assert db_root == expected_db_root
+
+
+@pytest.mark.parametrize(
+    'tables, media, expected',
+    [
+        (
+            None,
+            None,
+            [
+                'db.emotion.csv',
+                'db.files.csv',
+                'audio/001.wav',
+                'audio/002.wav',
+                'audio/003.wav',
+                'audio/004.wav',
+                'audio/005.wav',
+            ],
+        ),
+        (
+            'files',
+            None,
+            [
+                'db.files.csv',
+                'audio/001.wav',
+                'audio/002.wav',
+                'audio/003.wav',
+                'audio/004.wav',
+            ],
+        ),
+        (
+            ['files'],
+            None,
+            [
+                'db.files.csv',
+                'audio/001.wav',
+                'audio/002.wav',
+                'audio/003.wav',
+                'audio/004.wav',
+            ],
+        ),
+        (
+            None,
+            'audio',
+            [
+                'db.emotion.csv',
+                'db.files.csv',
+                'audio/001.wav',
+                'audio/002.wav',
+                'audio/003.wav',
+                'audio/004.wav',
+                'audio/005.wav',
+            ],
+        ),
+        (
+            None,
+            'audio/001.wav',
+            [
+                'db.emotion.csv',
+                'db.files.csv',
+                'audio/001.wav',
+            ],
+        ),
+        (
+            None,
+            'audio/005.wav',
+            [
+                'db.emotion.csv',
+                'db.files.csv',
+                'audio/005.wav',
+            ],
+        ),
+        (
+            None,
+            ['audio/001.wav'],
+            [
+                'db.emotion.csv',
+                'db.files.csv',
+                'audio/001.wav',
+            ],
+        ),
+        (
+            None,
+            ['audio/002.wav', 'audio/005.wav'],
+            [
+                'db.emotion.csv',
+                'db.files.csv',
+                'audio/002.wav',
+                'audio/005.wav',
+            ],
+        ),
+        (
+            'emotion',
+            'audio/001.wav',
+            [
+                'db.emotion.csv',
+                'audio/001.wav',
+            ],
+        ),
+        (
+            [],
+            None,
+            [],
+        ),
+        (
+            None,
+            [],
+            [
+                'db.emotion.csv',
+                'db.files.csv',
+            ],
+        ),
+        (
+            [],
+            [],
+            [],
+        ),
+        (
+            'files',
+            'audio/005.wav',
+            [
+                'db.files.csv',
+            ],
+        ),
+    ]
+)
+def test_dependencies(tables, media, expected):
+    deps = audb.dependencies(
+        DB_NAME,
+        version='1.0.0',
+        tables=tables,
+        media=media,
+    )
+    df = deps()
+    # db = audb.load(
+    #     DB_NAME,
+    #     version='1.0.0',
+    #     full_path=False,
+    #     tables=tables,
+    #     media=media,
+    # )
+    # print(db['files'].df)
+    # print(db['emotion'].df)
+    # print(deps())
+    assert sorted(list(df.index)) == sorted(list(expected))
 
 
 def test_load_wrong_argument():

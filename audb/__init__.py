@@ -2,7 +2,6 @@ from audb import info
 from audb.core.api import (
     available,
     cached,
-    dependencies,
     exists,
     flavor_path,
     latest_version,
@@ -15,6 +14,7 @@ from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
 from audb.core.load import (
+    dependencies,
     load,
     load_media,
     load_table,
