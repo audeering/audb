@@ -332,16 +332,6 @@ def test_dependencies(tables, media, expected):
         media=media,
     )
     df = deps()
-    # db = audb.load(
-    #     DB_NAME,
-    #     version='1.0.0',
-    #     full_path=False,
-    #     tables=tables,
-    #     media=media,
-    # )
-    # print(db['files'].df)
-    # print(db['emotion'].df)
-    # print(deps())
     assert sorted(list(df.index)) == sorted(list(expected))
 
 
