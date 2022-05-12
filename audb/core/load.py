@@ -762,6 +762,10 @@ def dependencies(
     Returns:
         dependency object
 
+    Raises:
+        ValueError: if table or media is requested
+            that is not part of the database
+
     Example:
         >>> deps = dependencies('emodb', version='1.2.0')
         >>> deps.version('db.emotion.csv')
