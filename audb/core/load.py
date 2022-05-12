@@ -213,7 +213,7 @@ def _files_duration(
 
 
 def _filter_media(
-        available_media: typing.Sequence,
+        available_media: typing.Sequence[str],
         requested_media: typing.Optional[
             typing.Union[str, typing.Sequence[str]]
         ],
