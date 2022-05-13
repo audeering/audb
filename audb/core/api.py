@@ -399,6 +399,12 @@ def flavor_path(
     Returns:
         flavor path relative to cache folder
 
+    Raises:
+        ValueError: if a non-supported ``bit_depth``,
+            ``format``,
+            or ``sampling_rate``
+            is requested
+
     Example:
         >>> flavor_path('emodb', version='1.2.0').split(os.path.sep)
         ['emodb', '1.2.0', 'd3b62a9b']

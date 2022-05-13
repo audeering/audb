@@ -826,6 +826,10 @@ def load(
     Raises:
         ValueError: if table or media is requested
             that is not part of the database
+        ValueError: if a non-supported ``bit_depth``,
+            ``format``,
+            or ``sampling_rate``
+            is requested
 
     Example:
         >>> db = audb.load(
@@ -1081,6 +1085,10 @@ def load_media(
     Raises:
         ValueError: if a media file is requested
             that is not part of the database
+        ValueError: if a non-supported ``bit_depth``,
+            ``format``,
+            or ``sampling_rate``
+            is requested
 
     Example:
         >>> paths = load_media(
