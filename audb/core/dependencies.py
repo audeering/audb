@@ -26,10 +26,6 @@ class Dependencies:
     The dependencies of a database can be requested with
     :func:`audb.dependencies`.
 
-    Args:
-        name: name of database associated with dependencies
-        version: version of database associated with dependencies
-
     Example:
         >>> deps = Dependencies()
         >>> deps()
@@ -532,15 +528,12 @@ class Dependencies:
             tables: include only tables
                 matching the regular expression
                 or provided in the list
-            name: name of database
-            version: version of database
 
         Returns:
             list of table IDs inside the dependency object
                 matching the requested ``tables``
 
         """
-
         if tables is None:
             return self.table_ids
         elif len(tables) == 0:

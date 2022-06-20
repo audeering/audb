@@ -180,7 +180,6 @@ def test_duration(tables, media):
         full_path=False,
         verbose=False,
     )
-    print(db.files)
     expected_duration = pd.to_timedelta(
         sum(
             [
