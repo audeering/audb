@@ -175,20 +175,6 @@ def _database_is_complete(
     return complete
 
 
-def _error_message_missing_object(
-        object_name: str,
-        missing_object: typing.Union[str, typing.Sequence],
-        db_name: str,
-        db_version: str,
-) -> str:
-    if isinstance(missing_object, str):
-        msg = f"Could not find a {object_name} matching '{missing_object}' "
-    else:
-        msg = f"Could not find the {object_name} '{missing_object[0]}' "
-    msg += f'in {db_name} v{db_version}'
-    return msg
-
-
 def _files_duration(
         db: audformat.Database,
         deps: Dependencies,
@@ -665,88 +651,56 @@ def _update_path(
     )
 
 
-def filter_media(
-        media_files: typing.Sequence,
-        media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+def filtered_dependencies(
         name: str,
         version: str,
-) -> typing.Sequence[str]:
-    r"""Filter database media files by requested media files."""
+        media: typing.Union[str, typing.Sequence[str]],
+        tables: typing.Union[str, typing.Sequence[str]],
+        cache_root: str = None,
+) -> pd.DataFrame:
+    r"""Filter media by tables.
 
-    if media is None:
-        return media_files
-    elif len(media) == 0:
-        return []
+    Return all media files from ``media``
+    that are mentioned in at least one table
+    from ``tables``.
+    This has to download every table
+    for doing the check.
 
-    if isinstance(media, str):
-        pattern = re.compile(media)
-        requested_media = []
-        for m in media_files:
-            if pattern.search(m):
-                requested_media.append(m)
-        if len(requested_media) == 0:
-            msg = _error_message_missing_object(
-                'media file',
-                media,
-                name,
-                version,
-            )
-            raise ValueError(msg)
+    Args:
+        name: name of database
+        version: version of database
+        media: media files
+        tables: table IDs
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+
+    Returns:
+        filtered dependencies
+
+    """
+    deps = dependencies(name, version=version, cache_root=cache_root)
+    if tables is None and media is None:
+        df = deps._df
     else:
-        requested_media = media
-        for media_file in requested_media:
-            if media_file not in media_files:
-                msg = _error_message_missing_object(
-                    'media file',
-                    [media_file],
-                    name,
-                    version,
-                )
-                raise ValueError(msg)
-
-    return requested_media
-
-
-def filter_tables(
-        deps: Dependencies,
-        tables: typing.Optional[typing.Union[str, typing.Sequence[str]]],
-        name: str,
-        version: str,
-) -> typing.Sequence[str]:
-    r"""Filter database tables by requested tables."""
-
-    if tables is None:
-        return deps.table_ids
-    elif len(tables) == 0:
-        return []
-
-    if isinstance(tables, str):
-        pattern = re.compile(tables)
-        requested_tables = []
-        for table in deps.table_ids:
-            if pattern.search(table):
-                requested_tables.append(table)
-        if len(requested_tables) == 0:
-            msg = _error_message_missing_object(
-                'table',
-                tables,
+        available_media = []
+        tables = deps._filter_tables(tables)
+        for table in tables:
+            df = load_table(
                 name,
-                version,
+                table,
+                version=version,
+                cache_root=cache_root,
+                verbose=False,
             )
-            raise ValueError(msg)
-    else:
-        requested_tables = tables
-        for table in requested_tables:
-            if table not in deps.table_ids:
-                msg = _error_message_missing_object(
-                    'table',
-                    [table],
-                    name,
-                    version,
-                )
-                raise ValueError(msg)
+            available_media += list(
+                df.index.get_level_values('file').unique()
+            )
 
-    return requested_tables
+        media = deps._filter_media(media)
+        available_media = [m for m in media if m in list(set(available_media))]
+        df = deps._df.loc[available_media]
+
+    return df
 
 
 def load(
@@ -883,7 +837,7 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # filter tables
-            requested_tables = filter_tables(deps, tables, name, version)
+            requested_tables = deps._filter_tables(tables)
 
             # load missing tables
             if not db_is_complete:
@@ -910,7 +864,7 @@ def load(
                 db[table].load(os.path.join(db_root, f'db.{table}'))
 
             # filter media
-            requested_media = filter_media(db.files, media, name, version)
+            requested_media = deps._filter_media(media, db.files)
 
             # load missing media
             if not db_is_complete and not only_metadata:
@@ -1128,11 +1082,9 @@ def load_media(
     available_files = deps.media
     for media_file in media:
         if media_file not in available_files:
-            msg = _error_message_missing_object(
+            msg = deps._error_message_missing_object(
                 'media file',
                 [media_file],
-                name,
-                version,
             )
             raise ValueError(msg)
 
@@ -1248,12 +1200,7 @@ def load_table(
     )
 
     if table not in deps.table_ids:
-        msg = _error_message_missing_object(
-            'table',
-            [table],
-            name,
-            version,
-        )
+        msg = deps._error_message_missing_object('table', [table])
         raise ValueError(msg)
 
     with FolderLock(db_root):

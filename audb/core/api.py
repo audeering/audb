@@ -261,6 +261,8 @@ def dependencies(
     deps_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
 
     deps = Dependencies()
+    deps._name = name
+    deps._version = version
 
     with FolderLock(db_root):
         try:

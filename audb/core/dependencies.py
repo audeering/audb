@@ -1,10 +1,12 @@
 import errno
 import os
+import re
 import typing
 
 import pandas as pd
 
 import audeer
+import audformat
 import audiofile
 
 from audb.core import define
@@ -23,6 +25,10 @@ class Dependencies:
 
     The dependencies of a database can be requested with
     :func:`audb.dependencies`.
+
+    Args:
+        name: name of database associated with dependencies
+        version: version of database associated with dependencies
 
     Example:
         >>> deps = Dependencies()
@@ -58,6 +64,8 @@ class Dependencies:
         ):
             data[name] = pd.Series(dtype=dtype)
         self._df = pd.DataFrame(data)
+        self._name = None
+        self._version = None
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -432,6 +440,135 @@ class Dependencies:
 
         """
         self._df.drop(file, inplace=True)
+
+    def _error_message_missing_object(
+            self,
+            object_name: str,
+            missing_object: typing.Union[str, typing.Sequence],
+    ) -> str:
+        r"""Error message for missing objects.
+
+        E.g. if a table is not part of a :attr:`audb.Dependencies.table_ids`.
+
+        Args:
+            object_name: object that is supposed to contain ``missing_object``
+            missing_object: name of missing object
+
+        Returns:
+            error message
+
+        """
+        if isinstance(missing_object, str):
+            msg = (
+                f"Could not find a {object_name} "
+                f"matching '{missing_object}'"
+            )
+        else:
+            msg = (
+                f"Could not find the {object_name} "
+                f"'{missing_object[0]}'"
+            )
+        if self._name is not None and self._version is not None:
+            msg += f' in {self._name} v{self._version}'
+        return msg
+
+    def _filter_media(
+            self,
+            media: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+            media_files: typing.Sequence = None,
+    ) -> typing.Sequence[str]:
+        r"""Filter media files by requested media.
+
+        Args:
+            media: requested media files
+            media_files: sequence of media files.
+                If ``None`` :attr:`audb.Dependencies.media`
+                will be used
+
+        Returns:
+            list of media files inside the dependency object
+                matching the requested ``media``
+
+        """
+        if media_files is None:
+            media_files = self.media
+
+        if media is None:
+            return media_files
+        elif len(media) == 0:
+            return []
+
+        if isinstance(media, str):
+            pattern = re.compile(media)
+            requested_media = []
+            for m in media_files:
+                if pattern.search(m):
+                    requested_media.append(m)
+            if len(requested_media) == 0:
+                msg = self._error_message_missing_object(
+                    'media file',
+                    media,
+                )
+                raise ValueError(msg)
+        else:
+            requested_media = media
+            for media_file in requested_media:
+                if media_file not in media_files:
+                    msg = self._error_message_missing_object(
+                        'media file',
+                        [media_file],
+                    )
+                    raise ValueError(msg)
+
+        return requested_media
+
+    def _filter_tables(
+            self,
+            tables: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+    ) -> typing.Sequence[str]:
+        r"""Filter dependency tables by requested tables.
+
+        Args:
+            tables: include only tables
+                matching the regular expression
+                or provided in the list
+            name: name of database
+            version: version of database
+
+        Returns:
+            list of table IDs inside the dependency object
+                matching the requested ``tables``
+
+        """
+
+        if tables is None:
+            return self.table_ids
+        elif len(tables) == 0:
+            return []
+
+        if isinstance(tables, str):
+            pattern = re.compile(tables)
+            requested_tables = []
+            for table in self.table_ids:
+                if pattern.search(table):
+                    requested_tables.append(table)
+            if len(requested_tables) == 0:
+                msg = self._error_message_missing_object(
+                    'table',
+                    tables,
+                )
+                raise ValueError(msg)
+        else:
+            requested_tables = tables
+            for table in requested_tables:
+                if table not in self.table_ids:
+                    msg = self._error_message_missing_object(
+                        'table',
+                        [table],
+                    )
+                    raise ValueError(msg)
+
+        return requested_tables
 
     def _remove(self, file: str):
         r"""Mark file as removed.
