@@ -219,6 +219,7 @@ def load_to(
         name: str,
         *,
         version: str = None,
+        only_metadata: bool = False,
         cache_root: str = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
@@ -237,6 +238,7 @@ def load_to(
         root: target directory
         name: name of database
         version: version string, latest if ``None``
+        only_metadata: load only metadata
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used.
             Only used to read the dependencies of the requested version
@@ -266,7 +268,8 @@ def load_to(
         verbose=verbose,
     )
     if update:
-        for file in deps.files:
+        files = deps.tables if only_metadata else deps.files
+        for file in files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
                 checksum = audbackend.md5(full_file)
@@ -312,9 +315,10 @@ def load_to(
 
     # get altered and new media files
 
-    media = _find_media(db, db_root, deps, num_workers, verbose)
-    _get_media(media, db_root, db_root_tmp, name, deps, backend,
-               num_workers, verbose)
+    if not only_metadata:
+        media = _find_media(db, db_root, deps, num_workers, verbose)
+        _get_media(media, db_root, db_root_tmp, name, deps, backend,
+                   num_workers, verbose)
 
     # save dependencies
 
