@@ -1,7 +1,9 @@
+import filecmp
 import os
 import re
 import shutil
 
+import numpy as np
 import pytest
 
 import audbackend
@@ -68,7 +70,7 @@ def fixture_publish_db():
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
-        ['adam', 'adam', '11', '11'],
+        ['adam', 'adam', 'adam', '11'],
         index=audformat.filewise_index(db.files[:4]),
     )
     db.save(
@@ -117,7 +119,7 @@ def fixture_publish_db():
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
-        ['adam', 'adam', '11', '11'],
+        ['adam', 'adam', 'adam', '11'],
         index=audformat.filewise_index(db.files[:4]),
     )
     db.save(DB_ROOT_VERSION['6.0.0'])
@@ -485,7 +487,7 @@ def test_update_database():
         verbose=False,
     )
 
-    # Check that depencies include previous and actual version only
+    # Check that dependencies include previous and actual version only
     versions = audeer.sort_versions([deps.version(f) for f in deps.files])
     assert versions[-1] == version
     assert versions[0] == previous_version
@@ -509,6 +511,84 @@ def test_update_database():
     db1.meta['audb'] = {}
     db2.meta['audb'] = {}
     assert db1 == db2
+
+
+def test_update_database_without_media(tmpdir):
+
+    build_root = tmpdir
+    previous_version = '1.0.0'
+    version = '1.1.0'
+
+    new_table = 'new'
+    new_files = [
+        'new/001.wav',
+        'new/002.wav',
+    ]
+    alter_files = [
+        'audio/001.wav',  # same archive as 'audio/00[2,3].wav'
+        'audio/005.wav',
+    ]
+    rem_files = [
+        'new/003.wav',  # same archive as 'audio/00[1,2].wav'
+    ]
+
+    # load without media
+    db = audb.load_to(
+        build_root,
+        DB_NAME,
+        only_metadata=True,
+        version=previous_version,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    for file in db.files:
+        assert not os.path.exists(audeer.path(build_root, file))
+
+    # update and save database
+
+    # remove files
+    for file in rem_files:
+        db.drop_files(file)
+
+    # create and alter files
+    sampling_rate = 16000
+    signal = np.ones((1, sampling_rate), np.float32)
+    for file in new_files + alter_files:
+        path = audeer.path(build_root, file)
+        audeer.mkdir(os.path.dirname(path))
+        audiofile.write(path, signal, sampling_rate)
+
+    # add new table
+    db[new_table] = audformat.Table(audformat.filewise_index(new_files))
+
+    db.save(build_root)
+
+    # publish database
+    audb.publish(
+        build_root,
+        version,
+        pytest.PUBLISH_REPOSITORY,
+        previous_version=previous_version,
+        verbose=False,
+    )
+
+    # check if missing archive files were downloaded during publish
+    assert os.path.exists(audeer.path(build_root, 'audio/002.wav'))
+
+    # load new version and check media
+    db_load = audb.load(
+        DB_NAME,
+        version=version,
+    )
+    for file in db.files:
+        assert os.path.exists(audeer.path(db_load.root, file))
+    for file in rem_files:
+        assert not os.path.exists(audeer.path(db_load.root, file))
+    for file in new_files + alter_files:
+        filecmp.cmp(
+            audeer.path(build_root, file),
+            audeer.path(db_load.root, file),
+        )
 
 
 def test_cached():

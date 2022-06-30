@@ -151,14 +151,21 @@ Update a database
 In a next step we will add another file with age annotation
 to the database.
 As a first step we load
-the previous version
+the metadata of the
+previous version
 of the database
 to a new folder.
 
 .. jupyter-execute::
 
     build_dir = './age-test-1.1.0'
-    db = audb.load_to(build_dir, 'age-test', version='1.0.0', verbose=False)
+    db = audb.load_to(
+        build_dir,
+        'age-test',
+        version='1.0.0',
+        only_metadata=True,
+        verbose=False,
+    )
 
 Then we extend the age table by another file (:file:`audio/004.wav`)
 and add the age annotation of 22 to it.
@@ -238,6 +245,6 @@ to see how to load and use a database.
 .. jupyter-execute::
     :hide-code:
 
-    for folder in folders: 
+    for folder in folders:
         if os.path.exists(folder):
             shutil.rmtree(folder)

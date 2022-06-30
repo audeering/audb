@@ -337,6 +337,10 @@ def publish(
     you first have to load the version of the database
     that the new version should depend on
     with :func:`audb.load_to` to ``db_root``.
+    Media files that are not altered can be omitted,
+    so consider to set
+    ``only_metadata=True``
+    for large databases.
     Afterwards you make your changes to that folder
     and run :func:`audb.publish`.
 
