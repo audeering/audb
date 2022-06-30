@@ -301,42 +301,80 @@ def test_publish_changed_db(version1, version2, media_difference):
     assert media1 - media2 == set(media_difference)
 
 
-def test_publish_error_messages():
-
-    for version in ['1.0.0', '4.0.0', '5.0.0']:
-
-        if version == '1.0.0':
-            error_msg = (
-                "A version '1.0.0' already exists for database "
-                f"'{DB_NAME}'."
-            )
-        elif version == '4.0.0':
-            error_msg = (
-                "5 files are referenced in tables that cannot be found. "
-                "Missing files are: '['audio/002.wav', 'audio/003.wav', "
-                f"'audio/004.wav', 'audio/005.wav', '{LONG_PATH}']'."
-            )
-        elif version == '5.0.0':
-            error_msg = (
-                "25 files are referenced in tables that cannot be found. "
-                "Missing files are: '['audio/002.wav', 'audio/003.wav', "
-                f"'audio/004.wav', 'audio/005.wav', '{LONG_PATH}', "
+@pytest.mark.parametrize(
+    'version, previous_version, error_msg',
+    [
+        (
+            '1.0.0',
+            None,
+            "A version '1.0.0' already exists for database "
+            f"'{DB_NAME}'."
+        ),
+        (
+            '4.0.0',
+            None,
+            (
+                "The following 5 files are referenced in tables "
+                "that cannot be found on disk "
+                "and are not yet part of the database: "
+                "['audio/002.wav', 'audio/003.wav', "
+                "'audio/004.wav', 'audio/005.wav', "
+                f"'{LONG_PATH}']."
+            ),
+        ),
+        (
+            '5.0.0',
+            None,
+            (
+                "The following 25 files are referenced in tables "
+                "that cannot be found on disk "
+                "and are not yet part of the database: "
+                "['audio/002.wav', 'audio/003.wav', "
+                "'audio/004.wav', 'audio/005.wav', "
+                f"'{LONG_PATH}', "
                 "'file0.wav', 'file1.wav', 'file10.wav', 'file11.wav', "
                 "'file12.wav', 'file13.wav', 'file14.wav', 'file15.wav', "
                 "'file16.wav', 'file17.wav', 'file18.wav', 'file19.wav', "
-                "'file2.wav', 'file3.wav', 'file4.wav'], ...'."
+                "'file2.wav', 'file3.wav', 'file4.wav', ...]."
+            ),
+        ),
+        (
+            '5.0.0',
+            '1.0.0',
+            (
+                "The following 21 files are referenced in tables "
+                "that cannot be found on disk "
+                "and are not yet part of the database: "
+                f"['{LONG_PATH}', "
+                "'file0.wav', 'file1.wav', 'file10.wav', 'file11.wav', "
+                "'file12.wav', 'file13.wav', 'file14.wav', 'file15.wav', "
+                "'file16.wav', 'file17.wav', 'file18.wav', 'file19.wav', "
+                "'file2.wav', 'file3.wav', 'file4.wav', 'file5.wav', "
+                "'file6.wav', 'file7.wav', 'file8.wav', ...]."
+            ),
+        ),
+    ]
+)
+def test_publish_error_messages(version, previous_version, error_msg):
+    with pytest.raises(RuntimeError, match=re.escape(error_msg)):
+        if previous_version:
+            deps = audb.dependencies(
+                DB_NAME,
+                version=previous_version,
             )
-
-        with pytest.raises(RuntimeError, match=re.escape(error_msg)):
-
-            audb.publish(
+            path = os.path.join(
                 DB_ROOT_VERSION[version],
-                version,
-                pytest.PUBLISH_REPOSITORY,
-                previous_version=None,
-                num_workers=pytest.NUM_WORKERS,
-                verbose=False,
+                audb.core.define.DEPENDENCIES_FILE,
             )
+            deps.save(path)
+        audb.publish(
+            DB_ROOT_VERSION[version],
+            version,
+            pytest.PUBLISH_REPOSITORY,
+            previous_version=previous_version,
+            num_workers=pytest.NUM_WORKERS,
+            verbose=False,
+        )
 
 
 def test_update_database():

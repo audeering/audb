@@ -1,5 +1,6 @@
 import collections
 import os
+import shutil
 import tempfile
 import typing
 
@@ -11,6 +12,7 @@ import audiofile
 from audb.core import define
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
+from audb.core.load import load_media
 from audb.core.repository import Repository
 
 
@@ -32,6 +34,37 @@ def _check_for_duplicates(
         progress_bar=verbose,
         task_description='Check tables for duplicates',
     )
+
+
+def _check_for_missing_media(
+        db: audformat.Database,
+        db_root: str,
+        deps: Dependencies,
+):
+    missing_files = []
+    media = deps.media
+
+    for f in db.files:
+        path = os.path.join(db_root, f)
+        if not os.path.exists(path) and f not in media:
+            missing_files.append(f)
+
+    if len(missing_files) > 0:
+        number_of_presented_files = 20
+        error_msg = (
+            f'The following '
+            f'{len(missing_files)} '
+            f'files are referenced in tables '
+            f'that cannot be found on disk '
+            f'and are not yet part of the database: '
+            f"{missing_files[:number_of_presented_files]}"
+        )
+        if len(missing_files) <= number_of_presented_files:
+            error_msg += "."
+        else:
+            error_msg = error_msg[:-1]
+            error_msg += ", ...]."
+        raise RuntimeError(error_msg)
 
 
 def _find_tables(
@@ -100,7 +133,7 @@ def _find_media(
                 checksum,
             )
             add_media.append(values)
-        elif not deps.removed(file):
+        elif not deps.removed(file) and os.path.exists(path):
             checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.archive(file)
@@ -177,6 +210,7 @@ def _put_media(
         db_root: str,
         db_name: str,
         version: str,
+        previous_version: typing.Optional[str],
         deps: Dependencies,
         backend: audbackend.Backend,
         num_workers: typing.Optional[int],
@@ -196,16 +230,47 @@ def _put_media(
 
         def job(archive):
             if archive in map_media_to_files:
-                for file in map_media_to_files[archive]:
+
+                files = map_media_to_files[archive]
+                for file in files:
                     update_media.append(file)
+
                 archive_file = backend.join(
                     db_name,
                     define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
                     archive,
                 )
+
+                if previous_version is not None:
+                    # if only some files of the archive were altered
+                    # it may happen that the others do not exist
+                    # in the root folder,
+                    # so we have to download the archive
+                    # and copy the missing files first
+                    missing_files = []
+                    for file in files:
+                        path = os.path.join(db_root, file)
+                        if not os.path.exists(path):
+                            missing_files.append(file)
+                    if missing_files:
+                        with tempfile.TemporaryDirectory() as tmp_root:
+                            backend.get_archive(
+                                archive_file,
+                                tmp_root,
+                                previous_version,
+                            )
+                            for missing_file in missing_files:
+                                src_path = os.path.join(tmp_root, missing_file)
+                                dst_path = os.path.join(db_root, missing_file)
+                                audeer.mkdir(os.path.dirname(dst_path))
+                                shutil.copy(
+                                    src_path,
+                                    dst_path,
+                                )
+
                 backend.put_archive(
                     db_root,
-                    map_media_to_files[archive],
+                    files,
                     archive_file,
                     version,
                 )
@@ -413,23 +478,13 @@ def publish(
         )
     _check_for_duplicates(db, num_workers, verbose)
 
-    # check all files referenced in a table exists
-    missing_files = [
-        f for f in db.files
-        if not os.path.exists(os.path.join(db_root, f))
-    ]
-    if len(missing_files) > 0:
-        number_of_presented_files = 20
-        error_msg = (
-            f'{len(missing_files)} files are referenced in tables '
-            'that cannot be found. '
-            f"Missing files are: '{missing_files[:number_of_presented_files]}"
-        )
-        if len(missing_files) <= number_of_presented_files:
-            error_msg += "'."
-        else:
-            error_msg += ", ...'."
-        raise RuntimeError(error_msg)
+    # check all media referenced in a table exist
+    # on disk or are already part of the database
+    _check_for_missing_media(
+        db,
+        db_root,
+        deps,
+    )
 
     # make sure all tables are stored in CSV format
     for table_id, table in db.tables.items():
@@ -449,8 +504,8 @@ def publish(
     # publish media
     media = _find_media(db, db_root, version, deps, archives, num_workers,
                         verbose)
-    _put_media(media, db_root, db.name, version, deps, backend, num_workers,
-               verbose)
+    _put_media(media, db_root, db.name, version, previous_version,
+               deps, backend, num_workers, verbose)
 
     # publish dependencies and header
     deps.save(deps_path)
