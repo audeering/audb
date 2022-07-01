@@ -40,21 +40,28 @@ def _check_for_missing_media(
         db: audformat.Database,
         db_root: str,
         deps: Dependencies,
+        num_workers: int,
         verbose: bool,
 ):
+    r"""Check for media that is not on disk and not in dependencies."""
+
+    def job(file):
+        path = os.path.join(db_root, file)
+        if not os.path.exists(path) and file not in media:
+            missing_files.append(file)
+
     missing_files = []
     media = deps.media
-
-    for f in audeer.progress_bar(
-        db.files,
-        desc='Check media',
-        disable=not verbose,
-    ):
-        path = os.path.join(db_root, f)
-        if not os.path.exists(path) and f not in media:
-            missing_files.append(f)
+    audeer.run_tasks(
+        job,
+        params=[([file], {}) for file in db.files],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Check for missing media',
+    )
 
     if len(missing_files) > 0:
+        missing_files = sorted(missing_files)
         number_of_presented_files = 20
         error_msg = (
             f'The following '
@@ -396,6 +403,7 @@ def publish(
     db = audformat.Database.load(
         db_root,
         load_data=False,
+        num_workers=num_workers,
         verbose=verbose,
     )
 
@@ -481,6 +489,7 @@ def publish(
     db = audformat.Database.load(
         db_root,
         load_data=True,
+        num_workers=num_workers,
         verbose=verbose,
     )
 
@@ -497,12 +506,7 @@ def publish(
 
     # check all media referenced in a table exist
     # on disk or are already part of the database
-    _check_for_missing_media(
-        db,
-        db_root,
-        deps,
-        verbose,
-    )
+    _check_for_missing_media(db, db_root, deps, num_workers, verbose)
 
     # make sure all tables are stored in CSV format
     for table_id, table in db.tables.items():
@@ -528,9 +532,8 @@ def publish(
     # publish dependencies and header
     deps.save(deps_path)
     archive_file = backend.join(db.name, define.DB)
-    backend.put_archive(
-        db_root, define.DEPENDENCIES_FILE, archive_file, version,
-    )
+    backend.put_archive(db_root, define.DEPENDENCIES_FILE, archive_file,
+                        version)
     try:
         local_header = os.path.join(db_root, define.HEADER_FILE)
         remote_header = db.name + '/' + define.HEADER_FILE
