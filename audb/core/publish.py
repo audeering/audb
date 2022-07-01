@@ -41,24 +41,16 @@ def _check_for_duplicates(
 def _check_for_missing_media(
         db: audformat.Database,
         db_root: str,
+        db_root_files: typing.Set[str],
         deps: Dependencies,
 ):
     r"""Check for media that is not in root and not in dependencies."""
 
     db_files = db.files
     deps_files = deps.media
-    root_files = audeer.list_file_names(
-        db_root,
-        basenames=True,
-        recursive=True,
-    )
-
-    if os.name == 'nt':  # pragma: no cover
-        # convert '\\' to '/'
-        root_files = [file.replace('\\', '/') for file in root_files]
 
     db_files_not_in_deps = set(db_files) - set(deps_files)
-    missing_files = db_files_not_in_deps - set(root_files)
+    missing_files = db_files_not_in_deps - db_root_files
 
     if len(missing_files) > 0:
         missing_files = sorted(list(missing_files))
@@ -112,6 +104,7 @@ def _find_tables(
 def _find_media(
         db: audformat.Database,
         db_root: str,
+        db_root_files: typing.Set[str],
         version: str,
         deps: Dependencies,
         archives: typing.Mapping[str, str],
@@ -122,10 +115,13 @@ def _find_media(
     # release dependencies to removed media
     # and select according archives for upload
     media = set()
-    db_media = db.files
-    for file in set(deps.media) - set(db_media):
+    db_media = set(db.files)
+    for file in set(deps.media) - db_media:
         media.add(deps.archive(file))
         deps._drop(file)
+
+    # limit to relevant media
+    db_media_in_root = db_media.intersection(db_root_files)
 
     # update version of altered media and insert new ones
 
@@ -145,7 +141,7 @@ def _find_media(
                 checksum,
             )
             add_media.append(values)
-        elif not deps.removed(file) and os.path.exists(path):
+        elif not deps.removed(file):
             checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.archive(file)
@@ -162,7 +158,7 @@ def _find_media(
     update_media = []
     audeer.run_tasks(
         job,
-        params=[([file], {}) for file in db_media],
+        params=[([file], {}) for file in db_media_in_root],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Find media',
@@ -173,6 +169,23 @@ def _find_media(
         deps._add_media(add_media)
 
     return media
+
+
+def _get_root_files(
+        db_root: str,
+) -> typing.Set[str]:
+    r"""Return list of files in root directory."""
+
+    db_root_files = audeer.list_file_names(
+        db_root,
+        basenames=True,
+        recursive=True,
+    )
+    if os.name == 'nt':  # pragma: no cover
+        # convert '\\' to '/'
+        db_root_files = [file.replace('\\', '/') for file in db_root_files]
+
+    return set(db_root_files)
 
 
 def _media_values(
@@ -506,7 +519,8 @@ def publish(
 
     # check all media referenced in a table exist
     # on disk or are already part of the database
-    _check_for_missing_media(db, db_root, deps)
+    db_root_files = _get_root_files(db_root)
+    _check_for_missing_media(db, db_root, db_root_files, deps)
 
     # make sure all tables are stored in CSV format
     for table_id, table in db.tables.items():
@@ -524,8 +538,8 @@ def publish(
                 verbose)
 
     # publish media
-    media = _find_media(db, db_root, version, deps, archives, num_workers,
-                        verbose)
+    media = _find_media(db, db_root, db_root_files, version, deps, archives,
+                        num_workers, verbose)
     _put_media(media, db_root, db.name, version, previous_version,
                deps, backend, num_workers, verbose)
 
