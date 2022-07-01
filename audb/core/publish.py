@@ -1,6 +1,7 @@
 import collections
 import os
 import shutil
+import sys
 import tempfile
 import typing
 
@@ -40,35 +41,34 @@ def _check_for_missing_media(
         db: audformat.Database,
         db_root: str,
         deps: Dependencies,
-        num_workers: int,
         verbose: bool,
 ):
     r"""Check for media that is not in root and not in dependencies."""
 
-    def job(file):
-        if (
-                file not in deps_files
-                and file not in root_files
-        ):
-            missing_files.append(file)
-
-    missing_files = []
     deps_files = deps.media
     root_files = audeer.list_file_names(
         db_root,
         basenames=True,
         recursive=True,
     )
-    audeer.run_tasks(
-        job,
-        params=[([file], {}) for file in db.files],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Check for missing media',
-    )
+
+    if os.name == 'nt':  # pragma: no cover
+        # convert '\\' to '/'
+        root_files = [file.replace('\\', '/') for file in root_files]
+
+    missing_files = []
+    for file in audeer.progress_bar(
+        db.files,
+        desc='Check for missing media',
+        disable=not verbose,
+    ):
+        if (
+                file not in deps_files
+                and file not in root_files
+        ):
+            missing_files.append(file)
 
     if len(missing_files) > 0:
-        missing_files = sorted(missing_files)
         number_of_presented_files = 20
         error_msg = (
             f'The following '
@@ -513,7 +513,7 @@ def publish(
 
     # check all media referenced in a table exist
     # on disk or are already part of the database
-    _check_for_missing_media(db, db_root, deps, num_workers, verbose)
+    _check_for_missing_media(db, db_root, deps, verbose)
 
     # make sure all tables are stored in CSV format
     for table_id, table in db.tables.items():
