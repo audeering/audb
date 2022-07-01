@@ -40,11 +40,16 @@ def _check_for_missing_media(
         db: audformat.Database,
         db_root: str,
         deps: Dependencies,
+        verbose: bool,
 ):
     missing_files = []
     media = deps.media
 
-    for f in db.files:
+    for f in audeer.progress_bar(
+        db.files,
+        desc='Check media',
+        disable=not verbose,
+    ):
         path = os.path.join(db_root, f)
         if not os.path.exists(path) and f not in media:
             missing_files.append(f)
@@ -488,6 +493,7 @@ def publish(
         db,
         db_root,
         deps,
+        verbose,
     )
 
     # make sure all tables are stored in CSV format
