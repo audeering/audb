@@ -393,7 +393,11 @@ def publish(
             but sox and/or mediafile is not installed
 
     """
-    db = audformat.Database.load(db_root, load_data=False)
+    db = audformat.Database.load(
+        db_root,
+        load_data=False,
+        verbose=verbose,
+    )
 
     backend = audbackend.create(
         repository.backend,
@@ -473,8 +477,12 @@ def publish(
                     f"or modified the file manually?"
                 )
 
-    # load database from folder
-    db = audformat.Database.load(db_root, load_data=True)
+    # load database with table data
+    db = audformat.Database.load(
+        db_root,
+        load_data=True,
+        verbose=verbose,
+    )
 
     # check all tables are conform with audformat
     if not db.is_portable:
