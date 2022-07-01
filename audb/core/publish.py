@@ -43,15 +43,22 @@ def _check_for_missing_media(
         num_workers: int,
         verbose: bool,
 ):
-    r"""Check for media that is not on disk and not in dependencies."""
+    r"""Check for media that is not in root and not in dependencies."""
 
     def job(file):
-        path = os.path.join(db_root, file)
-        if not os.path.exists(path) and file not in media:
+        if (
+                file not in deps_files
+                and file not in root_files
+        ):
             missing_files.append(file)
 
     missing_files = []
-    media = deps.media
+    deps_files = deps.media
+    root_files = audeer.list_file_names(
+        db_root,
+        basenames=True,
+        recursive=True,
+    )
     audeer.run_tasks(
         job,
         params=[([file], {}) for file in db.files],
