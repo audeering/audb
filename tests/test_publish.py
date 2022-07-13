@@ -585,7 +585,7 @@ def test_update_database_without_media(tmpdir):
     for file in rem_files:
         assert not os.path.exists(audeer.path(db_load.root, file))
     for file in new_files + alter_files:
-        filecmp.cmp(
+        assert filecmp.cmp(
             audeer.path(build_root, file),
             audeer.path(db_load.root, file),
         )
