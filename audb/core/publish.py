@@ -111,13 +111,14 @@ def _find_media(
         num_workers: int,
         verbose: bool,
 ) -> typing.Set[str]:
+    r"""Find archives with new, altered or removed media files."""
 
     # release dependencies to removed media
     # and select according archives for upload
-    media = set()
+    media_archives = set()
     db_media = set(db.files)
     for file in set(deps.media) - db_media:
-        media.add(deps.archive(file))
+        media_archives.add(deps.archive(file))
         deps._drop(file)
 
     # limit to relevant media
@@ -168,7 +169,12 @@ def _find_media(
     if add_media:
         deps._add_media(add_media)
 
-    return media
+    # select archives with new or altered files for upload
+    for file in deps.media:
+        if not deps.removed(file) and deps.version(file) == version:
+            media_archives.add(deps.archive(file))
+
+    return media_archives
 
 
 def _get_root_files(
@@ -231,7 +237,7 @@ def _media_values(
 
 
 def _put_media(
-        media: typing.Set[str],
+        media_archives: typing.Set[str],
         db_root: str,
         db_name: str,
         version: str,
@@ -241,22 +247,20 @@ def _put_media(
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
-    # create a mapping from archives to media and
-    # select archives with new or altered files for upload
-    map_media_to_files = collections.defaultdict(list)
-    for file in deps.media:
-        if not deps.removed(file):
-            map_media_to_files[deps.archive(file)].append(file)
-            if deps.version(file) == version:
-                media.add(deps.archive(file))
+    r"""Upload archives with new, altered or removed media files."""
 
-    # upload new and altered archives if it contains at least one file
-    if media:
+    if media_archives:
+
+        # create a mapping from archives to media files
+        map_archive_to_files = collections.defaultdict(list)
+        for file in deps.media:
+            if not deps.removed(file):
+                map_archive_to_files[deps.archive(file)].append(file)
 
         def job(archive):
-            if archive in map_media_to_files:
+            if archive in map_archive_to_files:
 
-                files = map_media_to_files[archive]
+                files = map_archive_to_files[archive]
                 for file in files:
                     update_media.append(file)
 
@@ -303,7 +307,7 @@ def _put_media(
         update_media = []
         audeer.run_tasks(
             job,
-            params=[([archive], {}) for archive in media],
+            params=[([archive], {}) for archive in media_archives],
             num_workers=num_workers,
             progress_bar=verbose,
             task_description='Put media',
@@ -544,9 +548,9 @@ def publish(
                 verbose)
 
     # publish media
-    media = _find_media(db, db_root, db_root_files, version, deps, archives,
-                        num_workers, verbose)
-    _put_media(media, db_root, db.name, version, previous_version,
+    media_archives = _find_media(db, db_root, db_root_files, version, deps,
+                                 archives, num_workers, verbose)
+    _put_media(media_archives, db_root, db.name, version, previous_version,
                deps, backend, num_workers, verbose)
 
     # publish dependencies and header
