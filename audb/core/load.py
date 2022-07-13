@@ -187,7 +187,7 @@ def _files_duration(
         format: typing.Optional[str],
 ):
     field = define.DEPEND_FIELD_NAMES[define.DependField.DURATION]
-    durs = deps._df.loc[files][field]
+    durs = deps().loc[files][field]
     durs = durs[durs > 0]
     durs = pd.to_timedelta(durs, unit='s')
     durs.index.name = 'file'
@@ -702,7 +702,7 @@ def filtered_dependencies(
 
         media = filter_media(media, deps.media, name, version)
         available_media = [m for m in media if m in list(set(available_media))]
-        df = deps._df.loc[available_media]
+        df = deps().loc[available_media]
 
     return df
 
