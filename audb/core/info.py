@@ -231,7 +231,7 @@ def formats(
             If not set :meth:`audb.default_cache_root` is used
 
     Returns:
-        format
+        formats
 
     Raises:
         ValueError: if table or media is requested

@@ -666,10 +666,9 @@ def filtered_dependencies(
     r"""Filter media by tables.
 
     Return all media files from ``media``
-    that are mentioned in at least one table
+    that are referenced in at least one table
     from ``tables``.
-    This has to download every table
-    for doing the check.
+    This will download all tables.
 
     Args:
         name: name of database
@@ -685,7 +684,7 @@ def filtered_dependencies(
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     if tables is None and media is None:
-        df = deps._df
+        df = deps()
     else:
         available_media = []
         tables = filter_tables(tables, deps.table_ids)
