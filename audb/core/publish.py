@@ -352,22 +352,28 @@ def publish(
     r"""Publish database.
 
     A database can have dependencies
-    to files of an older version of itself.
-    E.g. you might add a few new files to an existing database
-    and publish as a new version.
-    :func:`audb.publish` will upload then only the new files
-    and store dependencies on the already published files.
+    to media files and tables of an older version.
+    E.g. you might alter an existing table
+    by adding new media files to it
+    and publish it as a new version.
+    :func:`audb.publish` will then upload
+    only the altered table
+    and the new media files,
+    which will be added as new dependencies
+    to the already published files.
 
-    To allow for dependencies
-    you first have to load the version of the database
+    To update a database,
+    you first have to load the version
     that the new version should depend on
     with :func:`audb.load_to` to ``db_root``.
     Media files that are not altered can be omitted,
-    so consider to set
-    ``only_metadata=True``
-    for large databases.
+    so it recommended to set
+    ``only_metadata=True``.
     Afterwards you make your changes to that folder
     and run :func:`audb.publish`.
+    To remove media files from a database,
+    make sure they are no
+    longer referenced in the tables.
 
     Setting ``previous_version=None`` allows you
     to start from scratch and upload all files
