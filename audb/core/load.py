@@ -22,7 +22,12 @@ from audb.core.cache import (
     database_tmp_root,
     default_cache_root,
 )
-from audb.core.dependencies import Dependencies
+from audb.core.dependencies import (
+    Dependencies,
+    error_message_missing_object,
+    filter_media,
+    filter_tables,
+)
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
 from audb.core.utils import lookup_backend
@@ -683,7 +688,7 @@ def filtered_dependencies(
         df = deps._df
     else:
         available_media = []
-        tables = deps._filter_tables(tables)
+        tables = filter_tables(tables, deps.table_ids)
         for table in tables:
             df = load_table(
                 name,
@@ -696,7 +701,7 @@ def filtered_dependencies(
                 df.index.get_level_values('file').unique()
             )
 
-        media = deps._filter_media(media)
+        media = filter_media(media, deps.media, name, version)
         available_media = [m for m in media if m in list(set(available_media))]
         df = deps._df.loc[available_media]
 
@@ -837,7 +842,7 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # filter tables
-            requested_tables = deps._filter_tables(tables)
+            requested_tables = filter_tables(tables, deps.table_ids)
 
             # load missing tables
             if not db_is_complete:
@@ -864,7 +869,7 @@ def load(
                 db[table].load(os.path.join(db_root, f'db.{table}'))
 
             # filter media
-            requested_media = deps._filter_media(media, db.files)
+            requested_media = filter_media(media, db.files, name, version)
 
             # load missing media
             if not db_is_complete and not only_metadata:
@@ -1082,9 +1087,11 @@ def load_media(
     available_files = deps.media
     for media_file in media:
         if media_file not in available_files:
-            msg = deps._error_message_missing_object(
+            msg = error_message_missing_object(
                 'media file',
                 [media_file],
+                name,
+                version,
             )
             raise ValueError(msg)
 
@@ -1200,7 +1207,12 @@ def load_table(
     )
 
     if table not in deps.table_ids:
-        msg = deps._error_message_missing_object('table', [table])
+        msg = error_message_missing_object(
+            'table',
+            [table],
+            name,
+            version,
+        )
         raise ValueError(msg)
 
     with FolderLock(db_root):
