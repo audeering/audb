@@ -1,10 +1,12 @@
 import errno
 import os
+import re
 import typing
 
 import pandas as pd
 
 import audeer
+import audformat
 import audiofile
 
 from audb.core import define
@@ -488,3 +490,149 @@ class Dependencies:
         """
         field = define.DEPEND_FIELD_NAMES[define.DependField.VERSION]
         self._df.loc[files, field] = version
+
+
+def error_message_missing_object(
+        object_name: str,
+        missing_object_id: typing.Union[str, typing.Sequence],
+        database_name: str = None,
+        database_version: str = None,
+) -> str:
+    r"""Error message for missing objects.
+
+    Args:
+        object_name: object that is supposed to contain ``missing_object_id``,
+            should be ``'table'`` or ``'media file'``
+        missing_object_id: ID of missing object
+        database_name: name of affected database
+        database_version: name of affected database
+
+    Returns:
+        error message
+
+    """
+    if isinstance(missing_object_id, str):
+        msg = (
+            f"Could not find a {object_name} "
+            f"matching '{missing_object_id}'"
+        )
+    else:
+        msg = (
+            f"Could not find the {object_name} "
+            f"'{missing_object_id[0]}'"
+        )
+    if database_name is not None and database_version is not None:
+        msg += f' in {database_name} v{database_version}'
+    return msg
+
+
+def filter_media(
+        requested_media: typing.Optional[
+            typing.Union[str, typing.Sequence[str]]
+        ],
+        available_media: typing.Sequence[str],
+        database_name: str = None,
+        database_version: str = None,
+) -> typing.Sequence[str]:
+    r"""Filter media files by requested media.
+
+    Args:
+        requested_media: requested media files
+        available_media: sequence of media files
+        database_name: name of affected database
+        database_version: name of affected database
+
+    Returns:
+        list of media files inside the dependency object
+            matching ``requested_media``
+
+    """
+    if requested_media is None:
+        return available_media
+    elif len(requested_media) == 0:
+        return []
+
+    if isinstance(requested_media, str):
+        request = requested_media
+        pattern = re.compile(request)
+        requested_media = []
+        for m in available_media:
+            if pattern.search(m):
+                requested_media.append(m)
+        if len(requested_media) == 0:
+            msg = error_message_missing_object(
+                'media file',
+                request,
+                database_name,
+                database_version,
+            )
+            raise ValueError(msg)
+    else:
+        for media_file in requested_media:
+            if media_file not in available_media:
+                msg = error_message_missing_object(
+                    'media file',
+                    [media_file],
+                    database_name,
+                    database_version,
+                )
+                raise ValueError(msg)
+
+    return requested_media
+
+
+def filter_tables(
+        requested_tables: typing.Optional[
+            typing.Union[str, typing.Sequence[str]]
+        ],
+        available_tables: typing.Sequence[str],
+        database_name: str = None,
+        database_version: str = None,
+) -> typing.Sequence[str]:
+    r"""Filter dependency tables by requested tables.
+
+    Args:
+        requested_tables: include only tables
+            matching the regular expression
+            or provided in the list
+        available_tables: sequence of available table IDs
+        database_name: name of affected database
+        database_version: name of affected database
+
+    Returns:
+        list of table IDs inside the dependency object
+            matching ``requested_tables``
+
+    """
+    if requested_tables is None:
+        return available_tables
+    elif len(requested_tables) == 0:
+        return []
+
+    if isinstance(requested_tables, str):
+        request = requested_tables
+        pattern = re.compile(request)
+        requested_tables = []
+        for table in available_tables:
+            if pattern.search(table):
+                requested_tables.append(table)
+        if len(requested_tables) == 0:
+            msg = error_message_missing_object(
+                'table',
+                request,
+                database_name,
+                database_version,
+            )
+            raise ValueError(msg)
+    else:
+        for table in requested_tables:
+            if table not in available_tables:
+                msg = error_message_missing_object(
+                    'table',
+                    [table],
+                    database_name,
+                    database_version,
+                )
+                raise ValueError(msg)
+
+    return requested_tables
