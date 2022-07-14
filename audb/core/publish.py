@@ -362,8 +362,8 @@ def publish(
     by adding labels for new media files to it
     and publish it as a new version.
     :func:`audb.publish` will then upload
-    only the new and altered files
-    and update their dependencies.
+    new and altered files and update
+    the dependencies accordingly.
 
     To update a database,
     you first have to load the version
