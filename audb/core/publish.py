@@ -420,8 +420,22 @@ def publish(
             see :meth:`audformat.Database.is_portable`
         RuntimeError: if non-standard formats like MP3 and MP4 are published,
             but sox and/or mediafile is not installed
+        ValueError: if ``previous_version`` is not smaller than ``version``
 
     """
+    if (
+            previous_version is not None
+            and previous_version != 'latest'
+            and (
+                audeer.LooseVersion(version)
+                <= audeer.LooseVersion(previous_version)
+            )
+    ):
+        raise ValueError(
+            "'previous_version' needs to be smaller than 'version', "
+            f"but yours is {previous_version} >= {version}."
+        )
+
     db = audformat.Database.load(
         db_root,
         load_data=False,
