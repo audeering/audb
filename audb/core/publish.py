@@ -1,6 +1,9 @@
 import collections
 import os
+import shutil
+import sys
 import tempfile
+import time
 import typing
 
 import audbackend
@@ -11,6 +14,7 @@ import audiofile
 from audb.core import define
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
+from audb.core.load import load_media
 from audb.core.repository import Repository
 
 
@@ -34,6 +38,39 @@ def _check_for_duplicates(
     )
 
 
+def _check_for_missing_media(
+        db: audformat.Database,
+        db_root: str,
+        db_root_files: typing.Set[str],
+        deps: Dependencies,
+):
+    r"""Check for media that is not in root and not in dependencies."""
+
+    db_files = db.files
+    deps_files = deps.media
+
+    db_files_not_in_deps = set(db_files) - set(deps_files)
+    missing_files = db_files_not_in_deps - db_root_files
+
+    if len(missing_files) > 0:
+        missing_files = sorted(list(missing_files))
+        number_of_presented_files = 20
+        error_msg = (
+            f'The following '
+            f'{len(missing_files)} '
+            f'files are referenced in tables '
+            f'that cannot be found on disk '
+            f'and are not yet part of the database: '
+            f"{missing_files[:number_of_presented_files]}"
+        )
+        if len(missing_files) <= number_of_presented_files:
+            error_msg += "."
+        else:
+            error_msg = error_msg[:-1]
+            error_msg += ", ...]."
+        raise RuntimeError(error_msg)
+
+
 def _find_tables(
         db: audformat.Database,
         db_root: str,
@@ -41,7 +78,7 @@ def _find_tables(
         deps: Dependencies,
         verbose: bool,
 ) -> typing.List[str]:
-    r"""Update tables."""
+    r"""Find altered, new or removed tables and update 'deps'."""
 
     # release dependencies to removed tables
 
@@ -67,20 +104,26 @@ def _find_tables(
 def _find_media(
         db: audformat.Database,
         db_root: str,
+        db_root_files: typing.Set[str],
         version: str,
         deps: Dependencies,
         archives: typing.Mapping[str, str],
         num_workers: int,
         verbose: bool,
 ) -> typing.Set[str]:
+    r"""Find archives with new, altered or removed media and update 'deps'."""
+
+    media_archives = set()
+    db_media = set(db.files)
 
     # release dependencies to removed media
     # and select according archives for upload
-    media = set()
-    db_media = db.files
-    for file in set(deps.media) - set(db_media):
-        media.add(deps.archive(file))
+    for file in set(deps.media) - db_media:
+        media_archives.add(deps.archive(file))
         deps._drop(file)
+
+    # limit to relevant media
+    db_media_in_root = db_media.intersection(db_root_files)
 
     # update version of altered media and insert new ones
 
@@ -117,7 +160,7 @@ def _find_media(
     update_media = []
     audeer.run_tasks(
         job,
-        params=[([file], {}) for file in db_media],
+        params=[([file], {}) for file in db_media_in_root],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Find media',
@@ -127,7 +170,29 @@ def _find_media(
     if add_media:
         deps._add_media(add_media)
 
-    return media
+    # select archives with new or altered files for upload
+    for file in deps.media:
+        if not deps.removed(file) and deps.version(file) == version:
+            media_archives.add(deps.archive(file))
+
+    return media_archives
+
+
+def _get_root_files(
+        db_root: str,
+) -> typing.Set[str]:
+    r"""Return list of files in root directory."""
+
+    db_root_files = audeer.list_file_names(
+        db_root,
+        basenames=True,
+        recursive=True,
+    )
+    if os.name == 'nt':  # pragma: no cover
+        # convert '\\' to '/'
+        db_root_files = [file.replace('\\', '/') for file in db_root_files]
+
+    return set(db_root_files)
 
 
 def _media_values(
@@ -173,39 +238,69 @@ def _media_values(
 
 
 def _put_media(
-        media: typing.Set[str],
+        media_archives: typing.Set[str],
         db_root: str,
         db_name: str,
         version: str,
+        previous_version: typing.Optional[str],
         deps: Dependencies,
         backend: audbackend.Backend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
-    # create a mapping from archives to media and
-    # select archives with new or altered files for upload
-    map_media_to_files = collections.defaultdict(list)
-    for file in deps.media:
-        if not deps.removed(file):
-            map_media_to_files[deps.archive(file)].append(file)
-            if deps.version(file) == version:
-                media.add(deps.archive(file))
+    r"""Upload archives with new, altered or removed media files."""
 
-    # upload new and altered archives if it contains at least one file
-    if media:
+    if media_archives:
+
+        # create a mapping from archives to media files
+        map_archive_to_files = collections.defaultdict(list)
+        for file in deps.media:
+            if not deps.removed(file):
+                map_archive_to_files[deps.archive(file)].append(file)
 
         def job(archive):
-            if archive in map_media_to_files:
-                for file in map_media_to_files[archive]:
+            if archive in map_archive_to_files:
+
+                files = map_archive_to_files[archive]
+                for file in files:
                     update_media.append(file)
+
                 archive_file = backend.join(
                     db_name,
                     define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
                     archive,
                 )
+
+                if previous_version is not None:
+                    # if only some files of the archive were altered
+                    # it may happen that the others do not exist
+                    # in the root folder,
+                    # so we have to download the archive
+                    # and copy the missing files first
+                    missing_files = []
+                    for file in files:
+                        path = os.path.join(db_root, file)
+                        if not os.path.exists(path):
+                            missing_files.append(file)
+                    if missing_files:
+                        with tempfile.TemporaryDirectory() as tmp_root:
+                            backend.get_archive(
+                                archive_file,
+                                tmp_root,
+                                previous_version,
+                            )
+                            for missing_file in missing_files:
+                                src_path = os.path.join(tmp_root, missing_file)
+                                dst_path = os.path.join(db_root, missing_file)
+                                audeer.mkdir(os.path.dirname(dst_path))
+                                shutil.copy(
+                                    src_path,
+                                    dst_path,
+                                )
+
                 backend.put_archive(
                     db_root,
-                    map_media_to_files[archive],
+                    files,
                     archive_file,
                     version,
                 )
@@ -213,7 +308,7 @@ def _put_media(
         update_media = []
         audeer.run_tasks(
             job,
-            params=[([archive], {}) for archive in media],
+            params=[([archive], {}) for archive in media_archives],
             num_workers=num_workers,
             progress_bar=verbose,
             task_description='Put media',
@@ -262,18 +357,26 @@ def publish(
     r"""Publish database.
 
     A database can have dependencies
-    to files of an older version of itself.
-    E.g. you might add a few new files to an existing database
-    and publish as a new version.
-    :func:`audb.publish` will upload then only the new files
-    and store dependencies on the already published files.
+    to media files and tables of an older version.
+    E.g. you might alter an existing table
+    by adding labels for new media files to it
+    and publish it as a new version.
+    :func:`audb.publish` will then upload
+    new and altered files and update
+    the dependencies accordingly.
 
-    To allow for dependencies
-    you first have to load the version of the database
+    To update a database,
+    you first have to load the version
     that the new version should depend on
     with :func:`audb.load_to` to ``db_root``.
+    Media files that are not altered can be omitted,
+    so it is recommended to set
+    ``only_metadata=True`` in :func:`audb.load_to`.
     Afterwards you make your changes to that folder
     and run :func:`audb.publish`.
+    To remove media files from a database,
+    make sure they are no
+    longer referenced in the tables.
 
     Setting ``previous_version=None`` allows you
     to start from scratch and upload all files
@@ -319,7 +422,12 @@ def publish(
             but sox and/or mediafile is not installed
 
     """
-    db = audformat.Database.load(db_root, load_data=False)
+    db = audformat.Database.load(
+        db_root,
+        load_data=False,
+        num_workers=num_workers,
+        verbose=verbose,
+    )
 
     backend = audbackend.create(
         repository.backend,
@@ -399,8 +507,13 @@ def publish(
                     f"or modified the file manually?"
                 )
 
-    # load database from folder
-    db = audformat.Database.load(db_root, load_data=True)
+    # load database with table data
+    db = audformat.Database.load(
+        db_root,
+        load_data=True,
+        num_workers=num_workers,
+        verbose=verbose,
+    )
 
     # check all tables are conform with audformat
     if not db.is_portable:
@@ -413,23 +526,10 @@ def publish(
         )
     _check_for_duplicates(db, num_workers, verbose)
 
-    # check all files referenced in a table exists
-    missing_files = [
-        f for f in db.files
-        if not os.path.exists(os.path.join(db_root, f))
-    ]
-    if len(missing_files) > 0:
-        number_of_presented_files = 20
-        error_msg = (
-            f'{len(missing_files)} files are referenced in tables '
-            'that cannot be found. '
-            f"Missing files are: '{missing_files[:number_of_presented_files]}"
-        )
-        if len(missing_files) <= number_of_presented_files:
-            error_msg += "'."
-        else:
-            error_msg += ", ...'."
-        raise RuntimeError(error_msg)
+    # check all media referenced in a table exist
+    # on disk or are already part of the database
+    db_root_files = _get_root_files(db_root)
+    _check_for_missing_media(db, db_root, db_root_files, deps)
 
     # make sure all tables are stored in CSV format
     for table_id, table in db.tables.items():
@@ -447,17 +547,16 @@ def publish(
                 verbose)
 
     # publish media
-    media = _find_media(db, db_root, version, deps, archives, num_workers,
-                        verbose)
-    _put_media(media, db_root, db.name, version, deps, backend, num_workers,
-               verbose)
+    media_archives = _find_media(db, db_root, db_root_files, version, deps,
+                                 archives, num_workers, verbose)
+    _put_media(media_archives, db_root, db.name, version, previous_version,
+               deps, backend, num_workers, verbose)
 
     # publish dependencies and header
     deps.save(deps_path)
     archive_file = backend.join(db.name, define.DB)
-    backend.put_archive(
-        db_root, define.DEPENDENCIES_FILE, archive_file, version,
-    )
+    backend.put_archive(db_root, define.DEPENDENCIES_FILE, archive_file,
+                        version)
     try:
         local_header = os.path.join(db_root, define.HEADER_FILE)
         remote_header = db.name + '/' + define.HEADER_FILE
