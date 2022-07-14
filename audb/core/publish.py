@@ -372,7 +372,7 @@ def publish(
     with :func:`audb.load_to` to ``db_root``.
     Media files that are not altered can be omitted,
     so it recommended to set
-    ``only_metadata=True``.
+    ``only_metadata=True`` in :func:`audb.load_to`.
     Afterwards you make your changes to that folder
     and run :func:`audb.publish`.
     To remove media files from a database,
