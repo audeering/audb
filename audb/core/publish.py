@@ -78,7 +78,7 @@ def _find_tables(
         deps: Dependencies,
         verbose: bool,
 ) -> typing.List[str]:
-    r"""Update tables."""
+    r"""Find altered, new or removed tables and update 'deps'."""
 
     # release dependencies to removed tables
 
@@ -111,7 +111,7 @@ def _find_media(
         num_workers: int,
         verbose: bool,
 ) -> typing.Set[str]:
-    r"""Find archives with new, altered or removed media files."""
+    r"""Find archives with new, altered or removed media and update 'deps'."""
 
     media_archives = set()
     db_media = set(db.files)
