@@ -10,7 +10,8 @@ and this project adheres to `Semantic Versioning`_.
 Version 1.3.0 (2022-07-14)
 --------------------------
 
-* Added: lock cache folder when modifying it by a lock file
+* Added: lock cache folder with a lock file
+  when modifying it
 * Added: ``verbose`` argument to ``audb.dependencies()``
 * Added: ``audb.info.files()``
 * Added: ``media`` and ``tables`` arguments
