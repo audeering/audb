@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.6
+                v1.3.0
               </div>
             
           
@@ -167,9 +167,14 @@
 <span class="kn">import</span> <span class="nn">audformat</span>
 
 <span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
+<span class="kn">from</span> <span class="nn">audb.core.cache</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">database_cache_root</span><span class="p">,</span>
+    <span class="n">default_cache_root</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">audb.core.config</span> <span class="kn">import</span> <span class="n">config</span>
 <span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.flavor</span> <span class="kn">import</span> <span class="n">Flavor</span>
+<span class="kn">from</span> <span class="nn">audb.core.lock</span> <span class="kn">import</span> <span class="n">FolderLock</span>
 <span class="kn">from</span> <span class="nn">audb.core.repository</span> <span class="kn">import</span> <span class="n">Repository</span>
 <span class="kn">from</span> <span class="nn">audb.core.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">lookup_backend</span><span class="p">,</span>
@@ -377,49 +382,12 @@
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="default_cache_root"><a class="viewcode-back" href="../../../api.html#audb.default_cache_root">[docs]</a><span class="k">def</span> <span class="nf">default_cache_root</span><span class="p">(</span>
-        <span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default cache folder.</span>
-
-<span class="sd">    If ``shared`` is ``True``,</span>
-<span class="sd">    returns the path specified</span>
-<span class="sd">    by the environment variable</span>
-<span class="sd">    ``AUDB_SHARED_CACHE_ROOT``</span>
-<span class="sd">    or</span>
-<span class="sd">    ``audb.config.SHARED_CACHE_ROOT``.</span>
-<span class="sd">    If ``shared`` is ``False``,</span>
-<span class="sd">    returns the path specified</span>
-<span class="sd">    by the environment variable</span>
-<span class="sd">    ``AUDB_CACHE_ROOT``</span>
-<span class="sd">    or</span>
-<span class="sd">    ``audb.config.CACHE_ROOT``.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        shared: if ``True`` returns path to shared cache folder</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        path normalized by :func:`audeer.path`</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">shared</span><span class="p">:</span>
-        <span class="n">cache</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;AUDB_SHARED_CACHE_ROOT&#39;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">SHARED_CACHE_ROOT</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">cache</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;AUDB_CACHE_ROOT&#39;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">cache</span><span class="p">)</span></div>
-
-
 <div class="viewcode-block" id="dependencies"><a class="viewcode-back" href="../../../api.html#audb.dependencies">[docs]</a><span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dependencies</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Database dependencies.</span>
 
@@ -428,6 +396,7 @@
 <span class="sd">        version: version of database</span>
 <span class="sd">        cache_root: cache folder where databases are stored.</span>
 <span class="sd">            If not set :meth:`audb.default_cache_root` is used</span>
+<span class="sd">        verbose: show debug messages</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dependency object</span>
@@ -441,37 +410,31 @@
     <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="n">cache_roots</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">default_cache_root</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>  <span class="c1"># check shared cache first</span>
-        <span class="n">default_cache_root</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span>
-    <span class="p">]</span> <span class="k">if</span> <span class="n">cache_root</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="n">cache_root</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">cache_root</span> <span class="ow">in</span> <span class="n">cache_roots</span><span class="p">:</span>
-        <span class="n">deps_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
-            <span class="n">cache_root</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">deps_root</span><span class="p">):</span>
-            <span class="k">break</span>
-
-    <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">deps_root</span><span class="p">)</span>
-    <span class="n">deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">deps_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">CACHED_DEPENDENCIES_FILE</span><span class="p">)</span>
+    <span class="n">db_root</span> <span class="o">=</span> <span class="n">database_cache_root</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">,</span>
+        <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">CACHED_DEPENDENCIES_FILE</span><span class="p">)</span>
 
     <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
-    <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">):</span>
-        <span class="c1"># If loading pickled cached file fails, load again from backend</span>
-        <span class="n">backend</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_root</span><span class="p">:</span>
-            <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span><span class="p">)</span>
-            <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
-                <span class="n">archive</span><span class="p">,</span>
-                <span class="n">tmp_root</span><span class="p">,</span>
-                <span class="n">version</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">))</span>
-            <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">FolderLock</span><span class="p">(</span><span class="n">db_root</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">):</span>
+            <span class="c1"># If loading pickled cached file fails, load again from backend</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_root</span><span class="p">:</span>
+                <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span><span class="p">)</span>
+                <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+                    <span class="n">archive</span><span class="p">,</span>
+                    <span class="n">tmp_root</span><span class="p">,</span>
+                    <span class="n">version</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">))</span>
+                <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">deps</span></div>
 
@@ -593,6 +556,12 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        flavor path relative to cache folder</span>
 
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if a non-supported ``bit_depth``,</span>
+<span class="sd">            ``format``,</span>
+<span class="sd">            or ``sampling_rate``</span>
+<span class="sd">            is requested</span>
+
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; flavor_path(&#39;emodb&#39;, version=&#39;1.2.0&#39;).split(os.path.sep)</span>
 <span class="sd">        [&#39;emodb&#39;, &#39;1.2.0&#39;, &#39;d3b62a9b&#39;]</span>
@@ -619,6 +588,9 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        version string</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: if no version exists for the requested database</span>
 
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; latest_version(&#39;emodb&#39;)</span>
@@ -667,13 +639,18 @@
                 <span class="n">archive</span><span class="p">,</span>
                 <span class="n">db_root</span><span class="p">,</span>
                 <span class="n">version</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">deps_path</span><span class="p">)</span>
             <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
             <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
             <span class="n">upload</span> <span class="o">=</span> <span class="kc">False</span>
 
-            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span>
+                <span class="n">files</span><span class="p">,</span>
+                <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span>
+                <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Remove media from v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="p">):</span>
                 <span class="k">if</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">:</span>
                     <span class="n">archive</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
@@ -718,6 +695,7 @@
                     <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">,</span>
                     <span class="n">remote_archive</span><span class="p">,</span>
                     <span class="n">version</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
                 <span class="p">)</span></div>
 
 
@@ -791,7 +769,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/14 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -826,6 +804,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>

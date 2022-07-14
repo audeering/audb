@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.2.6
+                v1.3.0
               </div>
             
           
@@ -166,7 +166,7 @@
 </div>
 </div>
 <div class="section" id="caching">
-<span id="id1"></span><h1>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Caching<a class="headerlink" href="#caching" title="Permalink to this heading">¶</a></h1>
 <p>When you request a database the first time,
 <a class="reference internal" href="api.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> will unpack (and convert) annotations and data to
 <code class="file docutils literal notranslate"><span class="pre">&lt;cache&gt;/&lt;name&gt;/&lt;version&gt;/&lt;flavor&gt;/</span></code>.
@@ -175,11 +175,11 @@ Next time your request it again,
 <p><a class="reference internal" href="api.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> distinguishes two <code class="file docutils literal notranslate"><span class="pre">&lt;cache&gt;</span></code> folders.
 A system wide shared cache folder and a user cache folder.</p>
 <div class="section" id="shared-cache">
-<h2>Shared cache<a class="headerlink" href="#shared-cache" title="Permalink to this headline">¶</a></h2>
+<h2>Shared cache<a class="headerlink" href="#shared-cache" title="Permalink to this heading">¶</a></h2>
 <p>By default the shared cache is located at</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -202,13 +202,13 @@ $ setfacl -d -m u::rwx,g::rwx,o::rx- /data/audb  <span class="c1"># content inhe
 </div>
 </div>
 <div class="section" id="user-cache">
-<h2>User cache<a class="headerlink" href="#user-cache" title="Permalink to this headline">¶</a></h2>
+<h2>User cache<a class="headerlink" href="#user-cache" title="Permalink to this heading">¶</a></h2>
 <p>The second cache folder should be
 accessible to you only.
 By default it points to</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -223,7 +223,7 @@ By default it points to</p>
 and afterwards in your local cache folder.</p>
 </div>
 <div class="section" id="changing-cache-locations">
-<h2>Changing cache locations<a class="headerlink" href="#changing-cache-locations" title="Permalink to this headline">¶</a></h2>
+<h2>Changing cache locations<a class="headerlink" href="#changing-cache-locations" title="Permalink to this heading">¶</a></h2>
 <p>There are four ways to change the default locations:</p>
 <ol class="arabic simple">
 <li><p>By setting the argument <code class="docutils literal notranslate"><span class="pre">cache_root</span></code> during a function call, e.g.</p></li>
@@ -243,7 +243,7 @@ and afterwards in your local cache folder.</p>
 </ol>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">SHARED_CACHE_ROOT</span> <span class="o">=</span> <span class="s1">&#39;/new/shared/cache/audb&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">SHARED_CACHE_ROOT</span> <span class="o">=</span> <span class="s1">&#39;/new/shared/cache/audb&#39;</span>
 <span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -256,7 +256,7 @@ and afterwards in your local cache folder.</p>
 </div>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s1">&#39;/new/local/cache/audb&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s1">&#39;/new/local/cache/audb&#39;</span>
 <span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -302,7 +302,7 @@ and so on.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/14 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -337,6 +337,7 @@ and so on.</p>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>

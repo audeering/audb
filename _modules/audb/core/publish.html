@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.6
+                v1.3.0
               </div>
             
           
@@ -157,7 +157,10 @@
   <h1>Source code for audb.core.publish</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 
 <span class="kn">import</span> <span class="nn">audbackend</span>
@@ -168,6 +171,7 @@
 <span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
 <span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="n">dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
+<span class="kn">from</span> <span class="nn">audb.core.load</span> <span class="kn">import</span> <span class="n">load_media</span>
 <span class="kn">from</span> <span class="nn">audb.core.repository</span> <span class="kn">import</span> <span class="n">Repository</span>
 
 
@@ -191,6 +195,39 @@
     <span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_check_for_missing_media</span><span class="p">(</span>
+        <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">db_root_files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for media that is not in root and not in dependencies.&quot;&quot;&quot;</span>
+
+    <span class="n">db_files</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">files</span>
+    <span class="n">deps_files</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span>
+
+    <span class="n">db_files_not_in_deps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">db_files</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">deps_files</span><span class="p">)</span>
+    <span class="n">missing_files</span> <span class="o">=</span> <span class="n">db_files_not_in_deps</span> <span class="o">-</span> <span class="n">db_root_files</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">missing_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">missing_files</span><span class="p">))</span>
+        <span class="n">number_of_presented_files</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;The following &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">missing_files</span><span class="p">)</span><span class="si">}</span><span class="s1"> &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;files are referenced in tables &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;that cannot be found on disk &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;and are not yet part of the database: &#39;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">missing_files</span><span class="p">[:</span><span class="n">number_of_presented_files</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_files</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">number_of_presented_files</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">+=</span> <span class="s2">&quot;.&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="n">error_msg</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">error_msg</span> <span class="o">+=</span> <span class="s2">&quot;, ...].&quot;</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">_find_tables</span><span class="p">(</span>
         <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -198,7 +235,7 @@
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update tables.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find altered, new or removed tables and update &#39;deps&#39;.&quot;&quot;&quot;</span>
 
     <span class="c1"># release dependencies to removed tables</span>
 
@@ -224,20 +261,26 @@
 <span class="k">def</span> <span class="nf">_find_media</span><span class="p">(</span>
         <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">db_root_files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">archives</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find archives with new, altered or removed media and update &#39;deps&#39;.&quot;&quot;&quot;</span>
+
+    <span class="n">media_archives</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">db_media</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
 
     <span class="c1"># release dependencies to removed media</span>
     <span class="c1"># and select according archives for upload</span>
-    <span class="n">media</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="n">db_media</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">files</span>
-    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">db_media</span><span class="p">):</span>
-        <span class="n">media</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">)</span> <span class="o">-</span> <span class="n">db_media</span><span class="p">:</span>
+        <span class="n">media_archives</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
         <span class="n">deps</span><span class="o">.</span><span class="n">_drop</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="c1"># limit to relevant media</span>
+    <span class="n">db_media_in_root</span> <span class="o">=</span> <span class="n">db_media</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">db_root_files</span><span class="p">)</span>
 
     <span class="c1"># update version of altered media and insert new ones</span>
 
@@ -274,7 +317,7 @@
     <span class="n">update_media</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
         <span class="n">job</span><span class="p">,</span>
-        <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">file</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">db_media</span><span class="p">],</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">file</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">db_media_in_root</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Find media&#39;</span><span class="p">,</span>
@@ -284,7 +327,29 @@
     <span class="k">if</span> <span class="n">add_media</span><span class="p">:</span>
         <span class="n">deps</span><span class="o">.</span><span class="n">_add_media</span><span class="p">(</span><span class="n">add_media</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">media</span>
+    <span class="c1"># select archives with new or altered files for upload</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">deps</span><span class="o">.</span><span class="n">removed</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="ow">and</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">==</span> <span class="n">version</span><span class="p">:</span>
+            <span class="n">media_archives</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">media_archives</span>
+
+
+<span class="k">def</span> <span class="nf">_get_root_files</span><span class="p">(</span>
+        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return list of files in root directory.&quot;&quot;&quot;</span>
+
+    <span class="n">db_root_files</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">list_file_names</span><span class="p">(</span>
+        <span class="n">db_root</span><span class="p">,</span>
+        <span class="n">basenames</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># convert &#39;\\&#39; to &#39;/&#39;</span>
+        <span class="n">db_root_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">db_root_files</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">db_root_files</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_media_values</span><span class="p">(</span>
@@ -330,39 +395,69 @@
 
 
 <span class="k">def</span> <span class="nf">_put_media</span><span class="p">(</span>
-        <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">media_archives</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">previous_version</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="c1"># create a mapping from archives to media and</span>
-    <span class="c1"># select archives with new or altered files for upload</span>
-    <span class="n">map_media_to_files</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">deps</span><span class="o">.</span><span class="n">removed</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-            <span class="n">map_media_to_files</span><span class="p">[</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">==</span> <span class="n">version</span><span class="p">:</span>
-                <span class="n">media</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Upload archives with new, altered or removed media files.&quot;&quot;&quot;</span>
 
-    <span class="c1"># upload new and altered archives if it contains at least one file</span>
-    <span class="k">if</span> <span class="n">media</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">media_archives</span><span class="p">:</span>
+
+        <span class="c1"># create a mapping from archives to media files</span>
+        <span class="n">map_archive_to_files</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">deps</span><span class="o">.</span><span class="n">removed</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+                <span class="n">map_archive_to_files</span><span class="p">[</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">archive</span> <span class="ow">in</span> <span class="n">map_media_to_files</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">map_media_to_files</span><span class="p">[</span><span class="n">archive</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">archive</span> <span class="ow">in</span> <span class="n">map_archive_to_files</span><span class="p">:</span>
+
+                <span class="n">files</span> <span class="o">=</span> <span class="n">map_archive_to_files</span><span class="p">[</span><span class="n">archive</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
                     <span class="n">update_media</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
                 <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="n">db_name</span><span class="p">,</span>
                     <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">],</span>
                     <span class="n">archive</span><span class="p">,</span>
                 <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">previous_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># if only some files of the archive were altered</span>
+                    <span class="c1"># it may happen that the others do not exist</span>
+                    <span class="c1"># in the root folder,</span>
+                    <span class="c1"># so we have to download the archive</span>
+                    <span class="c1"># and copy the missing files first</span>
+                    <span class="n">missing_files</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                            <span class="n">missing_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">missing_files</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_root</span><span class="p">:</span>
+                            <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+                                <span class="n">archive_file</span><span class="p">,</span>
+                                <span class="n">tmp_root</span><span class="p">,</span>
+                                <span class="n">previous_version</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="k">for</span> <span class="n">missing_file</span> <span class="ow">in</span> <span class="n">missing_files</span><span class="p">:</span>
+                                <span class="n">src_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">,</span> <span class="n">missing_file</span><span class="p">)</span>
+                                <span class="n">dst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">missing_file</span><span class="p">)</span>
+                                <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dst_path</span><span class="p">))</span>
+                                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span>
+                                    <span class="n">src_path</span><span class="p">,</span>
+                                    <span class="n">dst_path</span><span class="p">,</span>
+                                <span class="p">)</span>
+
                 <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
                     <span class="n">db_root</span><span class="p">,</span>
-                    <span class="n">map_media_to_files</span><span class="p">[</span><span class="n">archive</span><span class="p">],</span>
+                    <span class="n">files</span><span class="p">,</span>
                     <span class="n">archive_file</span><span class="p">,</span>
                     <span class="n">version</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -370,7 +465,7 @@
         <span class="n">update_media</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
             <span class="n">job</span><span class="p">,</span>
-            <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">archive</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">archive</span> <span class="ow">in</span> <span class="n">media</span><span class="p">],</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">archive</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">archive</span> <span class="ow">in</span> <span class="n">media_archives</span><span class="p">],</span>
             <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
             <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Put media&#39;</span><span class="p">,</span>
@@ -419,18 +514,26 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Publish database.</span>
 
 <span class="sd">    A database can have dependencies</span>
-<span class="sd">    to files of an older version of itself.</span>
-<span class="sd">    E.g. you might add a few new files to an existing database</span>
-<span class="sd">    and publish as a new version.</span>
-<span class="sd">    :func:`audb.publish` will upload then only the new files</span>
-<span class="sd">    and store dependencies on the already published files.</span>
+<span class="sd">    to media files and tables of an older version.</span>
+<span class="sd">    E.g. you might alter an existing table</span>
+<span class="sd">    by adding labels for new media files to it</span>
+<span class="sd">    and publish it as a new version.</span>
+<span class="sd">    :func:`audb.publish` will then upload</span>
+<span class="sd">    new and altered files and update</span>
+<span class="sd">    the dependencies accordingly.</span>
 
-<span class="sd">    To allow for dependencies</span>
-<span class="sd">    you first have to load the version of the database</span>
+<span class="sd">    To update a database,</span>
+<span class="sd">    you first have to load the version</span>
 <span class="sd">    that the new version should depend on</span>
 <span class="sd">    with :func:`audb.load_to` to ``db_root``.</span>
+<span class="sd">    Media files that are not altered can be omitted,</span>
+<span class="sd">    so it is recommended to set</span>
+<span class="sd">    ``only_metadata=True`` in :func:`audb.load_to`.</span>
 <span class="sd">    Afterwards you make your changes to that folder</span>
 <span class="sd">    and run :func:`audb.publish`.</span>
+<span class="sd">    To remove media files from a database,</span>
+<span class="sd">    make sure they are no</span>
+<span class="sd">    longer referenced in the tables.</span>
 
 <span class="sd">    Setting ``previous_version=None`` allows you</span>
 <span class="sd">    to start from scratch and upload all files</span>
@@ -474,9 +577,28 @@
 <span class="sd">            see :meth:`audformat.Database.is_portable`</span>
 <span class="sd">        RuntimeError: if non-standard formats like MP3 and MP4 are published,</span>
 <span class="sd">            but sox and/or mediafile is not installed</span>
+<span class="sd">        ValueError: if ``previous_version`` &gt;= ``version``</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+            <span class="n">previous_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">previous_version</span> <span class="o">!=</span> <span class="s1">&#39;latest&#39;</span>
+            <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
+                <span class="o">&lt;=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">(</span><span class="n">previous_version</span><span class="p">)</span>
+            <span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;&#39;previous_version&#39; needs to be smaller than &#39;version&#39;, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;but yours is </span><span class="si">{</span><span class="n">previous_version</span><span class="si">}</span><span class="s2"> &gt;= </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+        <span class="n">db_root</span><span class="p">,</span>
+        <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">backend</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
         <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
@@ -538,6 +660,7 @@
                 <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                 <span class="n">version</span><span class="o">=</span><span class="n">previous_version</span><span class="p">,</span>
                 <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">previous_deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">previous_deps_path</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span> <span class="o">!=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">previous_deps_path</span><span class="p">):</span>
@@ -555,8 +678,13 @@
                     <span class="sa">f</span><span class="s2">&quot;or modified the file manually?&quot;</span>
                 <span class="p">)</span>
 
-    <span class="c1"># load database from folder</span>
-    <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># load database with table data</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+        <span class="n">db_root</span><span class="p">,</span>
+        <span class="n">load_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># check all tables are conform with audformat</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">db</span><span class="o">.</span><span class="n">is_portable</span><span class="p">:</span>
@@ -569,23 +697,10 @@
         <span class="p">)</span>
     <span class="n">_check_for_duplicates</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
-    <span class="c1"># check all files referenced in a table exists</span>
-    <span class="n">missing_files</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">files</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
-    <span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">number_of_presented_files</span> <span class="o">=</span> <span class="mi">20</span>
-        <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">missing_files</span><span class="p">)</span><span class="si">}</span><span class="s1"> files are referenced in tables &#39;</span>
-            <span class="s1">&#39;that cannot be found. &#39;</span>
-            <span class="sa">f</span><span class="s2">&quot;Missing files are: &#39;</span><span class="si">{</span><span class="n">missing_files</span><span class="p">[:</span><span class="n">number_of_presented_files</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_files</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">number_of_presented_files</span><span class="p">:</span>
-            <span class="n">error_msg</span> <span class="o">+=</span> <span class="s2">&quot;&#39;.&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">error_msg</span> <span class="o">+=</span> <span class="s2">&quot;, ...&#39;.&quot;</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+    <span class="c1"># check all media referenced in a table exist</span>
+    <span class="c1"># on disk or are already part of the database</span>
+    <span class="n">db_root_files</span> <span class="o">=</span> <span class="n">_get_root_files</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
+    <span class="n">_check_for_missing_media</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db_root_files</span><span class="p">,</span> <span class="n">deps</span><span class="p">)</span>
 
     <span class="c1"># make sure all tables are stored in CSV format</span>
     <span class="k">for</span> <span class="n">table_id</span><span class="p">,</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -603,17 +718,16 @@
                 <span class="n">verbose</span><span class="p">)</span>
 
     <span class="c1"># publish media</span>
-    <span class="n">media</span> <span class="o">=</span> <span class="n">_find_media</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">archives</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span>
-                        <span class="n">verbose</span><span class="p">)</span>
-    <span class="n">_put_media</span><span class="p">(</span><span class="n">media</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span>
-               <span class="n">verbose</span><span class="p">)</span>
+    <span class="n">media_archives</span> <span class="o">=</span> <span class="n">_find_media</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db_root_files</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span>
+                                 <span class="n">archives</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="n">_put_media</span><span class="p">(</span><span class="n">media_archives</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">previous_version</span><span class="p">,</span>
+               <span class="n">deps</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
     <span class="c1"># publish dependencies and header</span>
     <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
     <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span><span class="p">)</span>
-    <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
-        <span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span>
+                        <span class="n">version</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">local_header</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
         <span class="n">remote_header</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span>
@@ -642,7 +756,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/14 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -677,6 +791,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>

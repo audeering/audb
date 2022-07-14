@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.2.6
+                v1.3.0
               </div>
             
           
@@ -162,7 +162,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h1>
 <p><a class="reference internal" href="api.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> is similar to a version control system
 for text and binary data.
 It allows to manage your databases
@@ -181,7 +181,7 @@ If you just want to use it,
 you might read on at <a class="reference internal" href="publish.html#publish"><span class="std std-ref">Publish a database</span></a>
 or <a class="reference internal" href="load.html#load"><span class="std std-ref">Load a database</span></a>.</p>
 <div class="section" id="backends">
-<h2>Backends<a class="headerlink" href="#backends" title="Permalink to this headline">¶</a></h2>
+<h2>Backends<a class="headerlink" href="#backends" title="Permalink to this heading">¶</a></h2>
 <p><a class="reference internal" href="api.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> abstracts the database storage
 by using the <a class="reference external" href="https://audeering.github.io/audbackend/api.html#module-audbackend" title="(in audbackend v0.3.15)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audbackend</span></code></a> package
 to communicate with the underlying backend.
@@ -205,7 +205,7 @@ you would use the following repository.</p>
 </div>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">repository</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">repository</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s1">&#39;data-local&#39;</span><span class="p">,</span>
     <span class="n">host</span><span class="o">=</span><span class="s1">&#39;/data&#39;</span><span class="p">,</span>
     <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;file-system&#39;</span><span class="p">,</span>
@@ -221,7 +221,7 @@ and can be managed best
 by specifying them in the <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">Configuration</span></a>.</p>
 </div>
 <div class="section" id="publish">
-<h2>Publish<a class="headerlink" href="#publish" title="Permalink to this headline">¶</a></h2>
+<h2>Publish<a class="headerlink" href="#publish" title="Permalink to this heading">¶</a></h2>
 <p>When publishing your data
 with <a class="reference internal" href="api.html#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a>
 the following operations are performed:</p>
@@ -272,7 +272,7 @@ the following operations are performed:</p>
 }</p></object></div>
 </div>
 <div class="section" id="load">
-<h2>Load<a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h2>
+<h2>Load<a class="headerlink" href="#load" title="Permalink to this heading">¶</a></h2>
 <p>In the process of loading data
 with <a class="reference internal" href="api.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>
 the following operations are performed:</p>
@@ -353,7 +353,7 @@ the audio files (optional)</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/14 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -388,6 +388,7 @@ the audio files (optional)</p></li>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>

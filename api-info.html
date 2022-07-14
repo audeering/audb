@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.2.6
+                v1.3.0
               </div>
             
           
@@ -119,6 +119,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#channels">channels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#description">description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#duration">duration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#files">files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#formats">formats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#header">header</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#languages">languages</a></li>
@@ -179,7 +180,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-audb.info">
-<span id="audb-info"></span><h1>audb.info<a class="headerlink" href="#module-audb.info" title="Permalink to this headline">¶</a></h1>
+<span id="audb-info"></span><h1>audb.info<a class="headerlink" href="#module-audb.info" title="Permalink to this heading">¶</a></h1>
 <p>Get information from database headers.</p>
 <div class="jupyter_cell docutils container">
 <div class="cell_output docutils container">
@@ -196,7 +197,7 @@ provide you direct access to this information.</p>
 <p>So instead of running:</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
     <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">,</span>
     <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -237,7 +238,7 @@ files:
 <p>You can run:</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
     <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">,</span>
 <span class="p">)</span>
@@ -273,7 +274,7 @@ files:
 </div>
 </div>
 <div class="section" id="author">
-<h2>author<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h2>
+<h2>author<a class="headerlink" href="#author" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.author">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">author</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#author"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.author" title="Permalink to this definition">¶</a></dt>
@@ -303,16 +304,20 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="bit-depths">
-<h2>bit_depths<a class="headerlink" href="#bit-depths" title="Permalink to this headline">¶</a></h2>
+<h2>bit_depths<a class="headerlink" href="#bit-depths" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.bit_depths">
-<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">bit_depths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#bit_depths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.bit_depths" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">bit_depths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#bit_depths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.bit_depths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Media bit depth.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
 <li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version of database</p></li>
+<li><p><strong>tables</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only tables matching the regular expression or
+provided in the list</p></li>
+<li><p><strong>media</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only media matching the regular expression or
+provided in the list</p></li>
 <li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
 If not set <a class="reference internal" href="api.html#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
 </ul>
@@ -322,6 +327,10 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>bit depths</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – if table or media is requested
+    that is not part of the database</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -333,16 +342,20 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="channels">
-<h2>channels<a class="headerlink" href="#channels" title="Permalink to this headline">¶</a></h2>
+<h2>channels<a class="headerlink" href="#channels" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.channels">
-<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#channels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.channels" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#channels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.channels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Media channels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
 <li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version of database</p></li>
+<li><p><strong>tables</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only tables matching the regular expression or
+provided in the list</p></li>
+<li><p><strong>media</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only media matching the regular expression or
+provided in the list</p></li>
 <li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
 If not set <a class="reference internal" href="api.html#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
 </ul>
@@ -352,6 +365,10 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>channel numbers</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – if table or media is requested
+    that is not part of the database</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -363,7 +380,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="description">
-<h2>description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<h2>description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.description">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.description" title="Permalink to this definition">¶</a></dt>
@@ -394,11 +411,51 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="duration">
-<h2>duration<a class="headerlink" href="#duration" title="Permalink to this headline">¶</a></h2>
+<h2>duration<a class="headerlink" href="#duration" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.duration">
-<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.duration" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.duration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total media duration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version of database</p></li>
+<li><p><strong>tables</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only tables matching the regular expression or
+provided in the list</p></li>
+<li><p><strong>media</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only media matching the regular expression or
+provided in the list</p></li>
+<li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
+If not set <a class="reference internal" href="api.html#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timedelta.html#pandas.Timedelta" title="(in pandas v1.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timedelta</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>duration</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – if table or media is requested
+    that is not part of the database</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<span class="go">Timedelta(&#39;0 days 00:24:47.092187500&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">,</span> <span class="n">media</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;wav/03a01Fa.wav&#39;</span><span class="p">])</span>
+<span class="go">Timedelta(&#39;0 days 00:00:01.898250&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="files">
+<h2>files<a class="headerlink" href="#files" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="audb.info.files">
+<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Media files included in the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -409,31 +466,35 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timedelta.html#pandas.Timedelta" title="(in pandas v1.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timedelta</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>duration</p>
+<dd class="field-odd"><p>media files</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
-<span class="go">Timedelta(&#39;0 days 00:24:47.092187500&#39;)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">[&#39;wav/03a01Fa.wav&#39;, &#39;wav/03a01Nc.wav&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
 
 </div>
 <div class="section" id="formats">
-<h2>formats<a class="headerlink" href="#formats" title="Permalink to this headline">¶</a></h2>
+<h2>formats<a class="headerlink" href="#formats" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.formats">
-<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">formats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#formats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.formats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">formats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#formats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.formats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Media formats.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
 <li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version of database</p></li>
+<li><p><strong>tables</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only tables matching the regular expression or
+provided in the list</p></li>
+<li><p><strong>media</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only media matching the regular expression or
+provided in the list</p></li>
 <li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
 If not set <a class="reference internal" href="api.html#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
 </ul>
@@ -442,7 +503,11 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Set" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>format</p>
+<dd class="field-odd"><p>formats</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – if table or media is requested
+    that is not part of the database</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -454,7 +519,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="header">
-<h2>header<a class="headerlink" href="#header" title="Permalink to this headline">¶</a></h2>
+<h2>header<a class="headerlink" href="#header" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.header">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.header" title="Permalink to this definition">¶</a></dt>
@@ -469,7 +534,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.14.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.14.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>database object without table data</p>
@@ -485,7 +550,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="languages">
-<h2>languages<a class="headerlink" href="#languages" title="Permalink to this headline">¶</a></h2>
+<h2>languages<a class="headerlink" href="#languages" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.languages">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">languages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#languages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.languages" title="Permalink to this definition">¶</a></dt>
@@ -515,7 +580,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="license">
-<h2>license<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<h2>license<a class="headerlink" href="#license" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.license">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">license</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#license"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.license" title="Permalink to this definition">¶</a></dt>
@@ -545,7 +610,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="license-url">
-<h2>license_url<a class="headerlink" href="#license-url" title="Permalink to this headline">¶</a></h2>
+<h2>license_url<a class="headerlink" href="#license-url" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.license_url">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">license_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#license_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.license_url" title="Permalink to this definition">¶</a></dt>
@@ -575,7 +640,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="media">
-<h2>media<a class="headerlink" href="#media" title="Permalink to this headline">¶</a></h2>
+<h2>media<a class="headerlink" href="#media" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.media">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">media</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#media"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.media" title="Permalink to this definition">¶</a></dt>
@@ -606,7 +671,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="meta">
-<h2>meta<a class="headerlink" href="#meta" title="Permalink to this headline">¶</a></h2>
+<h2>meta<a class="headerlink" href="#meta" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.meta">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.meta" title="Permalink to this definition">¶</a></dt>
@@ -637,7 +702,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="organization">
-<h2>organization<a class="headerlink" href="#organization" title="Permalink to this headline">¶</a></h2>
+<h2>organization<a class="headerlink" href="#organization" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.organization">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">organization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#organization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.organization" title="Permalink to this definition">¶</a></dt>
@@ -667,7 +732,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="raters">
-<h2>raters<a class="headerlink" href="#raters" title="Permalink to this headline">¶</a></h2>
+<h2>raters<a class="headerlink" href="#raters" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.raters">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">raters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#raters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.raters" title="Permalink to this definition">¶</a></dt>
@@ -698,16 +763,20 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="sampling-rates">
-<h2>sampling_rates<a class="headerlink" href="#sampling-rates" title="Permalink to this headline">¶</a></h2>
+<h2>sampling_rates<a class="headerlink" href="#sampling-rates" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.sampling_rates">
-<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">sampling_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#sampling_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.sampling_rates" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">sampling_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#sampling_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.sampling_rates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Media sampling rates.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
 <li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version of database</p></li>
+<li><p><strong>tables</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only tables matching the regular expression or
+provided in the list</p></li>
+<li><p><strong>media</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – include only media matching the regular expression or
+provided in the list</p></li>
 <li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
 If not set <a class="reference internal" href="api.html#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
 </ul>
@@ -717,6 +786,10 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>sampling rates</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – if table or media is requested
+    that is not part of the database</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -728,7 +801,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="schemes">
-<h2>schemes<a class="headerlink" href="#schemes" title="Permalink to this headline">¶</a></h2>
+<h2>schemes<a class="headerlink" href="#schemes" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.schemes">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">schemes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#schemes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.schemes" title="Permalink to this definition">¶</a></dt>
@@ -758,7 +831,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="source">
-<h2>source<a class="headerlink" href="#source" title="Permalink to this headline">¶</a></h2>
+<h2>source<a class="headerlink" href="#source" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.source">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.source" title="Permalink to this definition">¶</a></dt>
@@ -788,7 +861,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="splits">
-<h2>splits<a class="headerlink" href="#splits" title="Permalink to this headline">¶</a></h2>
+<h2>splits<a class="headerlink" href="#splits" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.splits">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">splits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#splits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.splits" title="Permalink to this definition">¶</a></dt>
@@ -821,7 +894,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="tables">
-<h2>tables<a class="headerlink" href="#tables" title="Permalink to this headline">¶</a></h2>
+<h2>tables<a class="headerlink" href="#tables" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.tables">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.tables" title="Permalink to this definition">¶</a></dt>
@@ -851,7 +924,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 
 </div>
 <div class="section" id="usage">
-<h2>usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<h2>usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.usage">
 <span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.usage" title="Permalink to this definition">¶</a></dt>
@@ -905,7 +978,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/14 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -940,6 +1013,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>

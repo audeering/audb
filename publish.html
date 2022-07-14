@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.2.6
+                v1.3.0
               </div>
             
           
@@ -171,20 +171,20 @@
 </div>
 </div>
 <div class="section" id="publish-a-database">
-<span id="publish"></span><h1>Publish a database<a class="headerlink" href="#publish-a-database" title="Permalink to this headline">¶</a></h1>
+<span id="publish"></span><h1>Publish a database<a class="headerlink" href="#publish-a-database" title="Permalink to this heading">¶</a></h1>
 <p>To publish a database we need to first create
-and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.14.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
+and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api.html#module-audformat" title="(in audformat vv0.14.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
 Afterwards we publish the database to a <a class="reference internal" href="api.html#audb.Repository" title="audb.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>.
 Finally,
 we add more files
 and release a new version.</p>
 <div class="section" id="create-a-database">
-<h2>Create a database<a class="headerlink" href="#create-a-database" title="Permalink to this headline">¶</a></h2>
+<h2>Create a database<a class="headerlink" href="#create-a-database" title="Permalink to this heading">¶</a></h2>
 <p>We can create an example database
-with the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.14.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
+with the <a class="reference external" href="https://audeering.github.io/audformat/api-testing.html#module-audformat.testing" title="(in audformat vv0.14.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audformat.testing</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audformat.testing</span>
 
 <span class="n">build_dir</span> <span class="o">=</span> <span class="s1">&#39;./age-test-1.0.0&#39;</span>
 
@@ -211,7 +211,7 @@ with the <a class="reference external" href="https://audeering.github.io/audform
 stored under <code class="file docutils literal notranslate"><span class="pre">build_dir</span></code>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span>
 </pre></div>
 </div>
 </div>
@@ -235,7 +235,7 @@ tables:
 <p>Containing a few random annotations.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -268,15 +268,15 @@ tables:
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>83</td>
+      <td>33</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>28</td>
+      <td>71</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>69</td>
+      <td>63</td>
     </tr>
   </tbody>
 </table>
@@ -284,12 +284,12 @@ tables:
 </div>
 </div>
 <div class="section" id="publish-the-first-version">
-<h2>Publish the first version<a class="headerlink" href="#publish-the-first-version" title="Permalink to this headline">¶</a></h2>
+<h2>Publish the first version<a class="headerlink" href="#publish-the-first-version" title="Permalink to this heading">¶</a></h2>
 <p>We define a repository on the <a class="reference external" href="https://audeering.github.io/audbackend/api.html#audbackend.FileSystem" title="(in audbackend v0.3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.FileSystem</span></code></a> backend
 to publish the database to.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audb</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audb</span>
 
 <span class="n">repository</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s1">&#39;data-local&#39;</span><span class="p">,</span>
@@ -307,7 +307,7 @@ where the database is stored,
 and pick a version for publishing it.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">build_dir</span><span class="p">,</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">build_dir</span><span class="p">,</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -321,7 +321,7 @@ in which archives they are stored,
 and information about audio metadata.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -402,7 +402,7 @@ and information about audio metadata.</p>
 <p>We can compare this with the files stored in the repository.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 
 <span class="k">def</span> <span class="nf">list_files</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -421,24 +421,24 @@ and information about audio metadata.</p>
 <div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>data/
   data-local/
     age-test/
-      db/
-        1.0.0/
-          db-1.0.0.zip
-          db-1.0.0.yaml
-      media/
-        436c65ec-1e42-f9de-2708-ecafe07e827e/
-          1.0.0/
-            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
-        fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
-          1.0.0/
-            fda7e4d6-f2b2-4cff-cab5-906ef5d57607-1.0.0.zip
-        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
-          1.0.0/
-            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
       meta/
         age/
           1.0.0/
             age-1.0.0.zip
+      media/
+        fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
+          1.0.0/
+            fda7e4d6-f2b2-4cff-cab5-906ef5d57607-1.0.0.zip
+        436c65ec-1e42-f9de-2708-ecafe07e827e/
+          1.0.0/
+            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
+        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
+          1.0.0/
+            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
+      db/
+        1.0.0/
+          db-1.0.0.yaml
+          db-1.0.0.zip
 </pre></div>
 </div>
 </div>
@@ -455,7 +455,7 @@ we need to tell <a class="reference internal" href="api.html#module-audb" title=
 instead of its default ones.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span><span class="n">repository</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span><span class="n">repository</span><span class="p">]</span>
 <span class="n">audb</span><span class="o">.</span><span class="n">available</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -506,17 +506,24 @@ instead of its default ones.</p>
 </div>
 </div>
 <div class="section" id="update-a-database">
-<h2>Update a database<a class="headerlink" href="#update-a-database" title="Permalink to this headline">¶</a></h2>
+<h2>Update a database<a class="headerlink" href="#update-a-database" title="Permalink to this heading">¶</a></h2>
 <p>In a next step we will add another file with age annotation
 to the database.
 As a first step we load
-the previous version
+the metadata of the
+previous version
 of the database
 to a new folder.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">build_dir</span> <span class="o">=</span> <span class="s1">&#39;./age-test-1.1.0&#39;</span>
-<span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_to</span><span class="p">(</span><span class="n">build_dir</span><span class="p">,</span> <span class="s1">&#39;age-test&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">build_dir</span> <span class="o">=</span> <span class="s1">&#39;./age-test-1.1.0&#39;</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_to</span><span class="p">(</span>
+    <span class="n">build_dir</span><span class="p">,</span>
+    <span class="s1">&#39;age-test&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span>
+    <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -527,7 +534,7 @@ to a new folder.</p>
 and add the age annotation of 22 to it.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">filewise_index</span><span class="p">([</span><span class="s1">&#39;audio/004.wav&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">filewise_index</span><span class="p">([</span><span class="s1">&#39;audio/004.wav&#39;</span><span class="p">])</span>
 <span class="n">db</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend_index</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">db</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">][</span><span class="s1">&#39;age&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="mi">22</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
 
@@ -564,15 +571,15 @@ and add the age annotation of 22 to it.</p>
   <tbody>
     <tr>
       <th>audio/001.wav</th>
-      <td>83</td>
+      <td>33</td>
     </tr>
     <tr>
       <th>audio/002.wav</th>
-      <td>28</td>
+      <td>71</td>
     </tr>
     <tr>
       <th>audio/003.wav</th>
-      <td>69</td>
+      <td>63</td>
     </tr>
     <tr>
       <th>audio/004.wav</th>
@@ -587,7 +594,7 @@ overwrite the old table,
 and add a new audio file.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">build_dir</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">build_dir</span><span class="p">)</span>
 <span class="n">audformat</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">create_audio_files</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -602,7 +609,7 @@ which files have changed
 and will only publish those.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
     <span class="n">build_dir</span><span class="p">,</span>
     <span class="s1">&#39;1.1.0&#39;</span><span class="p">,</span>
     <span class="n">repository</span><span class="p">,</span>
@@ -704,7 +711,7 @@ it just <a class="reference internal" href="dependencies.html#database-dependenc
 We can again inspect the repository.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">list_files</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">list_files</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -712,32 +719,32 @@ We can again inspect the repository.</p>
 <div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>data/
   data-local/
     age-test/
-      db/
-        1.1.0/
-          db-1.1.0.yaml
-          db-1.1.0.zip
-        1.0.0/
-          db-1.0.0.zip
-          db-1.0.0.yaml
-      media/
-        436c65ec-1e42-f9de-2708-ecafe07e827e/
-          1.0.0/
-            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
-        fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
-          1.0.0/
-            fda7e4d6-f2b2-4cff-cab5-906ef5d57607-1.0.0.zip
-        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
-          1.0.0/
-            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
-        ef4d1e81-6488-95cf-a165-604d1e47d575/
-          1.1.0/
-            ef4d1e81-6488-95cf-a165-604d1e47d575-1.1.0.zip
       meta/
         age/
           1.1.0/
             age-1.1.0.zip
           1.0.0/
             age-1.0.0.zip
+      media/
+        ef4d1e81-6488-95cf-a165-604d1e47d575/
+          1.1.0/
+            ef4d1e81-6488-95cf-a165-604d1e47d575-1.1.0.zip
+        fda7e4d6-f2b2-4cff-cab5-906ef5d57607/
+          1.0.0/
+            fda7e4d6-f2b2-4cff-cab5-906ef5d57607-1.0.0.zip
+        436c65ec-1e42-f9de-2708-ecafe07e827e/
+          1.0.0/
+            436c65ec-1e42-f9de-2708-ecafe07e827e-1.0.0.zip
+        e26ef45d-bdc1-6153-bdc4-852d83806e4a/
+          1.0.0/
+            e26ef45d-bdc1-6153-bdc4-852d83806e4a-1.0.0.zip
+      db/
+        1.1.0/
+          db-1.1.0.zip
+          db-1.1.0.yaml
+        1.0.0/
+          db-1.0.0.yaml
+          db-1.0.0.zip
 </pre></div>
 </div>
 </div>
@@ -745,7 +752,7 @@ We can again inspect the repository.</p>
 <p>And check which databases are available.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">available</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">available</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -805,7 +812,7 @@ you could automate the update step
 and let a database grow every day.</p>
 </div>
 <div class="section" id="real-world-example">
-<h2>Real world example<a class="headerlink" href="#real-world-example" title="Permalink to this headline">¶</a></h2>
+<h2>Real world example<a class="headerlink" href="#real-world-example" title="Permalink to this heading">¶</a></h2>
 <p>We published a version of a small German acted emotional speech databases
 called <a class="reference external" href="http://emodb.bilderbar.info/start.html">emodb</a>
 in the default Artifactory repository of <a class="reference internal" href="api.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a>.
@@ -843,7 +850,7 @@ to see how to load and use a database.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/14 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -878,6 +885,7 @@ to see how to load and use a database.</p>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>

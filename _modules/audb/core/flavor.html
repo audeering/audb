@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.2.6
+                v1.3.0
               </div>
             
           
@@ -197,6 +197,12 @@
 <span class="sd">        mixdown: apply mono mix-down on selection</span>
 <span class="sd">        sampling_rate: sampling rate in Hz, one of</span>
 <span class="sd">            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if a non-supported ``bit_depth``,</span>
+<span class="sd">            ``format``,</span>
+<span class="sd">            or ``sampling_rate``</span>
+<span class="sd">            is requested</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -460,7 +466,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/04/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/14 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -495,6 +501,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>
