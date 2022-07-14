@@ -30,7 +30,7 @@ DB_NAME = f'test_publish-{pytest.ID}'
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_ROOT_VERSION = {
     version: os.path.join(DB_ROOT, version) for version in
-    ['1.0.0', '2.0.0', '2.1.0', '3.0.0', '4.0.0', '5.0.0', '6.0.0']
+    ['0.1.0', '1.0.0', '2.0.0', '2.1.0', '3.0.0', '4.0.0', '5.0.0', '6.0.0']
 }
 LONG_PATH = '/'.join(['audio'] * 50) + '/new.wav'
 
@@ -304,17 +304,21 @@ def test_publish_changed_db(version1, version2, media_difference):
 
 
 @pytest.mark.parametrize(
-    'version, previous_version, error_msg',
+    'version, previous_version, error_type, error_msg',
     [
         (
             '1.0.0',
             None,
-            "A version '1.0.0' already exists for database "
-            f"'{DB_NAME}'."
+            RuntimeError,
+            (
+                "A version '1.0.0' already exists for database "
+                f"'{DB_NAME}'."
+            ),
         ),
         (
             '4.0.0',
             None,
+            RuntimeError,
             (
                 "The following 5 files are referenced in tables "
                 "that cannot be found on disk "
@@ -327,6 +331,7 @@ def test_publish_changed_db(version1, version2, media_difference):
         (
             '5.0.0',
             None,
+            RuntimeError,
             (
                 "The following 25 files are referenced in tables "
                 "that cannot be found on disk "
@@ -343,6 +348,7 @@ def test_publish_changed_db(version1, version2, media_difference):
         (
             '5.0.0',
             '1.0.0',
+            RuntimeError,
             (
                 "The following 21 files are referenced in tables "
                 "that cannot be found on disk "
@@ -355,11 +361,40 @@ def test_publish_changed_db(version1, version2, media_difference):
                 "'file6.wav', 'file7.wav', 'file8.wav', ...]."
             ),
         ),
+        (
+            '0.1.0',
+            '1.0.0',
+            ValueError,
+            (
+                "'previous_version' needs to be smaller than 'version', "
+                "but yours is 1.0.0 >= 0.1.0."
+            ),
+        ),
+        (
+            '0.1.0',
+            '0.1.0',
+            ValueError,
+            (
+                "'previous_version' needs to be smaller than 'version', "
+                "but yours is 0.1.0 >= 0.1.0."
+            ),
+        ),
     ]
 )
-def test_publish_error_messages(version, previous_version, error_msg):
-    with pytest.raises(RuntimeError, match=re.escape(error_msg)):
-        if previous_version:
+def test_publish_error_messages(
+        version,
+        previous_version,
+        error_type,
+        error_msg,
+):
+    with pytest.raises(error_type, match=re.escape(error_msg)):
+        if (
+                previous_version
+                and (
+                    audeer.LooseVersion(previous_version)
+                    < audeer.LooseVersion(version)
+                )
+        ):
             deps = audb.dependencies(
                 DB_NAME,
                 version=previous_version,
