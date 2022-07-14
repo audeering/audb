@@ -358,7 +358,7 @@ def publish(
     A database can have dependencies
     to media files and tables of an older version.
     E.g. you might alter an existing table
-    by adding new media files to it
+    by adding labels for new media files to it
     and publish it as a new version.
     :func:`audb.publish` will then upload
     only the altered table
