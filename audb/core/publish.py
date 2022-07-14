@@ -420,7 +420,7 @@ def publish(
             see :meth:`audformat.Database.is_portable`
         RuntimeError: if non-standard formats like MP3 and MP4 are published,
             but sox and/or mediafile is not installed
-        ValueError: if ``previous_version`` is not smaller than ``version``
+        ValueError: if ``previous_version`` >= ``version``
 
     """
     if (
