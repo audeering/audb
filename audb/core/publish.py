@@ -113,10 +113,11 @@ def _find_media(
 ) -> typing.Set[str]:
     r"""Find archives with new, altered or removed media files."""
 
-    # release dependencies to removed media
-    # and select according archives for upload
     media_archives = set()
     db_media = set(db.files)
+
+    # release dependencies to removed media
+    # and select according archives for upload
     for file in set(deps.media) - db_media:
         media_archives.add(deps.archive(file))
         deps._drop(file)
@@ -361,10 +362,8 @@ def publish(
     by adding labels for new media files to it
     and publish it as a new version.
     :func:`audb.publish` will then upload
-    only the altered table
-    and the new media files,
-    which will be added as new dependencies
-    to the already published files.
+    only the new and altered files
+    and update their dependencies.
 
     To update a database,
     you first have to load the version
