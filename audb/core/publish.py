@@ -371,7 +371,7 @@ def publish(
     that the new version should depend on
     with :func:`audb.load_to` to ``db_root``.
     Media files that are not altered can be omitted,
-    so it recommended to set
+    so it is recommended to set
     ``only_metadata=True`` in :func:`audb.load_to`.
     Afterwards you make your changes to that folder
     and run :func:`audb.publish`.
