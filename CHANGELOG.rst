@@ -7,6 +7,28 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.3.0 (2022-07-14)
+--------------------------
+
+* Added: lock cache folder with a lock file
+  when modifying it
+* Added: ``verbose`` argument to ``audb.dependencies()``
+* Added: ``audb.info.files()``
+* Added: ``media`` and ``tables`` arguments
+  to appropriate functions
+  in ``audb.info`` sub-module
+* Added: ``only_metadata`` argument to ``audb.load_to()``
+* Added: ``audb.publish()`` raises ``ValueError``
+  if ``previous_version``
+  is not smaller than ``version``
+* Changed: ``audb.publish()`` does not require unchanged media files
+  to exists in database folder
+* Changed: ``audb.load()`` raises ``ValueError``
+  if a table or media file is requested
+  that is not part of the database
+* Fixed: add missing exceptions to docstrings
+
+
 Version 1.2.6 (2022-04-01)
 --------------------------
 
