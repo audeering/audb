@@ -157,7 +157,7 @@ def _get_tables(
         # if os.path.exists(path_pkl):
         #     os.remove(path_pkl)
         name = db.name
-        version = deps.version(f'db.{table}.{CSV}')
+        version = deps.version(f'{define.DB}.{table}.{CSV}')
         load_table(
             name,
             table,
@@ -168,7 +168,7 @@ def _get_tables(
         )
         db_cache_root = database_cache_root(name, version, cache_root)
         for storage_format in [CSV, PKL]:
-            file = f'db.{table}.{storage_format}'
+            file = f'{define.DB}.{table}.{storage_format}'
             shutil.copy(
                 os.path.join(db_cache_root, file),
                 os.path.join(db_root, file),
