@@ -13,7 +13,6 @@ from audb.core.api import (
 from audb.core.load import (
     filtered_dependencies,
     load_header,
-    load_table,
 )
 from audb.core.lock import FolderLock
 
