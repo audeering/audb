@@ -25,6 +25,10 @@ from audb.core.load import (
 )
 
 
+CSV = audformat.define.TableStorageFormat.CSV
+PKL = audformat.define.TableStorageFormat.PICKLE
+
+
 def _find_media(
         db: audformat.Database,
         db_root: str,
@@ -64,7 +68,7 @@ def _find_tables(
     tables = []
 
     def job(table: str):
-        file = f'{define.DB}.{table}.csv'
+        file = f'{define.DB}.{table}.{CSV}'
         full_file = os.path.join(db_root, file)
         if not os.path.exists(full_file):
             tables.append(table)
@@ -143,9 +147,6 @@ def _get_tables(
         verbose: bool,
 ):
 
-    pickle = audformat.define.TableStorageFormat.PICKLE
-    csv = audformat.define.TableStorageFormat.CSV
-
     def job(table: str):
         # If a pickled version of the table exists,
         # we have to remove it to make sure that
@@ -156,7 +157,7 @@ def _get_tables(
         # if os.path.exists(path_pkl):
         #     os.remove(path_pkl)
         name = db.name
-        version = deps.version(f'db.{table}.{csv}')
+        version = deps.version(f'db.{table}.{CSV}')
         load_table(
             name,
             table,
@@ -166,7 +167,7 @@ def _get_tables(
             verbose=False,
         )
         db_cache_root = database_cache_root(name, version, cache_root)
-        for storage_format in [csv, pickle]:
+        for storage_format in [CSV, PKL]:
             file = f'db.{table}.{storage_format}'
             shutil.copy(
                 os.path.join(db_cache_root, file),
@@ -193,39 +194,6 @@ def _remove_empty_dirs(root):
                 _remove_empty_dirs(full_file)
 
     os.rmdir(root)
-
-
-def _save_database(
-        db: audformat.Database,
-        db_root: str,
-        db_root_tmp: str,
-        num_workers: typing.Optional[int],
-        verbose: bool,
-):
-
-    for storage_format in [
-        audformat.define.TableStorageFormat.CSV,
-        audformat.define.TableStorageFormat.PICKLE,
-    ]:
-        db.save(
-            db_root_tmp,
-            storage_format=storage_format,
-            update_other_formats=False,
-            num_workers=num_workers,
-            verbose=verbose,
-        )
-        audeer.move_file(
-            os.path.join(db_root_tmp, define.HEADER_FILE),
-            os.path.join(db_root, define.HEADER_FILE),
-        )
-        for path in glob.glob(
-                os.path.join(db_root_tmp, f'*.{storage_format}')
-        ):
-            file = os.path.relpath(path, db_root_tmp)
-            audeer.move_file(
-                os.path.join(db_root_tmp, file),
-                os.path.join(db_root, file),
-            )
 
 
 def load_to(
@@ -301,7 +269,6 @@ def load_to(
 
     # get altered and new tables
 
-    db_header.save(db_root_tmp, header_only=True)
     tables = _find_tables(
         db_header,
         db_root,
@@ -322,8 +289,11 @@ def load_to(
 
     # load database
 
-    # save header to root and load database ...
-    db_header.save(db_root, header_only=True)
+    # move header to root and load database ...
+    audeer.move_file(
+        os.path.join(db_root_tmp, define.HEADER_FILE),
+        os.path.join(db_root, define.HEADER_FILE),
+    )
     try:
         db = audformat.Database.load(
             db_root,
@@ -357,7 +327,7 @@ def load_to(
     # save database and remove the temporal directory
     # to signal all files were correctly loaded
 
-    _save_database(db, db_root, db_root_tmp, num_workers, verbose)
+    db_header.save(db_root, header_only=True)
     try:
         _remove_empty_dirs(db_root_tmp)
     except OSError:  # pragma: no cover
