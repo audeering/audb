@@ -178,7 +178,7 @@ def _get_tables(
         params=[([table], {}) for table in tables],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Load tables',
+        task_description='Get tables',
     )
 
 
