@@ -12,7 +12,10 @@ from audb.core.api import (
     dependencies,
     latest_version,
 )
-from audb.core.cache import database_tmp_root
+from audb.core.cache import (
+    database_cache_root,
+    database_tmp_root,
+)
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
 from audb.core.load import (
@@ -125,6 +128,53 @@ def _get_media(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Get media',
+    )
+
+
+def _get_tables(
+        tables: typing.List[str],
+        db_root: str,
+        db: str,
+        deps: Dependencies,
+        version: str,
+        backend: audbackend.Backend,
+        cache_root: str,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+):
+    db_cache_root = database_cache_root(db.name, version, cache_root)
+    _load_tables(
+        tables,
+        backend,
+        db_cache_root,
+        db,
+        version,
+        None,
+        deps,
+        Flavor(),
+        cache_root,
+        num_workers,
+        verbose,
+    )
+
+    def job(table_id: str):
+        # Move from cache to db_root
+        for storage_format in [
+            audformat.define.TableStorageFormat.PICKLE,
+            audformat.define.TableStorageFormat.CSV,
+        ]:
+            file = f'db.{table_id}.{storage_format}'
+            audeer.move_file(
+                os.path.join(db_cache_root, file),
+                os.path.join(db_root, file),
+            )
+
+    audeer.run_tasks(
+        job,
+        params=[([table], {}) for table in tables],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Copy tables from cache',
     )
 
 
@@ -255,22 +305,17 @@ def load_to(
         num_workers,
         verbose,
     )
-    _load_tables(
+    _get_tables(
         tables,
-        backend,
         db_root,
         db_header,
-        version,
-        None,
         deps,
-        Flavor(),
+        version,
+        backend,
         cache_root,
         num_workers,
         verbose,
     )
-
-    # recreate tmp folder as it is deleted by _get_tables
-    db_root_tmp = database_tmp_root(db_root)
 
     # load database
 
