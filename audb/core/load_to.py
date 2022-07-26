@@ -1,5 +1,6 @@
 import glob
 import os
+import shutil
 import typing
 
 import audbackend
@@ -151,9 +152,9 @@ def _get_tables(
         # later on the new CSV tables are loaded.
         # This can happen if we upgrading an existing
         # database to a different version.
-        path_pkl = os.path.join(db_root, f'db.{table}.{pickle}')
-        if os.path.exists(path_pkl):
-            os.remove(path_pkl)
+        # path_pkl = os.path.join(db_root, f'db.{table}.{pickle}')
+        # if os.path.exists(path_pkl):
+        #     os.remove(path_pkl)
         name = db.name
         version = deps.version(f'db.{table}.{csv}')
         load_table(
@@ -167,7 +168,7 @@ def _get_tables(
         db_cache_root = database_cache_root(name, version, cache_root)
         for storage_format in [csv, pickle]:
             file = f'db.{table}.{storage_format}'
-            audeer.move_file(
+            shutil.copy(
                 os.path.join(db_cache_root, file),
                 os.path.join(db_root, file),
             )
