@@ -147,14 +147,6 @@ def _get_tables(
 ):
 
     def job(table: str):
-        # If a pickled version of the table exists,
-        # we have to remove it to make sure that
-        # later on the new CSV tables are loaded.
-        # This can happen if we upgrading an existing
-        # database to a different version.
-        # path_pkl = os.path.join(db_root, f'db.{table}.{pickle}')
-        # if os.path.exists(path_pkl):
-        #     os.remove(path_pkl)
         name = db.name
         version = deps.version(f'{define.DB}.{table}.{CSV}')
         load_table(
