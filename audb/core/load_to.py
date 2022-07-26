@@ -20,7 +20,7 @@ from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
 from audb.core.load import (
     load_header,
-    _load_tables,
+    load_table,
 )
 
 
@@ -137,33 +137,36 @@ def _get_tables(
         db: str,
         deps: Dependencies,
         version: str,
-        backend: audbackend.Backend,
         cache_root: str,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
-    db_cache_root = database_cache_root(db.name, version, cache_root)
-    _load_tables(
-        tables,
-        backend,
-        db_cache_root,
-        db,
-        version,
-        None,
-        deps,
-        Flavor(),
-        cache_root,
-        num_workers,
-        verbose,
-    )
 
-    def job(table_id: str):
-        # Move from cache to db_root
-        for storage_format in [
-            audformat.define.TableStorageFormat.PICKLE,
-            audformat.define.TableStorageFormat.CSV,
-        ]:
-            file = f'db.{table_id}.{storage_format}'
+    pickle = audformat.define.TableStorageFormat.PICKLE
+    csv = audformat.define.TableStorageFormat.CSV
+
+    def job(table: str):
+        # If a pickled version of the table exists,
+        # we have to remove it to make sure that
+        # later on the new CSV tables are loaded.
+        # This can happen if we upgrading an existing
+        # database to a different version.
+        path_pkl = os.path.join(db_root, f'db.{table}.{pickle}')
+        if os.path.exists(path_pkl):
+            os.remove(path_pkl)
+        name = db.name
+        version = deps.version(f'db.{table}.{csv}')
+        load_table(
+            name,
+            table,
+            version=version,
+            num_workers=num_workers,
+            cache_root=cache_root,
+            verbose=False,
+        )
+        db_cache_root = database_cache_root(name, version, cache_root)
+        for storage_format in [csv, pickle]:
+            file = f'db.{table}.{storage_format}'
             audeer.move_file(
                 os.path.join(db_cache_root, file),
                 os.path.join(db_root, file),
@@ -174,7 +177,7 @@ def _get_tables(
         params=[([table], {}) for table in tables],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Copy tables from cache',
+        task_description='Load tables',
     )
 
 
@@ -311,7 +314,6 @@ def load_to(
         db_header,
         deps,
         version,
-        backend,
         cache_root,
         num_workers,
         verbose,
