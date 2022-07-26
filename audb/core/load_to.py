@@ -12,10 +12,12 @@ from audb.core.api import (
     dependencies,
     latest_version,
 )
+from audb.core.cache import database_tmp_root
 from audb.core.dependencies import Dependencies
+from audb.core.flavor import Flavor
 from audb.core.load import (
-    database_tmp_root,
     load_header,
+    _load_tables,
 )
 
 
@@ -58,17 +60,17 @@ def _find_tables(
     tables = []
 
     def job(table: str):
-        file = f'db.{table}.csv'
+        file = f'{define.DB}.{table}.csv'
         full_file = os.path.join(db_root, file)
         if not os.path.exists(full_file):
-            tables.append(file)
+            tables.append(table)
         else:
             checksum = audbackend.md5(full_file)
             # if the table already exists
             # we have to compare checksum
             # in case it was altered by flavor
             if checksum != deps.checksum(file):  # pragma: no cover
-                tables.append(file)
+                tables.append(table)
 
     audeer.run_tasks(
         job,
@@ -123,48 +125,6 @@ def _get_media(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Get media',
-    )
-
-
-def _get_tables(
-        tables: typing.List[str],
-        db_root: str,
-        db_root_tmp: str,
-        db_name: str,
-        deps: Dependencies,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
-):
-
-    def job(table: str):
-        # If a pickled version of the table exists,
-        # we have to remove it to make sure that
-        # later on the new CSV tables are loaded.
-        # This can happen if we upgrading an existing
-        # database to a different version.
-        path_pkl = os.path.join(
-            db_root, table
-        )[:-3] + audformat.define.TableStorageFormat.PICKLE
-        if os.path.exists(path_pkl):
-            os.remove(path_pkl)
-        archive = backend.join(
-            db_name,
-            define.DEPEND_TYPE_NAMES[define.DependType.META],
-            deps.archive(table),
-        )
-        backend.get_archive(archive, db_root_tmp, deps.version(table))
-        audeer.move_file(
-            os.path.join(db_root_tmp, table),
-            os.path.join(db_root, table),
-        )
-
-    audeer.run_tasks(
-        job,
-        params=[([table], {}) for table in tables],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Get tables',
     )
 
 
@@ -255,7 +215,6 @@ def load_to(
         version = latest_version(name)
 
     db_root = audeer.path(root)
-    db_root_tmp = database_tmp_root(db_root)
 
     # remove files with a wrong checksum
     # to ensure we load correct version
@@ -278,6 +237,7 @@ def load_to(
 
     # load database header without tables from backend
 
+    db_root_tmp = database_tmp_root(db_root)
     db_header, backend = load_header(
         db_root_tmp,
         name,
@@ -288,17 +248,34 @@ def load_to(
     # get altered and new tables
 
     db_header.save(db_root_tmp, header_only=True)
-    tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
-    _get_tables(tables, db_root, db_root_tmp, name, deps, backend,
-                num_workers, verbose)
+    tables = _find_tables(
+        db_header,
+        db_root,
+        deps,
+        num_workers,
+        verbose,
+    )
+    _load_tables(
+        tables,
+        backend,
+        db_root,
+        db_header,
+        version,
+        None,
+        deps,
+        Flavor(),
+        cache_root,
+        num_workers,
+        verbose,
+    )
+
+    # recreate tmp folder as it is deleted by _get_tables
+    db_root_tmp = database_tmp_root(db_root)
 
     # load database
 
-    # move header to root and load database ...
-    audeer.move_file(
-        os.path.join(db_root_tmp, define.HEADER_FILE),
-        os.path.join(db_root, define.HEADER_FILE),
-    )
+    # save header to root and load database ...
+    db_header.save(db_root, header_only=True)
     try:
         db = audformat.Database.load(
             db_root,
