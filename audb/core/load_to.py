@@ -228,6 +228,7 @@ def load_to(
         version = latest_version(name)
 
     db_root = audeer.path(root)
+    db_root_tmp = database_tmp_root(db_root)
 
     # remove files with a wrong checksum
     # to ensure we load correct version
@@ -250,7 +251,6 @@ def load_to(
 
     # load database header without tables from backend
 
-    db_root_tmp = database_tmp_root(db_root)
     db_header, backend = load_header(
         db_root_tmp,
         name,
