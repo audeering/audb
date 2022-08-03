@@ -36,7 +36,7 @@ def author(
         author(s) of database
 
     Example:
-        >>> author('emodb', version='1.2.0')
+        >>> author('emodb', version='1.3.0')
         'Felix Burkhardt, Astrid Paeschke, Miriam Rolfes, Walter Sendlmeier, Benjamin Weiss'
 
     """  # noqa: E501
@@ -72,7 +72,7 @@ def bit_depths(
             that is not part of the database
 
     Example:
-        >>> bit_depths('emodb', version='1.2.0')
+        >>> bit_depths('emodb', version='1.3.0')
         {16}
 
     """
@@ -108,7 +108,7 @@ def channels(
             that is not part of the database
 
     Example:
-        >>> channels('emodb', version='1.2.0')
+        >>> channels('emodb', version='1.3.0')
         {1}
 
     """
@@ -134,7 +134,7 @@ def description(
         description of database
 
     Example:
-        >>> desc = description('emodb', version='1.2.0')
+        >>> desc = description('emodb', version='1.3.0')
         >>> desc.split('.')[0]  # show first sentence
         'Berlin Database of Emotional Speech'
 
@@ -171,9 +171,9 @@ def duration(
             that is not part of the database
 
     Example:
-        >>> duration('emodb', version='1.2.0')
+        >>> duration('emodb', version='1.3.0')
         Timedelta('0 days 00:24:47.092187500')
-        >>> duration('emodb', version='1.2.0', media=['wav/03a01Fa.wav'])
+        >>> duration('emodb', version='1.3.0', media=['wav/03a01Fa.wav'])
         Timedelta('0 days 00:00:01.898250')
 
     """
@@ -202,7 +202,7 @@ def files(
         media files
 
     Example:
-        >>> files('emodb', version='1.2.0')[:2]
+        >>> files('emodb', version='1.3.0')[:2]
         ['wav/03a01Fa.wav', 'wav/03a01Nc.wav']
 
     """
@@ -238,7 +238,7 @@ def formats(
             that is not part of the database
 
     Example:
-        >>> formats('emodb', version='1.2.0')
+        >>> formats('emodb', version='1.3.0')
         {'wav'}
 
     """
@@ -264,7 +264,7 @@ def header(
         database object without table data
 
     Example:
-        >>> db = header('emodb', version='1.2.0')
+        >>> db = header('emodb', version='1.3.0')
         >>> db.name
         'emodb'
 
@@ -298,7 +298,7 @@ def languages(
         languages of database
 
     Example:
-        >>> languages('emodb', version='1.2.0')
+        >>> languages('emodb', version='1.3.0')
         ['deu']
 
     """
@@ -324,7 +324,7 @@ def license(
         license of database
 
     Example:
-        >>> license('emodb', version='1.2.0')
+        >>> license('emodb', version='1.3.0')
         'CC0-1.0'
 
     """
@@ -350,7 +350,7 @@ def license_url(
         license URL of database
 
     Example:
-        >>> license_url('emodb', version='1.2.0')
+        >>> license_url('emodb', version='1.3.0')
         'https://creativecommons.org/publicdomain/zero/1.0/'
 
     """
@@ -376,7 +376,7 @@ def media(
         media of database
 
     Example:
-        >>> media('emodb', version='1.2.0')
+        >>> media('emodb', version='1.3.0')
         microphone:
             {type: other, format: wav, channels: 1, sampling_rate: 16000}
 
@@ -403,7 +403,7 @@ def meta(
         meta information of database
 
     Example:
-        >>> meta('emodb', version='1.2.0')
+        >>> meta('emodb', version='1.3.0')
         pdf:
           http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&rep=rep1&type=pdf
 
@@ -456,7 +456,7 @@ def organization(
         organization responsible for database
 
     Example:
-        >>> organization('emodb', version='1.2.0')
+        >>> organization('emodb', version='1.3.0')
         'audEERING'
 
     """
@@ -482,7 +482,7 @@ def raters(
         raters of database
 
     Example:
-        >>> raters('emodb', version='1.2.0')
+        >>> raters('emodb', version='1.3.0')
         gold:
             {type: human}
 
@@ -519,7 +519,7 @@ def sampling_rates(
             that is not part of the database
 
     Example:
-        >>> sampling_rates('emodb', version='1.2.0')
+        >>> sampling_rates('emodb', version='1.3.0')
         {16000}
 
     """
@@ -545,7 +545,7 @@ def schemes(
         schemes of database
 
     Example:
-        >>> list(schemes('emodb', version='1.2.0'))
+        >>> list(schemes('emodb', version='1.3.0'))
         ['confidence', 'duration', 'emotion', 'speaker', 'transcription']
 
     """
@@ -571,7 +571,7 @@ def source(
         source of database
 
     Example:
-        >>> source('emodb', version='1.2.0')
+        >>> source('emodb', version='1.3.0')
         'http://emodb.bilderbar.info/download/download.zip'
 
     """
@@ -597,7 +597,7 @@ def splits(
         splits of database
 
     Example:
-        >>> splits('emodb', version='1.2.0')
+        >>> splits('emodb', version='1.3.0')
         test:
           {description: Unofficial speaker-independent test split, type: test}
         train:
@@ -626,7 +626,7 @@ def tables(
         tables of database
 
     Example:
-        >>> list(tables('emodb', version='1.2.0'))
+        >>> list(tables('emodb', version='1.3.0'))
         ['emotion', 'emotion.categories.test.gold_standard', 'emotion.categories.train.gold_standard', 'files']
 
     """  # noqa: E501
@@ -652,7 +652,7 @@ def usage(
         usage of database
 
     Example:
-        >>> usage('emodb', version='1.2.0')
+        >>> usage('emodb', version='1.3.0')
         'unrestricted'
 
     """
