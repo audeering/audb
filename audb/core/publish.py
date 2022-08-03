@@ -28,7 +28,10 @@ def _check_for_duplicates(
     def job(table):
         audformat.assert_no_duplicates(table._df)
 
-    tables = db.tables.values()
+    tables = (
+        list(db.tables.values())
+        + list(db.misc_tables.values())
+    )
     audeer.run_tasks(
         job,
         params=[([table], {}) for table in tables],
@@ -82,13 +85,13 @@ def _find_tables(
 
     # release dependencies to removed tables
 
-    db_tables = [f'db.{table}.csv' for table in db.tables]
+    db_tables = [f'db.{table}.csv' for table in list(db)]
     for file in set(deps.tables) - set(db_tables):
         deps._drop(file)
 
     tables = []
     for table in audeer.progress_bar(
-            db.tables,
+            list(db),
             desc='Find tables',
             disable=not verbose,
     ):
@@ -546,7 +549,7 @@ def publish(
     _check_for_missing_media(db, db_root, db_root_files, deps)
 
     # make sure all tables are stored in CSV format
-    for table_id, table in db.tables.items():
+    for table_id, table in {**db.tables, **db.misc_tables}.items():
         table_path = os.path.join(db_root, f'db.{table_id}')
         table_ext = audformat.define.TableStorageFormat.CSV
         if not os.path.exists(table_path + f'.{table_ext}'):

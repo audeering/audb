@@ -62,6 +62,9 @@ DB['table2']['column'] = audformat.Column(
     scheme_id='scheme',
     rater_id='rater',
 )
+DB['misc_table1'] = audformat.Table(
+    pd.Index([0, 1], name='idx')
+)
 
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
 
@@ -218,6 +221,10 @@ def test_media():
 
 def test_meta():
     assert audb.info.meta(DB_NAME) == DB.meta
+
+
+def test_misc_tables():
+    assert str(audb.info.misc_tables(DB_NAME)) == str(DB.misc_tables)
 
 
 def test_organization():

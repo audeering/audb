@@ -412,6 +412,32 @@ def meta(
     return db.meta
 
 
+def misc_tables(
+        name: str,
+        *,
+        version: str = None,
+        cache_root: str = None,
+) -> typing.Dict:
+    """Miscellaneous tables of database.
+
+    Args:
+        name: name of database
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+
+    Returns:
+        miscellaneous tables of database
+
+    Example:
+        >>> list(misc_tables('emodb', version='1.3.0'))
+        ['speaker']
+
+    """  # noqa: E501
+    db = header(name, version=version, cache_root=cache_root)
+    return db.misc_tables
+
+
 def organization(
         name: str,
         *,

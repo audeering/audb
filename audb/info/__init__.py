@@ -69,6 +69,7 @@ from audb.core.info import (
     license_url,
     media,
     meta,
+    misc_tables,
     organization,
     raters,
     sampling_rates,
