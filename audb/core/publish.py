@@ -549,7 +549,8 @@ def publish(
     _check_for_missing_media(db, db_root, db_root_files, deps)
 
     # make sure all tables are stored in CSV format
-    for table_id, table in {**db.tables, **db.misc_tables}.items():
+    for table_id in list(db):
+        table = db[table_id]
         table_path = os.path.join(db_root, f'db.{table_id}')
         table_ext = audformat.define.TableStorageFormat.CSV
         if not os.path.exists(table_path + f'.{table_ext}'):
