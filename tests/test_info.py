@@ -62,7 +62,7 @@ DB['table2']['column'] = audformat.Column(
     scheme_id='scheme',
     rater_id='rater',
 )
-DB['misc_table1'] = audformat.Table(
+DB['misc_table1'] = audformat.MiscTable(
     pd.Index([0, 1], name='idx')
 )
 
