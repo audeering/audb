@@ -696,9 +696,13 @@ def filtered_dependencies(
                 cache_root=cache_root,
                 verbose=False,
             )
-            available_media += list(
-                df.index.get_level_values('file').unique()
-            )
+            if (
+                    audformat.is_filewise_index(df)
+                    or audformat.is_segmented_index(df)
+            ):
+                available_media += list(
+                    df.index.get_level_values('file').unique()
+                )
 
         media = filter_media(media, deps.media, name, version)
         available_media = [m for m in media if m in list(set(available_media))]
