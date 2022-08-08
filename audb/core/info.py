@@ -269,15 +269,7 @@ def header(
         'emodb'
 
     """
-    if version is None:
-        version = latest_version(name)
-
-    db_root = database_cache_root(name, version, cache_root)
-
-    with FolderLock(db_root):
-        db, _ = load_header(db_root, name, version)
-
-    return db
+    return load_header(name, version=version, cache_root=cache_root)
 
 
 def languages(
@@ -546,9 +538,9 @@ def schemes(
 
     Example:
         >>> list(schemes('emodb', version='1.3.0'))
-        ['confidence', 'duration', 'emotion', 'speaker', 'transcription']
+        ['age', 'confidence', 'duration', 'emotion', 'gender', 'language', 'speaker', 'transcription']
 
-    """
+    """  # noqa: E501
     db = header(name, version=version, cache_root=cache_root)
     return db.schemes
 

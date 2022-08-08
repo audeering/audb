@@ -4,6 +4,7 @@ import re
 import shutil
 
 import numpy as np
+import pandas as pd
 import pytest
 
 import audbackend
@@ -64,8 +65,18 @@ def fixture_publish_db():
         num_files=5,
         columns={'emotion': ('scheme', None)}
     )
+    audformat.testing.add_misc_table(
+        db,
+        'misc',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
     db.schemes['speaker'] = audformat.Scheme(
         labels=['adam', '11']
+    )
+    db.schemes['misc'] = audformat.Scheme(
+        'int',
+        labels='misc',
     )
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
@@ -113,8 +124,18 @@ def fixture_publish_db():
         num_files=5,
         columns={'emotion': ('scheme', None)}
     )
+    audformat.testing.add_misc_table(
+        db,
+        'misc',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
     db.schemes['speaker'] = audformat.Scheme(
         labels=['adam', '11']
+    )
+    db.schemes['misc'] = audformat.Scheme(
+        'int',
+        labels='misc',
     )
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
@@ -629,7 +650,9 @@ def test_update_database_without_media(tmpdir):
 def test_cached():
     # Check first that we have different database names available
     df = audb.cached()
+    print(df)
     names = list(set(df.name))
+    print(names)
     assert len(names) > 1
     df = audb.cached(name=names[0])
     assert set(df.name) == set([names[0]])
