@@ -1296,10 +1296,7 @@ def load_table(
         )
 
         # Load table
-        tables = (
-            _misc_tables_used_in_scheme(db)
-            + [table]
-        )
+        tables = _misc_tables_used_in_scheme(db) + [table]
         for table in tables:
             table_file = os.path.join(db_root, f'db.{table}')
             if not (
