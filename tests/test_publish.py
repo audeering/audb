@@ -67,7 +67,13 @@ def fixture_publish_db():
     )
     audformat.testing.add_misc_table(
         db,
-        'misc',
+        'misc-in-scheme',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
+    audformat.testing.add_misc_table(
+        db,
+        'misc-not-in-scheme',
         pd.Index([0, 1, 2], dtype='Int64', name='idx'),
         columns={'emotion': ('scheme', None)}
     )
@@ -76,7 +82,7 @@ def fixture_publish_db():
     )
     db.schemes['misc'] = audformat.Scheme(
         'int',
-        labels='misc',
+        labels='misc-in-scheme',
     )
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
@@ -131,7 +137,13 @@ def fixture_publish_db():
     )
     audformat.testing.add_misc_table(
         db,
-        'misc',
+        'misc-in-scheme',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
+    audformat.testing.add_misc_table(
+        db,
+        'misc-not-in-scheme',
         pd.Index([0, 1, 2], dtype='Int64', name='idx'),
         columns={'emotion': ('scheme', None)}
     )
@@ -140,12 +152,17 @@ def fixture_publish_db():
     )
     db.schemes['misc'] = audformat.Scheme(
         'int',
-        labels='misc',
+        labels='misc-in-scheme',
     )
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
         ['adam', 'adam', 'adam', '11'],
+        index=audformat.filewise_index(db.files[:4]),
+    )
+    db['files']['misc'] = audformat.Column(scheme_id='misc')
+    db['files']['misc'].set(
+        [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
     db.save(DB_ROOT_VERSION['6.0.0'])

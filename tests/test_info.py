@@ -62,15 +62,15 @@ DB['table2']['column'] = audformat.Column(
     scheme_id='scheme1',
     rater_id='rater',
 )
-DB['misc_table1'] = audformat.MiscTable(
+DB['misc-in-scheme'] = audformat.MiscTable(
     pd.Index([0, 1], name='idx')
 )
-DB['misc_table2'] = audformat.MiscTable(
+DB['misc-not-in-scheme'] = audformat.MiscTable(
     pd.Index([0, 1], name='idx')
 )
 DB.schemes['scheme2'] = audformat.Scheme(
     'int',
-    labels='misc_table1',
+    labels='misc-in-scheme',
 )
 
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
@@ -169,8 +169,8 @@ def test_description():
         (None, []),
         ('', ''),
         ('table1', None),
-        ('misc_table1', None),
-        ('misc_table2', None),
+        ('misc-in-scheme', None),
+        ('misc-not-in-scheme', None),
         (None, ['f11.wav', 'f12.wav']),
         ('table1', ['f11.wav', 'f12.wav']),
         # Error as tables and media do not overlap

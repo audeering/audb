@@ -63,19 +63,19 @@ def fixture_publish_db():
     )
     audformat.testing.add_misc_table(
         db,
-        'misc1',
+        'misc-in-scheme',
         pd.Index([0, 1, 2], dtype='Int64', name='idx'),
         columns={'emotion': ('scheme', None)}
     )
     audformat.testing.add_misc_table(
         db,
-        'misc2',
+        'misc-not-in-scheme',
         pd.Index([0, 1, 2], dtype='Int64', name='idx'),
         columns={'emotion': ('scheme', None)}
     )
     db.schemes['misc'] = audformat.Scheme(
         'int',
-        labels='misc1',
+        labels='misc-in-scheme',
     )
     db.save(DB_ROOT)
     audformat.testing.create_audio_files(db)
@@ -109,8 +109,8 @@ def test_load_on_demand():
 
     assert db['table1'] == db_original['table1']
     assert db['table2'] == db_original['table2']
-    assert db['misc1'] == db_original['misc1']
-    assert db['misc2'] == db_original['misc2']
+    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
+    assert db['misc-not-in-scheme'] == db_original['misc-not-in-scheme']
     pd.testing.assert_index_equal(db.files, db_original.files)
     assert not db.meta['audb']['complete']
 
@@ -124,9 +124,9 @@ def test_load_on_demand():
     )
 
     assert db['table1'] == db_original['table1']
-    assert db['misc1'] == db_original['misc1']  # loaded as used in a scheme
+    assert db['misc-in-scheme'] == db_original['misc-in-scheme']  # loaded as used in a scheme
     assert 'table2' not in db.tables
-    assert 'misc2' not in db.misc_tables
+    assert 'misc-not-in-scheme' not in db.misc_tables
     pd.testing.assert_index_equal(db.files, db_original['table1'].files)
     assert not db.meta['audb']['complete']
 
@@ -140,9 +140,9 @@ def test_load_on_demand():
     )
 
     assert db['table1'] == db_original['table1']
-    assert db['misc1'] == db_original['misc1']
+    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
     assert 'table2' not in db.tables
-    assert 'misc2' not in db.misc_tables
+    assert 'misc-not-in-scheme' not in db.misc_tables
     pd.testing.assert_index_equal(db.files, db_original['table1'].files)
     assert not db.meta['audb']['complete']
 
@@ -155,9 +155,9 @@ def test_load_on_demand():
     )
 
     assert db['table1'] == db_original['table1']
-    assert db['misc1'] == db_original['misc1']  # loaded as used in a scheme
+    assert db['misc-in-scheme'] == db_original['misc-in-scheme']  # loaded as used in a scheme
     assert 'table2' not in db.tables
-    assert 'misc2' not in db.misc_tables
+    assert 'misc-not-in-scheme' not in db.misc_tables
     pd.testing.assert_index_equal(db.files, db_original['table1'].files)
     assert not db.meta['audb']['complete']
 
@@ -175,8 +175,8 @@ def test_load_on_demand():
 
     assert db['table1'] == db_original['table1']
     assert db['table2'] == db_original['table2']
-    assert db['misc1'] == db_original['misc1']
-    assert db['misc2'] == db_original['misc2']
+    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
+    assert db['misc-not-in-scheme'] == db_original['misc-not-in-scheme']
     pd.testing.assert_index_equal(db.files, db_original.files)
     assert not db.meta['audb']['complete']
 
@@ -190,8 +190,8 @@ def test_load_on_demand():
 
     assert 'table1' in db.tables
     assert 'table2' in db.tables
-    assert 'misc1' in db.misc_tables
-    assert 'misc2' in db.misc_tables
+    assert 'misc-in-scheme' in db.misc_tables
+    assert 'misc-not-in-scheme' in db.misc_tables
     pd.testing.assert_index_equal(
         db.files,
         audformat.filewise_index(['audio/000.wav', 'audio/001.wav']),
@@ -207,8 +207,8 @@ def test_load_on_demand():
     )
 
     assert 'table1' not in db.tables
-    assert 'misc2' not in db.misc_tables
-    assert db['misc1'] == db_original['misc1']
+    assert 'misc-not-in-scheme' not in db.misc_tables
+    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
     assert db['table2'] == db_original['table2']
     pd.testing.assert_index_equal(db.files, db_original['table2'].files)
     assert db.meta['audb']['complete']
@@ -216,15 +216,15 @@ def test_load_on_demand():
     db = audb.load(
         DB_NAME,
         version=DB_VERSION,
-        tables=['misc2'],
+        tables=['misc-not-in-scheme'],
         full_path=False,
         verbose=False,
     )
 
     assert 'table1' not in db.tables
     assert 'table2' not in db.tables
-    assert db['misc1'] == db_original['misc1']
-    assert db['misc2'] == db_original['misc2']
+    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
+    assert db['misc-not-in-scheme'] == db_original['misc-not-in-scheme']
     assert db.meta['audb']['complete']
 
     db = audb.load(

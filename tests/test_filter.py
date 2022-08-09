@@ -50,19 +50,19 @@ def fixture_publish_db():
     )
     audformat.testing.add_misc_table(
         db,
-        'misc1',
+        'misc-in-scheme',
         pd.Index([0, 1, 2], dtype='Int64', name='idx'),
         columns={'emotion': ('scheme', None)}
     )
     audformat.testing.add_misc_table(
         db,
-        'misc2',
+        'misc-not-in-scheme',
         pd.Index([0, 1, 2], dtype='Int64', name='idx'),
         columns={'emotion': ('scheme', None)}
     )
     db.schemes['misc'] = audformat.Scheme(
         'int',
-        labels='misc1',
+        labels='misc-in-scheme',
     )
     audformat.testing.add_table(
         db,
@@ -203,7 +203,7 @@ def test_media(media, format, expected_files):
         (
             None,
             None,
-            ['dev', 'misc1', 'misc2', 'test', 'train'],
+            ['dev', 'misc-in-scheme', 'misc-not-in-scheme', 'test', 'train'],
             ['audio/000.wav', 'audio/001.wav',
              'audio/010.wav', 'audio/011.wav',
              'audio/1/020.wav', 'audio/2/021.wav'],
@@ -211,40 +211,40 @@ def test_media(media, format, expected_files):
         (
             'test',
             None,
-            ['misc1', 'test'],
+            ['misc-in-scheme', 'test'],
             ['audio/000.wav', 'audio/001.wav'],
         ),
         (
             't.*',
             None,
-            ['misc1', 'test', 'train'],
+            ['misc-in-scheme', 'test', 'train'],
             ['audio/000.wav', 'audio/001.wav',
              'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
-            ['dev', 'train', 'misc2'],
+            ['dev', 'train', 'misc-not-in-scheme'],
             None,
-            ['dev', 'misc1', 'misc2', 'train'],
+            ['dev', 'misc-in-scheme', 'misc-not-in-scheme', 'train'],
             ['audio/010.wav', 'audio/011.wav',
              'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
             ['dev', 'train'],
             'flac',
-            ['dev', 'misc1', 'train'],
+            ['dev', 'misc-in-scheme', 'train'],
             ['audio/010.flac', 'audio/011.flac',
              'audio/1/020.flac', 'audio/2/021.flac'],
         ),
         (
             [],
             None,
-            ['misc1'],
+            ['misc-in-scheme'],
             [],
         ),
         (
             '',
             None,
-            ['misc1'],
+            ['misc-in-scheme'],
             [],
         ),
         pytest.param(
