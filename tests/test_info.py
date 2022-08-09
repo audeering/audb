@@ -35,7 +35,7 @@ DB = audformat.Database(
     meta={'foo': 'bar'}
 )
 DB.media['media'] = audformat.Media()
-DB.schemes['scheme'] = audformat.Scheme()
+DB.schemes['scheme1'] = audformat.Scheme()
 DB.splits['split'] = audformat.Split()
 DB.raters['rater'] = audformat.Rater()
 DB['table1'] = audformat.Table(
@@ -46,7 +46,7 @@ DB['table1'] = audformat.Table(
     split_id='split',
 )
 DB['table1']['column'] = audformat.Column(
-    scheme_id='scheme',
+    scheme_id='scheme1',
     rater_id='rater',
 )
 DB['table2'] = audformat.Table(
@@ -59,11 +59,15 @@ DB['table2'] = audformat.Table(
     split_id='split',
 )
 DB['table2']['column'] = audformat.Column(
-    scheme_id='scheme',
+    scheme_id='scheme1',
     rater_id='rater',
 )
 DB['misc_table1'] = audformat.MiscTable(
     pd.Index([0, 1], name='idx')
+)
+DB.schemes['scheme2'] = audformat.Scheme(
+    'int',
+    labels='misc_table1',
 )
 
 DB_ROOT = os.path.join(pytest.ROOT, 'db')

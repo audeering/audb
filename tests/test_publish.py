@@ -84,6 +84,11 @@ def fixture_publish_db():
         ['adam', 'adam', 'adam', '11'],
         index=audformat.filewise_index(db.files[:4]),
     )
+    db['files']['misc'] = audformat.Column(scheme_id='misc')
+    db['files']['misc'].set(
+        [0, 1, 1, 2],
+        index=audformat.filewise_index(db.files[:4]),
+    )
     db.save(
         DB_ROOT_VERSION['1.0.0'],
         storage_format=audformat.define.TableStorageFormat.PICKLE,
@@ -650,9 +655,7 @@ def test_update_database_without_media(tmpdir):
 def test_cached():
     # Check first that we have different database names available
     df = audb.cached()
-    print(df)
     names = list(set(df.name))
-    print(names)
     assert len(names) > 1
     df = audb.cached(name=names[0])
     assert set(df.name) == set([names[0]])
