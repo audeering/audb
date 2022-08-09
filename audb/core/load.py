@@ -727,35 +727,6 @@ def filtered_dependencies(
     return df
 
 
-def load_header(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
-) -> audformat.Database:
-    r"""Load header of database.
-
-    Args:
-        name: name of database
-        version: version of database
-        cache_root: cache folder where databases are stored.
-            If not set :meth:`audb.default_cache_root` is used
-
-    Returns:
-        database object without table data
-
-    """
-    if version is None:
-        version = latest_version(name)
-
-    db_root = database_cache_root(name, version, cache_root)
-
-    with FolderLock(db_root):
-        db, _ = load_header_to(db_root, name, version)
-
-    return db
-
-
 def load(
         name: str,
         *,
@@ -990,6 +961,35 @@ def load(
 
     except filelock.Timeout:
         utils.timeout_warning()
+
+    return db
+
+
+def load_header(
+        name: str,
+        *,
+        version: str = None,
+        cache_root: str = None,
+) -> audformat.Database:
+    r"""Load header of database.
+
+    Args:
+        name: name of database
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+
+    Returns:
+        database object without table data
+
+    """
+    if version is None:
+        version = latest_version(name)
+
+    db_root = database_cache_root(name, version, cache_root)
+
+    with FolderLock(db_root):
+        db, _ = load_header_to(db_root, name, version)
 
     return db
 
