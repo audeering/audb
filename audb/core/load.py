@@ -894,8 +894,7 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # filter tables (convert regexp pattern to list of tables)
-            available_tables = list(db.misc_tables) + list(db.tables)
-            requested_tables = filter_tables(tables, available_tables)
+            requested_tables = filter_tables(tables, list(db))
 
             # add/split into misc tables used in a scheme
             # and all other (misc) tables
