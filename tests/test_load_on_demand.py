@@ -124,7 +124,7 @@ def test_load_on_demand():
     )
 
     assert db['table1'] == db_original['table1']
-    assert db['misc-in-scheme'] == db_original['misc-in-scheme']  # loaded as used in a scheme
+    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
     assert 'table2' not in db.tables
     assert 'misc-not-in-scheme' not in db.misc_tables
     pd.testing.assert_index_equal(db.files, db_original['table1'].files)
@@ -155,7 +155,7 @@ def test_load_on_demand():
     )
 
     assert db['table1'] == db_original['table1']
-    assert db['misc-in-scheme'] == db_original['misc-in-scheme']  # loaded as used in a scheme
+    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
     assert 'table2' not in db.tables
     assert 'misc-not-in-scheme' not in db.misc_tables
     pd.testing.assert_index_equal(db.files, db_original['table1'].files)

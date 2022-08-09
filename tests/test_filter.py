@@ -215,7 +215,7 @@ def test_media(media, format, expected_files):
             ['audio/000.wav', 'audio/001.wav'],
         ),
         (
-            't.*',
+            '^t.*',
             None,
             ['misc-in-scheme', 'test', 'train'],
             ['audio/000.wav', 'audio/001.wav',
@@ -272,5 +272,7 @@ def test_tables(tables, format, expected_tables, expected_files):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
+    print(list(db))
+    print(expected_tables)
     assert list(db) == expected_tables
     assert list(db.files) == expected_files
