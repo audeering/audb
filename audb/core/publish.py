@@ -25,16 +25,13 @@ def _check_for_duplicates(
 ):
     r"""Ensures tables do not contain duplicated index entries."""
 
-    def job(table):
-        audformat.assert_no_duplicates(table._df)
+    def job(table_id):
+        audformat.assert_no_duplicates(db[table_id]._df)
 
-    tables = (
-        list(db.tables.values())
-        + list(db.misc_tables.values())
-    )
+    table_ids = list(db)
     audeer.run_tasks(
         job,
-        params=[([table], {}) for table in tables],
+        params=[([table_id], {}) for table_id in table_ids],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Check tables for duplicates',
