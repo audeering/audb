@@ -295,7 +295,7 @@ def test_load(format, version):
 
     deps = audb.dependencies(DB_NAME, version=version)
     assert str(deps().to_string()) == str(deps)
-    assert len(deps) == len(db.files) + len(db.tables)
+    assert len(deps) == len(db.files) + len(db.tables) + len(db.misc_tables)
 
     # from cache with full path
 

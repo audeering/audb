@@ -553,6 +553,18 @@ def _load_tables(
     return cached_versions
 
 
+def _misc_tables_used_in_scheme(
+        db: audformat.Database,
+) -> typing.Sequence[str]:
+    r"""List of misc tables that are used inside a scheme."""
+    misc_tables_used_in_scheme = []
+    for scheme in db.schemes.values():
+        if isinstance(scheme.labels, str):
+            misc_tables_used_in_scheme.append(scheme.labels)
+
+    return list(set(misc_tables_used_in_scheme))
+
+
 def _missing_media(
         db_root: str,
         media: typing.Sequence[str],
@@ -876,33 +888,40 @@ def load(
 
             db_is_complete = _database_is_complete(db)
 
-            # filter tables
-            requested_tables = filter_tables(tables, deps.table_ids)
+            # filter tables (convert regexp pattern to list of tables)
+            available_tables = list(db.misc_tables) + list(db.tables)
+            requested_tables = filter_tables(tables, available_tables)
 
-            # add misc tables, which are used as scheme
-            if tables is not None:
-                misc_tables_used_in_scheme = []
-                for scheme in db.schemes.values():
-                    if isinstance(scheme.labels, str):
-                        misc_tables_used_in_scheme.append(scheme.labels)
-                requested_tables += misc_tables_used_in_scheme
-                requested_tables = list(set(requested_tables))
+            # add/split into misc tables used in a scheme
+            # and all other (misc) tables
+            requested_misc_tables = _misc_tables_used_in_scheme(db)
+            requested_tables = [
+                table for table in requested_tables
+                if table not in requested_misc_tables
+            ]
 
             # load missing tables
             if not db_is_complete:
-                cached_versions = _load_tables(
-                    requested_tables,
-                    backend,
-                    db_root,
-                    db,
-                    version,
-                    cached_versions,
-                    deps,
-                    flavor,
-                    cache_root,
-                    num_workers,
-                    verbose,
-                )
+                for _tables in [
+                        requested_misc_tables,
+                        requested_tables,
+                ]:
+                    # need to load misc tables used in a scheme first
+                    # as loading is done in parallel
+                    cached_versions = _load_tables(
+                        _tables,
+                        backend,
+                        db_root,
+                        db,
+                        version,
+                        cached_versions,
+                        deps,
+                        flavor,
+                        cache_root,
+                        num_workers,
+                        verbose,
+                    )
+            requested_tables = requested_misc_tables + requested_tables
 
             # filter tables
             if tables is not None:
@@ -1273,25 +1292,30 @@ def load_table(
         )
 
         # Load table
-        table_file = os.path.join(db_root, f'db.{table}')
-        if not (
-                os.path.exists(f'{table_file}.csv')
-                or os.path.exists(f'{table_file}.pkl')
-        ):
-            _load_tables(
-                [table],
-                backend,
-                db_root,
-                db,
-                version,
-                None,
-                deps,
-                Flavor(),
-                cache_root,
-                num_workers,
-                verbose,
-            )
-        table = audformat.Table()
-        table.load(table_file)
+        tables = (
+            _misc_tables_used_in_scheme(db)
+            + [table]
+        )
+        for table in tables:
+            table_file = os.path.join(db_root, f'db.{table}')
+            if not (
+                    os.path.exists(f'{table_file}.csv')
+                    or os.path.exists(f'{table_file}.pkl')
+            ):
+                _load_tables(
+                    [table],
+                    backend,
+                    db_root,
+                    db,
+                    version,
+                    None,
+                    deps,
+                    Flavor(),
+                    cache_root,
+                    num_workers,
+                    verbose,
+                )
+            table = audformat.Table()
+            table.load(table_file)
 
     return table._df
