@@ -1,6 +1,7 @@
 import os
 import shutil
 
+import pandas as pd
 import pytest
 
 import audformat.testing
@@ -47,6 +48,22 @@ def fixture_publish_db():
     db.schemes['scheme'] = audformat.Scheme(
         labels=['some', 'test', 'labels']
     )
+    audformat.testing.add_misc_table(
+        db,
+        'misc1',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
+    audformat.testing.add_misc_table(
+        db,
+        'misc2',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
+    db.schemes['misc'] = audformat.Scheme(
+        'int',
+        labels='misc1',
+    )
     audformat.testing.add_table(
         db,
         'test',
@@ -58,7 +75,7 @@ def fixture_publish_db():
         db,
         'dev',
         audformat.define.IndexType.SEGMENTED,
-        columns={'label': ('scheme', None)},
+        columns={'label': ('misc', None)},
         num_files=[10, 11],
     )
     audformat.testing.add_table(
@@ -186,7 +203,7 @@ def test_media(media, format, expected_files):
         (
             None,
             None,
-            ['dev', 'test', 'train'],
+            ['dev', 'misc1', 'misc2', 'test', 'train'],
             ['audio/000.wav', 'audio/001.wav',
              'audio/010.wav', 'audio/011.wav',
              'audio/1/020.wav', 'audio/2/021.wav'],
@@ -194,40 +211,40 @@ def test_media(media, format, expected_files):
         (
             'test',
             None,
-            ['test'],
+            ['misc1', 'test'],
             ['audio/000.wav', 'audio/001.wav'],
         ),
         (
             't.*',
             None,
-            ['test', 'train'],
+            ['misc1', 'test', 'train'],
             ['audio/000.wav', 'audio/001.wav',
              'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
-            ['dev', 'train'],
+            ['dev', 'train', 'misc2'],
             None,
-            ['dev', 'train'],
+            ['dev', 'misc1', 'misc2', 'train'],
             ['audio/010.wav', 'audio/011.wav',
              'audio/1/020.wav', 'audio/2/021.wav'],
         ),
         (
             ['dev', 'train'],
             'flac',
-            ['dev', 'train'],
+            ['dev', 'misc1', 'train'],
             ['audio/010.flac', 'audio/011.flac',
              'audio/1/020.flac', 'audio/2/021.flac'],
         ),
         (
             [],
             None,
-            [],
+            ['misc1'],
             [],
         ),
         (
             '',
             None,
-            [],
+            ['misc1'],
             [],
         ),
         pytest.param(
@@ -255,5 +272,5 @@ def test_tables(tables, format, expected_tables, expected_files):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    assert list(db.tables) == expected_tables
+    assert list(db) == expected_tables
     assert list(db.files) == expected_files
