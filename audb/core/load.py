@@ -555,7 +555,7 @@ def _load_tables(
 
 def _misc_tables_used_in_scheme(
         db: audformat.Database,
-) -> typing.Sequence[str]:
+) -> typing.List[str]:
     r"""List of misc tables that are used inside a scheme."""
     misc_tables_used_in_scheme = []
     for scheme in db.schemes.values():
