@@ -65,6 +65,9 @@ DB['table2']['column'] = audformat.Column(
 DB['misc_table1'] = audformat.MiscTable(
     pd.Index([0, 1], name='idx')
 )
+DB['misc_table2'] = audformat.MiscTable(
+    pd.Index([0, 1], name='idx')
+)
 DB.schemes['scheme2'] = audformat.Scheme(
     'int',
     labels='misc_table1',
@@ -166,6 +169,8 @@ def test_description():
         (None, []),
         ('', ''),
         ('table1', None),
+        ('misc_table1', None),
+        ('misc_table2', None),
         (None, ['f11.wav', 'f12.wav']),
         ('table1', ['f11.wav', 'f12.wav']),
         # Error as tables and media do not overlap

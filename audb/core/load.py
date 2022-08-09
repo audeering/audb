@@ -700,7 +700,8 @@ def filtered_dependencies(
     else:
         # Load header to get list of tables
         db = load_header(name, version=version, cache_root=cache_root)
-        tables = filter_tables(tables, list(db.tables))
+        tables = filter_tables(tables, list(db))
+        tables = [t for t in tables if t not in list(db.misc_tables)]
         # Gather media files from tables
         available_media = []
         for table in tables:
@@ -715,8 +716,12 @@ def filtered_dependencies(
                 df.index.get_level_values('file').unique()
             )
 
-        media = filter_media(media, deps.media, name, version)
-        available_media = [m for m in media if m in list(set(available_media))]
+        if len(available_media) > 0:
+            media = filter_media(media, deps.media, name, version)
+            available_media = [
+                m for m in media
+                if m in list(set(available_media))
+            ]
         df = deps().loc[available_media]
 
     return df
