@@ -559,7 +559,7 @@ def _misc_tables_used_in_scheme(
     r"""List of misc tables that are used inside a scheme."""
     misc_tables_used_in_scheme = []
     for scheme in db.schemes.values():
-        if isinstance(scheme.labels, str):
+        if scheme.uses_table:
             misc_tables_used_in_scheme.append(scheme.labels)
 
     return list(set(misc_tables_used_in_scheme))
