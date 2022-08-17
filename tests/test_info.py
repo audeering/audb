@@ -134,7 +134,16 @@ def test_author():
 
 
 def test_header():
-    assert str(audb.info.header(DB_NAME)) == str(DB)
+    # Load header without loading misc tables
+    db = audb.info.header(DB_NAME, load_tables=False)
+    assert str(db) == str(DB)
+    error_msg = 'No file found for table with path'
+    with pytest.raises(RuntimeError, match=error_msg):
+        assert 0 in db.schemes['scheme2']
+    # Load header with tables
+    db = audb.info.header(DB_NAME)
+    assert str(db) == str(DB)
+    assert 0 in db.schemes['scheme2']
 
 
 def test_bit_depths():
@@ -255,7 +264,16 @@ def test_sampling_rates():
 
 
 def test_schemes():
-    assert str(audb.info.schemes(DB_NAME)) == str(DB.schemes)
+    # Load schemes without loading misc tables
+    schemes = audb.info.schemes(DB_NAME, load_tables=False)
+    assert str(schemes) == str(DB.schemes)
+    error_msg = 'No file found for table with path'
+    with pytest.raises(RuntimeError, match=error_msg):
+        assert 0 in schemes['scheme2']
+    # Load header with tables
+    schemes = audb.info.schemes(DB_NAME)
+    str(schemes) == str(DB.schemes)
+    assert 0 in schemes['scheme2']
 
 
 def test_splits():
