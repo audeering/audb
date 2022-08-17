@@ -40,7 +40,12 @@ def author(
         'Felix Burkhardt, Astrid Paeschke, Miriam Rolfes, Walter Sendlmeier, Benjamin Weiss'
 
     """  # noqa: E501
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.author
 
 
@@ -139,7 +144,12 @@ def description(
         'Berlin Database of Emotional Speech'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.description
 
 
@@ -250,6 +260,7 @@ def header(
         name: str,
         *,
         version: str = None,
+        load_tables: bool = True,
         cache_root: str = None,
 ) -> audformat.Database:
     r"""Load header of database.
@@ -257,6 +268,9 @@ def header(
     Args:
         name: name of database
         version: version of database
+        load_tables: if ``True``
+            it will download misc tables
+            used as labels in a scheme
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -269,7 +283,19 @@ def header(
         'emodb'
 
     """
-    return load_header(name, version=version, cache_root=cache_root)
+    db = load_header(name, version=version, cache_root=cache_root)
+    if load_tables:
+        for scheme in db.schemes.values():
+            if scheme.uses_table:
+                table = scheme.labels
+                load_table(
+                    name,
+                    table,
+                    version=version,
+                    cache_root=cache_root,
+                    verbose=False,
+                )
+    return db
 
 
 def languages(
@@ -294,7 +320,12 @@ def languages(
         ['deu']
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.languages
 
 
@@ -320,7 +351,12 @@ def license(
         'CC0-1.0'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.license
 
 
@@ -346,7 +382,12 @@ def license_url(
         'https://creativecommons.org/publicdomain/zero/1.0/'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.license_url
 
 
@@ -373,7 +414,12 @@ def media(
             {type: other, format: wav, channels: 1, sampling_rate: 16000}
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.media
 
 
@@ -400,7 +446,12 @@ def meta(
           http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&rep=rep1&type=pdf
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.meta
 
 
@@ -426,7 +477,12 @@ def misc_tables(
         ['speaker']
 
     """  # noqa: E501
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.misc_tables
 
 
@@ -452,7 +508,12 @@ def organization(
         'audEERING'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.organization
 
 
@@ -479,7 +540,12 @@ def raters(
             {type: human}
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.raters
 
 
@@ -523,6 +589,7 @@ def schemes(
         name: str,
         *,
         version: str = None,
+        load_tables: bool = True,
         cache_root: str = None,
 ) -> typing.Dict:
     """Schemes of database.
@@ -530,6 +597,9 @@ def schemes(
     Args:
         name: name of database
         version: version of database
+        load_tables: if ``True``
+            it will download misc tables
+            used as labels in a scheme
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -541,7 +611,12 @@ def schemes(
         ['age', 'confidence', 'duration', 'emotion', 'gender', 'language', 'speaker', 'transcription']
 
     """  # noqa: E501
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=load_tables,
+        cache_root=cache_root,
+    )
     return db.schemes
 
 
@@ -567,7 +642,12 @@ def source(
         'http://emodb.bilderbar.info/download/download.zip'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.source
 
 
@@ -596,7 +676,12 @@ def splits(
           {description: Unofficial speaker-independent train split, type: train}
 
     """  # noqa: E501
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.splits
 
 
@@ -622,7 +707,12 @@ def tables(
         ['emotion', 'emotion.categories.test.gold_standard', 'emotion.categories.train.gold_standard', 'files']
 
     """  # noqa: E501
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.tables
 
 
@@ -648,5 +738,10 @@ def usage(
         'unrestricted'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.usage
