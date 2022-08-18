@@ -269,8 +269,8 @@ def header(
         name: name of database
         version: version of database
         load_tables: if ``True``
-            it will download misc tables
-            used as labels in a scheme
+            downloads misc tables
+            used by schemes
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -598,8 +598,8 @@ def schemes(
         name: name of database
         version: version of database
         load_tables: if ``True``
-            it will download misc tables
-            used as labels in a scheme
+            downloads misc tables
+            used by schemes
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
