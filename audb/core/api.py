@@ -42,7 +42,7 @@ def available(
         >>> audb.available(only_latest=True)
                    backend                                    host   repository version
         name
-        emodb  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.2.0
+        emodb  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.3.0
 
     """  # noqa: E501
     databases = []
@@ -126,7 +126,7 @@ def cached(
     Example:
         >>> db = audb.load(
         ...     'emodb',
-        ...     version='1.2.0',
+        ...     version='1.3.0',
         ...     only_metadata=True,
         ...     full_path=False,
         ...     verbose=False,
@@ -135,7 +135,7 @@ def cached(
         >>> print(df.iloc[0].to_string())
         name                emodb
         flavor_id        d3b62a9b
-        version             1.2.0
+        version             1.3.0
         complete            False
         bit_depth            None
         channels             None
@@ -245,7 +245,7 @@ def dependencies(
         dependency object
 
     Example:
-        >>> deps = dependencies('emodb', version='1.2.0')
+        >>> deps = dependencies('emodb', version='1.3.0')
         >>> deps.version('db.emotion.csv')
         '1.1.0'
 
@@ -324,13 +324,13 @@ def exists(
     Example:
         >>> db = audb.load(
         ...     'emodb',
-        ...     version='1.2.0',
+        ...     version='1.3.0',
         ...     only_metadata=True,
         ...     verbose=False,
         ... )
-        >>> audb.exists('emodb', version='1.2.0')
+        >>> audb.exists('emodb', version='1.3.0')
         True
-        >>> audb.exists('emodb', version='1.2.0', format='wav')
+        >>> audb.exists('emodb', version='1.3.0', format='wav')
         False
 
     """
@@ -406,8 +406,8 @@ def flavor_path(
             is requested
 
     Example:
-        >>> flavor_path('emodb', version='1.2.0').split(os.path.sep)
-        ['emodb', '1.2.0', 'd3b62a9b']
+        >>> flavor_path('emodb', version='1.3.0').split(os.path.sep)
+        ['emodb', '1.3.0', 'd3b62a9b']
 
     """
     flavor = Flavor(
@@ -437,7 +437,7 @@ def latest_version(
 
     Example:
         >>> latest_version('emodb')
-        '1.2.0'
+        '1.3.0'
 
     """
     vs = versions(name)
@@ -564,7 +564,7 @@ def repository(
         RuntimeError: if database is not found
 
     Example:
-        >>> audb.repository('emodb', '1.2.0')
+        >>> audb.repository('emodb', '1.3.0')
         Repository('data-public', 'https://audeering.jfrog.io/artifactory', 'artifactory')
 
     """  # noqa: E501
@@ -584,7 +584,7 @@ def versions(
 
     Example:
         >>> versions('emodb')
-        ['1.1.0', '1.1.1', '1.2.0']
+        ['1.1.0', '1.1.1', '1.2.0', '1.3.0']
 
     """
     vs = []

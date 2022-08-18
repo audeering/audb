@@ -17,9 +17,6 @@ jobs:
         tasks: [ tests ]
         include:
           - os: ubuntu-latest
-            python-version: 3.7
-            tasks: tests
-          - os: ubuntu-latest
             python-version: 3.9
             tasks: tests
           - os: ubuntu-latest

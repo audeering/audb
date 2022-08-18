@@ -36,11 +36,16 @@ def author(
         author(s) of database
 
     Example:
-        >>> author('emodb', version='1.2.0')
+        >>> author('emodb', version='1.3.0')
         'Felix Burkhardt, Astrid Paeschke, Miriam Rolfes, Walter Sendlmeier, Benjamin Weiss'
 
     """  # noqa: E501
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.author
 
 
@@ -72,7 +77,7 @@ def bit_depths(
             that is not part of the database
 
     Example:
-        >>> bit_depths('emodb', version='1.2.0')
+        >>> bit_depths('emodb', version='1.3.0')
         {16}
 
     """
@@ -108,7 +113,7 @@ def channels(
             that is not part of the database
 
     Example:
-        >>> channels('emodb', version='1.2.0')
+        >>> channels('emodb', version='1.3.0')
         {1}
 
     """
@@ -134,12 +139,17 @@ def description(
         description of database
 
     Example:
-        >>> desc = description('emodb', version='1.2.0')
+        >>> desc = description('emodb', version='1.3.0')
         >>> desc.split('.')[0]  # show first sentence
         'Berlin Database of Emotional Speech'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.description
 
 
@@ -171,9 +181,9 @@ def duration(
             that is not part of the database
 
     Example:
-        >>> duration('emodb', version='1.2.0')
+        >>> duration('emodb', version='1.3.0')
         Timedelta('0 days 00:24:47.092187500')
-        >>> duration('emodb', version='1.2.0', media=['wav/03a01Fa.wav'])
+        >>> duration('emodb', version='1.3.0', media=['wav/03a01Fa.wav'])
         Timedelta('0 days 00:00:01.898250')
 
     """
@@ -202,7 +212,7 @@ def files(
         media files
 
     Example:
-        >>> files('emodb', version='1.2.0')[:2]
+        >>> files('emodb', version='1.3.0')[:2]
         ['wav/03a01Fa.wav', 'wav/03a01Nc.wav']
 
     """
@@ -238,7 +248,7 @@ def formats(
             that is not part of the database
 
     Example:
-        >>> formats('emodb', version='1.2.0')
+        >>> formats('emodb', version='1.3.0')
         {'wav'}
 
     """
@@ -250,6 +260,7 @@ def header(
         name: str,
         *,
         version: str = None,
+        load_tables: bool = True,
         cache_root: str = None,
 ) -> audformat.Database:
     r"""Load header of database.
@@ -257,6 +268,9 @@ def header(
     Args:
         name: name of database
         version: version of database
+        load_tables: if ``True``
+            it will download misc tables
+            used as labels in a scheme
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -264,19 +278,23 @@ def header(
         database object without table data
 
     Example:
-        >>> db = header('emodb', version='1.2.0')
+        >>> db = header('emodb', version='1.3.0')
         >>> db.name
         'emodb'
 
     """
-    if version is None:
-        version = latest_version(name)
-
-    db_root = database_cache_root(name, version, cache_root)
-
-    with FolderLock(db_root):
-        db, _ = load_header(db_root, name, version)
-
+    db = load_header(name, version=version, cache_root=cache_root)
+    if load_tables:
+        for scheme in db.schemes.values():
+            if scheme.uses_table:
+                table = scheme.labels
+                load_table(
+                    name,
+                    table,
+                    version=version,
+                    cache_root=cache_root,
+                    verbose=False,
+                )
     return db
 
 
@@ -298,11 +316,16 @@ def languages(
         languages of database
 
     Example:
-        >>> languages('emodb', version='1.2.0')
+        >>> languages('emodb', version='1.3.0')
         ['deu']
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.languages
 
 
@@ -324,11 +347,16 @@ def license(
         license of database
 
     Example:
-        >>> license('emodb', version='1.2.0')
+        >>> license('emodb', version='1.3.0')
         'CC0-1.0'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.license
 
 
@@ -350,11 +378,16 @@ def license_url(
         license URL of database
 
     Example:
-        >>> license_url('emodb', version='1.2.0')
+        >>> license_url('emodb', version='1.3.0')
         'https://creativecommons.org/publicdomain/zero/1.0/'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.license_url
 
 
@@ -376,12 +409,17 @@ def media(
         media of database
 
     Example:
-        >>> media('emodb', version='1.2.0')
+        >>> media('emodb', version='1.3.0')
         microphone:
             {type: other, format: wav, channels: 1, sampling_rate: 16000}
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.media
 
 
@@ -403,13 +441,49 @@ def meta(
         meta information of database
 
     Example:
-        >>> meta('emodb', version='1.2.0')
+        >>> meta('emodb', version='1.3.0')
         pdf:
           http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&rep=rep1&type=pdf
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.meta
+
+
+def misc_tables(
+        name: str,
+        *,
+        version: str = None,
+        cache_root: str = None,
+) -> typing.Dict:
+    """Miscellaneous tables of database.
+
+    Args:
+        name: name of database
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+
+    Returns:
+        miscellaneous tables of database
+
+    Example:
+        >>> list(misc_tables('emodb', version='1.3.0'))
+        ['speaker']
+
+    """  # noqa: E501
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
+    return db.misc_tables
 
 
 def organization(
@@ -430,11 +504,16 @@ def organization(
         organization responsible for database
 
     Example:
-        >>> organization('emodb', version='1.2.0')
+        >>> organization('emodb', version='1.3.0')
         'audEERING'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.organization
 
 
@@ -456,12 +535,17 @@ def raters(
         raters of database
 
     Example:
-        >>> raters('emodb', version='1.2.0')
+        >>> raters('emodb', version='1.3.0')
         gold:
             {type: human}
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.raters
 
 
@@ -493,7 +577,7 @@ def sampling_rates(
             that is not part of the database
 
     Example:
-        >>> sampling_rates('emodb', version='1.2.0')
+        >>> sampling_rates('emodb', version='1.3.0')
         {16000}
 
     """
@@ -505,6 +589,7 @@ def schemes(
         name: str,
         *,
         version: str = None,
+        load_tables: bool = True,
         cache_root: str = None,
 ) -> typing.Dict:
     """Schemes of database.
@@ -512,6 +597,9 @@ def schemes(
     Args:
         name: name of database
         version: version of database
+        load_tables: if ``True``
+            it will download misc tables
+            used as labels in a scheme
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -519,11 +607,16 @@ def schemes(
         schemes of database
 
     Example:
-        >>> list(schemes('emodb', version='1.2.0'))
-        ['confidence', 'duration', 'emotion', 'speaker', 'transcription']
+        >>> list(schemes('emodb', version='1.3.0'))
+        ['age', 'confidence', 'duration', 'emotion', 'gender', 'language', 'speaker', 'transcription']
 
-    """
-    db = header(name, version=version, cache_root=cache_root)
+    """  # noqa: E501
+    db = header(
+        name,
+        version=version,
+        load_tables=load_tables,
+        cache_root=cache_root,
+    )
     return db.schemes
 
 
@@ -545,11 +638,16 @@ def source(
         source of database
 
     Example:
-        >>> source('emodb', version='1.2.0')
+        >>> source('emodb', version='1.3.0')
         'http://emodb.bilderbar.info/download/download.zip'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.source
 
 
@@ -571,14 +669,19 @@ def splits(
         splits of database
 
     Example:
-        >>> splits('emodb', version='1.2.0')
+        >>> splits('emodb', version='1.3.0')
         test:
           {description: Unofficial speaker-independent test split, type: test}
         train:
           {description: Unofficial speaker-independent train split, type: train}
 
     """  # noqa: E501
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.splits
 
 
@@ -600,11 +703,16 @@ def tables(
         tables of database
 
     Example:
-        >>> list(tables('emodb', version='1.2.0'))
+        >>> list(tables('emodb', version='1.3.0'))
         ['emotion', 'emotion.categories.test.gold_standard', 'emotion.categories.train.gold_standard', 'files']
 
     """  # noqa: E501
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.tables
 
 
@@ -626,9 +734,14 @@ def usage(
         usage of database
 
     Example:
-        >>> usage('emodb', version='1.2.0')
+        >>> usage('emodb', version='1.3.0')
         'unrestricted'
 
     """
-    db = header(name, version=version, cache_root=cache_root)
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
     return db.usage

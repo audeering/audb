@@ -78,13 +78,28 @@ def fixture_publish_db():
         num_files=5,
         columns={'emotion': ('scheme', None)}
     )
+    audformat.testing.add_misc_table(
+        db,
+        'misc-in-scheme',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
     db.schemes['speaker'] = audformat.Scheme(
         labels=['adam', 'eve']
+    )
+    db.schemes['misc'] = audformat.Scheme(
+        'int',
+        labels='misc-in-scheme',
     )
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
         ['adam', 'adam', 'eve', 'eve'],
+        index=audformat.filewise_index(db.files[:4]),
+    )
+    db['files']['misc'] = audformat.Column(scheme_id='misc')
+    db['files']['misc'].set(
+        [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
 
@@ -268,7 +283,7 @@ def test_load(format, version):
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:
         assert os.path.exists(os.path.join(db_root, file))
-    for table in db.tables:
+    for table in db:
         assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
         pd.testing.assert_frame_equal(
             db_original[table].df,
@@ -280,7 +295,7 @@ def test_load(format, version):
 
     deps = audb.dependencies(DB_NAME, version=version)
     assert str(deps().to_string()) == str(deps)
-    assert len(deps) == len(db.files) + len(db.tables)
+    assert len(deps) == len(db.files) + len(db.tables) + len(db.misc_tables)
 
     # from cache with full path
 
@@ -294,7 +309,7 @@ def test_load(format, version):
     )
     for file in db.files:
         assert os.path.exists(file)
-    for table in db.tables:
+    for table in db:
         assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
 
     files_duration = {
@@ -456,7 +471,7 @@ def test_load_to(version):
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:
         assert os.path.exists(os.path.join(db_root, file))
-    for table in db.tables:
+    for table in db:
         assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
         pd.testing.assert_frame_equal(
             db_original[table].df,

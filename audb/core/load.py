@@ -553,6 +553,18 @@ def _load_tables(
     return cached_versions
 
 
+def _misc_tables_used_in_scheme(
+        db: audformat.Database,
+) -> typing.List[str]:
+    r"""List of misc tables that are used inside a scheme."""
+    misc_tables_used_in_scheme = []
+    for scheme in db.schemes.values():
+        if scheme.uses_table:
+            misc_tables_used_in_scheme.append(scheme.labels)
+
+    return list(set(misc_tables_used_in_scheme))
+
+
 def _missing_media(
         db_root: str,
         media: typing.Sequence[str],
@@ -686,8 +698,12 @@ def filtered_dependencies(
     if tables is None and media is None:
         df = deps()
     else:
+        # Load header to get list of tables
+        db = load_header(name, version=version, cache_root=cache_root)
+        tables = filter_tables(tables, list(db))
+        tables = [t for t in tables if t not in list(db.misc_tables)]
+        # Gather media files from tables
         available_media = []
-        tables = filter_tables(tables, deps.table_ids)
         for table in tables:
             df = load_table(
                 name,
@@ -700,8 +716,12 @@ def filtered_dependencies(
                 df.index.get_level_values('file').unique()
             )
 
-        media = filter_media(media, deps.media, name, version)
-        available_media = [m for m in media if m in list(set(available_media))]
+        if len(available_media) > 0:
+            media = filter_media(media, deps.media, name, version)
+            available_media = [
+                m for m in media
+                if m in list(set(available_media))
+            ]
         df = deps().loc[available_media]
 
     return df
@@ -795,7 +815,7 @@ def load(
     Example:
         >>> db = audb.load(
         ...     'emodb',
-        ...     version='1.2.0',
+        ...     version='1.3.0',
         ...     tables=['emotion', 'files'],
         ...     only_metadata=True,
         ...     full_path=False,
@@ -834,7 +854,7 @@ def load(
         with FolderLock(db_root, timeout=timeout):
 
             # Start with database header without tables
-            db, backend = load_header(
+            db, backend = load_header_to(
                 db_root,
                 name,
                 version,
@@ -844,24 +864,39 @@ def load(
 
             db_is_complete = _database_is_complete(db)
 
-            # filter tables
-            requested_tables = filter_tables(tables, deps.table_ids)
+            # filter tables (convert regexp pattern to list of tables)
+            requested_tables = filter_tables(tables, list(db))
+
+            # add/split into misc tables used in a scheme
+            # and all other (misc) tables
+            requested_misc_tables = _misc_tables_used_in_scheme(db)
+            requested_tables = [
+                table for table in requested_tables
+                if table not in requested_misc_tables
+            ]
 
             # load missing tables
             if not db_is_complete:
-                cached_versions = _load_tables(
-                    requested_tables,
-                    backend,
-                    db_root,
-                    db,
-                    version,
-                    cached_versions,
-                    deps,
-                    flavor,
-                    cache_root,
-                    num_workers,
-                    verbose,
-                )
+                for _tables in [
+                        requested_misc_tables,
+                        requested_tables,
+                ]:
+                    # need to load misc tables used in a scheme first
+                    # as loading is done in parallel
+                    cached_versions = _load_tables(
+                        _tables,
+                        backend,
+                        db_root,
+                        db,
+                        version,
+                        cached_versions,
+                        deps,
+                        flavor,
+                        cache_root,
+                        num_workers,
+                        verbose,
+                    )
+            requested_tables = requested_misc_tables + requested_tables
 
             # filter tables
             if tables is not None:
@@ -931,6 +966,35 @@ def load(
 
 
 def load_header(
+        name: str,
+        *,
+        version: str = None,
+        cache_root: str = None,
+) -> audformat.Database:
+    r"""Load header of database.
+
+    Args:
+        name: name of database
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+
+    Returns:
+        database object without table data
+
+    """
+    if version is None:
+        version = latest_version(name)
+
+    db_root = database_cache_root(name, version, cache_root)
+
+    with FolderLock(db_root):
+        db, _ = load_header_to(db_root, name, version)
+
+    return db
+
+
+def load_header_to(
         db_root: str,
         name: str,
         version: str,
@@ -1055,12 +1119,12 @@ def load_media(
         >>> paths = load_media(
         ...     'emodb',
         ...     ['wav/03a01Fa.wav'],
-        ...     version='1.2.0',
+        ...     version='1.3.0',
         ...     format='flac',
         ...     verbose=False,
         ... )
         >>> paths[0].split(os.path.sep)[-5:]
-        ['emodb', '1.2.0', '40bb2241', 'wav', '03a01Fa.flac']
+        ['emodb', '1.3.0', '40bb2241', 'wav', '03a01Fa.flac']
 
     """
     media = audeer.to_list(media)
@@ -1106,7 +1170,7 @@ def load_media(
         with FolderLock(db_root, timeout=timeout):
 
             # Start with database header without tables
-            db, backend = load_header(
+            db, backend = load_header_to(
                 db_root,
                 name,
                 version,
@@ -1186,7 +1250,7 @@ def load_table(
         >>> df = load_table(
         ...     'emodb',
         ...     'emotion',
-        ...     version='1.2.0',
+        ...     version='1.3.0',
         ...     verbose=False,
         ... )
         >>> df[:3]
@@ -1225,32 +1289,34 @@ def load_table(
     with FolderLock(db_root):
 
         # Start with database header without tables
-        db, backend = load_header(
+        db, backend = load_header_to(
             db_root,
             name,
             version,
         )
 
         # Load table
-        table_file = os.path.join(db_root, f'db.{table}')
-        if not (
-                os.path.exists(f'{table_file}.csv')
-                or os.path.exists(f'{table_file}.pkl')
-        ):
-            _load_tables(
-                [table],
-                backend,
-                db_root,
-                db,
-                version,
-                None,
-                deps,
-                Flavor(),
-                cache_root,
-                num_workers,
-                verbose,
-            )
-        table = audformat.Table()
-        table.load(table_file)
+        tables = _misc_tables_used_in_scheme(db) + [table]
+        for table in tables:
+            table_file = os.path.join(db_root, f'db.{table}')
+            if not (
+                    os.path.exists(f'{table_file}.csv')
+                    or os.path.exists(f'{table_file}.pkl')
+            ):
+                _load_tables(
+                    [table],
+                    backend,
+                    db_root,
+                    db,
+                    version,
+                    None,
+                    deps,
+                    Flavor(),
+                    cache_root,
+                    num_workers,
+                    verbose,
+                )
+            table = audformat.Table()
+            table.load(table_file)
 
     return table._df

@@ -15,7 +15,7 @@ from audb.core.api import (
 from audb.core.dependencies import Dependencies
 from audb.core.load import (
     database_tmp_root,
-    load_header,
+    load_header_to,
 )
 
 
@@ -72,7 +72,7 @@ def _find_tables(
 
     audeer.run_tasks(
         job,
-        params=[([table], {}) for table in db_header.tables],
+        params=[([table], {}) for table in list(db_header)],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Find tables',
@@ -278,7 +278,7 @@ def load_to(
 
     # load database header without tables from backend
 
-    db_header, backend = load_header(
+    db_header, backend = load_header_to(
         db_root_tmp,
         name,
         version,

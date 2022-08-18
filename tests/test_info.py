@@ -35,7 +35,7 @@ DB = audformat.Database(
     meta={'foo': 'bar'}
 )
 DB.media['media'] = audformat.Media()
-DB.schemes['scheme'] = audformat.Scheme()
+DB.schemes['scheme1'] = audformat.Scheme()
 DB.splits['split'] = audformat.Split()
 DB.raters['rater'] = audformat.Rater()
 DB['table1'] = audformat.Table(
@@ -46,7 +46,7 @@ DB['table1'] = audformat.Table(
     split_id='split',
 )
 DB['table1']['column'] = audformat.Column(
-    scheme_id='scheme',
+    scheme_id='scheme1',
     rater_id='rater',
 )
 DB['table2'] = audformat.Table(
@@ -59,8 +59,18 @@ DB['table2'] = audformat.Table(
     split_id='split',
 )
 DB['table2']['column'] = audformat.Column(
-    scheme_id='scheme',
+    scheme_id='scheme1',
     rater_id='rater',
+)
+DB['misc-in-scheme'] = audformat.MiscTable(
+    pd.Index([0, 1], name='idx')
+)
+DB['misc-not-in-scheme'] = audformat.MiscTable(
+    pd.Index([0, 1], name='idx')
+)
+DB.schemes['scheme2'] = audformat.Scheme(
+    'int',
+    labels='misc-in-scheme',
 )
 
 DB_ROOT = os.path.join(pytest.ROOT, 'db')
@@ -124,7 +134,16 @@ def test_author():
 
 
 def test_header():
-    assert str(audb.info.header(DB_NAME)) == str(DB)
+    # Load header without loading misc tables
+    db = audb.info.header(DB_NAME, load_tables=False)
+    assert str(db) == str(DB)
+    error_msg = 'No file found for table with path'
+    with pytest.raises(RuntimeError, match=error_msg):
+        assert 0 in db.schemes['scheme2']
+    # Load header with tables
+    db = audb.info.header(DB_NAME)
+    assert str(db) == str(DB)
+    assert 0 in db.schemes['scheme2']
 
 
 def test_bit_depths():
@@ -159,6 +178,8 @@ def test_description():
         (None, []),
         ('', ''),
         ('table1', None),
+        ('misc-in-scheme', None),
+        ('misc-not-in-scheme', None),
         (None, ['f11.wav', 'f12.wav']),
         ('table1', ['f11.wav', 'f12.wav']),
         # Error as tables and media do not overlap
@@ -220,6 +241,10 @@ def test_meta():
     assert audb.info.meta(DB_NAME) == DB.meta
 
 
+def test_misc_tables():
+    assert str(audb.info.misc_tables(DB_NAME)) == str(DB.misc_tables)
+
+
 def test_organization():
     assert audb.info.organization(DB_NAME) == DB.organization
 
@@ -239,7 +264,16 @@ def test_sampling_rates():
 
 
 def test_schemes():
-    assert str(audb.info.schemes(DB_NAME)) == str(DB.schemes)
+    # Load schemes without loading misc tables
+    schemes = audb.info.schemes(DB_NAME, load_tables=False)
+    assert str(schemes) == str(DB.schemes)
+    error_msg = 'No file found for table with path'
+    with pytest.raises(RuntimeError, match=error_msg):
+        assert 0 in schemes['scheme2']
+    # Load header with tables
+    schemes = audb.info.schemes(DB_NAME)
+    str(schemes) == str(DB.schemes)
+    assert 0 in schemes['scheme2']
 
 
 def test_splits():

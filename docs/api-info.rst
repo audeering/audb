@@ -68,6 +68,11 @@ meta
 
 .. autofunction:: meta
 
+misc_tables
+-----------
+
+.. autofunction:: misc_tables
+
 organization
 ------------
 

@@ -23,7 +23,7 @@ r"""Get information from database headers.
 
     audb.load(
         'emodb',
-        version='1.2.0',
+        version='1.3.0',
         only_metadata=True,
         verbose=False,
     )
@@ -39,7 +39,7 @@ So instead of running:
 
     db = audb.load(
         'emodb',
-        version='1.2.0',
+        version='1.3.0',
         only_metadata=True,
         verbose=False,
     )
@@ -51,7 +51,7 @@ You can run:
 
     audb.info.tables(
         'emodb',
-        version='1.2.0',
+        version='1.3.0',
     )
 
 """
@@ -69,6 +69,7 @@ from audb.core.info import (
     license_url,
     media,
     meta,
+    misc_tables,
     organization,
     raters,
     sampling_rates,

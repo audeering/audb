@@ -4,6 +4,7 @@ import re
 import shutil
 
 import numpy as np
+import pandas as pd
 import pytest
 
 import audbackend
@@ -64,13 +65,34 @@ def fixture_publish_db():
         num_files=5,
         columns={'emotion': ('scheme', None)}
     )
+    audformat.testing.add_misc_table(
+        db,
+        'misc-in-scheme',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
+    audformat.testing.add_misc_table(
+        db,
+        'misc-not-in-scheme',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
     db.schemes['speaker'] = audformat.Scheme(
         labels=['adam', '11']
+    )
+    db.schemes['misc'] = audformat.Scheme(
+        'int',
+        labels='misc-in-scheme',
     )
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
         ['adam', 'adam', 'adam', '11'],
+        index=audformat.filewise_index(db.files[:4]),
+    )
+    db['files']['misc'] = audformat.Column(scheme_id='misc')
+    db['files']['misc'].set(
+        [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
     db.save(
@@ -113,13 +135,34 @@ def fixture_publish_db():
         num_files=5,
         columns={'emotion': ('scheme', None)}
     )
+    audformat.testing.add_misc_table(
+        db,
+        'misc-in-scheme',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
+    audformat.testing.add_misc_table(
+        db,
+        'misc-not-in-scheme',
+        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
+        columns={'emotion': ('scheme', None)}
+    )
     db.schemes['speaker'] = audformat.Scheme(
         labels=['adam', '11']
+    )
+    db.schemes['misc'] = audformat.Scheme(
+        'int',
+        labels='misc-in-scheme',
     )
     db['files'] = audformat.Table(db.files)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set(
         ['adam', 'adam', 'adam', '11'],
+        index=audformat.filewise_index(db.files[:4]),
+    )
+    db['files']['misc'] = audformat.Column(scheme_id='misc')
+    db['files']['misc'].set(
+        [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
     db.save(DB_ROOT_VERSION['6.0.0'])
