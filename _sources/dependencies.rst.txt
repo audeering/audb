@@ -45,7 +45,7 @@ You request a :class:`audb.Dependencies` object with
 
 .. jupyter-execute::
 
-    deps = audb.dependencies('emodb', version='1.2.0')
+    deps = audb.dependencies('emodb', version='1.3.0')
 
 You can see all entries by calling the returned object.
 
@@ -72,7 +72,7 @@ in the database dependency table.
 
 .. jupyter-execute::
 
-    deps = audb.dependencies('emodb', version='1.2.0')
+    deps = audb.dependencies('emodb', version='1.3.0')
     df = deps()
     df.duration[:10]
 
@@ -81,7 +81,7 @@ you can get their overall duration with:
 
 .. jupyter-execute::
 
-    audb.info.duration('emodb', version='1.2.0')
+    audb.info.duration('emodb', version='1.3.0')
 
 The duration of parts of a database
 can be calculated
@@ -95,7 +95,7 @@ of the emodb database.
 
     import numpy as np
 
-    df = audb.load_table('emodb', 'emotion', version='1.2.0', verbose=False)
+    df = audb.load_table('emodb', 'emotion', version='1.3.0', verbose=False)
     files = df.index[:10]
     duration_in_sec = np.sum([deps.duration(f) for f in files])
     pd.to_timedelta(duration_in_sec, unit='s')

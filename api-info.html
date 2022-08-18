@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.3.0
+                v1.4.0
               </div>
             
           
@@ -127,6 +127,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#license-url">license_url</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#media">media</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#meta">meta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#misc-tables">misc_tables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#organization">organization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#raters">raters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sampling-rates">sampling_rates</a></li>
@@ -199,7 +200,7 @@ provide you direct access to this information.</p>
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
     <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
@@ -240,7 +241,7 @@ files:
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -296,7 +297,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">author</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">author</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">&#39;Felix Burkhardt, Astrid Paeschke, Miriam Rolfes, Walter Sendlmeier, Benjamin Weiss&#39;</span>
 </pre></div>
 </div>
@@ -334,7 +335,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bit_depths</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bit_depths</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">{16}</span>
 </pre></div>
 </div>
@@ -372,7 +373,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">channels</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">channels</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">{1}</span>
 </pre></div>
 </div>
@@ -402,7 +403,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span> <span class="o">=</span> <span class="n">description</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span> <span class="o">=</span> <span class="n">description</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># show first sentence</span>
 <span class="go">&#39;Berlin Database of Emotional Speech&#39;</span>
 </pre></div>
@@ -441,9 +442,9 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">Timedelta(&#39;0 days 00:24:47.092187500&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">,</span> <span class="n">media</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;wav/03a01Fa.wav&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">duration</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span> <span class="n">media</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;wav/03a01Fa.wav&#39;</span><span class="p">])</span>
 <span class="go">Timedelta(&#39;0 days 00:00:01.898250&#39;)</span>
 </pre></div>
 </div>
@@ -473,7 +474,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
 <span class="go">[&#39;wav/03a01Fa.wav&#39;, &#39;wav/03a01Nc.wav&#39;]</span>
 </pre></div>
 </div>
@@ -511,7 +512,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formats</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formats</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">{&#39;wav&#39;}</span>
 </pre></div>
 </div>
@@ -522,26 +523,29 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 <h2>header<a class="headerlink" href="#header" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.header">
-<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.header" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load header of database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
 <li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version of database</p></li>
+<li><p><strong>load_tables</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>
+downloads misc tables
+used by schemes</p></li>
 <li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
 If not set <a class="reference internal" href="api.html#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.14.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.15.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>database object without table data</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">header</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">header</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;emodb&#39;</span>
 </pre></div>
@@ -572,7 +576,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">languages</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">languages</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">[&#39;deu&#39;]</span>
 </pre></div>
 </div>
@@ -602,7 +606,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">license</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">license</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">&#39;CC0-1.0&#39;</span>
 </pre></div>
 </div>
@@ -632,7 +636,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">license_url</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">license_url</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">&#39;https://creativecommons.org/publicdomain/zero/1.0/&#39;</span>
 </pre></div>
 </div>
@@ -662,7 +666,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">media</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">media</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">microphone:</span>
 <span class="go">    {type: other, format: wav, channels: 1, sampling_rate: 16000}</span>
 </pre></div>
@@ -693,9 +697,39 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">pdf:</span>
 <span class="go">  http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&amp;rep=rep1&amp;type=pdf</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="misc-tables">
+<h2>misc_tables<a class="headerlink" href="#misc-tables" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="audb.info.misc_tables">
+<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">misc_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#misc_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.misc_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Miscellaneous tables of database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version of database</p></li>
+<li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
+If not set <a class="reference internal" href="api.html#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>miscellaneous tables of database</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">misc_tables</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">))</span>
+<span class="go">[&#39;speaker&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -724,7 +758,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">organization</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">organization</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">&#39;audEERING&#39;</span>
 </pre></div>
 </div>
@@ -754,7 +788,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">raters</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">raters</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">gold:</span>
 <span class="go">    {type: human}</span>
 </pre></div>
@@ -793,7 +827,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampling_rates</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampling_rates</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">{16000}</span>
 </pre></div>
 </div>
@@ -804,13 +838,16 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 <h2>schemes<a class="headerlink" href="#schemes" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.info.schemes">
-<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">schemes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#schemes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.schemes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audb.info.</span></span><span class="sig-name descname"><span class="pre">schemes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/info.html#schemes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.info.schemes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Schemes of database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of database</p></li>
 <li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – version of database</p></li>
+<li><p><strong>load_tables</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>
+downloads misc tables
+used by schemes</p></li>
 <li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where databases are stored.
 If not set <a class="reference internal" href="api.html#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
 </ul>
@@ -823,8 +860,8 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">schemes</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">))</span>
-<span class="go">[&#39;confidence&#39;, &#39;duration&#39;, &#39;emotion&#39;, &#39;speaker&#39;, &#39;transcription&#39;]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">schemes</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">))</span>
+<span class="go">[&#39;age&#39;, &#39;confidence&#39;, &#39;duration&#39;, &#39;emotion&#39;, &#39;gender&#39;, &#39;language&#39;, &#39;speaker&#39;, &#39;transcription&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -853,7 +890,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">&#39;http://emodb.bilderbar.info/download/download.zip&#39;</span>
 </pre></div>
 </div>
@@ -883,7 +920,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">splits</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">splits</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">test:</span>
 <span class="go">  {description: Unofficial speaker-independent test split, type: test}</span>
 <span class="go">train:</span>
@@ -916,7 +953,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">tables</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">tables</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">))</span>
 <span class="go">[&#39;emotion&#39;, &#39;emotion.categories.test.gold_standard&#39;, &#39;emotion.categories.train.gold_standard&#39;, &#39;files&#39;]</span>
 </pre></div>
 </div>
@@ -946,7 +983,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">usage</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.2.0&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">usage</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
 <span class="go">&#39;unrestricted&#39;</span>
 </pre></div>
 </div>
@@ -978,7 +1015,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/07/14 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/08/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1019,7 +1056,7 @@ If not set <a class="reference internal" href="api.html#audb.default_cache_root"
         <script src="_static/copybutton.js"></script>
         <script src="_static/thebelab-helper.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   
