@@ -7,6 +7,24 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.4.0 (2022-08-18)
+--------------------------
+
+* Added: support for ``audformat``'s newly introduced misc tables
+* Added: ``audb.info.misc_tables()``
+* Added: ``load_tables=True`` argument to
+  ``audb.info.header()``
+  and ``audb.info.schemes()``
+  specifying if misc tables
+  used as labels
+  in a scheme
+  should be downloaded
+* Changed: require ``audformat >=0.15.2``
+* changed: use version 1.3.0 of emodb
+  in the documentation examples
+* Removed: support for Python 3.7
+
+
 Version 1.3.0 (2022-07-14)
 --------------------------
 
