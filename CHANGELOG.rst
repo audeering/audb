@@ -20,7 +20,7 @@ Version 1.4.0 (2022-08-18)
   in a scheme
   should be downloaded
 * Changed: require ``audformat >=0.15.2``
-* changed: use version 1.3.0 of emodb
+* Changed: use version 1.3.0 of emodb
   in the documentation examples
 * Removed: support for Python 3.7
 
