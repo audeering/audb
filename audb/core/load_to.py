@@ -110,7 +110,12 @@ def _get_media(
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
             archive,
         )
-        files = backend.get_archive(archive, db_root_tmp, version)
+        files = backend.get_archive(
+            archive,
+            db_root_tmp,
+            version,
+            tmp_root=db_root_tmp,
+        )
         for file in files:
             audeer.move_file(
                 os.path.join(db_root_tmp, file),
@@ -153,7 +158,12 @@ def _get_tables(
             define.DEPEND_TYPE_NAMES[define.DependType.META],
             deps.archive(table),
         )
-        backend.get_archive(archive, db_root_tmp, deps.version(table))
+        backend.get_archive(
+            archive,
+            db_root_tmp,
+            deps.version(table),
+            tmp_root=db_root_tmp,
+        )
         audeer.move_file(
             os.path.join(db_root_tmp, table),
             os.path.join(db_root, table),
