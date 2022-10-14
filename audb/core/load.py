@@ -248,7 +248,12 @@ def _get_media_from_backend(
         )
         # extract and move all files that are stored in the archive,
         # even if only a single file from the archive was requested
-        files = backend.get_archive(archive, db_root_tmp, version)
+        files = backend.get_archive(
+            archive,
+            db_root_tmp,
+            version,
+            tmp_root=db_root_tmp,
+        )
         for file in files:
             if flavor is not None:
                 bit_depth = deps.bit_depth(file)
@@ -352,6 +357,7 @@ def _get_tables_from_backend(
             archive,
             db_root_tmp,
             deps.version(table),
+            tmp_root=db_root_tmp,
         )
         table_id = table[3:-4]
         table_path = os.path.join(db_root_tmp, f'db.{table_id}')
