@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.4.1 (2022-10-17)
+--------------------------
+
+* Changed: ``audb.load()`` and ``audb.load_to()``
+  extract archives in the corresponding database folder
+  inside the ``audb`` cache
+  instead of the system wide cache
+
+
 Version 1.4.0 (2022-08-18)
 --------------------------
 
