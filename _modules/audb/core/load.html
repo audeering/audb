@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                v1.4.0
+                v1.4.1
               </div>
             
           
@@ -405,7 +405,12 @@
         <span class="p">)</span>
         <span class="c1"># extract and move all files that are stored in the archive,</span>
         <span class="c1"># even if only a single file from the archive was requested</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+            <span class="n">archive</span><span class="p">,</span>
+            <span class="n">db_root_tmp</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">tmp_root</span><span class="o">=</span><span class="n">db_root_tmp</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">flavor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
@@ -509,6 +514,7 @@
             <span class="n">archive</span><span class="p">,</span>
             <span class="n">db_root_tmp</span><span class="p">,</span>
             <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">table</span><span class="p">),</span>
+            <span class="n">tmp_root</span><span class="o">=</span><span class="n">db_root_tmp</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">table_id</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
         <span class="n">table_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -1492,7 +1498,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/08/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1529,6 +1535,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>
         <script src="../../../_static/thebelab-helper.js"></script>

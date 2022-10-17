@@ -74,7 +74,7 @@
             
             
               <div class="version">
-                v1.4.0
+                v1.4.1
               </div>
             
           
@@ -113,25 +113,127 @@
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">audb</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#available">available</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#cached">cached</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#config">config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#default-cache-root">default_cache_root</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id1">dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#exists">exists</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#flavor">Flavor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#flavor-path">flavor_path</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#latest-version">latest_version</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#load">load</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#load-media">load_media</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#load-table">load_table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#load-to">load_to</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#publish">publish</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#remove-media">remove_media</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#repository">Repository</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">repository</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#versions">versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#available">available</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.available"><code class="docutils literal notranslate"><span class="pre">available()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#cached">cached</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.cached"><code class="docutils literal notranslate"><span class="pre">cached()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#config">config</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.config"><code class="docutils literal notranslate"><span class="pre">config</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#audb.config.CACHE_ROOT"><code class="docutils literal notranslate"><span class="pre">config.CACHE_ROOT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.config.REPOSITORIES"><code class="docutils literal notranslate"><span class="pre">config.REPOSITORIES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.config.SHARED_CACHE_ROOT"><code class="docutils literal notranslate"><span class="pre">config.SHARED_CACHE_ROOT</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.Dependencies"><code class="docutils literal notranslate"><span class="pre">Dependencies</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.__call__"><code class="docutils literal notranslate"><span class="pre">Dependencies.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.__contains__"><code class="docutils literal notranslate"><span class="pre">Dependencies.__contains__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.__getitem__"><code class="docutils literal notranslate"><span class="pre">Dependencies.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.__weakref__"><code class="docutils literal notranslate"><span class="pre">Dependencies.__weakref__</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.archive"><code class="docutils literal notranslate"><span class="pre">Dependencies.archive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.archives"><code class="docutils literal notranslate"><span class="pre">Dependencies.archives</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.bit_depth"><code class="docutils literal notranslate"><span class="pre">Dependencies.bit_depth()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.channels"><code class="docutils literal notranslate"><span class="pre">Dependencies.channels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.checksum"><code class="docutils literal notranslate"><span class="pre">Dependencies.checksum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.duration"><code class="docutils literal notranslate"><span class="pre">Dependencies.duration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.files"><code class="docutils literal notranslate"><span class="pre">Dependencies.files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.format"><code class="docutils literal notranslate"><span class="pre">Dependencies.format()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.load"><code class="docutils literal notranslate"><span class="pre">Dependencies.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.media"><code class="docutils literal notranslate"><span class="pre">Dependencies.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.removed"><code class="docutils literal notranslate"><span class="pre">Dependencies.removed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.removed_media"><code class="docutils literal notranslate"><span class="pre">Dependencies.removed_media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.sampling_rate"><code class="docutils literal notranslate"><span class="pre">Dependencies.sampling_rate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.save"><code class="docutils literal notranslate"><span class="pre">Dependencies.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.table_ids"><code class="docutils literal notranslate"><span class="pre">Dependencies.table_ids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.tables"><code class="docutils literal notranslate"><span class="pre">Dependencies.tables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.type"><code class="docutils literal notranslate"><span class="pre">Dependencies.type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Dependencies.version"><code class="docutils literal notranslate"><span class="pre">Dependencies.version()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#default-cache-root">default_cache_root</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.default_cache_root"><code class="docutils literal notranslate"><span class="pre">default_cache_root()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#exists">exists</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.exists"><code class="docutils literal notranslate"><span class="pre">exists()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#flavor">Flavor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.Flavor"><code class="docutils literal notranslate"><span class="pre">Flavor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Flavor.__call__"><code class="docutils literal notranslate"><span class="pre">Flavor.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Flavor.bit_depth"><code class="docutils literal notranslate"><span class="pre">Flavor.bit_depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Flavor.channels"><code class="docutils literal notranslate"><span class="pre">Flavor.channels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Flavor.destination"><code class="docutils literal notranslate"><span class="pre">Flavor.destination()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Flavor.format"><code class="docutils literal notranslate"><span class="pre">Flavor.format</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Flavor.mixdown"><code class="docutils literal notranslate"><span class="pre">Flavor.mixdown</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Flavor.path"><code class="docutils literal notranslate"><span class="pre">Flavor.path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Flavor.sampling_rate"><code class="docutils literal notranslate"><span class="pre">Flavor.sampling_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Flavor.short_id"><code class="docutils literal notranslate"><span class="pre">Flavor.short_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#flavor-path">flavor_path</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.flavor_path"><code class="docutils literal notranslate"><span class="pre">flavor_path()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#latest-version">latest_version</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.latest_version"><code class="docutils literal notranslate"><span class="pre">latest_version()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#load">load</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#load-media">load_media</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.load_media"><code class="docutils literal notranslate"><span class="pre">load_media()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#load-table">load_table</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.load_table"><code class="docutils literal notranslate"><span class="pre">load_table()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#load-to">load_to</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.load_to"><code class="docutils literal notranslate"><span class="pre">load_to()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#publish">publish</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.publish"><code class="docutils literal notranslate"><span class="pre">publish()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#remove-media">remove_media</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.remove_media"><code class="docutils literal notranslate"><span class="pre">remove_media()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#repository">Repository</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.Repository"><code class="docutils literal notranslate"><span class="pre">Repository</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Repository.backend"><code class="docutils literal notranslate"><span class="pre">Repository.backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Repository.host"><code class="docutils literal notranslate"><span class="pre">Repository.host</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#audb.Repository.name"><code class="docutils literal notranslate"><span class="pre">Repository.name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">repository</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.repository"><code class="docutils literal notranslate"><span class="pre">repository()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#versions">versions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audb.versions"><code class="docutils literal notranslate"><span class="pre">versions()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
@@ -190,7 +292,7 @@
 <dd class="field-odd"><p><strong>only_latest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – include only latest version of database</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>table with database name as index,
@@ -225,7 +327,7 @@ it will show only cached versions of that database</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>cached databases
@@ -362,7 +464,7 @@ but also what version of the file is required.</p>
 <dd><p>Return dependencies as a table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>table with dependencies</p>
@@ -1058,7 +1160,7 @@ To get the absolute path, do:</p>
 <span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/audb/core/load.html#load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load database.</p>
 <p>Loads meta and media files of a database to the local cache and returns
-a <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.15.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
+a <a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.15.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
 <p>By setting
 <code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>,
 <code class="docutils literal notranslate"><span class="pre">channels</span></code>,
@@ -1111,7 +1213,7 @@ database can be accessed</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.15.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.15.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>database object</p>
@@ -1245,7 +1347,7 @@ processors on the machine multiplied by 5</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>database table</p>
@@ -1303,7 +1405,7 @@ processors on the machine multiplied by 5</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.15.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://audeering.github.io/audformat/api.html#audformat.Database" title="(in audformat vv0.15.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>database object</p>
@@ -1546,7 +1648,7 @@ is given by <a class="reference internal" href="#audb.config.REPOSITORIES" title
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/08/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1583,6 +1685,7 @@ is given by <a class="reference internal" href="#audb.config.REPOSITORIES" title
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
         <script src="_static/thebelab-helper.js"></script>
