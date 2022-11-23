@@ -68,6 +68,10 @@ autodoc_mock_imports = [
 ]
 graphviz_output_format = 'svg'
 
+# Disable auto-generation of TOC entries in the API
+# https://github.com/sphinx-doc/sphinx/issues/6316
+toc_object_entries = False
+
 # HTML --------------------------------------------------------------------
 html_theme = 'sphinx_audeering_theme'
 html_theme_options = {
