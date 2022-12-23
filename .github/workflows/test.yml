@@ -13,14 +13,17 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
-        python-version: [ 3.8 ]
+        python-version: [ '3.8' ]
         tasks: [ tests ]
         include:
           - os: ubuntu-latest
-            python-version: 3.9
+            python-version: '3.9'
             tasks: tests
           - os: ubuntu-latest
-            python-version: 3.8
+            python-version: '3.10'
+            tasks: tests
+          - os: ubuntu-latest
+            python-version: '3.8'
             tasks: docs
 
     steps:
