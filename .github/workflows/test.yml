@@ -24,16 +24,16 @@ jobs:
             tasks: docs
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Cache emodb
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/audb
         key: emodb-1.2.0
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -72,7 +72,7 @@ jobs:
       if: matrix.tasks == 'tests'
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
