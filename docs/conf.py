@@ -60,6 +60,7 @@ linkcheck_ignore = [
         'https://github.com/audeering/audbackend/blob/'
         'edd23462799ae9052a43cdd045698f78e19dbcaf'
     ),
+    'http://emodb.bilderbar.info/start.html',
 ]
 # Ignore package dependencies during building the docs
 # This fixes URL link issues with pandas and sphinx_autodoc_typehints
