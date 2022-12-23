@@ -17,7 +17,7 @@ author = config['metadata']['author']
 copyright = f'2020-{date.today().year} audEERING GmbH'
 project = config['metadata']['name']
 version = audeer.git_repo_version()
-title = f'Documentation'
+title = 'Documentation'
 
 
 # General -----------------------------------------------------------------
