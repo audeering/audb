@@ -2,7 +2,6 @@ import os
 
 import audeer
 
-from audb.core import define
 from audb.core.config import config
 from audb.core.flavor import Flavor
 

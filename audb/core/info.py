@@ -5,17 +5,12 @@ import pandas as pd
 import audformat
 
 from audb.core import define
-from audb.core.api import (
-    dependencies,
-    database_cache_root,
-    latest_version,
-)
+from audb.core.api import dependencies
 from audb.core.load import (
     filtered_dependencies,
     load_header,
     load_table,
 )
-from audb.core.lock import FolderLock
 
 
 def author(

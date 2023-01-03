@@ -6,8 +6,6 @@ import typing
 import pandas as pd
 
 import audeer
-import audformat
-import audiofile
 
 from audb.core import define
 
