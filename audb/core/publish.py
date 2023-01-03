@@ -1,9 +1,7 @@
 import collections
 import os
 import shutil
-import sys
 import tempfile
-import time
 import typing
 
 import audbackend
@@ -14,7 +12,6 @@ import audiofile
 from audb.core import define
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
-from audb.core.load import load_media
 from audb.core.repository import Repository
 
 

@@ -4,8 +4,6 @@ import shutil
 import pandas as pd
 import pytest
 
-import audiofile
-
 import audformat.testing
 import audeer
 
