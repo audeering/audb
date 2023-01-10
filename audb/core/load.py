@@ -24,8 +24,7 @@ from audb.core.cache import (
 from audb.core.dependencies import (
     Dependencies,
     error_message_missing_object,
-    filter_media,
-    filter_tables,
+    filter_deps,
 )
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
@@ -705,7 +704,7 @@ def filtered_dependencies(
     else:
         # Load header to get list of tables
         db = load_header(name, version=version, cache_root=cache_root)
-        tables = filter_tables(tables, list(db))
+        tables = filter_deps(tables, list(db), 'table')
         tables = [t for t in tables if t not in list(db.misc_tables)]
         # Gather media files from tables
         available_media = []
@@ -722,7 +721,7 @@ def filtered_dependencies(
             )
 
         if len(available_media) > 0:
-            media = filter_media(media, deps.media, name, version)
+            media = filter_deps(media, deps.media, 'media', name, version)
             available_media = [
                 m for m in media
                 if m in list(set(available_media))
@@ -870,7 +869,7 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # filter tables (convert regexp pattern to list of tables)
-            requested_tables = filter_tables(tables, list(db))
+            requested_tables = filter_deps(tables, list(db), 'table')
 
             # add/split into misc tables used in a scheme
             # and all other (misc) tables
@@ -912,7 +911,13 @@ def load(
                 db[table].load(os.path.join(db_root, f'db.{table}'))
 
             # filter media
-            requested_media = filter_media(media, db.files, name, version)
+            requested_media = filter_deps(
+                media,
+                db.files,
+                'media',
+                name,
+                version,
+            )
 
             # load missing media
             if not db_is_complete and not only_metadata:
@@ -1164,7 +1169,7 @@ def load_media(
     for media_file in media:
         if media_file not in available_files:
             msg = error_message_missing_object(
-                'media file',
+                'media',
                 [media_file],
                 name,
                 version,

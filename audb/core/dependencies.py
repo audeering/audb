@@ -13,7 +13,8 @@ from audb.core import define
 class Dependencies:
     r"""Dependencies of a database.
 
-    :class:`audb.Dependencies` gathers all database files
+    :class:`audb.Dependencies` gathers
+    all database media, table, and attachment files
     and metadata about them
     in a single object.
     The metadata contains information
@@ -100,7 +101,7 @@ class Dependencies:
 
     @property
     def archives(self) -> typing.List[str]:
-        r"""All archives (table and media).
+        r"""All media, table, attachment archives.
 
         Return:
             list of archives
@@ -110,8 +111,22 @@ class Dependencies:
         return sorted(list(set(archives)))
 
     @property
+    def attachment_files(self) -> typing.List[str]:
+        r"""Attachment files.
+
+        Returns:
+            list of attachment files
+
+        """
+        return list(
+            self._df[
+                self._df['type'] == define.DependType.ATTACHMENT
+            ].index
+        )
+
+    @property
     def files(self) -> typing.List[str]:
-        r"""All files (table and media).
+        r"""All media, table, attachment files.
 
         Returns:
             list of files
@@ -361,6 +376,37 @@ class Dependencies:
         """
         return self._df.version[file]
 
+    def _add_attachment(
+            self,
+            file: str,
+            version: str,
+            archive: str,
+            checksum: str,
+    ):
+        r"""Add or update attachment file.
+
+        Args:
+            file: relative file path
+            archive: archive name without extension
+            checksum: checksum of file
+            version: version string
+
+        """
+        format = audeer.file_extension(file).lower()
+
+        self._df.loc[file] = [
+            archive,                       # archive
+            0,                             # bit_depth
+            0,                             # channels
+            checksum,                      # checksum
+            0.0,                           # duration
+            format,                        # format
+            0,                             # removed
+            0,                             # sampling_rate
+            define.DependType.ATTACHMENT,  # type
+            version,                       # version
+        ]
+
     def _add_media(
             self,
             values: typing.Sequence[
@@ -491,7 +537,7 @@ class Dependencies:
 
 
 def error_message_missing_object(
-        object_name: str,
+        object_type: str,
         missing_object_id: typing.Union[str, typing.Sequence],
         database_name: str = None,
         database_version: str = None,
@@ -499,8 +545,11 @@ def error_message_missing_object(
     r"""Error message for missing objects.
 
     Args:
-        object_name: object that is supposed to contain ``missing_object_id``,
-            should be ``'table'`` or ``'media file'``
+        object_type: object that is supposed to contain ``missing_object_id``,
+            should be
+            ``'media'``,
+            ``'table'``
+            or ``'attachment'``
         missing_object_id: ID of missing object
         database_name: name of affected database
         database_version: name of affected database
@@ -509,6 +558,11 @@ def error_message_missing_object(
         error message
 
     """
+    if object_type == 'table':
+        object_name = object_type
+    else:
+        object_name = f'{object_type} file'
+
     if isinstance(missing_object_id, str):
         msg = (
             f"Could not find a {object_name} "
@@ -524,76 +578,25 @@ def error_message_missing_object(
     return msg
 
 
-def filter_media(
-        requested_media: typing.Optional[
+def filter_deps(
+        requested_deps: typing.Optional[
             typing.Union[str, typing.Sequence[str]]
         ],
-        available_media: typing.Sequence[str],
+        available_deps: typing.Sequence[str],
+        deps_type: str,
         database_name: str = None,
         database_version: str = None,
 ) -> typing.Sequence[str]:
-    r"""Filter media files by requested media.
+    r"""Filter dependency files by requested files.
 
     Args:
-        requested_media: requested media files
-        available_media: sequence of media files
-        database_name: name of affected database
-        database_version: name of affected database
-
-    Returns:
-        list of media files inside the dependency object
-            matching ``requested_media``
-
-    """
-    if requested_media is None:
-        return available_media
-    elif len(requested_media) == 0:
-        return []
-
-    if isinstance(requested_media, str):
-        request = requested_media
-        pattern = re.compile(request)
-        requested_media = []
-        for m in available_media:
-            if pattern.search(m):
-                requested_media.append(m)
-        if len(requested_media) == 0:
-            msg = error_message_missing_object(
-                'media file',
-                request,
-                database_name,
-                database_version,
-            )
-            raise ValueError(msg)
-    else:
-        for media_file in requested_media:
-            if media_file not in available_media:
-                msg = error_message_missing_object(
-                    'media file',
-                    [media_file],
-                    database_name,
-                    database_version,
-                )
-                raise ValueError(msg)
-
-    return requested_media
-
-
-def filter_tables(
-        requested_tables: typing.Optional[
-            typing.Union[str, typing.Sequence[str]]
-        ],
-        available_tables: typing.Sequence[str],
-        database_name: str = None,
-        database_version: str = None,
-) -> typing.Sequence[str]:
-    r"""Filter dependency tables by requested tables.
-
-    Args:
-        requested_tables: include only tables
+        requested_deps: include only media, tables,
+            or attachements
             matching the regular expression
             or provided in the list
-        available_tables: sequence of available table IDs
+        available_deps: sequence of available media files,
+            table IDs, or attachment IDs
+        deps_type: ``'media'``, ``'table'``, or ``'attachment'``
         database_name: name of affected database
         database_version: name of affected database
 
@@ -602,35 +605,35 @@ def filter_tables(
             matching ``requested_tables``
 
     """
-    if requested_tables is None:
-        return available_tables
-    elif len(requested_tables) == 0:
+    if requested_deps is None:
+        return available_deps
+    elif len(requested_deps) == 0:
         return []
 
-    if isinstance(requested_tables, str):
-        request = requested_tables
+    if isinstance(requested_deps, str):
+        request = requested_deps
         pattern = re.compile(request)
-        requested_tables = []
-        for table in available_tables:
-            if pattern.search(table):
-                requested_tables.append(table)
-        if len(requested_tables) == 0:
+        requested_deps = []
+        for dep in available_deps:
+            if pattern.search(dep):
+                requested_deps.append(dep)
+        if len(requested_deps) == 0:
             msg = error_message_missing_object(
-                'table',
+                deps_type,
                 request,
                 database_name,
                 database_version,
             )
             raise ValueError(msg)
     else:
-        for table in requested_tables:
-            if table not in available_tables:
+        for dep in requested_deps:
+            if dep not in available_deps:
                 msg = error_message_missing_object(
-                    'table',
-                    [table],
+                    deps_type,
+                    [dep],
                     database_name,
                     database_version,
                 )
                 raise ValueError(msg)
 
-    return requested_tables
+    return requested_deps

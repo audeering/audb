@@ -234,6 +234,35 @@ def _media_values(
     )
 
 
+def _put_attachments(
+        attachments: typing.List[str],
+        db_root: str,
+        db_name: str,
+        version: str,
+        backend: audbackend.Backend,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+):
+    def job(attachment: str):
+        # TODO:
+        # get files from attachments
+        files = attachment.files
+        archive_file = backend.join(
+            db_name,
+            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
+            attachment,
+        )
+        backend.put_archive(db_root, files, archive_file, version)
+
+    audeer.run_tasks(
+        job,
+        params=[([attachment], {}) for attachment in attachments],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Put tables',
+    )
+
+
 def _put_media(
         media_archives: typing.Set[str],
         db_root: str,
