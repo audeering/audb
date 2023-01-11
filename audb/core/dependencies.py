@@ -376,7 +376,7 @@ class Dependencies:
         """
         return self._df.version[file]
 
-    def _add_attachment(
+    def _add_attachment_file(
             self,
             file: str,
             version: str,
