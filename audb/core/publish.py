@@ -94,10 +94,11 @@ def _find_attachment_files(
         for file in db.attachments[attachment_id].files:
             checksum = audbackend.md5(audeer.path(db_root, file))
             if file not in deps or checksum != deps.checksum(file):
+                archive = audeer.uid(from_string=file.replace('\\', '/'))
                 deps._add_attachment_file(
                     file=file,
                     version=version,
-                    archive=os.path.basename(file),
+                    archive=archive,
                     checksum=checksum,
                 )
                 attachment_files.append(file)

@@ -201,6 +201,131 @@ def _files_duration(
     db._files_duration = durs.to_dict()
 
 
+def _get_files_from_cache(
+        files: typing.Sequence[str],
+        files_type: str,
+        db_root: str,
+        deps: Dependencies,
+        cached_versions: CachedVersions,
+        flavor: Flavor,
+        num_workers: int,
+        verbose: bool,
+) -> typing.Sequence[str]:
+    r"""Copy files from cache.
+
+    This function copies requested media files,
+    attachment files, or table files
+    from other cached versions
+    to the new database folder.
+
+    Args:
+        files: sequence of media files,
+            attachment files,
+            or table IDs
+        files_type: ``'media'``,
+            ``'tables'``,
+            ``'attachments'``
+        db_root: database root
+        deps: dependency object
+        cached_versions: object containing information
+            on existing cached versions of the database
+        flavor: database flavor object
+        num_workers: number of workers to use
+        verbose: if ``True`` show progress bar
+
+    Returns:
+        list of files that couldn't be found in cache
+
+    """
+    db_root_cached = [x[1] for x in cached_versions]
+
+    try:
+        with FolderLock(
+                db_root_cached,
+                timeout=define.CACHED_VERSIONS_TIMEOUT,
+        ):
+
+            cached_files, missing_files = _cached_files(
+                files,
+                deps,
+                cached_versions,
+                flavor,
+                verbose,
+            )
+            db_root_tmp = database_tmp_root(db_root)
+
+            # Tables are also cached as PKL files
+            if files_type == 'tables':
+
+                def job(cache_root: str, file: str):
+                    file_pkl = audeer.replace_file_extension(
+                        file,
+                        audformat.define.TableStorageFormat.PICKLE,
+                    )
+                    _copy_file(file, cache_root, db_root_tmp, db_root)
+                    _copy_file(file_pkl, cache_root, db_root_tmp, db_root)
+
+            else:
+
+                def job(cache_root: str, file: str):
+                    _copy_file(file, cache_root, db_root_tmp, db_root)
+
+            audeer.run_tasks(
+                job,
+                params=[([root, file], {}) for root, file in cached_files],
+                num_workers=num_workers,
+                progress_bar=verbose,
+                task_description=f'Copy {files_type}',
+            )
+
+            audeer.rmdir(db_root_tmp)
+
+    except filelock.Timeout:
+        missing_files = files
+
+    return missing_files
+
+
+def _get_attachments_from_backend(
+        db: audformat.Database,
+        attachment_files: typing.Sequence[str],
+        db_root: str,
+        deps: Dependencies,
+        backend: audbackend.Backend,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+):
+    r"""Load attachment files from backend."""
+    db_root_tmp = database_tmp_root(db_root)
+
+    def job(file: str):
+        archive = backend.join(
+            db.name,
+            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
+            deps.archive(file),
+        )
+        backend.get_archive(
+            archive,
+            db_root_tmp,
+            deps.version(file),
+            tmp_root=db_root_tmp,
+        )
+        audeer.move_file(
+            os.path.join(db_root_tmp, file),
+            os.path.join(db_root, file),
+        )
+
+    audeer.run_tasks(
+        job,
+        params=[([file], {}) for file in attachment_files],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Load attachments',
+    )
+
+    audeer.rmdir(db_root_tmp)
+
+
 def _get_media_from_backend(
         name: str,
         media: typing.Sequence[str],
@@ -286,53 +411,6 @@ def _get_media_from_backend(
     audeer.rmdir(db_root_tmp)
 
 
-def _get_media_from_cache(
-        media: typing.Sequence[str],
-        db_root: str,
-        deps: Dependencies,
-        cached_versions: CachedVersions,
-        flavor: Flavor,
-        num_workers: int,
-        verbose: bool,
-) -> typing.Sequence[str]:
-    r"""Copy media from cache."""
-
-    db_root_cached = [x[1] for x in cached_versions]
-
-    try:
-        with FolderLock(
-                db_root_cached,
-                timeout=define.CACHED_VERSIONS_TIMEOUT,
-        ):
-
-            cached_media, missing_media = _cached_files(
-                media,
-                deps,
-                cached_versions,
-                flavor,
-                verbose,
-            )
-            db_root_tmp = database_tmp_root(db_root)
-
-            def job(cache_root: str, file: str):
-                _copy_file(file, cache_root, db_root_tmp, db_root)
-
-            audeer.run_tasks(
-                job,
-                params=[([root, file], {}) for root, file in cached_media],
-                num_workers=num_workers,
-                progress_bar=verbose,
-                task_description='Copy media',
-            )
-
-            audeer.rmdir(db_root_tmp)
-
-    except filelock.Timeout:
-        missing_media = media
-
-    return missing_media
-
-
 def _get_tables_from_backend(
         db: audformat.Database,
         tables: typing.Sequence[str],
@@ -385,121 +463,9 @@ def _get_tables_from_backend(
     audeer.rmdir(db_root_tmp)
 
 
-def _get_tables_from_cache(
-        tables: typing.Sequence[str],
-        db_root: str,
-        deps: Dependencies,
-        cached_versions: CachedVersions,
-        num_workers: int,
-        verbose: bool,
-) -> typing.Sequence[str]:
-    r"""Copy tables from cache."""
-
-    db_root_cached = [x[1] for x in cached_versions]
-
-    try:
-        with FolderLock(
-                db_root_cached,
-                timeout=define.CACHED_VERSIONS_TIMEOUT,
-        ):
-
-            cached_tables, missing_tables = _cached_files(
-                tables,
-                deps,
-                cached_versions,
-                None,
-                verbose,
-            )
-            db_root_tmp = database_tmp_root(db_root)
-
-            def job(cache_root: str, file: str):
-                file_pkl = audeer.replace_file_extension(
-                    file,
-                    audformat.define.TableStorageFormat.PICKLE,
-                )
-                _copy_file(file, cache_root, db_root_tmp, db_root)
-                _copy_file(file_pkl, cache_root, db_root_tmp, db_root)
-
-            audeer.run_tasks(
-                job,
-                params=[([root, file], {}) for root, file in cached_tables],
-                num_workers=num_workers,
-                progress_bar=verbose,
-                task_description='Copy tables',
-            )
-
-            audeer.rmdir(db_root_tmp)
-
-    except filelock.Timeout:
-        missing_tables = tables
-
-    return missing_tables
-
-
-def _load_media(
-        media: typing.Sequence[str],
-        backend: audbackend.Backend,
-        db_root: str,
-        name: str,
-        version: str,
-        cached_versions: typing.Optional[CachedVersions],
-        deps: Dependencies,
-        flavor: Flavor,
-        cache_root: str,
-        num_workers: int,
-        verbose: bool,
-) -> typing.Optional[CachedVersions]:
-    r"""Load media files to cache.
-
-    All media files not existing in cache yet
-    are copied from the corresponding flavor cache
-    folder of other versions of the database
-    or are downloaded from the backend.
-
-    """
-    missing_media = _missing_media(
-        db_root,
-        media,
-        flavor,
-        verbose,
-    )
-    if missing_media:
-        if cached_versions is None:
-            cached_versions = _cached_versions(
-                name,
-                version,
-                flavor,
-                cache_root,
-            )
-        if cached_versions:
-            missing_media = _get_media_from_cache(
-                missing_media,
-                db_root,
-                deps,
-                cached_versions,
-                flavor,
-                num_workers,
-                verbose,
-            )
-        if missing_media:
-            if backend is None:
-                backend = lookup_backend(name, version)
-            _get_media_from_backend(
-                name,
-                missing_media,
-                db_root,
-                flavor,
-                deps,
-                backend,
-                num_workers,
-                verbose,
-            )
-
-    return cached_versions
-
-
-def _load_tables(
-        tables: typing.Sequence[str],
+def _load_files(
+        files: typing.Sequence[str],
+        files_type: str,
         backend: audbackend.Backend,
         db_root: str,
         db: audformat.Database,
@@ -511,20 +477,50 @@ def _load_tables(
         num_workers: int,
         verbose: bool,
 ) -> typing.Optional[CachedVersions]:
-    r"""Load table files to cache.
+    r"""Load files to cache.
 
-    All table files not existing in cache yet
+    Loads media files,
+    attachment files,
+    or table files to database root folder.
+
+    All files not existing in cache yet
     are copied from the corresponding flavor cache
     folder of other versions of the database
     or are downloaded from the backend.
 
+    Args:
+        files: list of media files,
+            attachemnt files,
+            or table IDs
+        files_type: ``'media'``,
+            ``'tables'``,
+            or ``'atatchemnts'``
+        backend: backend object
+        db_root: database root
+        db: database object
+        version: database version
+        cached_versions: object representing cached versions
+            of the database
+        deps: database dependency object
+        flavor: database flavor object
+        cache_root: root path of cache
+        num_workers: number of workers to use
+        verbose: if ``True`` show progress bars
+            for each step
+
+    Returns:
+        cached versions object
+            if other versions of the database are found in cache
+
     """
-    missing_tables = _missing_tables(
+    missing_files = _missing_files(
+        files,
+        files_type,
         db_root,
-        tables,
+        flavor,
         verbose,
     )
-    if missing_tables:
+    if missing_files:
         if cached_versions is None:
             cached_versions = _cached_versions(
                 db.name,
@@ -533,26 +529,50 @@ def _load_tables(
                 cache_root,
             )
         if cached_versions:
-            missing_tables = _get_tables_from_cache(
-                missing_tables,
+            missing_files = _get_files_from_cache(
+                missing_files,
+                files_type,
                 db_root,
                 deps,
                 cached_versions,
+                flavor,
                 num_workers,
                 verbose,
             )
-        if missing_tables:
+        if missing_files:
             if backend is None:
                 backend = lookup_backend(db.name, version)
-            _get_tables_from_backend(
-                db,
-                missing_tables,
-                db_root,
-                deps,
-                backend,
-                num_workers,
-                verbose,
-            )
+            if files_type == 'media':
+                _get_media_from_backend(
+                    db.name,
+                    missing_files,
+                    db_root,
+                    flavor,
+                    deps,
+                    backend,
+                    num_workers,
+                    verbose,
+                )
+            elif files_type == 'tables':
+                _get_tables_from_backend(
+                    db,
+                    missing_files,
+                    db_root,
+                    deps,
+                    backend,
+                    num_workers,
+                    verbose,
+                )
+            elif files_type == 'attachments':
+                _get_attachments_from_backend(
+                    db,
+                    missing_files,
+                    db_root,
+                    deps,
+                    backend,
+                    num_workers,
+                    verbose,
+                )
 
     return cached_versions
 
@@ -569,42 +589,56 @@ def _misc_tables_used_in_scheme(
     return list(set(misc_tables_used_in_scheme))
 
 
-def _missing_media(
+def _missing_files(
+        files: typing.Sequence[str],
+        files_type: str,
         db_root: str,
-        media: typing.Sequence[str],
         flavor: Flavor,
         verbose: bool,
 ) -> typing.Sequence[str]:
-    missing_media = []
-    for file in audeer.progress_bar(
-            media,
-            desc='Missing media',
-            disable=not verbose
-    ):
-        path = os.path.join(db_root, file)
+    r"""List missing files.
+
+    Checks for media files,
+    attachment files,
+    or table files
+    if they exist already in database root.
+
+    Args:
+        db_root: database root
+        files: list of media files,
+            attachment files,
+            or table IDs
+        files_type: ``'media'``,
+            ``'tables'``,
+            or ``'attachments'``
+        flavor: requested database flavor
+        verbose: if ``True`` show progress bar
+
+    Returns:
+        list of missing files
+
+    """
+    missing_files = []
+
+    if files_type == 'tables':
+        files = [f'db.{file}.csv' for file in files]
+    elif files_type == 'media':
         if flavor.format is not None:
-            path = audeer.replace_file_extension(path, flavor.format)
-        if not os.path.exists(path):
-            missing_media.append(file)
-    return missing_media
+            files = [
+                audeer.replace_file_extension(file, flavor.format)
+                for file in files
+            ]
 
-
-def _missing_tables(
-        db_root: str,
-        tables: typing.Sequence[str],
-        verbose: bool,
-) -> typing.Sequence[str]:
-    missing_tables = []
-    for table in audeer.progress_bar(
-            tables,
-            desc='Missing tables',
+    for file in audeer.progress_bar(
+            files,
+            desc=f'Missing {files_type}',
             disable=not verbose,
     ):
-        file = f'db.{table}.csv'
         path = os.path.join(db_root, file)
         if not os.path.exists(path):
-            missing_tables.append(file)
-    return missing_tables
+            missing_files.append(file)
+
+    return missing_files
 
 
 def _remove_media(
@@ -868,6 +902,24 @@ def load(
 
             db_is_complete = _database_is_complete(db)
 
+            # load attachments
+            requested_attachment_files = deps.attachment_files
+            if not db_is_complete:
+                cached_versions = _load_files(
+                    requested_attachment_files,
+                    'attachments',
+                    backend,
+                    db_root,
+                    db,
+                    version,
+                    cached_versions,
+                    deps,
+                    flavor,
+                    cache_root,
+                    num_workers,
+                    verbose,
+                )
+
             # filter tables (convert regexp pattern to list of tables)
             requested_tables = filter_deps(tables, list(db), 'table')
 
@@ -887,8 +939,9 @@ def load(
                 ]:
                     # need to load misc tables used in a scheme first
                     # as loading is done in parallel
-                    cached_versions = _load_tables(
+                    cached_versions = _load_files(
                         _tables,
+                        'tables',
                         backend,
                         db_root,
                         db,
@@ -921,8 +974,9 @@ def load(
 
             # load missing media
             if not db_is_complete and not only_metadata:
-                cached_versions = _load_media(
+                cached_versions = _load_files(
                     requested_media,
+                    'media',
                     backend,
                     db_root,
                     name,
@@ -1192,8 +1246,9 @@ def load_media(
 
             # load missing media
             if not db_is_complete:
-                _load_media(
+                _load_files(
                     media,
+                    'media',
                     backend,
                     db_root,
                     name,
@@ -1313,8 +1368,9 @@ def load_table(
                     os.path.exists(f'{table_file}.csv')
                     or os.path.exists(f'{table_file}.pkl')
             ):
-                _load_tables(
+                _load_files(
                     [table],
+                    'tables',
                     backend,
                     db_root,
                     db,

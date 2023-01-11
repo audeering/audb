@@ -590,19 +590,17 @@ def filter_deps(
     r"""Filter dependency files by requested files.
 
     Args:
-        requested_deps: include only media, tables,
-            or attachements
+        requested_deps: include only media, tables
             matching the regular expression
             or provided in the list
-        available_deps: sequence of available media files,
-            table IDs, or attachment IDs
-        deps_type: ``'media'``, ``'table'``, or ``'attachment'``
+        available_deps: sequence of available media files or tables
+        deps_type: ``'media'`` or ``'table'``
         database_name: name of affected database
         database_version: name of affected database
 
     Returns:
-        list of table IDs inside the dependency object
-            matching ``requested_tables``
+        list of media or tables inside the dependency object
+            matching ``requested_deps``
 
     """
     if requested_deps is None:

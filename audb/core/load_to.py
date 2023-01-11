@@ -19,6 +19,32 @@ from audb.core.load import (
 )
 
 
+def _find_attachment_files(
+        db_root: str,
+        deps: Dependencies,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+) -> typing.List[str]:
+    r"""Find altered and new attachment files."""
+
+    attachment_files = []
+
+    def job(file: str):
+        full_file = os.path.join(db_root, file)
+        if not os.path.exists(full_file):
+            attachment_files.append(file)
+
+    audeer.run_tasks(
+        job,
+        params=[([file], {}) for file in deps.attachment_files],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Find attachments',
+    )
+
+    return attachment_files
+
+
 def _find_media(
         db: audformat.Database,
         db_root: str,
@@ -79,6 +105,48 @@ def _find_tables(
     )
 
     return tables
+
+
+def _get_attachment_files(
+        attachment_files: typing.List[str],
+        db_root: str,
+        db_root_tmp: str,
+        db_name: str,
+        deps: Dependencies,
+        backend: audbackend.Backend,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+):
+
+    # create folder tree to avoid race condition
+    # in os.makedirs when files are unpacked
+    utils.mkdir_tree(attachment_files, db_root)
+    utils.mkdir_tree(attachment_files, db_root_tmp)
+
+    def job(file: str):
+        archive = backend.join(
+            db_name,
+            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
+            deps.archive(file),
+        )
+        backend.get_archive(
+            archive,
+            db_root_tmp,
+            deps.version(file),
+            tmp_root=db_root_tmp,
+        )
+        audeer.move_file(
+            os.path.join(db_root_tmp, file),
+            os.path.join(db_root, file),
+        )
+
+    audeer.run_tasks(
+        job,
+        params=[([file], {}) for file in deps.attachment_files],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Get attachments',
+    )
 
 
 def _get_media(
@@ -278,7 +346,10 @@ def load_to(
         verbose=verbose,
     )
     if update:
-        files = deps.tables if only_metadata else deps.files
+        if only_metadata:
+            files = deps.attachment_files + deps.tables
+        else:
+            files = deps.files
         for file in files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
@@ -294,10 +365,17 @@ def load_to(
         version,
         overwrite=True,
     )
+    db_header.save(db_root_tmp, header_only=True)
+
+    # get altered and new attachemnt files
+
+    attachment_files = _find_attachment_files(db_root, deps, num_workers,
+                                              verbose)
+    _get_attachment_files(attachment_files, db_root, db_root_tmp, name, deps,
+                          backend, num_workers, verbose)
 
     # get altered and new tables
 
-    db_header.save(db_root_tmp, header_only=True)
     tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
     _get_tables(tables, db_root, db_root_tmp, name, deps, backend,
                 num_workers, verbose)
