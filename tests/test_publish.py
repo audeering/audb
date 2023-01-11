@@ -642,10 +642,12 @@ def test_update_database():
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    # Remove one file as in version 3.0.0
+    # Remove one media file and all attachments as in version 3.0.0
     remove_file = 'audio/001.wav'
     remove_path = os.path.join(DB_ROOT_VERSION[version], remove_file)
     os.remove(remove_path)
+    del db.attachments['file']
+    del db.attachments['folder']
     db.drop_files(remove_file)
     db.save(DB_ROOT_VERSION[version])
 

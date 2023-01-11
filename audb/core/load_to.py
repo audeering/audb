@@ -1,4 +1,3 @@
-import glob
 import os
 import typing
 
@@ -259,39 +258,6 @@ def _remove_empty_dirs(root):
     os.rmdir(root)
 
 
-def _save_database(
-        db: audformat.Database,
-        db_root: str,
-        db_root_tmp: str,
-        num_workers: typing.Optional[int],
-        verbose: bool,
-):
-
-    for storage_format in [
-        audformat.define.TableStorageFormat.CSV,
-        audformat.define.TableStorageFormat.PICKLE,
-    ]:
-        db.save(
-            db_root_tmp,
-            storage_format=storage_format,
-            update_other_formats=False,
-            num_workers=num_workers,
-            verbose=verbose,
-        )
-        audeer.move_file(
-            os.path.join(db_root_tmp, define.HEADER_FILE),
-            os.path.join(db_root, define.HEADER_FILE),
-        )
-        for path in glob.glob(
-                os.path.join(db_root_tmp, f'*.{storage_format}')
-        ):
-            file = os.path.relpath(path, db_root_tmp)
-            audeer.move_file(
-                os.path.join(db_root_tmp, file),
-                os.path.join(db_root, file),
-            )
-
-
 def load_to(
         root: str,
         name: str,
@@ -367,7 +333,7 @@ def load_to(
     )
     db_header.save(db_root_tmp, header_only=True)
 
-    # get altered and new attachemnt files
+    # get altered and new attachment files
 
     attachment_files = _find_attachment_files(db_root, deps, num_workers,
                                               verbose)
@@ -417,10 +383,18 @@ def load_to(
         os.path.join(db_root, define.DEPENDENCIES_FILE),
     )
 
-    # save database and remove the temporal directory
-    # to signal all files were correctly loaded
+    # save database and PKL tables
 
-    _save_database(db, db_root, db_root_tmp, num_workers, verbose)
+    db.save(
+        db_root,
+        storage_format=audformat.define.TableStorageFormat.PICKLE,
+        update_other_formats=False,
+        num_workers=num_workers,
+        verbose=verbose,
+    )
+
+    # remove the temporal directory
+    # to signal all files were correctly loaded
     try:
         _remove_empty_dirs(db_root_tmp)
     except OSError:  # pragma: no cover
@@ -429,8 +403,5 @@ def load_to(
             'probably there are some leftover files. '
             'This should not happen.'
         )
-
-    # Force root to not point to tmp folder
-    db._root = db_root
 
     return db

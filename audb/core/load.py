@@ -298,6 +298,11 @@ def _get_attachments_from_backend(
     r"""Load attachment files from backend."""
     db_root_tmp = database_tmp_root(db_root)
 
+    # create folder tree to avoid race condition
+    # in os.makedirs when files are unpacked
+    utils.mkdir_tree(attachment_files, db_root)
+    utils.mkdir_tree(attachment_files, db_root_tmp)
+
     def job(file: str):
         archive = backend.join(
             db.name,
@@ -622,12 +627,6 @@ def _missing_files(
 
     if files_type == 'tables':
         files = [f'db.{file}.csv' for file in files]
-    elif files_type == 'media':
-        if flavor.format is not None:
-            files = [
-                audeer.replace_file_extension(file, flavor.format)
-                for file in files
-            ]
 
     for file in audeer.progress_bar(
             files,
@@ -979,7 +978,7 @@ def load(
                     'media',
                     backend,
                     db_root,
-                    name,
+                    db,
                     version,
                     cached_versions,
                     deps,
@@ -1251,7 +1250,7 @@ def load_media(
                     'media',
                     backend,
                     db_root,
-                    name,
+                    db,
                     version,
                     None,
                     deps,
