@@ -51,8 +51,25 @@ def fixture_publish_db():
     clear_root(DB_ROOT)
     clear_root(pytest.FILE_SYSTEM_HOST)
 
-    # create db
-
+    # Version 1.0.0
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    # attachment files:
+    #   - extra/file.txt
+    #   - extra/folder/file1.txt
+    #   - extra/folder/file2.txt
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['1.0.0']
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
     db.schemes['scheme'] = audformat.Scheme(
@@ -95,34 +112,153 @@ def fixture_publish_db():
         [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
+    audeer.mkdir(audeer.path(db_root, 'extra/folder'))
+    audeer.touch(audeer.path(db_root, 'extra/file.txt'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/file1.txt'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/file2.txt'))
+    db.attachments['file'] = audformat.Attachment('extra/file.txt')
+    db.attachments['folder'] = audformat.Attachment('extra/folder')
     db.save(
-        DB_ROOT_VERSION['1.0.0'],
+        db_root,
         storage_format=audformat.define.TableStorageFormat.PICKLE,
     )
     audformat.testing.create_audio_files(db)
 
-    # Extend version 2.0.0 by a new file with a path >260 characters
+    # Version 2.0.0
+    #
+    # Changes:
+    #   * Added: new file with a path >260 characters,
+    #   * Removed: 1 attachment file
+    #
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
+    # attachment files:
+    #   - extra/file.txt
+    #   - extra/folder/file1.txt
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['2.0.0']
+    shutil.copytree(
+        audeer.path(DB_ROOT_VERSION['1.0.0'], 'extra'),
+        audeer.path(db_root, 'extra'),
+    )
+    os.remove(audeer.path(db_root, 'extra/folder/file2.txt'))
     db['files'].extend_index(audformat.filewise_index(LONG_PATH), inplace=True)
-    db.save(DB_ROOT_VERSION['2.0.0'])
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
 
-    # Remove one file in version 3.0.0
+    # Version 3.0.0
+    #
+    # Changes:
+    #   * Removed: 1 media files
+    #   * Removed: all attachments
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['3.0.0']
     remove_file = 'audio/001.wav'
     db.drop_files(remove_file)
-    db.save(DB_ROOT_VERSION['3.0.0'])
+    del db.attachments['file']
+    del db.attachments['folder']
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
 
-    # Store without audio files in version 4.0.0
-    db.save(DB_ROOT_VERSION['4.0.0'])
+    # Version 4.0.0
+    #
+    # Changes:
+    #   * Removed: all media files
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['4.0.0']
+    db.save(db_root)
 
-    # Extend database to >20 files and store without audio in version 5.0.0
+    # Version 5.0.0
+    #
+    # Changes:
+    #   * Added:
+    #   * Removed: all media files
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
+    #   - file0.wav
+    #   - ...
+    #   - file19.wav
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['5.0.0']
     db['files'] = db['files'].extend_index(
         audformat.filewise_index([f'file{n}.wav' for n in range(20)])
     )
     assert len(db.files) > 20
-    db.save(DB_ROOT_VERSION['5.0.0'])
+    db.save(db_root)
 
-    # Make database non-portable in version 6.0.0
+    # Version 5.0.0
+    #
+    # Changes:
+    #   * Added: 'scheme' scheme
+    #   * Changed: make database non-portable
+    #   * Removed: media file with >260 chars
+    #   * Removed: 20 file{n}.wav media files
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
+    #   - file0.wav
+    #   - ...
+    #   - file19.wav
+    # schemes:
+    #   - scheme
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['6.0.0']
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
     db.schemes['scheme'] = audformat.Scheme(
@@ -165,10 +301,10 @@ def fixture_publish_db():
         [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
-    db.save(DB_ROOT_VERSION['6.0.0'])
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
     db.map_files(lambda x: os.path.join(db.root, x))  # make paths absolute
-    db.save(DB_ROOT_VERSION['6.0.0'])
+    db.save(db_root)
 
     yield
 
