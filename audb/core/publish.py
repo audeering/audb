@@ -285,7 +285,7 @@ def _put_attachment_files(
         archive_file = backend.join(
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            os.path.basename(file),
+            audeer.uid(from_string=file.replace('\\', '/')),
         )
         backend.put_archive(db_root, file, archive_file, version)
 
