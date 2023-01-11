@@ -189,13 +189,19 @@ def fixture_publish_db():
     # Version 4.0.0
     #
     # Changes:
-    #   * Removed: all media files
+    #   * Changed: store without media files
     #
     # tables:
     #   - emotion
     # misc tables:
     #   - misc-in-scheme
     #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
     # schemes:
     #   - speaker
     #   - misc
@@ -205,8 +211,7 @@ def fixture_publish_db():
     # Version 5.0.0
     #
     # Changes:
-    #   * Added:
-    #   * Removed: all media files
+    #   * Added: 20 `file{n}.wav` media files in metadata
     #
     # tables:
     #   - emotion
@@ -232,10 +237,11 @@ def fixture_publish_db():
     assert len(db.files) > 20
     db.save(db_root)
 
-    # Version 5.0.0
+    # Version 6.0.0
     #
     # Changes:
     #   * Added: 'scheme' scheme
+    #   * Changed: include media files (not metadata only database)
     #   * Changed: make database non-portable
     #   * Removed: media file with >260 chars
     #   * Removed: 20 file{n}.wav media files
@@ -760,6 +766,20 @@ def test_update_database_without_media(tmpdir):
     for file in db.files:
         assert not os.path.exists(audeer.path(build_root, file))
 
+    # add changes to build folder
+    # and call again load_to()
+    # to revert them
+    os.remove(audeer.path(build_root, 'extra/folder/file2.txt'))
+    db = audb.load_to(
+        build_root,
+        DB_NAME,
+        only_metadata=True,
+        version=previous_version,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    assert os.path.exists(audeer.path(build_root, 'extra/folder/file2.txt'))
+
     # update and save database
 
     # remove files
@@ -776,6 +796,9 @@ def test_update_database_without_media(tmpdir):
 
     # add new table
     db[new_table] = audformat.Table(audformat.filewise_index(new_files))
+
+    # remove one attachment file
+    os.remove(audeer.path(build_root, 'extra/folder/file2.txt'))
 
     db.save(build_root)
 
