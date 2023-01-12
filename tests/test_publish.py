@@ -52,6 +52,7 @@ def fixture_publish_db():
     clear_root(pytest.FILE_SYSTEM_HOST)
 
     # Version 1.0.0
+    #
     # tables:
     #   - emotion
     # misc tables:
@@ -129,7 +130,6 @@ def fixture_publish_db():
     # Changes:
     #   * Added: new file with a path >260 characters,
     #   * Removed: 1 attachment file
-    #
     #
     # tables:
     #   - emotion
