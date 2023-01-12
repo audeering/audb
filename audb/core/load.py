@@ -223,7 +223,7 @@ def _get_files_from_cache(
             attachment files,
             or table IDs
         files_type: ``'media'``,
-            ``'tables'``,
+            ``'table'``,
             ``'attachments'``
         db_root: database root
         deps: dependency object
@@ -255,7 +255,7 @@ def _get_files_from_cache(
             db_root_tmp = database_tmp_root(db_root)
 
             # Tables are also cached as PKL files
-            if files_type == 'tables':
+            if files_type == 'table':
 
                 def job(cache_root: str, file: str):
                     file_pkl = audeer.replace_file_extension(
@@ -498,7 +498,7 @@ def _load_files(
             attachemnt files,
             or table IDs
         files_type: ``'media'``,
-            ``'tables'``,
+            ``'table'``,
             or ``'atatchemnts'``
         backend: backend object
         db_root: database root
@@ -558,7 +558,7 @@ def _load_files(
                     num_workers,
                     verbose,
                 )
-            elif files_type == 'tables':
+            elif files_type == 'table':
                 _get_tables_from_backend(
                     db,
                     missing_files,
@@ -614,7 +614,7 @@ def _missing_files(
             attachment files,
             or table IDs
         files_type: ``'media'``,
-            ``'tables'``,
+            ``'table'``,
             or ``'attachments'``
         flavor: requested database flavor
         verbose: if ``True`` show progress bar
@@ -625,7 +625,7 @@ def _missing_files(
     """
     missing_files = []
 
-    if files_type == 'tables':
+    if files_type == 'table':
         files = [f'db.{file}.csv' for file in files]
 
     for file in audeer.progress_bar(
@@ -940,7 +940,7 @@ def load(
                     # as loading is done in parallel
                     cached_versions = _load_files(
                         _tables,
-                        'tables',
+                        'table',
                         backend,
                         db_root,
                         db,
@@ -1369,7 +1369,7 @@ def load_table(
             ):
                 _load_files(
                     [table],
-                    'tables',
+                    'table',
                     backend,
                     db_root,
                     db,
