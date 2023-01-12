@@ -499,7 +499,7 @@ def _load_files(
             or table IDs
         files_type: ``'media'``,
             ``'table'``,
-            or ``'atatchemnts'``
+            or ``'attachment'``
         backend: backend object
         db_root: database root
         db: database object
