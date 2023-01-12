@@ -224,7 +224,7 @@ def _get_files_from_cache(
             or table IDs
         files_type: ``'media'``,
             ``'table'``,
-            ``'attachments'``
+            ``'attachment'``
         db_root: database root
         deps: dependency object
         cached_versions: object containing information
@@ -568,7 +568,7 @@ def _load_files(
                     num_workers,
                     verbose,
                 )
-            elif files_type == 'attachments':
+            elif files_type == 'attachment':
                 _get_attachments_from_backend(
                     db,
                     missing_files,
@@ -615,7 +615,7 @@ def _missing_files(
             or table IDs
         files_type: ``'media'``,
             ``'table'``,
-            or ``'attachments'``
+            or ``'attachment'``
         flavor: requested database flavor
         verbose: if ``True`` show progress bar
 
@@ -906,7 +906,7 @@ def load(
             if not db_is_complete:
                 cached_versions = _load_files(
                     requested_attachment_files,
-                    'attachments',
+                    'attachment',
                     backend,
                     db_root,
                     db,
