@@ -397,10 +397,18 @@ def test_publish(version):
         verbose=False,
     )
     backend = audb.core.utils.lookup_backend(DB_NAME, version)
-    number_of_files = len(set(archives.keys()))
-    number_of_archives = len(set(archives.values()))
-    assert len(deps.files) - len(deps.archives) == (
-        number_of_files - number_of_archives
+    number_of_media_files_in_custom_archives = len(set(archives.keys()))
+    number_of_custom_archives = len(set(archives.values()))
+    number_of_media_files = len(deps.media)
+    number_of_media_archives = len(
+        set([deps.archive(file) for file in deps.media])
+    )
+    assert (
+        number_of_media_files_in_custom_archives
+        - number_of_custom_archives
+    ) == (
+        number_of_media_files
+        - number_of_media_archives
     )
     for archive in set(archives.values()):
         assert archive in deps.archives
