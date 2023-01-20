@@ -531,6 +531,9 @@ def test_load_to(version):
             db_original[table].df,
             db[table].df,
         )
+    for attachment in db.attachments:
+        for attachment_file in db.attachments[attachment].files:
+            assert os.path.exists(os.path.join(db_root, attachment_file))
 
 
 @pytest.mark.parametrize(
