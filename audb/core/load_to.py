@@ -122,6 +122,8 @@ def _get_attachment_files(
     utils.mkdir_tree(attachment_files, db_root)
     utils.mkdir_tree(attachment_files, db_root_tmp)
 
+    print(attachment_files)
+
     def job(file: str):
         archive = backend.join(
             db_name,
@@ -141,7 +143,7 @@ def _get_attachment_files(
 
     audeer.run_tasks(
         job,
-        params=[([file], {}) for file in deps.attachment_files],
+        params=[([file], {}) for file in attachment_files],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Get attachments',
