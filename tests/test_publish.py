@@ -67,6 +67,7 @@ def fixture_publish_db():
     #   - extra/file.txt
     #   - extra/folder/file1.txt
     #   - extra/folder/file2.txt
+    #   - extra/folder/sub-folder/file3.txt
     # schemes:
     #   - speaker
     #   - misc
@@ -117,6 +118,8 @@ def fixture_publish_db():
     audeer.touch(audeer.path(db_root, 'extra/file.txt'))
     audeer.touch(audeer.path(db_root, 'extra/folder/file1.txt'))
     audeer.touch(audeer.path(db_root, 'extra/folder/file2.txt'))
+    audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/sub-folder/file3.txt'))
     db.attachments['file'] = audformat.Attachment('extra/file.txt')
     db.attachments['folder'] = audformat.Attachment('extra/folder')
     db.save(
@@ -128,7 +131,8 @@ def fixture_publish_db():
     # Version 2.0.0
     #
     # Changes:
-    #   * Added: new file with a path >260 characters,
+    #   * Added: new file with a path >260 characters
+    #   * Added: 1 attachment file
     #   * Removed: 1 attachment file
     #
     # tables:
@@ -145,6 +149,8 @@ def fixture_publish_db():
     # attachment files:
     #   - extra/file.txt
     #   - extra/folder/file1.txt
+    #   - extra/folder/file3.txt
+    #   - extra/folder/sub-folder/file3.txt
     # schemes:
     #   - speaker
     #   - misc
@@ -154,6 +160,7 @@ def fixture_publish_db():
         audeer.path(db_root, 'extra'),
     )
     os.remove(audeer.path(db_root, 'extra/folder/file2.txt'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/file3.txt'))
     db['files'].extend_index(audformat.filewise_index(LONG_PATH), inplace=True)
     db.save(db_root)
     audformat.testing.create_audio_files(db)
@@ -438,54 +445,79 @@ def test_publish(version):
 
 
 @pytest.mark.parametrize(
-    'version1, version2, media_difference',
+    'version1, version2, media_difference, attachment_difference',
     [
         (
             '1.0.0',
             '1.0.0',
             [],
+            [],
         ),
         (
             '1.0.0',
             '2.0.0',
             [],
+            ['extra/folder/file2.txt'],
         ),
         (
             '2.0.0',
             '1.0.0',
             [LONG_PATH],
+            ['extra/folder/file3.txt'],
         ),
         (
             '2.0.0',
             '3.0.0',
             ['audio/001.wav'],
+            [
+                'extra/file.txt',
+                'extra/folder/file1.txt',
+                'extra/folder/file3.txt',
+                'extra/folder/sub-folder/file3.txt',
+            ],
         ),
         (
             '3.0.0',
             '2.0.0',
+            [],
             [],
         ),
         (
             '1.0.0',
             '3.0.0',
             ['audio/001.wav'],
+            [
+                'extra/file.txt',
+                'extra/folder/file1.txt',
+                'extra/folder/file2.txt',
+                'extra/folder/sub-folder/file3.txt',
+            ],
         ),
         (
             '3.0.0',
             '1.0.0',
             [LONG_PATH],
+            [],
         ),
     ]
 )
-def test_publish_changed_db(version1, version2, media_difference):
+def test_publish_changed_db(
+        version1,
+        version2,
+        media_difference,
+        attachment_difference,
+):
 
     depend1 = audb.dependencies(DB_NAME, version=version1)
     depend2 = audb.dependencies(DB_NAME, version=version2)
 
     media1 = set(sorted(depend1.media))
     media2 = set(sorted(depend2.media))
-
     assert media1 - media2 == set(media_difference)
+
+    attachment1 = set(sorted(depend1.attachment_files))
+    attachment2 = set(sorted(depend2.attachment_files))
+    assert attachment1 - attachment2 == set(attachment_difference)
 
 
 @pytest.mark.parametrize(
