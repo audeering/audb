@@ -122,8 +122,6 @@ def _get_attachment_files(
     utils.mkdir_tree(attachment_files, db_root)
     utils.mkdir_tree(attachment_files, db_root_tmp)
 
-    print(attachment_files)
-
     def job(file: str):
         archive = backend.join(
             db_name,
