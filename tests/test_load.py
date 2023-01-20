@@ -102,35 +102,52 @@ def fixture_publish_db():
         [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
+    db.attachments['file'] = audformat.Attachment('extra/file.txt')
+    db.attachments['folder'] = audformat.Attachment('extra/folder')
 
     # publish 1.0.0
 
-    db.save(DB_ROOT_VERSION['1.0.0'])
+    db_root = DB_ROOT_VERSION['1.0.0']
+
+    audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
+    audeer.touch(audeer.path(db_root, 'extra/file.txt'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/file1.txt'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/file2.txt'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/sub-folder/file3.txt'))
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb.publish(
-        DB_ROOT_VERSION['1.0.0'],
+        db_root,
         '1.0.0',
         pytest.PUBLISH_REPOSITORY,
         archives=archives,
         verbose=False,
     )
 
-    # publish 1.1.0, add table
+    # publish 1.1.0, add table, remove attachment file
+
+    db_root = DB_ROOT_VERSION['1.1.0']
+    previous_db_root = DB_ROOT_VERSION['1.0.0']
 
     audformat.testing.add_table(
         db, 'train', audformat.define.IndexType.SEGMENTED,
         columns={'label': ('scheme', None)}
     )
+    shutil.copytree(
+        audeer.path(previous_db_root, 'extra'),
+        audeer.path(db_root, 'extra'),
+    )
+    os.remove(audeer.path(db_root, 'extra/folder/file2.txt'))
 
-    db.save(DB_ROOT_VERSION['1.1.0'])
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        os.path.join(DB_ROOT_VERSION['1.0.0'], 'db.csv'),
-        os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
+        audeer.path(previous_db_root, 'db.csv'),
+        audeer.path(db_root, 'db.csv'),
     )
     audb.publish(
-        DB_ROOT_VERSION['1.1.0'],
+        db_root,
         '1.1.0',
         pytest.PUBLISH_REPOSITORY,
         verbose=False,
@@ -138,57 +155,83 @@ def fixture_publish_db():
 
     # publish 1.1.1, change label
 
-    db['train'].df['label'][0] = None
+    db_root = DB_ROOT_VERSION['1.1.1']
+    previous_db_root = DB_ROOT_VERSION['1.1.0']
 
-    db.save(DB_ROOT_VERSION['1.1.1'])
+    db['train'].df['label'][0] = None
+    shutil.copytree(
+        audeer.path(previous_db_root, 'extra'),
+        audeer.path(db_root, 'extra'),
+    )
+
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        os.path.join(DB_ROOT_VERSION['1.1.0'], 'db.csv'),
-        os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
+        audeer.path(previous_db_root, 'db.csv'),
+        audeer.path(db_root, 'db.csv'),
     )
     audb.publish(
-        DB_ROOT_VERSION['1.1.1'],
+        db_root,
         '1.1.1',
         pytest.PUBLISH_REPOSITORY,
         verbose=False,
     )
 
-    # publish 2.0.0, alter and remove media
+    # publish 2.0.0, alter and remove media, remove attachment
 
-    db.save(DB_ROOT_VERSION['2.0.0'])
+    db_root = DB_ROOT_VERSION['2.0.0']
+    previous_db_root = DB_ROOT_VERSION['1.1.1']
+
+    shutil.copytree(
+        audeer.path(previous_db_root, 'extra'),
+        audeer.path(db_root, 'extra'),
+    )
+    del db.attachments['file']
+    os.remove(audeer.path(db_root, 'extra/file.txt'))
+
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
-    file = os.path.join(DB_ROOT_VERSION['2.0.0'], db.files[0])
+    file = os.path.join(db_root, db.files[0])
     y, sr = audiofile.read(file)
     y[0] = 1
     audiofile.write(file, y, sr)
     file = db.files[-1]
     db.pick_files(lambda x: x != file)
-    os.remove(audeer.path(DB_ROOT_VERSION['2.0.0'], file))
-    db.save(DB_ROOT_VERSION['2.0.0'])
+    os.remove(audeer.path(db_root, file))
+    db.save(db_root)
 
     shutil.copy(
-        os.path.join(DB_ROOT_VERSION['1.1.1'], 'db.csv'),
-        os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
+        os.path.join(previous_db_root, 'db.csv'),
+        os.path.join(db_root, 'db.csv'),
     )
     audb.publish(
-        DB_ROOT_VERSION['2.0.0'],
+        db_root,
         '2.0.0',
         pytest.PUBLISH_REPOSITORY,
         verbose=False,
     )
 
-    # publish 3.0.0, remove table
+    # publish 3.0.0, remove table, alter attachment file
+
+    db_root = DB_ROOT_VERSION['3.0.0']
+    previous_db_root = DB_ROOT_VERSION['2.0.0']
+
+    shutil.copytree(
+        audeer.path(previous_db_root, 'extra'),
+        audeer.path(db_root, 'extra'),
+    )
+    with open(audeer.path(db_root, 'extra/folder/file1.txt'), 'a') as fp:
+        fp.write('text')
 
     db.drop_tables('train')
-
-    db.save(DB_ROOT_VERSION['3.0.0'])
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        os.path.join(DB_ROOT_VERSION['2.0.0'], 'db.csv'),
-        os.path.join(DB_ROOT_VERSION['3.0.0'], 'db.csv'),
+        os.path.join(previous_db_root, 'db.csv'),
+        os.path.join(db_root, 'db.csv'),
     )
     audb.publish(
-        DB_ROOT_VERSION['3.0.0'],
+        db_root,
         '3.0.0',
         pytest.PUBLISH_REPOSITORY,
         verbose=False,
@@ -296,7 +339,17 @@ def test_load(format, version):
 
     deps = audb.dependencies(DB_NAME, version=version)
     assert str(deps().to_string()) == str(deps)
-    assert len(deps) == len(db.files) + len(db.tables) + len(db.misc_tables)
+    attachment_files = audeer.flatten_list(
+        [attachment.files for _, attachment in db.attachments.items()]
+    )
+    assert len(deps) == (
+        len(db.files)
+        + len(db.tables)
+        + len(db.misc_tables)
+        + len(attachment_files)
+    )
+    for attachment_file in attachment_files:
+        assert os.path.exists(audeer.path(db.root, attachment_file))
 
     # from cache with full path
 
