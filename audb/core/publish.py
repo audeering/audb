@@ -68,7 +68,7 @@ def _check_for_missing_media(
         raise RuntimeError(error_msg)
 
 
-def _find_attachment_files(
+def _find_attachments(
         db: audformat.Database,
         db_root: str,
         version: str,
@@ -85,25 +85,28 @@ def _find_attachment_files(
         deps._drop(file)
 
     # add dependencies to new attachment files
-    attachment_files = []
+    attachments = set()
     for attachment_id in audeer.progress_bar(
             list(db.attachments),
             desc='Find attachments',
             disable=not verbose,
     ):
+        # use one archive per attachment ID
         for file in db.attachments[attachment_id].files:
             checksum = audbackend.md5(audeer.path(db_root, file))
             if file not in deps or checksum != deps.checksum(file):
-                archive = audeer.uid(from_string=file.replace('\\', '/'))
+                attachments.add(attachment_id)
+        # update version number for all files in archive
+        if attachment_id in attachments:
+            for file in db.attachments[attachment_id].files:
                 deps._add_attachment_file(
                     file=file,
                     version=version,
-                    archive=archive,
+                    archive=attachment_id,
                     checksum=checksum,
                 )
-                attachment_files.append(file)
 
-    return attachment_files
+    return list(attachments)
 
 
 def _find_media(
@@ -272,26 +275,27 @@ def _media_values(
     )
 
 
-def _put_attachment_files(
-        attachment_files: typing.List[str],
+def _put_attachments(
+        attachments: typing.List[str],
         db_root: str,
-        db_name: str,
+        db: audformat.Database,
         version: str,
         backend: audbackend.Backend,
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
-    def job(file: str):
+    def job(attachment_id: str):
         archive_file = backend.join(
-            db_name,
+            db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            audeer.uid(from_string=file.replace('\\', '/')),
+            attachment_id,
         )
-        backend.put_archive(db_root, file, archive_file, version)
+        files = db.attachments[attachment_id].files
+        backend.put_archive(db_root, files, archive_file, version)
 
     audeer.run_tasks(
         job,
-        params=[([file], {}) for file in attachment_files],
+        params=[([attachment_id], {}) for attachment_id in attachments],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Put attachments',
@@ -630,11 +634,10 @@ def publish(
     # check archives
     archives = archives or {}
 
-    # publish attachment files
-    attachment_files = _find_attachment_files(db, db_root, version, deps,
-                                              verbose)
-    _put_attachment_files(attachment_files, db_root, db.name, version, backend,
-                          num_workers, verbose)
+    # publish attachments
+    attachments = _find_attachments(db, db_root, version, deps, verbose)
+    _put_attachments(attachments, db_root, db, version, backend, num_workers,
+                     verbose)
 
     # publish tables
     tables = _find_tables(db, db_root, version, deps, verbose)

@@ -122,26 +122,35 @@ def _get_attachment_files(
     utils.mkdir_tree(attachment_files, db_root)
     utils.mkdir_tree(attachment_files, db_root_tmp)
 
-    def job(file: str):
+    # find needed archives
+    archives = set()
+    for file in attachment_files:
+        archives.add((deps.archive(file), deps.version(file)))
+
+    def job(archive: str, version: str):
         archive = backend.join(
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            deps.archive(file),
+            archive,
         )
-        backend.get_archive(
+        files = backend.get_archive(
             archive,
             db_root_tmp,
-            deps.version(file),
+            version,
             tmp_root=db_root_tmp,
         )
-        audeer.move_file(
-            os.path.join(db_root_tmp, file),
-            os.path.join(db_root, file),
-        )
+        for file in files:
+            if file in attachment_files:
+                audeer.move_file(
+                    os.path.join(db_root_tmp, file),
+                    os.path.join(db_root, file),
+                )
+            else:
+                os.remove(os.path.join(db_root_tmp, file))
 
     audeer.run_tasks(
         job,
-        params=[([file], {}) for file in attachment_files],
+        params=[([archive, version], {}) for archive, version in archives],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Get attachments',
