@@ -179,6 +179,42 @@ def _database_is_complete(
     return complete
 
 
+def _evaluate_format(
+        format: typing.Optional[str],
+        deps: Dependencies,
+) -> typing.Optional[str]:
+    r"""Checks if requested format is already met.
+
+    If ``format`` is not ``None``
+    it checks
+    if the requested format
+    is already full filled by the media files
+    as stored in the dependency object.
+    In this case it returns ``None``
+    otherwise the original content of ``format``.
+
+    This avoids renaming index file entries
+    if the original format is requested
+    and handles upper or mixed case file extensions,
+    see
+    https://github.com/audeering/audb/issues/103
+
+    Args:
+        format: requested format
+        deps: dependency object
+
+    Returns:
+        requested format
+
+    """
+    if format is not None:
+        extensions = set([deps.format(m) for m in deps.media])
+        extensions = [extension.lower() for extension in extensions]
+        if len(extensions) == 1 and extensions[0] == format:
+            format = None
+    return format
+
+
 def _files_duration(
         db: audformat.Database,
         deps: Dependencies,
@@ -190,6 +226,7 @@ def _files_duration(
     durs = durs[durs > 0]
     durs = pd.to_timedelta(durs, unit='s')
     durs.index.name = 'file'
+    format = _evaluate_format(format, deps)
     if format is not None:
         durs.index = audformat.utils.replace_file_extension(durs.index, format)
     # Norm file path under Windows to include `\`
@@ -626,6 +663,7 @@ def _remove_media(
 def _update_path(
         db: audformat.Database,
         root: str,
+        deps: Dependencies,
         full_path: bool,
         format: typing.Optional[str],
         num_workers: int,
@@ -636,12 +674,15 @@ def _update_path(
     Args:
         db: database object
         root: root to add to path
+        deps: dependency object
         full_path: if ``True`` expand file path with ``root``
         format: file extension to change to in path
         num_workers: number of workers to use
         verbose: if ``True`` show progress bar
 
     """
+    format = _evaluate_format(format, deps)
+
     if not full_path and format is None:
         return
 
@@ -941,6 +982,7 @@ def load(
             _update_path(
                 db,
                 db_root,
+                deps,
                 full_path,
                 flavor.format,
                 num_workers,
