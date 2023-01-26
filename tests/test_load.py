@@ -153,8 +153,9 @@ def fixture_publish_db():
         verbose=False,
     )
 
-    # publish 2.0.0, alter and remove media
+    # publish 2.0.0, alter, remove, add media
 
+    db['files'].extend_index(audformat.filewise_index(['audio/006.WAV']))
     db.save(DB_ROOT_VERSION['2.0.0'])
     audformat.testing.create_audio_files(db)
     file = os.path.join(DB_ROOT_VERSION['2.0.0'], db.files[0])
