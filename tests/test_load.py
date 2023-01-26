@@ -225,6 +225,7 @@ def test_load_wrong_argument():
     'format',
     [
         None,
+        'wav',
         'flac',
     ]
 )
@@ -260,7 +261,7 @@ def test_load(format, version):
     )
     db_root = db.meta['audb']['root']
 
-    assert audb.exists(DB_NAME, version=version)
+    assert audb.exists(DB_NAME, version=version, format=format)
 
     files_duration = {
         os.path.join(db_root, os.path.normpath(file)): pd.to_timedelta(
