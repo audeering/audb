@@ -280,7 +280,7 @@ def test_load(format, version):
         resolved_version = version
     db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
 
-    if format is not None:
+    if format is not None and format != 'wav':
         db_original.map_files(
             lambda x: audeer.replace_file_extension(x, format)
         )
