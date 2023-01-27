@@ -96,9 +96,8 @@ def _find_attachments(
             checksum = audbackend.md5(audeer.path(db_root, file))
             if file not in deps or checksum != deps.checksum(file):
                 attachments.add(attachment_id)
-        # update version number for all files in archive
-        if attachment_id in attachments:
-            for file in db.attachments[attachment_id].files:
+            # update version number for all files in archive
+            if attachment_id in attachments:
                 deps._add_attachment_file(
                     file=file,
                     version=version,
