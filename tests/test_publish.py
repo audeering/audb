@@ -120,6 +120,13 @@ def fixture_publish_db():
     audeer.touch(audeer.path(db_root, 'extra/folder/file2.txt'))
     audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
     audeer.touch(audeer.path(db_root, 'extra/folder/sub-folder/file3.txt'))
+    # Create one file with different content to force different checksum
+    file_with_different_content = audeer.path(
+        db_root,
+        'extra/folder/sub-folder/file3.txt',
+    )
+    with open(file_with_different_content, 'w') as fp:
+        fp.write('test')
     db.attachments['file'] = audformat.Attachment('extra/file.txt')
     db.attachments['folder'] = audformat.Attachment('extra/folder')
     db.save(
@@ -412,6 +419,22 @@ def test_publish(version):
     )
     for archive in set(archives.values()):
         assert archive in deps.archives
+
+    # Check checksums of attachment files
+    file_with_different_checksum = 'extra/folder/sub-folder/file3.txt'
+    if len(deps.attachment_files) == 0:
+        expected_number_of_different_checksums = 0
+    elif (
+            file_with_different_checksum in deps.attachment_files
+            and len(deps.attachment_files) > 2
+    ):
+        expected_number_of_different_checksums = 2
+    else:
+        expected_number_of_different_checksums = 1
+    assert (
+        len(set([deps.checksum(f) for f in deps.attachment_files]))
+        == expected_number_of_different_checksums
+    )
 
     db = audb.load(
         DB_NAME,
