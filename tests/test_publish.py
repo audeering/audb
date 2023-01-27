@@ -421,20 +421,13 @@ def test_publish(version):
         assert archive in deps.archives
 
     # Check checksums of attachment files
-    file_with_different_checksum = 'extra/folder/sub-folder/file3.txt'
-    if len(deps.attachment_files) == 0:
-        expected_number_of_different_checksums = 0
-    elif (
-            file_with_different_checksum in deps.attachment_files
-            and len(deps.attachment_files) > 2
-    ):
-        expected_number_of_different_checksums = 2
-    else:
-        expected_number_of_different_checksums = 1
-    assert (
-        len(set([deps.checksum(f) for f in deps.attachment_files]))
-        == expected_number_of_different_checksums
-    )
+    expected_checksum_empty_attachment = 'd41d8cd98f00b204e9800998ecf8427e'
+    expected_checksum_file3_attachment = '098f6bcd4621d373cade4e832627b4f6'
+    for file in deps.attachment_files:
+        if file == 'extra/folder/sub-folder/file3.txt':
+            assert deps.checksum(file) == expected_checksum_file3_attachment
+        else:
+            assert deps.checksum(file) == expected_checksum_empty_attachment
 
     db = audb.load(
         DB_NAME,
