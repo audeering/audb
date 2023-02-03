@@ -353,6 +353,9 @@ def publish(
 ) -> Dependencies:
     r"""Publish database.
 
+    Publishes a database conform to audformat_,
+    stored in the ``db_root`` folder.
+
     A database can have dependencies
     to media files and tables of an older version.
     E.g. you might alter an existing table
@@ -380,6 +383,16 @@ def publish(
     even if an older versions exist.
     In this case you don't call :func:`audb.load_to`
     before running :func:`audb.publish`.
+
+    When canceling :func:`audb.publish`
+    during publication
+    you can restart it afterwards
+    to continue from the current state.
+    But you might need overwrite permissions
+    in addition to write permissions
+    on the backend then.
+
+    .. _audformat: https://audeering.github.io/audformat/data-introduction.html
 
     Args:
         db_root: root directory of database
