@@ -668,7 +668,6 @@ def _update_path(
     Args:
         db: database object
         root: root to add to path
-        deps: dependency object
         full_path: if ``True`` expand file path with ``root``
         format: file extension to change to in path
         num_workers: number of workers to use
