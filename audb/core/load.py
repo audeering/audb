@@ -180,37 +180,6 @@ def _database_is_complete(
     return complete
 
 
-def _evaluate_format(
-        format: typing.Optional[str],
-        deps: Dependencies,
-) -> typing.Optional[str]:
-    r"""Checks if requested format is already met.
-    If ``format`` is not ``None``
-    it checks
-    if the requested format
-    is already full filled by the media files
-    as stored in the dependency object.
-    In this case it returns ``None``
-    otherwise the original content of ``format``.
-    This avoids renaming index file entries
-    if the original format is requested
-    and handles upper or mixed case file extensions,
-    see
-    https://github.com/audeering/audb/issues/103
-    Args:
-        format: requested format
-        deps: dependency object
-    Returns:
-        requested format
-    """
-    if format is not None:
-        extensions = set([deps.format(m) for m in deps.media])
-        extensions = [extension.lower() for extension in extensions]
-        if len(extensions) == 1 and extensions[0] == format:
-            format = None
-    return format
-
-
 def _files_duration(
         db: audformat.Database,
         deps: Dependencies,
@@ -222,7 +191,6 @@ def _files_duration(
     durs = durs[durs > 0]
     durs = pd.to_timedelta(durs, unit='s')
     durs.index.name = 'file'
-    format = _evaluate_format(format, deps)
     if format is not None:
         pattern = _format_replace_pattern(format)
         durs.index = audformat.utils.replace_file_extension(
@@ -243,9 +211,18 @@ def _files_duration(
 def _format_replace_pattern(format):
     r"""Search pattern to replace file extension for format.
 
-    Create search pattern form format
+    Create search pattern from format
     to handle lower/uppercase versions,
-    e.g. 'wav' -> '\.[^w^W][^a^A]?[^v^V]?[^\.]*$'
+    e.g. for 'wav' we want to replace all strings
+    that are not 'wav', 'Wav', 'wAv', 'waV', 'WAv', 'WaV', 'wAV', 'WAV'
+    as represented by '\.[^w^W][^a^A]?[^v^V]?[^\.]*$',
+    where
+    * \. - defines file extension by the last . in string
+    * [^w^W] - matches all letters besides w and W
+    * [^a^A]? - matches all letters besides a and A or no letter
+    * [^v^V]? - matches all letters besides v and V or no letter
+    * [^\.]* - matches all characters besides . no or several times
+    * $ - matches end of string
 
     """
     pattern = r'\.'
@@ -681,7 +658,6 @@ def _remove_media(
 def _update_path(
         db: audformat.Database,
         root: str,
-        deps: Dependencies,
         full_path: bool,
         format: typing.Optional[str],
         num_workers: int,
@@ -699,8 +675,6 @@ def _update_path(
         verbose: if ``True`` show progress bar
 
     """
-    format = _evaluate_format(format, deps)
-
     if not full_path and format is None:
         return
 
@@ -1002,7 +976,6 @@ def load(
             _update_path(
                 db,
                 db_root,
-                deps,
                 full_path,
                 flavor.format,
                 num_workers,
