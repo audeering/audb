@@ -386,11 +386,11 @@ def publish(
 
     When canceling :func:`audb.publish`
     during publication
-    you can restart it afterwards
-    to continue from the current state.
-    But you might need overwrite permissions
+    you can restart it afterwards.
+    It will continue from the current state,
+    but you might need overwrite permissions
     in addition to write permissions
-    on the backend then.
+    on the backend.
 
     .. _audformat: https://audeering.github.io/audformat/data-introduction.html
 
