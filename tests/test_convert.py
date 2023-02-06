@@ -207,11 +207,13 @@ def test_format(format):
     df = audb.cached()
     assert df['format'].values[0] == format
 
+    print(f'{db.files=}')
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
         original_file = os.path.join(DB_ROOT, original_file)
 
+        print(f'{format=}')
         if format is None:
             assert converted_file[-4:] == original_file[-4:]
         else:

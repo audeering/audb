@@ -220,6 +220,17 @@ def test_database_cache_folder():
     assert db_root == expected_db_root
 
 
+@pytest.mark.parametrize(
+    'format, expected',
+    [
+        ('wav', r'\.[^w^W][^a^A]?[^v^V]?[^\.]*$'),
+        ('flac', r'\.[^f^F][^l^L]?[^a^A]?[^c^C]?[^\.]*$'),
+    ]
+)
+def test_format_replace_pattern(format, expected):
+    assert audb.core.load._format_replace_pattern(format) == expected
+
+
 def test_load_wrong_argument():
     with pytest.raises(TypeError):
         audb.load(DB_NAME, typo='1.0.0')

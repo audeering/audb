@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import typing
 
@@ -179,6 +180,37 @@ def _database_is_complete(
     return complete
 
 
+def _evaluate_format(
+        format: typing.Optional[str],
+        deps: Dependencies,
+) -> typing.Optional[str]:
+    r"""Checks if requested format is already met.
+    If ``format`` is not ``None``
+    it checks
+    if the requested format
+    is already full filled by the media files
+    as stored in the dependency object.
+    In this case it returns ``None``
+    otherwise the original content of ``format``.
+    This avoids renaming index file entries
+    if the original format is requested
+    and handles upper or mixed case file extensions,
+    see
+    https://github.com/audeering/audb/issues/103
+    Args:
+        format: requested format
+        deps: dependency object
+    Returns:
+        requested format
+    """
+    if format is not None:
+        extensions = set([deps.format(m) for m in deps.media])
+        extensions = [extension.lower() for extension in extensions]
+        if len(extensions) == 1 and extensions[0] == format:
+            format = None
+    return format
+
+
 def _files_duration(
         db: audformat.Database,
         deps: Dependencies,
@@ -190,17 +222,14 @@ def _files_duration(
     durs = durs[durs > 0]
     durs = pd.to_timedelta(durs, unit='s')
     durs.index.name = 'file'
+    format = _evaluate_format(format, deps)
     if format is not None:
-        # Create search pattern form format
-        # to handle lower/uppercase versions,
-        # e.g. wav -> [^w^W]av|w[^a^A]v|wa[^v^V]
-        pattern = r'\.'
-        for n in range(len(format)):
-            pattern += format[0:n]
-            pattern += f'[^{format[n]}^{format[n].upper()}]'
-            pattern += format[n:]
-        pattern += '$'
-        durs.index = audformat.utils.replace_file_extension(durs.index, format)
+        pattern = _format_replace_pattern(format)
+        durs.index = audformat.utils.replace_file_extension(
+            durs.index,
+            format,
+            pattern=pattern,
+        )
     # Norm file path under Windows to include `\`
     if os.name == 'nt':  # pragma: nocover as tested in Windows runner
         durs.index = audformat.utils.map_file_path(
@@ -209,6 +238,23 @@ def _files_duration(
         )
     durs.index = audformat.utils.expand_file_path(durs.index, db.root)
     db._files_duration = durs.to_dict()
+
+
+def _format_replace_pattern(format):
+    r"""Search pattern to replace file extension for format.
+
+    Create search pattern form format
+    to handle lower/uppercase versions,
+    e.g. 'wav' -> '\.[^w^W][^a^A]?[^v^V]?[^\.]*$'
+
+    """
+    pattern = r'\.'
+    for n in range(len(format)):
+        pattern += f'[^{format[n]}^{format[n].upper()}]'
+        if n > 0:
+            pattern += '?'
+    pattern += r'[^\.]*$'
+    return pattern
 
 
 def _get_media_from_backend(
@@ -653,6 +699,8 @@ def _update_path(
         verbose: if ``True`` show progress bar
 
     """
+    format = _evaluate_format(format, deps)
+
     if not full_path and format is None:
         return
 
@@ -669,15 +717,7 @@ def _update_path(
                     os.path.normpath,
                 )
         if format is not None:
-            # Create search pattern form format
-            # to handle lower/uppercase versions,
-            # e.g. wav -> [^w^W]av|w[^a^A]v|wa[^v^V]
-            pattern = r'\.'
-            for n in range(len(format)):
-                pattern += format[0:n]
-                pattern += f'[^{format[n]}^{format[n].upper()}]'
-                pattern += format[n:]
-            pattern += '$'
+            pattern = _format_replace_pattern(format)
             table._df.index = audformat.utils.replace_file_extension(
                 table._df.index,
                 format,
@@ -1224,8 +1264,11 @@ def load_media(
                 )
 
             if format is not None:
+                pattern = _format_replace_pattern(format)
+                pattern = re.compile(pattern)
                 media = [
-                    audeer.replace_file_extension(m, format) for m in media
+                    re.sub(pattern, f'.{format}', m)
+                    for m in media
                 ]
             files = [
                 os.path.join(db_root, os.path.normpath(m)) for m in media
