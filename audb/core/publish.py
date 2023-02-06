@@ -384,6 +384,13 @@ def publish(
     In this case you don't call :func:`audb.load_to`
     before running :func:`audb.publish`.
 
+    Handling of audio formats
+    is based on the file extension
+    in :mod:`audb`.
+    This means you should only publish WAV files
+    that end with ``.wav``
+    or any upper or mixed case version of that string.
+
     When canceling :func:`audb.publish`
     during publication
     you can restart it afterwards.
