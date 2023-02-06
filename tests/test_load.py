@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 
 import pandas as pd
@@ -229,6 +230,30 @@ def test_database_cache_folder():
 )
 def test_format_replace_pattern(format, expected):
     assert audb.core.load._format_replace_pattern(format) == expected
+
+
+@pytest.mark.parametrize(
+    'format, file_extension, expected',
+    [
+        ('wav', 'Wav', False),
+        ('wav', 'wAv', False),
+        ('wav', 'waV', False),
+        ('wav', 'WAv', False),
+        ('wav', 'wAV', False),
+        ('wav', 'WAV', False),
+        ('wav', 'wa1', True),
+        ('wav', 'gav', True),
+        ('wav', 'wbv', True),
+        ('wav', 'gz', True),
+        ('wav', 'flac', True),
+    ]
+)
+def test_format_replace(format, file_extension, expected):
+    pattern = audb.core.load._format_replace_pattern(format)
+    if re.match(pattern, file_extension):
+        assert expected is True
+    else:
+        assert expected is False
 
 
 def test_load_wrong_argument():
