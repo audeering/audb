@@ -33,7 +33,7 @@ DB_FILES = {
         'format': 'wav',
         'sampling_rate': 8000,
     },
-    'audio/file2.wav': {
+    'audio/file2.WAV': {
         'bit_depth': 24,
         'channels': 2,
         'format': 'wav',
@@ -42,6 +42,12 @@ DB_FILES = {
     'audio/file3.flac': {
         'bit_depth': 8,
         'channels': 3,
+        'format': 'flac',
+        'sampling_rate': 44100,
+    },
+    'audio/file4.Flac': {
+        'bit_depth': 8,
+        'channels': 1,
         'format': 'flac',
         'sampling_rate': 44100,
     },
@@ -207,17 +213,15 @@ def test_format(format):
     df = audb.cached()
     assert df['format'].values[0] == format
 
-    print(f'{db.files=}')
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
         original_file = os.path.join(DB_ROOT, original_file)
 
-        print(f'{format=}')
         if format is None:
             assert converted_file[-4:] == original_file[-4:]
         else:
-            assert converted_file.endswith(format)
+            assert converted_file.lower().endswith(format)
 
 
 @pytest.mark.parametrize(
