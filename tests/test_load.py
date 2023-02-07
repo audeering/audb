@@ -224,8 +224,8 @@ def test_database_cache_folder():
 @pytest.mark.parametrize(
     'format, expected',
     [
-        ('wav', r'\.[^w^W][^a^A]?[^v^V]?[^\.]*$'),
-        ('flac', r'\.[^f^F][^l^L]?[^a^A]?[^c^C]?[^\.]*$'),
+        ('wav', r'(?P<before>.*)\.((?![wW][aA][vV]).)*$'),
+        ('flac', r'(?P<before>.*)\.((?![fF][lL][aA][cC]).)*$'),
     ]
 )
 def test_format_replace_pattern(format, expected):
@@ -235,17 +235,17 @@ def test_format_replace_pattern(format, expected):
 @pytest.mark.parametrize(
     'format, file_extension, expected',
     [
-        ('wav', 'Wav', False),
-        ('wav', 'wAv', False),
-        ('wav', 'waV', False),
-        ('wav', 'WAv', False),
-        ('wav', 'wAV', False),
-        ('wav', 'WAV', False),
-        ('wav', 'wa1', True),
-        ('wav', 'gav', True),
-        ('wav', 'wbv', True),
-        ('wav', 'gz', True),
-        ('wav', 'flac', True),
+        ('wav', '.Wav', False),
+        ('wav', '.wAv', False),
+        ('wav', '.waV', False),
+        ('wav', '.WAv', False),
+        ('wav', '.wAV', False),
+        ('wav', '.WAV', False),
+        ('wav', '.wa1', True),
+        ('wav', '.gav', True),
+        ('wav', '.wbv', True),
+        ('wav', '.gz', True),
+        ('wav', '.flac', True),
     ]
 )
 def test_format_replace(format, file_extension, expected):
