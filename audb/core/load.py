@@ -191,7 +191,7 @@ def _files_duration(
     durs = durs[durs > 0]
     durs = pd.to_timedelta(durs, unit='s')
     durs.index.name = 'file'
-    durs.index = _maybe_replace_file_extension(durs.index, format)
+    durs.index = _maybe_replace_file_extension(durs.index, format, deps)
     # Norm file path under Windows to include `\`
     if os.name == 'nt':  # pragma: nocover as tested in Windows runner
         durs.index = audformat.utils.map_file_path(
@@ -604,7 +604,8 @@ def _load_tables(
 
 def _maybe_replace_file_extension(
         files: typing.Union[typing.List, pd.Index],
-        format: str
+        format: str,
+        deps: Dependencies,
 ) -> typing.Union[typing.List, pd.Index]:
     r"""Replaces file extension if required for format.
 
@@ -628,6 +629,7 @@ def _maybe_replace_file_extension(
         files: filewise or segmented index,
             or list of files
         format: requested format, e.g. ``'wav'``
+        deps: dependency object
 
     Returns:
         index or list with replaced file formats if required
@@ -635,12 +637,15 @@ def _maybe_replace_file_extension(
     Example:
         >>> format = 'wav'
         >>> index = audformat.filewise_index(['f1,wav', 'f2.WAV', 'f3.flac'])
-        >>> _maybe_replace_file_extension(index, format)
+        >>> _maybe_replace_file_extension(index, format, deps)  # doctest: +SKIP
         Index(['f1,wav', 'f2.WAV', 'f3.wav'], dtype='string', name='file')
 
-    """
-    if format is not None:
-        if len(files) > 0:
+    """  # noqa: E501
+    if format is not None and len(files) > 0:
+        # First check if we need to replace anything at all
+        extensions = set([deps.format(m) for m in deps.media])
+        extensions = [extension.lower() for extension in extensions]
+        if not (len(extensions) == 0 and extensions[0] == format):
             pattern = re.compile(_format_replace_pattern(format))
             replacement = f'\\g<before>.{format}'
             if not isinstance(files, pd.Index):
@@ -734,6 +739,7 @@ def _remove_media(
 def _update_path(
         db: audformat.Database,
         root: str,
+        deps: Dependencies,
         full_path: bool,
         format: typing.Optional[str],
         num_workers: int,
@@ -768,6 +774,7 @@ def _update_path(
         table._df.index = _maybe_replace_file_extension(
             table._df.index,
             format,
+            deps,
         )
 
     tables = db.tables.values()
@@ -1048,6 +1055,7 @@ def load(
             _update_path(
                 db,
                 db_root,
+                deps,
                 full_path,
                 flavor.format,
                 num_workers,
@@ -1308,7 +1316,7 @@ def load_media(
                     verbose,
                 )
 
-            media = _maybe_replace_file_extension(media, format)
+            media = _maybe_replace_file_extension(media, format, deps)
             files = [
                 os.path.join(db_root, os.path.normpath(m)) for m in media
             ]
