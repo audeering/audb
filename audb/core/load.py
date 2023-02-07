@@ -191,7 +191,7 @@ def _files_duration(
     durs = durs[durs > 0]
     durs = pd.to_timedelta(durs, unit='s')
     durs.index.name = 'file'
-    durs.index = _maybe_replace_file_extension_in_index(durs.index, format)
+    durs.index = _maybe_replace_file_extension(durs.index, format)
     # Norm file path under Windows to include `\`
     if os.name == 'nt':  # pragma: nocover as tested in Windows runner
         durs.index = audformat.utils.map_file_path(
@@ -207,15 +207,23 @@ def _format_replace_pattern(format):
 
     Create search pattern from format
     to handle lower/uppercase versions,
-    e.g. for 'wav' we want to replace all strings
-    that don't end with 'wav', 'Wav', 'wAv', 'waV', 'WAv', 'WaV', 'wAV', 'WAV'
-    as represented by '(?P<before>.*)\.((?![wW][aA][vV]).)*$
+    e.g. for ``'wav'`` we want to replace all strings
+    that don't end with
+    ``'wav'``,
+    ``'Wav'``,
+    ``'wAv'``,
+    ``'waV'``,
+    ``'WAv'``,
+    ``'WaV'``,
+    ``'wAV'``,
+    ``'WAV'``
+    as represented by ``r'(?P<before>.*)\.((?![wW][aA][vV]).)*$'``
     where
-    * (?P<before>.*) - refers to everything matched before the extension,
-                       stored in the group <before>
-    * \. - defines file extension by the last . in string
-    * ((?!REGEX).)* - matches the opposite of REGEX, see https://stackoverflow.com/a/850918
-    * $ - matches end of string
+    * ``(?P<before>.*)`` - refers to everything matched before the extension,
+                           stored in the group <before>
+    * ``\.``             - defines file extension by the last . in string
+    * ``((?!REGEX).)*``  - matches the opposite of REGEX, see https://stackoverflow.com/a/850918
+    * ``$``              - matches end of string
 
     This means if you would like to replace the extension,
     you need to reuse the group afterwards.
@@ -594,44 +602,68 @@ def _load_tables(
     return cached_versions
 
 
-def _maybe_replace_file_extension_in_index(
-        index: pd.Index,
+def _maybe_replace_file_extension(
+        files: typing.Union[typing.List, pd.Index],
         format: str
-) -> pd.Index:
+) -> typing.Union[typing.List, pd.Index]:
     r"""Replaces file extension if required for format.
 
     If ``format='flac'`` and the index contains files
-    ``'f1.wav'``, ``'f2.flac'``, ``'f3.FLAC'``
+    ``'f1.wav'``,
+    ``'f2.flac'``,
+    ``'f3.FLAC'``
     the index will be updated to contain
-    ``'f1.flac'``, ``'f2.flac'``, ``'f3.FLAC'``
+    ``'f1.flac'``,
+    ``'f2.flac'``,
+    ``'f3.FLAC'``
     afterwards.
 
-    The implementation follows audformat.utils.replace_file_extension(),
+    The implementation follows
+    :func:`audformat.utils.replace_file_extension`,
     which cannot be directly used
     as you can only provide it a file extension,
     but not a replacement pattern.
 
+    Args:
+        files: filewise or segmented index,
+            or list of files
+        format: requested format, e.g. ``'wav'``
+
+    Returns:
+        index or list with replaced file formats if required
+
+    Example:
+        >>> format = 'wav'
+        >>> index = audformat.filewise_index(['f1,wav', 'f2.WAV', 'f3.flac'])
+        >>> _maybe_replace_file_extension(index, format)
+        Index(['f1,wav', 'f2.WAV', 'f3.wav'], dtype='string', name='file')
+
     """
     if format is not None:
-        if len(index) > 0:
+        if len(files) > 0:
             pattern = re.compile(_format_replace_pattern(format))
             replacement = f'\\g<before>.{format}'
-            if audformat.is_segmented_index(index):
-                index = index.set_levels(
-                    index.levels[0].str.replace(
+            if not isinstance(files, pd.Index):
+                files = [
+                    re.sub(pattern, replacement, file)
+                    for file in files
+                ]
+            elif audformat.is_segmented_index(files):
+                files = files.set_levels(
+                    files.levels[0].str.replace(
                         pattern,
                         replacement,
                         regex=True,
                     ),
                     level='file',
                 )
-            else:
-                index = index.str.replace(
+            elif audformat.is_filewise_index(files):
+                files = files.str.replace(
                     pattern,
                     replacement,
                     regex=True,
                 )
-    return index
+    return files
 
 
 def _misc_tables_used_in_scheme(
@@ -733,7 +765,7 @@ def _update_path(
                     table._df.index,
                     os.path.normpath,
                 )
-        table._df.index = _maybe_replace_file_extension_in_index(
+        table._df.index = _maybe_replace_file_extension(
             table._df.index,
             format,
         )
@@ -1276,13 +1308,7 @@ def load_media(
                     verbose,
                 )
 
-            if format is not None:
-                pattern = _format_replace_pattern(format)
-                pattern = re.compile(pattern)
-                media = [
-                    re.sub(pattern, f'\\g<before>.{format}', m)
-                    for m in media
-                ]
+            media = _maybe_replace_file_extension(media, format)
             files = [
                 os.path.join(db_root, os.path.normpath(m)) for m in media
             ]

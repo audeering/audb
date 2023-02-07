@@ -126,6 +126,7 @@ def cached(
         >>> db = audb.load(
         ...     'emodb',
         ...     version='1.3.0',
+        ...     format='flac',
         ...     only_metadata=True,
         ...     full_path=False,
         ...     verbose=False,
@@ -133,12 +134,12 @@ def cached(
         >>> df = cached()
         >>> print(df.iloc[0].to_string())
         name                emodb
-        flavor_id        d3b62a9b
+        flavor_id        40bb2241
         version             1.3.0
         complete            False
         bit_depth            None
         channels             None
-        format               None
+        format               flac
         mixdown             False
         sampling_rate        None
 
