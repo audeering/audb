@@ -7,6 +7,18 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.4.2 (2023-02-13)
+--------------------------
+
+* Added: support for Python 3.10
+* Added: document optional needed overwrite permissions
+  for ``audb.publish()``
+  when continuing a canceled publishing command
+* Changed: require ``audbackend>=0.3.17``
+* Changed: split API documentation into sub-pages
+  for each function
+
+
 Version 1.4.1 (2022-10-17)
 --------------------------
 
