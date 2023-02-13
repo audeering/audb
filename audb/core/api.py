@@ -37,7 +37,7 @@ def available(
         table with database name as index,
         and backend, host, repository, version as columns
 
-    Example:
+    Examples:
         >>> audb.available(only_latest=True)
                    backend                                    host   repository version
         name
@@ -122,7 +122,7 @@ def cached(
         sampling_rate
         as columns
 
-    Example:
+    Examples:
         >>> db = audb.load(
         ...     'emodb',
         ...     version='1.3.0',
@@ -243,7 +243,7 @@ def dependencies(
     Returns:
         dependency object
 
-    Example:
+    Examples:
         >>> deps = dependencies('emodb', version='1.3.0')
         >>> deps.version('db.emotion.csv')
         '1.1.0'
@@ -320,7 +320,7 @@ def exists(
     Returns:
         ``True`` if database flavor exists
 
-    Example:
+    Examples:
         >>> db = audb.load(
         ...     'emodb',
         ...     version='1.3.0',
@@ -404,7 +404,7 @@ def flavor_path(
             or ``sampling_rate``
             is requested
 
-    Example:
+    Examples:
         >>> flavor_path('emodb', version='1.3.0').split(os.path.sep)
         ['emodb', '1.3.0', 'd3b62a9b']
 
@@ -434,7 +434,7 @@ def latest_version(
     Raises:
         RuntimeError: if no version exists for the requested database
 
-    Example:
+    Examples:
         >>> latest_version('emodb')
         '1.3.0'
 
@@ -562,7 +562,7 @@ def repository(
     Raises:
         RuntimeError: if database is not found
 
-    Example:
+    Examples:
         >>> audb.repository('emodb', '1.3.0')
         Repository('data-public', 'https://audeering.jfrog.io/artifactory', 'artifactory')
 
@@ -581,7 +581,7 @@ def versions(
     Returns:
         list of versions
 
-    Example:
+    Examples:
         >>> versions('emodb')
         ['1.1.0', '1.1.1', '1.2.0', '1.3.0']
 

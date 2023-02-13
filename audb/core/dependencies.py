@@ -24,7 +24,7 @@ class Dependencies:
     The dependencies of a database can be requested with
     :func:`audb.dependencies`.
 
-    Example:
+    Examples:
         >>> deps = Dependencies()
         >>> deps()
         Empty DataFrame
