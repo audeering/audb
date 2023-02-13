@@ -817,7 +817,7 @@ def load(
             or ``sampling_rate``
             is requested
 
-    Example:
+    Examples:
         >>> db = audb.load(
         ...     'emodb',
         ...     version='1.3.0',
@@ -1120,7 +1120,7 @@ def load_media(
             or ``sampling_rate``
             is requested
 
-    Example:
+    Examples:
         >>> paths = load_media(
         ...     'emodb',
         ...     ['wav/03a01Fa.wav'],
@@ -1251,7 +1251,7 @@ def load_table(
         ValueError: if a table is requested
             that is not part of the database
 
-    Example:
+    Examples:
         >>> df = load_table(
         ...     'emodb',
         ...     'emotion',
