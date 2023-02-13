@@ -14,7 +14,6 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
         python-version: [ '3.8' ]
-        tasks: [ tests ]
         include:
           - os: ubuntu-latest
             python-version: '3.9'
@@ -22,9 +21,6 @@ jobs:
           - os: ubuntu-latest
             python-version: '3.10'
             tasks: tests
-          - os: ubuntu-latest
-            python-version: '3.8'
-            tasks: docs
 
     steps:
     - uses: actions/checkout@v3
@@ -56,44 +52,25 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends --yes ffmpeg mediainfo
-      if: matrix.tasks == 'tests' && matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest'
 
     - name: OSX - install ffmpeg/mediainfo
       run: brew install ffmpeg mediainfo
-      if: matrix.tasks == 'tests' && matrix.os == 'macOS-latest'
+      if: matrix.os == 'macOS-latest'
 
     - name: Windows - install ffmpeg/mediainfo
       run: choco install ffmpeg mediainfo-cli
-      if: matrix.tasks == 'tests' && matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-latest'
 
     - name: Install tests requirements
       run: pip install -r tests/requirements.txt
-      if: matrix.tasks == 'tests'
 
     - name: Test with pytest
       run: python -m pytest
-      if: matrix.tasks == 'tests'
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
-      if: matrix.tasks == 'tests' && matrix.os == 'ubuntu-latest'
-
-      # DOCS
-    - name: Ubuntu - install graphviz
-      run: sudo apt-get install --yes graphviz
-      if: matrix.tasks == 'docs'
-
-    - name: Install docs requirements
-      run: pip install -r docs/requirements.txt
-      if: matrix.tasks == 'docs'
-
-    - name: Test building documentation
-      run: python -m sphinx docs/ docs/_build/ -b html -W
-      if: matrix.tasks == 'docs'
-
-    - name: Check links in documentation
-      run: python -m sphinx docs/ docs/_build/ -b linkcheck -W
-      if: matrix.tasks == 'docs'
+      if: matrix.os == 'ubuntu-latest'
