@@ -1,0 +1,6 @@
+﻿channels\(\)
+============
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.channels

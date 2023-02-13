@@ -1,0 +1,92 @@
+﻿Dependencies
+============
+
+.. currentmodule:: audb
+
+.. autoclass:: Dependencies
+
+
+\_\_call\_\_\(\)
+----------------
+.. automethod:: Dependencies.__call__
+    
+\_\_contains\_\_\(\)
+--------------------
+.. automethod:: Dependencies.__contains__
+    
+\_\_getitem\_\_\(\)
+-------------------
+.. automethod:: Dependencies.__getitem__
+    
+archive\(\)
+-----------
+.. automethod:: Dependencies.archive
+    
+archives
+--------
+.. autoattribute:: Dependencies.archives
+    
+bit\_depth\(\)
+--------------
+.. automethod:: Dependencies.bit_depth
+    
+channels\(\)
+------------
+.. automethod:: Dependencies.channels
+    
+checksum\(\)
+------------
+.. automethod:: Dependencies.checksum
+    
+duration\(\)
+------------
+.. automethod:: Dependencies.duration
+    
+files
+-----
+.. autoattribute:: Dependencies.files
+    
+format\(\)
+----------
+.. automethod:: Dependencies.format
+    
+load\(\)
+--------
+.. automethod:: Dependencies.load
+    
+media
+-----
+.. autoattribute:: Dependencies.media
+    
+removed\(\)
+-----------
+.. automethod:: Dependencies.removed
+    
+removed\_media
+--------------
+.. autoattribute:: Dependencies.removed_media
+    
+sampling\_rate\(\)
+------------------
+.. automethod:: Dependencies.sampling_rate
+    
+save\(\)
+--------
+.. automethod:: Dependencies.save
+    
+table\_ids
+----------
+.. autoattribute:: Dependencies.table_ids
+    
+tables
+------
+.. autoattribute:: Dependencies.tables
+    
+type\(\)
+--------
+.. automethod:: Dependencies.type
+    
+version\(\)
+-----------
+.. automethod:: Dependencies.version
+    

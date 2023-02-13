@@ -1,0 +1,6 @@
+﻿source\(\)
+==========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.source

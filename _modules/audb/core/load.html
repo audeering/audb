@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>audb.core.load &mdash; audb Documentation</title>
+  <title>audb.core.load &mdash; Documentation</title>
   
 
   
@@ -25,12 +25,8 @@
     
 
   
-
-  
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -72,7 +68,7 @@
             
             
               <div class="version">
-                v1.4.1
+                v1.4.2
               </div>
             
           
@@ -110,8 +106,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../api.html">audb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audb.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audb.info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
@@ -156,7 +152,6 @@
             
   <h1>Source code for audb.core.load</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 
@@ -201,7 +196,7 @@
         <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CachedVersions</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find other cached versions of same flavor.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find other cached versions of same flavor.&quot;&quot;&quot;</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">cached</span><span class="p">(</span><span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
     <span class="c1"># If no explicit cache root is given,</span>
@@ -241,7 +236,7 @@
         <span class="n">flavor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Flavor</span><span class="p">],</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find cached files.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find cached files.&quot;&quot;&quot;</span>
 
     <span class="n">cached_files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">missing_files</span> <span class="o">=</span> <span class="p">[]</span>
@@ -285,7 +280,7 @@
         <span class="n">root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">root_dst</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy file.&quot;&quot;&quot;</span>
     <span class="n">src_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_src</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
     <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
     <span class="n">dst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dst</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
@@ -370,7 +365,7 @@
         <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media from backend.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media from backend.&quot;&quot;&quot;</span>
 
     <span class="c1"># figure out archives</span>
     <span class="n">archives</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -454,7 +449,7 @@
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy media from cache.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy media from cache.&quot;&quot;&quot;</span>
 
     <span class="n">db_root_cached</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cached_versions</span><span class="p">]</span>
 
@@ -501,7 +496,7 @@
         <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load tables from backend.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load tables from backend.&quot;&quot;&quot;</span>
     <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_root</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -552,7 +547,7 @@
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy tables from cache.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy tables from cache.&quot;&quot;&quot;</span>
 
     <span class="n">db_root_cached</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cached_versions</span><span class="p">]</span>
 
@@ -608,7 +603,7 @@
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">CachedVersions</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media files to cache.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media files to cache.</span>
 
 <span class="sd">    All media files not existing in cache yet</span>
 <span class="sd">    are copied from the corresponding flavor cache</span>
@@ -670,7 +665,7 @@
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">CachedVersions</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load table files to cache.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load table files to cache.</span>
 
 <span class="sd">    All table files not existing in cache yet</span>
 <span class="sd">    are copied from the corresponding flavor cache</span>
@@ -719,7 +714,7 @@
 <span class="k">def</span> <span class="nf">_misc_tables_used_in_scheme</span><span class="p">(</span>
         <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;List of misc tables that are used inside a scheme.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;List of misc tables that are used inside a scheme.&quot;&quot;&quot;</span>
     <span class="n">misc_tables_used_in_scheme</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">scheme</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">schemes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">scheme</span><span class="o">.</span><span class="n">uses_table</span><span class="p">:</span>
@@ -789,7 +784,7 @@
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Change the file path in all tables.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Change the file path in all tables.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        db: database object</span>
@@ -838,7 +833,7 @@
         <span class="n">tables</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Filter media by tables.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Filter media by tables.</span>
 
 <span class="sd">    Return all media files from ``media``</span>
 <span class="sd">    that are referenced in at least one table</span>
@@ -890,7 +885,7 @@
     <span class="k">return</span> <span class="n">df</span>
 
 
-<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../api.html#audb.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../api/audb.load.html#audb.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -909,7 +904,7 @@
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database.</span>
 
 <span class="sd">    Loads meta and media files of a database to the local cache and returns</span>
 <span class="sd">    a :class:`audformat.Database` object.</span>
@@ -975,7 +970,7 @@
 <span class="sd">            or ``sampling_rate``</span>
 <span class="sd">            is requested</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; db = audb.load(</span>
 <span class="sd">        ...     &#39;emodb&#39;,</span>
 <span class="sd">        ...     version=&#39;1.3.0&#39;,</span>
@@ -1134,7 +1129,7 @@
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load header of database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load header of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -1166,7 +1161,7 @@
         <span class="n">add_audb_meta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">]]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database header from folder or backend.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database header from folder or backend.</span>
 
 <span class="sd">    If the database header cannot be found in ``db_root``</span>
 <span class="sd">    it will search for the backend that contains the database,</span>
@@ -1215,7 +1210,7 @@
     <span class="k">return</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">backend</span>
 
 
-<div class="viewcode-block" id="load_media"><a class="viewcode-back" href="../../../api.html#audb.load_media">[docs]</a><span class="k">def</span> <span class="nf">load_media</span><span class="p">(</span>
+<div class="viewcode-block" id="load_media"><a class="viewcode-back" href="../../../api/audb.load_media.html#audb.load_media">[docs]</a><span class="k">def</span> <span class="nf">load_media</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1230,7 +1225,7 @@
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media file(s).</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media file(s).</span>
 
 <span class="sd">    If you are interested in media files</span>
 <span class="sd">    and not the corresponding tables,</span>
@@ -1278,7 +1273,7 @@
 <span class="sd">            or ``sampling_rate``</span>
 <span class="sd">            is requested</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; paths = load_media(</span>
 <span class="sd">        ...     &#39;emodb&#39;,</span>
 <span class="sd">        ...     [&#39;wav/03a01Fa.wav&#39;],</span>
@@ -1373,7 +1368,7 @@
     <span class="k">return</span> <span class="n">files</span></div>
 
 
-<div class="viewcode-block" id="load_table"><a class="viewcode-back" href="../../../api.html#audb.load_table">[docs]</a><span class="k">def</span> <span class="nf">load_table</span><span class="p">(</span>
+<div class="viewcode-block" id="load_table"><a class="viewcode-back" href="../../../api/audb.load_table.html#audb.load_table">[docs]</a><span class="k">def</span> <span class="nf">load_table</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1382,7 +1377,7 @@
         <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load a database table.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load a database table.</span>
 
 <span class="sd">    If you are interested in a single table</span>
 <span class="sd">    from a database</span>
@@ -1409,7 +1404,7 @@
 <span class="sd">        ValueError: if a table is requested</span>
 <span class="sd">            that is not part of the database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; df = load_table(</span>
 <span class="sd">        ...     &#39;emodb&#39;,</span>
 <span class="sd">        ...     &#39;emotion&#39;,</span>
@@ -1498,7 +1493,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1506,7 +1501,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2022 audEERING GmbH
+      &copy; 2020-2023 audEERING GmbH
     </p>
   </div> 
 

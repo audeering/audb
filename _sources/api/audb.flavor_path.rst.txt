@@ -1,0 +1,6 @@
+﻿flavor\_path\(\)
+================
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.flavor_path

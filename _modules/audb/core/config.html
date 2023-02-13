@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>audb.core.config &mdash; audb Documentation</title>
+  <title>audb.core.config &mdash; Documentation</title>
   
 
   
@@ -25,12 +25,8 @@
     
 
   
-
-  
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -72,7 +68,7 @@
             
             
               <div class="version">
-                v1.4.1
+                v1.4.2
               </div>
             
           
@@ -110,8 +106,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../api.html">audb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audb.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audb.info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
@@ -169,7 +165,7 @@
 
 
 <span class="k">def</span> <span class="nf">load_configuration_file</span><span class="p">(</span><span class="n">config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read configuration from YAML file.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read configuration from YAML file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        config_file: path to configuration file.</span>
@@ -224,8 +220,8 @@
 <span class="n">global_config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user_config</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="config"><a class="viewcode-back" href="../../../api.html#audb.config">[docs]</a><span class="k">class</span> <span class="nc">config</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Get/set configuration values for the :mod:`audb` module.</span>
+<div class="viewcode-block" id="config"><a class="viewcode-back" href="../../../api/audb.config.html#audb.config">[docs]</a><span class="k">class</span> <span class="nc">config</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get/set configuration values for the :mod:`audb` module.</span>
 
 <span class="sd">    The configuration values are read in during module import</span>
 <span class="sd">    from the :ref:`configuration file &lt;configuration&gt;`</span>
@@ -235,7 +231,7 @@
 <span class="sd">    The :ref:`caching &lt;caching&gt;` related configuration values</span>
 <span class="sd">    can be overwritten by environment variables.</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 
 <span class="sd">        &gt;&gt;&gt; config.CACHE_ROOT</span>
 <span class="sd">        &#39;~/audb&#39;</span>
@@ -246,13 +242,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;cache_root&#39;</span><span class="p">]</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default user cache folder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default user cache folder.&quot;&quot;&quot;</span>
 
     <span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">Repository</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;backend&#39;</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;repositories&#39;</span><span class="p">]</span>
     <span class="p">]</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repositories, will be iterated in given order.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repositories, will be iterated in given order.</span>
 
 <span class="sd">    A repository is defined by the object :class:`audb.Repository`,</span>
 <span class="sd">    containing the following attributes:</span>
@@ -265,7 +261,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">SHARED_CACHE_ROOT</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;shared_cache_root&#39;</span><span class="p">]</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shared cache folder.&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shared cache folder.&quot;&quot;&quot;</span></div>
 </pre></div>
 
            </div>
@@ -281,7 +277,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -289,7 +285,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2022 audEERING GmbH
+      &copy; 2020-2023 audEERING GmbH
     </p>
   </div> 
 

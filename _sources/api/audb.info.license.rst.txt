@@ -1,0 +1,6 @@
+﻿license\(\)
+===========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.license

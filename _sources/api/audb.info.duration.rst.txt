@@ -1,0 +1,6 @@
+﻿duration\(\)
+============
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.duration

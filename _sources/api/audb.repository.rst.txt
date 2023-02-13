@@ -1,0 +1,6 @@
+﻿repository\(\)
+==============
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.repository

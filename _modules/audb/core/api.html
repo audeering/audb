@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>audb.core.api &mdash; audb Documentation</title>
+  <title>audb.core.api &mdash; Documentation</title>
   
 
   
@@ -25,12 +25,8 @@
     
 
   
-
-  
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -72,7 +68,7 @@
             
             
               <div class="version">
-                v1.4.1
+                v1.4.2
               </div>
             
           
@@ -110,8 +106,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../api.html">audb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audb.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audb.info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
@@ -156,7 +152,6 @@
             
   <h1>Source code for audb.core.api</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 
@@ -182,11 +177,11 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="available"><a class="viewcode-back" href="../../../api.html#audb.available">[docs]</a><span class="k">def</span> <span class="nf">available</span><span class="p">(</span>
+<div class="viewcode-block" id="available"><a class="viewcode-back" href="../../../api/audb.available.html#audb.available">[docs]</a><span class="k">def</span> <span class="nf">available</span><span class="p">(</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">only_latest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;List all databases that are available to the user.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;List all databases that are available to the user.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        only_latest: include only latest version of database</span>
@@ -195,7 +190,7 @@
 <span class="sd">        table with database name as index,</span>
 <span class="sd">        and backend, host, repository, version as columns</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; audb.available(only_latest=True)</span>
 <span class="sd">                   backend                                    host   repository version</span>
 <span class="sd">        name</span>
@@ -250,13 +245,13 @@
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cached"><a class="viewcode-back" href="../../../api.html#audb.cached">[docs]</a><span class="k">def</span> <span class="nf">cached</span><span class="p">(</span>
+<div class="viewcode-block" id="cached"><a class="viewcode-back" href="../../../api/audb.cached.html#audb.cached">[docs]</a><span class="k">def</span> <span class="nf">cached</span><span class="p">(</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">shared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;List available databases and flavors in the cache.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;List available databases and flavors in the cache.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cache_root: cache folder where databases are stored.</span>
@@ -280,7 +275,7 @@
 <span class="sd">        sampling_rate</span>
 <span class="sd">        as columns</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; db = audb.load(</span>
 <span class="sd">        ...     &#39;emodb&#39;,</span>
 <span class="sd">        ...     version=&#39;1.3.0&#39;,</span>
@@ -382,14 +377,14 @@
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="dependencies"><a class="viewcode-back" href="../../../api.html#audb.dependencies">[docs]</a><span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span>
+<div class="viewcode-block" id="dependencies"><a class="viewcode-back" href="../../../api/audb.dependencies.html#audb.dependencies">[docs]</a><span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dependencies</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Database dependencies.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Database dependencies.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -401,7 +396,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        dependency object</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; deps = dependencies(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; deps.version(&#39;db.emotion.csv&#39;)</span>
 <span class="sd">        &#39;1.1.0&#39;</span>
@@ -439,7 +434,7 @@
     <span class="k">return</span> <span class="n">deps</span></div>
 
 
-<div class="viewcode-block" id="exists"><a class="viewcode-back" href="../../../api.html#audb.exists">[docs]</a><span class="k">def</span> <span class="nf">exists</span><span class="p">(</span>
+<div class="viewcode-block" id="exists"><a class="viewcode-back" href="../../../api/audb.exists.html#audb.exists">[docs]</a><span class="k">def</span> <span class="nf">exists</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -450,7 +445,7 @@
     <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if specified database flavor exists in local cache folder.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if specified database flavor exists in local cache folder.</span>
 
 <span class="sd">    Does not check for any flavor of the requested database in the cache,</span>
 <span class="sd">    but only for a particular flavor.</span>
@@ -478,7 +473,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        ``True`` if database flavor exists</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; db = audb.load(</span>
 <span class="sd">        ...     &#39;emodb&#39;,</span>
 <span class="sd">        ...     version=&#39;1.3.0&#39;,</span>
@@ -516,7 +511,7 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="flavor_path"><a class="viewcode-back" href="../../../api.html#audb.flavor_path">[docs]</a><span class="k">def</span> <span class="nf">flavor_path</span><span class="p">(</span>
+<div class="viewcode-block" id="flavor_path"><a class="viewcode-back" href="../../../api/audb.flavor_path.html#audb.flavor_path">[docs]</a><span class="k">def</span> <span class="nf">flavor_path</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -526,7 +521,7 @@
     <span class="n">mixdown</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flavor cache path.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flavor cache path.</span>
 
 <span class="sd">    Returns the path under which :func:`audb.load` stores a specific</span>
 <span class="sd">    flavor of a database in the cache folder, that is:</span>
@@ -562,7 +557,7 @@
 <span class="sd">            or ``sampling_rate``</span>
 <span class="sd">            is requested</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; flavor_path(&#39;emodb&#39;, version=&#39;1.3.0&#39;).split(os.path.sep)</span>
 <span class="sd">        [&#39;emodb&#39;, &#39;1.3.0&#39;, &#39;d3b62a9b&#39;]</span>
 
@@ -578,10 +573,10 @@
     <span class="k">return</span> <span class="n">flavor</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="latest_version"><a class="viewcode-back" href="../../../api.html#audb.latest_version">[docs]</a><span class="k">def</span> <span class="nf">latest_version</span><span class="p">(</span>
+<div class="viewcode-block" id="latest_version"><a class="viewcode-back" href="../../../api/audb.latest_version.html#audb.latest_version">[docs]</a><span class="k">def</span> <span class="nf">latest_version</span><span class="p">(</span>
         <span class="n">name</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Latest version of database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Latest version of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -592,7 +587,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: if no version exists for the requested database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; latest_version(&#39;emodb&#39;)</span>
 <span class="sd">        &#39;1.3.0&#39;</span>
 
@@ -605,13 +600,13 @@
     <span class="k">return</span> <span class="n">vs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="remove_media"><a class="viewcode-back" href="../../../api.html#audb.remove_media">[docs]</a><span class="k">def</span> <span class="nf">remove_media</span><span class="p">(</span>
+<div class="viewcode-block" id="remove_media"><a class="viewcode-back" href="../../../api/audb.remove_media.html#audb.remove_media">[docs]</a><span class="k">def</span> <span class="nf">remove_media</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove media from all versions.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove media from all versions.</span>
 
 <span class="sd">    Be careful,</span>
 <span class="sd">    this removes files from all published versions</span>
@@ -699,11 +694,11 @@
                 <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="repository"><a class="viewcode-back" href="../../../api.html#audb.repository">[docs]</a><span class="k">def</span> <span class="nf">repository</span><span class="p">(</span>
+<div class="viewcode-block" id="repository"><a class="viewcode-back" href="../../../api/audb.repository.html#audb.repository">[docs]</a><span class="k">def</span> <span class="nf">repository</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Repository</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return repository that stores the requested database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return repository that stores the requested database.</span>
 
 <span class="sd">    If the database is stored in several repositories,</span>
 <span class="sd">    only the first one is returned.</span>
@@ -720,7 +715,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: if database is not found</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; audb.repository(&#39;emodb&#39;, &#39;1.3.0&#39;)</span>
 <span class="sd">        Repository(&#39;data-public&#39;, &#39;https://audeering.jfrog.io/artifactory&#39;, &#39;artifactory&#39;)</span>
 
@@ -728,10 +723,10 @@
     <span class="k">return</span> <span class="n">_lookup</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="versions"><a class="viewcode-back" href="../../../api.html#audb.versions">[docs]</a><span class="k">def</span> <span class="nf">versions</span><span class="p">(</span>
+<div class="viewcode-block" id="versions"><a class="viewcode-back" href="../../../api/audb.versions.html#audb.versions">[docs]</a><span class="k">def</span> <span class="nf">versions</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Available versions of database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Available versions of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -739,7 +734,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        list of versions</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; versions(&#39;emodb&#39;)</span>
 <span class="sd">        [&#39;1.1.0&#39;, &#39;1.1.1&#39;, &#39;1.2.0&#39;, &#39;1.3.0&#39;]</span>
 
@@ -769,7 +764,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -777,7 +772,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2022 audEERING GmbH
+      &copy; 2020-2023 audEERING GmbH
     </p>
   </div> 
 

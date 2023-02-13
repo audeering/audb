@@ -1,0 +1,6 @@
+﻿media\(\)
+=========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.media

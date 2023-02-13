@@ -1,0 +1,6 @@
+﻿schemes\(\)
+===========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.schemes

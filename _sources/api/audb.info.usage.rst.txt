@@ -1,0 +1,6 @@
+﻿usage\(\)
+=========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.usage

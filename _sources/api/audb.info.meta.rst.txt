@@ -1,0 +1,6 @@
+﻿meta\(\)
+========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.meta

@@ -1,0 +1,6 @@
+﻿bit\_depths\(\)
+===============
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.bit_depths

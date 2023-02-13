@@ -1,0 +1,6 @@
+﻿organization\(\)
+================
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.organization

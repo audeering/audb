@@ -1,0 +1,6 @@
+﻿available\(\)
+=============
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.available

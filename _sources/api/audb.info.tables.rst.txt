@@ -1,0 +1,6 @@
+﻿tables\(\)
+==========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.tables

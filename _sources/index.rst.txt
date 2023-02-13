@@ -23,8 +23,8 @@
     :caption: API Documentation
     :hidden:
 
-    api
-    api-info
+    api/audb
+    api/audb.info
     genindex
 
 .. toctree::

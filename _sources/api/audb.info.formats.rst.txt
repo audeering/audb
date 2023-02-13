@@ -1,0 +1,6 @@
+﻿formats\(\)
+===========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.formats

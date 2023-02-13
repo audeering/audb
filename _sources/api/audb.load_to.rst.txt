@@ -1,0 +1,6 @@
+﻿load\_to\(\)
+============
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.load_to

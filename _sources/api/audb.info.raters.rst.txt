@@ -1,0 +1,6 @@
+﻿raters\(\)
+==========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.raters

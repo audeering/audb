@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>audb.core.info &mdash; audb Documentation</title>
+  <title>audb.core.info &mdash; Documentation</title>
   
 
   
@@ -25,12 +25,8 @@
     
 
   
-
-  
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -72,7 +68,7 @@
             
             
               <div class="version">
-                v1.4.1
+                v1.4.2
               </div>
             
           
@@ -110,8 +106,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../api.html">audb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audb.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audb.info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
@@ -162,26 +158,21 @@
 <span class="kn">import</span> <span class="nn">audformat</span>
 
 <span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
-<span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">dependencies</span><span class="p">,</span>
-    <span class="n">database_cache_root</span><span class="p">,</span>
-    <span class="n">latest_version</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="n">dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.load</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">filtered_dependencies</span><span class="p">,</span>
     <span class="n">load_header</span><span class="p">,</span>
     <span class="n">load_table</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">audb.core.lock</span> <span class="kn">import</span> <span class="n">FolderLock</span>
 
 
-<div class="viewcode-block" id="author"><a class="viewcode-back" href="../../../api-info.html#audb.info.author">[docs]</a><span class="k">def</span> <span class="nf">author</span><span class="p">(</span>
+<div class="viewcode-block" id="author"><a class="viewcode-back" href="../../../api/audb.info.author.html#audb.info.author">[docs]</a><span class="k">def</span> <span class="nf">author</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Author(s) of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Author(s) of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -192,7 +183,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        author(s) of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; author(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        &#39;Felix Burkhardt, Astrid Paeschke, Miriam Rolfes, Walter Sendlmeier, Benjamin Weiss&#39;</span>
 
@@ -206,7 +197,7 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">author</span></div>
 
 
-<div class="viewcode-block" id="bit_depths"><a class="viewcode-back" href="../../../api-info.html#audb.info.bit_depths">[docs]</a><span class="k">def</span> <span class="nf">bit_depths</span><span class="p">(</span>
+<div class="viewcode-block" id="bit_depths"><a class="viewcode-back" href="../../../api/audb.info.bit_depths.html#audb.info.bit_depths">[docs]</a><span class="k">def</span> <span class="nf">bit_depths</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -214,7 +205,7 @@
         <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Media bit depth.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Media bit depth.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -233,7 +224,7 @@
 <span class="sd">        ValueError: if table or media is requested</span>
 <span class="sd">            that is not part of the database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; bit_depths(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        {16}</span>
 
@@ -242,7 +233,7 @@
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="channels"><a class="viewcode-back" href="../../../api-info.html#audb.info.channels">[docs]</a><span class="k">def</span> <span class="nf">channels</span><span class="p">(</span>
+<div class="viewcode-block" id="channels"><a class="viewcode-back" href="../../../api/audb.info.channels.html#audb.info.channels">[docs]</a><span class="k">def</span> <span class="nf">channels</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -250,7 +241,7 @@
         <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Media channels.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Media channels.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -269,7 +260,7 @@
 <span class="sd">        ValueError: if table or media is requested</span>
 <span class="sd">            that is not part of the database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; channels(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        {1}</span>
 
@@ -278,13 +269,13 @@
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="description"><a class="viewcode-back" href="../../../api-info.html#audb.info.description">[docs]</a><span class="k">def</span> <span class="nf">description</span><span class="p">(</span>
+<div class="viewcode-block" id="description"><a class="viewcode-back" href="../../../api/audb.info.description.html#audb.info.description">[docs]</a><span class="k">def</span> <span class="nf">description</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Description of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Description of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -295,7 +286,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        description of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; desc = description(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; desc.split(&#39;.&#39;)[0]  # show first sentence</span>
 <span class="sd">        &#39;Berlin Database of Emotional Speech&#39;</span>
@@ -310,7 +301,7 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">description</span></div>
 
 
-<div class="viewcode-block" id="duration"><a class="viewcode-back" href="../../../api-info.html#audb.info.duration">[docs]</a><span class="k">def</span> <span class="nf">duration</span><span class="p">(</span>
+<div class="viewcode-block" id="duration"><a class="viewcode-back" href="../../../api/audb.info.duration.html#audb.info.duration">[docs]</a><span class="k">def</span> <span class="nf">duration</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -318,7 +309,7 @@
         <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Total media duration.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Total media duration.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -337,7 +328,7 @@
 <span class="sd">        ValueError: if table or media is requested</span>
 <span class="sd">            that is not part of the database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; duration(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        Timedelta(&#39;0 days 00:24:47.092187500&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; duration(&#39;emodb&#39;, version=&#39;1.3.0&#39;, media=[&#39;wav/03a01Fa.wav&#39;])</span>
@@ -351,13 +342,13 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="files"><a class="viewcode-back" href="../../../api-info.html#audb.info.files">[docs]</a><span class="k">def</span> <span class="nf">files</span><span class="p">(</span>
+<div class="viewcode-block" id="files"><a class="viewcode-back" href="../../../api/audb.info.files.html#audb.info.files">[docs]</a><span class="k">def</span> <span class="nf">files</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Media files included in the database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Media files included in the database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -368,7 +359,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        media files</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; files(&#39;emodb&#39;, version=&#39;1.3.0&#39;)[:2]</span>
 <span class="sd">        [&#39;wav/03a01Fa.wav&#39;, &#39;wav/03a01Nc.wav&#39;]</span>
 
@@ -377,7 +368,7 @@
     <span class="k">return</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span></div>
 
 
-<div class="viewcode-block" id="formats"><a class="viewcode-back" href="../../../api-info.html#audb.info.formats">[docs]</a><span class="k">def</span> <span class="nf">formats</span><span class="p">(</span>
+<div class="viewcode-block" id="formats"><a class="viewcode-back" href="../../../api/audb.info.formats.html#audb.info.formats">[docs]</a><span class="k">def</span> <span class="nf">formats</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -385,7 +376,7 @@
         <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Media formats.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Media formats.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -404,7 +395,7 @@
 <span class="sd">        ValueError: if table or media is requested</span>
 <span class="sd">            that is not part of the database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; formats(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        {&#39;wav&#39;}</span>
 
@@ -413,14 +404,14 @@
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="header"><a class="viewcode-back" href="../../../api-info.html#audb.info.header">[docs]</a><span class="k">def</span> <span class="nf">header</span><span class="p">(</span>
+<div class="viewcode-block" id="header"><a class="viewcode-back" href="../../../api/audb.info.header.html#audb.info.header">[docs]</a><span class="k">def</span> <span class="nf">header</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load header of database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load header of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -434,7 +425,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        database object without table data</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; db = header(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; db.name</span>
 <span class="sd">        &#39;emodb&#39;</span>
@@ -455,13 +446,13 @@
     <span class="k">return</span> <span class="n">db</span></div>
 
 
-<div class="viewcode-block" id="languages"><a class="viewcode-back" href="../../../api-info.html#audb.info.languages">[docs]</a><span class="k">def</span> <span class="nf">languages</span><span class="p">(</span>
+<div class="viewcode-block" id="languages"><a class="viewcode-back" href="../../../api/audb.info.languages.html#audb.info.languages">[docs]</a><span class="k">def</span> <span class="nf">languages</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Languages of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Languages of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -472,7 +463,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        languages of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; languages(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        [&#39;deu&#39;]</span>
 
@@ -486,13 +477,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">languages</span></div>
 
 
-<div class="viewcode-block" id="license"><a class="viewcode-back" href="../../../api-info.html#audb.info.license">[docs]</a><span class="k">def</span> <span class="nf">license</span><span class="p">(</span>
+<div class="viewcode-block" id="license"><a class="viewcode-back" href="../../../api/audb.info.license.html#audb.info.license">[docs]</a><span class="k">def</span> <span class="nf">license</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;License of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;License of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -503,7 +494,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        license of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; license(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        &#39;CC0-1.0&#39;</span>
 
@@ -517,13 +508,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">license</span></div>
 
 
-<div class="viewcode-block" id="license_url"><a class="viewcode-back" href="../../../api-info.html#audb.info.license_url">[docs]</a><span class="k">def</span> <span class="nf">license_url</span><span class="p">(</span>
+<div class="viewcode-block" id="license_url"><a class="viewcode-back" href="../../../api/audb.info.license_url.html#audb.info.license_url">[docs]</a><span class="k">def</span> <span class="nf">license_url</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;License URL of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;License URL of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -534,7 +525,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        license URL of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; license_url(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        &#39;https://creativecommons.org/publicdomain/zero/1.0/&#39;</span>
 
@@ -548,13 +539,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">license_url</span></div>
 
 
-<div class="viewcode-block" id="media"><a class="viewcode-back" href="../../../api-info.html#audb.info.media">[docs]</a><span class="k">def</span> <span class="nf">media</span><span class="p">(</span>
+<div class="viewcode-block" id="media"><a class="viewcode-back" href="../../../api/audb.info.media.html#audb.info.media">[docs]</a><span class="k">def</span> <span class="nf">media</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Audio and video media of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Audio and video media of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -565,7 +556,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        media of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; media(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        microphone:</span>
 <span class="sd">            {type: other, format: wav, channels: 1, sampling_rate: 16000}</span>
@@ -580,13 +571,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">media</span></div>
 
 
-<div class="viewcode-block" id="meta"><a class="viewcode-back" href="../../../api-info.html#audb.info.meta">[docs]</a><span class="k">def</span> <span class="nf">meta</span><span class="p">(</span>
+<div class="viewcode-block" id="meta"><a class="viewcode-back" href="../../../api/audb.info.meta.html#audb.info.meta">[docs]</a><span class="k">def</span> <span class="nf">meta</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Meta information of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Meta information of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -597,7 +588,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        meta information of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; meta(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        pdf:</span>
 <span class="sd">          http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&amp;rep=rep1&amp;type=pdf</span>
@@ -612,13 +603,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">meta</span></div>
 
 
-<div class="viewcode-block" id="misc_tables"><a class="viewcode-back" href="../../../api-info.html#audb.info.misc_tables">[docs]</a><span class="k">def</span> <span class="nf">misc_tables</span><span class="p">(</span>
+<div class="viewcode-block" id="misc_tables"><a class="viewcode-back" href="../../../api/audb.info.misc_tables.html#audb.info.misc_tables">[docs]</a><span class="k">def</span> <span class="nf">misc_tables</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Miscellaneous tables of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Miscellaneous tables of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -629,7 +620,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        miscellaneous tables of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; list(misc_tables(&#39;emodb&#39;, version=&#39;1.3.0&#39;))</span>
 <span class="sd">        [&#39;speaker&#39;]</span>
 
@@ -643,13 +634,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">misc_tables</span></div>
 
 
-<div class="viewcode-block" id="organization"><a class="viewcode-back" href="../../../api-info.html#audb.info.organization">[docs]</a><span class="k">def</span> <span class="nf">organization</span><span class="p">(</span>
+<div class="viewcode-block" id="organization"><a class="viewcode-back" href="../../../api/audb.info.organization.html#audb.info.organization">[docs]</a><span class="k">def</span> <span class="nf">organization</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Organization responsible for database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Organization responsible for database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -660,7 +651,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        organization responsible for database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; organization(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        &#39;audEERING&#39;</span>
 
@@ -674,13 +665,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">organization</span></div>
 
 
-<div class="viewcode-block" id="raters"><a class="viewcode-back" href="../../../api-info.html#audb.info.raters">[docs]</a><span class="k">def</span> <span class="nf">raters</span><span class="p">(</span>
+<div class="viewcode-block" id="raters"><a class="viewcode-back" href="../../../api/audb.info.raters.html#audb.info.raters">[docs]</a><span class="k">def</span> <span class="nf">raters</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Raters contributed to database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raters contributed to database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -691,7 +682,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        raters of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; raters(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        gold:</span>
 <span class="sd">            {type: human}</span>
@@ -706,7 +697,7 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">raters</span></div>
 
 
-<div class="viewcode-block" id="sampling_rates"><a class="viewcode-back" href="../../../api-info.html#audb.info.sampling_rates">[docs]</a><span class="k">def</span> <span class="nf">sampling_rates</span><span class="p">(</span>
+<div class="viewcode-block" id="sampling_rates"><a class="viewcode-back" href="../../../api/audb.info.sampling_rates.html#audb.info.sampling_rates">[docs]</a><span class="k">def</span> <span class="nf">sampling_rates</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -714,7 +705,7 @@
         <span class="n">media</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Media sampling rates.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Media sampling rates.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -733,7 +724,7 @@
 <span class="sd">        ValueError: if table or media is requested</span>
 <span class="sd">            that is not part of the database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; sampling_rates(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        {16000}</span>
 
@@ -742,14 +733,14 @@
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="schemes"><a class="viewcode-back" href="../../../api-info.html#audb.info.schemes">[docs]</a><span class="k">def</span> <span class="nf">schemes</span><span class="p">(</span>
+<div class="viewcode-block" id="schemes"><a class="viewcode-back" href="../../../api/audb.info.schemes.html#audb.info.schemes">[docs]</a><span class="k">def</span> <span class="nf">schemes</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Schemes of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Schemes of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -763,7 +754,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        schemes of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; list(schemes(&#39;emodb&#39;, version=&#39;1.3.0&#39;))</span>
 <span class="sd">        [&#39;age&#39;, &#39;confidence&#39;, &#39;duration&#39;, &#39;emotion&#39;, &#39;gender&#39;, &#39;language&#39;, &#39;speaker&#39;, &#39;transcription&#39;]</span>
 
@@ -777,13 +768,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">schemes</span></div>
 
 
-<div class="viewcode-block" id="source"><a class="viewcode-back" href="../../../api-info.html#audb.info.source">[docs]</a><span class="k">def</span> <span class="nf">source</span><span class="p">(</span>
+<div class="viewcode-block" id="source"><a class="viewcode-back" href="../../../api/audb.info.source.html#audb.info.source">[docs]</a><span class="k">def</span> <span class="nf">source</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Source of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Source of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -794,7 +785,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        source of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; source(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        &#39;http://emodb.bilderbar.info/download/download.zip&#39;</span>
 
@@ -808,13 +799,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">source</span></div>
 
 
-<div class="viewcode-block" id="splits"><a class="viewcode-back" href="../../../api-info.html#audb.info.splits">[docs]</a><span class="k">def</span> <span class="nf">splits</span><span class="p">(</span>
+<div class="viewcode-block" id="splits"><a class="viewcode-back" href="../../../api/audb.info.splits.html#audb.info.splits">[docs]</a><span class="k">def</span> <span class="nf">splits</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Splits of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Splits of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -825,7 +816,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        splits of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; splits(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        test:</span>
 <span class="sd">          {description: Unofficial speaker-independent test split, type: test}</span>
@@ -842,13 +833,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">splits</span></div>
 
 
-<div class="viewcode-block" id="tables"><a class="viewcode-back" href="../../../api-info.html#audb.info.tables">[docs]</a><span class="k">def</span> <span class="nf">tables</span><span class="p">(</span>
+<div class="viewcode-block" id="tables"><a class="viewcode-back" href="../../../api/audb.info.tables.html#audb.info.tables">[docs]</a><span class="k">def</span> <span class="nf">tables</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Tables of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tables of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -859,7 +850,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        tables of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; list(tables(&#39;emodb&#39;, version=&#39;1.3.0&#39;))</span>
 <span class="sd">        [&#39;emotion&#39;, &#39;emotion.categories.test.gold_standard&#39;, &#39;emotion.categories.train.gold_standard&#39;, &#39;files&#39;]</span>
 
@@ -873,13 +864,13 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">tables</span></div>
 
 
-<div class="viewcode-block" id="usage"><a class="viewcode-back" href="../../../api-info.html#audb.info.usage">[docs]</a><span class="k">def</span> <span class="nf">usage</span><span class="p">(</span>
+<div class="viewcode-block" id="usage"><a class="viewcode-back" href="../../../api/audb.info.usage.html#audb.info.usage">[docs]</a><span class="k">def</span> <span class="nf">usage</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Usage of database.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Usage of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -890,7 +881,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        usage of database</span>
 
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; usage(&#39;emodb&#39;, version=&#39;1.3.0&#39;)</span>
 <span class="sd">        &#39;unrestricted&#39;</span>
 
@@ -917,7 +908,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -925,7 +916,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2022 audEERING GmbH
+      &copy; 2020-2023 audEERING GmbH
     </p>
   </div> 
 

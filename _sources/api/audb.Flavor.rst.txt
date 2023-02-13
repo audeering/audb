@@ -1,0 +1,92 @@
+﻿Flavor
+======
+
+.. currentmodule:: audb
+
+.. autoclass:: Flavor
+
+
+\_\_call\_\_\(\)
+----------------
+.. automethod:: Flavor.__call__
+    
+arguments
+---------
+.. autoattribute:: Flavor.arguments
+    
+bit\_depth
+----------
+.. autoattribute:: Flavor.bit_depth
+    
+borrowed\_arguments
+-------------------
+.. autoattribute:: Flavor.borrowed_arguments
+    
+channels
+--------
+.. autoattribute:: Flavor.channels
+    
+destination\(\)
+---------------
+.. automethod:: Flavor.destination
+    
+format
+------
+.. autoattribute:: Flavor.format
+    
+from\_dict\(\)
+--------------
+.. automethod:: Flavor.from_dict
+    
+from\_yaml\(\)
+--------------
+.. automethod:: Flavor.from_yaml
+    
+from\_yaml\_s\(\)
+-----------------
+.. automethod:: Flavor.from_yaml_s
+    
+hidden\_arguments
+-----------------
+.. autoattribute:: Flavor.hidden_arguments
+    
+id
+--
+.. autoattribute:: Flavor.id
+    
+is\_loaded\_from\_dict
+----------------------
+.. autoattribute:: Flavor.is_loaded_from_dict
+    
+mixdown
+-------
+.. autoattribute:: Flavor.mixdown
+    
+path\(\)
+--------
+.. automethod:: Flavor.path
+    
+resolvers
+---------
+.. autoattribute:: Flavor.resolvers
+    
+sampling\_rate
+--------------
+.. autoattribute:: Flavor.sampling_rate
+    
+short\_id
+---------
+.. autoattribute:: Flavor.short_id
+    
+to\_dict\(\)
+------------
+.. automethod:: Flavor.to_dict
+    
+to\_yaml\(\)
+------------
+.. automethod:: Flavor.to_yaml
+    
+to\_yaml\_s\(\)
+---------------
+.. automethod:: Flavor.to_yaml_s
+    

@@ -1,0 +1,6 @@
+﻿load\_table\(\)
+===============
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.load_table

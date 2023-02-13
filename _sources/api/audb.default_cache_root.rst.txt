@@ -1,0 +1,6 @@
+﻿default\_cache\_root\(\)
+========================
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.default_cache_root

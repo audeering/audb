@@ -1,0 +1,6 @@
+﻿description\(\)
+===============
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.description

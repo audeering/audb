@@ -1,0 +1,6 @@
+﻿load\_media\(\)
+===============
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.load_media

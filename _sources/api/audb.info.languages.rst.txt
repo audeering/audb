@@ -1,0 +1,6 @@
+﻿languages\(\)
+=============
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.languages

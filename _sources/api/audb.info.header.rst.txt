@@ -1,0 +1,6 @@
+﻿header\(\)
+==========
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.header

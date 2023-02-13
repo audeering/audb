@@ -1,0 +1,6 @@
+﻿publish\(\)
+===========
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.publish

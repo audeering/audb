@@ -1,0 +1,6 @@
+﻿cached\(\)
+==========
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.cached

@@ -1,0 +1,6 @@
+﻿license\_url\(\)
+================
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.license_url

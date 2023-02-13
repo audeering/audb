@@ -1,0 +1,20 @@
+﻿config
+======
+
+.. currentmodule:: audb
+
+.. autoclass:: config
+
+
+CACHE\_ROOT
+-----------
+.. autoattribute:: config.CACHE_ROOT
+    
+REPOSITORIES
+------------
+.. autoattribute:: config.REPOSITORIES
+    
+SHARED\_CACHE\_ROOT
+-------------------
+.. autoattribute:: config.SHARED_CACHE_ROOT
+    

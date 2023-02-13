@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database dependencies &mdash; audb Documentation</title>
+  <title>Database dependencies &mdash; Documentation</title>
   
 
   
@@ -25,12 +25,8 @@
     
 
   
-
-  
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -74,7 +70,7 @@
             
             
               <div class="version">
-                v1.4.1
+                v1.4.2
               </div>
             
           
@@ -115,8 +111,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/audb.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/audb.info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
@@ -179,8 +175,8 @@ and store some additional metadata about the audio files
 like duration and number of channels
 in a dependency table in a file <code class="file docutils literal notranslate"><span class="pre">db.csv</span></code>
 for every version of a database.</p>
-<p>You request a <a class="reference internal" href="api.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> object with
-<a class="reference internal" href="api.html#audb.dependencies" title="audb.dependencies"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.dependencies()</span></code></a>.</p>
+<p>You request a <a class="reference internal" href="api/audb.Dependencies.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> object with
+<a class="reference internal" href="api/audb.dependencies.html#audb.dependencies" title="audb.dependencies"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.dependencies()</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s1">&#39;emodb&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">)</span>
@@ -295,7 +291,7 @@ for every version of a database.</p>
 </div>
 </div>
 </div>
-<p>See <a class="reference internal" href="api.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> for all available methods.</p>
+<p>See <a class="reference internal" href="api/audb.Dependencies.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> for all available methods.</p>
 <div class="section" id="duration-of-a-database">
 <h2>Duration of a database<a class="headerlink" href="#duration-of-a-database" title="Permalink to this heading">¶</a></h2>
 <p>If your database contains only WAV or FLAC files,
@@ -367,7 +363,7 @@ of the emodb database.</p>
 and you would like to get the duration
 of its segments
 that contain a label
-you can use <a class="reference external" href="https://audeering.github.io/audformat/api-utils.html#audformat.utils.duration" title="(in audformat vv0.15.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
+you can use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv0.16.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
 which calculates the duration
 from the <code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> entries.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s1">&#39;database-with-segmented-tables&#39;</span><span class="p">,</span> <span class="s1">&#39;segmented-table&#39;</span><span class="p">)</span>
@@ -384,7 +380,7 @@ for which no duration information is stored
 in the dependency table of the database,
 like MP4 files,
 you have to download the database first
-and use <a class="reference external" href="https://audeering.github.io/audformat/api-utils.html#audformat.utils.duration" title="(in audformat vv0.15.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
+and use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv0.16.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
 to calculate the duration on the fly.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;database-with-videos&#39;</span><span class="p">)</span>
 <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -416,7 +412,7 @@ to calculate the duration on the fly.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -424,7 +420,7 @@ to calculate the duration on the fly.</p>
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2022 audEERING GmbH
+      &copy; 2020-2023 audEERING GmbH
     </p>
   </div> 
 

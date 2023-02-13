@@ -1,0 +1,6 @@
+﻿dependencies\(\)
+================
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.dependencies

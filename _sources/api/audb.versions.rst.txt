@@ -1,0 +1,6 @@
+﻿versions\(\)
+============
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.versions

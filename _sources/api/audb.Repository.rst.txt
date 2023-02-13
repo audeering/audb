@@ -1,0 +1,20 @@
+﻿Repository
+==========
+
+.. currentmodule:: audb
+
+.. autoclass:: Repository
+
+
+backend
+-------
+.. autoattribute:: Repository.backend
+    
+host
+----
+.. autoattribute:: Repository.host
+    
+name
+----
+.. autoattribute:: Repository.name
+    

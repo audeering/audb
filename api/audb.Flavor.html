@@ -1,0 +1,699 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Flavor &mdash; Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/thebelab.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Repository" href="audb.Repository.html" />
+    <link rel="prev" title="Dependencies" href="audb.Dependencies.html" />
+    
+      
+    
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../index.html">
+          
+            <img src="../_static/images/audeering.png" class="logo" alt="audEERING"/>
+          
+          
+            <span> audb</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.4.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publish.html">Publish a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load.html">Load a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Database dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../caching.html">Caching</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="audb.html">audb</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="audb.config.html">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.Dependencies.html">Dependencies</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Flavor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#call">__call__()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arguments">arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bit-depth">bit_depth</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#borrowed-arguments">borrowed_arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#channels">channels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#destination">destination()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#format">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-dict">from_dict()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-yaml">from_yaml()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-yaml-s">from_yaml_s()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hidden-arguments">hidden_arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id">id</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#is-loaded-from-dict">is_loaded_from_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mixdown">mixdown</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#path">path()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resolvers">resolvers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sampling-rate">sampling_rate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#short-id">short_id</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#to-dict">to_dict()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#to-yaml">to_yaml()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#to-yaml-s">to_yaml_s()</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="audb.Repository.html">Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.available.html">available()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.cached.html">cached()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.default_cache_root.html">default_cache_root()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.dependencies.html">dependencies()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.exists.html">exists()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.flavor_path.html">flavor_path()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.latest_version.html">latest_version()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load.html">load()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load_media.html">load_media()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load_table.html">load_table()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load_to.html">load_to()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.publish.html">publish()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.remove_media.html">remove_media()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.repository.html">repository()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.versions.html">versions()</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="audb.info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">audb</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="audb.html">audb</a> &raquo;</li>
+      <li>Flavor</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/audeering/audb/" class="fa fa-github"> GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="flavor">
+<h1>Flavor<a class="headerlink" href="#flavor" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="audb.Flavor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">Flavor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/flavor.html#Flavor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Flavor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Database flavor.</p>
+<p>Helper class used by <a class="reference internal" href="audb.load.html#audb.load" title="audb.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.load()</span></code></a>
+to convert media files to the desired format.
+It stores the meta information about a flavor
+and offers a convenient way to convert files to it.</p>
+<p>As the following example shows,
+it can also be used to convert files
+that are not part of a database:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">original_file</span> <span class="o">=</span> <span class="s1">&#39;/org/path/file.flac&#39;</span>
+<span class="n">converted_file</span> <span class="o">=</span> <span class="s1">&#39;/new/path/file.wav&#39;</span>
+
+<span class="c1"># convert file to 16 kHz</span>
+<span class="n">flavor</span> <span class="o">=</span> <span class="n">Flavor</span><span class="p">(</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
+<span class="n">flavor</span><span class="p">(</span><span class="n">original_file</span><span class="p">,</span> <span class="n">converted_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bit_depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sample precision, one of <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">24</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code></p></li>
+<li><p><strong>channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – channel selection, see <a class="reference external" href="https://audeering.github.io/audresample/api/audresample.remix.html#audresample.remix" title="(in audresample vv1.2.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audresample.remix()</span></code></a></p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – file format, one of <code class="docutils literal notranslate"><span class="pre">'flac'</span></code>, <code class="docutils literal notranslate"><span class="pre">'wav'</span></code></p></li>
+<li><p><strong>mixdown</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – apply mono mix-down on selection</p></li>
+<li><p><strong>sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sampling rate in Hz, one of
+<code class="docutils literal notranslate"><span class="pre">8000</span></code>, <code class="docutils literal notranslate"><span class="pre">16000</span></code>, <code class="docutils literal notranslate"><span class="pre">22500</span></code>, <code class="docutils literal notranslate"><span class="pre">44100</span></code>, <code class="docutils literal notranslate"><span class="pre">48000</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – if a non-supported <code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>,
+    <code class="docutils literal notranslate"><span class="pre">format</span></code>,
+    or <code class="docutils literal notranslate"><span class="pre">sampling_rate</span></code>
+    is requested</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="call">
+<h2>__call__()<a class="headerlink" href="#call" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Flavor.__call__">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/flavor.html#Flavor.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Flavor.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert file to flavor.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>, <code class="docutils literal notranslate"><span class="pre">channels</span></code> or <code class="docutils literal notranslate"><span class="pre">sampling_rate</span></code>
+of source signal are known, they can be provided.
+Otherwise, they will be computed using <a class="reference external" href="https://audeering.github.io/audiofile/api/audiofile.html#module-audiofile" title="(in audiofile vv1.2.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to input file</p></li>
+<li><p><strong>dst_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to output file</p></li>
+<li><p><strong>src_bit_depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – bit depth</p></li>
+<li><p><strong>src_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of channels</p></li>
+<li><p><strong>src_sampling_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – sampling rate in Hz</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – if extension of output file does not match the
+    format of the flavor</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if a conversion is requested,
+    but no output format is specified,
+    and the input format is not WAV or FLAC</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="arguments">
+<h2>arguments<a class="headerlink" href="#arguments" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.arguments">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">arguments</span></span><a class="headerlink" href="#audb.Flavor.arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns arguments that are serialized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary of arguments and their values.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if arguments are found that are not assigned to
+    attributes of the same name</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">audobject.testing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span> <span class="o">=</span> <span class="n">audobject</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">TestObject</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">arguments</span>
+<span class="go">{&#39;name&#39;: &#39;test&#39;, &#39;point&#39;: (1, 1)}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="bit-depth">
+<h2>bit_depth<a class="headerlink" href="#bit-depth" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.bit_depth">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">bit_depth</span></span><a class="headerlink" href="#audb.Flavor.bit_depth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample precision.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="borrowed-arguments">
+<h2>borrowed_arguments<a class="headerlink" href="#borrowed-arguments" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.borrowed_arguments">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">borrowed_arguments</span></span><a class="headerlink" href="#audb.Flavor.borrowed_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns borrowed arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary with borrowed arguments.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="channels">
+<h2>channels<a class="headerlink" href="#channels" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.channels">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">channels</span></span><a class="headerlink" href="#audb.Flavor.channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Selected channels.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="destination">
+<h2>destination()<a class="headerlink" href="#destination" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Flavor.destination">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">destination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/flavor.html#Flavor.destination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Flavor.destination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return converted file path.</p>
+<p>The file path will only change if the file is converted to a different
+format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to input file</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>path to output file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="format">
+<h2>format<a class="headerlink" href="#format" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.format">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">format</span></span><a class="headerlink" href="#audb.Flavor.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>File format.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="from-dict">
+<h2>from_dict()<a class="headerlink" href="#from-dict" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Flavor.from_dict">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.Flavor.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://audeering.github.io/audobject/api/audobject.Object.html#audobject.Object" title="(in audobject vv0.7.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="from-yaml">
+<h2>from_yaml()<a class="headerlink" href="#from-yaml" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Flavor.from_yaml">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">from_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_or_stream</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.Flavor.from_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://audeering.github.io/audobject/api/audobject.Object.html#audobject.Object" title="(in audobject vv0.7.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="from-yaml-s">
+<h2>from_yaml_s()<a class="headerlink" href="#from-yaml-s" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Flavor.from_yaml_s">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">from_yaml_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_string</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.Flavor.from_yaml_s" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://audeering.github.io/audobject/api/audobject.Object.html#audobject.Object" title="(in audobject vv0.7.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="hidden-arguments">
+<h2>hidden_arguments<a class="headerlink" href="#hidden-arguments" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.hidden_arguments">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">hidden_arguments</span></span><a class="headerlink" href="#audb.Flavor.hidden_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns hidden arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List with names of hidden arguments.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id">
+<h2>id<a class="headerlink" href="#id" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.id">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#audb.Flavor.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object identifier.</p>
+<p>The ID of an object ID is created from its non-hidden arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>object identifier</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="n">Object</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bar</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="bp">self</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="n">bar</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">foo1</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">(</span><span class="s1">&#39;I am unique!&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">foo1</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="go">893df240-babe-d796-cdf1-c436171b7a96</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">foo2</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">(</span><span class="s1">&#39;I am different!&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">foo2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="go">9303f2a5-bfc9-e5ff-0ffa-a9846e2d2190</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">foo3</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">(</span><span class="s1">&#39;I am unique!&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">foo1</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">foo3</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="is-loaded-from-dict">
+<h2>is_loaded_from_dict<a class="headerlink" href="#is-loaded-from-dict" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.is_loaded_from_dict">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">is_loaded_from_dict</span></span><a class="headerlink" href="#audb.Flavor.is_loaded_from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if object was loaded from a dictionary.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code>
+if object was initialized
+from a dictionary,
+e.g. after loading it from a YAML file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">True</span></code> if object was loaded from a dictionary,</dt><dd><p>otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="mixdown">
+<h2>mixdown<a class="headerlink" href="#mixdown" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.mixdown">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">mixdown</span></span><a class="headerlink" href="#audb.Flavor.mixdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply mixdown.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="path">
+<h2>path()<a class="headerlink" href="#path" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Flavor.path">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/flavor.html#Flavor.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Flavor.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flavor path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – database name</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>relative path</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="resolvers">
+<h2>resolvers<a class="headerlink" href="#resolvers" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.resolvers">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">resolvers</span></span><a class="headerlink" href="#audb.Flavor.resolvers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return resolvers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary with resolvers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="sampling-rate">
+<h2>sampling_rate<a class="headerlink" href="#sampling-rate" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.sampling_rate">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">sampling_rate</span></span><a class="headerlink" href="#audb.Flavor.sampling_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sampling rate in Hz.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="short-id">
+<h2>short_id<a class="headerlink" href="#short-id" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.Flavor.short_id">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">short_id</span></span><a class="headerlink" href="#audb.Flavor.short_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short flavor ID.</p>
+<p>This just truncates the ID
+to its last eight characters.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="to-dict">
+<h2>to_dict()<a class="headerlink" href="#to-dict" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Flavor.to_dict">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.Flavor.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts object to a dictionary.</p>
+<p>Includes items from <code class="xref py py-meth docutils literal notranslate"><span class="pre">audobject.Object.arguments()</span></code>.
+If an argument has a resolver, its value is encoded.
+Usually, the object can be re-instantiated using
+<a class="reference external" href="https://audeering.github.io/audobject/api/audobject.Object.html#audobject.Object.from_dict" title="(in audobject vv0.7.7)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audobject.Object.from_dict()</span></code></a>.
+However, if <code class="docutils literal notranslate"><span class="pre">flatten=True</span></code>, this is not possible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>include_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – add version to class name</p></li>
+<li><p><strong>flatten</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – flatten the dictionary</p></li>
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – if file is written to disk, set to target directory</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dictionary that represent the object</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">audobject.testing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span> <span class="o">=</span> <span class="n">audobject</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">TestObject</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">include_version</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">{&#39;$audobject.core.testing.TestObject&#39;: {&#39;name&#39;: &#39;test&#39;, &#39;point&#39;: [1, 1]}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">{&#39;name&#39;: &#39;test&#39;, &#39;point.0&#39;: 1, &#39;point.1&#39;: 1}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="to-yaml">
+<h2>to_yaml()<a class="headerlink" href="#to-yaml" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Flavor.to_yaml">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">to_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_or_stream</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.Flavor.to_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save object to YAML file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_or_stream</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.IO" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IO</span></code></a>]) – file path or stream</p></li>
+<li><p><strong>include_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – add version to class name</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="to-yaml-s">
+<h2>to_yaml_s()<a class="headerlink" href="#to-yaml-s" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Flavor.to_yaml_s">
+<span class="sig-prename descclassname"><span class="pre">Flavor.</span></span><span class="sig-name descname"><span class="pre">to_yaml_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.Flavor.to_yaml_s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert object to YAML string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>include_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – add version to class name</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>YAML string</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">audobject.testing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span> <span class="o">=</span> <span class="n">audobject</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">TestObject</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">to_yaml_s</span><span class="p">(</span><span class="n">include_version</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="go">$audobject.core.testing.TestObject:</span>
+<span class="go">  name: test</span>
+<span class="go">  point:</span>
+<span class="go">  - 1</span>
+<span class="go">  - 1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="audb.Repository.html" class="btn btn-neutral float-right" title="Repository" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="audb.Dependencies.html" class="btn btn-neutral float-left" title="Dependencies" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2020-2023 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

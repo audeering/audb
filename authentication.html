@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Authentication &mdash; audb Documentation</title>
+  <title>Authentication &mdash; Documentation</title>
   
 
   
@@ -25,12 +25,8 @@
     
 
   
-
-  
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -74,7 +70,7 @@
             
             
               <div class="version">
-                v1.4.1
+                v1.4.2
               </div>
             
           
@@ -112,8 +108,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">audb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api-info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/audb.html">audb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/audb.info.html">audb.info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
@@ -164,14 +160,14 @@ You could use <a class="reference external" href="https://jfrog.com/knowledge-ba
 but we would only recommend it for downloading public data.</p>
 <p>To authenticate
 users have to store their credentials in <code class="file docutils literal notranslate"><span class="pre">~/.artifactory_python.cfg</span></code>.</p>
-<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[your-organization.jfrog.io/artifactory]</span><span class="w"></span>
-<span class="na">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_USERNAME</span><span class="w"></span>
-<span class="na">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_API_KEY</span><span class="w"></span>
+<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[your-organization.jfrog.io/artifactory]</span>
+<span class="na">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_USERNAME</span>
+<span class="na">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_API_KEY</span>
 </pre></div>
 </div>
 <p>Alternatively, they can export them as environment variables.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">ARTIFACTORY_USERNAME</span><span class="o">=</span><span class="s2">&quot;MY_USERNAME&quot;</span>
-<span class="nb">export</span> <span class="nv">ARTIFACTORY_API_KEY</span><span class="o">=</span><span class="s2">&quot;MY_API_KEY&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ARTIFACTORY_USERNAME</span><span class="o">=</span><span class="s2">&quot;MY_USERNAME&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ARTIFACTORY_API_KEY</span><span class="o">=</span><span class="s2">&quot;MY_API_KEY&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -199,7 +195,7 @@ users have to store their credentials in <code class="file docutils literal notr
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2022/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -207,7 +203,7 @@ users have to store their credentials in <code class="file docutils literal notr
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2022 audEERING GmbH
+      &copy; 2020-2023 audEERING GmbH
     </p>
   </div> 
 

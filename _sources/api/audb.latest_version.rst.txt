@@ -1,0 +1,6 @@
+﻿latest\_version\(\)
+===================
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.latest_version
