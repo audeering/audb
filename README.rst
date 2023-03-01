@@ -32,7 +32,7 @@ Have a look at the installation_ and quickstart_ instructions.
 .. |tests| image:: https://github.com/audeering/audb/workflows/Test/badge.svg
     :target: https://github.com/audeering/audb/actions?query=workflow%3ATest
     :alt: Test status
-.. |coverage| image:: https://codecov.io/gh/audeering/audb/branch/master/graph/badge.svg?token=drrULW8vEG
+.. |coverage| image:: https://codecov.io/gh/audeering/audb/branch/main/graph/badge.svg?token=drrULW8vEG
     :target: https://codecov.io/gh/audeering/audb/
     :alt: code coverage
 .. |docs| image:: https://img.shields.io/pypi/v/audb?label=docs
