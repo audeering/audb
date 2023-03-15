@@ -655,6 +655,116 @@ def test_publish_error_messages(
         )
 
 
+def test_publish_error_changed_deps_file_type(tmpdir):
+    # As we allow for every possible filename for attachments
+    # and store them in the dependency table
+    # besides media and table files
+    # there can be a naming clash between those entries.
+    # See https://github.com/audeering/audb/pull/244#issuecomment-1412211131
+
+    # media => attachment
+    error_msg = (
+        "The type of an existing dependency must not change, "
+        "but you are trying to change the type of the dependency "
+        "'data/file.wav' from 'media' to 'attachment'. "
+        'You might have a naming clash between a media file '
+        'and an attached file.'
+    )
+    db_name = 'test_publish_error_changed_deps_file_type-1'
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    data_path = audeer.mkdir(audeer.path(db_path, 'data'))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audeer.path(data_path, 'file.wav'), signal, sampling_rate)
+    db = audformat.Database(db_name)
+    db['table'] = audformat.Table(audformat.filewise_index('data/file.wav'))
+    db.attachments['attachment'] = audformat.Attachment('data/file.wav')
+    db.save(db_path)
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+
+    # table => attachment
+    error_msg = (
+        "The type of an existing dependency must not change, "
+        "but you are trying to change the type of the dependency "
+        "'db.table.csv' from 'meta' to 'attachment'. "
+        'You might have a naming clash between a table '
+        'and an attached file.'
+    )
+    db_name = 'test_publish_error_changed_deps_file_type-2'
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    data_path = audeer.mkdir(audeer.path(db_path, 'data'))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audeer.path(data_path, 'file.wav'), signal, sampling_rate)
+    db = audformat.Database(db_name)
+    db['table'] = audformat.Table(audformat.filewise_index('data/file.wav'))
+    db.attachments['attachment'] = audformat.Attachment('db.table.csv')
+    db.save(db_path)
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+
+    # attachment => media
+    error_msg = (
+        "The type of an existing dependency must not change, "
+        "but you are trying to change the type of the dependency "
+        "'data/file2.wav' from 'media' to 'attachment'. "
+        'You might have a naming clash between a media file '
+        'and an attached file.'
+    )
+    db_name = 'test_publish_error_changed_deps_file_type-3'
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    data_path = audeer.mkdir(audeer.path(db_path, 'data'))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audeer.path(data_path, 'file1.wav'), signal, sampling_rate)
+    audiofile.write(audeer.path(data_path, 'file2.wav'), signal, sampling_rate)
+    db = audformat.Database(db_name)
+    db['table'] = audformat.Table(audformat.filewise_index('data/file1.wav'))
+    db.attachments['attachment'] = audformat.Attachment('data/file2.wav')
+    db.save(db_path)
+    audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+    db = audb.load_to(db_path, db_name, version='1.0.0')
+    db['table'] = audformat.Table(
+        audformat.filewise_index(['data/file1.wav', 'data/file2.wav'])
+    )
+    db.save(db_path)
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '2.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+
+    # attachment => table
+    error_msg = (
+        "The type of an existing dependency must not change, "
+        "but you are trying to change the type of the dependency "
+        "'db.table2.csv' from 'meta' to 'attachment'. "
+        'You might have a naming clash between a table '
+        'and an attached file.'
+    )
+    db_name = 'test_publish_error_changed_deps_file_type-4'
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    data_path = audeer.mkdir(audeer.path(db_path, 'data'))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audeer.path(data_path, 'file.wav'), signal, sampling_rate)
+    db = audformat.Database(db_name)
+    db['table1'] = audformat.Table(audformat.filewise_index('data/file.wav'))
+    db.attachments['attachment'] = audformat.Attachment('db.table2.csv')
+    audeer.touch(audeer.path(db_path, 'db.table2.csv'))
+    db.save(db_path)
+    audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+    db = audb.load_to(db_path, db_name, version='1.0.0')
+    db['table2'] = audformat.Table(audformat.filewise_index('data/file.wav'))
+    db.save(db_path)
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '2.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+
+
 def test_update_database():
 
     version = '2.1.0'

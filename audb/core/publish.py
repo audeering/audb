@@ -15,6 +15,34 @@ from audb.core.dependencies import Dependencies
 from audb.core.repository import Repository
 
 
+def _assert_file_type_does_not_change(
+        deps: Dependencies,
+        file: str,
+        type: int,
+):
+    if file in deps and deps.type(file) != type:
+        error_msg = (
+            f"The type of an existing dependency must not change, "
+            f"but you are trying to change the type of the dependency "
+            f"'{file}' "
+            f"from "
+            f"'{define.DEPEND_TYPE_NAMES[type]}' "
+            f"to "
+            f"'{define.DEPEND_TYPE_NAMES[deps.type(file)]}'. "
+        )
+        if define.DependType.META in [deps.type(file), type]:
+            error_msg += (
+                'You might have a naming clash between a table '
+                'and an attached file.'
+            )
+        else:
+            error_msg += (
+                'You might have a naming clash between a media file '
+                'and an attached file.'
+            )
+        raise RuntimeError(error_msg)
+
+
 def _check_for_duplicates(
         db: audformat.Database,
         num_workers: int,
@@ -93,6 +121,11 @@ def _find_attachments(
     ):
         # use one archive per attachment ID
         for file in db.attachments[attachment_id].files:
+            _assert_file_type_does_not_change(
+                deps,
+                file,
+                define.DependType.ATTACHMENT,
+            )
             checksum = audbackend.md5(audeer.path(db_root, file))
             if file not in deps or checksum != deps.checksum(file):
                 attachments.add(attachment_id)
@@ -151,6 +184,11 @@ def _find_media(
             )
             add_media.append(values)
         elif not deps.removed(file):
+            _assert_file_type_does_not_change(
+                deps,
+                file,
+                define.DependType.MEDIA,
+            )
             checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.archive(file)
@@ -207,6 +245,7 @@ def _find_tables(
             disable=not verbose,
     ):
         file = f'db.{table}.csv'
+        _assert_file_type_does_not_change(deps, file, define.DependType.META)
         checksum = audbackend.md5(os.path.join(db_root, file))
         if file not in deps or checksum != deps.checksum(file):
             deps._add_meta(file, version, table, checksum)
