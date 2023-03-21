@@ -666,7 +666,7 @@ def test_publish_error_changed_deps_file_type(tmpdir):
     error_msg = (
         "The type of an existing dependency must not change, "
         "but you are trying to change the type of the dependency "
-        "'data/file.wav' from 'media' to 'attachment'. "
+        "'data/file.wav'. "
         'You might have a naming clash between a media file '
         'and an attached file.'
     )
@@ -688,7 +688,7 @@ def test_publish_error_changed_deps_file_type(tmpdir):
     error_msg = (
         "The type of an existing dependency must not change, "
         "but you are trying to change the type of the dependency "
-        "'db.table.csv' from 'meta' to 'attachment'. "
+        "'db.table.csv'. "
         'You might have a naming clash between a table '
         'and an attached file.'
     )
@@ -710,7 +710,7 @@ def test_publish_error_changed_deps_file_type(tmpdir):
     error_msg = (
         "The type of an existing dependency must not change, "
         "but you are trying to change the type of the dependency "
-        "'data/file2.wav' from 'media' to 'attachment'. "
+        "'data/file2.wav'. "
         'You might have a naming clash between a media file '
         'and an attached file.'
     )
@@ -740,7 +740,7 @@ def test_publish_error_changed_deps_file_type(tmpdir):
     error_msg = (
         "The type of an existing dependency must not change, "
         "but you are trying to change the type of the dependency "
-        "'db.table2.csv' from 'meta' to 'attachment'. "
+        "'db.table2.csv'. "
         'You might have a naming clash between a table '
         'and an attached file.'
     )

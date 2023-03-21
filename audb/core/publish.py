@@ -24,11 +24,7 @@ def _assert_file_type_does_not_change(
         error_msg = (
             f"The type of an existing dependency must not change, "
             f"but you are trying to change the type of the dependency "
-            f"'{file}' "
-            f"from "
-            f"'{define.DEPEND_TYPE_NAMES[type]}' "
-            f"to "
-            f"'{define.DEPEND_TYPE_NAMES[deps.type(file)]}'. "
+            f"'{file}'. "
         )
         if define.DependType.META in [deps.type(file), type]:
             error_msg += (
