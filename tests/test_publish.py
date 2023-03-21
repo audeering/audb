@@ -51,8 +51,27 @@ def fixture_publish_db():
     clear_root(DB_ROOT)
     clear_root(pytest.FILE_SYSTEM_HOST)
 
-    # create db
-
+    # Version 1.0.0
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    # attachment files:
+    #   - extra/file.txt
+    #   - extra/folder/file1.txt
+    #   - extra/folder/file2.txt
+    #   - extra/folder/sub-folder/file3.txt
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['1.0.0']
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
     db.schemes['scheme'] = audformat.Scheme(
@@ -95,34 +114,171 @@ def fixture_publish_db():
         [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
+    audeer.mkdir(audeer.path(db_root, 'extra/folder'))
+    audeer.touch(audeer.path(db_root, 'extra/file.txt'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/file1.txt'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/file2.txt'))
+    audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/sub-folder/file3.txt'))
+    # Create one file with different content to force different checksum
+    file_with_different_content = audeer.path(
+        db_root,
+        'extra/folder/sub-folder/file3.txt',
+    )
+    with open(file_with_different_content, 'w') as fp:
+        fp.write('test')
+    db.attachments['file'] = audformat.Attachment('extra/file.txt')
+    db.attachments['folder'] = audformat.Attachment('extra/folder')
     db.save(
-        DB_ROOT_VERSION['1.0.0'],
+        db_root,
         storage_format=audformat.define.TableStorageFormat.PICKLE,
     )
     audformat.testing.create_audio_files(db)
 
-    # Extend version 2.0.0 by a new file with a path >260 characters
+    # Version 2.0.0
+    #
+    # Changes:
+    #   * Added: new file with a path >260 characters
+    #   * Added: 1 attachment file
+    #   * Removed: 1 attachment file
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
+    # attachment files:
+    #   - extra/file.txt
+    #   - extra/folder/file1.txt
+    #   - extra/folder/file3.txt
+    #   - extra/folder/sub-folder/file3.txt
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['2.0.0']
+    shutil.copytree(
+        audeer.path(DB_ROOT_VERSION['1.0.0'], 'extra'),
+        audeer.path(db_root, 'extra'),
+    )
+    os.remove(audeer.path(db_root, 'extra/folder/file2.txt'))
+    audeer.touch(audeer.path(db_root, 'extra/folder/file3.txt'))
     db['files'].extend_index(audformat.filewise_index(LONG_PATH), inplace=True)
-    db.save(DB_ROOT_VERSION['2.0.0'])
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
 
-    # Remove one file in version 3.0.0
+    # Version 3.0.0
+    #
+    # Changes:
+    #   * Removed: 1 media files
+    #   * Removed: all attachments
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['3.0.0']
     remove_file = 'audio/001.wav'
     db.drop_files(remove_file)
-    db.save(DB_ROOT_VERSION['3.0.0'])
+    del db.attachments['file']
+    del db.attachments['folder']
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
 
-    # Store without audio files in version 4.0.0
-    db.save(DB_ROOT_VERSION['4.0.0'])
+    # Version 4.0.0
+    #
+    # Changes:
+    #   * Changed: store without media files
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['4.0.0']
+    db.save(db_root)
 
-    # Extend database to >20 files and store without audio in version 5.0.0
+    # Version 5.0.0
+    #
+    # Changes:
+    #   * Added: 20 `file{n}.wav` media files in metadata
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
+    #   - file0.wav
+    #   - ...
+    #   - file19.wav
+    # schemes:
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['5.0.0']
     db['files'] = db['files'].extend_index(
         audformat.filewise_index([f'file{n}.wav' for n in range(20)])
     )
     assert len(db.files) > 20
-    db.save(DB_ROOT_VERSION['5.0.0'])
+    db.save(db_root)
 
-    # Make database non-portable in version 6.0.0
+    # Version 6.0.0
+    #
+    # Changes:
+    #   * Added: 'scheme' scheme
+    #   * Changed: include media files (not metadata only database)
+    #   * Changed: make database non-portable
+    #   * Removed: media file with >260 chars
+    #   * Removed: 20 file{n}.wav media files
+    #
+    # tables:
+    #   - emotion
+    # misc tables:
+    #   - misc-in-scheme
+    #   - misc-not-in-scheme
+    # media:
+    #   - audio/001.wav
+    #   - audio/002.wav
+    #   - audio/003.wav
+    #   - audio/004.wav
+    #   - audio/.../audio/new.wav  # >260 chars
+    #   - file0.wav
+    #   - ...
+    #   - file19.wav
+    # schemes:
+    #   - scheme
+    #   - speaker
+    #   - misc
+    db_root = DB_ROOT_VERSION['6.0.0']
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
     db.schemes['scheme'] = audformat.Scheme(
@@ -165,10 +321,10 @@ def fixture_publish_db():
         [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
-    db.save(DB_ROOT_VERSION['6.0.0'])
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
     db.map_files(lambda x: os.path.join(db.root, x))  # make paths absolute
-    db.save(DB_ROOT_VERSION['6.0.0'])
+    db.save(db_root)
 
     yield
 
@@ -248,13 +404,30 @@ def test_publish(version):
         verbose=False,
     )
     backend = audb.core.utils.lookup_backend(DB_NAME, version)
-    number_of_files = len(set(archives.keys()))
-    number_of_archives = len(set(archives.values()))
-    assert len(deps.files) - len(deps.archives) == (
-        number_of_files - number_of_archives
+    number_of_media_files_in_custom_archives = len(set(archives.keys()))
+    number_of_custom_archives = len(set(archives.values()))
+    number_of_media_files = len(deps.media)
+    number_of_media_archives = len(
+        set([deps.archive(file) for file in deps.media])
+    )
+    assert (
+        number_of_media_files_in_custom_archives
+        - number_of_custom_archives
+    ) == (
+        number_of_media_files
+        - number_of_media_archives
     )
     for archive in set(archives.values()):
         assert archive in deps.archives
+
+    # Check checksums of attachment files
+    expected_checksum_empty_attachment = 'd41d8cd98f00b204e9800998ecf8427e'
+    expected_checksum_file3_attachment = '098f6bcd4621d373cade4e832627b4f6'
+    for file in deps.attachment_files:
+        if file == 'extra/folder/sub-folder/file3.txt':
+            assert deps.checksum(file) == expected_checksum_file3_attachment
+        else:
+            assert deps.checksum(file) == expected_checksum_empty_attachment
 
     db = audb.load(
         DB_NAME,
@@ -296,54 +469,79 @@ def test_publish(version):
 
 
 @pytest.mark.parametrize(
-    'version1, version2, media_difference',
+    'version1, version2, media_difference, attachment_difference',
     [
         (
             '1.0.0',
             '1.0.0',
             [],
+            [],
         ),
         (
             '1.0.0',
             '2.0.0',
             [],
+            ['extra/folder/file2.txt'],
         ),
         (
             '2.0.0',
             '1.0.0',
             [LONG_PATH],
+            ['extra/folder/file3.txt'],
         ),
         (
             '2.0.0',
             '3.0.0',
             ['audio/001.wav'],
+            [
+                'extra/file.txt',
+                'extra/folder/file1.txt',
+                'extra/folder/file3.txt',
+                'extra/folder/sub-folder/file3.txt',
+            ],
         ),
         (
             '3.0.0',
             '2.0.0',
+            [],
             [],
         ),
         (
             '1.0.0',
             '3.0.0',
             ['audio/001.wav'],
+            [
+                'extra/file.txt',
+                'extra/folder/file1.txt',
+                'extra/folder/file2.txt',
+                'extra/folder/sub-folder/file3.txt',
+            ],
         ),
         (
             '3.0.0',
             '1.0.0',
             [LONG_PATH],
+            [],
         ),
     ]
 )
-def test_publish_changed_db(version1, version2, media_difference):
+def test_publish_changed_db(
+        version1,
+        version2,
+        media_difference,
+        attachment_difference,
+):
 
     depend1 = audb.dependencies(DB_NAME, version=version1)
     depend2 = audb.dependencies(DB_NAME, version=version2)
 
     media1 = set(sorted(depend1.media))
     media2 = set(sorted(depend2.media))
-
     assert media1 - media2 == set(media_difference)
+
+    attachment1 = set(sorted(depend1.attachment_files))
+    attachment2 = set(sorted(depend2.attachment_files))
+    assert attachment1 - attachment2 == set(attachment_difference)
 
 
 @pytest.mark.parametrize(
@@ -457,6 +655,116 @@ def test_publish_error_messages(
         )
 
 
+def test_publish_error_changed_deps_file_type(tmpdir):
+    # As we allow for every possible filename for attachments
+    # and store them in the dependency table
+    # besides media and table files
+    # there can be a naming clash between those entries.
+    # See https://github.com/audeering/audb/pull/244#issuecomment-1412211131
+
+    # media => attachment
+    error_msg = (
+        "The type of an existing dependency must not change, "
+        "but you are trying to change the type of the dependency "
+        "'data/file.wav'. "
+        'You might have a naming clash between a media file '
+        'and an attached file.'
+    )
+    db_name = 'test_publish_error_changed_deps_file_type-1'
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    data_path = audeer.mkdir(audeer.path(db_path, 'data'))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audeer.path(data_path, 'file.wav'), signal, sampling_rate)
+    db = audformat.Database(db_name)
+    db['table'] = audformat.Table(audformat.filewise_index('data/file.wav'))
+    db.attachments['attachment'] = audformat.Attachment('data/file.wav')
+    db.save(db_path)
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+
+    # table => attachment
+    error_msg = (
+        "The type of an existing dependency must not change, "
+        "but you are trying to change the type of the dependency "
+        "'db.table.csv'. "
+        'You might have a naming clash between a table '
+        'and an attached file.'
+    )
+    db_name = 'test_publish_error_changed_deps_file_type-2'
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    data_path = audeer.mkdir(audeer.path(db_path, 'data'))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audeer.path(data_path, 'file.wav'), signal, sampling_rate)
+    db = audformat.Database(db_name)
+    db['table'] = audformat.Table(audformat.filewise_index('data/file.wav'))
+    db.attachments['attachment'] = audformat.Attachment('db.table.csv')
+    db.save(db_path)
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+
+    # attachment => media
+    error_msg = (
+        "The type of an existing dependency must not change, "
+        "but you are trying to change the type of the dependency "
+        "'data/file2.wav'. "
+        'You might have a naming clash between a media file '
+        'and an attached file.'
+    )
+    db_name = 'test_publish_error_changed_deps_file_type-3'
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    data_path = audeer.mkdir(audeer.path(db_path, 'data'))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audeer.path(data_path, 'file1.wav'), signal, sampling_rate)
+    audiofile.write(audeer.path(data_path, 'file2.wav'), signal, sampling_rate)
+    db = audformat.Database(db_name)
+    db['table'] = audformat.Table(audformat.filewise_index('data/file1.wav'))
+    db.attachments['attachment'] = audformat.Attachment('data/file2.wav')
+    db.save(db_path)
+    audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+    db = audb.load_to(db_path, db_name, version='1.0.0')
+    db['table'] = audformat.Table(
+        audformat.filewise_index(['data/file1.wav', 'data/file2.wav'])
+    )
+    db.save(db_path)
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '2.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+
+    # attachment => table
+    error_msg = (
+        "The type of an existing dependency must not change, "
+        "but you are trying to change the type of the dependency "
+        "'db.table2.csv'. "
+        'You might have a naming clash between a table '
+        'and an attached file.'
+    )
+    db_name = 'test_publish_error_changed_deps_file_type-4'
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    data_path = audeer.mkdir(audeer.path(db_path, 'data'))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audeer.path(data_path, 'file.wav'), signal, sampling_rate)
+    db = audformat.Database(db_name)
+    db['table1'] = audformat.Table(audformat.filewise_index('data/file.wav'))
+    db.attachments['attachment'] = audformat.Attachment('db.table2.csv')
+    audeer.touch(audeer.path(db_path, 'db.table2.csv'))
+    db.save(db_path)
+    audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+    db = audb.load_to(db_path, db_name, version='1.0.0')
+    db['table2'] = audformat.Table(audformat.filewise_index('data/file.wav'))
+    db.save(db_path)
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '2.0.0', pytest.PUBLISH_REPOSITORY)
+    audeer.rmdir(db_path)
+
+
 def test_update_database():
 
     version = '2.1.0'
@@ -506,10 +814,12 @@ def test_update_database():
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    # Remove one file as in version 3.0.0
+    # Remove one media file and all attachments as in version 3.0.0
     remove_file = 'audio/001.wav'
     remove_path = os.path.join(DB_ROOT_VERSION[version], remove_file)
     os.remove(remove_path)
+    del db.attachments['file']
+    del db.attachments['folder']
     db.drop_files(remove_file)
     db.save(DB_ROOT_VERSION[version])
 
@@ -622,6 +932,20 @@ def test_update_database_without_media(tmpdir):
     for file in db.files:
         assert not os.path.exists(audeer.path(build_root, file))
 
+    # add changes to build folder
+    # and call again load_to()
+    # to revert them
+    os.remove(audeer.path(build_root, 'extra/folder/file2.txt'))
+    db = audb.load_to(
+        build_root,
+        DB_NAME,
+        only_metadata=True,
+        version=previous_version,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    assert os.path.exists(audeer.path(build_root, 'extra/folder/file2.txt'))
+
     # update and save database
 
     # remove files
@@ -638,6 +962,9 @@ def test_update_database_without_media(tmpdir):
 
     # add new table
     db[new_table] = audformat.Table(audformat.filewise_index(new_files))
+
+    # remove one attachment file
+    os.remove(audeer.path(build_root, 'extra/folder/file2.txt'))
 
     db.save(build_root)
 

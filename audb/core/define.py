@@ -64,11 +64,13 @@ class DependType:
     r"""Dependency file types."""
     META = 0
     MEDIA = 1
+    ATTACHMENT = 2
 
 
 DEPEND_TYPE_NAMES = {
     DependType.META: 'meta',
     DependType.MEDIA: 'media',
+    DependType.ATTACHMENT: 'attachment',
 }
 
 

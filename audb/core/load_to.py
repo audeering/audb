@@ -1,4 +1,3 @@
-import glob
 import os
 import typing
 
@@ -17,6 +16,32 @@ from audb.core.load import (
     database_tmp_root,
     load_header_to,
 )
+
+
+def _find_attachment_files(
+        db_root: str,
+        deps: Dependencies,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+) -> typing.List[str]:
+    r"""Find altered and new attachment files."""
+
+    attachment_files = []
+
+    def job(file: str):
+        full_file = os.path.join(db_root, file)
+        if not os.path.exists(full_file):
+            attachment_files.append(file)
+
+    audeer.run_tasks(
+        job,
+        params=[([file], {}) for file in deps.attachment_files],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Find attachments',
+    )
+
+    return attachment_files
 
 
 def _find_media(
@@ -79,6 +104,57 @@ def _find_tables(
     )
 
     return tables
+
+
+def _get_attachment_files(
+        attachment_files: typing.List[str],
+        db_root: str,
+        db_root_tmp: str,
+        db_name: str,
+        deps: Dependencies,
+        backend: audbackend.Backend,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+):
+
+    # create folder tree to avoid race condition
+    # in os.makedirs when files are unpacked
+    utils.mkdir_tree(attachment_files, db_root)
+    utils.mkdir_tree(attachment_files, db_root_tmp)
+
+    # find needed archives
+    archives = set()
+    for file in attachment_files:
+        archives.add((deps.archive(file), deps.version(file)))
+
+    def job(archive: str, version: str):
+        archive = backend.join(
+            db_name,
+            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
+            archive,
+        )
+        files = backend.get_archive(
+            archive,
+            db_root_tmp,
+            version,
+            tmp_root=db_root_tmp,
+        )
+        for file in files:
+            if file in attachment_files:
+                audeer.move_file(
+                    os.path.join(db_root_tmp, file),
+                    os.path.join(db_root, file),
+                )
+            else:
+                os.remove(os.path.join(db_root_tmp, file))
+
+    audeer.run_tasks(
+        job,
+        params=[([archive, version], {}) for archive, version in archives],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Get attachments',
+    )
 
 
 def _get_media(
@@ -191,39 +267,6 @@ def _remove_empty_dirs(root):
     os.rmdir(root)
 
 
-def _save_database(
-        db: audformat.Database,
-        db_root: str,
-        db_root_tmp: str,
-        num_workers: typing.Optional[int],
-        verbose: bool,
-):
-
-    for storage_format in [
-        audformat.define.TableStorageFormat.CSV,
-        audformat.define.TableStorageFormat.PICKLE,
-    ]:
-        db.save(
-            db_root_tmp,
-            storage_format=storage_format,
-            update_other_formats=False,
-            num_workers=num_workers,
-            verbose=verbose,
-        )
-        audeer.move_file(
-            os.path.join(db_root_tmp, define.HEADER_FILE),
-            os.path.join(db_root, define.HEADER_FILE),
-        )
-        for path in glob.glob(
-                os.path.join(db_root_tmp, f'*.{storage_format}')
-        ):
-            file = os.path.relpath(path, db_root_tmp)
-            audeer.move_file(
-                os.path.join(db_root_tmp, file),
-                os.path.join(db_root, file),
-            )
-
-
 def load_to(
         root: str,
         name: str,
@@ -278,7 +321,10 @@ def load_to(
         verbose=verbose,
     )
     if update:
-        files = deps.tables if only_metadata else deps.files
+        if only_metadata:
+            files = deps.attachment_files + deps.tables
+        else:
+            files = deps.files
         for file in files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
@@ -294,10 +340,17 @@ def load_to(
         version,
         overwrite=True,
     )
+    db_header.save(db_root_tmp, header_only=True)
+
+    # get altered and new attachment files
+
+    attachment_files = _find_attachment_files(db_root, deps, num_workers,
+                                              verbose)
+    _get_attachment_files(attachment_files, db_root, db_root_tmp, name, deps,
+                          backend, num_workers, verbose)
 
     # get altered and new tables
 
-    db_header.save(db_root_tmp, header_only=True)
     tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
     _get_tables(tables, db_root, db_root_tmp, name, deps, backend,
                 num_workers, verbose)
@@ -339,10 +392,18 @@ def load_to(
         os.path.join(db_root, define.DEPENDENCIES_FILE),
     )
 
-    # save database and remove the temporal directory
-    # to signal all files were correctly loaded
+    # save database and PKL tables
 
-    _save_database(db, db_root, db_root_tmp, num_workers, verbose)
+    db.save(
+        db_root,
+        storage_format=audformat.define.TableStorageFormat.PICKLE,
+        update_other_formats=False,
+        num_workers=num_workers,
+        verbose=verbose,
+    )
+
+    # remove the temporal directory
+    # to signal all files were correctly loaded
     try:
         _remove_empty_dirs(db_root_tmp)
     except OSError:  # pragma: no cover
@@ -351,8 +412,5 @@ def load_to(
             'probably there are some leftover files. '
             'This should not happen.'
         )
-
-    # Force root to not point to tmp folder
-    db._root = db_root
 
     return db
