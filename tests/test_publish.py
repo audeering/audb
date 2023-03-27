@@ -495,6 +495,7 @@ def test_publish_attachment(tmpdir):
 
     db_path = audeer.path(tmpdir, 'db')
     audeer.mkdir(db_path)
+    db.save(db_path)
 
     # Publish database, path needs to exist
     error_msg = (
@@ -526,13 +527,32 @@ def test_publish_attachment(tmpdir):
     # File exist now, folder is empty
     assert db.attachments['file'].files == [file_path]
     assert db.attachments['folder'].files == []
+    error_msg = (
+        "You need to include at least one file "
+        "when using a folder as attachment as in 'folder'."
+    )
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+
+    # Add empty sub-folder
+    subfolder_path = f'{folder_path}/sub-folder'
+    audeer.mkdir(audeer.path(db_path, subfolder_path))
+    assert db.attachments['folder'].files == []
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+
+    # Add file to folder
+    file2_path = f'{folder_path}/file.txt'
+    audeer.touch(audeer.path(db_path, file2_path))
+    assert db.attachments['file'].files == [file_path]
+    assert db.attachments['folder'].files == [file2_path]
 
     # Publish and load database
     audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
     db = audb.load(db.name, version='1.0.0')
     assert list(db.attachments) == ['file', 'folder']
     assert db.attachments['file'].files == [file_path]
-    assert db.attachments['folder'].files == []
+    assert db.attachments['folder'].files == [file2_path]
     assert db.attachments['file'].path == file_path
     assert db.attachments['file'].description == 'Attached file'
     assert db.attachments['file'].meta == {'mime': 'text'}

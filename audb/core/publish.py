@@ -104,7 +104,14 @@ def _find_attachments(
     # release dependencies to removed attachment files
     db_attachment_files = []
     for attachment_id in list(db.attachments):
-        db_attachment_files += db.attachments[attachment_id].files
+        files = db.attachments[attachment_id].files
+        if len(files) == 0:
+            raise RuntimeError(
+                'You need to include at least one file '
+                'when using a folder as attachment '
+                f"as in '{attachment_id}'."
+            )
+        db_attachment_files += files
     for file in set(deps.attachment_files) - set(db_attachment_files):
         deps._drop(file)
 
@@ -526,6 +533,9 @@ def publish(
     Raises:
         RuntimeError: if version already exists
         RuntimeError: if database tables reference non-existing files
+        RuntimeError: if database attachment path does not exist,
+            is a symlink,
+            or contains only folders and no files
         RuntimeError: if database in ``db_root`` depends on other version
             as indicated by ``previous_version``
         RuntimeError: if database is not portable,
