@@ -468,6 +468,79 @@ def test_publish(version):
             assert deps.sampling_rate(file) == audiofile.sampling_rate(path)
 
 
+def test_publish_attachment(tmpdir):
+
+    # Create database (path does not need to exist)
+    file_path = 'attachments/file.txt'
+    folder_path = 'attachments/folder'
+    db = audformat.Database('db-with-attachments')
+    db.attachments['file'] = audformat.Attachment(
+        file_path,
+        description='Attached file',
+        meta={'mime': 'text'},
+    )
+    db.attachments['folder'] = audformat.Attachment(
+        folder_path,
+        description='Attached folder',
+        meta={'mime': 'inode/directory'},
+    )
+
+    assert list(db.attachments) == ['file', 'folder']
+    assert db.attachments['file'].path == file_path
+    assert db.attachments['file'].description == 'Attached file'
+    assert db.attachments['file'].meta == {'mime': 'text'}
+    assert db.attachments['folder'].path == folder_path
+    assert db.attachments['folder'].description == 'Attached folder'
+    assert db.attachments['folder'].meta == {'mime': 'inode/directory'}
+
+    db_path = audeer.path(tmpdir, 'db')
+    audeer.mkdir(db_path)
+
+    # Publish database, path needs to exist
+    error_msg = (
+        f"The provided path '{file_path}' "
+        f"of attachment 'file' "
+        "does not exist."
+    )
+    with pytest.raises(FileNotFoundError, match=error_msg):
+        audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+
+    # Publish database, path is not allowed to be a symlink
+    audeer.mkdir(audeer.path(db_path, folder_path))
+    os.symlink(
+        audeer.path(db_path, folder_path),
+        audeer.path(db_path, file_path),
+    )
+    error_msg = (
+        f"The provided path '{file_path}' "
+        f"of attachment 'file' "
+        "must not be a symlink."
+    )
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+
+    os.remove(os.path.join(db_path, file_path))
+    audeer.touch(audeer.path(db_path, file_path))
+    db.save(db_path)
+
+    # File exist now, folder is empty
+    assert db.attachments['file'].files == [file_path]
+    assert db.attachments['folder'].files == []
+
+    # Publish and load database
+    audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+    db = audb.load(db.name, version='1.0.0')
+    assert list(db.attachments) == ['file', 'folder']
+    assert db.attachments['file'].files == [file_path]
+    assert db.attachments['folder'].files == []
+    assert db.attachments['file'].path == file_path
+    assert db.attachments['file'].description == 'Attached file'
+    assert db.attachments['file'].meta == {'mime': 'text'}
+    assert db.attachments['folder'].path == folder_path
+    assert db.attachments['folder'].description == 'Attached folder'
+    assert db.attachments['folder'].meta == {'mime': 'inode/directory'}
+
+
 @pytest.mark.parametrize(
     'version1, version2, media_difference, attachment_difference',
     [
