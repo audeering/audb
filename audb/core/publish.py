@@ -107,9 +107,10 @@ def _find_attachments(
         files = db.attachments[attachment_id].files
         if len(files) == 0:
             raise RuntimeError(
-                'You need to include at least one file '
-                'when using a folder as attachment '
-                f"as in '{attachment_id}'."
+                "An attached folder must "
+                "contain at least one file. "
+                f"But attachment '{attachment_id}' "
+                f"doesn't contain any files."
             )
         db_attachment_files += files
     for file in set(deps.attachment_files) - set(db_attachment_files):

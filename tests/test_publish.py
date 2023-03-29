@@ -528,8 +528,10 @@ def test_publish_attachment(tmpdir):
     assert db.attachments['file'].files == [file_path]
     assert db.attachments['folder'].files == []
     error_msg = (
-        "You need to include at least one file "
-        "when using a folder as attachment as in 'folder'."
+        "An attached folder must "
+        "contain at least one file. "
+        "But attachment 'folder' "
+        "doesn't contain any files."
     )
     with pytest.raises(RuntimeError, match=error_msg):
         audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
