@@ -531,7 +531,7 @@ def test_publish_attachment(tmpdir):
         "An attached folder must "
         "contain at least one file. "
         "But attachment 'folder' "
-        "doesn't contain any files."
+        "points to an empty folder."
     )
     with pytest.raises(RuntimeError, match=error_msg):
         audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
@@ -540,21 +540,35 @@ def test_publish_attachment(tmpdir):
     subfolder_path = f'{folder_path}/sub-folder'
     audeer.mkdir(audeer.path(db_path, subfolder_path))
     assert db.attachments['folder'].files == []
+    error_msg = (
+        "An attachment must contain "
+        "only non-empty sub-folders. "
+        "But attachment 'folder' "
+        "contains the empty sub-folder 'sub-folder'."
+    )
     with pytest.raises(RuntimeError, match=error_msg):
         audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
 
-    # Add file to folder
+    # Add file to folder, sub-folder still empty
     file2_path = f'{folder_path}/file.txt'
     audeer.touch(audeer.path(db_path, file2_path))
     assert db.attachments['file'].files == [file_path]
     assert db.attachments['folder'].files == [file2_path]
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
+
+    # Add file to sub-folder
+    file3_path = f'{subfolder_path}/file.txt'
+    audeer.touch(audeer.path(db_path, file3_path))
+    assert db.attachments['file'].files == [file_path]
+    assert db.attachments['folder'].files == [file2_path, file3_path]
 
     # Publish and load database
     audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
     db = audb.load(db.name, version='1.0.0')
     assert list(db.attachments) == ['file', 'folder']
     assert db.attachments['file'].files == [file_path]
-    assert db.attachments['folder'].files == [file2_path]
+    assert db.attachments['folder'].files == [file2_path, file3_path]
     assert db.attachments['file'].path == file_path
     assert db.attachments['file'].description == 'Attached file'
     assert db.attachments['file'].meta == {'mime': 'text'}

@@ -104,13 +104,29 @@ def _find_attachments(
     # release dependencies to removed attachment files
     db_attachment_files = []
     for attachment_id in list(db.attachments):
+        path = audeer.path(db.root, db.attachments[attachment_id].path)
+        if os.path.isdir(path):
+            folders = audeer.list_dir_names(
+                path,
+                recursive=True,
+                hidden=True,
+                basenames=True,
+            )
+            for folder in folders:
+                if not os.listdir(audeer.path(path, folder)):
+                    raise RuntimeError(
+                        "An attachment must contain "
+                        "only non-empty sub-folders. "
+                        f"But attachment '{attachment_id}' "
+                        f"contains the empty sub-folder '{folder}'."
+                    )
         files = db.attachments[attachment_id].files
         if len(files) == 0:
             raise RuntimeError(
                 "An attached folder must "
                 "contain at least one file. "
                 f"But attachment '{attachment_id}' "
-                f"doesn't contain any files."
+                "points to an empty folder."
             )
         db_attachment_files += files
     for file in set(deps.attachment_files) - set(db_attachment_files):
@@ -536,7 +552,8 @@ def publish(
         RuntimeError: if database tables reference non-existing files
         RuntimeError: if database attachment path does not exist,
             is a symlink,
-            or contains only folders and no files
+            is empty,
+            or contains an empty sub-folder
         RuntimeError: if database in ``db_root`` depends on other version
             as indicated by ``previous_version``
         RuntimeError: if database is not portable,
