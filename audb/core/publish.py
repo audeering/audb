@@ -115,8 +115,8 @@ def _find_attachments(
             for folder in folders:
                 if not os.listdir(audeer.path(path, folder)):
                     raise RuntimeError(
-                        "An attachment must contain "
-                        "only non-empty sub-folders. "
+                        "An attachment must not "
+                        "contain empty sub-folders. "
                         f"But attachment '{attachment_id}' "
                         f"contains the empty sub-folder '{folder}'."
                     )

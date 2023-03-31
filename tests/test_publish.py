@@ -541,8 +541,8 @@ def test_publish_attachment(tmpdir):
     audeer.mkdir(audeer.path(db_path, subfolder_path))
     assert db.attachments['folder'].files == []
     error_msg = (
-        "An attachment must contain "
-        "only non-empty sub-folders. "
+        "An attachment must not "
+        "contain empty sub-folders. "
         "But attachment 'folder' "
         "contains the empty sub-folder 'sub-folder'."
     )
