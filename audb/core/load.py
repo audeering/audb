@@ -1099,7 +1099,7 @@ def load_attachments(
         attachment_files += list(
             deps._df[
                 deps._df['archive'] == attachment
-            ].files
+            ].index
         )
 
     try:
