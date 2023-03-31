@@ -1037,6 +1037,108 @@ def load(
     return db
 
 
+def load_attachments(
+        name: str,
+        attachments: typing.Union[str, typing.Sequence[str]],
+        *,
+        version: str = None,
+        cache_root: str = None,
+        num_workers: typing.Optional[int] = 1,
+        timeout: float = -1,
+        verbose: bool = True,
+) -> audformat.Database:
+    r"""Load attachment(s) of database.
+
+    Args:
+        name: name of database
+        attachments: attachment ID
+            or sequence of attachment IDs
+            to load
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+
+    Returns:
+        list of attachment file paths
+
+    """
+    attachments = audeer.to_list(attachments)
+    if version is None:
+        version = latest_version(name)
+
+    db_root = database_cache_root(name, version, cache_root)
+
+    if verbose:  # pragma: no cover
+        print(f'Get:   {name} v{version}')
+        print(f'Cache: {db_root}')
+
+    deps = dependencies(
+        name,
+        version=version,
+        cache_root=cache_root,
+        verbose=verbose,
+    )
+    # We use single archive per attachment ID,
+    # so we can infer available attachment IDs
+    # from archive names
+    attachment_ids = list(
+        deps._df[
+            deps._df['type'] == define.DependType.ATTACHMENT
+        ].archive
+    )
+    attachment_files = []
+    for attachment in attachments:
+        if attachment not in attachment_ids:
+            msg = error_message_missing_object(
+                'attachment',
+                [attachment],
+                name,
+                version,
+            )
+            raise ValueError(msg)
+        attachment_files += list(
+            deps._df[
+                deps._df['archive'] == attachment
+            ].files
+        )
+
+    try:
+        with FolderLock(db_root):
+
+            # Start with database header
+            db, backend = load_header_to(
+                db_root,
+                name,
+                version,
+            )
+
+            # Load attachments
+            _load_files(
+                attachment_files,
+                'attachment',
+                backend,
+                db_root,
+                db,
+                version,
+                None,
+                deps,
+                Flavor(),
+                cache_root,
+                num_workers,
+                verbose,
+            )
+
+            attachment_files = [
+                os.path.join(db_root, os.path.normpath(a))
+                for a in attachment_files
+            ]
+
+    except filelock.Timeout:
+        utils.timeout_warning()
+
+    return attachment_files
+
+
 def load_header(
         name: str,
         *,
