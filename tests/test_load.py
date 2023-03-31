@@ -375,6 +375,76 @@ def test_load(format, version):
 
 
 @pytest.mark.parametrize(
+    'version, attachments',
+    [
+        (
+            '1.0.0',
+            [],
+        ),
+        (
+            '1.0.0',
+            'file',
+        ),
+        pytest.param(
+            '1.0.0',
+            ['file', 'non-existent'],
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        (
+            '1.0.0',
+            ['file', 'folder'],
+        ),
+        (
+            None,
+            ['folder'],
+        ),
+    ]
+)
+def test_load_attachments(version, attachments):
+
+    deps = audb.dependencies(DB_NAME, version=version)
+
+    expected_attachment_files = []
+    for attachment in audeer.to_list(attachments):
+        expected_attachment_files += list(
+            deps._df[
+                deps._df['archive'] == attachment
+            ].index
+        )
+
+    paths = audb.load_attachments(
+        DB_NAME,
+        attachments,
+        version=version,
+        verbose=False,
+    )
+
+    if version is None:
+        version = audb.latest_version(DB_NAME)
+    expected_paths = [
+        os.path.join(pytest.CACHE_ROOT, DB_NAME, version, file)
+        for file in expected_attachment_files
+    ]
+    assert paths == expected_paths
+
+    # Clear cache to force loading from other cache
+    cache_root = audb.core.load.database_cache_root(
+        DB_NAME,
+        version,
+        pytest.CACHE_ROOT,
+        audb.Flavor(),
+    )
+    shutil.rmtree(cache_root)
+    paths2 = audb.load_attachments(
+        DB_NAME,
+        attachments,
+        version=version,
+        verbose=False,
+    )
+    assert paths2 == expected_paths
+
+
+@pytest.mark.parametrize(
     'version, media, format',
     [
         (

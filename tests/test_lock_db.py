@@ -135,6 +135,13 @@ def fixture_publish_db():
         'filewise',
         num_files=[0, 1, 2],
     )
+    db.attachments['file'] = audformat.Attachment('extra/file.txt')
+    db.attachments['folder'] = audformat.Attachment('extra/folder')
+    audeer.mkdir(audeer.path(DB_ROOT, 'extra/folder/sub-folder'))
+    audeer.touch(audeer.path(DB_ROOT, 'extra/file.txt'))
+    audeer.touch(audeer.path(DB_ROOT, 'extra/folder/file1.txt'))
+    audeer.touch(audeer.path(DB_ROOT, 'extra/folder/file2.txt'))
+    audeer.touch(audeer.path(DB_ROOT, 'extra/folder/sub-folder/file3.txt'))
     db.save(DB_ROOT)
     audformat.testing.create_audio_files(db)
 
@@ -416,6 +423,61 @@ def test_lock_load_from_cached_versions(fixture_set_repositories):
 
     # reset timeout
     audb.core.define.CACHED_VERSIONS_TIMEOUT = cached_version_timeout
+
+
+def load_attachments(timeout):
+    return audb.load_attachments(
+        DB_NAME,
+        ['file', 'folder'],
+        version=DB_VERSIONS[0],
+        timeout=timeout,
+        verbose=False,
+    )
+
+
+@pytest.mark.parametrize(
+    'fixture_set_repositories',
+    ['slow-file-system'],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    'multiprocessing',
+    [
+        False,
+        True,
+    ]
+)
+@pytest.mark.parametrize(
+    'num_workers, timeout, expected',
+    [
+        (2, -1, 2),
+        (2, 9999, 2),
+        (2, 0, 1),
+    ]
+)
+def test_lock_load_attachments(fixture_set_repositories, multiprocessing,
+                               num_workers, timeout, expected):
+
+    # avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
+        return
+
+    warns = not multiprocessing and num_workers != expected
+    with pytest.warns(
+            UserWarning if warns else None,
+            match=audb.core.define.TIMEOUT_MSG,
+    ):
+        result = audeer.run_tasks(
+            load_attachments,
+            [([timeout], {})] * num_workers,
+            num_workers=num_workers,
+            multiprocessing=multiprocessing,
+        )
+    result = [x for x in result if x is not None]
+
+    assert len(result) == expected
 
 
 def load_media(timeout):
