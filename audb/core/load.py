@@ -1057,9 +1057,30 @@ def load_attachments(
         version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
+        num_workers: number of parallel jobs or 1 for sequential
+            processing. If ``None`` will be set to the number of
+            processors on the machine multiplied by 5
+        timeout: maximum wait time if another thread or process is already
+            accessing the database. If timeout is reached, ``None`` is
+            returned. If timeout < 0 the method will block until the
+            database can be accessed
+        verbose: show debug messages
 
     Returns:
         list of attachment file paths
+
+    Raises:
+        ValueError: if an attachment ID is requested
+            that is not part of the database
+
+    Examples:
+        >>> load_attachments(
+        ...     'emodb',
+        ...     [],
+        ...     version='1.3.0',
+        ...     verbose=False,
+        ... )
+        []
 
     """
     attachments = audeer.to_list(attachments)
