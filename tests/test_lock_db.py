@@ -138,10 +138,14 @@ def fixture_publish_db():
     db.attachments['file'] = audformat.Attachment('extra/file.txt')
     db.attachments['folder'] = audformat.Attachment('extra/folder')
     audeer.mkdir(audeer.path(DB_ROOT, 'extra/folder/sub-folder'))
-    audeer.touch(audeer.path(DB_ROOT, 'extra/file.txt'))
-    audeer.touch(audeer.path(DB_ROOT, 'extra/folder/file1.txt'))
-    audeer.touch(audeer.path(DB_ROOT, 'extra/folder/file2.txt'))
-    audeer.touch(audeer.path(DB_ROOT, 'extra/folder/sub-folder/file3.txt'))
+    for file in [
+            'extra/file.txt',
+            'extra/folder/file1.txt',
+            'extra/folder/file2.txt',
+            'extra/folder/sub-folder/file3.txt',
+    ]:
+        with open(audeer.path(DB_ROOT, file), 'w') as fp:
+            fp.write('Some text')
     db.save(DB_ROOT)
     audformat.testing.create_audio_files(db)
 
