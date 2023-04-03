@@ -96,6 +96,6 @@ the following operations are performed:
 .. graphviz:: pics/load.dot
 
 
-.. _Generic repository: https://www.jfrog.com/confluence/display/JFROG/Repository+Management#RepositoryManagement-GenericRepositories
+.. _Generic repository: https://jfrog.com/help/r/jfrog-artifactory-documentation/repository-management
 .. _Artifactory server: https://jfrog.com/artifactory/
 .. _implements the required functions: https://github.com/audeering/audbackend/blob/edd23462799ae9052a43cdd045698f78e19dbcaf/audbackend/core/backend.py#L559-L659
