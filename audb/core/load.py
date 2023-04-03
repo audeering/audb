@@ -1237,6 +1237,7 @@ def load_table(
     Args:
         name: name of database
         table: load table from database
+        version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
         num_workers: number of parallel jobs or 1 for sequential
