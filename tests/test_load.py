@@ -422,7 +422,12 @@ def test_load_attachments(version, attachments):
     if version is None:
         version = audb.latest_version(DB_NAME)
     expected_paths = [
-        os.path.join(pytest.CACHE_ROOT, DB_NAME, version, file)
+        os.path.join(
+            pytest.CACHE_ROOT,
+            DB_NAME,
+            version,
+            os.path.normpath(file),
+        )
         for file in expected_attachment_files
     ]
     assert paths == expected_paths
