@@ -429,12 +429,11 @@ def test_lock_load_from_cached_versions(fixture_set_repositories):
     audb.core.define.CACHED_VERSIONS_TIMEOUT = cached_version_timeout
 
 
-def load_attachments(timeout):
+def load_attachments():
     return audb.load_attachments(
         DB_NAME,
         ['file', 'folder'],
         version=DB_VERSIONS[0],
-        timeout=timeout,
         verbose=False,
     )
 
@@ -452,15 +451,13 @@ def load_attachments(timeout):
     ]
 )
 @pytest.mark.parametrize(
-    'num_workers, timeout, expected',
+    'num_workers',
     [
-        (2, -1, 2),
-        (2, 9999, 2),
-        (2, 0, 1),
+        4,
     ]
 )
 def test_lock_load_attachments(fixture_set_repositories, multiprocessing,
-                               num_workers, timeout, expected):
+                               num_workers):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -468,20 +465,14 @@ def test_lock_load_attachments(fixture_set_repositories, multiprocessing,
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
-    warns = not multiprocessing and num_workers != expected
-    with pytest.warns(
-            UserWarning if warns else None,
-            match=audb.core.define.TIMEOUT_MSG,
-    ):
-        result = audeer.run_tasks(
-            load_attachments,
-            [([timeout], {})] * num_workers,
-            num_workers=num_workers,
-            multiprocessing=multiprocessing,
-        )
-    result = [x for x in result if x is not None]
+    result = audeer.run_tasks(
+        load_attachments,
+        [([], {})] * num_workers,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
 
-    assert len(result) == expected
+    assert len(result) == num_workers
 
 
 def load_media(timeout):

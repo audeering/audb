@@ -1044,7 +1044,6 @@ def load_attachments(
         version: str = None,
         cache_root: str = None,
         num_workers: typing.Optional[int] = 1,
-        timeout: float = -1,
         verbose: bool = True,
 ) -> audformat.Database:
     r"""Load attachment(s) of database.
@@ -1060,10 +1059,6 @@ def load_attachments(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``None`` is
-            returned. If timeout < 0 the method will block until the
-            database can be accessed
         verbose: show debug messages
 
     Returns:
@@ -1123,39 +1118,35 @@ def load_attachments(
             ].index
         )
 
-    try:
-        with FolderLock(db_root):
+    with FolderLock(db_root):
 
-            # Start with database header
-            db, backend = load_header_to(
-                db_root,
-                name,
-                version,
-            )
+        # Start with database header
+        db, backend = load_header_to(
+            db_root,
+            name,
+            version,
+        )
 
-            # Load attachments
-            _load_files(
-                attachment_files,
-                'attachment',
-                backend,
-                db_root,
-                db,
-                version,
-                None,
-                deps,
-                Flavor(),
-                cache_root,
-                num_workers,
-                verbose,
-            )
+        # Load attachments
+        _load_files(
+            attachment_files,
+            'attachment',
+            backend,
+            db_root,
+            db,
+            version,
+            None,
+            deps,
+            Flavor(),
+            cache_root,
+            num_workers,
+            verbose,
+        )
 
-            attachment_files = [
-                os.path.join(db_root, os.path.normpath(a))
-                for a in attachment_files
-            ]
-
-    except filelock.Timeout:
-        utils.timeout_warning()
+        attachment_files = [
+            os.path.join(db_root, os.path.normpath(a))
+            for a in attachment_files
+        ]
 
     return attachment_files
 
