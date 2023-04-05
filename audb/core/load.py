@@ -861,7 +861,7 @@ def load(
     Examples:
         >>> db = audb.load(
         ...     'emodb',
-        ...     version='1.4.0',
+        ...     version='1.4.1',
         ...     tables=['emotion', 'files'],
         ...     only_metadata=True,
         ...     full_path=False,
@@ -1191,12 +1191,12 @@ def load_media(
         >>> paths = load_media(
         ...     'emodb',
         ...     ['wav/03a01Fa.wav'],
-        ...     version='1.4.0',
+        ...     version='1.4.1',
         ...     format='flac',
         ...     verbose=False,
         ... )
         >>> paths[0].split(os.path.sep)[-5:]
-        ['emodb', '1.4.0', '40bb2241', 'wav', '03a01Fa.flac']
+        ['emodb', '1.4.1', '40bb2241', 'wav', '03a01Fa.flac']
 
     """
     media = audeer.to_list(media)
@@ -1324,7 +1324,7 @@ def load_table(
         >>> df = load_table(
         ...     'emodb',
         ...     'emotion',
-        ...     version='1.4.0',
+        ...     version='1.4.1',
         ...     verbose=False,
         ... )
         >>> df[:3]
