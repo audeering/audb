@@ -1045,12 +1045,12 @@ def load_attachment(
         cache_root: str = None,
         num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
-) -> audformat.Database:
+) -> typing.List[str]:
     r"""Load attachment(s) of database.
 
     Args:
         name: name of database
-        attachments: attachment ID to load
+        attachment: attachment ID to load
         version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
@@ -1095,12 +1095,13 @@ def load_attachment(
     # We use single archive per attachment ID,
     # so we can infer available attachment IDs
     # from archive names
-    attachment_ids = list(
+    attachment_files = list(
         deps._df[
-            deps._df['type'] == define.DependType.ATTACHMENT
-        ].archive
+            deps._df['archive'] == attachment
+        ].index
     )
-    if attachment not in attachment_ids:
+
+    if not attachment_files:
         msg = error_message_missing_object(
             'attachment',
             [attachment],
@@ -1108,11 +1109,6 @@ def load_attachment(
             version,
         )
         raise ValueError(msg)
-    attachment_files = list(
-        deps._df[
-            deps._df['archive'] == attachment
-        ].index
-    )
 
     with FolderLock(db_root):
 
