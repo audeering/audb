@@ -1043,7 +1043,6 @@ def load_attachment(
         *,
         version: str = None,
         cache_root: str = None,
-        num_workers: typing.Optional[int] = 1,
         verbose: bool = True,
 ) -> typing.List[str]:
     r"""Load attachment(s) of database.
@@ -1054,9 +1053,6 @@ def load_attachment(
         version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
-        num_workers: number of parallel jobs or 1 for sequential
-            processing. If ``None`` will be set to the number of
-            processors on the machine multiplied by 5
         verbose: show debug messages
 
     Returns:
@@ -1131,7 +1127,7 @@ def load_attachment(
             deps,
             Flavor(),
             cache_root,
-            num_workers,
+            1,
             verbose,
         )
 
