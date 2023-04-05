@@ -1037,9 +1037,9 @@ def load(
     return db
 
 
-def load_attachments(
+def load_attachment(
         name: str,
-        attachments: typing.Union[str, typing.Sequence[str]],
+        attachment: str,
         *,
         version: str = None,
         cache_root: str = None,
@@ -1050,9 +1050,7 @@ def load_attachments(
 
     Args:
         name: name of database
-        attachments: attachment ID
-            or sequence of attachment IDs
-            to load
+        attachments: attachment ID to load
         version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
@@ -1069,16 +1067,16 @@ def load_attachments(
             that is not part of the database
 
     Examples:
-        >>> load_attachments(
+        >>> paths = load_attachment(
         ...     'emodb',
-        ...     [],
-        ...     version='1.3.0',
+        ...     'bibtex',
+        ...     version='1.4.1',
         ...     verbose=False,
         ... )
-        []
+        >>> os.path.basename(paths[0])
+        'burkhardt2005emodb.bib'
 
     """
-    attachments = audeer.to_list(attachments)
     if version is None:
         version = latest_version(name)
 
@@ -1102,21 +1100,19 @@ def load_attachments(
             deps._df['type'] == define.DependType.ATTACHMENT
         ].archive
     )
-    attachment_files = []
-    for attachment in attachments:
-        if attachment not in attachment_ids:
-            msg = error_message_missing_object(
-                'attachment',
-                [attachment],
-                name,
-                version,
-            )
-            raise ValueError(msg)
-        attachment_files += list(
-            deps._df[
-                deps._df['archive'] == attachment
-            ].index
+    if attachment not in attachment_ids:
+        msg = error_message_missing_object(
+            'attachment',
+            [attachment],
+            name,
+            version,
         )
+        raise ValueError(msg)
+    attachment_files = list(
+        deps._df[
+            deps._df['archive'] == attachment
+        ].index
+    )
 
     with FolderLock(db_root):
 

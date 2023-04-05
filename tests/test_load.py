@@ -375,46 +375,45 @@ def test_load(format, version):
 
 
 @pytest.mark.parametrize(
-    'version, attachments',
+    'version, attachment_id',
     [
-        (
+        pytest.param(
             '1.0.0',
-            [],
+            '',
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        pytest.param(
+            '1.0.0',
+            'non-existent',
+            marks=pytest.mark.xfail(raises=ValueError),
         ),
         (
             '1.0.0',
             'file',
         ),
-        pytest.param(
-            '1.0.0',
-            ['file', 'non-existent'],
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
         (
             '1.0.0',
-            ['file', 'folder'],
+            'folder',
         ),
         (
             None,
-            ['folder'],
+            'folder',
         ),
     ]
 )
-def test_load_attachments(version, attachments):
+def test_load_attachment(version, attachment_id):
 
     deps = audb.dependencies(DB_NAME, version=version)
 
-    expected_attachment_files = []
-    for attachment in audeer.to_list(attachments):
-        expected_attachment_files += list(
-            deps._df[
-                deps._df['archive'] == attachment
-            ].index
-        )
+    expected_attachment_files = list(
+        deps._df[
+            deps._df['archive'] == attachment_id
+        ].index
+    )
 
-    paths = audb.load_attachments(
+    paths = audb.load_attachment(
         DB_NAME,
-        attachments,
+        attachment_id,
         version=version,
         verbose=False,
     )
@@ -440,9 +439,9 @@ def test_load_attachments(version, attachments):
         audb.Flavor(),
     )
     shutil.rmtree(cache_root)
-    paths2 = audb.load_attachments(
+    paths2 = audb.load_attachment(
         DB_NAME,
-        attachments,
+        attachment_id,
         version=version,
         verbose=False,
     )

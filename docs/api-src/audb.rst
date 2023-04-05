@@ -28,7 +28,7 @@ audb
     flavor_path
     latest_version
     load
-    load_attachments
+    load_attachment
     load_media
     load_table
     load_to

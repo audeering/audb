@@ -429,10 +429,10 @@ def test_lock_load_from_cached_versions(fixture_set_repositories):
     audb.core.define.CACHED_VERSIONS_TIMEOUT = cached_version_timeout
 
 
-def load_attachments():
-    return audb.load_attachments(
+def load_attachment():
+    return audb.load_attachment(
         DB_NAME,
-        ['file', 'folder'],
+        'folder',
         version=DB_VERSIONS[0],
         verbose=False,
     )
@@ -456,17 +456,20 @@ def load_attachments():
         4,
     ]
 )
-def test_lock_load_attachments(fixture_set_repositories, multiprocessing,
-                               num_workers):
+def test_lock_load_attachment(
+        fixture_set_repositories,
+        multiprocessing,
+        num_workers,
+):
 
-    # avoid
+    # Avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
     # when multiprocessing=True on Windows and macOS
     if multiprocessing and sys.platform in ['win32', 'darwin']:
         return
 
     result = audeer.run_tasks(
-        load_attachments,
+        load_attachment,
         [([], {})] * num_workers,
         num_workers=num_workers,
         multiprocessing=multiprocessing,
