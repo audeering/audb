@@ -377,16 +377,6 @@ def test_load(format, version):
 @pytest.mark.parametrize(
     'version, attachment_id',
     [
-        pytest.param(
-            '1.0.0',
-            '',
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
-        pytest.param(
-            '1.0.0',
-            'non-existent',
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
         (
             '1.0.0',
             'file',
@@ -446,6 +436,34 @@ def test_load_attachment(version, attachment_id):
         verbose=False,
     )
     assert paths2 == expected_paths
+
+
+@pytest.mark.parametrize(
+    'version, attachment_id, error, error_msg',
+    [
+        (
+            '1.0.0',
+            '',
+            ValueError,
+            "Could not find the attachment ''"
+        ),
+        (
+            '1.0.0',
+            'non-existent',
+            ValueError,
+            "Could not find the attachment 'non-existent'"
+        ),
+    ]
+)
+def test_load_attachment_errors(version, attachment_id, error, error_msg):
+
+    with pytest.raises(error, match=error_msg):
+        audb.load_attachment(
+            DB_NAME,
+            attachment_id,
+            version=version,
+            verbose=False,
+        )
 
 
 @pytest.mark.parametrize(
