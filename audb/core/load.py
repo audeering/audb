@@ -1132,7 +1132,7 @@ def load_attachment(
         )
 
         attachment_files = [
-            os.path.join(db_root, os.path.normpath(a))
+            audeer.path(db_root, os.path.normpath(a))
             for a in attachment_files
         ]
 
