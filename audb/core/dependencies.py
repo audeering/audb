@@ -31,8 +31,8 @@ class Dependencies:
         Empty DataFrame
         Columns: [archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version]
         Index: []
-        >>> # Request dependencies for emodb 1.4.0
-        >>> deps = audb.dependencies('emodb', version='1.4.0')
+        >>> # Request dependencies for emodb 1.4.1
+        >>> deps = audb.dependencies('emodb', version='1.4.1')
         >>> # List all files or archives
         >>> deps.files[:3]
         ['db.emotion.csv', 'db.files.csv', 'wav/03a01Fa.wav']
