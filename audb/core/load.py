@@ -504,7 +504,7 @@ def _load_files(
 
     Args:
         files: list of media files,
-            attachemnt files,
+            attachment files,
             or table IDs
         files_type: ``'media'``,
             ``'table'``,
