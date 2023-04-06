@@ -110,8 +110,39 @@ class Dependencies:
         archives = self._df.archive.to_list()
         return sorted(list(set(archives)))
 
+
     @property
     def attachment_files(self) -> typing.List[str]:
+        r"""Attachment files.
+
+        Returns:
+            list of attachment files
+
+        """
+        return list(
+            self._df[
+                self._df['type'] == define.DependType.ATTACHMENT
+            ].index
+        )
+
+
+    @property
+    def attachment_ids(self) -> typing.List[str]:
+        r"""Attachment files.
+
+        Returns:
+            list of attachment files
+
+        """
+        return list(
+            self._df[
+                self._df['type'] == define.DependType.ATTACHMENT
+            ].archive
+        )
+
+
+    @property
+    def attachment_paths(self) -> typing.List[str]:
         r"""Attachment files.
 
         Returns:
@@ -376,20 +407,20 @@ class Dependencies:
         """
         return self._df.version[file]
 
-    def _add_attachment_file(
+    def _add_attachment(
             self,
             file: str,
             version: str,
             archive: str,
             checksum: str,
     ):
-        r"""Add or update attachment file.
+        r"""Add or update attachment.
 
         Args:
-            file: relative file path
+            file: relative path of attachment
+            version: version string
             archive: archive name without extension
             checksum: checksum of file
-            version: version string
 
         """
         format = audeer.file_extension(file).lower()
@@ -562,6 +593,8 @@ def error_message_missing_object(
         object_name = f'{object_type} file'
     else:
         object_name = object_type
+
+    # TODO: check if we can combine the two error messages
 
     if isinstance(missing_object_id, str):
         msg = (

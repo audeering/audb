@@ -339,14 +339,14 @@ def test_load(format, version):
 
     deps = audb.dependencies(DB_NAME, version=version)
     assert str(deps().to_string()) == str(deps)
-    attachment_files = audeer.flatten_list(
-        [attachment.files for _, attachment in db.attachments.items()]
-    )
     assert len(deps) == (
         len(db.files)
         + len(db.tables)
         + len(db.misc_tables)
-        + len(attachment_files)
+        + len(db.attachments)
+    )
+    attachment_files = audeer.flatten_list(
+        [attachment.files for _, attachment in db.attachments.items()]
     )
     for attachment_file in attachment_files:
         assert os.path.exists(audeer.path(db.root, attachment_file))
@@ -395,10 +395,10 @@ def test_load_attachment(version, attachment_id):
 
     deps = audb.dependencies(DB_NAME, version=version)
 
-    expected_attachment_files = list(
-        deps._df[
-            deps._df['archive'] == attachment_id
-        ].index
+    db = audb.load(
+        DB_NAME,
+        version=version,
+        verbose=False,
     )
 
     paths = audb.load_attachment(
@@ -410,6 +410,7 @@ def test_load_attachment(version, attachment_id):
 
     if version is None:
         version = audb.latest_version(DB_NAME)
+
     expected_paths = [
         os.path.join(
             pytest.CACHE_ROOT,
@@ -417,7 +418,7 @@ def test_load_attachment(version, attachment_id):
             version,
             os.path.normpath(file),
         )
-        for file in expected_attachment_files
+        for file in db.attachments[attachment_id].files
     ]
     assert paths == expected_paths
 

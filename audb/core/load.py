@@ -340,6 +340,64 @@ def _get_attachments_from_backend(
     audeer.rmdir(db_root_tmp)
 
 
+def _get_attachments_from_backend_(
+        db: audformat.Database,
+        attachments: typing.Sequence[str],
+        db_root: str,
+        deps: Dependencies,
+        backend: audbackend.Backend,
+        num_workers: typing.Optional[int],
+        verbose: bool,
+):
+    r"""Load attachments from backend."""
+    db_root_tmp = database_tmp_root(db_root)
+
+    # find needed archives
+    archives = []
+    for attachment in attachments:
+        path = db.attachments[attachment].path
+        archives.append((path, deps.archive(path), deps.version(path)))
+
+    def job(path: str, archive: str, version: str):
+        archive = backend.join(
+            db.name,
+            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
+            archive,
+        )
+        backend.get_archive(
+            archive,
+            db_root_tmp,
+            version,
+            tmp_root=db_root_tmp,
+        )
+        src_path = audeer.path(db_root_tmp, path)
+        dst_path = audeer.path(db_root, path)
+        audeer.mkdir(os.path.dirname(dst_path))
+        audeer.move_file(
+            src_path,
+            dst_path,
+        )
+        # for file in files:
+        #     if file in attachment_files:
+        #         audeer.move_file(
+        #             os.path.join(db_root_tmp, file),
+        #             os.path.join(db_root, file),
+        #         )
+        #     else:
+        #         os.remove(os.path.join(db_root_tmp, file))
+
+    audeer.run_tasks(
+        job,
+        params=[([path, archive, version], {})
+                for path, archive, version in archives],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description='Load attachments',
+    )
+
+    audeer.rmdir(db_root_tmp)
+
+
 def _get_media_from_backend(
         name: str,
         media: typing.Sequence[str],
@@ -475,6 +533,84 @@ def _get_tables_from_backend(
     )
 
     audeer.rmdir(db_root_tmp)
+
+
+def _load_attachments(
+        attachments: typing.Sequence[str],
+        backend: audbackend.Backend,
+        db_root: str,
+        db: audformat.Database,
+        version: str,
+        cached_versions: typing.Optional[CachedVersions],
+        deps: Dependencies,
+        flavor: Flavor,
+        cache_root: str,
+        num_workers: int,
+        verbose: bool,
+) -> typing.Optional[CachedVersions]:
+    r"""Load attachments to cache.
+
+    Args:
+        attachments: list of attachment IDs
+        backend: backend object
+        db_root: database root
+        db: database object
+        version: database version
+        cached_versions: object representing cached versions
+            of the database
+        deps: database dependency object
+        flavor: database flavor object
+        cache_root: root path of cache
+        num_workers: number of workers to use
+        verbose: if ``True`` show progress bars
+            for each step
+
+    Returns:
+        cached versions object
+            if other versions of the database are found in cache
+
+    """
+    missing_attachments = []
+    for attachment in attachments:
+        path = db.attachments[attachment].path
+        path = audeer.path(db_root, path)
+        if not os.path.exists(path):
+            missing_attachments.append(attachment)
+
+    if missing_attachments:
+        if cached_versions is None:
+            cached_versions = _cached_versions(
+                db.name,
+                version,
+                flavor,
+                cache_root,
+            )
+        # TODO: look for cached attachments
+        # if cached_versions:
+        #     missing_files = _get_files_from_cache(
+        #         missing_files,
+        #         files_type,
+        #         db_root,
+        #         deps,
+        #         cached_versions,
+        #         flavor,
+        #         num_workers,
+        #         verbose,
+        #     )
+        if missing_attachments:
+            if backend is None:
+                backend = lookup_backend(db.name, version)
+            _get_attachments_from_backend_(
+                db,
+                missing_attachments,
+                db_root,
+                deps,
+                backend,
+                num_workers,
+                verbose,
+            )
+
+    return cached_versions
 
 
 def _load_files(
@@ -911,11 +1047,9 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # load attachments
-            requested_attachment_files = deps.attachment_files
             if not db_is_complete:
-                cached_versions = _load_files(
-                    requested_attachment_files,
-                    'attachment',
+                cached_versions = _load_attachments(
+                    db.attachments,
                     backend,
                     db_root,
                     db,
@@ -1056,7 +1190,7 @@ def load_attachment(
         verbose: show debug messages
 
     Returns:
-        list of attachment file paths
+        list of file paths belonging to attachment
 
     Raises:
         ValueError: if an attachment ID is requested
@@ -1088,16 +1222,8 @@ def load_attachment(
         cache_root=cache_root,
         verbose=verbose,
     )
-    # We use single archive per attachment ID,
-    # so we can infer the files that belong
-    # to an attachment from the archive name
-    attachment_files = list(
-        deps._df[
-            deps._df['archive'] == attachment
-        ].index
-    )
 
-    if not attachment_files:
+    if not attachment in deps.archives:
         msg = error_message_missing_object(
             'attachment',
             [attachment],
@@ -1115,10 +1241,9 @@ def load_attachment(
             version,
         )
 
-        # Load attachments
-        _load_files(
-            attachment_files,
-            'attachment',
+        # Load attachment
+        _load_attachments(
+            [attachment],
             backend,
             db_root,
             db,
@@ -1131,10 +1256,8 @@ def load_attachment(
             verbose,
         )
 
-        attachment_files = [
-            audeer.path(db_root, os.path.normpath(a))
-            for a in attachment_files
-        ]
+    attachment_files = db.attachments[attachment].files
+    attachment_files = [audeer.path(db_root, a) for a in attachment_files]
 
     return attachment_files
 

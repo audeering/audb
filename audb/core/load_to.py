@@ -322,13 +322,13 @@ def load_to(
     )
     if update:
         if only_metadata:
-            files = deps.attachment_files + deps.tables
+            files = deps.attachment_paths + deps.tables
         else:
             files = deps.files
         for file in files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
-                checksum = audbackend.md5(full_file)
+                checksum = utils.md5(full_file)
                 if checksum != deps.checksum(file):
                     os.remove(full_file)
 
