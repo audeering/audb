@@ -1089,8 +1089,8 @@ def load_attachment(
         verbose=verbose,
     )
     # We use single archive per attachment ID,
-    # so we can infer available attachment IDs
-    # from archive names
+    # so we can infer the files that belong 
+    # to an attachment from the archive name
     attachment_files = list(
         deps._df[
             deps._df['archive'] == attachment
