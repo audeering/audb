@@ -7,6 +7,7 @@ audb.info
     :toctree:
     :nosignatures:
 
+    attachments
     author
     bit_depths
     channels
