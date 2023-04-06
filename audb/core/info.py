@@ -34,7 +34,7 @@ def attachments(
         >>> list(attachments('emodb', version='1.4.1'))
         ['bibtex']
 
-    """  # noqa: E501
+    """
     db = header(
         name,
         version=version,
