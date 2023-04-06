@@ -16,6 +16,7 @@ from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
 from audb.core.load import (
     load,
+    load_attachment,
     load_media,
     load_table,
 )

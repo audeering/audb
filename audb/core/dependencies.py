@@ -558,10 +558,10 @@ def error_message_missing_object(
         error message
 
     """
-    if object_type == 'table':
-        object_name = object_type
-    else:
+    if object_type == 'media':
         object_name = f'{object_type} file'
+    else:
+        object_name = object_type
 
     if isinstance(missing_object_id, str):
         msg = (

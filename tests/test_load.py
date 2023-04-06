@@ -375,6 +375,98 @@ def test_load(format, version):
 
 
 @pytest.mark.parametrize(
+    'version, attachment_id',
+    [
+        (
+            '1.0.0',
+            'file',
+        ),
+        (
+            '1.0.0',
+            'folder',
+        ),
+        (
+            None,
+            'folder',
+        ),
+    ]
+)
+def test_load_attachment(version, attachment_id):
+
+    deps = audb.dependencies(DB_NAME, version=version)
+
+    expected_attachment_files = list(
+        deps._df[
+            deps._df['archive'] == attachment_id
+        ].index
+    )
+
+    paths = audb.load_attachment(
+        DB_NAME,
+        attachment_id,
+        version=version,
+        verbose=False,
+    )
+
+    if version is None:
+        version = audb.latest_version(DB_NAME)
+    expected_paths = [
+        os.path.join(
+            pytest.CACHE_ROOT,
+            DB_NAME,
+            version,
+            os.path.normpath(file),
+        )
+        for file in expected_attachment_files
+    ]
+    assert paths == expected_paths
+
+    # Clear cache to force loading from other cache
+    cache_root = audb.core.load.database_cache_root(
+        DB_NAME,
+        version,
+        pytest.CACHE_ROOT,
+        audb.Flavor(),
+    )
+    shutil.rmtree(cache_root)
+    paths2 = audb.load_attachment(
+        DB_NAME,
+        attachment_id,
+        version=version,
+        verbose=False,
+    )
+    assert paths2 == expected_paths
+
+
+@pytest.mark.parametrize(
+    'version, attachment_id, error, error_msg',
+    [
+        (
+            '1.0.0',
+            '',
+            ValueError,
+            "Could not find the attachment ''"
+        ),
+        (
+            '1.0.0',
+            'non-existent',
+            ValueError,
+            "Could not find the attachment 'non-existent'"
+        ),
+    ]
+)
+def test_load_attachment_errors(version, attachment_id, error, error_msg):
+
+    with pytest.raises(error, match=error_msg):
+        audb.load_attachment(
+            DB_NAME,
+            attachment_id,
+            version=version,
+            verbose=False,
+        )
+
+
+@pytest.mark.parametrize(
     'version, media, format',
     [
         (

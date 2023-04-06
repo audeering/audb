@@ -135,6 +135,17 @@ def fixture_publish_db():
         'filewise',
         num_files=[0, 1, 2],
     )
+    db.attachments['file'] = audformat.Attachment('extra/file.txt')
+    db.attachments['folder'] = audformat.Attachment('extra/folder')
+    audeer.mkdir(audeer.path(DB_ROOT, 'extra/folder/sub-folder'))
+    for file in [
+            'extra/file.txt',
+            'extra/folder/file1.txt',
+            'extra/folder/file2.txt',
+            'extra/folder/sub-folder/file3.txt',
+    ]:
+        with open(audeer.path(DB_ROOT, file), 'w') as fp:
+            fp.write('Some text')
     db.save(DB_ROOT)
     audformat.testing.create_audio_files(db)
 
@@ -416,6 +427,55 @@ def test_lock_load_from_cached_versions(fixture_set_repositories):
 
     # reset timeout
     audb.core.define.CACHED_VERSIONS_TIMEOUT = cached_version_timeout
+
+
+def load_attachment():
+    return audb.load_attachment(
+        DB_NAME,
+        'folder',
+        version=DB_VERSIONS[0],
+        verbose=False,
+    )
+
+
+@pytest.mark.parametrize(
+    'fixture_set_repositories',
+    ['slow-file-system'],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    'multiprocessing',
+    [
+        False,
+        True,
+    ]
+)
+@pytest.mark.parametrize(
+    'num_workers',
+    [
+        4,
+    ]
+)
+def test_lock_load_attachment(
+        fixture_set_repositories,
+        multiprocessing,
+        num_workers,
+):
+
+    # Avoid
+    # AttributeError: module pytest has no attribute CACHE_ROOT
+    # when multiprocessing=True on Windows and macOS
+    if multiprocessing and sys.platform in ['win32', 'darwin']:
+        return
+
+    result = audeer.run_tasks(
+        load_attachment,
+        [([], {})] * num_workers,
+        num_workers=num_workers,
+        multiprocessing=multiprocessing,
+    )
+
+    assert len(result) == num_workers
 
 
 def load_media(timeout):

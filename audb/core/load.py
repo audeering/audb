@@ -504,7 +504,7 @@ def _load_files(
 
     Args:
         files: list of media files,
-            attachemnt files,
+            attachment files,
             or table IDs
         files_type: ``'media'``,
             ``'table'``,
@@ -1035,6 +1035,108 @@ def load(
         utils.timeout_warning()
 
     return db
+
+
+def load_attachment(
+        name: str,
+        attachment: str,
+        *,
+        version: str = None,
+        cache_root: str = None,
+        verbose: bool = True,
+) -> typing.List[str]:
+    r"""Load attachment(s) of database.
+
+    Args:
+        name: name of database
+        attachment: attachment ID to load
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+        verbose: show debug messages
+
+    Returns:
+        list of attachment file paths
+
+    Raises:
+        ValueError: if an attachment ID is requested
+            that is not part of the database
+
+    Examples:
+        >>> paths = load_attachment(
+        ...     'emodb',
+        ...     'bibtex',
+        ...     version='1.4.1',
+        ...     verbose=False,
+        ... )
+        >>> os.path.basename(paths[0])
+        'burkhardt2005emodb.bib'
+
+    """
+    if version is None:
+        version = latest_version(name)
+
+    db_root = database_cache_root(name, version, cache_root)
+
+    if verbose:  # pragma: no cover
+        print(f'Get:   {name} v{version}')
+        print(f'Cache: {db_root}')
+
+    deps = dependencies(
+        name,
+        version=version,
+        cache_root=cache_root,
+        verbose=verbose,
+    )
+    # We use single archive per attachment ID,
+    # so we can infer the files that belong
+    # to an attachment from the archive name
+    attachment_files = list(
+        deps._df[
+            deps._df['archive'] == attachment
+        ].index
+    )
+
+    if not attachment_files:
+        msg = error_message_missing_object(
+            'attachment',
+            [attachment],
+            name,
+            version,
+        )
+        raise ValueError(msg)
+
+    with FolderLock(db_root):
+
+        # Start with database header
+        db, backend = load_header_to(
+            db_root,
+            name,
+            version,
+        )
+
+        # Load attachments
+        _load_files(
+            attachment_files,
+            'attachment',
+            backend,
+            db_root,
+            db,
+            version,
+            None,
+            deps,
+            Flavor(),
+            cache_root,
+            1,
+            verbose,
+        )
+
+        attachment_files = [
+            audeer.path(db_root, os.path.normpath(a))
+            for a in attachment_files
+        ]
+
+    return attachment_files
 
 
 def load_header(
