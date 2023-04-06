@@ -56,6 +56,7 @@ You can run:
 
 """
 from audb.core.info import (
+    attachments,
     author,
     bit_depths,
     channels,
