@@ -577,8 +577,6 @@ def error_message_missing_object(
     else:
         object_name = object_type
 
-    # TODO: check if we can combine the two error messages
-
     if isinstance(missing_object_id, str):
         msg = (
             f"Could not find a {object_name} "
