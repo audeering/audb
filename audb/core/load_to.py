@@ -316,22 +316,7 @@ def load_to(
             if os.path.exists(full_file):
                 checksum = utils.md5(full_file)
                 if checksum != deps.checksum(file):
-                    if os.path.isdir(full_file):
-                        for f in audeer.list_file_names(
-                            full_file,
-                            recursive=True,
-                            hidden=True,
-                        ):
-                            os.remove(f)
-                        for d in audeer.list_dir_names(
-                            full_file,
-                            recursive=True,
-                            hidden=True,
-                        ):
-                            os.rmdir(d)
-                        os.rmdir(full_file)
-                    else:
-                        os.remove(full_file)
+                    audeer.rmdir(full_file)
 
     # load database header without tables from backend
 
