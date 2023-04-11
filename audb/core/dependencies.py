@@ -110,7 +110,6 @@ class Dependencies:
         archives = self._df.archive.to_list()
         return sorted(list(set(archives)))
 
-
     @property
     def attachment_ids(self) -> typing.List[str]:
         r"""Attachment files.
@@ -124,7 +123,6 @@ class Dependencies:
                 self._df['type'] == define.DependType.ATTACHMENT
             ].archive
         )
-
 
     @property
     def attachment_paths(self) -> typing.List[str]:

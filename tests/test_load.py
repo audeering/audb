@@ -393,8 +393,6 @@ def test_load(format, version):
 )
 def test_load_attachment(version, attachment_id):
 
-    deps = audb.dependencies(DB_NAME, version=version)
-
     db = audb.load(
         DB_NAME,
         version=version,

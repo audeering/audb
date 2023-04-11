@@ -1153,7 +1153,7 @@ def load_attachment(
         verbose=verbose,
     )
 
-    if not attachment in deps.archives:
+    if attachment not in deps.archives:
         msg = error_message_missing_object(
             'attachment',
             [attachment],

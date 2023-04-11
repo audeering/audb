@@ -79,19 +79,16 @@ def _find_attachments(
     r"""Find altered, new or removed attachments and update 'deps'."""
 
     for attachment_id in deps.attachment_ids:
-        if not attachment_id in db.attachments:
+        if attachment_id not in db.attachments:
             path = deps._df.index[deps._df.archive == attachment_id][0]
             deps._drop(path)
 
     db_files = list(db.files) + [f'db.{t}.csv' for t in db.tables]
 
     # check attachments are valid
-    db_attachment_files = []
     for attachment_id in db.attachments:
 
         path = db.attachments[attachment_id].path
-
-        # TODO: makes 'type-has-changed-error' obsolete?
         for file in db_files:
             if file.startswith(path):
                 raise RuntimeError(
@@ -128,7 +125,6 @@ def _find_attachments(
                 "points to an empty folder."
             )
 
-
     # add dependencies to new or updated attachments
     attachment_ids = []
     for attachment_id in audeer.progress_bar(
@@ -139,7 +135,7 @@ def _find_attachments(
         # use one archive per attachment ID
         path = db.attachments[attachment_id].path
         checksum = utils.md5(audeer.path(db_root, path))
-        if not path in deps or checksum != deps.checksum(path):
+        if path not in deps or checksum != deps.checksum(path):
             deps._add_attachment(
                 file=path,
                 version=version,
