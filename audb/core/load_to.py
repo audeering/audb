@@ -26,7 +26,7 @@ def _find_attachments(
 
     attachments = []
 
-    for file in deps.attachment_paths:
+    for file in deps.attachments:
         full_file = os.path.join(db_root, file)
         if not os.path.exists(full_file):
             attachments.append(file)
@@ -308,7 +308,7 @@ def load_to(
     )
     if update:
         if only_metadata:
-            files = deps.attachment_paths + deps.tables
+            files = deps.attachments + deps.tables
         else:
             files = deps.files
         for file in files:

@@ -420,7 +420,7 @@ def test_publish(version):
         assert archive in deps.archives
 
     # Check checksums of attachment files
-    for path in deps.attachment_paths:
+    for path in deps.attachments:
         expected_checksum = audb.core.utils.md5(audeer.path(db.root, path))
         assert deps.checksum(path) == expected_checksum
 
@@ -585,23 +585,23 @@ def test_publish_attachment(tmpdir):
             '1.0.0',
             '2.0.0',
             [],
-            ['extra/folder/file2.txt'],
+            [os.path.join('extra', 'folder', 'file2.txt')],
         ),
         (
             '2.0.0',
             '1.0.0',
             [LONG_PATH],
-            ['extra/folder/file3.txt'],
+            [os.path.join('extra', 'folder', 'file3.txt')],
         ),
         (
             '2.0.0',
             '3.0.0',
             ['audio/001.wav'],
             [
-                'extra/file.txt',
-                'extra/folder/file1.txt',
-                'extra/folder/file3.txt',
-                'extra/folder/sub-folder/file3.txt',
+                os.path.join('extra', 'file.txt'),
+                os.path.join('extra', 'folder', 'file1.txt'),
+                os.path.join('extra', 'folder', 'file3.txt'),
+                os.path.join('extra', 'folder', 'sub-folder', 'file3.txt'),
             ],
         ),
         (
@@ -615,10 +615,10 @@ def test_publish_attachment(tmpdir):
             '3.0.0',
             ['audio/001.wav'],
             [
-                'extra/file.txt',
-                'extra/folder/file1.txt',
-                'extra/folder/file2.txt',
-                'extra/folder/sub-folder/file3.txt',
+                os.path.join('extra', 'file.txt'),
+                os.path.join('extra', 'folder', 'file1.txt'),
+                os.path.join('extra', 'folder', 'file2.txt'),
+                os.path.join('extra', 'folder', 'sub-folder', 'file3.txt'),
             ],
         ),
         (
@@ -644,7 +644,7 @@ def test_publish_changed_db(
     assert media1 - media2 == set(media_difference)
 
     attachment1 = []
-    for path in depend1.attachment_paths:
+    for path in depend1.attachments:
         root = DB_ROOT_VERSION[version1]
         files = audeer.list_file_names(
             audeer.path(root, path),
@@ -655,7 +655,7 @@ def test_publish_changed_db(
         attachment1.extend(files)
 
     attachment2 = []
-    for path in depend2.attachment_paths:
+    for path in depend2.attachments:
         root = DB_ROOT_VERSION[version2]
         files = audeer.list_file_names(
             audeer.path(root, path),

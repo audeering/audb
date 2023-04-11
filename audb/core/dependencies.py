@@ -111,25 +111,11 @@ class Dependencies:
         return sorted(list(set(archives)))
 
     @property
-    def attachment_ids(self) -> typing.List[str]:
-        r"""Attachment files.
+    def attachments(self) -> typing.List[str]:
+        r"""Attachment paths (can be a file or a folder).
 
         Returns:
-            list of attachment files
-
-        """
-        return list(
-            self._df[
-                self._df['type'] == define.DependType.ATTACHMENT
-            ].archive
-        )
-
-    @property
-    def attachment_paths(self) -> typing.List[str]:
-        r"""Attachment files.
-
-        Returns:
-            list of attachment files
+            list of attachment
 
         """
         return list(
@@ -139,8 +125,22 @@ class Dependencies:
         )
 
     @property
+    def attachment_ids(self) -> typing.List[str]:
+        r"""Attachment IDs.
+
+        Returns:
+            list of attachment ID
+
+        """
+        return list(
+            self._df[
+                self._df['type'] == define.DependType.ATTACHMENT
+            ].archive
+        )
+
+    @property
     def files(self) -> typing.List[str]:
-        r"""All media, table, attachment files.
+        r"""All media, table, attachments.
 
         Returns:
             list of files
