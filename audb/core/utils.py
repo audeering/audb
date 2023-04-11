@@ -69,7 +69,7 @@ def md5(
     for file in files:
         # encode file name that renaming of files
         # produces different checksum
-        hasher.update(file.encode())
+        hasher.update(file.replace(os.path.sep, '/').encode())
         with open(audeer.path(path, file), 'rb') as fp:
             for chunk in md5_read_chunk(fp, chunk_size):
                 hasher.update(chunk)

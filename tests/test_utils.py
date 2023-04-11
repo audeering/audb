@@ -12,11 +12,11 @@ import audb
     [
         (
             ['f', os.path.join('sub', 'f')],
-            'b7a818f20a169f8e903408706fdbb2cb',
+            'b540f38948f445622adc657a757f4b0d',
         ),
         (
             ['f', os.path.join('sub', 'g')],
-            '234b7950b37a3ff61d4d422233c65347',
+            '305107efbb15f9334d22ae4fbeec4de6',
         ),
         (
             ['ä', 'ö', 'ü', 'ß'],
