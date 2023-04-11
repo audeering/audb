@@ -129,7 +129,7 @@ class Dependencies:
         r"""Attachment IDs.
 
         Returns:
-            list of attachment ID
+            list of attachment IDs
 
         """
         return list(
