@@ -115,7 +115,7 @@ class Dependencies:
         r"""Attachment paths (can be a file or a folder).
 
         Returns:
-            list of attachment
+            list of attachments
 
         """
         return list(
