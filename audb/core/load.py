@@ -288,60 +288,6 @@ def _get_files_from_cache(
 
 def _get_attachments_from_backend(
         db: audformat.Database,
-        attachment_files: typing.Sequence[str],
-        db_root: str,
-        deps: Dependencies,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
-):
-    r"""Load attachment files from backend."""
-    db_root_tmp = database_tmp_root(db_root)
-
-    # create folder tree to avoid race condition
-    # in os.makedirs when files are unpacked
-    utils.mkdir_tree(attachment_files, db_root)
-    utils.mkdir_tree(attachment_files, db_root_tmp)
-
-    # find needed archives
-    archives = set()
-    for file in attachment_files:
-        archives.add((deps.archive(file), deps.version(file)))
-
-    def job(archive: str, version: str):
-        archive = backend.join(
-            db.name,
-            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            archive,
-        )
-        files = backend.get_archive(
-            archive,
-            db_root_tmp,
-            version,
-            tmp_root=db_root_tmp,
-        )
-        for file in files:
-            if file in attachment_files:
-                audeer.move_file(
-                    os.path.join(db_root_tmp, file),
-                    os.path.join(db_root, file),
-                )
-            else:
-                os.remove(os.path.join(db_root_tmp, file))
-
-    audeer.run_tasks(
-        job,
-        params=[([archive, version], {}) for archive, version in archives],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Load attachments',
-    )
-
-    audeer.rmdir(db_root_tmp)
-
-
-def _get_attachments_from_backend_(
-        db: audformat.Database,
         attachments: typing.Sequence[str],
         db_root: str,
         deps: Dependencies,
@@ -352,13 +298,16 @@ def _get_attachments_from_backend_(
     r"""Load attachments from backend."""
     db_root_tmp = database_tmp_root(db_root)
 
-    # find needed archives
-    archives = []
-    for attachment in attachments:
-        path = db.attachments[attachment].path
-        archives.append((path, deps.archive(path), deps.version(path)))
+    paths = [db.attachments[attachment].path for attachment in attachments]
 
-    def job(path: str, archive: str, version: str):
+    # create folder tree to avoid race condition
+    # in os.makedirs when files are unpacked
+    utils.mkdir_tree(paths, db_root)
+    utils.mkdir_tree(paths, db_root_tmp)
+
+    def job(path: str):
+        archive = deps.archive(path)
+        version = deps.version(path)
         archive = backend.join(
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
@@ -377,19 +326,10 @@ def _get_attachments_from_backend_(
             src_path,
             dst_path,
         )
-        # for file in files:
-        #     if file in attachment_files:
-        #         audeer.move_file(
-        #             os.path.join(db_root_tmp, file),
-        #             os.path.join(db_root, file),
-        #         )
-        #     else:
-        #         os.remove(os.path.join(db_root_tmp, file))
 
     audeer.run_tasks(
         job,
-        params=[([path, archive, version], {})
-                for path, archive, version in archives],
+        params=[([path], {}) for path in paths],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description='Load attachments',
@@ -600,7 +540,7 @@ def _load_attachments(
         if missing_attachments:
             if backend is None:
                 backend = lookup_backend(db.name, version)
-            _get_attachments_from_backend_(
+            _get_attachments_from_backend(
                 db,
                 missing_attachments,
                 db_root,
@@ -705,16 +645,6 @@ def _load_files(
                 )
             elif files_type == 'table':
                 _get_tables_from_backend(
-                    db,
-                    missing_files,
-                    db_root,
-                    deps,
-                    backend,
-                    num_workers,
-                    verbose,
-                )
-            elif files_type == 'attachment':
-                _get_attachments_from_backend(
                     db,
                     missing_files,
                     db_root,

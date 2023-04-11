@@ -1,4 +1,3 @@
-import errno
 import hashlib
 import os
 import typing
@@ -56,22 +55,22 @@ def md5(
     r"""Create MD5 checksum of file or folder."""
     path = audeer.path(path)
 
-    if not os.path.exists(path):
-        raise FileNotFoundError(
-            errno.ENOENT,
-            os.strerror(errno.ENOENT),
-            path,
-        )
+    if not os.path.isdir(path):
+        return audbackend.md5(path)
 
     files = audeer.list_file_names(
         audeer.path(path),
         recursive=True,
         hidden=True,
+        basenames=True,
     )
 
     hasher = hashlib.md5()
     for file in files:
-        with open(file, 'rb') as fp:
+        # encode file name that renaming of files
+        # produces different checksum
+        hasher.update(file.encode())
+        with open(audeer.path(path, file), 'rb') as fp:
             for chunk in md5_read_chunk(fp, chunk_size):
                 hasher.update(chunk)
 

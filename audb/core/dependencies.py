@@ -112,21 +112,6 @@ class Dependencies:
 
 
     @property
-    def attachment_files(self) -> typing.List[str]:
-        r"""Attachment files.
-
-        Returns:
-            list of attachment files
-
-        """
-        return list(
-            self._df[
-                self._df['type'] == define.DependType.ATTACHMENT
-            ].index
-        )
-
-
-    @property
     def attachment_ids(self) -> typing.List[str]:
         r"""Attachment files.
 

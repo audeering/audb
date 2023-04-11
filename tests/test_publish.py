@@ -14,7 +14,6 @@ import audiofile
 
 import audb
 
-
 os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
 os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 
@@ -421,13 +420,9 @@ def test_publish(version):
         assert archive in deps.archives
 
     # Check checksums of attachment files
-    expected_checksum_empty_attachment = 'd41d8cd98f00b204e9800998ecf8427e'
-    expected_checksum_file3_attachment = '098f6bcd4621d373cade4e832627b4f6'
-    for file in deps.attachment_files:
-        if file == 'extra/folder/sub-folder/file3.txt':
-            assert deps.checksum(file) == expected_checksum_file3_attachment
-        else:
-            assert deps.checksum(file) == expected_checksum_empty_attachment
+    for path in deps.attachment_paths:
+        expected_checksum = audb.core.utils.md5(audeer.path(db.root, path))
+        assert deps.checksum(path) == expected_checksum
 
     db = audb.load(
         DB_NAME,
@@ -565,7 +560,7 @@ def test_publish_attachment(tmpdir):
 
     # Publish and load database
     audb.publish(db_path, '1.0.0', pytest.PUBLISH_REPOSITORY)
-    db = audb.load(db.name, version='1.0.0')
+    db = audb.load(db.name, version='1.0.0', verbose=False)
     assert list(db.attachments) == ['file', 'folder']
     assert db.attachments['file'].files == [file_path]
     assert db.attachments['folder'].files == [file2_path, file3_path]
@@ -648,9 +643,29 @@ def test_publish_changed_db(
     media2 = set(sorted(depend2.media))
     assert media1 - media2 == set(media_difference)
 
-    attachment1 = set(sorted(depend1.attachment_files))
-    attachment2 = set(sorted(depend2.attachment_files))
-    assert attachment1 - attachment2 == set(attachment_difference)
+    attachment1 = []
+    for path in depend1.attachment_paths:
+        root = DB_ROOT_VERSION[version1]
+        files = audeer.list_file_names(
+            audeer.path(root, path),
+            recursive=True,
+            hidden=True,
+        )
+        files = [file[len(root) + 1:] for file in files]
+        attachment1.extend(files)
+
+    attachment2 = []
+    for path in depend2.attachment_paths:
+        root = DB_ROOT_VERSION[version2]
+        files = audeer.list_file_names(
+            audeer.path(root, path),
+            recursive=True,
+            hidden=True,
+        )
+        files = [file[len(root) + 1:] for file in files]
+        attachment2.extend(files)
+
+    assert set(attachment1) - set(attachment2) == set(attachment_difference)
 
 
 @pytest.mark.parametrize(
@@ -773,11 +788,8 @@ def test_publish_error_changed_deps_file_type(tmpdir):
 
     # media => attachment
     error_msg = (
-        "The type of an existing dependency must not change, "
-        "but you are trying to change the type of the dependency "
-        "'data/file.wav'. "
-        'You might have a naming clash between a media file '
-        'and an attached file.'
+        "An attachment must not overlap with media or tables. "
+        "But attachment 'attachment' contains 'data/file.wav'."
     )
     db_name = 'test_publish_error_changed_deps_file_type-1'
     db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
@@ -795,11 +807,8 @@ def test_publish_error_changed_deps_file_type(tmpdir):
 
     # table => attachment
     error_msg = (
-        "The type of an existing dependency must not change, "
-        "but you are trying to change the type of the dependency "
-        "'db.table.csv'. "
-        'You might have a naming clash between a table '
-        'and an attached file.'
+        "An attachment must not overlap with media or tables. "
+        "But attachment 'attachment' contains 'db.table.csv'."
     )
     db_name = 'test_publish_error_changed_deps_file_type-2'
     db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
@@ -817,11 +826,8 @@ def test_publish_error_changed_deps_file_type(tmpdir):
 
     # attachment => media
     error_msg = (
-        "The type of an existing dependency must not change, "
-        "but you are trying to change the type of the dependency "
-        "'data/file2.wav'. "
-        'You might have a naming clash between a media file '
-        'and an attached file.'
+        "An attachment must not overlap with media or tables. "
+        "But attachment 'attachment' contains 'data/file2.wav'."
     )
     db_name = 'test_publish_error_changed_deps_file_type-3'
     db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
@@ -847,11 +853,8 @@ def test_publish_error_changed_deps_file_type(tmpdir):
 
     # attachment => table
     error_msg = (
-        "The type of an existing dependency must not change, "
-        "but you are trying to change the type of the dependency "
-        "'db.table2.csv'. "
-        'You might have a naming clash between a table '
-        'and an attached file.'
+        "An attachment must not overlap with media or tables. "
+        "But attachment 'attachment' contains 'db.table2.csv'."
     )
     db_name = 'test_publish_error_changed_deps_file_type-4'
     db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
@@ -1044,6 +1047,7 @@ def test_update_database_without_media(tmpdir):
     # add changes to build folder
     # and call again load_to()
     # to revert them
+
     os.remove(audeer.path(build_root, 'extra/folder/file2.txt'))
     db = audb.load_to(
         build_root,
@@ -1093,6 +1097,7 @@ def test_update_database_without_media(tmpdir):
     db_load = audb.load(
         DB_NAME,
         version=version,
+        verbose=False,
     )
     for file in db.files:
         assert os.path.exists(audeer.path(db_load.root, file))
