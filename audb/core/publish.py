@@ -83,9 +83,8 @@ def _find_attachments(
             path = deps._df.index[deps._df.archive == attachment_id][0]
             deps._drop(path)
 
-    db_files = list(db.files) + [f'db.{t}.csv' for t in db.tables]
-
     # check attachments are valid
+    db_files = list(db.files) + [f'db.{t}.csv' for t in db.tables]
     for attachment_id in db.attachments:
 
         path = db.attachments[attachment_id].path
