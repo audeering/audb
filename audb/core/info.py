@@ -28,7 +28,7 @@ def attachments(
             If not set :meth:`audb.default_cache_root` is used
 
     Returns:
-        attachment ID(s) of database
+        attachments of database
 
     Examples:
         >>> list(attachments('emodb', version='1.4.1'))
