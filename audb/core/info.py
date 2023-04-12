@@ -18,7 +18,7 @@ def attachments(
         *,
         version: str = None,
         cache_root: str = None,
-) -> typing.Dict:
+) -> typing.Dict[str, audformat.Attachment]:
     """Attachment(s) of database.
 
     Args:
@@ -422,7 +422,7 @@ def media(
         *,
         version: str = None,
         cache_root: str = None,
-) -> typing.Dict:
+) -> typing.Dict[str, audformat.Media]:
     """Audio and video media of database.
 
     Args:
@@ -486,7 +486,7 @@ def misc_tables(
         *,
         version: str = None,
         cache_root: str = None,
-) -> typing.Dict:
+) -> typing.Dict[str, audformat.MiscTable]:
     """Miscellaneous tables of database.
 
     Args:
@@ -548,7 +548,7 @@ def raters(
         *,
         version: str = None,
         cache_root: str = None,
-) -> typing.Dict:
+) -> typing.Dict[str, audformat.Rater]:
     """Raters contributed to database.
 
     Args:
@@ -617,7 +617,7 @@ def schemes(
         version: str = None,
         load_tables: bool = True,
         cache_root: str = None,
-) -> typing.Dict:
+) -> typing.Dict[str, audformat.Scheme]:
     """Schemes of database.
 
     Args:
@@ -682,7 +682,7 @@ def splits(
         *,
         version: str = None,
         cache_root: str = None,
-) -> typing.Dict:
+) -> typing.Dict[str, audformat.Split]:
     """Splits of database.
 
     Args:
@@ -716,7 +716,7 @@ def tables(
         *,
         version: str = None,
         cache_root: str = None,
-) -> typing.Dict:
+) -> typing.Dict[str, audformat.Table]:
     """Tables of database.
 
     Args:
