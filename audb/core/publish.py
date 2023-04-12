@@ -10,33 +10,10 @@ import audformat
 import audiofile
 
 from audb.core import define
+from audb.core import utils
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
 from audb.core.repository import Repository
-
-
-def _assert_file_type_does_not_change(
-        deps: Dependencies,
-        file: str,
-        type: int,
-):
-    if file in deps and deps.type(file) != type:
-        error_msg = (
-            f"The type of an existing dependency must not change, "
-            f"but you are trying to change the type of the dependency "
-            f"'{file}'. "
-        )
-        if define.DependType.META in [deps.type(file), type]:
-            error_msg += (
-                'You might have a naming clash between a table '
-                'and an attached file.'
-            )
-        else:
-            error_msg += (
-                'You might have a naming clash between a media file '
-                'and an attached file.'
-            )
-        raise RuntimeError(error_msg)
 
 
 def _check_for_duplicates(
@@ -101,10 +78,27 @@ def _find_attachments(
 ) -> typing.List[str]:
     r"""Find altered, new or removed attachments and update 'deps'."""
 
-    # release dependencies to removed attachment files
-    db_attachment_files = []
-    for attachment_id in list(db.attachments):
+    for attachment_id in deps.attachment_ids:
+        if attachment_id not in db.attachments:
+            path = deps._df.index[deps._df.archive == attachment_id][0]
+            deps._drop(path)
+
+    # check attachments are valid
+    db_files = list(db.files) + [f'db.{t}.csv' for t in db.tables]
+    for attachment_id in db.attachments:
+
+        path = db.attachments[attachment_id].path
+        for file in db_files:
+            if file.startswith(path):
+                raise RuntimeError(
+                    "An attachment must not "
+                    "overlap with media or tables. "
+                    f"But attachment '{attachment_id}' "
+                    f"contains '{file}'."
+                )
+
         path = audeer.path(db.root, db.attachments[attachment_id].path)
+
         if os.path.isdir(path):
             folders = audeer.list_dir_names(
                 path,
@@ -120,6 +114,7 @@ def _find_attachments(
                         f"But attachment '{attachment_id}' "
                         f"contains the empty sub-folder '{folder}'."
                     )
+
         files = db.attachments[attachment_id].files
         if len(files) == 0:
             raise RuntimeError(
@@ -128,37 +123,27 @@ def _find_attachments(
                 f"But attachment '{attachment_id}' "
                 "points to an empty folder."
             )
-        db_attachment_files += files
-    for file in set(deps.attachment_files) - set(db_attachment_files):
-        deps._drop(file)
 
-    # add dependencies to new attachment files
-    attachments = set()
+    # add dependencies to new or updated attachments
+    attachment_ids = []
     for attachment_id in audeer.progress_bar(
             list(db.attachments),
             desc='Find attachments',
             disable=not verbose,
     ):
         # use one archive per attachment ID
-        for file in db.attachments[attachment_id].files:
-            _assert_file_type_does_not_change(
-                deps,
-                file,
-                define.DependType.ATTACHMENT,
+        path = db.attachments[attachment_id].path
+        checksum = utils.md5(audeer.path(db_root, path))
+        if path not in deps or checksum != deps.checksum(path):
+            deps._add_attachment(
+                file=path,
+                version=version,
+                archive=attachment_id,
+                checksum=checksum,
             )
-            checksum = audbackend.md5(audeer.path(db_root, file))
-            if file not in deps or checksum != deps.checksum(file):
-                attachments.add(attachment_id)
-            # update version number for all files in archive
-            if attachment_id in attachments:
-                deps._add_attachment_file(
-                    file=file,
-                    version=version,
-                    archive=attachment_id,
-                    checksum=checksum,
-                )
+            attachment_ids.append(attachment_id)
 
-    return list(attachments)
+    return list(attachment_ids)
 
 
 def _find_media(
@@ -204,11 +189,6 @@ def _find_media(
             )
             add_media.append(values)
         elif not deps.removed(file):
-            _assert_file_type_does_not_change(
-                deps,
-                file,
-                define.DependType.MEDIA,
-            )
             checksum = audbackend.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.archive(file)
@@ -265,7 +245,6 @@ def _find_tables(
             disable=not verbose,
     ):
         file = f'db.{table}.csv'
-        _assert_file_type_does_not_change(deps, file, define.DependType.META)
         checksum = audbackend.md5(os.path.join(db_root, file))
         if file not in deps or checksum != deps.checksum(file):
             deps._add_meta(file, version, table, checksum)

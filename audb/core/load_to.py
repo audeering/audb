@@ -18,30 +18,20 @@ from audb.core.load import (
 )
 
 
-def _find_attachment_files(
+def _find_attachments(
         db_root: str,
         deps: Dependencies,
-        num_workers: typing.Optional[int],
-        verbose: bool,
 ) -> typing.List[str]:
-    r"""Find altered and new attachment files."""
+    r"""Find missing attachments."""
 
-    attachment_files = []
+    attachments = []
 
-    def job(file: str):
+    for file in deps.attachments:
         full_file = os.path.join(db_root, file)
         if not os.path.exists(full_file):
-            attachment_files.append(file)
+            attachments.append(file)
 
-    audeer.run_tasks(
-        job,
-        params=[([file], {}) for file in deps.attachment_files],
-        num_workers=num_workers,
-        progress_bar=verbose,
-        task_description='Find attachments',
-    )
-
-    return attachment_files
+    return attachments
 
 
 def _find_media(
@@ -106,8 +96,8 @@ def _find_tables(
     return tables
 
 
-def _get_attachment_files(
-        attachment_files: typing.List[str],
+def _get_attachments(
+        paths: typing.Sequence[str],
         db_root: str,
         db_root_tmp: str,
         db_name: str,
@@ -116,44 +106,40 @@ def _get_attachment_files(
         num_workers: typing.Optional[int],
         verbose: bool,
 ):
+    r"""Load attachments from backend."""
 
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
-    utils.mkdir_tree(attachment_files, db_root)
-    utils.mkdir_tree(attachment_files, db_root_tmp)
+    utils.mkdir_tree(paths, db_root)
+    utils.mkdir_tree(paths, db_root_tmp)
 
-    # find needed archives
-    archives = set()
-    for file in attachment_files:
-        archives.add((deps.archive(file), deps.version(file)))
-
-    def job(archive: str, version: str):
+    def job(path: str):
+        archive = deps.archive(path)
+        version = deps.version(path)
         archive = backend.join(
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
             archive,
         )
-        files = backend.get_archive(
+        backend.get_archive(
             archive,
             db_root_tmp,
             version,
             tmp_root=db_root_tmp,
         )
-        for file in files:
-            if file in attachment_files:
-                audeer.move_file(
-                    os.path.join(db_root_tmp, file),
-                    os.path.join(db_root, file),
-                )
-            else:
-                os.remove(os.path.join(db_root_tmp, file))
+        src_path = audeer.path(db_root_tmp, path)
+        dst_path = audeer.path(db_root, path)
+        audeer.move_file(
+            src_path,
+            dst_path,
+        )
 
     audeer.run_tasks(
         job,
-        params=[([archive, version], {}) for archive, version in archives],
+        params=[([path], {}) for path in paths],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Get attachments',
+        task_description='Load attachments',
     )
 
 
@@ -222,7 +208,7 @@ def _get_tables(
         # If a pickled version of the table exists,
         # we have to remove it to make sure that
         # later on the new CSV tables are loaded.
-        # This can happen if we upgrading an existing
+        # This can happen if we upgrade an existing
         # database to a different version.
         path_pkl = os.path.join(
             db_root, table
@@ -322,15 +308,18 @@ def load_to(
     )
     if update:
         if only_metadata:
-            files = deps.attachment_files + deps.tables
+            files = deps.attachments + deps.tables
         else:
             files = deps.files
         for file in files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
-                checksum = audbackend.md5(full_file)
+                checksum = utils.md5(full_file)
                 if checksum != deps.checksum(file):
-                    os.remove(full_file)
+                    if os.path.isdir(full_file):
+                        audeer.rmdir(full_file)
+                    else:
+                        os.remove(full_file)
 
     # load database header without tables from backend
 
@@ -342,12 +331,20 @@ def load_to(
     )
     db_header.save(db_root_tmp, header_only=True)
 
-    # get altered and new attachment files
-
-    attachment_files = _find_attachment_files(db_root, deps, num_workers,
-                                              verbose)
-    _get_attachment_files(attachment_files, db_root, db_root_tmp, name, deps,
-                          backend, num_workers, verbose)
+    attachments = _find_attachments(
+        db_root,
+        deps,
+    )
+    _get_attachments(
+        attachments,
+        db_root,
+        db_root_tmp,
+        name,
+        deps,
+        backend,
+        num_workers,
+        verbose,
+    )
 
     # get altered and new tables
 
@@ -372,6 +369,7 @@ def load_to(
         # make sure to remove header if user interrupts
         os.remove(os.path.join(db_root, define.HEADER_FILE))
         raise
+
     # afterwards remove header to avoid the database
     # can be loaded before download is complete
     os.remove(os.path.join(db_root, define.HEADER_FILE))

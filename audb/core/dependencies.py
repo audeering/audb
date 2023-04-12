@@ -111,11 +111,11 @@ class Dependencies:
         return sorted(list(set(archives)))
 
     @property
-    def attachment_files(self) -> typing.List[str]:
-        r"""Attachment files.
+    def attachments(self) -> typing.List[str]:
+        r"""Attachment paths (can be a file or a folder).
 
         Returns:
-            list of attachment files
+            list of attachments
 
         """
         return list(
@@ -125,8 +125,22 @@ class Dependencies:
         )
 
     @property
+    def attachment_ids(self) -> typing.List[str]:
+        r"""Attachment IDs.
+
+        Returns:
+            list of attachment IDs
+
+        """
+        return list(
+            self._df[
+                self._df['type'] == define.DependType.ATTACHMENT
+            ].archive
+        )
+
+    @property
     def files(self) -> typing.List[str]:
-        r"""All media, table, attachment files.
+        r"""All media, table, attachments.
 
         Returns:
             list of files
@@ -376,20 +390,20 @@ class Dependencies:
         """
         return self._df.version[file]
 
-    def _add_attachment_file(
+    def _add_attachment(
             self,
             file: str,
             version: str,
             archive: str,
             checksum: str,
     ):
-        r"""Add or update attachment file.
+        r"""Add or update attachment.
 
         Args:
-            file: relative file path
+            file: relative path of attachment
+            version: version string
             archive: archive name without extension
             checksum: checksum of file
-            version: version string
 
         """
         format = audeer.file_extension(file).lower()
