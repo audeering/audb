@@ -38,6 +38,7 @@ DB.media['media'] = audformat.Media()
 DB.schemes['scheme1'] = audformat.Scheme()
 DB.splits['split'] = audformat.Split()
 DB.raters['rater'] = audformat.Rater()
+DB.attachments['attachment'] = audformat.Attachment('file.txt')
 DB['table1'] = audformat.Table(
     audformat.filewise_index(
         ['f11.wav', 'f12.wav', 'f13.wav'],
@@ -94,6 +95,7 @@ def fixture_publish_db():
     # create db + audio files
     sampling_rate = 8000
     audeer.mkdir(DB_ROOT)
+    audeer.touch(audeer.path(DB_ROOT, DB.attachments['attachment'].path))
     for table in list(DB.tables):
         for file in DB[table].files:
             audiofile.write(
@@ -127,6 +129,10 @@ def fixture_clear_cache():
     clear_root(pytest.CACHE_ROOT)
     yield
     clear_root(pytest.CACHE_ROOT)
+
+
+def test_attachemnts():
+    assert str(audb.info.attachments(DB_NAME)) == str(DB.attachments)
 
 
 def test_author():

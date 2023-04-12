@@ -13,6 +13,37 @@ from audb.core.load import (
 )
 
 
+def attachments(
+        name: str,
+        *,
+        version: str = None,
+        cache_root: str = None,
+) -> typing.Dict:
+    """Attachment(s) of database.
+
+    Args:
+        name: name of database
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+
+    Returns:
+        attachments of database
+
+    Examples:
+        >>> list(attachments('emodb', version='1.4.1'))
+        ['bibtex']
+
+    """
+    db = header(
+        name,
+        version=version,
+        load_tables=False,
+        cache_root=cache_root,
+    )
+    return db.attachments
+
+
 def author(
         name: str,
         *,
