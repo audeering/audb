@@ -499,9 +499,8 @@ def publish(
     Handling of audio formats
     is based on the file extension
     in :mod:`audb`.
-    This means you can only use lowercase letters
-    and should use an extension
-    that matches the audio format of the file,
+    This means the extension must only contain lowercase letters
+    and should match the audio format of the file,
     e.g. ``.wav``.
 
     When canceling :func:`audb.publish`
