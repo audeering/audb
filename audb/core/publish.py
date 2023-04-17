@@ -175,6 +175,13 @@ def _find_media(
     def job(file):
         path = os.path.join(db_root, file)
         if file not in deps:
+            # enforce lowercase file extensions
+            ext = audeer.file_extension(file)
+            if ext.lower() != ext:
+                raise RuntimeError(
+                    "Only lower case file extensions are allowed, "
+                    f"but '{file}' includes at least one uppercase letter."
+                )
             checksum = audbackend.md5(path)
             if file in archives:
                 archive = archives[file]
@@ -489,6 +496,14 @@ def publish(
     In this case you don't call :func:`audb.load_to`
     before running :func:`audb.publish`.
 
+    Handling of audio formats
+    is based on the file extension
+    in :mod:`audb`.
+    This means you can only use lowercase letters
+    and should use an extension
+    that matches the audio format of the file,
+    e.g. ``.wav``.
+
     When canceling :func:`audb.publish`
     during publication
     you can restart it afterwards.
@@ -541,6 +556,8 @@ def publish(
             but sox and/or mediafile is not installed
         RuntimeError: if the type of a database file changes,
             e.g. from media to attachment
+        RuntimeError: if a new media file
+            has an uppercase letter in its file extension
         ValueError: if ``previous_version`` >= ``version``
 
     """

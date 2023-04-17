@@ -877,6 +877,34 @@ def test_publish_error_changed_deps_file_type(tmpdir):
     audeer.rmdir(db_path)
 
 
+@pytest.mark.parametrize(
+    'file',
+    [
+        'file.Wav',
+        'file.WAV',
+        'file.1A',
+    ]
+)
+def test_publish_error_uppercase_file_extension(tmpdir, file):
+    # Prepare files
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    audeer.touch(audeer.path(db_path, file))
+    # Prepare database
+    db = audformat.Database('db')
+    db['table'] = audformat.Table(audformat.filewise_index([file]))
+    db['table']['column'] = audformat.Column()
+    db['table']['column'].set(['label'])
+    db.save(db_path)
+    # Fail as we include file with uppercase letter
+    error_msg = (
+        "Only lower case file extensions are allowed, "
+        f"but '{file}' includes at least one uppercase letter."
+    )
+    repository = audb.Repository('repo', 'host', 'file-system')
+    with pytest.raises(RuntimeError, match=error_msg):
+        audb.publish(db_path, '1.0.0', repository)
+
+
 def test_update_database():
 
     version = '2.1.0'
