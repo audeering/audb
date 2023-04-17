@@ -897,7 +897,7 @@ def test_publish_error_uppercase_file_extension(tmpdir, file):
     db.save(db_path)
     # Fail as we include file with uppercase letter
     error_msg = (
-        "Only lower case file extensions are allowed, "
+        "The file extension of a media file must be lowercase, "
         f"but '{file}' includes at least one uppercase letter."
     )
     repository = audb.Repository('repo', 'host', 'file-system')

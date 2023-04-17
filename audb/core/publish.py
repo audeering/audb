@@ -179,7 +179,7 @@ def _find_media(
             ext = audeer.file_extension(file)
             if ext.lower() != ext:
                 raise RuntimeError(
-                    "Only lower case file extensions are allowed, "
+                    "The file extension of a media file must be lowercase, "
                     f"but '{file}' includes at least one uppercase letter."
                 )
             checksum = audbackend.md5(path)
