@@ -175,7 +175,7 @@ def _find_media(
     def job(file):
         path = os.path.join(db_root, file)
         if file not in deps:
-            # enforce lowercase file extensions
+            # assert lowercase file extensions
             ext = audeer.file_extension(file)
             if ext.lower() != ext:
                 raise RuntimeError(
@@ -499,7 +499,7 @@ def publish(
     Handling of audio formats
     is based on the file extension
     in :mod:`audb`.
-    This means the extension must only contain lowercase letters
+    This means the file extension must be lowercase
     and should match the audio format of the file,
     e.g. ``.wav``.
 
