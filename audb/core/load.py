@@ -977,7 +977,7 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # load attachments
-            if not db_is_complete:
+            if not db_is_complete and not only_metadata:
                 cached_versions = _load_attachments(
                     db.attachments,
                     backend,
