@@ -352,11 +352,16 @@ def test_load(format, version, only_metadata):
             db[table].df,
         )
 
-    # Assert attachments are identical and files exist
+    # Assert attachments are identical and files do (not) exist
     assert db.attachments == db_original.attachments
     for attachment in db.attachments:
-        for attachment_file in db.attachments[attachment].files:
-            assert os.path.exists(audeer.path(db.root, attachment_file))
+        path = audeer.path(db.root, db.attachments[attachment].path)
+        if only_metadata:
+            assert not os.path.exists(path)
+        else:
+            assert os.path.exists(path)
+            for attachment_file in db.attachments[attachment].files:
+                assert os.path.exists(audeer.path(db.root, attachment_file))
 
     # Assert all files are listed in dependency table
     deps = audb.dependencies(DB_NAME, version=version)
@@ -400,10 +405,15 @@ def test_load(format, version, only_metadata):
     for table in db:
         assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
 
-    # Assert attachments files exist
+    # Assert attachments files do (not) exist
     for attachment in db.attachments:
-        for attachment_file in db.attachments[attachment].files:
-            assert os.path.exists(audeer.path(db.root, attachment_file))
+        path = audeer.path(db.root, db.attachments[attachment].path)
+        if only_metadata:
+            assert not os.path.exists(path)
+        else:
+            assert os.path.exists(path)
+            for attachment_file in db.attachments[attachment].files:
+                assert os.path.exists(audeer.path(db.root, attachment_file))
 
 
 @pytest.mark.parametrize(
@@ -675,8 +685,13 @@ def test_load_to(version, only_metadata):
     # Assert attachments are identical and files exist
     assert db.attachments == db_original.attachments
     for attachment in db.attachments:
-        for attachment_file in db.attachments[attachment].files:
-            assert os.path.exists(os.path.join(db_root, attachment_file))
+        path = audeer.path(db.root, db.attachments[attachment].path)
+        if only_metadata:
+            assert not os.path.exists(path)
+        else:
+            assert os.path.exists(path)
+            for attachment_file in db.attachments[attachment].files:
+                assert os.path.exists(audeer.path(db.root, attachment_file))
 
 
 @pytest.mark.parametrize(
