@@ -883,7 +883,7 @@ def load(
     Args:
         name: name of database
         version: version string, latest if ``None``
-        only_metadata: load only metadata
+        only_metadata: load only header and tables of database
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`.
             Note that media files with too few channels

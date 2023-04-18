@@ -277,7 +277,7 @@ def load_to(
         root: target directory
         name: name of database
         version: version string, latest if ``None``
-        only_metadata: load only metadata
+        only_metadata: load only header and tables of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used.
             Only used to read the dependencies of the requested version
