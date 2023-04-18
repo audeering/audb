@@ -264,6 +264,7 @@ def test_load_wrong_argument():
         audb.load(DB_NAME, typo='1.0.0')
 
 
+@pytest.mark.parametrize('only_metadata', [True, False])
 @pytest.mark.parametrize(
     'format',
     [
@@ -286,47 +287,64 @@ def test_load_wrong_argument():
         ),
     ]
 )
-def test_load(format, version):
+def test_load(format, version, only_metadata):
 
-    assert not audb.exists(
-        DB_NAME,
-        version=version,
-        format=format,
-    )
+    # When loading the first time (only_metadata=True)
+    # the database should not exists in cache
+    if only_metadata:
+        assert not audb.exists(
+            DB_NAME,
+            version=version,
+            format=format,
+        )
+
+    # === Load from REPOSITORY with full_path=False ===
 
     db = audb.load(
         DB_NAME,
         version=version,
         format=format,
+        only_metadata=only_metadata,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
     db_root = db.meta['audb']['root']
 
-    assert audb.exists(DB_NAME, version=version, format=format)
-
-    files_duration = {
-        os.path.join(db_root, os.path.normpath(file)): pd.to_timedelta(
-            audiofile.duration(os.path.join(db_root, file)), unit='s')
-        for file in db.files
-    }
-    assert db._files_duration == files_duration
-
+    # Load original database from folder (expected database)
     if version is None:
         resolved_version = audb.latest_version(DB_NAME)
     else:
         resolved_version = version
     db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
-
     if format is not None:
         db_original.map_files(
             lambda x: audeer.replace_file_extension(x, format)
         )
 
+    # Assert database exists in cache
+    assert audb.exists(DB_NAME, version=version, format=format)
+    df = audb.cached()
+    assert df.loc[db_root]['version'] == resolved_version
+
+    # Assert files duration are stored as hidden attribute
+    if not only_metadata:
+        files_duration = {
+            os.path.join(db_root, os.path.normpath(file)): pd.to_timedelta(
+                audiofile.duration(os.path.join(db_root, file)), unit='s')
+            for file in db.files
+        }
+        assert db._files_duration == files_duration
+
+    # Assert media files are identical and (not) exist
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:
-        assert os.path.exists(os.path.join(db_root, file))
+        if only_metadata:
+            assert not os.path.exists(os.path.join(db_root, file))
+        else:
+            assert os.path.exists(os.path.join(db_root, file))
+
+    # Assert tables are identical and exist as CSV files
     for table in db:
         assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
         pd.testing.assert_frame_equal(
@@ -334,9 +352,13 @@ def test_load(format, version):
             db[table].df,
         )
 
-    df = audb.cached()
-    assert df.loc[db_root]['version'] == resolved_version
+    # Assert attachments are identical and files exist
+    assert db.attachments == db_original.attachments
+    for attachment in db.attachments:
+        for attachment_file in db.attachments[attachment].files:
+            assert os.path.exists(audeer.path(db.root, attachment_file))
 
+    # Assert all files are listed in dependency table
     deps = audb.dependencies(DB_NAME, version=version)
     assert str(deps().to_string()) == str(deps)
     assert len(deps) == (
@@ -345,33 +367,43 @@ def test_load(format, version):
         + len(db.misc_tables)
         + len(db.attachments)
     )
-    attachment_files = audeer.flatten_list(
-        [attachment.files for _, attachment in db.attachments.items()]
-    )
-    for attachment_file in attachment_files:
-        assert os.path.exists(audeer.path(db.root, attachment_file))
 
-    # from cache with full path
+    # === Load from CACHE with full_path=True ===
 
     db = audb.load(
         DB_NAME,
         version=version,
         full_path=True,
         format=format,
+        only_metadata=only_metadata,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
+
+    # Assert files duration are stored as hidden attribute
+    if not only_metadata:
+        files_duration = {
+            os.path.normpath(file):
+            pd.to_timedelta(audiofile.duration(file), unit='s')
+            for file in db.files
+        }
+        assert db._files_duration == files_duration
+
+    # Assert media files do (not) exist
     for file in db.files:
-        assert os.path.exists(file)
+        if only_metadata:
+            assert not os.path.exists(file)
+        else:
+            assert os.path.exists(file)
+
+    # Assert table CSV files exist
     for table in db:
         assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
 
-    files_duration = {
-        os.path.normpath(file):
-        pd.to_timedelta(audiofile.duration(file), unit='s')
-        for file in db.files
-    }
-    assert db._files_duration == files_duration
+    # Assert attachments files exist
+    for attachment in db.attachments:
+        for attachment_file in db.attachments[attachment].files:
+            assert os.path.exists(audeer.path(db.root, attachment_file))
 
 
 @pytest.mark.parametrize(
@@ -581,6 +613,14 @@ def test_load_table(version, table):
     assert files == expected_files
 
 
+# In the `test_load_to` test
+# it is important
+# that first all only_metadata=True cases are tested
+# as otherwise some files will exist
+# and the test will fail.
+# To ensure the right order
+# `@pytest.mark.parametrize('only_metadata', ...)`
+# needs to be defined as last entry.
 @pytest.mark.parametrize(
     'version',
     [
@@ -596,7 +636,8 @@ def test_load_table(version, table):
         ),
     ]
 )
-def test_load_to(version):
+@pytest.mark.parametrize('only_metadata', [True, False])
+def test_load_to(version, only_metadata):
 
     db_root = os.path.join(DB_ROOT, 'raw')
 
@@ -604,24 +645,35 @@ def test_load_to(version):
         db_root,
         DB_NAME,
         version=version,
+        only_metadata=only_metadata,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
     assert db.root == db_root
 
+    # Load original database from folder (expected database)
     if version is None:
         version = audb.latest_version(DB_NAME)
     db_original = audformat.Database.load(DB_ROOT_VERSION[version])
 
+    # Assert media files are identical and do (not) exist
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:
-        assert os.path.exists(os.path.join(db_root, file))
+        if only_metadata:
+            assert not os.path.exists(os.path.join(db_root, file))
+        else:
+            assert os.path.exists(os.path.join(db_root, file))
+
+    # Assert tables are identical and exist as CSV files
     for table in db:
         assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
         pd.testing.assert_frame_equal(
             db_original[table].df,
             db[table].df,
         )
+
+    # Assert attachments are identical and files exist
+    assert db.attachments == db_original.attachments
     for attachment in db.attachments:
         for attachment_file in db.attachments[attachment].files:
             assert os.path.exists(os.path.join(db_root, attachment_file))
