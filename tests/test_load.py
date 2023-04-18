@@ -312,10 +312,7 @@ def test_load(format, version, only_metadata):
     db_root = db.meta['audb']['root']
 
     # Load original database from folder (expected database)
-    if version is None:
-        resolved_version = audb.latest_version(DB_NAME)
-    else:
-        resolved_version = version
+    resolved_version = version or audb.latest_version(DB_NAME)
     db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
     if format is not None:
         db_original.map_files(
@@ -662,9 +659,8 @@ def test_load_to(version, only_metadata):
     assert db.root == db_root
 
     # Load original database from folder (expected database)
-    if version is None:
-        version = audb.latest_version(DB_NAME)
-    db_original = audformat.Database.load(DB_ROOT_VERSION[version])
+    resolved_version = version or audb.latest_version(DB_NAME)
+    db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
 
     # Assert media files are identical and do (not) exist
     pd.testing.assert_index_equal(db.files, db_original.files)
