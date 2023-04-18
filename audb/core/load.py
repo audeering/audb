@@ -144,6 +144,9 @@ def _database_check_complete(
 ):
     def check() -> bool:
         complete = True
+        for attachment in deps.attachments:
+            if not os.path.exists(os.path.join(db_root, attachment)):
+                return False
         for table in deps.tables:
             if not os.path.exists(os.path.join(db_root, table)):
                 return False
