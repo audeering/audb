@@ -135,7 +135,12 @@ def _find_attachments(
         path = db.attachments[attachment_id].path
         if not os.path.exists(audeer.path(db_root, path)):
             if path not in deps:
-                # Force raising error
+                # Raise FileNotFoundError
+                #
+                # Attachment is not in deps,
+                # but its path does not exist on disk neither.
+                # We call its `files` property
+                # which raises a FileNotFoundError in this case
                 db.attachments[attachment_id].files
         else:
             checksum = utils.md5(audeer.path(db_root, path))
