@@ -305,8 +305,8 @@ def _get_attachments_from_backend(
 
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
-    utils.mkdir_tree(paths, db_root)
-    utils.mkdir_tree(paths, db_root_tmp)
+    # utils.mkdir_tree(paths, db_root)
+    # utils.mkdir_tree(paths, db_root_tmp)
 
     def job(path: str):
         archive = deps.archive(path)
@@ -325,16 +325,10 @@ def _get_attachments_from_backend(
         src_path = audeer.path(db_root_tmp, path)
         dst_path = audeer.path(db_root, path)
         audeer.mkdir(os.path.dirname(dst_path))
-        if not os.path.isdir(src_path):
-            audeer.move_file(
-                src_path,
-                dst_path,
-            )
-        else:
-            # attachments can be folders
-            # which cannot be moved by audeer.move_file()
-            # under Windows
-            shutil.move(src_path, dst_path)
+        audeer.move_file(
+            src_path,
+            dst_path,
+        )
 
     audeer.run_tasks(
         job,
