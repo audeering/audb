@@ -926,7 +926,7 @@ def load(
         database object
 
     Raises:
-        ValueError: if table or media is requested
+        ValueError: if attachment, table or media is requested
             that is not part of the database
         ValueError: if a non-supported ``bit_depth``,
             ``format``,
