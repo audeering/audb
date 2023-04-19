@@ -903,7 +903,7 @@ def load(
             for the attachments
             matching the regular expression
             or provided in the list.
-            Use ``[]`` to not load any attachment files
+            If set to ``[]`` no attachments are loaded
         tables: include only tables
             matching the regular expression
             or provided in the list.
