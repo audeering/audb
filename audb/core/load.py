@@ -305,7 +305,6 @@ def _get_attachments_from_backend(
 
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
-    # utils.mkdir_tree(paths, db_root)
     utils.mkdir_tree(paths, db_root_tmp)
 
     def job(path: str):
