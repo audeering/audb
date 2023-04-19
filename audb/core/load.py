@@ -904,10 +904,23 @@ def load(
             matching the regular expression
             or provided in the list.
             Use ``[]`` to not load any attachment files
-        tables: include only tables matching the regular expression or
-            provided in the list
-        media: include only media matching the regular expression or
-            provided in the list
+        tables: include only tables
+            matching the regular expression
+            or provided in the list.
+            It will also limit possible media files
+            to those listed in the selected tables.
+            If ``[]`` is provided
+            only misc tables
+            used as labels in a scheme
+            and no media files are loaded
+        media: include only media files
+            matching the regular expression
+            or provided in the list.
+            The entries for non-matching media files
+            will be removed from tables
+            resulting in potentially empty tables.
+            If ``[]`` is provided
+            no media files are loaded
         removed_media: keep rows that reference removed media
         full_path: replace relative with absolute file paths
         cache_root: cache folder where databases are stored.
