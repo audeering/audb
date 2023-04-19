@@ -325,8 +325,6 @@ def _get_attachments_from_backend(
         src_path = audeer.path(db_root_tmp, path)
         dst_path = audeer.path(db_root, path)
         audeer.mkdir(os.path.dirname(dst_path))
-        print(f'{os.path.exists(src_path)=}')
-        print(f'{os.path.exists(dst_path)=}')
         if not os.path.isdir(src_path):
             audeer.move_file(
                 src_path,
