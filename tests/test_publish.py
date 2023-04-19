@@ -1047,7 +1047,25 @@ def test_update_database_without_media(tmpdir):
     previous_version = '1.0.0'
     version = '1.1.0'
 
-    new_table = 'new'
+    # attachments
+    new_attachment = 'new-atatchment'
+    # attachment files
+    # (all for attachment ID `folder`)
+    new_attachment_files = [
+        'extra/folder/file4.txt',
+    ]
+    altered_attachment_files = [
+        'extra/folder/sub-folder/file3.txt',
+    ]
+    removed_attachment_files = [
+        'extra/folder/file1.txt',
+        'extra/folder/file2.txt',
+    ]
+
+    # tables
+    new_table = 'new-table'
+
+    # media
     new_files = [
         'new/001.wav',
         'new/002.wav',
@@ -1076,7 +1094,7 @@ def test_update_database_without_media(tmpdir):
     # and call again load_to()
     # to revert them
 
-    os.remove(audeer.path(build_root, 'extra/folder/file2.txt'))
+    os.remove(audeer.path(build_root, 'db.emotion.csv'))
     db = audb.load_to(
         build_root,
         DB_NAME,
@@ -1085,15 +1103,15 @@ def test_update_database_without_media(tmpdir):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    assert os.path.exists(audeer.path(build_root, 'extra/folder/file2.txt'))
+    assert os.path.exists(audeer.path(build_root, 'db.emotion.csv'))
 
     # update and save database
 
-    # remove files
+    # remove media files
     for file in rem_files:
         db.drop_files(file)
 
-    # create and alter files
+    # create and alter media files
     sampling_rate = 16000
     signal = np.ones((1, sampling_rate), np.float32)
     for file in new_files + alter_files:
@@ -1104,8 +1122,27 @@ def test_update_database_without_media(tmpdir):
     # add new table
     db[new_table] = audformat.Table(audformat.filewise_index(new_files))
 
-    # remove one attachment file
-    os.remove(audeer.path(build_root, 'extra/folder/file2.txt'))
+    # Add, alter, and remove attachment files for `folder` attachment.
+    # The removal is done automatically as we alter
+    # and add a file in the same folder
+    # as the to be removed attachment files are located.
+    for attachment_file in new_attachment_files:
+        path = audeer.path(build_root, attachment_file)
+        audeer.mkdir(os.path.dirname(path))
+        audeer.touch(path)
+    for attachment_file in altered_attachment_files:
+        path = audeer.path(build_root, attachment_file)
+        audeer.mkdir(os.path.dirname(path))
+        with open(path, 'w') as fp:
+            fp.write('abc')
+    for attachment_file in removed_attachment_files:
+        path = audeer.path(build_root, attachment_file)
+        assert not os.path.exists(path)
+
+    # add new attachment
+    audeer.mkdir(audeer.path(build_root, 'extra'))
+    audeer.touch(audeer.path(build_root, 'extra/new.txt'))
+    db.attachments[new_attachment] = audformat.Attachment('extra/new.txt')
 
     db.save(build_root)
 
@@ -1118,10 +1155,11 @@ def test_update_database_without_media(tmpdir):
         verbose=False,
     )
 
-    # check if missing archive files were downloaded during publish
+    # check if media files missing from the same archive
+    # were downloaded during publish
     assert os.path.exists(audeer.path(build_root, 'audio/002.wav'))
 
-    # load new version and check media
+    # load new version and check media and attachments
     db_load = audb.load(
         DB_NAME,
         version=version,
@@ -1135,6 +1173,21 @@ def test_update_database_without_media(tmpdir):
         assert filecmp.cmp(
             audeer.path(build_root, file),
             audeer.path(db_load.root, file),
+        )
+    assert new_attachment in list(db_load.attachments)
+    assert db.attachments == db_load.attachments
+    for attachment in db_load.attachments:
+        path = audeer.path(db_load.root, db_load.attachments[attachment].path)
+        assert os.path.exists(path)
+        for attachment_file in db_load.attachments[attachment].files:
+            assert os.path.exists(audeer.path(db_load.root, attachment_file))
+    for attachment_file in removed_attachment_files:
+        assert not os.path.exists(audeer.path(db_load.root, attachment_file))
+    for attachment_file in new_attachment_files + altered_attachment_files:
+        assert os.path.exists(audeer.path(db_load.root, attachment_file))
+        assert filecmp.cmp(
+            audeer.path(build_root, attachment_file),
+            audeer.path(db_load.root, attachment_file),
         )
 
 

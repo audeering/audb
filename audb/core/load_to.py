@@ -277,7 +277,7 @@ def load_to(
         root: target directory
         name: name of database
         version: version string, latest if ``None``
-        only_metadata: load only metadata
+        only_metadata: load only header and tables of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used.
             Only used to read the dependencies of the requested version
@@ -308,9 +308,9 @@ def load_to(
     )
     if update:
         if only_metadata:
-            files = deps.attachments + deps.tables
+            files = deps.tables
         else:
-            files = deps.files
+            files = deps.attachments + deps.files
         for file in files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
@@ -331,20 +331,23 @@ def load_to(
     )
     db_header.save(db_root_tmp, header_only=True)
 
-    attachments = _find_attachments(
-        db_root,
-        deps,
-    )
-    _get_attachments(
-        attachments,
-        db_root,
-        db_root_tmp,
-        name,
-        deps,
-        backend,
-        num_workers,
-        verbose,
-    )
+    # get altered and new attachments
+
+    if not only_metadata:
+        attachments = _find_attachments(
+            db_root,
+            deps,
+        )
+        _get_attachments(
+            attachments,
+            db_root,
+            db_root_tmp,
+            name,
+            deps,
+            backend,
+            num_workers,
+            verbose,
+        )
 
     # get altered and new tables
 

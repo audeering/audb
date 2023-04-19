@@ -144,6 +144,9 @@ def _database_check_complete(
 ):
     def check() -> bool:
         complete = True
+        for attachment in deps.attachments:
+            if not os.path.exists(os.path.join(db_root, attachment)):
+                return False
         for table in deps.tables:
             if not os.path.exists(os.path.join(db_root, table)):
                 return False
@@ -883,7 +886,7 @@ def load(
     Args:
         name: name of database
         version: version string, latest if ``None``
-        only_metadata: load only metadata
+        only_metadata: load only header and tables of database
         bit_depth: bit depth, one of ``16``, ``24``, ``32``
         channels: channel selection, see :func:`audresample.remix`.
             Note that media files with too few channels
@@ -977,7 +980,7 @@ def load(
             db_is_complete = _database_is_complete(db)
 
             # load attachments
-            if not db_is_complete:
+            if not db_is_complete and not only_metadata:
                 cached_versions = _load_attachments(
                     db.attachments,
                     backend,
