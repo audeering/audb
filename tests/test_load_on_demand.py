@@ -142,6 +142,13 @@ def test_load_only_metadata():
     pd.testing.assert_index_equal(db.files, db_original.files)
     assert not db.meta['audb']['complete']
 
+    flavor_path = audeer.path(
+        audb.default_cache_root(),
+        audb.flavor_path(DB_NAME, DB_VERSION),
+    )
+    print(f'{audeer.list_file_names(flavor_path)=}')
+    print(f'{audeer.list_dir_names(flavor_path)=}')
+
     # Load whole database
     db = audb.load(
         DB_NAME,
