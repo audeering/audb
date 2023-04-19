@@ -138,7 +138,7 @@ def _find_attachments(
                 # Raise FileNotFoundError
                 #
                 # Attachment is not in deps,
-                # but its path does not exist on disk neither.
+                # but its path does not exist on disk either.
                 # We call its `files` property
                 # which raises a FileNotFoundError in this case
                 db.attachments[attachment_id].files
