@@ -608,12 +608,13 @@ def filter_deps(
             matching the regular expression
             or provided in the list
         available_deps: sequence of available media files or tables
-        deps_type: ``'media'`` or ``'table'``
+        deps_type: ``'attachment'``, ``'media'`` or ``'table'``
         database_name: name of affected database
         database_version: name of affected database
 
     Returns:
-        list of media or tables inside the dependency object
+        list of attachments, media or tables
+            inside the dependency object
             matching ``requested_deps``
 
     """

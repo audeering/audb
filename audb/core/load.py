@@ -852,6 +852,7 @@ def load(
         format: str = None,
         mixdown: bool = False,
         sampling_rate: int = None,
+        attachments: typing.Union[str, typing.Sequence[str]] = None,
         tables: typing.Union[str, typing.Sequence[str]] = None,
         media: typing.Union[str, typing.Sequence[str]] = None,
         removed_media: bool = False,
@@ -899,6 +900,11 @@ def load(
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+        attachments: load only attachment files
+            for the attachments
+            matching the regular expression
+            or provided in the list.
+            Use ``[]`` to not load any attachment files
         tables: include only tables matching the regular expression or
             provided in the list
         media: include only media matching the regular expression or
@@ -981,8 +987,16 @@ def load(
 
             # load attachments
             if not db_is_complete and not only_metadata:
-                cached_versions = _load_attachments(
+
+                # filter attachments
+                requested_attachments = filter_deps(
+                    attachments,
                     db.attachments,
+                    'attachment',
+                )
+
+                cached_versions = _load_attachments(
+                    requested_attachments,
                     backend,
                     db_root,
                     db,
