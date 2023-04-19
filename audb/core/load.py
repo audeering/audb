@@ -334,32 +334,7 @@ def _get_attachments_from_backend(
             # attachments can be folders
             # which cannot be moved by audeer.move_file()
             # under Windows
-            def move_folder(src_path, dst_path):
-                audeer.mkdir(dst_path)
-                files = audeer.list_file_names(
-                    src_path,
-                    recursive=False,
-                    hidden=True,
-                    basenames=True,
-                )
-                for file in files:
-                    audeer.move_file(
-                        audeer.path(src_path, file),
-                        audeer.path(dst_path, file),
-                    )
-                folders = audeer.list_dir_names(
-                    src_path,
-                    recursive=False,
-                    hidden=True,
-                    basenames=True,
-                )
-                for folder in folders:
-                    move_folder(
-                        audeer.path(src_path, folder),
-                        audeer.path(dst_path, folder),
-                    )
-
-            move_folder(src_path, dst_path)
+            shutil.move(src_path, dst_path)
 
     audeer.run_tasks(
         job,
