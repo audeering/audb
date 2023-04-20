@@ -41,7 +41,16 @@ def _find_media(
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
-    r"""Find altered and new media."""
+    r"""Find missing media.
+
+    Collects all media files present in ``db.files``,
+    but not in ``db_root``.
+    This will find missing files,
+    but also altered files
+    as those have been deleted
+    in a previous step.
+
+    """
 
     media = []
 
@@ -69,6 +78,17 @@ def _find_tables(
         num_workers: typing.Optional[int],
         verbose: bool,
 ) -> typing.List[str]:
+    r"""Find missing tables.
+
+    Collects all tables and misc tables
+    present in ``db_header``,
+    but not in ``db_root``.
+    This will find missing tables,
+    but also altered tables
+    as those have been deleted
+    in a previous step.
+
+    """
 
     tables = []
 
@@ -77,13 +97,6 @@ def _find_tables(
         full_file = os.path.join(db_root, file)
         if not os.path.exists(full_file):
             tables.append(file)
-        else:
-            checksum = audbackend.md5(full_file)
-            # if the table already exists
-            # we have to compare checksum
-            # in case it was altered by flavor
-            if checksum != deps.checksum(file):  # pragma: no cover
-                tables.append(file)
 
     audeer.run_tasks(
         job,
