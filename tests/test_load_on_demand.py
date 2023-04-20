@@ -75,6 +75,12 @@ def fixture_publish_db():
         'int',
         labels='misc-in-scheme',
     )
+    db.attachments['file'] = audformat.Attachment('file.txt')
+    db.attachments['folder'] = audformat.Attachment('folder/')
+    audeer.mkdir(audeer.path(DB_ROOT, 'folder'))
+    audeer.touch(audeer.path(DB_ROOT, 'file.txt'))
+    audeer.touch(audeer.path(DB_ROOT, 'folder/file1.txt'))
+    audeer.touch(audeer.path(DB_ROOT, 'folder/file2.txt'))
     db.save(DB_ROOT)
     audformat.testing.create_audio_files(db)
 
@@ -93,7 +99,7 @@ def fixture_publish_db():
     clear_root(pytest.FILE_SYSTEM_HOST)
 
 
-def test_load_on_demand():
+def test_load_only_metadata():
 
     db_original = audformat.Database.load(DB_ROOT)
 
@@ -110,59 +116,18 @@ def test_load_on_demand():
     assert db['misc-in-scheme'] == db_original['misc-in-scheme']
     assert db['misc-not-in-scheme'] == db_original['misc-not-in-scheme']
     pd.testing.assert_index_equal(db.files, db_original.files)
+    for attachment in db.attachments:
+        path = audeer.path(db.root, db.attachments[attachment].path)
+        assert not os.path.exists(path)
+    for file in list(db.files):
+        path = audeer.path(db.root, file)
+        assert not os.path.exists(path)
     assert not db.meta['audb']['complete']
 
-    db = audb.load(
-        DB_NAME,
-        version=DB_VERSION,
-        only_metadata=True,
-        tables=['table1'],
-        full_path=False,
-        verbose=False,
-    )
-
-    assert db['table1'] == db_original['table1']
-    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
-    assert 'table2' not in db.tables
-    assert 'misc-not-in-scheme' not in db.misc_tables
-    pd.testing.assert_index_equal(db.files, db_original['table1'].files)
-    assert not db.meta['audb']['complete']
-
-    db = audb.load(
-        DB_NAME,
-        version=DB_VERSION,
-        only_metadata=True,
-        tables='.*1',
-        full_path=False,
-        verbose=False,
-    )
-
-    assert db['table1'] == db_original['table1']
-    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
-    assert 'table2' not in db.tables
-    assert 'misc-not-in-scheme' not in db.misc_tables
-    pd.testing.assert_index_equal(db.files, db_original['table1'].files)
-    assert not db.meta['audb']['complete']
-
-    db = audb.load(
-        DB_NAME,
-        version=DB_VERSION,
-        tables=['table1'],
-        full_path=False,
-        verbose=False,
-    )
-
-    assert db['table1'] == db_original['table1']
-    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
-    assert 'table2' not in db.tables
-    assert 'misc-not-in-scheme' not in db.misc_tables
-    pd.testing.assert_index_equal(db.files, db_original['table1'].files)
-    assert not db.meta['audb']['complete']
-
-    # Remove table to force downloading from backend again
+    # Delete table1
+    # to force downloading from backend again
     os.remove(os.path.join(db.meta['audb']['root'], 'db.table1.csv'))
     os.remove(os.path.join(db.meta['audb']['root'], 'db.table1.pkl'))
-
     db = audb.load(
         DB_NAME,
         version=DB_VERSION,
@@ -170,7 +135,6 @@ def test_load_on_demand():
         full_path=False,
         verbose=False,
     )
-
     assert db['table1'] == db_original['table1']
     assert db['table2'] == db_original['table2']
     assert db['misc-in-scheme'] == db_original['misc-in-scheme']
@@ -178,53 +142,7 @@ def test_load_on_demand():
     pd.testing.assert_index_equal(db.files, db_original.files)
     assert not db.meta['audb']['complete']
 
-    db = audb.load(
-        DB_NAME,
-        version=DB_VERSION,
-        media=['audio/000.wav', 'audio/001.wav'],
-        full_path=False,
-        verbose=False,
-    )
-
-    assert 'table1' in db.tables
-    assert 'table2' in db.tables
-    assert 'misc-in-scheme' in db.misc_tables
-    assert 'misc-not-in-scheme' in db.misc_tables
-    pd.testing.assert_index_equal(
-        db.files,
-        audformat.filewise_index(['audio/000.wav', 'audio/001.wav']),
-    )
-    assert not db.meta['audb']['complete']
-
-    db = audb.load(
-        DB_NAME,
-        version=DB_VERSION,
-        tables=['table2'],
-        full_path=False,
-        verbose=False,
-    )
-
-    assert 'table1' not in db.tables
-    assert 'misc-not-in-scheme' not in db.misc_tables
-    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
-    assert db['table2'] == db_original['table2']
-    pd.testing.assert_index_equal(db.files, db_original['table2'].files)
-    assert db.meta['audb']['complete']
-
-    db = audb.load(
-        DB_NAME,
-        version=DB_VERSION,
-        tables=['misc-not-in-scheme'],
-        full_path=False,
-        verbose=False,
-    )
-
-    assert 'table1' not in db.tables
-    assert 'table2' not in db.tables
-    assert db['misc-in-scheme'] == db_original['misc-in-scheme']
-    assert db['misc-not-in-scheme'] == db_original['misc-not-in-scheme']
-    assert db.meta['audb']['complete']
-
+    # Load whole database
     db = audb.load(
         DB_NAME,
         version=DB_VERSION,
@@ -234,3 +152,182 @@ def test_load_on_demand():
     db_original.meta = []
     db.meta = []
     assert db == db_original
+
+
+@pytest.mark.parametrize(
+    'attachments, '
+    'media, '
+    'tables, '
+    'expected_attachments, '
+    'expected_media, '
+    'expected_tables, '
+    'complete',
+    [
+        (
+            None,
+            None,
+            None,
+            ['file', 'folder'],
+            [
+                'audio/000.wav',
+                'audio/001.wav',
+                'audio/002.wav',
+                'audio/003.wav',
+            ],
+            ['misc-in-scheme', 'misc-not-in-scheme', 'table1', 'table2'],
+            True,
+        ),
+        (
+            [],
+            None,
+            None,
+            [],
+            [
+                'audio/000.wav',
+                'audio/001.wav',
+                'audio/002.wav',
+                'audio/003.wav',
+            ],
+            ['misc-in-scheme', 'misc-not-in-scheme', 'table1', 'table2'],
+            False,
+        ),
+        (
+            None,
+            [],
+            None,
+            ['file', 'folder'],
+            [],
+            ['misc-in-scheme', 'misc-not-in-scheme', 'table1', 'table2'],
+            False,
+        ),
+        (
+            None,
+            None,
+            [],
+            ['file', 'folder'],
+            [],
+            ['misc-in-scheme'],  # misc table used in scheme is still loaded
+            False,
+        ),
+        (
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['misc-in-scheme'],
+            False,
+        ),
+        (
+            [],
+            [],
+            None,
+            [],
+            [],
+            ['misc-in-scheme', 'misc-not-in-scheme', 'table1', 'table2'],
+            False,
+        ),
+        (
+            [],
+            None,
+            [],
+            [],
+            [],
+            ['misc-in-scheme'],
+            False,
+        ),
+        (
+            None,
+            [],
+            [],
+            ['file', 'folder'],
+            [],
+            ['misc-in-scheme'],
+            False,
+        ),
+        (
+            'folder',
+            None,
+            None,
+            ['folder'],
+            [
+                'audio/000.wav',
+                'audio/001.wav',
+                'audio/002.wav',
+                'audio/003.wav',
+            ],
+            ['misc-in-scheme', 'misc-not-in-scheme', 'table1', 'table2'],
+            False,
+        ),
+        (
+            ['file'],
+            None,
+            ['table1'],
+            ['file'],
+            [
+                'audio/000.wav',
+                'audio/001.wav',
+                'audio/002.wav',
+            ],
+            ['misc-in-scheme', 'table1'],
+            False,
+        ),
+        (
+            ['file', 'folder'],
+            None,
+            '.*1',
+            ['file', 'folder'],
+            [
+                'audio/000.wav',
+                'audio/001.wav',
+                'audio/002.wav',
+            ],
+            ['misc-in-scheme', 'table1'],
+            False,
+        ),
+        (
+            None,
+            '.3.wav',
+            None,
+            ['file', 'folder'],
+            [
+                'audio/003.wav',
+            ],
+            ['misc-in-scheme', 'misc-not-in-scheme', 'table1', 'table2'],
+            False,
+        ),
+    ]
+)
+def test_load_filter(
+        tmpdir,
+        attachments,
+        media,
+        tables,
+        expected_attachments,
+        expected_media,
+        expected_tables,
+        complete,
+):
+
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        attachments=attachments,
+        media=media,
+        tables=tables,
+        full_path=False,
+        cache_root=tmpdir,
+        verbose=False,
+    )
+    assert list(db) == expected_tables
+    assert list(db.files) == expected_media
+    assert list(db.attachments) == ['file', 'folder']
+    for attachment in db.attachments:
+        path = audeer.path(db.root, db.attachments[attachment].path)
+        if attachment in expected_attachments:
+            assert os.path.exists(path)
+            for file in db.attachments[attachment].files:
+                assert os.path.exists(audeer.path(db.root, file))
+        else:
+            assert not os.path.exists(path)
+    assert db.meta['audb']['complete'] == complete

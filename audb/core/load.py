@@ -305,7 +305,6 @@ def _get_attachments_from_backend(
 
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
-    utils.mkdir_tree(paths, db_root)
     utils.mkdir_tree(paths, db_root_tmp)
 
     def job(path: str):
@@ -852,6 +851,7 @@ def load(
         format: str = None,
         mixdown: bool = False,
         sampling_rate: int = None,
+        attachments: typing.Union[str, typing.Sequence[str]] = None,
         tables: typing.Union[str, typing.Sequence[str]] = None,
         media: typing.Union[str, typing.Sequence[str]] = None,
         removed_media: bool = False,
@@ -899,10 +899,30 @@ def load(
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
-        tables: include only tables matching the regular expression or
-            provided in the list
-        media: include only media matching the regular expression or
-            provided in the list
+        attachments: load only attachment files
+            for the attachments
+            matching the regular expression
+            or provided in the list.
+            If set to ``[]`` no attachments are loaded
+        tables: load only tables and misc tables
+            matching the regular expression
+            or provided in the list.
+            Media files not referenced
+            in the selected tables
+            are automatically excluded, too.
+            If set to ``[]``
+            no tables and media files are loaded.
+            Misc tables used in schemes are always loaded
+        media: load only media files
+            matching the regular expression
+            or provided in the list.
+            Excluded media files are
+            automatically removed from the tables, too.
+            This may result in empty tables.
+            If set to ``[]``
+            no media files are loaded
+            and all tables except
+            misc tables will be empty
         removed_media: keep rows that reference removed media
         full_path: replace relative with absolute file paths
         cache_root: cache folder where databases are stored.
@@ -920,7 +940,7 @@ def load(
         database object
 
     Raises:
-        ValueError: if table or media is requested
+        ValueError: if attachment, table or media is requested
             that is not part of the database
         ValueError: if a non-supported ``bit_depth``,
             ``format``,
@@ -981,8 +1001,16 @@ def load(
 
             # load attachments
             if not db_is_complete and not only_metadata:
-                cached_versions = _load_attachments(
+
+                # filter attachments
+                requested_attachments = filter_deps(
+                    attachments,
                     db.attachments,
+                    'attachment',
+                )
+
+                cached_versions = _load_attachments(
+                    requested_attachments,
                     backend,
                     db_root,
                     db,
