@@ -904,23 +904,25 @@ def load(
             matching the regular expression
             or provided in the list.
             If set to ``[]`` no attachments are loaded
-        tables: include only tables
+        tables: load only tables and misc tables
             matching the regular expression
             or provided in the list.
-            It will also limit possible media files
-            to those listed in the selected tables.
-            If ``[]`` is provided
-            only misc tables
-            used as labels in a scheme
-            and no media files are loaded
-        media: include only media files
+            Media files not referenced
+            in the selected tables
+            are automatically excluded, too.
+            If set to ``[]`` 
+            no tables and media files are loaded.
+            Misc tables used in schemes are always loaded
+        media: load only media files
             matching the regular expression
             or provided in the list.
-            The entries for non-matching media files
-            will be removed from tables
-            resulting in potentially empty tables.
-            If ``[]`` is provided
+            Excluded media files are 
+            automatically removed from the tables, too.
+            This may result in empty tables.
+            If set to ``[]``
             no media files are loaded
+            and all tables except
+            misc tables will be empty
         removed_media: keep rows that reference removed media
         full_path: replace relative with absolute file paths
         cache_root: cache folder where databases are stored.
