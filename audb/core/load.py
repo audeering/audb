@@ -910,13 +910,13 @@ def load(
             Media files not referenced
             in the selected tables
             are automatically excluded, too.
-            If set to ``[]`` 
+            If set to ``[]``
             no tables and media files are loaded.
             Misc tables used in schemes are always loaded
         media: load only media files
             matching the regular expression
             or provided in the list.
-            Excluded media files are 
+            Excluded media files are
             automatically removed from the tables, too.
             This may result in empty tables.
             If set to ``[]``
