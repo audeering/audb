@@ -244,39 +244,35 @@ def _get_attachments_from_cache(
         for attachment in attachments
     ]
 
-    try:
-        with FolderLock(
-                db_root_cached,
-                timeout=define.CACHED_VERSIONS_TIMEOUT,
-        ):
+    with FolderLock(
+            db_root_cached,
+            timeout=define.CACHED_VERSIONS_TIMEOUT,
+    ):
 
-            cached_paths, missing_paths = _cached_files(
-                paths,
-                deps,
-                cached_versions,
-                flavor,
-                verbose,
-            )
-            missing_attachments = [
-                deps.archive(path) for path in missing_paths
-            ]
-            db_root_tmp = database_tmp_root(db_root)
+        cached_paths, missing_paths = _cached_files(
+            paths,
+            deps,
+            cached_versions,
+            flavor,
+            verbose,
+        )
+        missing_attachments = [
+            deps.archive(path) for path in missing_paths
+        ]
+        db_root_tmp = database_tmp_root(db_root)
 
-            def job(cache_root: str, file: str):
-                _copy_path(file, cache_root, db_root_tmp, db_root)
+        def job(cache_root: str, file: str):
+            _copy_path(file, cache_root, db_root_tmp, db_root)
 
-            audeer.run_tasks(
-                job,
-                params=[([root, path], {}) for root, path in cached_paths],
-                num_workers=num_workers,
-                progress_bar=verbose,
-                task_description='Copy attachments',
-            )
+        audeer.run_tasks(
+            job,
+            params=[([root, path], {}) for root, path in cached_paths],
+            num_workers=num_workers,
+            progress_bar=verbose,
+            task_description='Copy attachments',
+        )
 
-            audeer.rmdir(db_root_tmp)
-
-    except filelock.Timeout:
-        missing_attachments = attachments
+        audeer.rmdir(db_root_tmp)
 
     return missing_attachments
 
