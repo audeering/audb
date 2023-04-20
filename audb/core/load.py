@@ -218,8 +218,8 @@ def _get_attachments_from_cache(
 ) -> typing.Sequence[str]:
     r"""Copy files from cache.
 
-    This function copies requested media files,
-    attachment files, or table files
+    This function copies all files
+    associated with the requested attachemnts
     from other cached versions
     to the new database folder.
 
