@@ -686,6 +686,89 @@ def test_load_to(tmpdir, dbs, version, only_metadata):
                 assert os.path.exists(audeer.path(db.root, attachment_file))
 
 
+@pytest.mark.parametrize('only_metadata', [True, False])
+def test_load_to_update(tmpdir, dbs, only_metadata):
+
+    # Use version 1.0.0 as this contains two attachments,
+    # one file and one folder
+    # which is needed to reach full code coverage
+    version = '1.0.0'
+
+    db_root = audeer.path(tmpdir, 'raw')
+
+    db = audb.load_to(
+        db_root,
+        DB_NAME,
+        version=version,
+        only_metadata=only_metadata,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    assert db.root == db_root
+
+    # Remove some files
+    if not only_metadata:
+        media = audeer.path(db_root, db.files[0])
+        os.remove(media)
+    table = audeer.path(db_root, f'db.{list(db)[0]}.csv')
+    os.remove(table)
+
+    # Change some files
+    if not only_metadata:
+        for attachment_id in list(db.attachments):
+            attachment = audeer.path(
+                db_root,
+                db.attachments[attachment_id].path,
+            )
+            if os.path.isdir(attachment):
+                audeer.touch(audeer.path(attachment, 'other-file.txt'))
+            else:
+                with open(attachment, 'a') as fp:
+                    fp.write('next')
+
+    # Load again to force restoring to original state
+    db = audb.load_to(
+        db_root,
+        DB_NAME,
+        version=version,
+        only_metadata=only_metadata,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    assert db.root == db_root
+
+    # Load original database from folder (expected database)
+    resolved_version = version or audb.latest_version(DB_NAME)
+    db_original = audformat.Database.load(dbs[resolved_version])
+
+    # Assert media files are identical and do (not) exist
+    pd.testing.assert_index_equal(db.files, db_original.files)
+    for file in db.files:
+        if only_metadata:
+            assert not os.path.exists(os.path.join(db_root, file))
+        else:
+            assert os.path.exists(os.path.join(db_root, file))
+
+    # Assert tables are identical and exist as CSV files
+    for table in db:
+        assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
+        pd.testing.assert_frame_equal(
+            db_original[table].df,
+            db[table].df,
+        )
+
+    # Assert attachments are identical and files exist
+    assert db.attachments == db_original.attachments
+    for attachment in db.attachments:
+        path = audeer.path(db.root, db.attachments[attachment].path)
+        if only_metadata:
+            assert not os.path.exists(path)
+        else:
+            assert os.path.exists(path)
+            for attachment_file in db.attachments[attachment].files:
+                assert os.path.exists(audeer.path(db.root, attachment_file))
+
+
 @pytest.mark.parametrize(
     'name, version',
     [
