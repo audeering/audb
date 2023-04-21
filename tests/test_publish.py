@@ -790,6 +790,65 @@ def test_publish_error_messages(
         )
 
 
+def test_publish_error_allowed_chars(tmpdir, repository):
+    # Table and attachment IDs are only allow
+    # to contain chars that can be used as filenames
+    # on the backends
+
+    # Prepare database files
+    db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
+    audio_file = audeer.path(db_path, 'f1.wav')
+    attachment_file = audeer.path(db_path, 'attachment.txt')
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audio_file, signal, sampling_rate)
+    audeer.touch(attachment_file)
+
+    # Database with not allowed table ID
+    db = audformat.Database('db')
+    index = audformat.filewise_index(os.path.basename(audio_file))
+    db['table?'] = audformat.Table(index)
+    db['table?']['column'] = audformat.Column()
+    db['table?']['column'].set(['label'])
+    db.save(db_path)
+    error_msg = (
+        "Table IDs must only contain [A-Za-z0-9._-] chars, "
+        "which is not the case for table 'table?'."
+    )
+    with pytest.raises(RuntimeError, match=re.escape(error_msg)):
+        audb.publish(db_path, '1.0.0', repository)
+    os.remove(audeer.path(db_path, 'db.table?.csv'))
+    os.remove(audeer.path(db_path, 'db.table?.pkl'))
+
+    # Database with not allowed attachment ID
+    db = audformat.Database('db')
+    index = audformat.filewise_index(os.path.basename(audio_file))
+    db['table'] = audformat.Table(index)
+    db['table']['column'] = audformat.Column()
+    db['table']['column'].set(['label'])
+    db.attachments['attachment?'] = audformat.Attachment(
+        os.path.basename(attachment_file)
+    )
+    db.save(db_path)
+    error_msg = (
+        "Attachment IDs must only contain [A-Za-z0-9._-] chars, "
+        "which is not the case for attachment 'attachment?'."
+    )
+    with pytest.raises(RuntimeError, match=re.escape(error_msg)):
+        audb.publish(db_path, '1.0.0', repository)
+    os.remove(audeer.path(db_path, 'db.table.csv'))
+    os.remove(audeer.path(db_path, 'db.table.pkl'))
+
+    # Ensure column and scheme IDs are not affected
+    db = audformat.Database('db')
+    index = audformat.filewise_index(os.path.basename(audio_file))
+    db.schemes['scheme?'] = audformat.Scheme('str')
+    db['table'] = audformat.Table(index)
+    db['table']['column?'] = audformat.Column(scheme_id='scheme?')
+    db['table']['column'].set(['label'])
+    audb.publish(db_path, '1.0.0', repository)
+
+
 def test_publish_error_changed_deps_file_type(tmpdir, repository):
     # As we allow for every possible filename for attachments
     # and store them in the dependency table
@@ -920,8 +979,6 @@ def test_update_database(dbs, persistent_repository):
     version = '2.1.0'
     start_version = '2.0.0'
 
-    print(f'{persistent_repository=}')
-    print(f'{audb.config.REPOSITORIES=}')
     audb.load_to(
         dbs[version],
         DB_NAME,
