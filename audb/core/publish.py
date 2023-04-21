@@ -1,5 +1,6 @@
 import collections
 import os
+import re
 import shutil
 import tempfile
 import typing
@@ -570,6 +571,10 @@ def publish(
             e.g. from media to attachment
         RuntimeError: if a new media file
             has an uppercase letter in its file extension
+        RuntimeError: if database contains tables,
+            misc tables, or attachemnts
+            that are stored under an ID
+            using a char not in ``'[A-Za-z0-9/._-/]+'``
         ValueError: if ``previous_version`` >= ``version``
 
     """
@@ -678,6 +683,26 @@ def publish(
         num_workers=num_workers,
         verbose=verbose,
     )
+
+    # ensure table and attachment IDs
+    # contain only chars allowed by the backend
+    # as the IDs are included in the filenames of the archives
+    # uploaded to the backend
+    allowed_chars = audbackend.core.utils.BACKEND_ALLOWED_CHARS
+    allowed_chars = allowed_chars.replace('/', '')
+    allowed_chars_compiled = re.compile(allowed_chars)
+    for table_id in list(db):
+        if allowed_chars_compiled.fullmatch(table_id) is None:
+            raise RuntimeError(
+                f"Table IDs must only contain {allowed_chars} chars, "
+                f"which is not the case for table '{table_id}'."
+            )
+    for attachment_id in list(db.attachments):
+        if allowed_chars_compiled.fullmatch(attachment_id) is None:
+            raise RuntimeError(
+                f"Attachment IDs must only contain {allowed_chars} chars, "
+                f"which is not the case for attachment '{attachment_id}'."
+            )
 
     # check all tables are conform with audformat
     if not db.is_portable:
