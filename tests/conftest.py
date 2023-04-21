@@ -42,3 +42,31 @@ def cleanup_session():
     yield
     if os.path.exists(pytest.ROOT):
         shutil.rmtree(pytest.ROOT)
+
+
+@pytest.fixture(scope='module', autouse=False)
+def persistent_repository(tmp_path_factory):
+    host = tmp_path_factory.mktemp('host').as_posix()
+    repository = audb.Repository(
+        name=pytest.REPOSITORY_NAME,
+        host=host,
+        backend=pytest.BACKEND,
+    )
+    audb.config.REPOSITORIES = [repository]
+    return repository
+
+
+@pytest.fixture(scope='function', autouse=False)
+def repository(tmpdir):
+    repository = audb.Repository(
+        name=pytest.REPOSITORY_NAME,
+        host=audeer.path(tmpdir, 'host'),
+        backend=pytest.BACKEND,
+    )
+    audb.config.REPOSITORIES += [repository]
+    return repository
+
+
+@pytest.fixture(scope='function', autouse=False)
+def shared_cache(tmpdir):
+    return audeer.mkdir(tmpdir, 'cache')

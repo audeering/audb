@@ -15,25 +15,7 @@ import audb
 os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
 os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 
-
-@pytest.fixture(
-    scope='session',
-    autouse=True,
-)
-def fixture_set_repositories():
-    audb.config.REPOSITORIES = pytest.REPOSITORIES
-
-
 DB_NAME = f'test_load-{pytest.ID}'
-DB_ROOT = os.path.join(pytest.ROOT, 'db')
-DB_ROOT_VERSION = {
-    version: os.path.join(DB_ROOT, version) for version in
-    ['1.0.0', '1.1.0', '1.1.1', '2.0.0', '3.0.0']
-}
-
-
-def clear_root(root: str):
-    audeer.rmdir(root)
 
 
 @pytest.fixture(
@@ -59,10 +41,17 @@ def fixture_ensure_tmp_folder_deleted():
     scope='module',
     autouse=True,
 )
-def fixture_publish_db():
+def dbs(tmp_path_factory, persistent_repository):
+    r"""Publish different versions of the same database.
 
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    Returns:
+        dictionary containg root folder for each version
+
+    """
+
+    # Collect single database paths
+    # and return them in the end
+    paths = {}
 
     # create db
 
@@ -107,7 +96,9 @@ def fixture_publish_db():
 
     # publish 1.0.0
 
-    db_root = DB_ROOT_VERSION['1.0.0']
+    version = '1.0.0'
+    db_root = tmp_path_factory.mktemp(version).as_posix()
+    paths[version] = db_root
 
     audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
     audeer.touch(audeer.path(db_root, 'extra/file.txt'))
@@ -119,16 +110,18 @@ def fixture_publish_db():
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb.publish(
         db_root,
-        '1.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         archives=archives,
         verbose=False,
     )
 
     # publish 1.1.0, add table, remove attachment file
 
-    db_root = DB_ROOT_VERSION['1.1.0']
-    previous_db_root = DB_ROOT_VERSION['1.0.0']
+    previous_db_root = db_root
+    version = '1.1.0'
+    db_root = tmp_path_factory.mktemp(version).as_posix()
+    paths[version] = db_root
 
     audformat.testing.add_table(
         db, 'train', audformat.define.IndexType.SEGMENTED,
@@ -148,15 +141,17 @@ def fixture_publish_db():
     )
     audb.publish(
         db_root,
-        '1.1.0',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         verbose=False,
     )
 
     # publish 1.1.1, change label
 
-    db_root = DB_ROOT_VERSION['1.1.1']
-    previous_db_root = DB_ROOT_VERSION['1.1.0']
+    previous_db_root = db_root
+    version = '1.1.1'
+    db_root = tmp_path_factory.mktemp(version).as_posix()
+    paths[version] = db_root
 
     db['train'].df['label'][0] = None
     shutil.copytree(
@@ -172,15 +167,17 @@ def fixture_publish_db():
     )
     audb.publish(
         db_root,
-        '1.1.1',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         verbose=False,
     )
 
     # publish 2.0.0, alter and remove media, remove attachment
 
-    db_root = DB_ROOT_VERSION['2.0.0']
-    previous_db_root = DB_ROOT_VERSION['1.1.1']
+    previous_db_root = db_root
+    version = '2.0.0'
+    db_root = tmp_path_factory.mktemp(version).as_posix()
+    paths[version] = db_root
 
     shutil.copytree(
         audeer.path(previous_db_root, 'extra'),
@@ -206,15 +203,17 @@ def fixture_publish_db():
     )
     audb.publish(
         db_root,
-        '2.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         verbose=False,
     )
 
     # publish 3.0.0, remove table, alter attachment file
 
-    db_root = DB_ROOT_VERSION['3.0.0']
-    previous_db_root = DB_ROOT_VERSION['2.0.0']
+    previous_db_root = db_root
+    version = '3.0.0'
+    db_root = tmp_path_factory.mktemp(version).as_posix()
+    paths[version] = db_root
 
     shutil.copytree(
         audeer.path(previous_db_root, 'extra'),
@@ -232,15 +231,12 @@ def fixture_publish_db():
     )
     audb.publish(
         db_root,
-        '3.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         verbose=False,
     )
 
-    yield
-
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    return paths
 
 
 def test_database_cache_folder():
@@ -287,7 +283,7 @@ def test_load_wrong_argument():
         ),
     ]
 )
-def test_load(format, version, only_metadata):
+def test_load(dbs, format, version, only_metadata):
 
     # When loading the first time (only_metadata=True)
     # the database should not exists in cache
@@ -313,7 +309,7 @@ def test_load(format, version, only_metadata):
 
     # Load original database from folder (expected database)
     resolved_version = version or audb.latest_version(DB_NAME)
-    db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
+    db_original = audformat.Database.load(dbs[resolved_version])
     if format is not None:
         db_original.map_files(
             lambda x: audeer.replace_file_extension(x, format)
@@ -644,9 +640,9 @@ def test_load_table(version, table):
     ]
 )
 @pytest.mark.parametrize('only_metadata', [True, False])
-def test_load_to(version, only_metadata):
+def test_load_to(tmpdir, dbs, version, only_metadata):
 
-    db_root = os.path.join(DB_ROOT, 'raw')
+    db_root = audeer.path(tmpdir, 'raw')
 
     db = audb.load_to(
         db_root,
@@ -660,7 +656,7 @@ def test_load_to(version, only_metadata):
 
     # Load original database from folder (expected database)
     resolved_version = version or audb.latest_version(DB_NAME)
-    db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
+    db_original = audformat.Database.load(dbs[resolved_version])
 
     # Assert media files are identical and do (not) exist
     pd.testing.assert_index_equal(db.files, db_original.files)
@@ -705,6 +701,6 @@ def test_load_to(version, only_metadata):
         )
     ]
 )
-def test_repository(name, version):
+def test_repository(persistent_repository, name, version):
     repository = audb.repository(name, version)
-    assert repository == pytest.PUBLISH_REPOSITORY
+    assert repository == persistent_repository

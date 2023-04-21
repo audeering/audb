@@ -1,16 +1,14 @@
-import os
-
 import pytest
 
 import audb
 import audeer
 
 
-def test_config_file():
+def test_config_file(tmpdir):
 
-    audeer.mkdir(pytest.ROOT)
+    root = audeer.mkdir(tmpdir)
 
-    config_file = os.path.join(pytest.ROOT, '.audb.yaml')
+    config_file = audeer.path(root, '.audb.yaml')
 
     # Try loading non-existing file
     config = audb.core.config.load_configuration_file(config_file)
