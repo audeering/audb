@@ -27,7 +27,7 @@ def test_config_file(tmpdir):
     )
     global_config.update(config)
     assert global_config['cache_root'] == '~/user'
-    assert global_config['shared_cache_root'] == audb.config.SHARED_CACHE_ROOT
+    assert global_config['shared_cache_root'] == '/data/audb'
 
     # Fail for wrong repositories entries
     with open(config_file, 'w') as cf:

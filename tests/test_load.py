@@ -30,7 +30,7 @@ def fixture_ensure_tmp_folder_deleted():
     """
     yield
 
-    dirs = audeer.list_dir_names(os.environ['AUDB_CACHE_ROOT'], recursive=True)
+    dirs = audeer.list_dir_names(audb.default_cache_root(), recursive=True)
     assert len([d for d in dirs if d.endswith('~')]) == 0
 
 

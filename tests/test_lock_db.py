@@ -78,14 +78,14 @@ def fixture_ensure_lock_file_deleted():
     assert not any(
         [
             os.path.exists(path)
-            for path in lock_paths(os.environ['AUDB_CACHE_ROOT'])
+            for path in lock_paths(audb.default_cache_root())
         ]
     )
     yield
     assert not any(
         [
             os.path.exists(path)
-            for path in lock_paths(os.environ['AUDB_CACHE_ROOT'])
+            for path in lock_paths(audb.default_cache_root())
         ]
     )
 

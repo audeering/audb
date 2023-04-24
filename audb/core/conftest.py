@@ -15,8 +15,19 @@ def cache(tmp_path_factory):
 
     """
     cache = tmp_path_factory.mktemp('cache').as_posix()
+    # We use the environment variable here
+    # to ensure audb.config.CACHE_ROOT
+    # does still return the default config value
+    # in the doctest
+    env_cache = os.environ.get('AUDB_CACHE_ROOT', None)
     os.environ['AUDB_CACHE_ROOT'] = cache
-    return cache
+
+    yield
+
+    if env_cache is None:
+        del os.environ['AUDB_CACHE_ROOT']
+    else:  # pragma: nocover
+        os.environ['AUDB_CACHE_ROOT'] = env_cache
 
 
 @pytest.fixture(autouse=True)
