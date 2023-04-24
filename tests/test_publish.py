@@ -14,8 +14,6 @@ import audiofile
 
 import audb
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 
 DB_NAME = f'test_publish-{pytest.ID}'
 LONG_PATH = '/'.join(['audio'] * 50) + '/new.wav'
@@ -1203,12 +1201,3 @@ def test_update_database_without_media(tmpdir, persistent_repository):
             audeer.path(build_root, attachment_file),
             audeer.path(db_load.root, attachment_file),
         )
-
-
-def test_cached():
-    # Check first that we have different database names available
-    df = audb.cached()
-    names = list(set(df.name))
-    assert len(names) > 1
-    df = audb.cached(name=names[0])
-    assert set(df.name) == set([names[0]])

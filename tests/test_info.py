@@ -11,10 +11,6 @@ import audiofile
 import audb
 
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-
-
 DB_NAME = f'test_info-{pytest.ID}'
 DB_VERSION = '1.0.0'
 
@@ -106,16 +102,6 @@ def db(tmp_path_factory, persistent_repository):
     )
 
     return db
-
-
-@pytest.fixture(
-    scope='function',
-    autouse=True,
-)
-def fixture_clear_cache():
-    audeer.rmdir(pytest.CACHE_ROOT)
-    yield
-    audeer.rmdir(pytest.CACHE_ROOT)
 
 
 def test_attachemnts(db):

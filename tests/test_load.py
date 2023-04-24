@@ -12,9 +12,6 @@ import audeer
 import audb
 
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-
 DB_NAME = f'test_load-{pytest.ID}'
 
 
@@ -33,7 +30,7 @@ def fixture_ensure_tmp_folder_deleted():
     """
     yield
 
-    dirs = audeer.list_dir_names(pytest.CACHE_ROOT, recursive=True)
+    dirs = audeer.list_dir_names(os.environ['AUDB_CACHE_ROOT'], recursive=True)
     assert len([d for d in dirs if d.endswith('~')]) == 0
 
 
@@ -239,8 +236,8 @@ def dbs(tmp_path_factory, persistent_repository):
     return paths
 
 
-def test_database_cache_folder():
-    cache_root = os.path.join(pytest.CACHE_ROOT, 'cache')
+def test_database_cache_folder(cache):
+    cache_root = os.path.join(cache, 'cache')
     version = '1.0.0'
     db_root = audb.core.load.database_cache_root(
         DB_NAME,
@@ -426,7 +423,7 @@ def test_load(dbs, format, version, only_metadata):
         ),
     ]
 )
-def test_load_attachment(version, attachment_id):
+def test_load_attachment(cache, version, attachment_id):
 
     db = audb.load(
         DB_NAME,
@@ -446,7 +443,7 @@ def test_load_attachment(version, attachment_id):
 
     expected_paths = [
         os.path.join(
-            pytest.CACHE_ROOT,
+            cache,
             DB_NAME,
             version,
             os.path.normpath(file),
@@ -459,7 +456,7 @@ def test_load_attachment(version, attachment_id):
     cache_root = audb.core.load.database_cache_root(
         DB_NAME,
         version,
-        pytest.CACHE_ROOT,
+        cache,
         audb.Flavor(),
     )
     shutil.rmtree(cache_root)
@@ -531,7 +528,7 @@ def test_load_attachment_errors(version, attachment_id, error, error_msg):
         ),
     ]
 )
-def test_load_media(version, media, format):
+def test_load_media(cache, version, media, format):
 
     paths = audb.load_media(
         DB_NAME,
@@ -541,7 +538,7 @@ def test_load_media(version, media, format):
         verbose=False,
     )
     expected_paths = [
-        os.path.join(pytest.CACHE_ROOT, p)
+        os.path.join(cache, p)
         for p in paths
     ]
     if format is not None:
@@ -557,7 +554,7 @@ def test_load_media(version, media, format):
     cache_root = audb.core.load.database_cache_root(
         DB_NAME,
         version,
-        pytest.CACHE_ROOT,
+        cache,
         audb.Flavor(format=format),
     )
     shutil.rmtree(cache_root)

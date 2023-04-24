@@ -14,12 +14,10 @@ pytest.ROOT = audeer.path(
 )
 
 pytest.BACKEND = 'file-system'
-pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
 pytest.FILE_SYSTEM_HOST = os.path.join(pytest.ROOT, 'repo')
 pytest.ID = audeer.uid()
 pytest.NUM_WORKERS = 5
 pytest.REPOSITORY_NAME = 'data-unittests-local'
-pytest.SHARED_CACHE_ROOT = os.path.join(pytest.ROOT, 'shared')
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -59,6 +57,19 @@ def repository(tmpdir):
     return repository
 
 
-@pytest.fixture(scope='function', autouse=False)
-def shared_cache(tmpdir):
-    return audeer.mkdir(tmpdir, 'cache')
+@pytest.fixture(scope='function', autouse=True)
+def shared_cache(tmp_path):
+    cache = tmp_path / 'shared_cache'
+    cache.mkdir()
+    cache = str(cache)
+    os.environ['AUDB_SHARED_CACHE_ROOT'] = cache
+    return cache
+
+
+@pytest.fixture(scope='function', autouse=True)
+def cache(tmp_path):
+    cache = tmp_path / 'cache'
+    cache.mkdir()
+    cache = str(cache)
+    os.environ['AUDB_CACHE_ROOT'] = cache
+    return cache

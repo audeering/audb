@@ -1,15 +1,9 @@
-import os
 import pandas as pd
 import pytest
 
 import audformat.testing
-import audeer
 
 import audb
-
-
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 
 
 DB_NAME = f'test_filter-{pytest.ID}'
@@ -102,16 +96,6 @@ def db(tmp_path_factory, persistent_repository):
         archives=archives,
         verbose=False,
     )
-
-
-@pytest.fixture(
-    scope='function',
-    autouse=True,
-)
-def fixture_clear_cache():
-    audeer.rmdir(pytest.CACHE_ROOT)
-    yield
-    audeer.rmdir(pytest.CACHE_ROOT)
 
 
 @pytest.mark.parametrize(

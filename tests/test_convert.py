@@ -9,10 +9,6 @@ import audiofile
 import audb
 
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-
-
 DB_NAME = f'test_convert-{pytest.ID}'
 
 
@@ -95,16 +91,6 @@ def db_root(tmp_path_factory, persistent_repository):
     )
 
     return db_root
-
-
-@pytest.fixture(
-    scope='function',
-    autouse=True,
-)
-def fixture_clear_cache():
-    audeer.rmdir(pytest.CACHE_ROOT)
-    yield
-    audeer.rmdir(pytest.CACHE_ROOT)
 
 
 @pytest.mark.parametrize(
@@ -271,7 +257,7 @@ def test_sampling_rate(db_root, sampling_rate):
             assert audiofile.sampling_rate(converted_file) == sampling_rate
 
 
-def test_mixed_cache():
+def test_mixed_cache(cache, shared_cache):
     # Avoid failing searching for other versions
     # if databases a stored accross private and shared cache
     # and the private one is empty, see
@@ -286,12 +272,11 @@ def test_mixed_cache():
         verbose=False,
         only_metadata=True,
         tables='files',
-        cache_root=pytest.SHARED_CACHE_ROOT,
+        cache_root=shared_cache,
     )
     # Now try to load same version to private cache
     # to force audb.cached() to return empty dataframe
-    audeer.rmdir(pytest.CACHE_ROOT)
-    audeer.mkdir(pytest.CACHE_ROOT)
+    audeer.rmdir(cache)
     audb.load(
         DB_NAME,
         sampling_rate=8000,

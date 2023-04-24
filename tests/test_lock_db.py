@@ -37,7 +37,6 @@ class CrashFileSystem(audbackend.FileSystem):
 
     """
     def _get_file(self, *args):
-        assert any([os.path.exists(path) for path in DB_LOCK_PATHS])
         raise RuntimeError()
 
 
@@ -47,8 +46,28 @@ audbackend.register(
 )
 
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
+def lock_paths(cache):
+    r"""Return list of lock file locations."""
+    paths = []
+    for version in DB_VERSIONS:
+        paths.append(
+            audeer.path(
+                cache,
+                DB_NAME,
+                version,
+                '.lock',
+            )
+        )
+        paths.append(
+            audeer.path(
+                cache,
+                DB_NAME,
+                version,
+                audb.Flavor().short_id,
+                '.lock',
+            )
+        )
+    return paths
 
 
 @pytest.fixture(
@@ -56,9 +75,19 @@ os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
     autouse=True,
 )
 def fixture_ensure_lock_file_deleted():
-    assert not any([os.path.exists(path) for path in DB_LOCK_PATHS])
+    assert not any(
+        [
+            os.path.exists(path)
+            for path in lock_paths(os.environ['AUDB_CACHE_ROOT'])
+        ]
+    )
     yield
-    assert not any([os.path.exists(path) for path in DB_LOCK_PATHS])
+    assert not any(
+        [
+            os.path.exists(path)
+            for path in lock_paths(os.environ['AUDB_CACHE_ROOT'])
+        ]
+    )
 
 
 @pytest.fixture(
@@ -78,35 +107,6 @@ def fixture_set_repositories(persistent_repository, request):
 
 DB_NAME = f'test_lock-{pytest.ID}'
 DB_VERSIONS = ['1.0.0', '2.0.0']
-
-DB_LOCK_PATHS = []
-for version in DB_VERSIONS:
-    DB_LOCK_PATHS.append(
-        audeer.path(
-            pytest.CACHE_ROOT,
-            DB_NAME,
-            version,
-            '.lock',
-        )
-    )
-    DB_LOCK_PATHS.append(
-        audeer.path(
-            pytest.CACHE_ROOT,
-            DB_NAME,
-            version,
-            audb.Flavor().short_id,
-            '.lock',
-        )
-    )
-
-
-@pytest.fixture(
-    scope='function',
-    autouse=True,
-)
-def fixture_remove_db_from_cache():
-    root = audeer.path(pytest.CACHE_ROOT, DB_NAME)
-    audeer.rmdir(root)
 
 
 @pytest.fixture(

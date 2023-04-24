@@ -1,6 +1,15 @@
+import os
+
 import pytest
 
 import audb
+
+
+@pytest.fixture(scope='package', autouse=True)
+def cache(tmp_path_factory):
+    cache = tmp_path_factory.mktemp('cache').as_posix()
+    os.environ['AUDB_CACHE_ROOT'] = cache
+    return cache
 
 
 @pytest.fixture(autouse=True)
@@ -18,6 +27,10 @@ def add_audb_with_public_data(doctest_namespace):
     as the code file where the docstring is defined.
 
     """
+    # cache = tmp_path / 'cache'
+    # cache.mkdir()
+    # cache = str(cache)
+    # os.environ['AUDB_CACHE_ROOT'] = cache
     audb.config.REPOSITORIES = [
         audb.Repository(
             name='data-public',

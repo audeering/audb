@@ -8,10 +8,6 @@ import audeer
 import audb
 
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-
-
 DB_NAME = f'test_remove-{pytest.ID}'
 DB_FILES = {
     '1.0.0': [
@@ -79,7 +75,7 @@ def publish_db(tmp_path_factory, persistent_repository):
         'flac',
     ]
 )
-def test_remove(format):
+def test_remove(cache, format):
 
     for remove in (
             DB_FILES['1.0.0'][0],  # bundle1
@@ -89,7 +85,7 @@ def test_remove(format):
     ):
 
         # remove db cache to ensure we always get a fresh copy
-        audeer.rmdir(pytest.CACHE_ROOT)
+        audeer.rmdir(cache)
 
         audb.remove_media(DB_NAME, remove)
 
