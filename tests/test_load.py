@@ -406,6 +406,66 @@ def test_load(dbs, format, version, only_metadata):
                 assert os.path.exists(audeer.path(db.root, attachment_file))
 
 
+def test_load_from_cache(dbs):
+
+    # Load a database with flavor to cache
+    # and reload afterwards from cache
+    format = 'flac'
+    version = '1.0.0'
+    db = audb.load(
+        DB_NAME,
+        version='1.0.0',
+        format='flac',
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    db_root = db.meta['audb']['root']
+
+    # Load original database from folder (expected database)
+    db_original = audformat.Database.load(dbs[version])
+    db_original.map_files(
+        lambda x: audeer.replace_file_extension(x, format)
+    )
+
+    # Assert database exists in cache
+    assert audb.exists(DB_NAME, version=version, format=format)
+    df = audb.cached()
+    assert df.loc[db_root]['version'] == version
+
+    # Assert media files are identical and exist
+    pd.testing.assert_index_equal(db.files, db_original.files)
+    for file in db.files:
+        assert os.path.exists(os.path.join(db_root, file))
+
+    version = '2.0.0'
+    db = audb.load(
+        DB_NAME,
+        version='2.0.0',
+        format='flac',
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    db_root = db.meta['audb']['root']
+
+    # Load original database from folder (expected database)
+    db_original = audformat.Database.load(dbs[version])
+    db_original.map_files(
+        lambda x: audeer.replace_file_extension(x, format)
+    )
+
+    # Assert database exists in cache
+    assert audb.exists(DB_NAME, version=version, format=format)
+    df = audb.cached()
+    assert df.loc[db_root]['version'] == version
+
+    # Assert media files are identical and exist
+    pd.testing.assert_index_equal(db.files, db_original.files)
+    for file in db.files:
+        assert os.path.exists(os.path.join(db_root, file))
+
+
 @pytest.mark.parametrize(
     'version, attachment_id',
     [
