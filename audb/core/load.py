@@ -210,6 +210,7 @@ def _files_duration(
 def _get_attachments_from_cache(
         attachments: typing.Sequence[str],
         db_root: str,
+        db: audformat.Database,
         deps: Dependencies,
         cached_versions: CachedVersions,
         flavor: Flavor,
@@ -226,6 +227,7 @@ def _get_attachments_from_cache(
     Args:
         attachments: sequence of attachment IDs
         db_root: database root
+        db: database object
         deps: dependency object
         cached_versions: object containing information
             on existing cached versions of the database
@@ -239,10 +241,7 @@ def _get_attachments_from_cache(
     """
     db_root_cached = [x[1] for x in cached_versions]
 
-    paths = [
-        deps._df[deps._df['archive'] == attachment].index[0]
-        for attachment in attachments
-    ]
+    paths = [db.attachments[attachment].path for attachment in attachments]
 
     with FolderLock(
             db_root_cached,
@@ -603,6 +602,7 @@ def _load_attachments(
             missing_attachments = _get_attachments_from_cache(
                 missing_attachments,
                 db_root,
+                db,
                 deps,
                 cached_versions,
                 flavor,
