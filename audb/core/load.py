@@ -219,7 +219,7 @@ def _get_attachments_from_cache(
     r"""Copy files from cache.
 
     This function copies all files
-    associated with the requested attachemnts
+    associated with the requested attachments
     from other cached versions
     to the new database folder.
 
