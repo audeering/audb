@@ -99,20 +99,20 @@ def _cached_files(
                 if file in cache_deps:
                     if deps.checksum(file) == cache_deps.checksum(file):
                         path = os.path.join(cache_root, file)
-                        if flavor and flavor.format is not None:
-                            path = audeer.replace_file_extension(
-                                path,
-                                flavor.format,
-                            )
+                        # if flavor and flavor.format is not None:
+                        #     path = audeer.replace_file_extension(
+                        #         path,
+                        #         flavor.format,
+                        #     )
                         if os.path.exists(path):
                             found = True
                             break
         if found:
-            if flavor and flavor.format is not None:
-                file = audeer.replace_file_extension(
-                    file,
-                    flavor.format,
-                )
+            # if flavor and flavor.format is not None:
+            #     file = audeer.replace_file_extension(
+            #         file,
+            #         flavor.format,
+            #     )
             cached_files.append((cache_root, file))
         else:
             missing_files.append(file)
