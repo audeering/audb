@@ -326,7 +326,10 @@ def test_lock_load_crash(fixture_set_repositories):
     ['file-system'],
     indirect=True,
 )
-def test_lock_load_from_cached_versions(fixture_set_repositories):
+def test_lock_load_from_cached_versions(
+        persistent_repository,
+        fixture_set_repositories,
+):
 
     # ensure immediate timeout if cache folder is locked
     cached_version_timeout = audb.core.define.CACHED_VERSIONS_TIMEOUT
@@ -351,8 +354,8 @@ def test_lock_load_from_cached_versions(fixture_set_repositories):
     # must be copied from version 1.0.0
     audb.config.REPOSITORIES = [
         audb.Repository(
-            name=pytest.REPOSITORY_NAME,
-            host=pytest.FILE_SYSTEM_HOST,
+            name=persistent_repository.name,
+            host=persistent_repository.host,
             backend='crash-file-system',
         ),
     ]
