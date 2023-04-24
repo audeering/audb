@@ -120,19 +120,22 @@ def _cached_files(
     return cached_files, missing_files
 
 
-def _copy_file(
-        file: str,
+def _copy_path(
+        path: str,
         root_src: str,
         root_tmp: str,
         root_dst: str,
 ):
     r"""Copy file."""
-    src_path = os.path.join(root_src, file)
-    tmp_path = os.path.join(root_tmp, file)
-    dst_path = os.path.join(root_dst, file)
-    audeer.mkdir(os.path.dirname(tmp_path))
+    src_path = os.path.join(root_src, path)
+    tmp_path = os.path.join(root_tmp, path)
+    dst_path = os.path.join(root_dst, path)
+    if os.path.isdir(src_path):
+        shutil.copytree(src_path, tmp_path)
+    else:
+        audeer.mkdir(os.path.dirname(tmp_path))
+        shutil.copy(src_path, tmp_path)
     audeer.mkdir(os.path.dirname(dst_path))
-    shutil.copy(src_path, tmp_path)
     audeer.move_file(tmp_path, dst_path)
 
 
@@ -204,6 +207,75 @@ def _files_duration(
     db._files_duration = durs.to_dict()
 
 
+def _get_attachments_from_cache(
+        attachments: typing.Sequence[str],
+        db_root: str,
+        db: audformat.Database,
+        deps: Dependencies,
+        cached_versions: CachedVersions,
+        flavor: Flavor,
+        num_workers: int,
+        verbose: bool,
+) -> typing.Sequence[str]:
+    r"""Copy files from cache.
+
+    This function copies all files
+    associated with the requested attachments
+    from other cached versions
+    to the new database folder.
+
+    Args:
+        attachments: sequence of attachment IDs
+        db_root: database root
+        db: database object
+        deps: dependency object
+        cached_versions: object containing information
+            on existing cached versions of the database
+        flavor: database flavor object
+        num_workers: number of workers to use
+        verbose: if ``True`` show progress bar
+
+    Returns:
+        list of attachment IDs that couldn't be found in cache
+
+    """
+    db_root_cached = [x[1] for x in cached_versions]
+
+    paths = [db.attachments[attachment].path for attachment in attachments]
+
+    with FolderLock(
+            db_root_cached,
+            timeout=define.CACHED_VERSIONS_TIMEOUT,
+    ):
+
+        cached_paths, missing_paths = _cached_files(
+            paths,
+            deps,
+            cached_versions,
+            flavor,
+            verbose,
+        )
+        missing_attachments = [
+            deps.archive(path) for path in missing_paths
+        ]
+        db_root_tmp = database_tmp_root(db_root)
+
+        def job(cache_root: str, file: str):
+            _copy_path(file, cache_root, db_root_tmp, db_root)
+
+        audeer.run_tasks(
+            job,
+            params=[([root, path], {}) for root, path in cached_paths],
+            num_workers=num_workers,
+            progress_bar=verbose,
+            task_description='Copy attachments',
+        )
+
+        audeer.rmdir(db_root_tmp)
+
+    return missing_attachments
+
+
 def _get_files_from_cache(
         files: typing.Sequence[str],
         files_type: str,
@@ -216,18 +288,17 @@ def _get_files_from_cache(
 ) -> typing.Sequence[str]:
     r"""Copy files from cache.
 
-    This function copies requested media files,
-    attachment files, or table files
+    This function copies requested media files
+    or table files
     from other cached versions
     to the new database folder.
 
     Args:
         files: sequence of media files,
-            attachment files,
+            attachment IDs,
             or table IDs
         files_type: ``'media'``,
             ``'table'``,
-            ``'attachment'``
         db_root: database root
         deps: dependency object
         cached_versions: object containing information
@@ -265,13 +336,13 @@ def _get_files_from_cache(
                         file,
                         audformat.define.TableStorageFormat.PICKLE,
                     )
-                    _copy_file(file, cache_root, db_root_tmp, db_root)
-                    _copy_file(file_pkl, cache_root, db_root_tmp, db_root)
+                    _copy_path(file, cache_root, db_root_tmp, db_root)
+                    _copy_path(file_pkl, cache_root, db_root_tmp, db_root)
 
             else:
 
                 def job(cache_root: str, file: str):
-                    _copy_file(file, cache_root, db_root_tmp, db_root)
+                    _copy_path(file, cache_root, db_root_tmp, db_root)
 
             audeer.run_tasks(
                 job,
@@ -527,18 +598,17 @@ def _load_attachments(
                 flavor,
                 cache_root,
             )
-        # TODO: look for cached attachments
-        # if cached_versions:
-        #     missing_files = _get_files_from_cache(
-        #         missing_files,
-        #         files_type,
-        #         db_root,
-        #         deps,
-        #         cached_versions,
-        #         flavor,
-        #         num_workers,
-        #         verbose,
-        #     )
+        if cached_versions:
+            missing_attachments = _get_attachments_from_cache(
+                missing_attachments,
+                db_root,
+                db,
+                deps,
+                cached_versions,
+                flavor,
+                num_workers,
+                verbose,
+            )
         if missing_attachments:
             if backend is None:
                 backend = lookup_backend(db.name, version)
