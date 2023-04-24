@@ -26,5 +26,8 @@ def add_audb_with_public_data(doctest_namespace):
         ),
     ]
     doctest_namespace['audb'] = audb
+
     yield
-    audb.config.REPOSITORIES = pytest.REPOSITORIES
+
+    # Remove public repo
+    audb.config.REPOSITORIES.pop()

@@ -19,14 +19,6 @@ pytest.FILE_SYSTEM_HOST = os.path.join(pytest.ROOT, 'repo')
 pytest.ID = audeer.uid()
 pytest.NUM_WORKERS = 5
 pytest.REPOSITORY_NAME = 'data-unittests-local'
-pytest.REPOSITORIES = [
-    audb.Repository(
-        name=pytest.REPOSITORY_NAME,
-        host=pytest.FILE_SYSTEM_HOST,
-        backend=pytest.BACKEND,
-    ),
-]
-pytest.PUBLISH_REPOSITORY = pytest.REPOSITORIES[0]
 pytest.SHARED_CACHE_ROOT = os.path.join(pytest.ROOT, 'shared')
 
 

@@ -345,7 +345,7 @@ def dbs(tmp_path_factory):
     'name',
     ['?', '!', ','],
 )
-def test_invalid_archives(dbs, name):
+def test_invalid_archives(dbs, persistent_repository, name):
 
     archives = {
         'audio/001.wav': name
@@ -354,7 +354,7 @@ def test_invalid_archives(dbs, name):
         audb.publish(
             dbs['1.0.0'],
             '1.0.1',
-            pytest.PUBLISH_REPOSITORY,
+            persistent_repository,
             archives=archives,
             num_workers=pytest.NUM_WORKERS,
             verbose=False,

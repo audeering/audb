@@ -1,5 +1,4 @@
 import os
-import shutil
 
 import pytest
 
@@ -13,16 +12,7 @@ os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
 os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
 
 
-@pytest.fixture(
-    scope='session',
-    autouse=True,
-)
-def fixture_set_repositories():
-    audb.config.REPOSITORIES = pytest.REPOSITORIES
-
-
 DB_NAME = f'test_remove-{pytest.ID}'
-DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_FILES = {
     '1.0.0': [
         'audio/bundle1.wav',
@@ -35,17 +25,13 @@ DB_FILES = {
 }
 
 
-def clear_root(root: str):
-    root = audeer.path(root)
-    if os.path.exists(root):
-        shutil.rmtree(root)
+@pytest.fixture(
+    scope='module',
+    autouse=True,
+)
+def publish_db(tmp_path_factory, persistent_repository):
 
-
-@pytest.fixture
-def publish_db():
-
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    db_root = tmp_path_factory.mktemp('db').as_posix()
 
     # create db
 
@@ -55,16 +41,16 @@ def publish_db():
 
     # publish 1.0.0
 
-    db.save(DB_ROOT)
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
     archives = {
         db.files[0]: 'bundle',
         db.files[1]: 'bundle',
     }
     audb.publish(
-        DB_ROOT,
+        db_root,
         '1.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        persistent_repository,
         archives=archives,
         verbose=False,
     )
@@ -75,19 +61,14 @@ def publish_db():
         audformat.filewise_index(DB_FILES['2.0.0']),
         inplace=True,
     )
-    db.save(DB_ROOT)
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
     audb.publish(
-        DB_ROOT,
+        db_root,
         '2.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        persistent_repository,
         verbose=False,
     )
-
-    yield
-
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
 
 
 @pytest.mark.parametrize(
@@ -98,7 +79,7 @@ def publish_db():
         'flac',
     ]
 )
-def test_remove(publish_db, format):
+def test_remove(format):
 
     for remove in (
             DB_FILES['1.0.0'][0],  # bundle1
@@ -108,7 +89,7 @@ def test_remove(publish_db, format):
     ):
 
         # remove db cache to ensure we always get a fresh copy
-        shutil.rmtree(pytest.CACHE_ROOT)
+        audeer.rmdir(pytest.CACHE_ROOT)
 
         audb.remove_media(DB_NAME, remove)
 

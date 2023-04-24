@@ -65,18 +65,18 @@ def fixture_ensure_lock_file_deleted():
     scope='function',
     autouse=True,
 )
-def fixture_set_repositories(request):
+def fixture_set_repositories(persistent_repository, request):
+    r"""Use the filesystem host and access with custom backends."""
     audb.config.REPOSITORIES = [
         audb.Repository(
-            name=pytest.REPOSITORY_NAME,
-            host=pytest.FILE_SYSTEM_HOST,
+            name=persistent_repository.name,
+            host=persistent_repository.host,
             backend=request.param,
         ),
     ]
 
 
 DB_NAME = f'test_lock-{pytest.ID}'
-DB_ROOT = os.path.join(pytest.ROOT, 'db')
 DB_VERSIONS = ['1.0.0', '2.0.0']
 
 DB_LOCK_PATHS = []
@@ -100,29 +100,22 @@ for version in DB_VERSIONS:
     )
 
 
-def clear_root(root: str):
-    audeer.rmdir(root)
-
-
 @pytest.fixture(
     scope='function',
     autouse=True,
 )
 def fixture_remove_db_from_cache():
     root = audeer.path(pytest.CACHE_ROOT, DB_NAME)
-    clear_root(root)
+    audeer.rmdir(root)
 
 
 @pytest.fixture(
     scope='module',
     autouse=True,
 )
-def fixture_publish_db():
+def fixture_publish_db(tmp_path_factory, persistent_repository):
 
-    audb.config.REPOSITORIES = pytest.REPOSITORIES
-
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    db_root = tmp_path_factory.mktemp('db').as_posix()
 
     # create db
 
@@ -137,24 +130,24 @@ def fixture_publish_db():
     )
     db.attachments['file'] = audformat.Attachment('extra/file.txt')
     db.attachments['folder'] = audformat.Attachment('extra/folder')
-    audeer.mkdir(audeer.path(DB_ROOT, 'extra/folder/sub-folder'))
+    audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
     for file in [
             'extra/file.txt',
             'extra/folder/file1.txt',
             'extra/folder/file2.txt',
             'extra/folder/sub-folder/file3.txt',
     ]:
-        with open(audeer.path(DB_ROOT, file), 'w') as fp:
+        with open(audeer.path(db_root, file), 'w') as fp:
             fp.write('Some text')
-    db.save(DB_ROOT)
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
 
     # publish 1.0.0
 
     audb.publish(
-        DB_ROOT,
+        db_root,
         DB_VERSIONS[0],
-        pytest.PUBLISH_REPOSITORY,
+        persistent_repository,
         verbose=False,
     )
 
@@ -166,19 +159,14 @@ def fixture_publish_db():
         'filewise',
         num_files=0,
     )
-    db.save(DB_ROOT)
+    db.save(db_root)
     audb.publish(
-        DB_ROOT,
+        db_root,
         DB_VERSIONS[1],
-        pytest.PUBLISH_REPOSITORY,
+        persistent_repository,
         previous_version=DB_VERSIONS[0],
         verbose=False,
     )
-
-    yield
-
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
 
 
 def load_deps():

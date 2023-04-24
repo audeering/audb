@@ -6,10 +6,8 @@ import audeer
 
 def test_available(repository):
 
-    # Non existing repo
-    name = 'non-existing-repo'
-    df = audb.available()
-    assert len(df) == 0
+    print(f'{repository=}')
+    print(f'{audb.config.REPOSITORIES=}')
 
     # Broken database in repo
     name = 'non-existing-database'
@@ -19,6 +17,18 @@ def test_available(repository):
         name,
     )
     path = audeer.mkdir(path)
-    audb.available()
+    df = audb.available()
     os.rmdir(path)
+    assert len(df) == 0
+
+    # Non existing repo
+    name = 'non-existing-repo'
+    audb.config.REPOSITORIES = [
+        audb.Repository(
+            name=name,
+            host=repository.host,
+            backend=repository.backend,
+        )
+    ]
+    df = audb.available()
     assert len(df) == 0
