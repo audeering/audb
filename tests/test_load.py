@@ -613,14 +613,6 @@ def test_load_table(version, table):
     assert files == expected_files
 
 
-# In the `test_load_to` test
-# it is important
-# that first all only_metadata=True cases are tested
-# as otherwise some files will exist
-# and the test will fail.
-# To ensure the right order
-# `@pytest.mark.parametrize('only_metadata', ...)`
-# needs to be defined as last entry.
 @pytest.mark.parametrize(
     'version',
     [
