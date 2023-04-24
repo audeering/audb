@@ -32,8 +32,6 @@ def cleanup_coverage_files():
 # for providing the cache to `audb`
 # as the config value is overwritten
 # by the audb config file
-
-
 @pytest.fixture(scope='function', autouse=True)
 def cache(tmp_path):
     cache = tmp_path / 'cache'
@@ -61,8 +59,6 @@ def shared_cache(tmp_path):
 # for each test,
 # the other fixture allows to reuse the same repository
 # across all tests in a module.
-
-
 @pytest.fixture(scope='module', autouse=False)
 def persistent_repository(tmp_path_factory):
     host = tmp_path_factory.mktemp('host').as_posix()
