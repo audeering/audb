@@ -66,6 +66,11 @@ def shared_cache(tmpdir):
 # the other fixture allows to reuse the same repository
 # across all tests in a module.
 #
+@pytest.fixture(scope='package', autouse=True)
+def hide_default_repository():
+    audb.config.REPOSITORIES = []
+
+
 @pytest.fixture(scope='module', autouse=False)
 def persistent_repository(tmpdir_factory):
     host = str(tmpdir_factory.mktemp('host'))
