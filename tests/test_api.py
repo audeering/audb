@@ -6,9 +6,6 @@ import audeer
 
 def test_available(repository):
 
-    print(f'{repository=}')
-    print(f'{audb.config.REPOSITORIES=}')
-
     # Broken database in repo
     name = 'non-existing-database'
     path = os.path.join(
