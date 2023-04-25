@@ -73,7 +73,7 @@ def hide_default_repository():
 
 @pytest.fixture(scope='module', autouse=False)
 def persistent_repository(tmpdir_factory):
-    host = str(tmpdir_factory.mktemp('host'))
+    host = tmpdir_factory.mktemp('host')
     repository = audb.Repository(
         name='data-unittests-local',
         host=host,
