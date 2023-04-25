@@ -67,7 +67,7 @@ def shared_cache(tmpdir):
 # across all tests in a module.
 #
 @pytest.fixture(scope='package', autouse=True)
-def hide_default_repository():
+def hide_default_repositories():
     audb.config.REPOSITORIES = []
 
 
