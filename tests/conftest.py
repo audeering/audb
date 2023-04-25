@@ -79,15 +79,20 @@ def persistent_repository(tmpdir_factory):
         host=host,
         backend='file-system',
     )
+    current_repositories = audb.config.REPOSITORIES
     audb.config.REPOSITORIES = [repository]
-    return repository
+
+    yield repository
+
+    audb.config.REPOSITORIES = current_repositories
 
 
 @pytest.fixture(scope='function', autouse=False)
-def repository(tmpdir):
+def repository(tmpdir_factory):
+    host = tmpdir_factory.mktemp('host')
     repository = audb.Repository(
         name='data-unittests-local',
-        host=audeer.path(tmpdir, 'host'),
+        host=host,
         backend='file-system',
     )
     current_repositories = audb.config.REPOSITORIES
