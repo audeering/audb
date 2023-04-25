@@ -7,7 +7,6 @@ import audb
 import audeer
 
 
-pytest.ID = audeer.uid()
 pytest.NUM_WORKERS = 5
 
 

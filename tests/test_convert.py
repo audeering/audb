@@ -9,7 +9,7 @@ import audiofile
 import audb
 
 
-DB_NAME = f'test_convert-{pytest.ID}'
+DB_NAME = 'test_convert'
 
 
 @pytest.fixture(

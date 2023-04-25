@@ -11,7 +11,7 @@ import audiofile
 import audb
 
 
-DB_NAME = f'test_info-{pytest.ID}'
+DB_NAME = 'test_info'
 DB_VERSION = '1.0.0'
 
 

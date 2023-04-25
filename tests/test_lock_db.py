@@ -105,7 +105,7 @@ def fixture_set_repositories(persistent_repository, request):
     ]
 
 
-DB_NAME = f'test_lock-{pytest.ID}'
+DB_NAME = 'test_lock'
 DB_VERSIONS = ['1.0.0', '2.0.0']
 
 

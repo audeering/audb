@@ -8,8 +8,8 @@ import audb
 
 
 DB_NAMES = [
-    f'test_cache-{pytest.ID}-0',
-    f'test_cache-{pytest.ID}-1',
+    'test_cache-0',
+    'test_cache-1',
 ]
 
 

@@ -6,7 +6,7 @@ import audformat.testing
 import audb
 
 
-DB_NAME = f'test_filter-{pytest.ID}'
+DB_NAME = 'test_filter'
 
 
 @pytest.fixture(

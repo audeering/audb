@@ -8,7 +8,7 @@ import audeer
 import audb
 
 
-DB_NAME = f'test_remove-{pytest.ID}'
+DB_NAME = 'test_remove'
 DB_FILES = {
     '1.0.0': [
         'audio/bundle1.wav',

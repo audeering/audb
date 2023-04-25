@@ -9,7 +9,7 @@ import audeer
 import audb
 
 
-DB_NAME = f'test_load_on_demand-{pytest.ID}'
+DB_NAME = 'test_load_on_demand'
 DB_VERSION = '1.0.0'
 
 

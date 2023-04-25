@@ -12,7 +12,7 @@ import audeer
 import audb
 
 
-DB_NAME = f'test_load-{pytest.ID}'
+DB_NAME = 'test_load'
 
 
 @pytest.fixture(
