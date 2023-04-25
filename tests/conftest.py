@@ -90,5 +90,9 @@ def repository(tmpdir):
         host=audeer.path(tmpdir, 'host'),
         backend='file-system',
     )
-    audb.config.REPOSITORIES += [repository]
-    return repository
+    current_repositories = audb.config.REPOSITORIES
+    audb.config.REPOSITORIES = [repository]
+
+    yield repository
+
+    audb.config.REPOSITORIES = current_repositories
