@@ -38,7 +38,7 @@ def fixture_ensure_tmp_folder_deleted():
     scope='module',
     autouse=True,
 )
-def dbs(tmp_path_factory, persistent_repository):
+def dbs(tmpdir_factory, persistent_repository):
     r"""Publish different versions of the same database.
 
     Returns:
@@ -94,7 +94,7 @@ def dbs(tmp_path_factory, persistent_repository):
     # publish 1.0.0
 
     version = '1.0.0'
-    db_root = tmp_path_factory.mktemp(version).as_posix()
+    db_root = str(tmpdir_factory.mktemp(version))
     paths[version] = db_root
 
     audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
@@ -117,7 +117,7 @@ def dbs(tmp_path_factory, persistent_repository):
 
     previous_db_root = db_root
     version = '1.1.0'
-    db_root = tmp_path_factory.mktemp(version).as_posix()
+    db_root = str(tmpdir_factory.mktemp(version))
     paths[version] = db_root
 
     audformat.testing.add_table(
@@ -147,7 +147,7 @@ def dbs(tmp_path_factory, persistent_repository):
 
     previous_db_root = db_root
     version = '1.1.1'
-    db_root = tmp_path_factory.mktemp(version).as_posix()
+    db_root = str(tmpdir_factory.mktemp(version))
     paths[version] = db_root
 
     db['train'].df['label'][0] = None
@@ -173,7 +173,7 @@ def dbs(tmp_path_factory, persistent_repository):
 
     previous_db_root = db_root
     version = '2.0.0'
-    db_root = tmp_path_factory.mktemp(version).as_posix()
+    db_root = str(tmpdir_factory.mktemp(version))
     paths[version] = db_root
 
     shutil.copytree(
@@ -209,7 +209,7 @@ def dbs(tmp_path_factory, persistent_repository):
 
     previous_db_root = db_root
     version = '3.0.0'
-    db_root = tmp_path_factory.mktemp(version).as_posix()
+    db_root = str(tmpdir_factory.mktemp(version))
     paths[version] = db_root
 
     shutil.copytree(

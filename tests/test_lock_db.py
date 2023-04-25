@@ -113,9 +113,9 @@ DB_VERSIONS = ['1.0.0', '2.0.0']
     scope='module',
     autouse=True,
 )
-def fixture_publish_db(tmp_path_factory, persistent_repository):
+def fixture_publish_db(tmpdir_factory, persistent_repository):
 
-    db_root = tmp_path_factory.mktemp('db').as_posix()
+    db_root = str(tmpdir_factory.mktemp('db'))
 
     # create db
 

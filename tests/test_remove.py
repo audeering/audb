@@ -25,9 +25,9 @@ DB_FILES = {
     scope='module',
     autouse=True,
 )
-def publish_db(tmp_path_factory, persistent_repository):
+def publish_db(tmpdir_factory, persistent_repository):
 
-    db_root = tmp_path_factory.mktemp('db').as_posix()
+    db_root = str(tmpdir_factory.mktemp('db'))
 
     # create db
 

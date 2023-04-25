@@ -16,7 +16,7 @@ DB_NAME = f'test_convert-{pytest.ID}'
     scope='module',
     autouse=True,
 )
-def db_root(tmp_path_factory, persistent_repository):
+def db_root(tmpdir_factory, persistent_repository):
     r"""Publish single database.
 
     Returns:
@@ -25,7 +25,7 @@ def db_root(tmp_path_factory, persistent_repository):
     """
 
     version = '1.0.0'
-    db_root = tmp_path_factory.mktemp(version).as_posix()
+    db_root = str(tmpdir_factory.mktemp(version))
 
     # define audio files and metadata
 

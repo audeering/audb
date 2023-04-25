@@ -13,11 +13,11 @@ DB_NAME = f'test_filter-{pytest.ID}'
     scope='module',
     autouse=True,
 )
-def db(tmp_path_factory, persistent_repository):
+def db(tmpdir_factory, persistent_repository):
     r"""Publish a single database."""
 
     version = '1.0.0'
-    db_root = tmp_path_factory.mktemp(version).as_posix()
+    db_root = str(tmpdir_factory.mktemp(version))
 
     # create db
 

@@ -19,7 +19,7 @@ DB_VERSION = '1.0.0'
     scope='module',
     autouse=True,
 )
-def db(tmp_path_factory, persistent_repository):
+def db(tmpdir_factory, persistent_repository):
     r"""Publish a single database.
 
     Returns:
@@ -79,7 +79,7 @@ def db(tmp_path_factory, persistent_repository):
 
     # create db + audio files
 
-    db_root = tmp_path_factory.mktemp(DB_VERSION).as_posix()
+    db_root = str(tmpdir_factory.mktemp(DB_VERSION))
     sampling_rate = 8000
     audeer.touch(audeer.path(db_root, db.attachments['attachment'].path))
     for table in list(db.tables):

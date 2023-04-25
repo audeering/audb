@@ -17,7 +17,7 @@ DB_VERSION = '1.0.0'
     scope='module',
     autouse=True,
 )
-def dbs(tmp_path_factory, persistent_repository):
+def dbs(tmpdir_factory, persistent_repository):
 
     # Collect single database paths
     # and return them in the end
@@ -25,7 +25,7 @@ def dbs(tmp_path_factory, persistent_repository):
 
     # publish 1.0.0
 
-    db_root = tmp_path_factory.mktemp(DB_VERSION).as_posix()
+    db_root = str(tmpdir_factory.mktemp(DB_VERSION))
     paths[DB_VERSION] = db_root
 
     db = audformat.testing.create_db(minimal=True)

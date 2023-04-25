@@ -45,19 +45,15 @@ def cleanup_environment_variables():
 # A fresh tmp folder is used for each test.
 #
 @pytest.fixture(scope='function', autouse=True)
-def cache(tmp_path):
-    cache = tmp_path / 'cache'
-    cache.mkdir()
-    cache = str(cache)
+def cache(tmpdir):
+    cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
     audb.config.CACHE_ROOT = cache
     return cache
 
 
 @pytest.fixture(scope='function', autouse=True)
-def shared_cache(tmp_path):
-    cache = tmp_path / 'shared_cache'
-    cache.mkdir()
-    cache = str(cache)
+def shared_cache(tmpdir):
+    cache = audeer.mkdir(audeer.path(tmpdir, 'shared_cache'))
     audb.config.SHARED_CACHE_ROOT = cache
     return cache
 
@@ -72,8 +68,8 @@ def shared_cache(tmp_path):
 # across all tests in a module.
 #
 @pytest.fixture(scope='module', autouse=False)
-def persistent_repository(tmp_path_factory):
-    host = tmp_path_factory.mktemp('host').as_posix()
+def persistent_repository(tmpdir_factory):
+    host = str(tmpdir_factory.mktemp('host'))
     repository = audb.Repository(
         name='data-unittests-local',
         host=host,

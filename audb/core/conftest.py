@@ -6,7 +6,7 @@ import audb
 
 
 @pytest.fixture(scope='package', autouse=True)
-def cache(tmp_path_factory):
+def cache(tmpdir_factory):
     r"""Provide a reuseable cache for docstring tests.
 
     As we rely on emodb from the public repo,
@@ -14,7 +14,7 @@ def cache(tmp_path_factory):
     across all docstring tests.
 
     """
-    cache = tmp_path_factory.mktemp('cache').as_posix()
+    cache = str(tmpdir_factory.mktemp('cache'))
     # We use the environment variable here
     # to ensure audb.config.CACHE_ROOT
     # does still return the default config value
