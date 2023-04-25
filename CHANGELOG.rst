@@ -7,6 +7,30 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.5.0 (2023-04-25)
+--------------------------
+
+* Added: support loading and publishing
+  of database attachments
+  (``audformat.Attachment``)
+* Added: ``audb.load_attachment()``
+  to load only an attachment of a database
+* Added: ``audb.info.attachments()``
+  to return the attachments entry
+  of a database header
+* Added: ``attachments`` argument to ``audb.load()``
+  to filter attachments
+  to be loaded with the database
+* Changed: raise ``RuntimeError`` in ``audb.publish()``
+  if any media file
+  contains uppercase letters
+  in its file extension
+* Changed: use emodb v1.4.1 for documentation examples
+* Fixed: speed up ``audb.load_to()``
+  when loading databases with large tables
+  using ``only_metadata=True``
+
+
 Version 1.4.2 (2023-02-13)
 --------------------------
 
