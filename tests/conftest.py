@@ -10,7 +10,7 @@ import audeer
 pytest.NUM_WORKERS = 5
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='package', autouse=True)
 def cleanup_coverage_files():
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
@@ -20,7 +20,7 @@ def cleanup_coverage_files():
         os.remove(file)
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='package', autouse=True)
 def cleanup_environment_variables():
     env_cache = os.environ.get('AUDB_CACHE_ROOT', None)
     env_shared_cache = os.environ.get('AUDB_SHARED_CACHE_ROOT', None)
