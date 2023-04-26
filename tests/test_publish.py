@@ -680,15 +680,15 @@ def test_publish_changed_db(
 @pytest.mark.parametrize(
     'version, previous_version, error_type, error_msg',
     [
-        # (
-        #     '1.0.0',
-        #     None,
-        #     RuntimeError,
-        #     (
-        #         "A version '1.0.0' already exists for database "
-        #         f"'{DB_NAME}'."
-        #     ),
-        # ),
+        (
+            '1.0.0',
+            None,
+            RuntimeError,
+            (
+                "A version '1.0.0' already exists for database "
+                f"'{DB_NAME}'."
+            ),
+        ),
         (
             '4.0.0',
             None,
