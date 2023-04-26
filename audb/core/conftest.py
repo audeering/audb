@@ -31,7 +31,7 @@ def cache(tmpdir_factory):
 
 
 @pytest.fixture(autouse=True)
-def add_audb_with_public_data(doctest_namespace):
+def public_repository(doctest_namespace):
     r"""Provide access to the public Artifactory repository.
 
     Some tests in the docstrings need access to the emodb database.
