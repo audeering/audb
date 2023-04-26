@@ -767,8 +767,8 @@ def test_publish_error_messages(
         if (
                 previous_version
                 and (
-                    audeer.LooseVersion(previous_version)
-                    < audeer.LooseVersion(version)
+                    audeer.StrictVersion(previous_version)
+                    < audeer.StrictVersion(version)
                 )
         ):
             deps = audb.dependencies(
