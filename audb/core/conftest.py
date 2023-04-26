@@ -14,13 +14,13 @@ def cache(tmpdir_factory):
     across all docstring tests.
 
     """
-    cache = str(tmpdir_factory.mktemp('cache'))
+    cache = tmpdir_factory.mktemp('cache')
     # We use the environment variable here
     # to ensure audb.config.CACHE_ROOT
     # does still return the default config value
     # in the doctest
     env_cache = os.environ.get('AUDB_CACHE_ROOT', None)
-    os.environ['AUDB_CACHE_ROOT'] = cache
+    os.environ['AUDB_CACHE_ROOT'] = str(cache)
 
     yield
 

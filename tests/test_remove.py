@@ -25,9 +25,15 @@ DB_FILES = {
     scope='module',
     autouse=True,
 )
-def publish_db(tmpdir_factory, persistent_repository):
+def dbs(tmpdir_factory, persistent_repository):
+    r"""Publish databases.
 
-    db_root = str(tmpdir_factory.mktemp('db'))
+    This publishes a database with the name ``DB_NAME``
+    and the versions 1.0.0 and 2.0.0
+    to a module wide repository.
+
+    """
+    db_root = tmpdir_factory.mktemp('db')
 
     # create db
 

@@ -25,7 +25,7 @@ def dbs(tmpdir_factory, persistent_repository):
 
     # publish 1.0.0
 
-    db_root = str(tmpdir_factory.mktemp(DB_VERSION))
+    db_root = tmpdir_factory.mktemp(DB_VERSION)
     paths[DB_VERSION] = db_root
 
     db = audformat.testing.create_db(minimal=True)

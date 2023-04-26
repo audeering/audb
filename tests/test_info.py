@@ -79,7 +79,7 @@ def db(tmpdir_factory, persistent_repository):
 
     # create db + audio files
 
-    db_root = str(tmpdir_factory.mktemp(DB_VERSION))
+    db_root = tmpdir_factory.mktemp(DB_VERSION)
     sampling_rate = 8000
     audeer.touch(audeer.path(db_root, db.attachments['attachment'].path))
     for table in list(db.tables):

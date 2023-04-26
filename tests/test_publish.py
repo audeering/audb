@@ -39,7 +39,7 @@ def dbs(tmpdir_factory):
     #
     # Folder without content
     version = '0.1.0'
-    db_root = str(tmpdir_factory.mktemp(version))
+    db_root = tmpdir_factory.mktemp(version)
     paths[version] = db_root
 
     # Version 1.0.0
@@ -63,8 +63,8 @@ def dbs(tmpdir_factory):
     #   - speaker
     #   - misc
     version = '1.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
     db.schemes['scheme'] = audformat.Scheme(
@@ -155,8 +155,8 @@ def dbs(tmpdir_factory):
     #   - speaker
     #   - misc
     version = '2.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
     shutil.copytree(
         audeer.path(paths['1.0.0'], 'extra'),
         audeer.path(db_root, 'extra'),
@@ -171,8 +171,8 @@ def dbs(tmpdir_factory):
     #
     # Folder without content
     version = '2.1.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     # Version 3.0.0
     #
@@ -195,8 +195,8 @@ def dbs(tmpdir_factory):
     #   - speaker
     #   - misc
     version = '3.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
     remove_file = 'audio/001.wav'
     db.drop_files(remove_file)
     del db.attachments['file']
@@ -224,8 +224,8 @@ def dbs(tmpdir_factory):
     #   - speaker
     #   - misc
     version = '4.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
     db.save(db_root)
 
     # Version 5.0.0
@@ -251,8 +251,8 @@ def dbs(tmpdir_factory):
     #   - speaker
     #   - misc
     version = '5.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
     db['files'] = db['files'].extend_index(
         audformat.filewise_index([f'file{n}.wav' for n in range(20)])
     )
@@ -287,8 +287,8 @@ def dbs(tmpdir_factory):
     #   - speaker
     #   - misc
     version = '6.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
     db.schemes['scheme'] = audformat.Scheme(

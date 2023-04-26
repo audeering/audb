@@ -113,15 +113,15 @@ def set_repositories(persistent_repository, request):
     scope='module',
     autouse=True,
 )
-def db(tmpdir_factory, persistent_repository):
-    r"""Publish a database.
+def dbs(tmpdir_factory, persistent_repository):
+    r"""Publish databases.
 
     This publishes a database with the name ``DB_NAME``
     and the versions 1.0.0 and 2.0.0
     to a module wide repository.
 
     """
-    db_root = str(tmpdir_factory.mktemp('db'))
+    db_root = tmpdir_factory.mktemp('db')
 
     # create db
 

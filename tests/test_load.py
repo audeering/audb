@@ -94,8 +94,8 @@ def dbs(tmpdir_factory, persistent_repository):
     # publish 1.0.0
 
     version = '1.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
     audeer.touch(audeer.path(db_root, 'extra/file.txt'))
@@ -117,8 +117,8 @@ def dbs(tmpdir_factory, persistent_repository):
 
     previous_db_root = db_root
     version = '1.1.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     audformat.testing.add_table(
         db, 'train', audformat.define.IndexType.SEGMENTED,
@@ -147,8 +147,8 @@ def dbs(tmpdir_factory, persistent_repository):
 
     previous_db_root = db_root
     version = '1.1.1'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     db['train'].df['label'][0] = None
     shutil.copytree(
@@ -173,8 +173,8 @@ def dbs(tmpdir_factory, persistent_repository):
 
     previous_db_root = db_root
     version = '2.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     shutil.copytree(
         audeer.path(previous_db_root, 'extra'),
@@ -209,8 +209,8 @@ def dbs(tmpdir_factory, persistent_repository):
 
     previous_db_root = db_root
     version = '3.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
-    paths[version] = db_root
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     shutil.copytree(
         audeer.path(previous_db_root, 'extra'),

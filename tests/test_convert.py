@@ -25,7 +25,7 @@ def db_root(tmpdir_factory, persistent_repository):
     """
 
     version = '1.0.0'
-    db_root = str(tmpdir_factory.mktemp(version))
+    db_root = tmpdir_factory.mktemp(version)
 
     # define audio files and metadata
 

@@ -17,12 +17,12 @@ DB_NAMES = [
     scope='module',
     autouse=True,
 )
-def publish_dbs(tmpdir_factory, persistent_repository):
+def dbs(tmpdir_factory, persistent_repository):
 
     # create dbs
 
     for name in DB_NAMES:
-        db_root = str(tmpdir_factory.mktemp(name))
+        db_root = tmpdir_factory.mktemp(name)
         db = audformat.testing.create_db(minimal=True)
         db.name = name
         db['files'] = audformat.Table(audformat.filewise_index(['f1.wav']))
