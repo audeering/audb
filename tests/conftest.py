@@ -92,14 +92,15 @@ def hide_default_caches():
 
     """
     audb.config.CACHE_ROOT = None
-    audb.config.SHARED_CACHE_ROOT = None
+    # Don't clean audb.config.SHARED_CACHE_ROOT
+    # as it is set by shared_cache anyway
 
     env_cache = os.environ.get('AUDB_CACHE_ROOT', None)
     env_shared_cache = os.environ.get('AUDB_SHARED_CACHE_ROOT', None)
     if env_cache is not None:
         del os.environ['AUDB_CACHE_ROOT']
     if env_shared_cache is not None:
-        del os.environ['AUDB_SAHRED_CACHE_ROOT']
+        del os.environ['AUDB_SHARED_CACHE_ROOT']
 
     yield
 

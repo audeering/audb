@@ -20,7 +20,9 @@ def cache(tmpdir_factory):
     # does still return the default config value
     # in the doctest
     env_cache = os.environ.get('AUDB_CACHE_ROOT', None)
+    env_shared_cache = os.environ.get('AUDB_SHARED_CACHE_ROOT', None)
     os.environ['AUDB_CACHE_ROOT'] = str(cache)
+    os.environ['AUDB_SHARED_CACHE_ROOT'] = str(cache)
 
     yield
 
@@ -28,6 +30,11 @@ def cache(tmpdir_factory):
         del os.environ['AUDB_CACHE_ROOT']
     else:  # pragma: nocover
         os.environ['AUDB_CACHE_ROOT'] = env_cache
+
+    if env_shared_cache is None:
+        del os.environ['AUDB_SHARED_CACHE_ROOT']
+    else:  # pragma: nocover
+        os.environ['AUDB_SHARED_CACHE_ROOT'] = env_shared_cache
 
 
 @pytest.fixture(autouse=True)
