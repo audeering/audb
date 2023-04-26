@@ -574,7 +574,7 @@ def publish(
         RuntimeError: if database contains tables,
             misc tables, or attachemnts
             that are stored under an ID
-            using a char not in ``'[A-Za-z0-9._-]+'``
+            using a char not in ``'[A-Za-z0-9._-]'``
         ValueError: if ``previous_version`` >= ``version``
 
     """
