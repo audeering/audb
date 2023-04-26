@@ -1,5 +1,4 @@
 import os
-import shutil
 
 import pandas as pd
 import pytest
@@ -10,39 +9,24 @@ import audeer
 import audb
 
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-
-
-@pytest.fixture(
-    scope='session',
-    autouse=True,
-)
-def fixture_set_repositories():
-    audb.config.REPOSITORIES = pytest.REPOSITORIES
-
-
-DB_NAME = f'test_load_on_demand-{pytest.ID}'
-DB_ROOT = os.path.join(pytest.ROOT, 'db')
+DB_NAME = 'test_load_on_demand'
 DB_VERSION = '1.0.0'
-
-
-def clear_root(root: str):
-    root = audeer.path(root)
-    if os.path.exists(root):
-        shutil.rmtree(root)
 
 
 @pytest.fixture(
     scope='module',
     autouse=True,
 )
-def fixture_publish_db():
+def dbs(tmpdir_factory, persistent_repository):
 
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    # Collect single database paths
+    # and return them in the end
+    paths = {}
 
-    # create db
+    # publish 1.0.0
+
+    db_root = tmpdir_factory.mktemp(DB_VERSION)
+    paths[DB_VERSION] = db_root
 
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
@@ -77,31 +61,26 @@ def fixture_publish_db():
     )
     db.attachments['file'] = audformat.Attachment('file.txt')
     db.attachments['folder'] = audformat.Attachment('folder/')
-    audeer.mkdir(audeer.path(DB_ROOT, 'folder'))
-    audeer.touch(audeer.path(DB_ROOT, 'file.txt'))
-    audeer.touch(audeer.path(DB_ROOT, 'folder/file1.txt'))
-    audeer.touch(audeer.path(DB_ROOT, 'folder/file2.txt'))
-    db.save(DB_ROOT)
+    audeer.mkdir(audeer.path(db_root, 'folder'))
+    audeer.touch(audeer.path(db_root, 'file.txt'))
+    audeer.touch(audeer.path(db_root, 'folder/file1.txt'))
+    audeer.touch(audeer.path(db_root, 'folder/file2.txt'))
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
 
-    # publish 1.0.0
-
     audb.publish(
-        DB_ROOT,
+        db_root,
         DB_VERSION,
-        pytest.PUBLISH_REPOSITORY,
+        persistent_repository,
         verbose=False,
     )
 
-    yield
-
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    return paths
 
 
-def test_load_only_metadata():
+def test_load_only_metadata(dbs):
 
-    db_original = audformat.Database.load(DB_ROOT)
+    db_original = audformat.Database.load(dbs[DB_VERSION])
 
     db = audb.load(
         DB_NAME,

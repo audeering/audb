@@ -1,45 +1,23 @@
-import os
-import shutil
-
 import pandas as pd
 import pytest
 
 import audformat.testing
-import audeer
 
 import audb
 
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-
-
-@pytest.fixture(
-    scope='session',
-    autouse=True,
-)
-def fixture_set_repositories():
-    audb.config.REPOSITORIES = pytest.REPOSITORIES
-
-
-DB_NAME = f'test_filter-{pytest.ID}'
-DB_ROOT = os.path.join(pytest.ROOT, 'db')
-
-
-def clear_root(root: str):
-    root = audeer.path(root)
-    if os.path.exists(root):
-        shutil.rmtree(root)
+DB_NAME = 'test_filter'
 
 
 @pytest.fixture(
     scope='module',
     autouse=True,
 )
-def fixture_publish_db():
+def db(tmpdir_factory, persistent_repository):
+    r"""Publish a single database."""
 
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    version = '1.0.0'
+    db_root = tmpdir_factory.mktemp(version)
 
     # create db
 
@@ -99,7 +77,7 @@ def fixture_publish_db():
         starts=starts,
         ends=ends,
     )
-    db.save(DB_ROOT)
+    db.save(db_root)
     audformat.testing.create_audio_files(db)
 
     # publish db
@@ -112,27 +90,12 @@ def fixture_publish_db():
             }
         )
     audb.publish(
-        DB_ROOT,
-        '1.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        db_root,
+        version,
+        persistent_repository,
         archives=archives,
         verbose=False,
     )
-
-    yield
-
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
-
-
-@pytest.fixture(
-    scope='function',
-    autouse=True,
-)
-def fixture_clear_cache():
-    clear_root(pytest.CACHE_ROOT)
-    yield
-    clear_root(pytest.CACHE_ROOT)
 
 
 @pytest.mark.parametrize(
@@ -272,7 +235,5 @@ def test_tables(tables, format, expected_tables, expected_files):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    print(list(db))
-    print(expected_tables)
     assert list(db) == expected_tables
     assert list(db.files) == expected_files

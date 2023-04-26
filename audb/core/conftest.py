@@ -1,10 +1,44 @@
+import os
+
 import pytest
 
 import audb
 
 
+@pytest.fixture(scope='package', autouse=True)
+def cache(tmpdir_factory):
+    r"""Provide a reuseable cache for docstring tests.
+
+    As we rely on emodb from the public repo,
+    it makes sense to cache it
+    across all docstring tests.
+
+    """
+    cache = tmpdir_factory.mktemp('cache')
+    # We use the environment variable here
+    # to ensure audb.config.CACHE_ROOT
+    # does still return the default config value
+    # in the doctest
+    env_cache = os.environ.get('AUDB_CACHE_ROOT', None)
+    env_shared_cache = os.environ.get('AUDB_SHARED_CACHE_ROOT', None)
+    os.environ['AUDB_CACHE_ROOT'] = str(cache)
+    os.environ['AUDB_SHARED_CACHE_ROOT'] = str(cache)
+
+    yield
+
+    if env_cache is None:
+        del os.environ['AUDB_CACHE_ROOT']
+    else:  # pragma: nocover
+        os.environ['AUDB_CACHE_ROOT'] = env_cache
+
+    if env_shared_cache is None:
+        del os.environ['AUDB_SHARED_CACHE_ROOT']
+    else:  # pragma: nocover
+        os.environ['AUDB_SHARED_CACHE_ROOT'] = env_shared_cache
+
+
 @pytest.fixture(autouse=True)
-def add_audb_with_public_data(doctest_namespace):
+def public_repository(doctest_namespace):
     r"""Provide access to the public Artifactory repository.
 
     Some tests in the docstrings need access to the emodb database.
@@ -26,5 +60,8 @@ def add_audb_with_public_data(doctest_namespace):
         ),
     ]
     doctest_namespace['audb'] = audb
+
     yield
-    audb.config.REPOSITORIES = pytest.REPOSITORIES
+
+    # Remove public repo
+    audb.config.REPOSITORIES.pop()

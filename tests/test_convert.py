@@ -1,6 +1,4 @@
 import os
-import shutil
-
 import numpy as np
 import pytest
 
@@ -11,111 +9,88 @@ import audiofile
 import audb
 
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-
-
-@pytest.fixture(
-    scope='session',
-    autouse=True,
-)
-def fixture_set_repositories():
-    audb.config.REPOSITORIES = pytest.REPOSITORIES
-
-
-DB_NAME = f'test_convert-{pytest.ID}'
-DB_ROOT = os.path.join(pytest.ROOT, 'db')
-
-DB_FILES = {
-    'audio/file1.wav': {
-        'bit_depth': 16,
-        'channels': 1,
-        'format': 'wav',
-        'sampling_rate': 8000,
-    },
-    'audio/file2.wav': {
-        'bit_depth': 24,
-        'channels': 2,
-        'format': 'wav',
-        'sampling_rate': 16000,
-    },
-    'audio/file3.flac': {
-        'bit_depth': 8,
-        'channels': 3,
-        'format': 'flac',
-        'sampling_rate': 44100,
-    },
-}
-
-
-def clear_root(root: str):
-    root = audeer.path(root)
-    if os.path.exists(root):
-        shutil.rmtree(root)
+DB_NAME = 'test_convert'
 
 
 @pytest.fixture(
     scope='module',
     autouse=True,
 )
-def fixture_publish_db():
+def db_root(tmpdir_factory, persistent_repository):
+    r"""Publish single database.
 
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    Returns:
+        path to original database root
+
+    """
+
+    version = '1.0.0'
+    db_root = tmpdir_factory.mktemp(version)
+
+    # define audio files and metadata
+
+    db_files = {
+        'audio/file1.wav': {
+            'bit_depth': 16,
+            'channels': 1,
+            'format': 'wav',
+            'sampling_rate': 8000,
+        },
+        'audio/file2.wav': {
+            'bit_depth': 24,
+            'channels': 2,
+            'format': 'wav',
+            'sampling_rate': 16000,
+        },
+        'audio/file3.flac': {
+            'bit_depth': 8,
+            'channels': 3,
+            'format': 'flac',
+            'sampling_rate': 44100,
+        },
+    }
 
     # create db
 
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
-    db['files'] = audformat.Table(audformat.filewise_index(list(DB_FILES)))
+
+    db['files'] = audformat.Table(audformat.filewise_index(list(db_files)))
     db['files']['original'] = audformat.Column()
-    db['files']['original'].set(list(DB_FILES))
-    for file in DB_FILES:
+    db['files']['original'].set(list(db_files))
+    for file in db_files:
         signal = np.zeros(
             (
-                DB_FILES[file]['channels'],
-                DB_FILES[file]['sampling_rate'],
+                db_files[file]['channels'],
+                db_files[file]['sampling_rate'],
             ),
             dtype=np.float32,
         )
-        path = os.path.join(DB_ROOT, file)
+        path = os.path.join(db_root, file)
         audeer.mkdir(os.path.dirname(path))
         audiofile.write(
-            path, signal, DB_FILES[file]['sampling_rate'],
-            bit_depth=DB_FILES[file]['bit_depth']
+            path, signal, db_files[file]['sampling_rate'],
+            bit_depth=db_files[file]['bit_depth']
         )
     db['segments'] = audformat.Table(
         audformat.segmented_index(
-            [list(DB_FILES)[0]] * 3,
+            [list(db_files)[0]] * 3,
             starts=['0s', '1s', '2s'],
             ends=['1s', '2s', '3s'],
         )
     )
-    db.save(DB_ROOT)
+    db.save(db_root)
 
     # publish db
 
     audb.publish(
-        DB_ROOT,
-        '1.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        db_root,
+        version,
+        persistent_repository,
         verbose=False,
     )
 
-    yield
-
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
-
-
-@pytest.fixture(
-    scope='function',
-    autouse=True,
-)
-def fixture_clear_cache():
-    clear_root(pytest.CACHE_ROOT)
-    yield
-    clear_root(pytest.CACHE_ROOT)
+    return db_root
 
 
 @pytest.mark.parametrize(
@@ -124,7 +99,7 @@ def fixture_clear_cache():
         None, 16,
     ],
 )
-def test_bit_depth(bit_depth):
+def test_bit_depth(db_root, bit_depth):
 
     db = audb.load(
         DB_NAME,
@@ -141,7 +116,7 @@ def test_bit_depth(bit_depth):
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
-        original_file = os.path.join(DB_ROOT, original_file)
+        original_file = os.path.join(db_root, original_file)
 
         if bit_depth is None:
             assert audiofile.bit_depth(converted_file) == \
@@ -156,7 +131,7 @@ def test_bit_depth(bit_depth):
         None, 1, [0, -1], range(5),
     ],
 )
-def test_channels(channels):
+def test_channels(db_root, channels):
 
     db = audb.load(
         DB_NAME,
@@ -172,7 +147,7 @@ def test_channels(channels):
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
-        original_file = os.path.join(DB_ROOT, original_file)
+        original_file = os.path.join(db_root, original_file)
 
         if channels is None:
             assert audiofile.channels(converted_file) == \
@@ -193,7 +168,7 @@ def test_channels(channels):
         audb.core.define.Format.FLAC,
     ],
 )
-def test_format(format):
+def test_format(db_root, format):
 
     db = audb.load(
         DB_NAME,
@@ -210,7 +185,7 @@ def test_format(format):
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
-        original_file = os.path.join(DB_ROOT, original_file)
+        original_file = os.path.join(db_root, original_file)
 
         if format is None:
             assert converted_file[-4:] == original_file[-4:]
@@ -224,7 +199,7 @@ def test_format(format):
         False, True
     ],
 )
-def test_mixdown(mixdown):
+def test_mixdown(db_root, mixdown):
 
     db = audb.load(
         DB_NAME,
@@ -241,7 +216,7 @@ def test_mixdown(mixdown):
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
-        original_file = os.path.join(DB_ROOT, original_file)
+        original_file = os.path.join(db_root, original_file)
 
         if mixdown:
             assert audiofile.channels(converted_file) == 1
@@ -256,7 +231,7 @@ def test_mixdown(mixdown):
         None, 16000
     ],
 )
-def test_sampling_rate(sampling_rate):
+def test_sampling_rate(db_root, sampling_rate):
 
     db = audb.load(
         DB_NAME,
@@ -273,7 +248,7 @@ def test_sampling_rate(sampling_rate):
     for converted_file, original_file in zip(db.files, original_files):
 
         converted_file = os.path.join(db.meta['audb']['root'], converted_file)
-        original_file = os.path.join(DB_ROOT, original_file)
+        original_file = os.path.join(db_root, original_file)
 
         if sampling_rate is None:
             assert audiofile.sampling_rate(converted_file) == \
@@ -282,7 +257,7 @@ def test_sampling_rate(sampling_rate):
             assert audiofile.sampling_rate(converted_file) == sampling_rate
 
 
-def test_mixed_cache():
+def test_mixed_cache(cache, shared_cache):
     # Avoid failing searching for other versions
     # if databases a stored accross private and shared cache
     # and the private one is empty, see
@@ -297,12 +272,11 @@ def test_mixed_cache():
         verbose=False,
         only_metadata=True,
         tables='files',
-        cache_root=pytest.SHARED_CACHE_ROOT,
+        cache_root=shared_cache,
     )
     # Now try to load same version to private cache
     # to force audb.cached() to return empty dataframe
-    clear_root(pytest.CACHE_ROOT)
-    audeer.mkdir(pytest.CACHE_ROOT)
+    audeer.rmdir(cache)
     audb.load(
         DB_NAME,
         sampling_rate=8000,

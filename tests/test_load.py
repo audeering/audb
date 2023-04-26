@@ -12,35 +12,14 @@ import audeer
 import audb
 
 
-os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
-os.environ['AUDB_SHARED_CACHE_ROOT'] = pytest.SHARED_CACHE_ROOT
-
-
-@pytest.fixture(
-    scope='session',
-    autouse=True,
-)
-def fixture_set_repositories():
-    audb.config.REPOSITORIES = pytest.REPOSITORIES
-
-
-DB_NAME = f'test_load-{pytest.ID}'
-DB_ROOT = os.path.join(pytest.ROOT, 'db')
-DB_ROOT_VERSION = {
-    version: os.path.join(DB_ROOT, version) for version in
-    ['1.0.0', '1.1.0', '1.1.1', '2.0.0', '3.0.0']
-}
-
-
-def clear_root(root: str):
-    audeer.rmdir(root)
+DB_NAME = 'test_load'
 
 
 @pytest.fixture(
     scope='function',
     autouse=True,
 )
-def fixture_ensure_tmp_folder_deleted():
+def assert_database_tmp_folder_is_deleted():
     """Fixture to test that the ~ tmp folder gets deleted.
 
     audb.load() first loads files to a folder
@@ -51,7 +30,7 @@ def fixture_ensure_tmp_folder_deleted():
     """
     yield
 
-    dirs = audeer.list_dir_names(pytest.CACHE_ROOT, recursive=True)
+    dirs = audeer.list_dir_names(audb.default_cache_root(), recursive=True)
     assert len([d for d in dirs if d.endswith('~')]) == 0
 
 
@@ -59,10 +38,17 @@ def fixture_ensure_tmp_folder_deleted():
     scope='module',
     autouse=True,
 )
-def fixture_publish_db():
+def dbs(tmpdir_factory, persistent_repository):
+    r"""Publish different versions of the same database.
 
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    Returns:
+        dictionary containing root folder for each version
+
+    """
+
+    # Collect single database paths
+    # and return them in the end
+    paths = {}
 
     # create db
 
@@ -107,7 +93,9 @@ def fixture_publish_db():
 
     # publish 1.0.0
 
-    db_root = DB_ROOT_VERSION['1.0.0']
+    version = '1.0.0'
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
     audeer.touch(audeer.path(db_root, 'extra/file.txt'))
@@ -119,16 +107,18 @@ def fixture_publish_db():
     archives = db['files']['speaker'].get().dropna().to_dict()
     audb.publish(
         db_root,
-        '1.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         archives=archives,
         verbose=False,
     )
 
     # publish 1.1.0, add table, remove attachment file
 
-    db_root = DB_ROOT_VERSION['1.1.0']
-    previous_db_root = DB_ROOT_VERSION['1.0.0']
+    previous_db_root = db_root
+    version = '1.1.0'
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     audformat.testing.add_table(
         db, 'train', audformat.define.IndexType.SEGMENTED,
@@ -148,15 +138,17 @@ def fixture_publish_db():
     )
     audb.publish(
         db_root,
-        '1.1.0',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         verbose=False,
     )
 
     # publish 1.1.1, change label
 
-    db_root = DB_ROOT_VERSION['1.1.1']
-    previous_db_root = DB_ROOT_VERSION['1.1.0']
+    previous_db_root = db_root
+    version = '1.1.1'
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     db['train'].df['label'][0] = None
     shutil.copytree(
@@ -172,15 +164,17 @@ def fixture_publish_db():
     )
     audb.publish(
         db_root,
-        '1.1.1',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         verbose=False,
     )
 
     # publish 2.0.0, alter and remove media, remove attachment
 
-    db_root = DB_ROOT_VERSION['2.0.0']
-    previous_db_root = DB_ROOT_VERSION['1.1.1']
+    previous_db_root = db_root
+    version = '2.0.0'
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     shutil.copytree(
         audeer.path(previous_db_root, 'extra'),
@@ -206,15 +200,17 @@ def fixture_publish_db():
     )
     audb.publish(
         db_root,
-        '2.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         verbose=False,
     )
 
     # publish 3.0.0, remove table, alter attachment file
 
-    db_root = DB_ROOT_VERSION['3.0.0']
-    previous_db_root = DB_ROOT_VERSION['2.0.0']
+    previous_db_root = db_root
+    version = '3.0.0'
+    db_root = tmpdir_factory.mktemp(version)
+    paths[version] = str(db_root)
 
     shutil.copytree(
         audeer.path(previous_db_root, 'extra'),
@@ -232,19 +228,16 @@ def fixture_publish_db():
     )
     audb.publish(
         db_root,
-        '3.0.0',
-        pytest.PUBLISH_REPOSITORY,
+        version,
+        persistent_repository,
         verbose=False,
     )
 
-    yield
-
-    clear_root(DB_ROOT)
-    clear_root(pytest.FILE_SYSTEM_HOST)
+    return paths
 
 
-def test_database_cache_folder():
-    cache_root = os.path.join(pytest.CACHE_ROOT, 'cache')
+def test_database_cache_folder(cache):
+    cache_root = os.path.join(cache, 'cache')
     version = '1.0.0'
     db_root = audb.core.load.database_cache_root(
         DB_NAME,
@@ -287,7 +280,7 @@ def test_load_wrong_argument():
         ),
     ]
 )
-def test_load(format, version, only_metadata):
+def test_load(dbs, format, version, only_metadata):
 
     # When loading the first time (only_metadata=True)
     # the database should not exists in cache
@@ -313,7 +306,7 @@ def test_load(format, version, only_metadata):
 
     # Load original database from folder (expected database)
     resolved_version = version or audb.latest_version(DB_NAME)
-    db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
+    db_original = audformat.Database.load(dbs[resolved_version])
     if format is not None:
         db_original.map_files(
             lambda x: audeer.replace_file_extension(x, format)
@@ -413,6 +406,66 @@ def test_load(format, version, only_metadata):
                 assert os.path.exists(audeer.path(db.root, attachment_file))
 
 
+def test_load_from_cache(dbs):
+
+    # Load a database with flavor to cache
+    # and reload afterwards from cache
+    format = 'flac'
+    version = '1.0.0'
+    db = audb.load(
+        DB_NAME,
+        version='1.0.0',
+        format='flac',
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    db_root = db.meta['audb']['root']
+
+    # Load original database from folder (expected database)
+    db_original = audformat.Database.load(dbs[version])
+    db_original.map_files(
+        lambda x: audeer.replace_file_extension(x, format)
+    )
+
+    # Assert database exists in cache
+    assert audb.exists(DB_NAME, version=version, format=format)
+    df = audb.cached()
+    assert df.loc[db_root]['version'] == version
+
+    # Assert media files are identical and exist
+    pd.testing.assert_index_equal(db.files, db_original.files)
+    for file in db.files:
+        assert os.path.exists(os.path.join(db_root, file))
+
+    version = '2.0.0'
+    db = audb.load(
+        DB_NAME,
+        version='2.0.0',
+        format='flac',
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    db_root = db.meta['audb']['root']
+
+    # Load original database from folder (expected database)
+    db_original = audformat.Database.load(dbs[version])
+    db_original.map_files(
+        lambda x: audeer.replace_file_extension(x, format)
+    )
+
+    # Assert database exists in cache
+    assert audb.exists(DB_NAME, version=version, format=format)
+    df = audb.cached()
+    assert df.loc[db_root]['version'] == version
+
+    # Assert media files are identical and exist
+    pd.testing.assert_index_equal(db.files, db_original.files)
+    for file in db.files:
+        assert os.path.exists(os.path.join(db_root, file))
+
+
 @pytest.mark.parametrize(
     'version, attachment_id',
     [
@@ -430,7 +483,7 @@ def test_load(format, version, only_metadata):
         ),
     ]
 )
-def test_load_attachment(version, attachment_id):
+def test_load_attachment(cache, version, attachment_id):
 
     db = audb.load(
         DB_NAME,
@@ -450,7 +503,7 @@ def test_load_attachment(version, attachment_id):
 
     expected_paths = [
         os.path.join(
-            pytest.CACHE_ROOT,
+            cache,
             DB_NAME,
             version,
             os.path.normpath(file),
@@ -463,7 +516,7 @@ def test_load_attachment(version, attachment_id):
     cache_root = audb.core.load.database_cache_root(
         DB_NAME,
         version,
-        pytest.CACHE_ROOT,
+        cache,
         audb.Flavor(),
     )
     shutil.rmtree(cache_root)
@@ -535,7 +588,7 @@ def test_load_attachment_errors(version, attachment_id, error, error_msg):
         ),
     ]
 )
-def test_load_media(version, media, format):
+def test_load_media(cache, version, media, format):
 
     paths = audb.load_media(
         DB_NAME,
@@ -545,7 +598,7 @@ def test_load_media(version, media, format):
         verbose=False,
     )
     expected_paths = [
-        os.path.join(pytest.CACHE_ROOT, p)
+        os.path.join(cache, p)
         for p in paths
     ]
     if format is not None:
@@ -561,7 +614,7 @@ def test_load_media(version, media, format):
     cache_root = audb.core.load.database_cache_root(
         DB_NAME,
         version,
-        pytest.CACHE_ROOT,
+        cache,
         audb.Flavor(format=format),
     )
     shutil.rmtree(cache_root)
@@ -620,14 +673,6 @@ def test_load_table(version, table):
     assert files == expected_files
 
 
-# In the `test_load_to` test
-# it is important
-# that first all only_metadata=True cases are tested
-# as otherwise some files will exist
-# and the test will fail.
-# To ensure the right order
-# `@pytest.mark.parametrize('only_metadata', ...)`
-# needs to be defined as last entry.
 @pytest.mark.parametrize(
     'version',
     [
@@ -644,9 +689,9 @@ def test_load_table(version, table):
     ]
 )
 @pytest.mark.parametrize('only_metadata', [True, False])
-def test_load_to(version, only_metadata):
+def test_load_to(tmpdir, dbs, version, only_metadata):
 
-    db_root = os.path.join(DB_ROOT, 'raw')
+    db_root = audeer.path(tmpdir, 'raw')
 
     db = audb.load_to(
         db_root,
@@ -660,7 +705,90 @@ def test_load_to(version, only_metadata):
 
     # Load original database from folder (expected database)
     resolved_version = version or audb.latest_version(DB_NAME)
-    db_original = audformat.Database.load(DB_ROOT_VERSION[resolved_version])
+    db_original = audformat.Database.load(dbs[resolved_version])
+
+    # Assert media files are identical and do (not) exist
+    pd.testing.assert_index_equal(db.files, db_original.files)
+    for file in db.files:
+        if only_metadata:
+            assert not os.path.exists(os.path.join(db_root, file))
+        else:
+            assert os.path.exists(os.path.join(db_root, file))
+
+    # Assert tables are identical and exist as CSV files
+    for table in db:
+        assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
+        pd.testing.assert_frame_equal(
+            db_original[table].df,
+            db[table].df,
+        )
+
+    # Assert attachments are identical and files exist
+    assert db.attachments == db_original.attachments
+    for attachment in db.attachments:
+        path = audeer.path(db.root, db.attachments[attachment].path)
+        if only_metadata:
+            assert not os.path.exists(path)
+        else:
+            assert os.path.exists(path)
+            for attachment_file in db.attachments[attachment].files:
+                assert os.path.exists(audeer.path(db.root, attachment_file))
+
+
+@pytest.mark.parametrize('only_metadata', [True, False])
+def test_load_to_update(tmpdir, dbs, only_metadata):
+
+    # Use version 1.0.0 as this contains two attachments,
+    # one file and one folder
+    # which is needed to reach full code coverage
+    version = '1.0.0'
+
+    db_root = audeer.path(tmpdir, 'raw')
+
+    db = audb.load_to(
+        db_root,
+        DB_NAME,
+        version=version,
+        only_metadata=only_metadata,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    assert db.root == db_root
+
+    # Remove some files
+    if not only_metadata:
+        media = audeer.path(db_root, db.files[0])
+        os.remove(media)
+    table = audeer.path(db_root, f'db.{list(db)[0]}.csv')
+    os.remove(table)
+
+    # Change some files
+    if not only_metadata:
+        for attachment_id in list(db.attachments):
+            attachment = audeer.path(
+                db_root,
+                db.attachments[attachment_id].path,
+            )
+            if os.path.isdir(attachment):
+                audeer.touch(audeer.path(attachment, 'other-file.txt'))
+            else:
+                with open(attachment, 'a') as fp:
+                    fp.write('next')
+
+    # Load again to force restoring to original state
+    db = audb.load_to(
+        db_root,
+        DB_NAME,
+        version=version,
+        only_metadata=only_metadata,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    assert db.root == db_root
+
+    # Load original database from folder (expected database)
+    resolved_version = version or audb.latest_version(DB_NAME)
+    db_original = audformat.Database.load(dbs[resolved_version])
 
     # Assert media files are identical and do (not) exist
     pd.testing.assert_index_equal(db.files, db_original.files)
@@ -705,6 +833,6 @@ def test_load_to(version, only_metadata):
         )
     ]
 )
-def test_repository(name, version):
+def test_repository(persistent_repository, name, version):
     repository = audb.repository(name, version)
-    assert repository == pytest.PUBLISH_REPOSITORY
+    assert repository == persistent_repository
