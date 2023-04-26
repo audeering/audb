@@ -19,8 +19,6 @@ DB_NAMES = [
 )
 def publish_dbs(tmpdir_factory, persistent_repository):
 
-    db_root = str(tmpdir_factory.mktemp('db'))
-
     # create dbs
 
     for name in DB_NAMES:
