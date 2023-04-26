@@ -42,7 +42,7 @@ def dbs(tmpdir_factory, persistent_repository):
     r"""Publish different versions of the same database.
 
     Returns:
-        dictionary containg root folder for each version
+        dictionary containing root folder for each version
 
     """
 

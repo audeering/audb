@@ -27,7 +27,7 @@ def dbs(tmpdir_factory):
     r"""Store different versions of the same database.
 
     Returns:
-        dictionary containg root folder for each version
+        dictionary containing root folder for each version
 
     """
 
