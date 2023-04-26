@@ -87,7 +87,7 @@ def hide_default_caches():
     ``AUDB_CACHE_ROOT``
     and ``AUDB_SHARED_CACHE_ROOT``.
 
-    To ensure those will not interfer with the tests
+    To ensure those will not interfere with the tests
     we hide them when executing the tests.
 
     """
