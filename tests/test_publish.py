@@ -976,14 +976,12 @@ def test_publish_error_version(tmpdir, repository):
     # Only versions supported by audeer.StrictVersion
     # are allowed
 
-    # Prepare database files
+    # Create simple database
     db_path = audeer.mkdir(audeer.path(tmpdir, 'db'))
     audio_file = audeer.path(db_path, 'f1.wav')
     signal = np.zeros((2, 1000))
     sampling_rate = 8000
     audiofile.write(audio_file, signal, sampling_rate)
-
-    # Database with not allowed table ID
     db = audformat.Database('db')
     index = audformat.filewise_index(os.path.basename(audio_file))
     db['table'] = audformat.Table(index)
@@ -998,8 +996,10 @@ def test_publish_error_version(tmpdir, repository):
     # Publish to check previous_version afterwards
     audb.publish(db_path, '1.0.0', repository)
 
+    # Update database
     db['table']['column'].set(['different-label'])
     db.save(db_path)
+
     error_msg = "invalid version number '1.0.0?'"
     with pytest.raises(ValueError, match=re.escape(error_msg)):
         audb.publish(db_path, '2.0.0', repository, previous_version='1.0.0?')
