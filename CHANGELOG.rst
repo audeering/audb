@@ -7,7 +7,7 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
-Version 1.5.0 (2023-04-25)
+Version 1.5.0 (2023-04-26)
 --------------------------
 
 * Added: support loading and publishing
@@ -26,6 +26,9 @@ Version 1.5.0 (2023-04-25)
   contains uppercase letters
   in its file extension
 * Changed: use emodb v1.4.1 for documentation examples
+* Changed: raise ``RuntimeError`` in ``audb.publish()``
+  if a table ID or attachment ID
+  contains a character not in ``[A-Za-z0-9._-]``
 * Fixed: speed up ``audb.load_to()``
   when loading databases with large tables
   using ``only_metadata=True``
