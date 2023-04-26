@@ -12,6 +12,9 @@ import audformat.testing
 import audb
 
 
+DB_NAME = 'test_lock'
+
+
 class SlowFileSystem(audbackend.FileSystem):
     r"""Emulate a slow file system.
 
@@ -49,7 +52,7 @@ audbackend.register(
 def lock_paths(cache):
     r"""Return list of lock file locations."""
     paths = []
-    for version in DB_VERSIONS:
+    for version in audb.versions(DB_NAME):
         paths.append(
             audeer.path(
                 cache,
@@ -74,7 +77,8 @@ def lock_paths(cache):
     scope='function',
     autouse=True,
 )
-def fixture_ensure_lock_file_deleted():
+def assert_lock_file_is_deleted():
+    r"""Tests if all lock files are deleted."""
     assert not any(
         [
             os.path.exists(path)
@@ -94,8 +98,8 @@ def fixture_ensure_lock_file_deleted():
     scope='function',
     autouse=True,
 )
-def fixture_set_repositories(persistent_repository, request):
-    r"""Use the filesystem host and access with custom backends."""
+def set_repositories(persistent_repository, request):
+    r"""Access module wide repository with custom backends."""
     audb.config.REPOSITORIES = [
         audb.Repository(
             name=persistent_repository.name,
@@ -105,16 +109,18 @@ def fixture_set_repositories(persistent_repository, request):
     ]
 
 
-DB_NAME = 'test_lock'
-DB_VERSIONS = ['1.0.0', '2.0.0']
-
-
 @pytest.fixture(
     scope='module',
     autouse=True,
 )
-def fixture_publish_db(tmpdir_factory, persistent_repository):
+def db(tmpdir_factory, persistent_repository):
+    r"""Publish a database.
 
+    This publishes a database with the name ``DB_NAME``
+    and the versions 1.0.0 and 2.0.0
+    to a module wide repository.
+
+    """
     db_root = str(tmpdir_factory.mktemp('db'))
 
     # create db
@@ -146,7 +152,7 @@ def fixture_publish_db(tmpdir_factory, persistent_repository):
 
     audb.publish(
         db_root,
-        DB_VERSIONS[0],
+        '1.0.0',
         persistent_repository,
         verbose=False,
     )
@@ -162,9 +168,9 @@ def fixture_publish_db(tmpdir_factory, persistent_repository):
     db.save(db_root)
     audb.publish(
         db_root,
-        DB_VERSIONS[1],
+        '2.0.0',
         persistent_repository,
-        previous_version=DB_VERSIONS[0],
+        previous_version='1.0.0',
         verbose=False,
     )
 
@@ -172,12 +178,12 @@ def fixture_publish_db(tmpdir_factory, persistent_repository):
 def load_deps():
     return audb.dependencies(
         DB_NAME,
-        version=DB_VERSIONS[0],
+        version='1.0.0',
     )
 
 
 @pytest.mark.parametrize(
-    'fixture_set_repositories',
+    'set_repositories',
     ['slow-file-system'],
     indirect=True,
 )
@@ -194,8 +200,11 @@ def load_deps():
         10,
     ]
 )
-def test_lock_dependencies(fixture_set_repositories, multiprocessing,
-                           num_workers):
+def test_lock_dependencies(
+        set_repositories,
+        multiprocessing,
+        num_workers,
+):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -216,12 +225,12 @@ def test_lock_dependencies(fixture_set_repositories, multiprocessing,
 def load_header():
     return audb.info.header(
         DB_NAME,
-        version=DB_VERSIONS[0],
+        version='1.0.0',
     )
 
 
 @pytest.mark.parametrize(
-    'fixture_set_repositories',
+    'set_repositories',
     ['slow-file-system'],
     indirect=True,
 )
@@ -238,7 +247,7 @@ def load_header():
         10,
     ]
 )
-def test_lock_header(fixture_set_repositories, multiprocessing, num_workers):
+def test_lock_header(set_repositories, multiprocessing, num_workers):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -259,14 +268,14 @@ def test_lock_header(fixture_set_repositories, multiprocessing, num_workers):
 def load_db(timeout):
     return audb.load(
         DB_NAME,
-        version=DB_VERSIONS[0],
+        version='1.0.0',
         timeout=timeout,
         verbose=False,
     )
 
 
 @pytest.mark.parametrize(
-    'fixture_set_repositories',
+    'set_repositories',
     ['slow-file-system'],
     indirect=True,
 )
@@ -285,8 +294,13 @@ def load_db(timeout):
         (2, 0, 1),
     ]
 )
-def test_lock_load(fixture_set_repositories, multiprocessing, num_workers,
-                   timeout, expected):
+def test_lock_load(
+        set_repositories,
+        multiprocessing,
+        num_workers,
+        timeout,
+        expected,
+):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -311,24 +325,24 @@ def test_lock_load(fixture_set_repositories, multiprocessing, num_workers,
 
 
 @pytest.mark.parametrize(
-    'fixture_set_repositories',
+    'set_repositories',
     ['crash-file-system'],
     indirect=True,
 )
-def test_lock_load_crash(fixture_set_repositories):
+def test_lock_load_crash(set_repositories):
 
     with pytest.raises(RuntimeError):
         load_db(-1)
 
 
 @pytest.mark.parametrize(
-    'fixture_set_repositories',
+    'set_repositories',
     ['file-system'],
     indirect=True,
 )
 def test_lock_load_from_cached_versions(
         persistent_repository,
-        fixture_set_repositories,
+        set_repositories,
 ):
 
     # ensure immediate timeout if cache folder is locked
@@ -338,14 +352,14 @@ def test_lock_load_from_cached_versions(
     # load version 1.0.0
     db_v1 = audb.load(
         DB_NAME,
-        version=DB_VERSIONS[0],
+        version='1.0.0',
         verbose=False,
     )
 
     # load new files added in version 2.0.0
     audb.load(
         DB_NAME,
-        version=DB_VERSIONS[1],
+        version='2.0.0',
         tables='empty',
         verbose=False,
     )
@@ -373,7 +387,7 @@ def test_lock_load_from_cached_versions(
     with pytest.raises(RuntimeError):
         audb.load(
             DB_NAME,
-            version=DB_VERSIONS[1],
+            version='2.0.0',
             tables='table',
             only_metadata=True,
             verbose=False,
@@ -386,7 +400,7 @@ def test_lock_load_from_cached_versions(
     # -> loading missing table from cache succeeds
     audb.load(
         DB_NAME,
-        version=DB_VERSIONS[1],
+        version='2.0.0',
         tables='table',
         only_metadata=True,
         verbose=False,
@@ -401,7 +415,7 @@ def test_lock_load_from_cached_versions(
     with pytest.raises(RuntimeError):
         audb.load(
             DB_NAME,
-            version=DB_VERSIONS[1],
+            version='2.0.0',
             verbose=False,
         )
 
@@ -412,7 +426,7 @@ def test_lock_load_from_cached_versions(
     # -> loading missing media from cache succeeds
     audb.load(
         DB_NAME,
-        version=DB_VERSIONS[1],
+        version='2.0.0',
         verbose=False,
     )
 
@@ -424,13 +438,13 @@ def load_attachment():
     return audb.load_attachment(
         DB_NAME,
         'folder',
-        version=DB_VERSIONS[0],
+        version='1.0.0',
         verbose=False,
     )
 
 
 @pytest.mark.parametrize(
-    'fixture_set_repositories',
+    'set_repositories',
     ['slow-file-system'],
     indirect=True,
 )
@@ -448,7 +462,7 @@ def load_attachment():
     ]
 )
 def test_lock_load_attachment(
-        fixture_set_repositories,
+        set_repositories,
         multiprocessing,
         num_workers,
 ):
@@ -473,14 +487,14 @@ def load_media(timeout):
     return audb.load_media(
         DB_NAME,
         'audio/001.wav',
-        version=DB_VERSIONS[0],
+        version='1.0.0',
         timeout=timeout,
         verbose=False,
     )
 
 
 @pytest.mark.parametrize(
-    'fixture_set_repositories',
+    'set_repositories',
     ['slow-file-system'],
     indirect=True,
 )
@@ -499,8 +513,13 @@ def load_media(timeout):
         (2, 0, 1),
     ]
 )
-def test_lock_load_media(fixture_set_repositories, multiprocessing,
-                         num_workers, timeout, expected):
+def test_lock_load_media(
+        set_repositories,
+        multiprocessing,
+        num_workers,
+        timeout,
+        expected,
+):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
@@ -528,13 +547,13 @@ def load_table():
     return audb.load_table(
         DB_NAME,
         'table',
-        version=DB_VERSIONS[0],
+        version='1.0.0',
         verbose=False,
     )
 
 
 @pytest.mark.parametrize(
-    'fixture_set_repositories',
+    'set_repositories',
     ['slow-file-system'],
     indirect=True,
 )
@@ -551,8 +570,7 @@ def load_table():
         10,
     ]
 )
-def test_lock_load_table(fixture_set_repositories, multiprocessing,
-                         num_workers):
+def test_lock_load_table(set_repositories, multiprocessing, num_workers):
 
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT

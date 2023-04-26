@@ -19,7 +19,7 @@ DB_NAME = 'test_load'
     scope='function',
     autouse=True,
 )
-def fixture_ensure_tmp_folder_deleted():
+def assert_database_tmp_folder_is_deleted():
     """Fixture to test that the ~ tmp folder gets deleted.
 
     audb.load() first loads files to a folder
