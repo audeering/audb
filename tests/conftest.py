@@ -4,7 +4,6 @@ import os
 import pytest
 
 import audb
-import audeer
 
 
 pytest.NUM_WORKERS = 5
@@ -22,7 +21,7 @@ def cleanup_coverage_files():
 
 # ===== CACHE =====
 @pytest.fixture(scope='function', autouse=True)
-def cache(tmpdir):
+def cache(tmpdir_factory):
     r"""Temp folder as cache.
 
     Provide a different temporary folder
@@ -30,22 +29,49 @@ def cache(tmpdir):
     in each test.
 
     """
-    cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
-    audb.config.CACHE_ROOT = cache
-    return cache
+    cache = tmpdir_factory.mktemp('cache')
+    current_cache = audb.config.CACHE_ROOT
+    audb.config.CACHE_ROOT = str(cache)
+
+    yield cache
+
+    audb.config.CACHE_ROOT = current_cache
 
 
-@pytest.fixture(scope='function', autouse=True)
-def shared_cache(tmpdir):
-    r"""Temp folder as shared cache.
+@pytest.fixture(scope='module', autouse=True)
+def persistent_cache(tmpdir_factory):
+    r"""Temp folder as module wide cache.
 
     Provide a different temporary folder
-    as audb shared cache root
-    in each test.
+    as cache across all tests
+    in a test definition file (module).
+
+    This cache will be used automatically
+    in all fixtures
+    that have module as scope
+    and access the cache folder.
 
     """
-    cache = audeer.mkdir(audeer.path(tmpdir, 'shared_cache'))
-    audb.config.SHARED_CACHE_ROOT = cache
+    cache = tmpdir_factory.mktemp('cache')
+    current_cache = audb.config.CACHE_ROOT
+    audb.config.CACHE_ROOT = str(cache)
+
+    yield cache
+
+    audb.config.CACHE_ROOT = current_cache
+
+
+@pytest.fixture(scope='package', autouse=True)
+def shared_cache(tmpdir_factory):
+    r"""Temp folder as shared cache.
+
+    Provide a single temporary folder
+    as audb shared cache root
+    across all tests.
+
+    """
+    cache = tmpdir_factory.mktemp('shared_cache')
+    audb.config.SHARED_CACHE_ROOT = str(cache)
     return cache
 
 
