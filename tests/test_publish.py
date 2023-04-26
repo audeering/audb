@@ -807,13 +807,13 @@ def test_publish_error_allowed_chars(tmpdir, repository):
     # Database with not allowed table ID
     db = audformat.Database('db')
     index = audformat.filewise_index(os.path.basename(audio_file))
-    db['table?'] = audformat.Table(index)
-    db['table?']['column'] = audformat.Column()
-    db['table?']['column'].set(['label'])
+    db['table/'] = audformat.Table(index)
+    db['table/']['column'] = audformat.Column()
+    db['table/']['column'].set(['label'])
     db.save(db_path)
     error_msg = (
         "Table IDs must only contain chars from [A-Za-z0-9._-], "
-        "which is not the case for table 'table?'."
+        "which is not the case for table 'table/'."
     )
     with pytest.raises(RuntimeError, match=re.escape(error_msg)):
         audb.publish(db_path, '1.0.0', repository)
