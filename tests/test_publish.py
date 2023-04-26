@@ -812,13 +812,11 @@ def test_publish_error_allowed_chars(tmpdir, repository):
     db['table?']['column'].set(['label'])
     db.save(db_path)
     error_msg = (
-        "Table IDs must only contain [A-Za-z0-9._-] chars, "
+        "Table IDs must only contain chars from [A-Za-z0-9._-], "
         "which is not the case for table 'table?'."
     )
     with pytest.raises(RuntimeError, match=re.escape(error_msg)):
         audb.publish(db_path, '1.0.0', repository)
-    os.remove(audeer.path(db_path, 'db.table?.csv'))
-    os.remove(audeer.path(db_path, 'db.table?.pkl'))
 
     # Database with not allowed attachment ID
     db = audformat.Database('db')
@@ -831,13 +829,11 @@ def test_publish_error_allowed_chars(tmpdir, repository):
     )
     db.save(db_path)
     error_msg = (
-        "Attachment IDs must only contain [A-Za-z0-9._-] chars, "
+        "Attachment IDs must only contain chars from [A-Za-z0-9._-], "
         "which is not the case for attachment 'attachment?'."
     )
     with pytest.raises(RuntimeError, match=re.escape(error_msg)):
         audb.publish(db_path, '1.0.0', repository)
-    os.remove(audeer.path(db_path, 'db.table.csv'))
-    os.remove(audeer.path(db_path, 'db.table.pkl'))
 
     # Ensure column and scheme IDs are not affected
     db = audformat.Database('db')
@@ -845,7 +841,8 @@ def test_publish_error_allowed_chars(tmpdir, repository):
     db.schemes['scheme?'] = audformat.Scheme('str')
     db['table'] = audformat.Table(index)
     db['table']['column?'] = audformat.Column(scheme_id='scheme?')
-    db['table']['column'].set(['label'])
+    db['table']['column?'].set(['label'])
+    db.save(db_path)
     audb.publish(db_path, '1.0.0', repository)
 
 

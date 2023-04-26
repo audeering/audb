@@ -694,13 +694,15 @@ def publish(
     for table_id in list(db):
         if allowed_chars_compiled.fullmatch(table_id) is None:
             raise RuntimeError(
-                f"Table IDs must only contain {allowed_chars} chars, "
+                "Table IDs must only contain chars from "
+                f"{allowed_chars[:-1]}, "
                 f"which is not the case for table '{table_id}'."
             )
     for attachment_id in list(db.attachments):
         if allowed_chars_compiled.fullmatch(attachment_id) is None:
             raise RuntimeError(
-                f"Attachment IDs must only contain {allowed_chars} chars, "
+                "Attachment IDs must only contain chars from "
+                f"{allowed_chars[:-1]}, "
                 f"which is not the case for attachment '{attachment_id}'."
             )
 
