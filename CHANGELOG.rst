@@ -32,6 +32,8 @@ Version 1.5.0 (2023-04-27)
   if ``version`` or ``previous_version``
   are not conform to ``audeer.StrictVersion``
 * Changed: use emodb v1.4.1 for documentation examples
+* Changed: require ``audbackend<1.0.0``
+  as ``audbackend`` will introduce breaking changes
 * Fixed: speed up ``audb.load_to()``
   when loading databases with large tables
   using ``only_metadata=True``
