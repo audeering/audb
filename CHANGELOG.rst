@@ -14,17 +14,16 @@ Version 1.5.0 (2023-04-27)
   of database attachments
   (``audformat.Attachment``)
 * Added: ``audb.load_attachment()``
-  to load only an attachment of a database
+  to load a single attachment of a database
 * Added: ``audb.info.attachments()``
   to return the attachments entry
   of a database header
 * Added: ``attachments`` argument to ``audb.load()``
-  to filter attachments
-  to be loaded with the database
+  to load only specific
+  attachments of a database
 * Changed: raise ``RuntimeError`` in ``audb.publish()``
-  if any media file
+  if the file extension of a media file
   contains uppercase letters
-  in its file extension
 * Changed: raise ``RuntimeError`` in ``audb.publish()``
   if a table ID or attachment ID
   contains a character not in ``[A-Za-z0-9._-]``
