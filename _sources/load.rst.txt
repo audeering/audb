@@ -56,7 +56,7 @@ even if a new version of the database is published.
 
     db = audb.load(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
         only_metadata=True,
         verbose=False,
     )
@@ -65,7 +65,7 @@ even if a new version of the database is published.
 
     db = audb.load(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
         verbose=False,
     )
 
@@ -154,7 +154,7 @@ inside the :ref:`cache <caching>`.
 
     db = audb.load(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
         format='flac',
         sampling_rate=44100,
         only_metadata=True,
@@ -165,7 +165,7 @@ inside the :ref:`cache <caching>`.
 
     db = audb.load(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
         format='flac',
         sampling_rate=44100,
         verbose=False,
@@ -204,7 +204,7 @@ but all the tables and the header.
 
     db = audb.load(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
         only_metadata=True,
         verbose=False,
     )
@@ -222,7 +222,7 @@ It can list all table definitions.
 
     audb.info.tables(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
     )
 
 Or get the total duration of all media files.
@@ -231,7 +231,7 @@ Or get the total duration of all media files.
 
     audb.info.duration(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
     )
 
 See :mod:`audb.info` for a list of all available options.
@@ -261,7 +261,7 @@ about the speakers (here ``db['files']``):
 
     db = audb.load(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
         tables=['files'],
         only_metadata=True,
         full_path=False,
@@ -301,7 +301,7 @@ only the data of this speaker.
 
     db = audb.load(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
         media=media,
         full_path=False,
         only_metadata=True,
@@ -312,7 +312,7 @@ only the data of this speaker.
 
     db = audb.load(
         'emodb',
-        version='1.3.0',
+        version='1.4.1',
         media=media,
         full_path=False,
         verbose=False,

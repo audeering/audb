@@ -26,6 +26,14 @@ archives
 --------
 .. autoattribute:: Dependencies.archives
     
+attachment\_ids
+---------------
+.. autoattribute:: Dependencies.attachment_ids
+    
+attachments
+-----------
+.. autoattribute:: Dependencies.attachments
+    
 bit\_depth\(\)
 --------------
 .. automethod:: Dependencies.bit_depth

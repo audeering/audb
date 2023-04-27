@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -115,6 +115,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-5-0-2023-04-27">Version 1.5.0 (2023-04-27)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-4-2-2023-02-13">Version 1.4.2 (2023-02-13)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-4-1-2022-10-17">Version 1.4.1 (2022-10-17)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-4-0-2022-08-18">Version 1.4.0 (2022-08-18)</a></li>
@@ -192,6 +193,37 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<div class="section" id="version-1-5-0-2023-04-27">
+<h2>Version 1.5.0 (2023-04-27)<a class="headerlink" href="#version-1-5-0-2023-04-27" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: support loading and publishing
+of database attachments
+(<code class="docutils literal notranslate"><span class="pre">audformat.Attachment</span></code>)</p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.load_attachment()</span></code>
+to load a single attachment of a database</p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.info.attachments()</span></code>
+to return the attachments entry
+of a database header</p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">attachments</span></code> argument to <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code>
+to load only specific
+attachments of a database</p></li>
+<li><p>Changed: raise <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> in <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code>
+if the file extension of a media file
+contains uppercase letters</p></li>
+<li><p>Changed: raise <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> in <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code>
+if a table ID or attachment ID
+contains a character not in <code class="docutils literal notranslate"><span class="pre">[A-Za-z0-9._-]</span></code></p></li>
+<li><p>Changed: raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> in <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code>
+if <code class="docutils literal notranslate"><span class="pre">version</span></code> or <code class="docutils literal notranslate"><span class="pre">previous_version</span></code>
+are not conform to <code class="docutils literal notranslate"><span class="pre">audeer.StrictVersion</span></code></p></li>
+<li><p>Changed: use emodb v1.4.1 for documentation examples</p></li>
+<li><p>Changed: require <code class="docutils literal notranslate"><span class="pre">audbackend&lt;1.0.0</span></code>
+as <code class="docutils literal notranslate"><span class="pre">audbackend</span></code> will introduce breaking changes</p></li>
+<li><p>Fixed: speed up <code class="docutils literal notranslate"><span class="pre">audb.load_to()</span></code>
+when loading databases with large tables
+using <code class="docutils literal notranslate"><span class="pre">only_metadata=True</span></code></p></li>
+</ul>
+</div>
 <div class="section" id="version-1-4-2-2023-02-13">
 <h2>Version 1.4.2 (2023-02-13)<a class="headerlink" href="#version-1-4-2-2023-02-13" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
@@ -566,7 +598,7 @@ in documentation</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/04/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

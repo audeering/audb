@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -121,6 +121,7 @@
 <li class="toctree-l2"><a class="reference internal" href="audb.flavor_path.html">flavor_path()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.latest_version.html">latest_version()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.load.html">load()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load_attachment.html">load_attachment()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.load_media.html">load_media()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.load_table.html">load_table()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.load_to.html">load_to()</a></li>
@@ -207,6 +208,12 @@ to start from scratch and upload all files
 even if an older versions exist.
 In this case you don’t call <a class="reference internal" href="audb.load_to.html#audb.load_to" title="audb.load_to"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load_to()</span></code></a>
 before running <a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a>.</p>
+<p>Handling of audio formats
+is based on the file extension
+in <a class="reference internal" href="audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a>.
+This means the file extension must be lowercase
+and should match the audio format of the file,
+e.g. <code class="docutils literal notranslate"><span class="pre">.wav</span></code>.</p>
 <p>When canceling <a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a>
 during publication
 you can restart it afterwards.
@@ -251,12 +258,26 @@ processors on the machine multiplied by 5</p></li>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if version already exists</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if database tables reference non-existing files</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if database attachment path does not exist,
+    is a symlink,
+    is empty,
+    or contains an empty sub-folder</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if database in <code class="docutils literal notranslate"><span class="pre">db_root</span></code> depends on other version
     as indicated by <code class="docutils literal notranslate"><span class="pre">previous_version</span></code></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if database is not portable,
     see <code class="xref py py-meth docutils literal notranslate"><span class="pre">audformat.Database.is_portable()</span></code></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if non-standard formats like MP3 and MP4 are published,
     but sox and/or mediafile is not installed</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if the type of a database file changes,
+    e.g. from media to attachment</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if a new media file
+    has an uppercase letter in its file extension</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.11)"><strong>RuntimeError</strong></a> – if database contains tables,
+    misc tables, or attachemnts
+    that are stored under an ID
+    using a char not in <code class="docutils literal notranslate"><span class="pre">'[A-Za-z0-9._-]'</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">version</span></code> or <code class="docutils literal notranslate"><span class="pre">previous_version</span></code>
+    cannot be parsed by <a class="reference external" href="https://audeering.github.io/audeer/api/audeer.StrictVersion.html#audeer.StrictVersion" title="(in audeer vv1.19.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audeer.StrictVersion</span></code></a></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">previous_version</span></code> &gt;= <code class="docutils literal notranslate"><span class="pre">version</span></code></p></li>
 </ul>
 </dd>
@@ -288,7 +309,7 @@ processors on the machine multiplied by 5</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/04/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

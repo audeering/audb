@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="../_static/thebelab.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="author()" href="audb.info.author.html" />
+    <link rel="next" title="attachments()" href="audb.info.attachments.html" />
     <link rel="prev" title="versions()" href="audb.versions.html" />
     
       
@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -110,6 +110,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="audb.html">audb</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">audb.info</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="audb.info.attachments.html">attachments()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.info.author.html">author()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.info.bit_depths.html">bit_depths()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.info.channels.html">channels()</a></li>
@@ -196,7 +197,7 @@ provide you direct access to this information.</p>
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.4.1&#39;</span><span class="p">,</span>
     <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
@@ -237,7 +238,7 @@ files:
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.4.1&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -276,70 +277,73 @@ files:
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.author.html#audb.info.author" title="audb.info.author"><code class="xref py py-obj docutils literal notranslate"><span class="pre">author</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.attachments.html#audb.info.attachments" title="audb.info.attachments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">attachments</span></code></a></p></td>
+<td><p>Attachment(s) of database.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.author.html#audb.info.author" title="audb.info.author"><code class="xref py py-obj docutils literal notranslate"><span class="pre">author</span></code></a></p></td>
 <td><p>Author(s) of database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.bit_depths.html#audb.info.bit_depths" title="audb.info.bit_depths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bit_depths</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.bit_depths.html#audb.info.bit_depths" title="audb.info.bit_depths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bit_depths</span></code></a></p></td>
 <td><p>Media bit depth.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.channels.html#audb.info.channels" title="audb.info.channels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channels</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.channels.html#audb.info.channels" title="audb.info.channels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channels</span></code></a></p></td>
 <td><p>Media channels.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.description.html#audb.info.description" title="audb.info.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.description.html#audb.info.description" title="audb.info.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span></code></a></p></td>
 <td><p>Description of database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.duration.html#audb.info.duration" title="audb.info.duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">duration</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.duration.html#audb.info.duration" title="audb.info.duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">duration</span></code></a></p></td>
 <td><p>Total media duration.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.files.html#audb.info.files" title="audb.info.files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">files</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.files.html#audb.info.files" title="audb.info.files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">files</span></code></a></p></td>
 <td><p>Media files included in the database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.formats.html#audb.info.formats" title="audb.info.formats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">formats</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.formats.html#audb.info.formats" title="audb.info.formats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">formats</span></code></a></p></td>
 <td><p>Media formats.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.header.html#audb.info.header" title="audb.info.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.header.html#audb.info.header" title="audb.info.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a></p></td>
 <td><p>Load header of database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.languages.html#audb.info.languages" title="audb.info.languages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">languages</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.languages.html#audb.info.languages" title="audb.info.languages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">languages</span></code></a></p></td>
 <td><p>Languages of database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.license.html#audb.info.license" title="audb.info.license"><code class="xref py py-obj docutils literal notranslate"><span class="pre">license</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.license.html#audb.info.license" title="audb.info.license"><code class="xref py py-obj docutils literal notranslate"><span class="pre">license</span></code></a></p></td>
 <td><p>License of database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.license_url.html#audb.info.license_url" title="audb.info.license_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">license_url</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.license_url.html#audb.info.license_url" title="audb.info.license_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">license_url</span></code></a></p></td>
 <td><p>License URL of database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.media.html#audb.info.media" title="audb.info.media"><code class="xref py py-obj docutils literal notranslate"><span class="pre">media</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.media.html#audb.info.media" title="audb.info.media"><code class="xref py py-obj docutils literal notranslate"><span class="pre">media</span></code></a></p></td>
 <td><p>Audio and video media of database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.meta.html#audb.info.meta" title="audb.info.meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">meta</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.meta.html#audb.info.meta" title="audb.info.meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">meta</span></code></a></p></td>
 <td><p>Meta information of database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.misc_tables.html#audb.info.misc_tables" title="audb.info.misc_tables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">misc_tables</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.misc_tables.html#audb.info.misc_tables" title="audb.info.misc_tables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">misc_tables</span></code></a></p></td>
 <td><p>Miscellaneous tables of database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.organization.html#audb.info.organization" title="audb.info.organization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">organization</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.organization.html#audb.info.organization" title="audb.info.organization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">organization</span></code></a></p></td>
 <td><p>Organization responsible for database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.raters.html#audb.info.raters" title="audb.info.raters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">raters</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.raters.html#audb.info.raters" title="audb.info.raters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">raters</span></code></a></p></td>
 <td><p>Raters contributed to database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.sampling_rates.html#audb.info.sampling_rates" title="audb.info.sampling_rates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sampling_rates</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.sampling_rates.html#audb.info.sampling_rates" title="audb.info.sampling_rates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sampling_rates</span></code></a></p></td>
 <td><p>Media sampling rates.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.schemes.html#audb.info.schemes" title="audb.info.schemes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">schemes</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.schemes.html#audb.info.schemes" title="audb.info.schemes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">schemes</span></code></a></p></td>
 <td><p>Schemes of database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.source.html#audb.info.source" title="audb.info.source"><code class="xref py py-obj docutils literal notranslate"><span class="pre">source</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.source.html#audb.info.source" title="audb.info.source"><code class="xref py py-obj docutils literal notranslate"><span class="pre">source</span></code></a></p></td>
 <td><p>Source of database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.splits.html#audb.info.splits" title="audb.info.splits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">splits</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.splits.html#audb.info.splits" title="audb.info.splits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">splits</span></code></a></p></td>
 <td><p>Splits of database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.tables.html#audb.info.tables" title="audb.info.tables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tables</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.info.tables.html#audb.info.tables" title="audb.info.tables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tables</span></code></a></p></td>
 <td><p>Tables of database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.info.usage.html#audb.info.usage" title="audb.info.usage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">usage</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.info.usage.html#audb.info.usage" title="audb.info.usage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">usage</span></code></a></p></td>
 <td><p>Usage of database.</p></td>
 </tr>
 </tbody>
@@ -354,7 +358,7 @@ files:
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="audb.info.author.html" class="btn btn-neutral float-right" title="author()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="audb.info.attachments.html" class="btn btn-neutral float-right" title="attachments()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="audb.versions.html" class="btn btn-neutral float-left" title="versions()" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -369,7 +373,7 @@ files:
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/04/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

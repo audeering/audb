@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -153,6 +153,7 @@
   <h1>Source code for audb.core.publish</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">typing</span>
@@ -163,6 +164,7 @@
 <span class="kn">import</span> <span class="nn">audiofile</span>
 
 <span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
+<span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="n">dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.repository</span> <span class="kn">import</span> <span class="n">Repository</span>
@@ -221,34 +223,94 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_find_tables</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">_find_attachments</span><span class="p">(</span>
         <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find altered, new or removed tables and update &#39;deps&#39;.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find altered, new or removed attachments and update &#39;deps&#39;.&quot;&quot;&quot;</span>
 
-    <span class="c1"># release dependencies to removed tables</span>
+    <span class="k">for</span> <span class="n">attachment_id</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">attachment_ids</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">attachment_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">deps</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">archive</span> <span class="o">==</span> <span class="n">attachment_id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">deps</span><span class="o">.</span><span class="n">_drop</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
-    <span class="n">db_tables</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s1">.csv&#39;</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">)]</span>
-    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">db_tables</span><span class="p">):</span>
-        <span class="n">deps</span><span class="o">.</span><span class="n">_drop</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="c1"># check attachments are valid</span>
+    <span class="n">db_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s1">.csv&#39;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">tables</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">attachment_id</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">:</span>
 
-    <span class="n">tables</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span>
-            <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">),</span>
-            <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Find tables&#39;</span><span class="p">,</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment_id</span><span class="p">]</span><span class="o">.</span><span class="n">path</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">db_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;An attachment must not &quot;</span>
+                    <span class="s2">&quot;overlap with media or tables. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;But attachment &#39;</span><span class="si">{</span><span class="n">attachment_id</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;contains &#39;</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment_id</span><span class="p">]</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">folders</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">list_dir_names</span><span class="p">(</span>
+                    <span class="n">path</span><span class="p">,</span>
+                    <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">hidden</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">basenames</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">folders</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">folder</span><span class="p">)):</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                            <span class="s2">&quot;An attachment must not &quot;</span>
+                            <span class="s2">&quot;contain empty sub-folders. &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;But attachment &#39;</span><span class="si">{</span><span class="n">attachment_id</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;contains the empty sub-folder &#39;</span><span class="si">{</span><span class="n">folder</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                        <span class="p">)</span>
+
+            <span class="n">files</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment_id</span><span class="p">]</span><span class="o">.</span><span class="n">files</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;An attached folder must &quot;</span>
+                    <span class="s2">&quot;contain at least one file. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;But attachment &#39;</span><span class="si">{</span><span class="n">attachment_id</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                    <span class="s2">&quot;points to an empty folder.&quot;</span>
+                <span class="p">)</span>
+
+    <span class="c1"># add dependencies to new or updated attachments</span>
+    <span class="n">attachment_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">attachment_id</span> <span class="ow">in</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">),</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Find attachments&#39;</span><span class="p">,</span>
             <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s1">.csv&#39;</span>
-        <span class="n">checksum</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deps</span> <span class="ow">or</span> <span class="n">checksum</span> <span class="o">!=</span> <span class="n">deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-            <span class="n">deps</span><span class="o">.</span><span class="n">_add_meta</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">checksum</span><span class="p">)</span>
-            <span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+        <span class="c1"># use one archive per attachment ID</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment_id</span><span class="p">]</span><span class="o">.</span><span class="n">path</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">path</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">:</span>
+                <span class="c1"># Raise FileNotFoundError</span>
+                <span class="c1">#</span>
+                <span class="c1"># Attachment is not in deps,</span>
+                <span class="c1"># but its path does not exist on disk either.</span>
+                <span class="c1"># We call its `files` property</span>
+                <span class="c1"># which raises a FileNotFoundError in this case</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment_id</span><span class="p">]</span><span class="o">.</span><span class="n">files</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">checksum</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+            <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deps</span>
+                    <span class="ow">or</span> <span class="n">checksum</span> <span class="o">!=</span> <span class="n">deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">deps</span><span class="o">.</span><span class="n">_add_attachment</span><span class="p">(</span>
+                    <span class="n">file</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+                    <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+                    <span class="n">archive</span><span class="o">=</span><span class="n">attachment_id</span><span class="p">,</span>
+                    <span class="n">checksum</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">attachment_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attachment_id</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">tables</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">attachment_ids</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_find_media</span><span class="p">(</span>
@@ -280,6 +342,13 @@
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">:</span>
+            <span class="c1"># assert lowercase file extensions</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="n">ext</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;The file extension of a media file must be lowercase, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but &#39;</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&#39; includes at least one uppercase letter.&quot;</span>
+                <span class="p">)</span>
             <span class="n">checksum</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">archives</span><span class="p">:</span>
                 <span class="n">archive</span> <span class="o">=</span> <span class="n">archives</span><span class="p">[</span><span class="n">file</span><span class="p">]</span>
@@ -326,6 +395,36 @@
             <span class="n">media_archives</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">media_archives</span>
+
+
+<span class="k">def</span> <span class="nf">_find_tables</span><span class="p">(</span>
+        <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find altered, new or removed tables and update &#39;deps&#39;.&quot;&quot;&quot;</span>
+
+    <span class="c1"># release dependencies to removed tables</span>
+
+    <span class="n">db_tables</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s1">.csv&#39;</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">db_tables</span><span class="p">):</span>
+        <span class="n">deps</span><span class="o">.</span><span class="n">_drop</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="n">tables</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">),</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Find tables&#39;</span><span class="p">,</span>
+            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+        <span class="n">checksum</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deps</span> <span class="ow">or</span> <span class="n">checksum</span> <span class="o">!=</span> <span class="n">deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+            <span class="n">deps</span><span class="o">.</span><span class="n">_add_meta</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">checksum</span><span class="p">)</span>
+            <span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tables</span>
 
 
 <span class="k">def</span> <span class="nf">_get_root_files</span><span class="p">(</span>
@@ -384,6 +483,33 @@
         <span class="n">sampling_rate</span><span class="p">,</span>
         <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">,</span>
         <span class="n">version</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_put_attachments</span><span class="p">(</span>
+        <span class="n">attachments</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">attachment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span><span class="p">],</span>
+            <span class="n">attachment_id</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment_id</span><span class="p">]</span><span class="o">.</span><span class="n">files</span>
+        <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+
+    <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
+        <span class="n">job</span><span class="p">,</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">attachment_id</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">attachment_id</span> <span class="ow">in</span> <span class="n">attachments</span><span class="p">],</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Put attachments&#39;</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -537,6 +663,13 @@
 <span class="sd">    In this case you don&#39;t call :func:`audb.load_to`</span>
 <span class="sd">    before running :func:`audb.publish`.</span>
 
+<span class="sd">    Handling of audio formats</span>
+<span class="sd">    is based on the file extension</span>
+<span class="sd">    in :mod:`audb`.</span>
+<span class="sd">    This means the file extension must be lowercase</span>
+<span class="sd">    and should match the audio format of the file,</span>
+<span class="sd">    e.g. ``.wav``.</span>
+
 <span class="sd">    When canceling :func:`audb.publish`</span>
 <span class="sd">    during publication</span>
 <span class="sd">    you can restart it afterwards.</span>
@@ -577,21 +710,37 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        RuntimeError: if version already exists</span>
 <span class="sd">        RuntimeError: if database tables reference non-existing files</span>
+<span class="sd">        RuntimeError: if database attachment path does not exist,</span>
+<span class="sd">            is a symlink,</span>
+<span class="sd">            is empty,</span>
+<span class="sd">            or contains an empty sub-folder</span>
 <span class="sd">        RuntimeError: if database in ``db_root`` depends on other version</span>
 <span class="sd">            as indicated by ``previous_version``</span>
 <span class="sd">        RuntimeError: if database is not portable,</span>
 <span class="sd">            see :meth:`audformat.Database.is_portable`</span>
 <span class="sd">        RuntimeError: if non-standard formats like MP3 and MP4 are published,</span>
 <span class="sd">            but sox and/or mediafile is not installed</span>
+<span class="sd">        RuntimeError: if the type of a database file changes,</span>
+<span class="sd">            e.g. from media to attachment</span>
+<span class="sd">        RuntimeError: if a new media file</span>
+<span class="sd">            has an uppercase letter in its file extension</span>
+<span class="sd">        RuntimeError: if database contains tables,</span>
+<span class="sd">            misc tables, or attachemnts</span>
+<span class="sd">            that are stored under an ID</span>
+<span class="sd">            using a char not in ``&#39;[A-Za-z0-9._-]&#39;``</span>
+<span class="sd">        ValueError: if ``version`` or ``previous_version``</span>
+<span class="sd">            cannot be parsed by :class:`audeer.StrictVersion`</span>
 <span class="sd">        ValueError: if ``previous_version`` &gt;= ``version``</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Enforce error if version cannot be converted to audeer.StrictVersion</span>
+    <span class="n">audeer</span><span class="o">.</span><span class="n">StrictVersion</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
             <span class="n">previous_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="ow">and</span> <span class="n">previous_version</span> <span class="o">!=</span> <span class="s1">&#39;latest&#39;</span>
             <span class="ow">and</span> <span class="p">(</span>
-                <span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
-                <span class="o">&lt;=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">LooseVersion</span><span class="p">(</span><span class="n">previous_version</span><span class="p">)</span>
+                <span class="n">audeer</span><span class="o">.</span><span class="n">StrictVersion</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
+                <span class="o">&lt;=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">StrictVersion</span><span class="p">(</span><span class="n">previous_version</span><span class="p">)</span>
             <span class="p">)</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -692,6 +841,28 @@
         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="c1"># ensure table and attachment IDs</span>
+    <span class="c1"># contain only chars allowed by the backend</span>
+    <span class="c1"># as the IDs are included in the filenames of the archives</span>
+    <span class="c1"># uploaded to the backend</span>
+    <span class="n">allowed_chars</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">BACKEND_ALLOWED_CHARS</span>
+    <span class="n">allowed_chars</span> <span class="o">=</span> <span class="n">allowed_chars</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">allowed_chars_compiled</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">allowed_chars</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">table_id</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">allowed_chars_compiled</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">table_id</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Table IDs must only contain chars from &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">allowed_chars</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;which is not the case for table &#39;</span><span class="si">{</span><span class="n">table_id</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">for</span> <span class="n">attachment_id</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">allowed_chars_compiled</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">attachment_id</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Attachment IDs must only contain chars from &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">allowed_chars</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;which is not the case for attachment &#39;</span><span class="si">{</span><span class="n">attachment_id</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="p">)</span>
+
     <span class="c1"># check all tables are conform with audformat</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">db</span><span class="o">.</span><span class="n">is_portable</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -718,6 +889,11 @@
 
     <span class="c1"># check archives</span>
     <span class="n">archives</span> <span class="o">=</span> <span class="n">archives</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="c1"># publish attachments</span>
+    <span class="n">attachments</span> <span class="o">=</span> <span class="n">_find_attachments</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="n">_put_attachments</span><span class="p">(</span><span class="n">attachments</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span>
+                     <span class="n">verbose</span><span class="p">)</span>
 
     <span class="c1"># publish tables</span>
     <span class="n">tables</span> <span class="o">=</span> <span class="n">_find_tables</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
@@ -763,7 +939,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/04/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

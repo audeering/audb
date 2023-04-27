@@ -1,0 +1,6 @@
+﻿load\_attachment\(\)
+====================
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.load_attachment

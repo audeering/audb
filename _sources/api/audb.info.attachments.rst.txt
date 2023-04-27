@@ -1,0 +1,6 @@
+﻿attachments\(\)
+===============
+
+.. currentmodule:: audb.info
+
+.. autofunction:: audb.info.attachments

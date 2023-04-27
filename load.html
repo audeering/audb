@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -181,14 +181,14 @@ even if a new version of the database is published.</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.4.1&#39;</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="api/audb.load.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> will download the data,
 store them in a cache folder,
-and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv0.16.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
+and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv0.16.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
 The most important content of that object
 are the database tables.</p>
 <div class="jupyter_cell jupyter_container docutils container">
@@ -226,7 +226,7 @@ files:
 </div>
 </div>
 <p>They contain the annotations of the database,
-and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
+and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;emotion&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -263,17 +263,17 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
   </thead>
   <tbody>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/03a...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a...</th>
       <td>happiness</td>
       <td>0.90</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/03a...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a...</th>
       <td>neutral</td>
       <td>1.00</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/03a...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a...</th>
       <td>anger</td>
       <td>0.95</td>
     </tr>
@@ -283,17 +283,17 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
       <td>...</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/16b...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b...</th>
       <td>sadness</td>
       <td>0.95</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/16b...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b...</th>
       <td>anger</td>
       <td>1.00</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/16b...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b...</th>
       <td>anger</td>
       <td>1.00</td>
     </tr>
@@ -302,7 +302,7 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
 <p>535 rows × 2 columns</p>
 </div></div></div>
 </div>
-<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
+<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">][</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -337,15 +337,15 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
   </thead>
   <tbody>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/03a...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a...</th>
       <td>0 days 00:00:01.898250</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/03a...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a...</th>
       <td>0 days 00:00:01.611250</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/03a...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a...</th>
       <td>0 days 00:00:01.877812500</td>
     </tr>
     <tr>
@@ -353,15 +353,15 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
       <td>...</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/16b...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b...</th>
       <td>0 days 00:00:03.934187500</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/16b...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b...</th>
       <td>0 days 00:00:02.414125</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b/wav/16b...</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b...</th>
       <td>0 days 00:00:02.522499999</td>
     </tr>
   </tbody>
@@ -421,7 +421,7 @@ inside the <a class="reference internal" href="caching.html#caching"><span class
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.4.1&#39;</span><span class="p">,</span>
     <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;flac&#39;</span><span class="p">,</span>
     <span class="n">sampling_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -482,17 +482,17 @@ inside the <code class="docutils literal notranslate"><span class="pre">db.meta[
   </thead>
   <tbody>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/9c872f39</th>
+      <th>/home/runner/audb/emodb/1.4.1/9c872f39</th>
       <td>emodb</td>
-      <td>1.3.0</td>
+      <td>1.4.1</td>
       <td>False</td>
       <td>flac</td>
       <td>44100</td>
     </tr>
     <tr>
-      <th>/home/runner/audb/emodb/1.3.0/d3b62a9b</th>
+      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b</th>
       <td>emodb</td>
-      <td>1.3.0</td>
+      <td>1.4.1</td>
       <td>False</td>
       <td>None</td>
       <td>None</td>
@@ -515,7 +515,7 @@ but all the tables and the header.</p>
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.4.1&#39;</span><span class="p">,</span>
     <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
@@ -537,7 +537,7 @@ It can list all table definitions.</p>
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.4.1&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -575,7 +575,7 @@ files:
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.4.1&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -606,7 +606,7 @@ about the speakers (here <code class="docutils literal notranslate"><span class=
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.4.1&#39;</span><span class="p">,</span>
     <span class="n">tables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">],</span>
     <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -776,7 +776,7 @@ only the data of this speaker.</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s1">&#39;emodb&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.3.0&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.4.1&#39;</span><span class="p">,</span>
     <span class="n">media</span><span class="o">=</span><span class="n">media</span><span class="p">,</span>
     <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -887,7 +887,7 @@ from the tables.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/02/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/04/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
