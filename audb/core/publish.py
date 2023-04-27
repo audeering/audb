@@ -575,13 +575,17 @@ def publish(
             misc tables, or attachemnts
             that are stored under an ID
             using a char not in ``'[A-Za-z0-9._-]'``
-        ValueError: if ``version`` or ``previous_version``
-            cannot be parsed by :class:`audeer.StrictVersion`
+        ValueError: if ``version`` cannot be parsed
+            by :class:`audeer.StrictVersion`
         ValueError: if ``previous_version`` >= ``version``
 
     """
-    # Enforce error if version cannot be converted to audeer.StrictVersion
-    audeer.StrictVersion(version)
+    # Get a StrictVersion object
+    # and enforce given version is supported by it
+    strict_version = audeer.StrictVersion('1.0')
+    if not strict_version.version_re.match(version):
+        raise ValueError(f"Invalid version number '{version}'.")
+
     if (
             previous_version is not None
             and previous_version != 'latest'
