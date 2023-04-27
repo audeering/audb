@@ -1003,9 +1003,9 @@ def test_publish_error_version(tmpdir, repository):
     # Request `previous_version` with forbidden character.
     # As it is not possible to publish such a database,
     # it will not be able to find it
-    error_msg = "Cannot find version 1.0.0? for database 'db'."
+    error_msg = "Cannot find version 1.0.0/ for database 'db'."
     with pytest.raises(RuntimeError, match=re.escape(error_msg)):
-        audb.publish(db_path, '2.0.0', repository, previous_version='1.0.0?')
+        audb.publish(db_path, '2.0.0', repository, previous_version='1.0.0/')
 
 
 def test_update_database(dbs, persistent_repository):
