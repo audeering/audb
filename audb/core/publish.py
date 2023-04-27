@@ -590,8 +590,8 @@ def publish(
             previous_version is not None
             and previous_version != 'latest'
             and (
-                audeer.StrictVersion(version)
-                <= audeer.StrictVersion(previous_version)
+                audeer.LooseVersion(version)
+                <= audeer.LooseVersion(previous_version)
             )
     ):
         raise ValueError(
