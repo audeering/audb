@@ -7,6 +7,37 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.5.0 (2023-04-27)
+--------------------------
+
+* Added: support loading and publishing
+  of database attachments
+  (``audformat.Attachment``)
+* Added: ``audb.load_attachment()``
+  to load a single attachment of a database
+* Added: ``audb.info.attachments()``
+  to return the attachments entry
+  of a database header
+* Added: ``attachments`` argument to ``audb.load()``
+  to load only specific
+  attachments of a database
+* Changed: raise ``RuntimeError`` in ``audb.publish()``
+  if the file extension of a media file
+  contains uppercase letters
+* Changed: raise ``RuntimeError`` in ``audb.publish()``
+  if a table ID or attachment ID
+  contains a character not in ``[A-Za-z0-9._-]``
+* Changed: raise ``ValueError`` in ``audb.publish()``
+  if ``version`` or ``previous_version``
+  are not conform to ``audeer.StrictVersion``
+* Changed: use emodb v1.4.1 for documentation examples
+* Changed: require ``audbackend<1.0.0``
+  as ``audbackend`` will introduce breaking changes
+* Fixed: speed up ``audb.load_to()``
+  when loading databases with large tables
+  using ``only_metadata=True``
+
+
 Version 1.4.2 (2023-02-13)
 --------------------------
 
