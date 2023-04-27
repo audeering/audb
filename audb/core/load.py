@@ -32,7 +32,7 @@ from audb.core.utils import lookup_backend
 
 
 CachedVersions = typing.Sequence[
-    typing.Tuple[audeer.LooseVersion, str, Dependencies],
+    typing.Tuple[audeer.StrictVersion, str, Dependencies],
 ]
 
 
@@ -66,7 +66,7 @@ def _cached_versions(
             cached_versions.insert(
                 0,
                 (
-                    audeer.LooseVersion(row['version']),
+                    audeer.StrictVersion(row['version']),
                     str(flavor_root),
                     deps,
                 ),
@@ -93,7 +93,7 @@ def _cached_files(
             disable=not verbose,
     ):
         found = False
-        file_version = audeer.LooseVersion(deps.version(file))
+        file_version = audeer.StrictVersion(deps.version(file))
         for cache_version, cache_root, cache_deps in cached_versions:
             if cache_version >= file_version:
                 if file in cache_deps:
