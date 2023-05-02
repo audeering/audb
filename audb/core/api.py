@@ -514,7 +514,7 @@ def remove_media(
                             version,
                         )
 
-                        if os.name == 'nt':
+                        if os.name == 'nt':  # pragma: no cover
                             files_in_archive = [
                                 file.replace(os.path.sep, '/')
                                 for file in files_in_archive
