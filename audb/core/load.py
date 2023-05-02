@@ -463,6 +463,8 @@ def _get_media_from_backend(
             tmp_root=db_root_tmp,
         )
         for file in files:
+            if os.name == 'nt':  # pragma: no cover
+                file = file.replace(os.sep, '/')
             if flavor is not None:
                 bit_depth = deps.bit_depth(file)
                 channels = deps.channels(file)

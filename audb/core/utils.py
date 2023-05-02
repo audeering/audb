@@ -1,4 +1,3 @@
-import hashlib
 import os
 import typing
 import warnings
@@ -29,52 +28,11 @@ def lookup_backend(
     Returns:
         backend
 
-
     Raises:
         RuntimeError: if database is not found
 
     """
     return _lookup(name, version)[1]
-
-
-def md5_read_chunk(
-        fp: typing.IO,
-        chunk_size: int = 8192,
-):
-    while True:
-        data = fp.read(chunk_size)
-        if not data:
-            break
-        yield data
-
-
-def md5(
-        path: str,
-        chunk_size: int = 8192,
-) -> str:
-    r"""Create MD5 checksum of file or folder."""
-    path = audeer.path(path)
-
-    if not os.path.isdir(path):
-        return audbackend.md5(path)
-
-    files = audeer.list_file_names(
-        audeer.path(path),
-        recursive=True,
-        hidden=True,
-        basenames=True,
-    )
-
-    hasher = hashlib.md5()
-    for file in files:
-        # encode file name that renaming of files
-        # produces different checksum
-        hasher.update(file.replace(os.path.sep, '/').encode())
-        with open(audeer.path(path, file), 'rb') as fp:
-            for chunk in md5_read_chunk(fp, chunk_size):
-                hasher.update(chunk)
-
-    return hasher.hexdigest()
 
 
 def mkdir_tree(

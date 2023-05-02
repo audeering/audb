@@ -11,7 +11,6 @@ import audformat
 import audiofile
 
 from audb.core import define
-from audb.core import utils
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
 from audb.core.repository import Repository
@@ -144,7 +143,7 @@ def _find_attachments(
                 # which raises a FileNotFoundError in this case
                 db.attachments[attachment_id].files
         else:
-            checksum = utils.md5(audeer.path(db_root, path))
+            checksum = audeer.md5(audeer.path(db_root, path))
             if (
                     path not in deps
                     or checksum != deps.checksum(path)
@@ -196,7 +195,7 @@ def _find_media(
                     "The file extension of a media file must be lowercase, "
                     f"but '{file}' includes at least one uppercase letter."
                 )
-            checksum = audbackend.md5(path)
+            checksum = audeer.md5(path)
             if file in archives:
                 archive = archives[file]
             else:
@@ -210,7 +209,7 @@ def _find_media(
             )
             add_media.append(values)
         elif not deps.removed(file):
-            checksum = audbackend.md5(path)
+            checksum = audeer.md5(path)
             if checksum != deps.checksum(file):
                 archive = deps.archive(file)
                 values = _media_values(
@@ -266,7 +265,7 @@ def _find_tables(
             disable=not verbose,
     ):
         file = f'db.{table}.csv'
-        checksum = audbackend.md5(os.path.join(db_root, file))
+        checksum = audeer.md5(os.path.join(db_root, file))
         if file not in deps or checksum != deps.checksum(file):
             deps._add_meta(file, version, table, checksum)
             tables.append(table)
@@ -665,7 +664,7 @@ def publish(
                 verbose=verbose,
             )
             previous_deps.save(previous_deps_path)
-            if audbackend.md5(deps_path) != audbackend.md5(previous_deps_path):
+            if audeer.md5(deps_path) != audeer.md5(previous_deps_path):
                 raise RuntimeError(
                     f"You want to depend on '{previous_version}' "
                     f"of {db.name}, "

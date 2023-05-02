@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import audbackend
 import audeer
 import audformat.testing
 import audiofile
@@ -429,7 +428,7 @@ def test_publish(dbs, persistent_repository, version):
 
     # Check checksums of attachment files
     for path in deps.attachments:
-        expected_checksum = audb.core.utils.md5(audeer.path(db.root, path))
+        expected_checksum = audeer.md5(audeer.path(db.root, path))
         assert deps.checksum(path) == expected_checksum
 
     db = audb.load(
@@ -460,7 +459,7 @@ def test_publish(dbs, persistent_repository, version):
         file_path = backend.join(db.name, 'media', name)
         backend.exists(file_path, version)
         path = os.path.join(dbs[version], file)
-        assert deps.checksum(file) == audbackend.md5(path)
+        assert deps.checksum(file) == audeer.md5(path)
         if deps.format(file) in [
             audb.core.define.Format.WAV,
             audb.core.define.Format.FLAC,

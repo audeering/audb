@@ -513,6 +513,13 @@ def remove_media(
                             db_root,
                             version,
                         )
+
+                        if os.name == 'nt':  # pragma: no cover
+                            files_in_archive = [
+                                file.replace(os.path.sep, '/')
+                                for file in files_in_archive
+                            ]
+
                         # skip if file was already deleted
                         if file in files_in_archive:
                             os.remove(os.path.join(db_root, file))
