@@ -327,7 +327,7 @@ def load_to(
         for file in files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
-                checksum = utils.md5(full_file)
+                checksum = audeer.md5(full_file)
                 if checksum != deps.checksum(file):
                     if os.path.isdir(full_file):
                         audeer.rmdir(full_file)
