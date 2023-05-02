@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import audbackend
 import audeer
 import audformat.testing
 import audiofile

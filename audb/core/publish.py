@@ -11,7 +11,6 @@ import audformat
 import audiofile
 
 from audb.core import define
-from audb.core import utils
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
 from audb.core.repository import Repository
