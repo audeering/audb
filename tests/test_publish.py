@@ -1292,7 +1292,7 @@ def test_update_database_without_media(tmpdir, persistent_repository):
         )
 
 
-def test_publish_media_files_order_stability():
+def test_unstability_of_media_files_order_during_publication():
     media_files = {}
     n_iterations = 10
     for i in range(n_iterations):
