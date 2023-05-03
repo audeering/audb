@@ -11,7 +11,9 @@ Version 1.5.1 (2023-05-03)
 --------------------------
 
 * Changed: require ``audeer>=1.20.0``
-* Fixed: a bunch of ``audb`` functions
+* Fixed: ``audb.load()``,
+  ``audb.load_to()``
+  and ``audb.remove_media()``
   were failing with ``audeer==1.20.0``
   under Windows
 
