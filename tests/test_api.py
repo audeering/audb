@@ -82,4 +82,3 @@ def test_media_files_order():
 
     for i in range(n_iterations - 1):
         pd.testing.assert_frame_equal(media_files[i], media_files[i + 1])
-
