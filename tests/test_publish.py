@@ -1293,7 +1293,7 @@ def test_update_database_without_media(tmpdir, persistent_repository):
 
 
 def test_unstability_of_media_files_order_during_publication():
-    media_files = {}
+    files = {}
     n_iterations = 10
     for i in range(n_iterations):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1333,7 +1333,7 @@ def test_unstability_of_media_files_order_during_publication():
 
             deps = audb.dependencies(name, version=version)
 
-            media_files[i] = deps()
+            files[i] = deps.files
 
     for i in range(n_iterations - 1):
-        pd.testing.assert_frame_equal(media_files[i], media_files[i + 1])
+        assert files[i] == files[i + 1]
