@@ -169,7 +169,7 @@ def _find_media(
         archives: typing.Mapping[str, str],
         num_workers: int,
         verbose: bool,
-) -> typing.Set[str]:
+) -> typing.Sequence[str]:
     r"""Find archives with new, altered or removed media and update 'deps'."""
 
     media_archives = set()
@@ -181,8 +181,8 @@ def _find_media(
         media_archives.add(deps.archive(file))
         deps._drop(file)
 
-    # limit to relevant media
-    db_media_in_root = db_media.intersection(db_root_files)
+    # limit to relevant media and impose order
+    db_media_in_root = sorted(db_media.intersection(db_root_files))
 
     # update version of altered media and insert new ones
 
@@ -241,7 +241,8 @@ def _find_media(
         if not deps.removed(file) and deps.version(file) == version:
             media_archives.add(deps.archive(file))
 
-    return media_archives
+    # Impose order of media archives before return
+    return sorted(media_archives)
 
 
 def _find_tables(
@@ -361,7 +362,7 @@ def _put_attachments(
 
 
 def _put_media(
-        media_archives: typing.Set[str],
+        media_archives: typing.Sequence[str],
         db_root: str,
         db_name: str,
         version: str,
