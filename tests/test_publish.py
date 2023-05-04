@@ -424,7 +424,7 @@ def test_publish(dbs, persistent_repository, version):
         number_of_media_files
         - number_of_media_archives
     )
-    # Check if media files are sorted in right order
+    # Check if media files are sorted
     assert deps.media == sorted(deps.media)
     for archive in set(archives.values()):
         assert archive in deps.archives
