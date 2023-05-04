@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.5.1
               </div>
             
           
@@ -616,6 +616,8 @@
             <span class="n">tmp_root</span><span class="o">=</span><span class="n">db_root_tmp</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">flavor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                 <span class="n">channels</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">channels</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
@@ -1819,7 +1821,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/04/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/05/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.5.1
               </div>
             
           
@@ -480,7 +480,7 @@
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
             <span class="n">full_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">full_file</span><span class="p">):</span>
-                <span class="n">checksum</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">full_file</span><span class="p">)</span>
+                <span class="n">checksum</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">full_file</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">checksum</span> <span class="o">!=</span> <span class="n">deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">full_file</span><span class="p">):</span>
                         <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">full_file</span><span class="p">)</span>
@@ -596,7 +596,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/04/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/05/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
