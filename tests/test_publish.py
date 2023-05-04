@@ -1,5 +1,4 @@
 import filecmp
-import tempfile
 import os
 import re
 import shutil
