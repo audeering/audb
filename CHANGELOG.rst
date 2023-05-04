@@ -7,6 +7,18 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.5.1 (2023-05-04)
+--------------------------
+
+* Changed: require ``audeer>=1.20.0``
+* Fixed: ``audb.load()``,
+  ``audb.load_to()``,
+  ``audb.load_media()``,
+  and ``audb.remove_media()``
+  were failing with ``audeer==1.20.0``
+  under Windows
+
+
 Version 1.5.0 (2023-04-27)
 --------------------------
 
