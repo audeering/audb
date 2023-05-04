@@ -231,6 +231,10 @@ def _find_media(
         progress_bar=verbose,
         task_description='Find media',
     )
+    # Add updated and new media to dependencies
+    # and sort them by paths
+    # as they can be returned in random order
+    # by the discovery job
     if update_media:
         update_media = sorted(update_media, key=lambda x: x[0])
         deps._update_media(update_media)
