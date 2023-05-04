@@ -3,9 +3,9 @@ import os
 import re
 import shutil
 
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
 
 import audbackend
 import audeer
