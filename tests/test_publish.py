@@ -4,15 +4,16 @@ import re
 import shutil
 
 import pytest
+import numpy as np
+import pandas as pd
 
 import audbackend
 import audeer
 import audformat.testing
 import audiofile
+
 import audb
 
-import numpy as np
-import pandas as pd
 
 
 DB_NAME = 'test_publish'
