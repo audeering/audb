@@ -15,7 +15,6 @@ import audiofile
 import audb
 
 
-
 DB_NAME = 'test_publish'
 LONG_PATH = '/'.join(['audio'] * 50) + '/new.wav'
 
