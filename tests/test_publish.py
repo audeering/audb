@@ -424,7 +424,7 @@ def test_publish(dbs, persistent_repository, version):
         number_of_media_files
         - number_of_media_archives
     )
-    # Check if media files are sorted
+    # Check if media files are sorted.
     # This does mean that media files are
     # always sorted by alphabetical order
     # but only in this specific test case
