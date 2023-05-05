@@ -235,6 +235,8 @@ def _find_media(
     # and sort them by paths
     # as they can be returned in random order
     # by the discovery job
+    # Sorting enforces determinism in the
+    # generation of the dependencies table
     if update_media:
         update_media = sorted(update_media, key=lambda x: x[0])
         deps._update_media(update_media)
