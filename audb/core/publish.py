@@ -234,7 +234,7 @@ def _find_media(
     # Add updated and new media to dependencies
     # and sort them by paths
     # as they can be returned in random order
-    # by the discovery job
+    # by the discovery job.
     # Sorting enforces determinism in the
     # generation of the dependencies table
     if update_media:
