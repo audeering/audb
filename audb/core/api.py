@@ -52,18 +52,9 @@ def available(
                 repository.host,
                 repository.name,
             )
-            names = set()
-            for path, _ in backend.ls('/'):
-                names.add(path.split('/')[1])
-            names = sorted(list(names))
-        except audbackend.BackendError:
-            # Handle missing repos
-            continue
-        for name in names:
-            try:
-                path = backend.join('/', name, define.HEADER_FILE)
-                versions = backend.versions(path)
-                for version in versions:
+            for path, version in backend.ls('/'):
+                if path.endswith(define.HEADER_FILE):
+                    name = path.split('/')[1]
                     databases.append(
                         [
                             name,
@@ -73,9 +64,8 @@ def available(
                             version,
                         ]
                     )
-            except audbackend.BackendError:
-                # Handle broken databases
-                continue
+        except audbackend.BackendError:
+            continue
 
     df = pd.DataFrame.from_records(
         databases,
