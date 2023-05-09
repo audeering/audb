@@ -46,19 +46,23 @@ def available(
     """  # noqa: E501
     databases = []
     for repository in config.REPOSITORIES:
-        backend = audbackend.create(
-            repository.backend,
-            repository.host,
-            repository.name,
-        )
         try:
-            names = backend.ls('')
-        except FileNotFoundError:
+            backend = audbackend.access(
+                repository.backend,
+                repository.host,
+                repository.name,
+            )
+            names = set()
+            for path, _ in backend.ls('/'):
+                names.add(path.split('/')[1])
+            names = sorted(list(names))
+        except audbackend.BackendError:
             # Handle missing repos
             continue
         for name in names:
             try:
-                versions = backend.ls(f'{name}/{define.DB}')
+                path = backend.join('/', name, define.HEADER_FILE)
+                versions = backend.versions(path)
                 for version in versions:
                     databases.append(
                         [
@@ -69,7 +73,7 @@ def available(
                             version,
                         ]
                     )
-            except FileNotFoundError:
+            except audbackend.BackendError:
                 # Handle broken databases
                 continue
 
@@ -268,7 +272,7 @@ def dependencies(
             # If loading pickled cached file fails, load again from backend
             backend = lookup_backend(name, version)
             with tempfile.TemporaryDirectory() as tmp_root:
-                archive = backend.join(name, define.DB)
+                archive = backend.join('/', name, define.DB + '.zip')
                 backend.get_archive(
                     archive,
                     tmp_root,
@@ -476,7 +480,7 @@ def remove_media(
         with tempfile.TemporaryDirectory() as db_root:
 
             # download dependencies
-            archive = backend.join(name, define.DB)
+            archive = backend.join('/', name, define.DB + '.zip')
             deps_path = backend.get_archive(
                 archive,
                 db_root,
@@ -499,14 +503,12 @@ def remove_media(
                     # if archive exists in this version,
                     # remove file from it and re-publish
                     remote_archive = backend.join(
+                        '/',
                         name,
                         define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-                        archive,
+                        archive + '.zip',
                     )
-                    if backend.exists(
-                            f'{remote_archive}.zip',
-                            version,
-                    ):
+                    if backend.exists(remote_archive, version):
 
                         files_in_archive = backend.get_archive(
                             remote_archive,
@@ -526,9 +528,9 @@ def remove_media(
                             files_in_archive.remove(file)
                             backend.put_archive(
                                 db_root,
-                                files_in_archive,
                                 remote_archive,
                                 version,
+                                files=files_in_archive,
                             )
 
                     # mark file as removed
@@ -538,12 +540,12 @@ def remove_media(
             # upload dependencies
             if upload:
                 deps.save(deps_path)
-                remote_archive = backend.join(name, define.DB)
+                remote_archive = backend.join('/', name, define.DB + '.zip')
                 backend.put_archive(
                     db_root,
-                    define.DEPENDENCIES_FILE,
                     remote_archive,
                     version,
+                    files=define.DEPENDENCIES_FILE,
                     verbose=verbose,
                 )
 
@@ -595,11 +597,11 @@ def versions(
     """
     vs = []
     for repository in config.REPOSITORIES:
-        backend = audbackend.create(
+        backend = audbackend.access(
             repository.backend,
             repository.host,
             repository.name,
         )
-        header = backend.join(name, 'db.yaml')
-        vs.extend(backend.versions(header))
+        header = backend.join('/', name, 'db.yaml')
+        vs.extend(backend.versions(header, suppress_backend_errors=True))
     return audeer.sort_versions(vs)

@@ -351,12 +351,13 @@ def _put_attachments(
 ):
     def job(attachment_id: str):
         archive_file = backend.join(
+            '/',
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            attachment_id,
+            attachment_id + '.zip',
         )
         files = db.attachments[attachment_id].files
-        backend.put_archive(db_root, files, archive_file, version)
+        backend.put_archive(db_root, archive_file, version, files=files)
 
     audeer.run_tasks(
         job,
@@ -396,9 +397,10 @@ def _put_media(
                     update_media.append(file)
 
                 archive_file = backend.join(
+                    '/',
                     db_name,
                     define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-                    archive,
+                    archive + '.zip',
                 )
 
                 if previous_version is not None:
@@ -430,9 +432,9 @@ def _put_media(
 
                 backend.put_archive(
                     db_root,
-                    files,
                     archive_file,
                     version,
+                    files=files,
                 )
 
         update_media = []
@@ -458,11 +460,12 @@ def _put_tables(
     def job(table: str):
         file = f'db.{table}.csv'
         archive_file = backend.join(
+            '/',
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.META],
-            table,
+            table + '.zip',
         )
-        backend.put_archive(db_root, file, archive_file, version)
+        backend.put_archive(db_root, archive_file, version, files=file)
 
     audeer.run_tasks(
         job,
@@ -609,14 +612,22 @@ def publish(
         verbose=verbose,
     )
 
-    backend = audbackend.create(
-        repository.backend,
-        repository.host,
-        repository.name,
-    )
+    # TODO: fix test and remove create()
+    try:
+        backend = audbackend.create(
+            repository.backend,
+            repository.host,
+            repository.name,
+        )
+    except audbackend.BackendError:
+        backend = audbackend.access(
+            repository.backend,
+            repository.host,
+            repository.name,
+        )
 
-    remote_header = backend.join(db.name, define.HEADER_FILE)
-    versions = backend.versions(remote_header)
+    remote_header = backend.join('/', db.name, define.HEADER_FILE)
+    versions = backend.versions(remote_header, suppress_backend_errors=True)
     if version in versions:
         raise RuntimeError(
             'A version '
@@ -762,12 +773,16 @@ def publish(
 
     # publish dependencies and header
     deps.save(deps_path)
-    archive_file = backend.join(db.name, define.DB)
-    backend.put_archive(db_root, define.DEPENDENCIES_FILE, archive_file,
-                        version)
+    archive_file = backend.join('/', db.name, define.DB + '.zip')
+    backend.put_archive(
+        db_root,
+        archive_file,
+        version,
+        files=define.DEPENDENCIES_FILE,
+    )
     try:
         local_header = os.path.join(db_root, define.HEADER_FILE)
-        remote_header = db.name + '/' + define.HEADER_FILE
+        remote_header = backend.join('/', db.name, define.HEADER_FILE)
         backend.put_file(local_header, remote_header, version)
     except Exception:  # pragma: no cover
         # after the header is published

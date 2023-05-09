@@ -58,12 +58,12 @@ def _lookup(
     """
     for repository in config.REPOSITORIES:
 
-        backend = audbackend.create(
+        backend = audbackend.access(
             repository.backend,
             repository.host,
             repository.name,
         )
-        header = backend.join(name, 'db.yaml')
+        header = backend.join('/', name, 'db.yaml')
 
         if backend.exists(header, version):
             return repository, backend

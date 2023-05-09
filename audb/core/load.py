@@ -382,9 +382,10 @@ def _get_attachments_from_backend(
         archive = deps.archive(path)
         version = deps.version(path)
         archive = backend.join(
+            '/',
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            archive,
+            archive + '.zip',
         )
         backend.get_archive(
             archive,
@@ -450,9 +451,10 @@ def _get_media_from_backend(
 
     def job(archive: str, version: str):
         archive = backend.join(
+            '/',
             name,
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-            archive,
+            archive + '.zip',
         )
         # extract and move all files that are stored in the archive,
         # even if only a single file from the archive was requested
@@ -512,9 +514,10 @@ def _get_tables_from_backend(
 
     def job(table: str):
         archive = backend.join(
+            '/',
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.META],
-            deps.archive(table),
+            deps.archive(table) + '.zip',
         )
         backend.get_archive(
             archive,
@@ -1359,7 +1362,7 @@ def load_header_to(
     local_header = os.path.join(db_root, define.HEADER_FILE)
     if overwrite or not os.path.exists(local_header):
         backend = lookup_backend(name, version)
-        remote_header = backend.join(name, define.HEADER_FILE)
+        remote_header = backend.join('/', name, define.HEADER_FILE)
         if add_audb_meta:
             db_root_tmp = database_tmp_root(db_root)
             local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
