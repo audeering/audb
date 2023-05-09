@@ -29,3 +29,16 @@ def test_available(repository):
     ]
     df = audb.available()
     assert len(df) == 0
+
+    # Broken database in repo
+    name = 'non-existing-database'
+    audb.config.REPOSITORIES = pytest.REPOSITORIES
+    path = os.path.join(
+        audb.config.REPOSITORIES[0].host,
+        audb.config.REPOSITORIES[0].name,
+        name,
+    )
+    path = audeer.mkdir(path)
+    audb.available()
+    os.rmdir(path)
+    assert len(df) == 0

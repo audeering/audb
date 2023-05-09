@@ -464,9 +464,9 @@ def test_publish(dbs, persistent_repository, version):
 
     for file in db.files:
         name = archives[file] if file in archives else file
-        file_path = backend.join(db.name, 'media', name)
+        file_path = backend.join('/', db.name, 'media', name)
         backend.exists(file_path, version)
-        path = os.path.join(dbs[version], file)
+        path = os.path.join(DB_ROOT_VERSION[version], file)
         assert deps.checksum(file) == audeer.md5(path)
         if deps.format(file) in [
             audb.core.define.Format.WAV,
