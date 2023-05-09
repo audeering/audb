@@ -59,13 +59,32 @@ def test_empty_shared_cache(shared_cache):
     assert 'name' in df.columns
 
 
-# TODO: reenable after emodb using new backend structure has been published
-# def test_cached_name():
-#     # Here we only have emodb available.
-#     # A test using more published databases
-#     # is executed in test_publish.py
-#     df = audb.cached(name='emodb')
-#     assert len(df) > 0
-#     assert set(df['name']) == set(['emodb'])
-#     df = audb.cached(name='non-existent')
-#     assert len(df) == 0
+def test_cached_name(cache):
+    # Empty cache
+    df = audb.cached()
+    assert len(df) == 0
+    df = audb.cached(name=DB_NAMES[0])
+    assert len(df) == 0
+    # Load first database
+    audb.load(DB_NAMES[0])
+    df = audb.cached()
+    assert len(df) == 1
+    assert set(df['name']) == {DB_NAMES[0]}
+    df = audb.cached(name=DB_NAMES[0])
+    assert len(df) == 1
+    assert set(df['name']) == {DB_NAMES[0]}
+    df = audb.cached(name=DB_NAMES[1])
+    assert len(df) == 0
+    # Load second database
+    audb.load(DB_NAMES[1])
+    df = audb.cached()
+    assert len(df) == 2
+    assert set(df['name']) == set(DB_NAMES)
+    df = audb.cached(name=DB_NAMES[0])
+    assert len(df) == 1
+    assert set(df['name']) == {DB_NAMES[0]}
+    df = audb.cached(name=DB_NAMES[1])
+    assert len(df) == 1
+    assert set(df['name']) == {DB_NAMES[1]}
+    df = audb.cached(name='non-existent')
+    assert len(df) == 0
