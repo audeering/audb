@@ -22,10 +22,31 @@ e.g. if you just want to download the test set.
 
 Have a look at the installation_ and quickstart_ instructions.
 
+
+Citation
+--------
+
+If you want to cite **audb**, you can refer to our paper_:
+
+.. code-block:: bibtex
+
+    @article{wierstorf2023audb,
+      title={audb -- Sharing and Versioning of Audio and Annotation Data in Python},
+      author={Hagen Wierstorf
+        and Johannes Wagner
+        and Florian Eyben
+        and Felix Burkhardt
+        and Bj{\"o}rn W. Schuller},
+      journal={arXiv preprint arXiv:2303.00645},
+      year={2023},
+    }
+
+
 .. _common format: https://audeering.github.io/audformat/
 .. _Artifactory: https://jfrog.com/artifactory/
 .. _installation: https://audeering.github.io/audb/install.html
 .. _quickstart: https://audeering.github.io/audb/quickstart.html
+.. _paper: https://arxiv.org/abs/2303.00645
 
 
 .. badges images and links:
