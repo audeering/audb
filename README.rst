@@ -26,7 +26,7 @@ Have a look at the installation_ and quickstart_ instructions.
 Citation
 --------
 
-If you want to cite **audb**, you can use our paper_:
+If you want to cite **audb**, you can refer to our paper_:
 
 .. code-block:: bibtex
 
