@@ -23,4 +23,4 @@ Alternatively, they can export them as environment variables.
     export ARTIFACTORY_API_KEY="MY_API_KEY"
 
 
-.. _anonymous access: https://jfrog.com/knowledge-base/how-to-grant-an-anonymous-user-access-to-specific-repositories/
+.. _anonymous access: https://jfrog.com/help/r/how-to-grant-an-anonymous-user-access-to-specific-repositories/
