@@ -15,7 +15,6 @@ DB_NAME = 'test_filter'
 )
 def db(tmpdir_factory, persistent_repository):
     r"""Publish a single database."""
-
     version = '1.0.0'
     db_root = tmpdir_factory.mktemp(version)
 

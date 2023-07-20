@@ -60,7 +60,7 @@ If you want to cite **audb**, you can refer to our paper_:
     :target: https://audeering.github.io/audb/
     :alt: audb's documentation
 .. |license| image:: https://img.shields.io/badge/license-MIT-green.svg
-    :target: https://github.com/audeering/audb/blob/master/LICENSE
+    :target: https://github.com/audeering/audb/blob/main/LICENSE
     :alt: audb's MIT license
 .. |python-versions| image:: https://img.shields.io/pypi/pyversions/audb.svg
     :target: https://pypi.org/project/audb/

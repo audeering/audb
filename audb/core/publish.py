@@ -43,7 +43,6 @@ def _check_for_missing_media(
         deps: Dependencies,
 ):
     r"""Check for media that is not in root and not in dependencies."""
-
     db_files = db.files
     deps_files = deps.media
 
@@ -77,7 +76,6 @@ def _find_attachments(
         verbose: bool,
 ) -> typing.List[str]:
     r"""Find altered, new or removed attachments and update 'deps'."""
-
     for attachment_id in deps.attachment_ids:
         if attachment_id not in db.attachments:
             path = deps._df.index[deps._df.archive == attachment_id][0]
@@ -170,7 +168,6 @@ def _find_media(
         verbose: bool,
 ) -> typing.Set[str]:
     r"""Find archives with new, altered or removed media and update 'deps'."""
-
     media_archives = set()
     db_media = set(db.files)
 
@@ -259,7 +256,6 @@ def _find_tables(
         verbose: bool,
 ) -> typing.List[str]:
     r"""Find altered, new or removed tables and update 'deps'."""
-
     # release dependencies to removed tables
 
     db_tables = [f'db.{table}.csv' for table in list(db)]
@@ -285,7 +281,6 @@ def _get_root_files(
         db_root: str,
 ) -> typing.Set[str]:
     r"""Return list of files in root directory."""
-
     db_root_files = audeer.list_file_names(
         db_root,
         basenames=True,
@@ -306,7 +301,6 @@ def _media_values(
         checksum: str,
 ) -> typing.Tuple[str, str, int, int, str, float, str, int, float, int, str]:
     r"""Return values of a media entry in dependencies."""
-
     format = audeer.file_extension(file).lower()
 
     try:
@@ -379,7 +373,6 @@ def _put_media(
         verbose: bool,
 ):
     r"""Upload archives with new, altered or removed media files."""
-
     if media_archives:
 
         # create a mapping from archives to media files
@@ -579,7 +572,7 @@ def publish(
         RuntimeError: if a new media file
             has an uppercase letter in its file extension
         RuntimeError: if database contains tables,
-            misc tables, or attachemnts
+            misc tables, or attachments
             that are stored under an ID
             using a char not in ``'[A-Za-z0-9._-]'``
         ValueError: if ``version`` or ``previous_version``

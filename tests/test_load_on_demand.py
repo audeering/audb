@@ -3,8 +3,8 @@ import os
 import pandas as pd
 import pytest
 
-import audformat.testing
 import audeer
+import audformat.testing
 
 import audb
 

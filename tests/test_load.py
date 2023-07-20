@@ -4,10 +4,9 @@ import shutil
 import pandas as pd
 import pytest
 
-import audiofile
-
-import audformat.testing
 import audeer
+import audformat.testing
+import audiofile
 
 import audb
 
@@ -45,7 +44,6 @@ def dbs(tmpdir_factory, persistent_repository):
         dictionary containing root folder for each version
 
     """
-
     # Collect single database paths
     # and return them in the end
     paths = {}

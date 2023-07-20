@@ -9,19 +9,15 @@ import audeer
 import audformat
 
 from audb.core import define
-from audb.core.cache import (
-    database_cache_root,
-    default_cache_root,
-)
+from audb.core.cache import database_cache_root
+from audb.core.cache import default_cache_root
 from audb.core.config import config
 from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
 from audb.core.repository import Repository
-from audb.core.utils import (
-    lookup_backend,
-    _lookup,
-)
+from audb.core.utils import _lookup
+from audb.core.utils import lookup_backend
 
 
 def available(

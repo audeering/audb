@@ -1,7 +1,8 @@
 import pytest
 
-import audb
 import audeer
+
+import audb
 
 
 def test_config_file(tmpdir):

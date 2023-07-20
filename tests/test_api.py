@@ -1,7 +1,8 @@
 import os
 
-import audb
 import audeer
+
+import audb
 
 
 def test_available(repository):

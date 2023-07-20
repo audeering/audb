@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import audformat.testing
 import audeer
+import audformat.testing
 import audiofile
 
 import audb
@@ -26,7 +26,6 @@ def db(tmpdir_factory, persistent_repository):
         database object
 
     """
-
     # creat db
 
     db = audformat.Database(

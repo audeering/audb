@@ -3,8 +3,12 @@ Contributing
 
 Everyone is invited to contribute to this project.
 Feel free to create a `pull request`_ .
-If you find errors, omissions, inconsistencies or other things
-that need improvement, please create an issue_.
+If you find errors,
+omissions,
+inconsistencies,
+or other things
+that need improvement,
+please create an issue_.
 
 .. _issue: https://github.com/audeering/audb/issues/new/
 .. _pull request: https://github.com/audeering/audb/compare/
@@ -13,30 +17,35 @@ that need improvement, please create an issue_.
 Development Installation
 ------------------------
 
-Instead of pip-installing the latest release from PyPI,
+Instead of pip-installing the latest release from PyPI_,
 you should get the newest development version from Github_::
 
-    git clone https://github.com/audeering/audb/
-    cd audb
-    # Create virutal environment for this project
-    # e.g.
-    # virtualenv --python="python3"  $HOME/.envs/audb
-    # source $HOME/.envs/audb/bin/activate
-    pip install -r requirements.txt
+   git clone https://github.com/audeering/audb/
+   cd audb
+   # Create virtual environment for this project
+   # e.g.
+   # virtualenv --python="python3"  $HOME/.envs/audb
+   # source $HOME/.envs/audb/bin/activate
+   pip install -r requirements.txt
 
-.. _Github: https://github.com/audeering/audb
 
-This way, your installation always stays up-to-date,
+This way,
+your installation always stays up-to-date,
 even if you pull new changes from the Github repository.
+
+.. _PyPI: https://pypi.org/project/audb/
+.. _Github: https://github.com/audeering/audb/
 
 
 Coding Convention
 -----------------
 
 We follow the PEP8_ convention for Python code
-and check for correct syntax with flake8_.
-Exceptions are defined under the ``[flake8]`` section
-in :file:`setup.cfg`.
+and check for correct syntax with ruff_.
+In addition,
+we check for common spelling errors with codespell_.
+Both tools and possible exceptions
+are defined in :file:`pyproject.toml`.
 
 The checks are executed in the CI using `pre-commit`_.
 You can enable those checks locally by executing::
@@ -45,22 +54,26 @@ You can enable those checks locally by executing::
     pre-commit install
     pre-commit run --all-files
 
-Afterwards flake8_ is executed
+Afterwards ruff_ and codespell_ are executed
 every time you create a commit.
 
-You can also install flake8_
+You can also install ruff_ and codespell_
 and call it directly::
 
-    pip install flake8  # consider system wide installation
-    flake8
+    pip install ruff codespell  # consider system wide installation
+    ruff check .
+    codespell
 
 It can be restricted to specific folders::
 
-    flake8 audfoo/ tests/
+    ruff check audfoo/ tests/
+    codespell audfoo/ tests/
 
+
+.. _codespell: https://github.com/codespell-project/codespell/
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
-.. _flake8: https://flake8.pycqa.org/en/latest/index.html
 .. _pre-commit: https://pre-commit.com
+.. _ruff: https://beta.ruff.rs
 
 
 Building the Documentation
@@ -70,21 +83,20 @@ If you make changes to the documentation,
 you can re-create the HTML pages using Sphinx_.
 You can install it and a few other necessary packages with::
 
-    pip install -r requirements.txt
-    pip install -r docs/requirements.txt
+   pip install -r docs/requirements.txt
 
 To create the HTML pages, use::
 
-	python -m sphinx docs/ build/sphinx/html -b html
+   python -m sphinx docs/ build/sphinx/html -b html
 
 The generated files will be available
 in the directory :file:`build/sphinx/html/`.
 
 It is also possible to automatically check if all links are still valid::
 
-    python -m sphinx docs/ build/sphinx/linkcheck -b linkcheck
+   python -m sphinx docs/ build/sphinx/html -b linkcheck
 
-.. _Sphinx: http://sphinx-doc.org/
+.. _Sphinx: http://sphinx-doc.org
 
 
 Running the Tests
@@ -93,13 +105,13 @@ Running the Tests
 You'll need pytest_ for that.
 It can be installed with::
 
-    pip install -r tests/requirements.txt
+   pip install -r tests/requirements.txt
 
 To execute the tests, simply run::
 
-    python -m pytest
+   python -m pytest
 
-.. _pytest: https://pytest.org/
+.. _pytest: https://pytest.org
 
 
 Creating a New Release

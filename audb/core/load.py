@@ -11,21 +11,15 @@ import audformat
 
 from audb.core import define
 from audb.core import utils
-from audb.core.api import (
-    cached,
-    dependencies,
-    latest_version,
-)
-from audb.core.cache import (
-    database_cache_root,
-    database_tmp_root,
-    default_cache_root,
-)
-from audb.core.dependencies import (
-    Dependencies,
-    error_message_missing_object,
-    filter_deps,
-)
+from audb.core.api import cached
+from audb.core.api import dependencies
+from audb.core.api import latest_version
+from audb.core.cache import database_cache_root
+from audb.core.cache import database_tmp_root
+from audb.core.cache import default_cache_root
+from audb.core.dependencies import Dependencies
+from audb.core.dependencies import error_message_missing_object
+from audb.core.dependencies import filter_deps
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
 from audb.core.utils import lookup_backend
@@ -43,7 +37,6 @@ def _cached_versions(
         cache_root: typing.Optional[str],
 ) -> CachedVersions:
     r"""Find other cached versions of same flavor."""
-
     df = cached(cache_root=cache_root, name=name)
     # If no explicit cache root is given,
     # we look into the private and shared one.
@@ -83,7 +76,6 @@ def _cached_files(
         verbose: bool,
 ) -> (typing.Sequence[typing.Union[str, str]], typing.Sequence[str]):
     r"""Find cached files."""
-
     cached_files = []
     missing_files = []
 
@@ -422,7 +414,6 @@ def _get_media_from_backend(
         verbose: bool,
 ):
     r"""Load media from backend."""
-
     # figure out archives
     archives = set()
     archive_names = set()

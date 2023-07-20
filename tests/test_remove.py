@@ -2,8 +2,8 @@ import os
 
 import pytest
 
-import audformat.testing
 import audeer
+import audformat.testing
 
 import audb
 

@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel twine
+        pip install build twine virtualenv
 
     # PyPI package
     - name: Build and publish
@@ -29,7 +29,7 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py sdist bdist_wheel
+        python -m build
         python -m twine upload dist/*
 
     # Remove apt repos that are known to break from time to time
@@ -68,7 +68,7 @@ jobs:
         CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
         CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
         echo "Got changelog: $CHANGELOG"
-        echo "::set-output name=body::$CHANGELOG"
+        echo "body=$CHANGELOG" >> $GITHUB_OUTPUT
 
     - name: Create release on Github
       id: create_release
