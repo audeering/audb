@@ -259,7 +259,7 @@ def test_sampling_rate(db_root, sampling_rate):
 
 def test_mixed_cache(cache, shared_cache):
     # Avoid failing searching for other versions
-    # if databases a stored accross private and shared cache
+    # if databases a stored across private and shared cache
     # and the private one is empty, see
     # https://github.com/audeering/audb/issues/101
 

@@ -579,7 +579,7 @@ def publish(
         RuntimeError: if a new media file
             has an uppercase letter in its file extension
         RuntimeError: if database contains tables,
-            misc tables, or attachemnts
+            misc tables, or attachments
             that are stored under an ID
             using a char not in ``'[A-Za-z0-9._-]'``
         ValueError: if ``version`` or ``previous_version``

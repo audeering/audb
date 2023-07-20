@@ -7,7 +7,7 @@ import audb
 
 @pytest.fixture(scope='package', autouse=True)
 def cache(tmpdir_factory):
-    r"""Provide a reuseable cache for docstring tests.
+    r"""Provide a reusable cache for docstring tests.
 
     As we rely on emodb from the public repo,
     it makes sense to cache it
