@@ -215,7 +215,6 @@ class Flavor(audobject.Object):
             sampling_rate: int,
     ) -> (np.ndarray, int):
         r"""Resample signal to flavor."""
-
         if (self.sampling_rate is not None) and \
                 (sampling_rate != self.sampling_rate):
             signal = audresample.resample(

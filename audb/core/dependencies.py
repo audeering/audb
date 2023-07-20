@@ -94,9 +94,10 @@ class Dependencies:
         return list(self._df.loc[file])
 
     def __len__(self) -> int:
+        r"""Number of all media, table, attachment files."""
         return len(self._df)
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # noqa: D105
         return self._df.to_string()
 
     @property

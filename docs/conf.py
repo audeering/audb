@@ -3,9 +3,9 @@ from datetime import date
 import os
 import shutil
 
+import audeer
 
 import audb
-import audeer
 
 
 config = configparser.ConfigParser()

@@ -29,7 +29,6 @@ def dbs(tmpdir_factory):
         dictionary containing root folder for each version
 
     """
-
     # Collect single database paths
     # and return them in the end
     paths = {}

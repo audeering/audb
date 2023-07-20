@@ -7,15 +7,11 @@ import audformat
 
 from audb.core import define
 from audb.core import utils
-from audb.core.api import (
-    dependencies,
-    latest_version,
-)
+from audb.core.api import dependencies
+from audb.core.api import latest_version
 from audb.core.dependencies import Dependencies
-from audb.core.load import (
-    database_tmp_root,
-    load_header_to,
-)
+from audb.core.load import database_tmp_root
+from audb.core.load import load_header_to
 
 
 def _find_attachments(
@@ -23,7 +19,6 @@ def _find_attachments(
         deps: Dependencies,
 ) -> typing.List[str]:
     r"""Find missing attachments."""
-
     attachments = []
 
     for file in deps.attachments:
@@ -51,7 +46,6 @@ def _find_media(
     in a previous step.
 
     """
-
     media = []
 
     def job(file: str):
@@ -89,7 +83,6 @@ def _find_tables(
     in a previous step.
 
     """
-
     tables = []
 
     def job(table: str):
@@ -120,7 +113,6 @@ def _get_attachments(
         verbose: bool,
 ):
     r"""Load attachments from backend."""
-
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
     utils.mkdir_tree(paths, db_root)
@@ -255,7 +247,6 @@ def _get_tables(
 
 def _remove_empty_dirs(root):
     r"""Remove directories, fails if it contains non-empty sub-folders."""
-
     files = os.listdir(root)
     if len(files):
         for file in files:

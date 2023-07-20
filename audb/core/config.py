@@ -4,10 +4,8 @@ import oyaml as yaml
 
 import audeer
 
-from audb.core.define import (
-    CONFIG_FILE,
-    USER_CONFIG_FILE,
-)
+from audb.core.define import CONFIG_FILE
+from audb.core.define import USER_CONFIG_FILE
 from audb.core.repository import Repository
 
 
@@ -79,7 +77,6 @@ class config:
     can be overwritten by environment variables.
 
     Examples:
-
         >>> config.CACHE_ROOT
         '~/audb'
         >>> config.CACHE_ROOT = '~/caches/audb'

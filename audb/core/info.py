@@ -6,11 +6,9 @@ import audformat
 
 from audb.core import define
 from audb.core.api import dependencies
-from audb.core.load import (
-    filtered_dependencies,
-    load_header,
-    load_table,
-)
+from audb.core.load import filtered_dependencies
+from audb.core.load import load_header
+from audb.core.load import load_table
 
 
 def attachments(

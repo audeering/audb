@@ -161,9 +161,9 @@ section-order = [
 ]
 [tool.ruff.isort.sections]
 'audeering' = [
-    'audb',
     'audbackend',
     'audeer',
+    'audformat',
     'audiofile',
     'audfactory',
     'audinterface',
