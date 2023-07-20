@@ -203,6 +203,9 @@ convention = 'google'
 # Find all (sub-)modules of the Python package
 [tool.setuptools.packages.find]
 
+[tool.setuptools.package-data]
+audb = ['core/etc/*']
+
 # ----- setuptools_scm ----------------------------------------------------
 #
 # Use setuptools_scm to get version from git
