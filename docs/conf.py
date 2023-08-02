@@ -78,12 +78,11 @@ graphviz_output_format = 'svg'
 toc_object_entries = False
 
 # HTML --------------------------------------------------------------------
-html_theme = 'sphinx_audeering_theme'
+html_theme = 'furo'
 html_theme_options = {
-    'display_version': True,
-    'logo_only': False,
-    'wide_pages': ['data-example'],
-    'footer_links': False,
+    'source_repository': 'https://github.com/audeering/audb',
+    'source_branch': 'main',
+    'source_directory': 'docs/',
 }
 html_context = {
     'display_github': True,

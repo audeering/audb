@@ -1,8 +1,8 @@
 docutils
+furo
 ipykernel
 jupyter-sphinx
 sphinx >=3.5.4
-sphinx-audeering-theme >=1.2.1
 sphinx-autodoc-typehints
 sphinx-copybutton
 toml
