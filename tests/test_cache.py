@@ -67,25 +67,25 @@ def test_cached_name(cache):
     df = audb.cached(name=DB_NAMES[0])
     assert len(df) == 0
     # Load first database
-    audb.load(DB_NAMES[0])
+    audb.load(DB_NAMES[0], verbose=False)
     df = audb.cached()
     assert len(df) == 1
-    assert set(df['name']) == set([DB_NAMES[0]])
+    assert set(df['name']) == {DB_NAMES[0]}
     df = audb.cached(name=DB_NAMES[0])
     assert len(df) == 1
-    assert set(df['name']) == set([DB_NAMES[0]])
+    assert set(df['name']) == {DB_NAMES[0]}
     df = audb.cached(name=DB_NAMES[1])
     assert len(df) == 0
     # Load second database
-    audb.load(DB_NAMES[1])
+    audb.load(DB_NAMES[1], verbose=False)
     df = audb.cached()
     assert len(df) == 2
     assert set(df['name']) == set(DB_NAMES)
     df = audb.cached(name=DB_NAMES[0])
     assert len(df) == 1
-    assert set(df['name']) == set([DB_NAMES[0]])
+    assert set(df['name']) == {DB_NAMES[0]}
     df = audb.cached(name=DB_NAMES[1])
     assert len(df) == 1
-    assert set(df['name']) == set([DB_NAMES[1]])
+    assert set(df['name']) == {DB_NAMES[1]}
     df = audb.cached(name='non-existent')
     assert len(df) == 0

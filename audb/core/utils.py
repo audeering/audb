@@ -10,6 +10,20 @@ from audb.core.config import config
 from audb.core.repository import Repository
 
 
+def access_backend(
+        repository: Repository,
+) -> audbackend.Backend:
+    r"""Helper function to access backend."""
+    backend = audbackend.access(
+        repository.backend,
+        repository.host,
+        repository.name,
+    )
+    if isinstance(backend, audbackend.Artifactory):
+        backend._use_legacy_file_structure()
+    return backend
+
+
 def lookup_backend(
         name: str,
         version: str,
@@ -58,20 +72,16 @@ def _lookup(
     """
     for repository in config.REPOSITORIES:
 
-        backend = audbackend.create(
-            repository.backend,
-            repository.host,
-            repository.name,
-        )
-        header = backend.join(name, 'db.yaml')
+        backend = access_backend(repository)
+        header = backend.join('/', name, 'db.yaml')
 
         if backend.exists(header, version):
             return repository, backend
 
     raise RuntimeError(
-        'Cannot find version '
-        f'{version} '
-        f'for database '
+        f"Cannot find version "
+        f"'{version}' "
+        f"for database "
         f"'{name}'."
     )
 

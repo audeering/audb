@@ -3,6 +3,7 @@ import os
 import re
 import shutil
 
+import audbackend
 import numpy as np
 import pandas as pd
 import pytest
@@ -463,7 +464,7 @@ def test_publish(dbs, persistent_repository, version):
 
     for file in db.files:
         name = archives[file] if file in archives else file
-        file_path = backend.join(db.name, 'media', name)
+        file_path = backend.join('/', db.name, 'media', name)
         backend.exists(file_path, version)
         path = os.path.join(dbs[version], file)
         assert deps.checksum(file) == audeer.md5(path)
@@ -948,6 +949,17 @@ def test_publish_error_changed_deps_file_type(tmpdir, repository):
     with pytest.raises(RuntimeError, match=error_msg):
         audb.publish(db_path, '2.0.0', repository)
     audeer.rmdir(db_path)
+
+
+def test_publish_error_repository_does_not_exist(tmpdir, repository):
+
+    db = audformat.Database('test')
+    db.save(tmpdir)
+
+    repository.name = 'does-not-exist'
+    with pytest.raises(audbackend.BackendError) as ex:
+        audb.publish(tmpdir, '1.0.0', repository)
+    assert 'No such file or directory' in str(ex.value.exception)
 
 
 @pytest.mark.parametrize(

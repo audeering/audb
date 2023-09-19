@@ -9,6 +9,7 @@ import audeer
 import audformat
 
 from audb.core import define
+from audb.core import utils
 from audb.core.cache import database_cache_root
 from audb.core.cache import default_cache_root
 from audb.core.config import config
@@ -16,8 +17,6 @@ from audb.core.dependencies import Dependencies
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
 from audb.core.repository import Repository
-from audb.core.utils import _lookup
-from audb.core.utils import lookup_backend
 
 
 def available(
@@ -42,32 +41,39 @@ def available(
     """  # noqa: E501
     databases = []
     for repository in config.REPOSITORIES:
-        backend = audbackend.create(
-            repository.backend,
-            repository.host,
-            repository.name,
-        )
         try:
-            names = backend.ls('')
-        except FileNotFoundError:
-            # Handle missing repos
+            backend = utils.access_backend(repository)
+            if isinstance(backend, audbackend.Artifactory):
+                # avoid backend.ls('/')
+                # which is very slow on Artifactory
+                # see https://github.com/audeering/audbackend/issues/132
+                for p in backend._repo.path:
+                    name = p.name
+                    for version in [str(x).split('/')[-1] for x in p / 'db']:
+                        databases.append(
+                            [
+                                name,
+                                repository.backend,
+                                repository.host,
+                                repository.name,
+                                version,
+                            ]
+                        )
+            else:
+                for path, version in backend.ls('/'):
+                    if path.endswith(define.HEADER_FILE):
+                        name = path.split('/')[1]
+                        databases.append(
+                            [
+                                name,
+                                repository.backend,
+                                repository.host,
+                                repository.name,
+                                version,
+                            ]
+                        )
+        except audbackend.BackendError:
             continue
-        for name in names:
-            try:
-                versions = backend.ls(f'{name}/{define.DB}')
-                for version in versions:
-                    databases.append(
-                        [
-                            name,
-                            repository.backend,
-                            repository.host,
-                            repository.name,
-                            version,
-                        ]
-                    )
-            except FileNotFoundError:
-                # Handle broken databases
-                continue
 
     df = pd.DataFrame.from_records(
         databases,
@@ -262,9 +268,9 @@ def dependencies(
             deps.load(deps_path)
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
             # If loading pickled cached file fails, load again from backend
-            backend = lookup_backend(name, version)
+            backend = utils.lookup_backend(name, version)
             with tempfile.TemporaryDirectory() as tmp_root:
-                archive = backend.join(name, define.DB)
+                archive = backend.join('/', name, define.DB + '.zip')
                 backend.get_archive(
                     archive,
                     tmp_root,
@@ -467,12 +473,12 @@ def remove_media(
 
     for version in versions(name):
 
-        backend = lookup_backend(name, version)
+        backend = utils.lookup_backend(name, version)
 
         with tempfile.TemporaryDirectory() as db_root:
 
             # download dependencies
-            archive = backend.join(name, define.DB)
+            archive = backend.join('/', name, define.DB + '.zip')
             deps_path = backend.get_archive(
                 archive,
                 db_root,
@@ -495,14 +501,12 @@ def remove_media(
                     # if archive exists in this version,
                     # remove file from it and re-publish
                     remote_archive = backend.join(
+                        '/',
                         name,
                         define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-                        archive,
+                        archive + '.zip',
                     )
-                    if backend.exists(
-                            f'{remote_archive}.zip',
-                            version,
-                    ):
+                    if backend.exists(remote_archive, version):
 
                         files_in_archive = backend.get_archive(
                             remote_archive,
@@ -522,9 +526,9 @@ def remove_media(
                             files_in_archive.remove(file)
                             backend.put_archive(
                                 db_root,
-                                files_in_archive,
                                 remote_archive,
                                 version,
+                                files=files_in_archive,
                             )
 
                     # mark file as removed
@@ -534,12 +538,12 @@ def remove_media(
             # upload dependencies
             if upload:
                 deps.save(deps_path)
-                remote_archive = backend.join(name, define.DB)
+                remote_archive = backend.join('/', name, define.DB + '.zip')
                 backend.put_archive(
                     db_root,
-                    define.DEPENDENCIES_FILE,
                     remote_archive,
                     version,
+                    files=define.DEPENDENCIES_FILE,
                     verbose=verbose,
                 )
 
@@ -563,14 +567,19 @@ def repository(
         repository that contains the database
 
     Raises:
-        RuntimeError: if database is not found
+        RuntimeError: if database or version is not found
 
     Examples:
         >>> audb.repository('emodb', '1.4.1')
         Repository('data-public', 'https://audeering.jfrog.io/artifactory', 'artifactory')
 
     """  # noqa: E501
-    return _lookup(name, version)[0]
+    if not versions(name):
+        raise RuntimeError(
+            f"Cannot find database "
+            f"'{name}'."
+        )
+    return utils._lookup(name, version)[0]
 
 
 def versions(
@@ -591,11 +600,7 @@ def versions(
     """
     vs = []
     for repository in config.REPOSITORIES:
-        backend = audbackend.create(
-            repository.backend,
-            repository.host,
-            repository.name,
-        )
-        header = backend.join(name, 'db.yaml')
-        vs.extend(backend.versions(header))
+        backend = utils.access_backend(repository)
+        header = backend.join('/', name, 'db.yaml')
+        vs.extend(backend.versions(header, suppress_backend_errors=True))
     return audeer.sort_versions(vs)
