@@ -63,6 +63,8 @@ linkcheck_ignore = [
         'edd23462799ae9052a43cdd045698f78e19dbcaf'
     ),
     'http://emodb.bilderbar.info/start.html',
+    # This permalink fails from time to time and should never be broken
+    'https://superuser.com/a/264406',
 ]
 # Ignore package dependencies during building the docs
 # This fixes URL link issues with pandas and sphinx_autodoc_typehints
