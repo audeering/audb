@@ -7,6 +7,17 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.5.2 (2023-09-26)
+--------------------------
+
+* Added: BibTeX reference to README
+* Fixed: link to Artifactory anonymous access
+  in the documentation
+* Fixed: enforce reproducible order
+  of media files entries in dependency table
+  during publication
+
+
 Version 1.5.1 (2023-05-04)
 --------------------------
 
