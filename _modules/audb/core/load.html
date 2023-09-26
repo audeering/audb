@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.5.2
               </div>
             
           
@@ -164,21 +164,15 @@
 
 <span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
 <span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">cached</span><span class="p">,</span>
-    <span class="n">dependencies</span><span class="p">,</span>
-    <span class="n">latest_version</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">audb.core.cache</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">database_cache_root</span><span class="p">,</span>
-    <span class="n">database_tmp_root</span><span class="p">,</span>
-    <span class="n">default_cache_root</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Dependencies</span><span class="p">,</span>
-    <span class="n">error_message_missing_object</span><span class="p">,</span>
-    <span class="n">filter_deps</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="n">cached</span>
+<span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="n">dependencies</span>
+<span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="n">latest_version</span>
+<span class="kn">from</span> <span class="nn">audb.core.cache</span> <span class="kn">import</span> <span class="n">database_cache_root</span>
+<span class="kn">from</span> <span class="nn">audb.core.cache</span> <span class="kn">import</span> <span class="n">database_tmp_root</span>
+<span class="kn">from</span> <span class="nn">audb.core.cache</span> <span class="kn">import</span> <span class="n">default_cache_root</span>
+<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
+<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">error_message_missing_object</span>
+<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">filter_deps</span>
 <span class="kn">from</span> <span class="nn">audb.core.flavor</span> <span class="kn">import</span> <span class="n">Flavor</span>
 <span class="kn">from</span> <span class="nn">audb.core.lock</span> <span class="kn">import</span> <span class="n">FolderLock</span>
 <span class="kn">from</span> <span class="nn">audb.core.utils</span> <span class="kn">import</span> <span class="n">lookup_backend</span>
@@ -196,7 +190,6 @@
         <span class="n">cache_root</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CachedVersions</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find other cached versions of same flavor.&quot;&quot;&quot;</span>
-
     <span class="n">df</span> <span class="o">=</span> <span class="n">cached</span><span class="p">(</span><span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
     <span class="c1"># If no explicit cache root is given,</span>
     <span class="c1"># we look into the private and shared one.</span>
@@ -236,7 +229,6 @@
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find cached files.&quot;&quot;&quot;</span>
-
     <span class="n">cached_files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">missing_files</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -575,7 +567,6 @@
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media from backend.&quot;&quot;&quot;</span>
-
     <span class="c1"># figure out archives</span>
     <span class="n">archives</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">archive_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -1821,7 +1812,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/05/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/09/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

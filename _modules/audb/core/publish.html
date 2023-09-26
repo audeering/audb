@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.5.2
               </div>
             
           
@@ -196,7 +196,6 @@
         <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for media that is not in root and not in dependencies.&quot;&quot;&quot;</span>
-
     <span class="n">db_files</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">files</span>
     <span class="n">deps_files</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span>
 
@@ -230,7 +229,6 @@
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find altered, new or removed attachments and update &#39;deps&#39;.&quot;&quot;&quot;</span>
-
     <span class="k">for</span> <span class="n">attachment_id</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">attachment_ids</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">attachment_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">deps</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">archive</span> <span class="o">==</span> <span class="n">attachment_id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -323,7 +321,6 @@
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find archives with new, altered or removed media and update &#39;deps&#39;.&quot;&quot;&quot;</span>
-
     <span class="n">media_archives</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">db_media</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
 
@@ -383,9 +380,17 @@
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="n">task_description</span><span class="o">=</span><span class="s1">&#39;Find media&#39;</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="c1"># Add updated and new media to dependencies</span>
+    <span class="c1"># and sort them by paths</span>
+    <span class="c1"># as they can be returned in random order</span>
+    <span class="c1"># by the discovery job.</span>
+    <span class="c1"># Sorting enforces determinism in the</span>
+    <span class="c1"># generation of the dependencies table</span>
     <span class="k">if</span> <span class="n">update_media</span><span class="p">:</span>
+        <span class="n">update_media</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">update_media</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">deps</span><span class="o">.</span><span class="n">_update_media</span><span class="p">(</span><span class="n">update_media</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">add_media</span><span class="p">:</span>
+        <span class="n">add_media</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">add_media</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">deps</span><span class="o">.</span><span class="n">_add_media</span><span class="p">(</span><span class="n">add_media</span><span class="p">)</span>
 
     <span class="c1"># select archives with new or altered files for upload</span>
@@ -404,7 +409,6 @@
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find altered, new or removed tables and update &#39;deps&#39;.&quot;&quot;&quot;</span>
-
     <span class="c1"># release dependencies to removed tables</span>
 
     <span class="n">db_tables</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s1">.csv&#39;</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">)]</span>
@@ -430,7 +434,6 @@
         <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return list of files in root directory.&quot;&quot;&quot;</span>
-
     <span class="n">db_root_files</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">list_file_names</span><span class="p">(</span>
         <span class="n">db_root</span><span class="p">,</span>
         <span class="n">basenames</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -451,7 +454,6 @@
         <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return values of a media entry in dependencies.&quot;&quot;&quot;</span>
-
     <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
     <span class="k">try</span><span class="p">:</span>
@@ -524,7 +526,6 @@
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Upload archives with new, altered or removed media files.&quot;&quot;&quot;</span>
-
     <span class="k">if</span> <span class="n">media_archives</span><span class="p">:</span>
 
         <span class="c1"># create a mapping from archives to media files</span>
@@ -724,7 +725,7 @@
 <span class="sd">        RuntimeError: if a new media file</span>
 <span class="sd">            has an uppercase letter in its file extension</span>
 <span class="sd">        RuntimeError: if database contains tables,</span>
-<span class="sd">            misc tables, or attachemnts</span>
+<span class="sd">            misc tables, or attachments</span>
 <span class="sd">            that are stored under an ID</span>
 <span class="sd">            using a char not in ``&#39;[A-Za-z0-9._-]&#39;``</span>
 <span class="sd">        ValueError: if ``version`` or ``previous_version``</span>
@@ -938,7 +939,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/05/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/09/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

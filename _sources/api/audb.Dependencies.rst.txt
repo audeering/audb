@@ -18,6 +18,10 @@
 -------------------
 .. automethod:: Dependencies.__getitem__
     
+\_\_len\_\_\(\)
+---------------
+.. automethod:: Dependencies.__len__
+    
 archive\(\)
 -----------
 .. automethod:: Dependencies.archive
