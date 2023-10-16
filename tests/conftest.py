@@ -1,8 +1,9 @@
 import glob
 import os
 
-import audeer
 import pytest
+
+import audeer
 
 import audb
 

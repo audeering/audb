@@ -3,11 +3,11 @@ import os
 import re
 import shutil
 
-import audbackend
 import numpy as np
 import pandas as pd
 import pytest
 
+import audbackend
 import audeer
 import audformat.testing
 import audiofile
