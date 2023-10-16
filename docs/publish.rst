@@ -22,6 +22,10 @@
         if os.path.exists(folder):
             shutil.rmtree(folder)
 
+    # create repository
+    os.mkdir('./data')
+    os.mkdir('./data/data-local')
+
 
 .. _publish:
 

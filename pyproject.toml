@@ -33,7 +33,7 @@ classifiers = [
 ]
 requires-python = '>=3.8'
 dependencies = [
-    'audbackend >=0.3.17, <1.0.0',
+    'audbackend[artifactory] >=1.0.0',
     'audeer >=1.20.0',
     'audformat >=0.16.1',
     'audiofile >=1.0.0',

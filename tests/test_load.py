@@ -817,20 +817,27 @@ def test_load_to_update(tmpdir, dbs, only_metadata):
 
 
 @pytest.mark.parametrize(
-    'name, version',
+    'name, version, error, error_msg',
     [
-        (DB_NAME, None),
-        (DB_NAME, '1.0.0'),
+        (DB_NAME, '1.0.0', None, None),
         pytest.param(  # database does not exist
-            'does-not-exist', None,
-            marks=pytest.mark.xfail(raises=RuntimeError),
+            'does-not-exist',
+            '1.0.0',
+            RuntimeError,
+            "Cannot find database 'does-not-exist'.",
         ),
         pytest.param(  # version does not exist
-            DB_NAME, 'does-not-exist',
-            marks=pytest.mark.xfail(raises=RuntimeError),
+            DB_NAME,
+            '999.9.9',
+            RuntimeError,
+            f"Cannot find version '999.9.9' for database '{DB_NAME}'.",
         )
     ]
 )
-def test_repository(persistent_repository, name, version):
-    repository = audb.repository(name, version)
-    assert repository == persistent_repository
+def test_repository(persistent_repository, name, version, error, error_msg):
+    if error is not None:
+        with pytest.raises(error, match=error_msg):
+            repository = audb.repository(name, version)
+    else:
+        repository = audb.repository(name, version)
+        assert repository == persistent_repository

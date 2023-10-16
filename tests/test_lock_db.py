@@ -331,7 +331,7 @@ def test_lock_load(
 )
 def test_lock_load_crash(set_repositories):
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(audbackend.BackendError):
         load_db(-1)
 
 
@@ -384,7 +384,7 @@ def test_lock_load_from_cached_versions(
     thread.start()
 
     # -> loading missing table from cache fails
-    with pytest.raises(RuntimeError):
+    with pytest.raises(audbackend.BackendError):
         audb.load(
             DB_NAME,
             version='2.0.0',
@@ -412,7 +412,7 @@ def test_lock_load_from_cached_versions(
     thread.start()
 
     # -> loading missing media from cache fails
-    with pytest.raises(RuntimeError):
+    with pytest.raises(audbackend.BackendError):
         audb.load(
             DB_NAME,
             version='2.0.0',

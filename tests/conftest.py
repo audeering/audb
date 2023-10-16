@@ -3,6 +3,8 @@ import os
 
 import pytest
 
+import audeer
+
 import audb
 
 
@@ -122,11 +124,13 @@ def repository(tmpdir_factory):
 
     """
     host = tmpdir_factory.mktemp('host')
+    name = 'data-unittests-local'
     repository = audb.Repository(
-        name='data-unittests-local',
+        name=name,
         host=host,
         backend='file-system',
     )
+    audeer.mkdir(audeer.path(host, name))
     current_repositories = audb.config.REPOSITORIES
     audb.config.REPOSITORIES = [repository]
 
@@ -156,11 +160,13 @@ def persistent_repository(tmpdir_factory):
 
     """
     host = tmpdir_factory.mktemp('host')
+    name = 'data-unittests-local'
     repository = audb.Repository(
-        name='data-unittests-local',
+        name=name,
         host=host,
         backend='file-system',
     )
+    audeer.mkdir(audeer.path(host, name))
     current_repositories = audb.config.REPOSITORIES
     audb.config.REPOSITORIES = [repository]
 
