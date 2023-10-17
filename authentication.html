@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.5.2
+                v1.6.0
               </div>
             
           
@@ -154,22 +154,10 @@
             
   <div class="section" id="authentication">
 <h1>Authentication<a class="headerlink" href="#authentication" title="Permalink to this heading">¶</a></h1>
-<p>If you want to use an Artifactory backend,
-users need to authenticate.
-You could use <a class="reference external" href="https://jfrog.com/help/r/how-to-grant-an-anonymous-user-access-to-specific-repositories/">anonymous access</a>,
-but we would only recommend it for downloading public data.</p>
-<p>To authenticate
-users have to store their credentials in <code class="file docutils literal notranslate"><span class="pre">~/.artifactory_python.cfg</span></code>.</p>
-<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[your-organization.jfrog.io/artifactory]</span>
-<span class="na">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_USERNAME</span>
-<span class="na">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_API_KEY</span>
-</pre></div>
-</div>
-<p>Alternatively, they can export them as environment variables.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ARTIFACTORY_USERNAME</span><span class="o">=</span><span class="s2">&quot;MY_USERNAME&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">ARTIFACTORY_API_KEY</span><span class="o">=</span><span class="s2">&quot;MY_API_KEY&quot;</span>
-</pre></div>
-</div>
+<p>Using Artifactory as backend
+requires authentication.
+For more information,
+see <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.Artifactory.html#audbackend.Artifactory" title="(in audbackend v1.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.Artifactory</span></code></a>.</p>
 </div>
 
 
@@ -195,7 +183,7 @@ users have to store their credentials in <code class="file docutils literal notr
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/09/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

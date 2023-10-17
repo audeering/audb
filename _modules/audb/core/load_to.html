@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.5.2
+                v1.6.0
               </div>
             
           
@@ -275,9 +275,10 @@
         <span class="n">archive</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="p">,</span>
             <span class="n">db_name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span><span class="p">],</span>
-            <span class="n">archive</span><span class="p">,</span>
+            <span class="n">archive</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
             <span class="n">archive</span><span class="p">,</span>
@@ -326,9 +327,10 @@
 
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="p">,</span>
             <span class="n">db_name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">],</span>
-            <span class="n">archive</span><span class="p">,</span>
+            <span class="n">archive</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">files</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
             <span class="n">archive</span><span class="p">,</span>
@@ -374,9 +376,10 @@
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path_pkl</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path_pkl</span><span class="p">)</span>
         <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="p">,</span>
             <span class="n">db_name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
-            <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">table</span><span class="p">),</span>
+            <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
             <span class="n">archive</span><span class="p">,</span>
@@ -587,7 +590,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/09/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

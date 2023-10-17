@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.5.2
+                v1.6.0
               </div>
             
           
@@ -164,6 +164,7 @@
 <span class="kn">import</span> <span class="nn">audiofile</span>
 
 <span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
+<span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="n">dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.repository</span> <span class="kn">import</span> <span class="n">Repository</span>
@@ -498,12 +499,13 @@
 <span class="p">):</span>
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">attachment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="p">,</span>
             <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span><span class="p">],</span>
-            <span class="n">attachment_id</span><span class="p">,</span>
+            <span class="n">attachment_id</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">files</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment_id</span><span class="p">]</span><span class="o">.</span><span class="n">files</span>
-        <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
         <span class="n">job</span><span class="p">,</span>
@@ -542,9 +544,10 @@
                     <span class="n">update_media</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
                 <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="s1">&#39;/&#39;</span><span class="p">,</span>
                     <span class="n">db_name</span><span class="p">,</span>
                     <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">],</span>
-                    <span class="n">archive</span><span class="p">,</span>
+                    <span class="n">archive</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span><span class="p">,</span>
                 <span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">previous_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -576,9 +579,9 @@
 
                 <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
                     <span class="n">db_root</span><span class="p">,</span>
-                    <span class="n">files</span><span class="p">,</span>
                     <span class="n">archive_file</span><span class="p">,</span>
                     <span class="n">version</span><span class="p">,</span>
+                    <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span>
                 <span class="p">)</span>
 
         <span class="n">update_media</span> <span class="o">=</span> <span class="p">[]</span>
@@ -604,11 +607,12 @@
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s1">.csv&#39;</span>
         <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s1">&#39;/&#39;</span><span class="p">,</span>
             <span class="n">db_name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
-            <span class="n">table</span><span class="p">,</span>
+            <span class="n">table</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">file</span><span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
         <span class="n">job</span><span class="p">,</span>
@@ -755,14 +759,10 @@
         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">backend</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
-        <span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
-        <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">backend</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">access_backend</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span>
 
-    <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
-    <span class="n">versions</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="n">remote_header</span><span class="p">)</span>
+    <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+    <span class="n">versions</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">suppress_backend_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="s1">&#39;A version &#39;</span>
@@ -908,12 +908,16 @@
 
     <span class="c1"># publish dependencies and header</span>
     <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
-    <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span><span class="p">)</span>
-    <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span>
-                        <span class="n">version</span><span class="p">)</span>
+    <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span><span class="p">)</span>
+    <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
+        <span class="n">db_root</span><span class="p">,</span>
+        <span class="n">archive_file</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">,</span>
+        <span class="n">files</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">local_header</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
-        <span class="n">remote_header</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span>
+        <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
         <span class="n">backend</span><span class="o">.</span><span class="n">put_file</span><span class="p">(</span><span class="n">local_header</span><span class="p">,</span> <span class="n">remote_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="c1"># after the header is published</span>
@@ -939,7 +943,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/09/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/10/17 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
