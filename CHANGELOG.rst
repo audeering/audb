@@ -7,7 +7,7 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
-Version 1.6.0 (2023-1--17)
+Version 1.6.0 (2023-10-17)
 --------------------------
 
 * Added: support for new backend API
