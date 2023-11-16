@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.6.1 (2023-11-16)
+--------------------------
+
+* Fixed: accessing a database in any repository
+  when a repository listed before it
+  in ``audb.config.REPOSITORIES``
+  has restricted rights
+  or is non-existing
+
+
 Version 1.6.0 (2023-10-17)
 --------------------------
 
