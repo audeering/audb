@@ -1,8 +1,8 @@
 import audb
 
 
-def test_visiting_repos(private_and_public_repository):
-    r"""Tests visiting several repos when looking for a database.
+def test_visiting_private_repos(private_and_public_repository):
+    r"""Tests visiting private repos when looking for a database.
 
     When requesting a database,
     audb needs to look for it
@@ -26,7 +26,7 @@ def test_visiting_non_existing_repos(non_existing_repository):
     audb needs to look for it
     in every repository on the corresponding backend.
     This should not fail,
-    even when the user has no access rights.
+    even when a repository does not exist.
 
     """
     audb.load(
