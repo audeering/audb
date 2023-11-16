@@ -9,11 +9,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: release
-      permissions:
-        contents: write
-        id-token: write
-      concurrency:
-        group: ${{ github.workflow }}-${{ github.ref }}
+    permissions:
+      contents: write
+      id-token: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
 
     steps:
     - uses: actions/checkout@v3
