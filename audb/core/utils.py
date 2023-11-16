@@ -72,10 +72,14 @@ def _lookup(
     """
     for repository in config.REPOSITORIES:
 
-        backend = access_backend(repository)
+        try:
+            backend = access_backend(repository)
+        except audbackend.BackendError:
+            continue
+
         header = backend.join('/', name, 'db.yaml')
 
-        if backend.exists(header, version):
+        if backend.exists(header, version, suppress_backend_errors=True):
             return repository, backend
 
     raise RuntimeError(
