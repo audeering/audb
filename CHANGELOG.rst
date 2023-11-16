@@ -11,10 +11,9 @@ Version 1.6.1 (2023-11-16)
 --------------------------
 
 * Fixed: accessing a database in any repository
-  when a repository listed before it
+  listed after a repository with access restrictions
+  or a non-existing repository
   in ``audb.config.REPOSITORIES``
-  has restricted rights
-  or is non-existing
 
 
 Version 1.6.0 (2023-10-17)
