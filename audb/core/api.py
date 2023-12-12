@@ -78,10 +78,10 @@ def available(
         except (
                 audbackend.BackendError,
                 requests.exceptions.ConnectionError,
-        ) as ex:
-            print(f'Catched {ex}')
-            # Add pause to avoid aborted Artifactory connection
-            time.sleep(0.5)
+        ):
+            # Add pause to avoid aborted Artifactory connection,
+            # see https://github.com/audeering/audb/pull/339
+            time.sleep(1.0)
             continue
 
     df = pd.DataFrame.from_records(
