@@ -1,7 +1,16 @@
+import pytest
+
 import audb
 
 
-def test_visiting_private_repos(private_and_public_repository):
+@pytest.mark.parametrize(
+    'repos',
+    [
+        'public_and_private_repository',
+        'private_and_public_repository',
+    ],
+)
+def test_visiting_private_repos(request, repos):
     r"""Tests visiting private repos when looking for a database.
 
     When requesting a database,
@@ -11,6 +20,7 @@ def test_visiting_private_repos(private_and_public_repository):
     even when the user has no access rights.
 
     """
+    db = request.getfixturevalue(repos)
     db = audb.load(
         'emodb',
         version='1.4.1',

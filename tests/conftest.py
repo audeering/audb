@@ -176,6 +176,32 @@ def persistent_repository(tmpdir_factory):
 
 
 @pytest.fixture(scope='module', autouse=False)
+def public_and_private_repository():
+    r"""Public and private repository on Artifactory.
+
+    Configure the following repositories:
+    * data-public: repo on public Artifactory with anonymous access
+    * data-private: repo on public Artifactory without access
+
+    Note, that the order of the repos is important.
+    audb will visit the repos in the given order
+    until it finds the requested database.
+
+    """
+    host = 'https://audeering.jfrog.io/artifactory'
+    backend = 'artifactory'
+    current_repositories = audb.config.REPOSITORIES
+    audb.config.REPOSITORIES = [
+        audb.Repository('data-public', host, backend),
+        audb.Repository('data-private', host, backend),
+    ]
+
+    yield repository
+
+    audb.config.REPOSITORIES = current_repositories
+
+
+@pytest.fixture(scope='module', autouse=False)
 def private_and_public_repository():
     r"""Private and public repository on Artifactory.
 
