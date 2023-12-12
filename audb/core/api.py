@@ -51,6 +51,7 @@ def available(
         try:
             backend = utils.access_backend(repository)
             if isinstance(backend, audbackend.Artifactory):
+                backend.path.timeout = 0.5
                 # avoid backend.ls('/')
                 # which is very slow on Artifactory
                 # see https://github.com/audeering/audbackend/issues/132
