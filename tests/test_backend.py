@@ -59,8 +59,8 @@ def test_visiting_private_repos(request, repos):
     assert db.name == 'emodb'
     # The following fails,
     # see https://github.com/audeering/audb/issues/340
-    # df = audb.available(only_latest=True)
-    # assert 'emodb' in df.index
+    df = audb.available(only_latest=True)
+    assert 'emodb' in df.index
     # deps = audb.dependencies('emodb', version='1.4.1')
     # assert 'wav/13b09La.wav' in deps.media
 

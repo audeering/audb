@@ -12,6 +12,25 @@ pytest.NUM_WORKERS = 5
 
 
 @pytest.fixture(scope='package', autouse=True)
+def anonymous():
+    current_user = os.environ.get('ARTIFACTORY_USERNAME', None)
+    current_key = os.environ.get('ARTIFACTORY_API_KEY', None)
+    os.environ['ARTIFACTORY_USERNAME'] = 'anonymous'
+    os.environ['ARTIFACTORY_API_KEY'] = ''
+
+    yield
+
+    if current_user is None:
+        os.environ.pop('ARTIFACTORY_USERNAME', None)
+    else:
+        os.environ['ARTIFACTORY_USERNAME'] = current_user
+    if current_key is None:
+        os.environ.pop('ARTIFACTORY_API_KEY', None)
+    else:
+        os.environ['ARTIFACTORY_API_KEY'] = current_key
+
+
+@pytest.fixture(scope='package', autouse=True)
 def cleanup_coverage_files():
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
