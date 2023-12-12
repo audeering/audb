@@ -42,6 +42,7 @@ def available(
 
     """  # noqa: E501
     databases = []
+    previous_repository = None
     for repository in config.REPOSITORIES:
         try:
             backend = utils.access_backend(repository)
@@ -74,13 +75,19 @@ def available(
                                 version,
                             ]
                         )
+            previous_repository = repository
         except (
                 audbackend.BackendError,
                 requests.exceptions.ConnectionError,
         ):
             # Add pause to avoid aborted Artifactory connection,
             # see https://github.com/audeering/audb/pull/339
-            time.sleep(1.0)
+            if (
+                    previous_repository is not None
+                    and previous_repository.host == repository.host
+            ):
+                time.sleep(1.0)
+            previous_repository = repository
             continue
 
     df = pd.DataFrame.from_records(
