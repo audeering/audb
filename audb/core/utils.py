@@ -10,6 +10,10 @@ from audb.core.config import config
 from audb.core.repository import Repository
 
 
+# Cache failing repositories to skip them
+BLACKLISTED_REPOSITORIES = []
+
+
 def access_backend(
         repository: Repository,
 ) -> audbackend.Backend:
@@ -70,11 +74,16 @@ def _lookup(
     Returns repository, version and backend object.
 
     """
+    global BLACKLISTED_REPOSITORIES
     for repository in config.REPOSITORIES:
+
+        if repository in BLACKLISTED_REPOSITORIES:
+            continue
 
         try:
             backend = access_backend(repository)
         except audbackend.BackendError:
+            BLACKLISTED_REPOSITORIES.append(repository)
             continue
 
         header = backend.join('/', name, 'db.yaml')

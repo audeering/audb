@@ -41,9 +41,12 @@ def available(
         emodb  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.1
 
     """  # noqa: E501
+    # global REPOSITORIES
     databases = []
     previous_repository = None
     for repository in config.REPOSITORIES:
+        if repository in utils.BLACKLISTED_REPOSITORIES:
+            continue
         try:
             backend = utils.access_backend(repository)
             if isinstance(backend, audbackend.Artifactory):
@@ -87,6 +90,7 @@ def available(
                     and previous_repository.host == repository.host
             ):
                 time.sleep(1.0)
+            utils.BLACKLISTED_REPOSITORIES.append(repository)
             previous_repository = repository
             continue
 
