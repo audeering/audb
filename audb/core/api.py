@@ -3,6 +3,7 @@ import tempfile
 import typing
 
 import pandas as pd
+import requests
 
 import audbackend
 import audeer
@@ -47,7 +48,7 @@ def available(
                 # avoid backend.ls('/')
                 # which is very slow on Artifactory
                 # see https://github.com/audeering/audbackend/issues/132
-                for p in backend._repo.path:
+                for p in backend._repo.path:  # this can cause ConnectionError
                     name = p.name
                     for version in [str(x).split('/')[-1] for x in p / 'db']:
                         databases.append(
@@ -72,7 +73,10 @@ def available(
                                 version,
                             ]
                         )
-        except audbackend.BackendError:
+        except (
+                audbackend.BackendError,
+                requests.exceptions.ConnectionError,
+        ):
             continue
 
     df = pd.DataFrame.from_records(
