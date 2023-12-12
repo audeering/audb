@@ -20,7 +20,8 @@ def test_visiting_private_repos(request, repos):
     even when the user has no access rights.
 
     """
-    db = request.getfixturevalue(repos)
+    request.getfixturevalue(repos)
+    print(f'{audb.config.REPOSITORIES=}')
     db = audb.load(
         'emodb',
         version='1.4.1',
