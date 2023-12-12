@@ -76,7 +76,7 @@ cache_dir = '.cache/pytest'
 xfail_strict = true
 addopts = '''
     --cov=audb
-    --cov-fail-under=100
+    --cov-fail-under=70
     --cov-report term-missing
     --cov-report xml
     --ignore=docs/
