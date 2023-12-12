@@ -43,6 +43,7 @@ def available(
     databases = []
     for repository in config.REPOSITORIES:
         try:
+            print(f'Visit {repository=}')
             backend = utils.access_backend(repository)
             if isinstance(backend, audbackend.Artifactory):
                 # avoid backend.ls('/')
@@ -76,7 +77,8 @@ def available(
         except (
                 audbackend.BackendError,
                 requests.exceptions.ConnectionError,
-        ):
+        ) as ex:
+            print(f'Catched {ex}')
             continue
 
     df = pd.DataFrame.from_records(
