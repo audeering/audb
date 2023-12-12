@@ -45,6 +45,7 @@ def available(
     databases = []
     previous_repository = None
     for repository in config.REPOSITORIES:
+        print(f'Visit {repository}')
         if repository in utils.BLACKLISTED_REPOSITORIES:
             continue
         try:
@@ -82,7 +83,8 @@ def available(
         except (
                 audbackend.BackendError,
                 requests.exceptions.ConnectionError,
-        ):
+        ) as ex:
+            print(f'Failed with {ex}')
             # Add pause to avoid aborted Artifactory connection,
             # see https://github.com/audeering/audb/pull/339
             if (

@@ -28,10 +28,13 @@ def test_visiting_private_repos(request, repos):
         only_metadata=True,
         verbose=False,
     )
+    print(f'{audb.config.REPOSITORIES=}')
     assert db.name == 'emodb'
     df = audb.available(only_latest=True)
+    print(f'{audb.config.REPOSITORIES=}')
     assert 'emodb' in df.index
     deps = audb.dependencies('emodb', version='1.4.1')
+    print(f'{audb.config.REPOSITORIES=}')
     assert 'wav/13b09La.wav' in deps.media
 
 
