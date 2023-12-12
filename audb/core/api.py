@@ -1,5 +1,6 @@
 import os
 import tempfile
+import time
 import typing
 
 import pandas as pd
@@ -79,6 +80,8 @@ def available(
                 requests.exceptions.ConnectionError,
         ) as ex:
             print(f'Catched {ex}')
+            # Add pause to avoid aborted Artifactory connection
+            time.sleep(1)
             continue
 
     df = pd.DataFrame.from_records(
