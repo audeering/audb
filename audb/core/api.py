@@ -91,7 +91,7 @@ def available(
                     previous_repository is not None
                     and previous_repository.host == repository.host
             ):
-                time.sleep(1.0)
+                time.sleep(10.0)
             utils.BLACKLISTED_REPOSITORIES.append(repository)
             previous_repository = repository
             continue
