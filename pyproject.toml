@@ -75,7 +75,6 @@ uri-ignore-words-list = 'ist'
 cache_dir = '.cache/pytest'
 xfail_strict = true
 addopts = '''
-    --doctest-plus
     --cov=audb
     --cov-fail-under=100
     --cov-report term-missing
