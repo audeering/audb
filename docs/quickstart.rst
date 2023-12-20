@@ -31,7 +31,7 @@ on our `public Artifactory server`_.
 
     audb.available()
 
-Let's load the emodb_ database.
+Let's load version 1.4.1 of the emodb_ database.
 
 .. Load with only_metadata=True in the background
 .. jupyter-execute::
