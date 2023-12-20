@@ -37,6 +37,7 @@ def available(
                    backend                                    host   repository version
         name
         emodb  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.1
+        musan  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.0.0
 
     """  # noqa: E501
     databases = []
