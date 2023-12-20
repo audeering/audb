@@ -106,7 +106,7 @@ if not audb.exists(database_name, version=database_version):
     audb.load(
         database_name,
         version=database_version,
-        num_workers=5,
+        num_workers=1,
         only_metadata=True,
         verbose=False,
     )
