@@ -29,7 +29,7 @@ on our `public Artifactory server`_.
 
     import audb
 
-    audb.available()
+    audb.available(only_latest=True)
 
 Let's load version 1.4.1 of the emodb_ database.
 
