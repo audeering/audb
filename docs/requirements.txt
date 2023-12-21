@@ -2,7 +2,7 @@ docutils
 ipykernel
 jupyter-sphinx
 sphinx >=3.5.4
-git+https://github.com/kai687/sphinxawesome-theme.git
+sphinxawesome-theme >=5.0.1
 sphinx-autodoc-typehints
 sphinx-copybutton
 toml

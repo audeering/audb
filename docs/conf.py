@@ -17,7 +17,7 @@ project = config['project']['name']
 copyright = f'2020-{date.today().year} audEERING GmbH'
 author = ', '.join(author['name'] for author in config['project']['authors'])
 version = audeer.git_repo_version()
-title = 'Documentation'
+title = project
 
 
 # General -----------------------------------------------------------------
@@ -40,8 +40,8 @@ extensions = [
     'sphinx_autodoc_typehints',
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
-    'sphinx_copybutton',
     'jupyter_sphinx',
+    'sphinxawesome_theme.highlighting',
 ]
 
 napoleon_use_ivar = True  # List of class attributes
@@ -77,12 +77,11 @@ toc_object_entries = False
 
 # HTML --------------------------------------------------------------------
 html_theme = 'sphinxawesome_theme'
-# html_theme_options = {
-#     'display_version': True,
-#     'logo_only': False,
-#     'wide_pages': ['data-example'],
-#     'footer_links': False,
-# }
+html_theme_options = {
+    'logo_light': 'pics/logo-black.png',
+    'logo_dark': 'pics/logo-white.png',
+}
+
 html_context = {
     'display_github': True,
 }
