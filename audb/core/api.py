@@ -36,8 +36,10 @@ def available(
         >>> audb.available(only_latest=True)
                    backend                                    host   repository version
         name
-        emodb  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.1
-        musan  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.0.0
+        air     artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.2
+        emodb   artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.1
+        micirp  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.0.0
+        musan   artifactory  https://audeering.jfrog.io/artifactory  data-public   1.0.0
 
     """  # noqa: E501
     databases = []
