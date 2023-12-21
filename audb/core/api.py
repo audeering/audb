@@ -33,13 +33,12 @@ def available(
         and backend, host, repository, version as columns
 
     Examples:
-        >>> audb.available(only_latest=True)
+        >>> df = audb.available(only_latest=True)
+        >>> df.loc[['air', 'emodb']]
                    backend                                    host   repository version
         name
-        air     artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.2
-        emodb   artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.1
-        micirp  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.0.0
-        musan   artifactory  https://audeering.jfrog.io/artifactory  data-public   1.0.0
+        air    artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.2
+        emodb  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.1
 
     """  # noqa: E501
     databases = []
