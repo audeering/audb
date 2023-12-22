@@ -100,12 +100,10 @@ html_theme_options = {
         'color-api-name': '#e13b41',
         'color-api-overall': '#5d6370',
         'color-api-background-hover': '#f7f7fd',
-        # The next setting
-        # is needed for inline code,
-        # but it also affects actual links.
-        # Need to tackle this.
-        # We also need to adjust the color of text links.
+        'color-link': '#e13b41',
+        'color-link--hover': '#e13b41',
         'color-link-underline': '#d6d7e5',
+        'color-link-underline--hover': '#e13b41',
         'color-inline-code-background': '#f7f7fd',
         'color-admonition-title--caution': '#f0aa3a',
         'color-admonition-title-background--caution': 'rgba(240,170,58,.2)',
@@ -152,6 +150,11 @@ html_theme_options = {
         #   }
         #   .sig-inline, code.literal {
         #     padding: 0.15em 0.25em;
+        #   }
+        #
+        # * center sidebar title
+        #   .sidebar-brand-text {
+        #     text-align: center;
         #   }
         'font-stack': 'Open Sans, sans-serif',
     }
