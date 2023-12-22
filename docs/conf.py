@@ -17,7 +17,7 @@ project = config['project']['name']
 copyright = f'2020-{date.today().year} audEERING GmbH'
 author = ', '.join(author['name'] for author in config['project']['authors'])
 version = audeer.git_repo_version()
-title = 'Documentation'
+title = project
 
 
 # General -----------------------------------------------------------------
@@ -79,10 +79,23 @@ toc_object_entries = False
 
 # HTML --------------------------------------------------------------------
 html_theme = 'furo'
+html_static_path = ['_static']
 html_theme_options = {
     'source_repository': 'https://github.com/audeering/audb',
     'source_branch': 'main',
     'source_directory': 'docs/',
+    # Logo
+    'light_logo': 'logo-black.png',
+    'dark_logo': 'logo-white.png',
+    # Colors
+    'light_css_variables': {
+        'color-brand-primary': '#e13b41',
+        'color-brand-content': '#3c4350',
+        'color-code-foreground': '#3c4350',
+        'color-code-background': '#ffffff',
+        'color-sidebar-background': '#ffffff',
+        'font-stack': 'Open Sans, sans-serif',
+    }
 }
 html_context = {
     'display_github': True,
