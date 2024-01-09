@@ -21,19 +21,17 @@ Quickstart
 The most common task is to load a database
 with :func:`audb.load`.
 
-Let's first see which databases are available to load.
+Let's first see which databases are available
+on our `public Artifactory server`_.
+
 
 .. jupyter-execute::
 
     import audb
 
-    audb.available()
+    audb.available(only_latest=True)
 
-As you can see we provide the emodb_ database
-as small example database,
-which we `have published`_
-to our `public Artifactory server`_.
-Let's load the database.
+Let's load version 1.4.1 of the emodb_ database.
 
 .. Load with only_metadata=True in the background
 .. jupyter-execute::
@@ -93,6 +91,5 @@ as a :class:`pandas.DataFrame`.
     df[:3]  # show first three entries
 
 
-.. _emodb: http://emodb.bilderbar.info/start.html
-.. _have published: https://github.com/audeering/emodb
+.. _emodb: https://github.com/audeering/emodb
 .. _public Artifactory server: https://audeering.jfrog.io/artifactory
