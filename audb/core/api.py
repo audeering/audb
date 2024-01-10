@@ -603,6 +603,18 @@ def versions(
     vs = []
     for repository in config.REPOSITORIES:
         backend = utils.access_backend(repository)
-        header = backend.join('/', name, 'db.yaml')
-        vs.extend(backend.versions(header, suppress_backend_errors=True))
+        if isinstance(backend, audbackend.Artifactory):
+            # Avoid using ls() on Artifactory
+            # see https://github.com/devopshq/artifactory/issues/423
+            folder = backend.join('/', name, 'db')
+            path = audbackend.core.artifactory._artifactory_path(
+                backend._expand(folder),
+                backend._username,
+                backend._api_key,
+            )
+            if path.exists():
+                vs.extend([p.parts[-1] for p in path])
+        else:
+            header = backend.join('/', name, 'db.yaml')
+            vs.extend(backend.versions(header, suppress_backend_errors=True))
     return audeer.sort_versions(vs)
