@@ -613,7 +613,11 @@ def versions(
                 backend._api_key,
             )
             if path.exists():
-                vs.extend([p.parts[-1] for p in path])
+                for p in path:
+                    version = p.parts[-1]
+                    header = p.joinpath(version).joinpath(f'db-{version}.yaml')
+                    if header.exists():
+                        vs.extend([version])
         else:
             header = backend.join('/', name, 'db.yaml')
             vs.extend(backend.versions(header, suppress_backend_errors=True))
