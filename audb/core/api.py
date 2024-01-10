@@ -615,7 +615,7 @@ def versions(
             if path.exists():
                 for p in path:
                     version = p.parts[-1]
-                    header = p.joinpath(version).joinpath(f'db-{version}.yaml')
+                    header = p.joinpath(f'db-{version}.yaml')
                     if header.exists():
                         vs.extend([version])
         else:
