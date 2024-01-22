@@ -17,7 +17,7 @@ project = config['project']['name']
 copyright = f'2020-{date.today().year} audEERING GmbH'
 author = ', '.join(author['name'] for author in config['project']['authors'])
 version = audeer.git_repo_version()
-title = 'Documentation'
+title = project
 
 
 # General -----------------------------------------------------------------
@@ -78,12 +78,86 @@ graphviz_output_format = 'svg'
 toc_object_entries = False
 
 # HTML --------------------------------------------------------------------
-html_theme = 'sphinx_audeering_theme'
+html_theme = 'furo'
+html_static_path = ['_static']
 html_theme_options = {
-    'display_version': True,
-    'logo_only': False,
-    'wide_pages': ['data-example'],
-    'footer_links': False,
+    'source_repository': 'https://github.com/audeering/audb',
+    'source_branch': 'main',
+    'source_directory': 'docs/',
+    # Logo
+    'light_logo': 'logo.png',
+    'dark_logo': 'logo.png',
+    # Colors
+    'light_css_variables': {
+        'color-brand-primary': '#e13b41',
+        'color-brand-content': '#3c4350',
+        'color-code-foreground': '#3c4350',
+        'color-code-background': '#f7f7fd',
+        'color-content-foreground': '#3c4350',
+        'color-sidebar-background': '#ffffff',
+        'color-sidebar-search-background': '#ffffff',
+        'color-api-pre-name': '#e13b41',
+        'color-api-name': '#e13b41',
+        'color-api-overall': '#5d6370',
+        'color-api-background-hover': '#f7f7fd',
+        'color-link': '#e13b41',
+        'color-link--hover': '#e13b41',
+        'color-link-underline': '#d6d7e5',
+        'color-link-underline--hover': '#e13b41',
+        'color-inline-code-background': '#f7f7fd',
+        'color-admonition-title--caution': '#f0aa3a',
+        'color-admonition-title-background--caution': 'rgba(240,170,58,.2)',
+        'color-admonition-title--warning': 'f0aa3a',
+        'color-admonition-title-background--warning': 'rgba(240,170,58,.2)',
+        'color-admonition-title--danger': '#e94274',
+        'color-admonition-title-background--danger': 'rgba(233,66,116,.2)',
+        'color-admonition-title--attention': '#e94274',
+        'color-admonition-title-background--attention': 'rgba(233,66,116,.2)',
+        'color-admonition-title--error': '#e94274',
+        'color-admonition-title-background--error': 'rgba(233,66,116,.2)',
+        'color-admonition-title--hint': '#35e17a',
+        'color-admonition-title-background--hint': 'rgba(53,255,122,.2)',
+        'color-admonition-title--tip': '#35e17a',
+        'color-admonition-title-background--tip': 'rgba(53,255,122,.2)',
+        'color-admonition-title--important': '#f0aa3a',
+        'color-admonition-title-background--important': 'rgba(240,170,58,.2)',
+        'color-admonition-title--note': '#32adf2',
+        'color-admonition-title-background--note': 'rgba(50,173,242,.2)',
+        'color-admonition-title--seealso': '#32adf2',
+        'color-admonition-title-background--seealso': 'rgba(50,173,242,.2)',
+        'color-admonition-title--todo': '#32adf2',
+        'color-admonition-title-background--todo': 'rgba(50,173,242,.2)',
+        # 'color-admonition-title': '',
+        # 'color-admonition-title-background': '',
+        # TODO:
+        # * color of code listings has to be set in CSS
+        #   by using:
+        #   .highlight {
+        #     background: #f7f7d;
+        #   }
+        # * adjust size of headings:
+        #   h1 {
+        #     font-size: 2.25em;
+        #   }
+        #   h2 {
+        #     font-size: 1.75em;
+        #   }
+        #
+        # * disable border of inline code,
+        #   and adjust padding for missing border:
+        #   p .sig-inline, p code.literal {
+        #     border: none;
+        #   }
+        #   .sig-inline, code.literal {
+        #     padding: 0.15em 0.25em;
+        #   }
+        #
+        # * center sidebar title
+        #   .sidebar-brand-text {
+        #     text-align: center;
+        #   }
+        'font-stack': 'Open Sans, sans-serif',
+    }
 }
 html_context = {
     'display_github': True,
