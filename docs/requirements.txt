@@ -1,6 +1,7 @@
 docutils
 ipykernel
 jupyter-sphinx
+pyarrow
 sphinx >=3.5.4
 sphinx-audeering-theme >=1.2.1
 sphinx-autodoc-typehints
