@@ -6,9 +6,8 @@ import audb
 
 
 def test_available(repository):
-
     # Broken database in repo
-    name = 'non-existing-database'
+    name = "non-existing-database"
     path = os.path.join(
         repository.host,
         repository.name,
@@ -20,7 +19,7 @@ def test_available(repository):
     assert len(df) == 0
 
     # Non existing repo
-    name = 'non-existing-repo'
+    name = "non-existing-repo"
     audb.config.REPOSITORIES = [
         audb.Repository(
             name=name,

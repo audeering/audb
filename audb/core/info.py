@@ -12,10 +12,10 @@ from audb.core.load import load_table
 
 
 def attachments(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> typing.Dict[str, audformat.Attachment]:
     """Attachment(s) of database.
 
@@ -29,7 +29,7 @@ def attachments(
         attachments of database
 
     Examples:
-        >>> list(attachments('emodb', version='1.4.1'))
+        >>> list(attachments("emodb", version="1.4.1"))
         ['bibtex']
 
     """
@@ -43,10 +43,10 @@ def attachments(
 
 
 def author(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> str:
     """Author(s) of database.
 
@@ -60,7 +60,7 @@ def author(
         author(s) of database
 
     Examples:
-        >>> author('emodb', version='1.4.1')
+        >>> author("emodb", version="1.4.1")
         'Felix Burkhardt, Astrid Paeschke, Miriam Rolfes, Walter Sendlmeier, Benjamin Weiss'
 
     """  # noqa: E501
@@ -74,12 +74,12 @@ def author(
 
 
 def bit_depths(
-        name: str,
-        *,
-        version: str = None,
-        tables: typing.Sequence = None,
-        media: typing.Sequence = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    tables: typing.Sequence = None,
+    media: typing.Sequence = None,
+    cache_root: str = None,
 ) -> typing.Set[int]:
     """Media bit depth.
 
@@ -101,7 +101,7 @@ def bit_depths(
             that is not part of the database
 
     Examples:
-        >>> bit_depths('emodb', version='1.4.1')
+        >>> bit_depths("emodb", version="1.4.1")
         {16}
 
     """
@@ -110,12 +110,12 @@ def bit_depths(
 
 
 def channels(
-        name: str,
-        *,
-        version: str = None,
-        tables: typing.Sequence = None,
-        media: typing.Sequence = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    tables: typing.Sequence = None,
+    media: typing.Sequence = None,
+    cache_root: str = None,
 ) -> typing.Set[int]:
     """Media channels.
 
@@ -137,7 +137,7 @@ def channels(
             that is not part of the database
 
     Examples:
-        >>> channels('emodb', version='1.4.1')
+        >>> channels("emodb", version="1.4.1")
         {1}
 
     """
@@ -146,10 +146,10 @@ def channels(
 
 
 def description(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> str:
     """Description of database.
 
@@ -163,8 +163,8 @@ def description(
         description of database
 
     Examples:
-        >>> desc = description('emodb', version='1.4.1')
-        >>> desc.split('.')[0]  # show first sentence
+        >>> desc = description("emodb", version="1.4.1")
+        >>> desc.split(".")[0]  # show first sentence
         'Berlin Database of Emotional Speech'
 
     """
@@ -178,12 +178,12 @@ def description(
 
 
 def duration(
-        name: str,
-        *,
-        version: str = None,
-        tables: typing.Sequence = None,
-        media: typing.Sequence = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    tables: typing.Sequence = None,
+    media: typing.Sequence = None,
+    cache_root: str = None,
 ) -> pd.Timedelta:
     """Total media duration.
 
@@ -205,24 +205,24 @@ def duration(
             that is not part of the database
 
     Examples:
-        >>> duration('emodb', version='1.4.1')
+        >>> duration("emodb", version="1.4.1")
         Timedelta('0 days 00:24:47.092187500')
-        >>> duration('emodb', version='1.4.1', media=['wav/03a01Fa.wav'])
+        >>> duration("emodb", version="1.4.1", media=["wav/03a01Fa.wav"])
         Timedelta('0 days 00:00:01.898250')
 
     """
     df = filtered_dependencies(name, version, media, tables, cache_root)
     return pd.to_timedelta(
         df[df.type == define.DependType.MEDIA].duration.sum(),
-        unit='s',
+        unit="s",
     )
 
 
 def files(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> typing.List[str]:
     """Media files included in the database.
 
@@ -236,7 +236,7 @@ def files(
         media files
 
     Examples:
-        >>> files('emodb', version='1.4.1')[:2]
+        >>> files("emodb", version="1.4.1")[:2]
         ['wav/03a01Fa.wav', 'wav/03a01Nc.wav']
 
     """
@@ -245,12 +245,12 @@ def files(
 
 
 def formats(
-        name: str,
-        *,
-        version: str = None,
-        tables: typing.Sequence = None,
-        media: typing.Sequence = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    tables: typing.Sequence = None,
+    media: typing.Sequence = None,
+    cache_root: str = None,
 ) -> typing.Set[str]:
     """Media formats.
 
@@ -272,7 +272,7 @@ def formats(
             that is not part of the database
 
     Examples:
-        >>> formats('emodb', version='1.4.1')
+        >>> formats("emodb", version="1.4.1")
         {'wav'}
 
     """
@@ -281,11 +281,11 @@ def formats(
 
 
 def header(
-        name: str,
-        *,
-        version: str = None,
-        load_tables: bool = True,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    load_tables: bool = True,
+    cache_root: str = None,
 ) -> audformat.Database:
     r"""Load header of database.
 
@@ -302,7 +302,7 @@ def header(
         database object without table data
 
     Examples:
-        >>> db = header('emodb', version='1.4.1')
+        >>> db = header("emodb", version="1.4.1")
         >>> db.name
         'emodb'
 
@@ -323,10 +323,10 @@ def header(
 
 
 def languages(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> typing.List[str]:
     """Languages of database.
 
@@ -340,7 +340,7 @@ def languages(
         languages of database
 
     Examples:
-        >>> languages('emodb', version='1.4.1')
+        >>> languages("emodb", version="1.4.1")
         ['deu']
 
     """
@@ -354,10 +354,10 @@ def languages(
 
 
 def license(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> str:
     """License of database.
 
@@ -371,7 +371,7 @@ def license(
         license of database
 
     Examples:
-        >>> license('emodb', version='1.4.1')
+        >>> license("emodb", version="1.4.1")
         'CC0-1.0'
 
     """
@@ -385,10 +385,10 @@ def license(
 
 
 def license_url(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> str:
     """License URL of database.
 
@@ -402,7 +402,7 @@ def license_url(
         license URL of database
 
     Examples:
-        >>> license_url('emodb', version='1.4.1')
+        >>> license_url("emodb", version="1.4.1")
         'https://creativecommons.org/publicdomain/zero/1.0/'
 
     """
@@ -416,10 +416,10 @@ def license_url(
 
 
 def media(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> typing.Dict[str, audformat.Media]:
     """Audio and video media of database.
 
@@ -433,7 +433,7 @@ def media(
         media of database
 
     Examples:
-        >>> media('emodb', version='1.4.1')
+        >>> media("emodb", version="1.4.1")
         microphone:
             {type: other, format: wav, channels: 1, sampling_rate: 16000}
 
@@ -448,10 +448,10 @@ def media(
 
 
 def meta(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> typing.Dict:
     """Meta information of database.
 
@@ -465,7 +465,7 @@ def meta(
         meta information of database
 
     Examples:
-        >>> meta('emodb', version='1.4.1')
+        >>> meta("emodb", version="1.4.1")
         pdf:
           http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&rep=rep1&type=pdf
 
@@ -480,10 +480,10 @@ def meta(
 
 
 def misc_tables(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> typing.Dict[str, audformat.MiscTable]:
     """Miscellaneous tables of database.
 
@@ -497,7 +497,7 @@ def misc_tables(
         miscellaneous tables of database
 
     Examples:
-        >>> list(misc_tables('emodb', version='1.4.1'))
+        >>> list(misc_tables("emodb", version="1.4.1"))
         ['speaker']
 
     """  # noqa: E501
@@ -511,10 +511,10 @@ def misc_tables(
 
 
 def organization(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> str:
     """Organization responsible for database.
 
@@ -528,7 +528,7 @@ def organization(
         organization responsible for database
 
     Examples:
-        >>> organization('emodb', version='1.4.1')
+        >>> organization("emodb", version="1.4.1")
         'audEERING'
 
     """
@@ -542,10 +542,10 @@ def organization(
 
 
 def raters(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> typing.Dict[str, audformat.Rater]:
     """Raters contributed to database.
 
@@ -559,7 +559,7 @@ def raters(
         raters of database
 
     Examples:
-        >>> raters('emodb', version='1.4.1')
+        >>> raters("emodb", version="1.4.1")
         gold:
             {type: human}
 
@@ -574,12 +574,12 @@ def raters(
 
 
 def sampling_rates(
-        name: str,
-        *,
-        version: str = None,
-        tables: typing.Sequence = None,
-        media: typing.Sequence = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    tables: typing.Sequence = None,
+    media: typing.Sequence = None,
+    cache_root: str = None,
 ) -> typing.Set[int]:
     """Media sampling rates.
 
@@ -601,7 +601,7 @@ def sampling_rates(
             that is not part of the database
 
     Examples:
-        >>> sampling_rates('emodb', version='1.4.1')
+        >>> sampling_rates("emodb", version="1.4.1")
         {16000}
 
     """
@@ -610,11 +610,11 @@ def sampling_rates(
 
 
 def schemes(
-        name: str,
-        *,
-        version: str = None,
-        load_tables: bool = True,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    load_tables: bool = True,
+    cache_root: str = None,
 ) -> typing.Dict[str, audformat.Scheme]:
     """Schemes of database.
 
@@ -631,7 +631,7 @@ def schemes(
         schemes of database
 
     Examples:
-        >>> list(schemes('emodb', version='1.4.1'))
+        >>> list(schemes("emodb", version="1.4.1"))
         ['age', 'confidence', 'duration', 'emotion', 'gender', 'language', 'speaker', 'transcription']
 
     """  # noqa: E501
@@ -645,10 +645,10 @@ def schemes(
 
 
 def source(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> str:
     """Source of database.
 
@@ -662,7 +662,7 @@ def source(
         source of database
 
     Examples:
-        >>> source('emodb', version='1.4.1')
+        >>> source("emodb", version="1.4.1")
         'http://emodb.bilderbar.info/download/download.zip'
 
     """
@@ -676,10 +676,10 @@ def source(
 
 
 def splits(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> typing.Dict[str, audformat.Split]:
     """Splits of database.
 
@@ -693,7 +693,7 @@ def splits(
         splits of database
 
     Examples:
-        >>> splits('emodb', version='1.4.1')
+        >>> splits("emodb", version="1.4.1")
         test:
           {description: Unofficial speaker-independent test split, type: test}
         train:
@@ -710,10 +710,10 @@ def splits(
 
 
 def tables(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> typing.Dict[str, audformat.Table]:
     """Tables of database.
 
@@ -727,7 +727,7 @@ def tables(
         tables of database
 
     Examples:
-        >>> list(tables('emodb', version='1.4.1'))
+        >>> list(tables("emodb", version="1.4.1"))
         ['emotion', 'emotion.categories.test.gold_standard', 'emotion.categories.train.gold_standard', 'files']
 
     """  # noqa: E501
@@ -741,10 +741,10 @@ def tables(
 
 
 def usage(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> str:
     """Usage of database.
 
@@ -758,7 +758,7 @@ def usage(
         usage of database
 
     Examples:
-        >>> usage('emodb', version='1.4.1')
+        >>> usage("emodb", version="1.4.1")
         'unrestricted'
 
     """

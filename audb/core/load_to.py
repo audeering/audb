@@ -15,8 +15,8 @@ from audb.core.load import load_header_to
 
 
 def _find_attachments(
-        db_root: str,
-        deps: Dependencies,
+    db_root: str,
+    deps: Dependencies,
 ) -> typing.List[str]:
     r"""Find missing attachments."""
     attachments = []
@@ -30,11 +30,11 @@ def _find_attachments(
 
 
 def _find_media(
-        db: audformat.Database,
-        db_root: str,
-        deps: Dependencies,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    db: audformat.Database,
+    db_root: str,
+    deps: Dependencies,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ) -> typing.List[str]:
     r"""Find missing media.
 
@@ -59,18 +59,18 @@ def _find_media(
         params=[([file], {}) for file in db.files],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Find media',
+        task_description="Find media",
     )
 
     return media
 
 
 def _find_tables(
-        db_header: audformat.Database,
-        db_root: str,
-        deps: Dependencies,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    db_header: audformat.Database,
+    db_root: str,
+    deps: Dependencies,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ) -> typing.List[str]:
     r"""Find missing tables.
 
@@ -86,7 +86,7 @@ def _find_tables(
     tables = []
 
     def job(table: str):
-        file = f'db.{table}.csv'
+        file = f"db.{table}.csv"
         full_file = os.path.join(db_root, file)
         if not os.path.exists(full_file):
             tables.append(file)
@@ -96,21 +96,21 @@ def _find_tables(
         params=[([table], {}) for table in list(db_header)],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Find tables',
+        task_description="Find tables",
     )
 
     return tables
 
 
 def _get_attachments(
-        paths: typing.Sequence[str],
-        db_root: str,
-        db_root_tmp: str,
-        db_name: str,
-        deps: Dependencies,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    paths: typing.Sequence[str],
+    db_root: str,
+    db_root_tmp: str,
+    db_name: str,
+    deps: Dependencies,
+    backend: audbackend.Backend,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ):
     r"""Load attachments from backend."""
     # create folder tree to avoid race condition
@@ -122,10 +122,10 @@ def _get_attachments(
         archive = deps.archive(path)
         version = deps.version(path)
         archive = backend.join(
-            '/',
+            "/",
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            archive + '.zip',
+            archive + ".zip",
         )
         backend.get_archive(
             archive,
@@ -145,21 +145,20 @@ def _get_attachments(
         params=[([path], {}) for path in paths],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Load attachments',
+        task_description="Load attachments",
     )
 
 
 def _get_media(
-        media: typing.List[str],
-        db_root: str,
-        db_root_tmp: str,
-        db_name: str,
-        deps: Dependencies,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    media: typing.List[str],
+    db_root: str,
+    db_root_tmp: str,
+    db_name: str,
+    deps: Dependencies,
+    backend: audbackend.Backend,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ):
-
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
     utils.mkdir_tree(media, db_root)
@@ -168,16 +167,14 @@ def _get_media(
     # figure out archives
     archives = set()
     for file in media:
-        archives.add(
-            (deps.archive(file), deps.version(file))
-        )
+        archives.add((deps.archive(file), deps.version(file)))
 
     def job(archive: str, version: str):
         archive = backend.join(
-            '/',
+            "/",
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-            archive + '.zip',
+            archive + ".zip",
         )
         files = backend.get_archive(
             archive,
@@ -196,37 +193,37 @@ def _get_media(
         params=[([archive, version], {}) for archive, version in archives],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Get media',
+        task_description="Get media",
     )
 
 
 def _get_tables(
-        tables: typing.List[str],
-        db_root: str,
-        db_root_tmp: str,
-        db_name: str,
-        deps: Dependencies,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    tables: typing.List[str],
+    db_root: str,
+    db_root_tmp: str,
+    db_name: str,
+    deps: Dependencies,
+    backend: audbackend.Backend,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ):
-
     def job(table: str):
         # If a pickled version of the table exists,
         # we have to remove it to make sure that
         # later on the new CSV tables are loaded.
         # This can happen if we upgrade an existing
         # database to a different version.
-        path_pkl = os.path.join(
-            db_root, table
-        )[:-3] + audformat.define.TableStorageFormat.PICKLE
+        path_pkl = (
+            os.path.join(db_root, table)[:-3]
+            + audformat.define.TableStorageFormat.PICKLE
+        )
         if os.path.exists(path_pkl):
             os.remove(path_pkl)
         archive = backend.join(
-            '/',
+            "/",
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.META],
-            deps.archive(table) + '.zip',
+            deps.archive(table) + ".zip",
         )
         backend.get_archive(
             archive,
@@ -244,7 +241,7 @@ def _get_tables(
         params=[([table], {}) for table in tables],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Get tables',
+        task_description="Get tables",
     )
 
 
@@ -261,14 +258,14 @@ def _remove_empty_dirs(root):
 
 
 def load_to(
-        root: str,
-        name: str,
-        *,
-        version: str = None,
-        only_metadata: bool = False,
-        cache_root: str = None,
-        num_workers: typing.Optional[int] = 1,
-        verbose: bool = True,
+    root: str,
+    name: str,
+    *,
+    version: str = None,
+    only_metadata: bool = False,
+    cache_root: str = None,
+    num_workers: typing.Optional[int] = 1,
+    verbose: bool = True,
 ) -> audformat.Database:
     r"""Load database to directory.
 
@@ -359,8 +356,7 @@ def load_to(
     # get altered and new tables
 
     tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
-    _get_tables(tables, db_root, db_root_tmp, name, deps, backend,
-                num_workers, verbose)
+    _get_tables(tables, db_root, db_root_tmp, name, deps, backend, num_workers, verbose)
 
     # load database
 
@@ -388,8 +384,9 @@ def load_to(
 
     if not only_metadata:
         media = _find_media(db, db_root, deps, num_workers, verbose)
-        _get_media(media, db_root, db_root_tmp, name, deps, backend,
-                   num_workers, verbose)
+        _get_media(
+            media, db_root, db_root_tmp, name, deps, backend, num_workers, verbose
+        )
 
     # save dependencies
 
@@ -416,9 +413,9 @@ def load_to(
         _remove_empty_dirs(db_root_tmp)
     except OSError:  # pragma: no cover
         raise RuntimeError(
-            'Could not remove temporary directory, '
-            'probably there are some leftover files. '
-            'This should not happen.'
+            "Could not remove temporary directory, "
+            "probably there are some leftover files. "
+            "This should not happen."
         )
 
     return db

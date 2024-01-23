@@ -11,11 +11,11 @@ import audiofile
 import audb
 
 
-DB_NAME = 'test_load'
+DB_NAME = "test_load"
 
 
 @pytest.fixture(
-    scope='function',
+    scope="function",
     autouse=True,
 )
 def assert_database_tmp_folder_is_deleted():
@@ -30,11 +30,11 @@ def assert_database_tmp_folder_is_deleted():
     yield
 
     dirs = audeer.list_dir_names(audb.default_cache_root(), recursive=True)
-    assert len([d for d in dirs if d.endswith('~')]) == 0
+    assert len([d for d in dirs if d.endswith("~")]) == 0
 
 
 @pytest.fixture(
-    scope='module',
+    scope="module",
     autouse=True,
 )
 def dbs(tmpdir_factory, persistent_repository):
@@ -52,57 +52,53 @@ def dbs(tmpdir_factory, persistent_repository):
 
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
-    db.schemes['scheme'] = audformat.Scheme(
-        labels=['positive', 'neutral', 'negative']
-    )
+    db.schemes["scheme"] = audformat.Scheme(labels=["positive", "neutral", "negative"])
     audformat.testing.add_table(
         db,
-        'emotion',
+        "emotion",
         audformat.define.IndexType.SEGMENTED,
         num_files=5,
-        columns={'emotion': ('scheme', None)}
+        columns={"emotion": ("scheme", None)},
     )
     audformat.testing.add_misc_table(
         db,
-        'misc-in-scheme',
-        pd.Index([0, 1, 2], dtype='Int64', name='idx'),
-        columns={'emotion': ('scheme', None)}
+        "misc-in-scheme",
+        pd.Index([0, 1, 2], dtype="Int64", name="idx"),
+        columns={"emotion": ("scheme", None)},
     )
-    db.schemes['speaker'] = audformat.Scheme(
-        labels=['adam', 'eve']
+    db.schemes["speaker"] = audformat.Scheme(labels=["adam", "eve"])
+    db.schemes["misc"] = audformat.Scheme(
+        "int",
+        labels="misc-in-scheme",
     )
-    db.schemes['misc'] = audformat.Scheme(
-        'int',
-        labels='misc-in-scheme',
-    )
-    db['files'] = audformat.Table(db.files)
-    db['files']['speaker'] = audformat.Column(scheme_id='speaker')
-    db['files']['speaker'].set(
-        ['adam', 'adam', 'eve', 'eve'],
+    db["files"] = audformat.Table(db.files)
+    db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
+    db["files"]["speaker"].set(
+        ["adam", "adam", "eve", "eve"],
         index=audformat.filewise_index(db.files[:4]),
     )
-    db['files']['misc'] = audformat.Column(scheme_id='misc')
-    db['files']['misc'].set(
+    db["files"]["misc"] = audformat.Column(scheme_id="misc")
+    db["files"]["misc"].set(
         [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
-    db.attachments['file'] = audformat.Attachment('extra/file.txt')
-    db.attachments['folder'] = audformat.Attachment('extra/folder')
+    db.attachments["file"] = audformat.Attachment("extra/file.txt")
+    db.attachments["folder"] = audformat.Attachment("extra/folder")
 
     # publish 1.0.0
 
-    version = '1.0.0'
+    version = "1.0.0"
     db_root = tmpdir_factory.mktemp(version)
     paths[version] = str(db_root)
 
-    audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
-    audeer.touch(audeer.path(db_root, 'extra/file.txt'))
-    audeer.touch(audeer.path(db_root, 'extra/folder/file1.txt'))
-    audeer.touch(audeer.path(db_root, 'extra/folder/file2.txt'))
-    audeer.touch(audeer.path(db_root, 'extra/folder/sub-folder/file3.txt'))
+    audeer.mkdir(audeer.path(db_root, "extra/folder/sub-folder"))
+    audeer.touch(audeer.path(db_root, "extra/file.txt"))
+    audeer.touch(audeer.path(db_root, "extra/folder/file1.txt"))
+    audeer.touch(audeer.path(db_root, "extra/folder/file2.txt"))
+    audeer.touch(audeer.path(db_root, "extra/folder/sub-folder/file3.txt"))
     db.save(db_root)
     audformat.testing.create_audio_files(db)
-    archives = db['files']['speaker'].get().dropna().to_dict()
+    archives = db["files"]["speaker"].get().dropna().to_dict()
     audb.publish(
         db_root,
         version,
@@ -114,25 +110,27 @@ def dbs(tmpdir_factory, persistent_repository):
     # publish 1.1.0, add table, remove attachment file
 
     previous_db_root = db_root
-    version = '1.1.0'
+    version = "1.1.0"
     db_root = tmpdir_factory.mktemp(version)
     paths[version] = str(db_root)
 
     audformat.testing.add_table(
-        db, 'train', audformat.define.IndexType.SEGMENTED,
-        columns={'label': ('scheme', None)}
+        db,
+        "train",
+        audformat.define.IndexType.SEGMENTED,
+        columns={"label": ("scheme", None)},
     )
     shutil.copytree(
-        audeer.path(previous_db_root, 'extra'),
-        audeer.path(db_root, 'extra'),
+        audeer.path(previous_db_root, "extra"),
+        audeer.path(db_root, "extra"),
     )
-    os.remove(audeer.path(db_root, 'extra/folder/file2.txt'))
+    os.remove(audeer.path(db_root, "extra/folder/file2.txt"))
 
     db.save(db_root)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        audeer.path(previous_db_root, 'db.csv'),
-        audeer.path(db_root, 'db.csv'),
+        audeer.path(previous_db_root, "db.csv"),
+        audeer.path(db_root, "db.csv"),
     )
     audb.publish(
         db_root,
@@ -144,22 +142,22 @@ def dbs(tmpdir_factory, persistent_repository):
     # publish 1.1.1, change label
 
     previous_db_root = db_root
-    version = '1.1.1'
+    version = "1.1.1"
     db_root = tmpdir_factory.mktemp(version)
     paths[version] = str(db_root)
 
-    row = db['train'].index[0]
-    db['train'].df.at[row, 'label'] = None
+    row = db["train"].index[0]
+    db["train"].df.at[row, "label"] = None
     shutil.copytree(
-        audeer.path(previous_db_root, 'extra'),
-        audeer.path(db_root, 'extra'),
+        audeer.path(previous_db_root, "extra"),
+        audeer.path(db_root, "extra"),
     )
 
     db.save(db_root)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        audeer.path(previous_db_root, 'db.csv'),
-        audeer.path(db_root, 'db.csv'),
+        audeer.path(previous_db_root, "db.csv"),
+        audeer.path(db_root, "db.csv"),
     )
     audb.publish(
         db_root,
@@ -171,16 +169,16 @@ def dbs(tmpdir_factory, persistent_repository):
     # publish 2.0.0, alter and remove media, remove attachment
 
     previous_db_root = db_root
-    version = '2.0.0'
+    version = "2.0.0"
     db_root = tmpdir_factory.mktemp(version)
     paths[version] = str(db_root)
 
     shutil.copytree(
-        audeer.path(previous_db_root, 'extra'),
-        audeer.path(db_root, 'extra'),
+        audeer.path(previous_db_root, "extra"),
+        audeer.path(db_root, "extra"),
     )
-    del db.attachments['file']
-    os.remove(audeer.path(db_root, 'extra/file.txt'))
+    del db.attachments["file"]
+    os.remove(audeer.path(db_root, "extra/file.txt"))
 
     db.save(db_root)
     audformat.testing.create_audio_files(db)
@@ -194,8 +192,8 @@ def dbs(tmpdir_factory, persistent_repository):
     db.save(db_root)
 
     shutil.copy(
-        os.path.join(previous_db_root, 'db.csv'),
-        os.path.join(db_root, 'db.csv'),
+        os.path.join(previous_db_root, "db.csv"),
+        os.path.join(db_root, "db.csv"),
     )
     audb.publish(
         db_root,
@@ -207,23 +205,23 @@ def dbs(tmpdir_factory, persistent_repository):
     # publish 3.0.0, remove table, alter attachment file
 
     previous_db_root = db_root
-    version = '3.0.0'
+    version = "3.0.0"
     db_root = tmpdir_factory.mktemp(version)
     paths[version] = str(db_root)
 
     shutil.copytree(
-        audeer.path(previous_db_root, 'extra'),
-        audeer.path(db_root, 'extra'),
+        audeer.path(previous_db_root, "extra"),
+        audeer.path(db_root, "extra"),
     )
-    with open(audeer.path(db_root, 'extra/folder/file1.txt'), 'a') as fp:
-        fp.write('text')
+    with open(audeer.path(db_root, "extra/folder/file1.txt"), "a") as fp:
+        fp.write("text")
 
-    db.drop_tables('train')
+    db.drop_tables("train")
     db.save(db_root)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        os.path.join(previous_db_root, 'db.csv'),
-        os.path.join(db_root, 'db.csv'),
+        os.path.join(previous_db_root, "db.csv"),
+        os.path.join(db_root, "db.csv"),
     )
     audb.publish(
         db_root,
@@ -236,8 +234,8 @@ def dbs(tmpdir_factory, persistent_repository):
 
 
 def test_database_cache_folder(cache):
-    cache_root = os.path.join(cache, 'cache')
-    version = '1.0.0'
+    cache_root = os.path.join(cache, "cache")
+    version = "1.0.0"
     db_root = audb.core.load.database_cache_root(
         DB_NAME,
         version,
@@ -253,34 +251,33 @@ def test_database_cache_folder(cache):
 
 def test_load_wrong_argument():
     with pytest.raises(TypeError):
-        audb.load(DB_NAME, typo='1.0.0')
+        audb.load(DB_NAME, typo="1.0.0")
 
 
-@pytest.mark.parametrize('only_metadata', [True, False])
+@pytest.mark.parametrize("only_metadata", [True, False])
 @pytest.mark.parametrize(
-    'format',
+    "format",
     [
         None,
-        'wav',
-        'flac',
-    ]
+        "wav",
+        "flac",
+    ],
 )
 @pytest.mark.parametrize(
-    'version',
+    "version",
     [
         None,  # 3.0.0
-        '1.0.0',
-        '1.1.0',
-        '1.1.1',
-        '2.0.0',
+        "1.0.0",
+        "1.1.0",
+        "1.1.1",
+        "2.0.0",
         pytest.param(
-            '4.0.0',
+            "4.0.0",
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
-    ]
+    ],
 )
 def test_load(dbs, format, version, only_metadata):
-
     # When loading the first time (only_metadata=True)
     # the database should not exists in cache
     if only_metadata:
@@ -301,26 +298,25 @@ def test_load(dbs, format, version, only_metadata):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    db_root = db.meta['audb']['root']
+    db_root = db.meta["audb"]["root"]
 
     # Load original database from folder (expected database)
     resolved_version = version or audb.latest_version(DB_NAME)
     db_original = audformat.Database.load(dbs[resolved_version])
     if format is not None:
-        db_original.map_files(
-            lambda x: audeer.replace_file_extension(x, format)
-        )
+        db_original.map_files(lambda x: audeer.replace_file_extension(x, format))
 
     # Assert database exists in cache
     assert audb.exists(DB_NAME, version=version, format=format)
     df = audb.cached()
-    assert df.loc[db_root, 'version'] == resolved_version
+    assert df.loc[db_root, "version"] == resolved_version
 
     # Assert files duration are stored as hidden attribute
     if not only_metadata:
         files_duration = {
             os.path.join(db_root, os.path.normpath(file)): pd.to_timedelta(
-                audiofile.duration(os.path.join(db_root, file)), unit='s')
+                audiofile.duration(os.path.join(db_root, file)), unit="s"
+            )
             for file in db.files
         }
         assert db._files_duration == files_duration
@@ -335,7 +331,7 @@ def test_load(dbs, format, version, only_metadata):
 
     # Assert tables are identical and exist as CSV files
     for table in db:
-        assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
+        assert os.path.exists(os.path.join(db_root, f"db.{table}.csv"))
         pd.testing.assert_frame_equal(
             db_original[table].df,
             db[table].df,
@@ -356,10 +352,7 @@ def test_load(dbs, format, version, only_metadata):
     deps = audb.dependencies(DB_NAME, version=version)
     assert str(deps().to_string()) == str(deps)
     assert len(deps) == (
-        len(db.files)
-        + len(db.tables)
-        + len(db.misc_tables)
-        + len(db.attachments)
+        len(db.files) + len(db.tables) + len(db.misc_tables) + len(db.attachments)
     )
 
     # === Load from CACHE with full_path=True ===
@@ -377,8 +370,7 @@ def test_load(dbs, format, version, only_metadata):
     # Assert files duration are stored as hidden attribute
     if not only_metadata:
         files_duration = {
-            os.path.normpath(file):
-            pd.to_timedelta(audiofile.duration(file), unit='s')
+            os.path.normpath(file): pd.to_timedelta(audiofile.duration(file), unit="s")
             for file in db.files
         }
         assert db._files_duration == files_duration
@@ -392,7 +384,7 @@ def test_load(dbs, format, version, only_metadata):
 
     # Assert table CSV files exist
     for table in db:
-        assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
+        assert os.path.exists(os.path.join(db_root, f"db.{table}.csv"))
 
     # Assert attachments files do (not) exist
     for attachment in db.attachments:
@@ -406,58 +398,53 @@ def test_load(dbs, format, version, only_metadata):
 
 
 def test_load_from_cache(dbs):
-
     # Load a database with flavor to cache
     # and reload afterwards from cache
-    format = 'flac'
-    version = '1.0.0'
+    format = "flac"
+    version = "1.0.0"
     db = audb.load(
         DB_NAME,
-        version='1.0.0',
-        format='flac',
+        version="1.0.0",
+        format="flac",
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    db_root = db.meta['audb']['root']
+    db_root = db.meta["audb"]["root"]
 
     # Load original database from folder (expected database)
     db_original = audformat.Database.load(dbs[version])
-    db_original.map_files(
-        lambda x: audeer.replace_file_extension(x, format)
-    )
+    db_original.map_files(lambda x: audeer.replace_file_extension(x, format))
 
     # Assert database exists in cache
     assert audb.exists(DB_NAME, version=version, format=format)
     df = audb.cached()
-    assert df.loc[db_root, 'version'] == version
+    assert df.loc[db_root, "version"] == version
 
     # Assert media files are identical and exist
     pd.testing.assert_index_equal(db.files, db_original.files)
     for file in db.files:
         assert os.path.exists(os.path.join(db_root, file))
 
-    version = '2.0.0'
+    version = "2.0.0"
     db = audb.load(
         DB_NAME,
-        version='2.0.0',
-        format='flac',
+        version="2.0.0",
+        format="flac",
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    db_root = db.meta['audb']['root']
+    db_root = db.meta["audb"]["root"]
 
     # Load original database from folder (expected database)
     db_original = audformat.Database.load(dbs[version])
-    db_original.map_files(
-        lambda x: audeer.replace_file_extension(x, format)
-    )
+    db_original.map_files(lambda x: audeer.replace_file_extension(x, format))
 
     # Assert database exists in cache
     assert audb.exists(DB_NAME, version=version, format=format)
     df = audb.cached()
-    assert df.loc[db_root, 'version'] == version
+    assert df.loc[db_root, "version"] == version
 
     # Assert media files are identical and exist
     pd.testing.assert_index_equal(db.files, db_original.files)
@@ -466,24 +453,23 @@ def test_load_from_cache(dbs):
 
 
 @pytest.mark.parametrize(
-    'version, attachment_id',
+    "version, attachment_id",
     [
         (
-            '1.0.0',
-            'file',
+            "1.0.0",
+            "file",
         ),
         (
-            '1.0.0',
-            'folder',
+            "1.0.0",
+            "folder",
         ),
         (
             None,
-            'folder',
+            "folder",
         ),
-    ]
+    ],
 )
 def test_load_attachment(cache, version, attachment_id):
-
     db = audb.load(
         DB_NAME,
         version=version,
@@ -529,24 +515,18 @@ def test_load_attachment(cache, version, attachment_id):
 
 
 @pytest.mark.parametrize(
-    'version, attachment_id, error, error_msg',
+    "version, attachment_id, error, error_msg",
     [
+        ("1.0.0", "", ValueError, "Could not find the attachment ''"),
         (
-            '1.0.0',
-            '',
+            "1.0.0",
+            "non-existent",
             ValueError,
-            "Could not find the attachment ''"
+            "Could not find the attachment 'non-existent'",
         ),
-        (
-            '1.0.0',
-            'non-existent',
-            ValueError,
-            "Could not find the attachment 'non-existent'"
-        ),
-    ]
+    ],
 )
 def test_load_attachment_errors(version, attachment_id, error, error_msg):
-
     with pytest.raises(error, match=error_msg):
         audb.load_attachment(
             DB_NAME,
@@ -557,38 +537,37 @@ def test_load_attachment_errors(version, attachment_id, error, error_msg):
 
 
 @pytest.mark.parametrize(
-    'version, media, format',
+    "version, media, format",
     [
         (
-            '1.0.0',
+            "1.0.0",
             [],
             None,
         ),
         (
-            '1.0.0',
-            'audio/001.wav',
-            'wav',
+            "1.0.0",
+            "audio/001.wav",
+            "wav",
         ),
         pytest.param(
-            '1.0.0',
-            ['audio/001.flac', 'audio/002.flac'],
-            'flac',
+            "1.0.0",
+            ["audio/001.flac", "audio/002.flac"],
+            "flac",
             marks=pytest.mark.xfail(raises=ValueError),
         ),
         (
-            '1.0.0',
-            ['audio/001.wav', 'audio/002.wav'],
-            'flac',
+            "1.0.0",
+            ["audio/001.wav", "audio/002.wav"],
+            "flac",
         ),
         (
             None,
-            ['audio/001.wav'],
+            ["audio/001.wav"],
             None,
         ),
-    ]
+    ],
 )
 def test_load_media(cache, version, media, format):
-
     paths = audb.load_media(
         DB_NAME,
         media,
@@ -596,14 +575,10 @@ def test_load_media(cache, version, media, format):
         format=format,
         verbose=False,
     )
-    expected_paths = [
-        os.path.join(cache, p)
-        for p in paths
-    ]
+    expected_paths = [os.path.join(cache, p) for p in paths]
     if format is not None:
         expected_paths = [
-            audeer.replace_file_extension(p, format)
-            for p in expected_paths
+            audeer.replace_file_extension(p, format) for p in expected_paths
         ]
     assert paths == expected_paths
 
@@ -628,25 +603,24 @@ def test_load_media(cache, version, media, format):
 
 
 @pytest.mark.parametrize(
-    'version, table',
+    "version, table",
     [
         (
-            '1.0.0',
-            'emotion',
+            "1.0.0",
+            "emotion",
         ),
         pytest.param(
-            '1.0.0',
-            'non-existing-table',
+            "1.0.0",
+            "non-existing-table",
             marks=pytest.mark.xfail(raises=ValueError),
         ),
         (
             None,
-            'emotion',
+            "emotion",
         ),
-    ]
+    ],
 )
 def test_load_table(version, table):
-
     df = audb.load_table(
         DB_NAME,
         table,
@@ -655,42 +629,41 @@ def test_load_table(version, table):
     )
     if version is None:
         expected_files = [
-            'audio/001.wav',
-            'audio/002.wav',
-            'audio/003.wav',
-            'audio/004.wav',
+            "audio/001.wav",
+            "audio/002.wav",
+            "audio/003.wav",
+            "audio/004.wav",
         ]
-    elif version == '1.0.0':
+    elif version == "1.0.0":
         expected_files = [
-            'audio/001.wav',
-            'audio/002.wav',
-            'audio/003.wav',
-            'audio/004.wav',
-            'audio/005.wav',
+            "audio/001.wav",
+            "audio/002.wav",
+            "audio/003.wav",
+            "audio/004.wav",
+            "audio/005.wav",
         ]
-    files = sorted(list(set(df.index.get_level_values('file'))))
+    files = sorted(list(set(df.index.get_level_values("file"))))
     assert files == expected_files
 
 
 @pytest.mark.parametrize(
-    'version',
+    "version",
     [
         None,
-        '1.0.0',
-        '1.1.0',
-        '1.1.1',
-        '2.0.0',
-        '3.0.0',
+        "1.0.0",
+        "1.1.0",
+        "1.1.1",
+        "2.0.0",
+        "3.0.0",
         pytest.param(
-            '4.0.0',
+            "4.0.0",
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
-    ]
+    ],
 )
-@pytest.mark.parametrize('only_metadata', [True, False])
+@pytest.mark.parametrize("only_metadata", [True, False])
 def test_load_to(tmpdir, dbs, version, only_metadata):
-
-    db_root = audeer.path(tmpdir, 'raw')
+    db_root = audeer.path(tmpdir, "raw")
 
     db = audb.load_to(
         db_root,
@@ -716,7 +689,7 @@ def test_load_to(tmpdir, dbs, version, only_metadata):
 
     # Assert tables are identical and exist as CSV files
     for table in db:
-        assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
+        assert os.path.exists(os.path.join(db_root, f"db.{table}.csv"))
         pd.testing.assert_frame_equal(
             db_original[table].df,
             db[table].df,
@@ -734,15 +707,14 @@ def test_load_to(tmpdir, dbs, version, only_metadata):
                 assert os.path.exists(audeer.path(db.root, attachment_file))
 
 
-@pytest.mark.parametrize('only_metadata', [True, False])
+@pytest.mark.parametrize("only_metadata", [True, False])
 def test_load_to_update(tmpdir, dbs, only_metadata):
-
     # Use version 1.0.0 as this contains two attachments,
     # one file and one folder
     # which is needed to reach full code coverage
-    version = '1.0.0'
+    version = "1.0.0"
 
-    db_root = audeer.path(tmpdir, 'raw')
+    db_root = audeer.path(tmpdir, "raw")
 
     db = audb.load_to(
         db_root,
@@ -758,7 +730,7 @@ def test_load_to_update(tmpdir, dbs, only_metadata):
     if not only_metadata:
         media = audeer.path(db_root, db.files[0])
         os.remove(media)
-    table = audeer.path(db_root, f'db.{list(db)[0]}.csv')
+    table = audeer.path(db_root, f"db.{list(db)[0]}.csv")
     os.remove(table)
 
     # Change some files
@@ -769,10 +741,10 @@ def test_load_to_update(tmpdir, dbs, only_metadata):
                 db.attachments[attachment_id].path,
             )
             if os.path.isdir(attachment):
-                audeer.touch(audeer.path(attachment, 'other-file.txt'))
+                audeer.touch(audeer.path(attachment, "other-file.txt"))
             else:
-                with open(attachment, 'a') as fp:
-                    fp.write('next')
+                with open(attachment, "a") as fp:
+                    fp.write("next")
 
     # Load again to force restoring to original state
     db = audb.load_to(
@@ -799,7 +771,7 @@ def test_load_to_update(tmpdir, dbs, only_metadata):
 
     # Assert tables are identical and exist as CSV files
     for table in db:
-        assert os.path.exists(os.path.join(db_root, f'db.{table}.csv'))
+        assert os.path.exists(os.path.join(db_root, f"db.{table}.csv"))
         pd.testing.assert_frame_equal(
             db_original[table].df,
             db[table].df,
@@ -818,22 +790,22 @@ def test_load_to_update(tmpdir, dbs, only_metadata):
 
 
 @pytest.mark.parametrize(
-    'name, version, error, error_msg',
+    "name, version, error, error_msg",
     [
-        (DB_NAME, '1.0.0', None, None),
+        (DB_NAME, "1.0.0", None, None),
         pytest.param(  # database does not exist
-            'does-not-exist',
-            '1.0.0',
+            "does-not-exist",
+            "1.0.0",
             RuntimeError,
             "Cannot find database 'does-not-exist'.",
         ),
         pytest.param(  # version does not exist
             DB_NAME,
-            '999.9.9',
+            "999.9.9",
             RuntimeError,
             f"Cannot find version '999.9.9' for database '{DB_NAME}'.",
-        )
-    ]
+        ),
+    ],
 )
 def test_repository(persistent_repository, name, version, error, error_msg):
     if error is not None:

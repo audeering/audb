@@ -2,25 +2,26 @@ import os
 
 
 # Configuration files
-CONFIG_FILE = os.path.join('etc', 'audb.yaml')
-USER_CONFIG_FILE = '~/.audb.yaml'
+CONFIG_FILE = os.path.join("etc", "audb.yaml")
+USER_CONFIG_FILE = "~/.audb.yaml"
 
 # Database
-DB = 'db'
-HEADER_FILE = f'{DB}.yaml'
+DB = "db"
+HEADER_FILE = f"{DB}.yaml"
 
 # Dependencies
-DEPENDENCIES_FILE = f'{DB}.csv'
-CACHED_DEPENDENCIES_FILE = f'{DB}.pkl'
+DEPENDENCIES_FILE = f"{DB}.csv"
+CACHED_DEPENDENCIES_FILE = f"{DB}.pkl"
 
 # Cache lock
 CACHED_VERSIONS_TIMEOUT = 10  # Timeout to acquire access to cached versions
-LOCK_FILE = '.lock'
-TIMEOUT_MSG = 'Lock could not be acquired. Timeout exceeded.'
+LOCK_FILE = ".lock"
+TIMEOUT_MSG = "Lock could not be acquired. Timeout exceeded."
 
 
 class DependField:
     r"""Fields stored in dependency table."""
+
     ARCHIVE = 0
     BIT_DEPTH = 1
     CHANNELS = 2
@@ -34,16 +35,16 @@ class DependField:
 
 
 DEPEND_FIELD_NAMES = {
-    DependField.ARCHIVE: 'archive',
-    DependField.BIT_DEPTH: 'bit_depth',
-    DependField.CHANNELS: 'channels',
-    DependField.CHECKSUM: 'checksum',
-    DependField.DURATION: 'duration',
-    DependField.FORMAT: 'format',
-    DependField.REMOVED: 'removed',
-    DependField.SAMPLING_RATE: 'sampling_rate',
-    DependField.TYPE: 'type',
-    DependField.VERSION: 'version',
+    DependField.ARCHIVE: "archive",
+    DependField.BIT_DEPTH: "bit_depth",
+    DependField.CHANNELS: "channels",
+    DependField.CHECKSUM: "checksum",
+    DependField.DURATION: "duration",
+    DependField.FORMAT: "format",
+    DependField.REMOVED: "removed",
+    DependField.SAMPLING_RATE: "sampling_rate",
+    DependField.TYPE: "type",
+    DependField.VERSION: "version",
 }
 
 DEPEND_FIELD_DTYPES = {
@@ -62,15 +63,16 @@ DEPEND_FIELD_DTYPES = {
 
 class DependType:
     r"""Dependency file types."""
+
     META = 0
     MEDIA = 1
     ATTACHMENT = 2
 
 
 DEPEND_TYPE_NAMES = {
-    DependType.META: 'meta',
-    DependType.MEDIA: 'media',
-    DependType.ATTACHMENT: 'attachment',
+    DependType.META: "meta",
+    DependType.MEDIA: "media",
+    DependType.ATTACHMENT: "attachment",
 }
 
 
@@ -81,8 +83,9 @@ class Format:
     Media formats :meth:`audb.load` can convert to on request.
 
     """
-    WAV = 'wav'
-    FLAC = 'flac'
+
+    WAV = "wav"
+    FLAC = "flac"
 
 
 FORMATS = [Format.WAV, Format.FLAC]

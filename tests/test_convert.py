@@ -10,11 +10,11 @@ import audiofile
 import audb
 
 
-DB_NAME = 'test_convert'
+DB_NAME = "test_convert"
 
 
 @pytest.fixture(
-    scope='module',
+    scope="module",
     autouse=True,
 )
 def db_root(tmpdir_factory, persistent_repository):
@@ -24,29 +24,29 @@ def db_root(tmpdir_factory, persistent_repository):
         path to original database root
 
     """
-    version = '1.0.0'
+    version = "1.0.0"
     db_root = tmpdir_factory.mktemp(version)
 
     # define audio files and metadata
 
     db_files = {
-        'audio/file1.wav': {
-            'bit_depth': 16,
-            'channels': 1,
-            'format': 'wav',
-            'sampling_rate': 8000,
+        "audio/file1.wav": {
+            "bit_depth": 16,
+            "channels": 1,
+            "format": "wav",
+            "sampling_rate": 8000,
         },
-        'audio/file2.wav': {
-            'bit_depth': 24,
-            'channels': 2,
-            'format': 'wav',
-            'sampling_rate': 16000,
+        "audio/file2.wav": {
+            "bit_depth": 24,
+            "channels": 2,
+            "format": "wav",
+            "sampling_rate": 16000,
         },
-        'audio/file3.flac': {
-            'bit_depth': 8,
-            'channels': 3,
-            'format': 'flac',
-            'sampling_rate': 44100,
+        "audio/file3.flac": {
+            "bit_depth": 8,
+            "channels": 3,
+            "format": "flac",
+            "sampling_rate": 44100,
         },
     }
 
@@ -55,28 +55,30 @@ def db_root(tmpdir_factory, persistent_repository):
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
 
-    db['files'] = audformat.Table(audformat.filewise_index(list(db_files)))
-    db['files']['original'] = audformat.Column()
-    db['files']['original'].set(list(db_files))
+    db["files"] = audformat.Table(audformat.filewise_index(list(db_files)))
+    db["files"]["original"] = audformat.Column()
+    db["files"]["original"].set(list(db_files))
     for file in db_files:
         signal = np.zeros(
             (
-                db_files[file]['channels'],
-                db_files[file]['sampling_rate'],
+                db_files[file]["channels"],
+                db_files[file]["sampling_rate"],
             ),
             dtype=np.float32,
         )
         path = os.path.join(db_root, file)
         audeer.mkdir(os.path.dirname(path))
         audiofile.write(
-            path, signal, db_files[file]['sampling_rate'],
-            bit_depth=db_files[file]['bit_depth']
+            path,
+            signal,
+            db_files[file]["sampling_rate"],
+            bit_depth=db_files[file]["bit_depth"],
         )
-    db['segments'] = audformat.Table(
+    db["segments"] = audformat.Table(
         audformat.segmented_index(
             [list(db_files)[0]] * 3,
-            starts=['0s', '1s', '2s'],
-            ends=['1s', '2s', '3s'],
+            starts=["0s", "1s", "2s"],
+            ends=["1s", "2s", "3s"],
         )
     )
     db.save(db_root)
@@ -94,13 +96,13 @@ def db_root(tmpdir_factory, persistent_repository):
 
 
 @pytest.mark.parametrize(
-    'bit_depth',
+    "bit_depth",
     [
-        None, 16,
+        None,
+        16,
     ],
 )
 def test_bit_depth(db_root, bit_depth):
-
     db = audb.load(
         DB_NAME,
         bit_depth=bit_depth,
@@ -108,31 +110,33 @@ def test_bit_depth(db_root, bit_depth):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    original_files = db['files']['original'].get()
+    original_files = db["files"]["original"].get()
 
     df = audb.cached()
-    assert df['bit_depth'].values[0] == bit_depth
+    assert df["bit_depth"].values[0] == bit_depth
 
     for converted_file, original_file in zip(db.files, original_files):
-
-        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        converted_file = os.path.join(db.meta["audb"]["root"], converted_file)
         original_file = os.path.join(db_root, original_file)
 
         if bit_depth is None:
-            assert audiofile.bit_depth(converted_file) == \
-                audiofile.bit_depth(original_file)
+            assert audiofile.bit_depth(converted_file) == audiofile.bit_depth(
+                original_file
+            )
         else:
             assert audiofile.bit_depth(converted_file) == bit_depth
 
 
 @pytest.mark.parametrize(
-    'channels',
+    "channels",
     [
-        None, 1, [0, -1], range(5),
+        None,
+        1,
+        [0, -1],
+        range(5),
     ],
 )
 def test_channels(db_root, channels):
-
     db = audb.load(
         DB_NAME,
         channels=channels,
@@ -140,28 +144,28 @@ def test_channels(db_root, channels):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    original_files = db['files']['original'].get()
+    original_files = db["files"]["original"].get()
 
     df = audb.cached()
 
     for converted_file, original_file in zip(db.files, original_files):
-
-        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        converted_file = os.path.join(db.meta["audb"]["root"], converted_file)
         original_file = os.path.join(db_root, original_file)
 
         if channels is None:
-            assert audiofile.channels(converted_file) == \
-                audiofile.channels(original_file)
-            assert df['channels'].values[0] == channels
+            assert audiofile.channels(converted_file) == audiofile.channels(
+                original_file
+            )
+            assert df["channels"].values[0] == channels
         elif isinstance(channels, int):
             assert audiofile.channels(converted_file) == 1
-            assert df['channels'].values[0] == [1]
+            assert df["channels"].values[0] == [1]
         else:
             assert audiofile.channels(converted_file) == len(channels)
 
 
 @pytest.mark.parametrize(
-    'format',
+    "format",
     [
         None,
         audb.core.define.Format.WAV,
@@ -169,7 +173,6 @@ def test_channels(db_root, channels):
     ],
 )
 def test_format(db_root, format):
-
     db = audb.load(
         DB_NAME,
         format=format,
@@ -177,14 +180,13 @@ def test_format(db_root, format):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    original_files = db['files']['original'].get()
+    original_files = db["files"]["original"].get()
 
     df = audb.cached()
-    assert df['format'].values[0] == format
+    assert df["format"].values[0] == format
 
     for converted_file, original_file in zip(db.files, original_files):
-
-        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        converted_file = os.path.join(db.meta["audb"]["root"], converted_file)
         original_file = os.path.join(db_root, original_file)
 
         if format is None:
@@ -194,13 +196,10 @@ def test_format(db_root, format):
 
 
 @pytest.mark.parametrize(
-    'mixdown',
-    [
-        False, True
-    ],
+    "mixdown",
+    [False, True],
 )
 def test_mixdown(db_root, mixdown):
-
     db = audb.load(
         DB_NAME,
         mixdown=mixdown,
@@ -208,31 +207,28 @@ def test_mixdown(db_root, mixdown):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    original_files = db['files']['original'].get()
+    original_files = db["files"]["original"].get()
 
     df = audb.cached()
-    assert df['mixdown'].values[0] == mixdown
+    assert df["mixdown"].values[0] == mixdown
 
     for converted_file, original_file in zip(db.files, original_files):
-
-        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        converted_file = os.path.join(db.meta["audb"]["root"], converted_file)
         original_file = os.path.join(db_root, original_file)
 
         if mixdown:
             assert audiofile.channels(converted_file) == 1
         else:
-            assert audiofile.channels(converted_file) == \
-                audiofile.channels(original_file)
+            assert audiofile.channels(converted_file) == audiofile.channels(
+                original_file
+            )
 
 
 @pytest.mark.parametrize(
-    'sampling_rate',
-    [
-        None, 16000
-    ],
+    "sampling_rate",
+    [None, 16000],
 )
 def test_sampling_rate(db_root, sampling_rate):
-
     db = audb.load(
         DB_NAME,
         sampling_rate=sampling_rate,
@@ -240,19 +236,19 @@ def test_sampling_rate(db_root, sampling_rate):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    original_files = db['files']['original'].get()
+    original_files = db["files"]["original"].get()
 
     df = audb.cached()
-    assert df['sampling_rate'].values[0] == sampling_rate
+    assert df["sampling_rate"].values[0] == sampling_rate
 
     for converted_file, original_file in zip(db.files, original_files):
-
-        converted_file = os.path.join(db.meta['audb']['root'], converted_file)
+        converted_file = os.path.join(db.meta["audb"]["root"], converted_file)
         original_file = os.path.join(db_root, original_file)
 
         if sampling_rate is None:
-            assert audiofile.sampling_rate(converted_file) == \
-                audiofile.sampling_rate(original_file)
+            assert audiofile.sampling_rate(converted_file) == audiofile.sampling_rate(
+                original_file
+            )
         else:
             assert audiofile.sampling_rate(converted_file) == sampling_rate
 
@@ -271,7 +267,7 @@ def test_mixed_cache(cache, shared_cache):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
         only_metadata=True,
-        tables='files',
+        tables="files",
         cache_root=shared_cache,
     )
     # Now try to load same version to private cache
@@ -284,5 +280,5 @@ def test_mixed_cache(cache, shared_cache):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
         only_metadata=True,
-        tables='segments',
+        tables="segments",
     )

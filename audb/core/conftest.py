@@ -5,7 +5,7 @@ import pytest
 import audb
 
 
-@pytest.fixture(scope='package', autouse=True)
+@pytest.fixture(scope="package", autouse=True)
 def cache(tmpdir_factory):
     r"""Provide a reusable cache for docstring tests.
 
@@ -14,27 +14,27 @@ def cache(tmpdir_factory):
     across all docstring tests.
 
     """
-    cache = tmpdir_factory.mktemp('cache')
+    cache = tmpdir_factory.mktemp("cache")
     # We use the environment variable here
     # to ensure audb.config.CACHE_ROOT
     # does still return the default config value
     # in the doctest
-    env_cache = os.environ.get('AUDB_CACHE_ROOT', None)
-    env_shared_cache = os.environ.get('AUDB_SHARED_CACHE_ROOT', None)
-    os.environ['AUDB_CACHE_ROOT'] = str(cache)
-    os.environ['AUDB_SHARED_CACHE_ROOT'] = str(cache)
+    env_cache = os.environ.get("AUDB_CACHE_ROOT", None)
+    env_shared_cache = os.environ.get("AUDB_SHARED_CACHE_ROOT", None)
+    os.environ["AUDB_CACHE_ROOT"] = str(cache)
+    os.environ["AUDB_SHARED_CACHE_ROOT"] = str(cache)
 
     yield
 
     if env_cache is None:
-        del os.environ['AUDB_CACHE_ROOT']
+        del os.environ["AUDB_CACHE_ROOT"]
     else:  # pragma: nocover
-        os.environ['AUDB_CACHE_ROOT'] = env_cache
+        os.environ["AUDB_CACHE_ROOT"] = env_cache
 
     if env_shared_cache is None:
-        del os.environ['AUDB_SHARED_CACHE_ROOT']
+        del os.environ["AUDB_SHARED_CACHE_ROOT"]
     else:  # pragma: nocover
-        os.environ['AUDB_SHARED_CACHE_ROOT'] = env_shared_cache
+        os.environ["AUDB_SHARED_CACHE_ROOT"] = env_shared_cache
 
 
 @pytest.fixture(autouse=True)
@@ -54,12 +54,12 @@ def public_repository(doctest_namespace):
     """
     audb.config.REPOSITORIES = [
         audb.Repository(
-            name='data-public',
-            host='https://audeering.jfrog.io/artifactory',
-            backend='artifactory',
+            name="data-public",
+            host="https://audeering.jfrog.io/artifactory",
+            backend="artifactory",
         ),
     ]
-    doctest_namespace['audb'] = audb
+    doctest_namespace["audb"] = audb
 
     yield
 

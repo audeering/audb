@@ -11,12 +11,12 @@ import audiofile
 import audb
 
 
-DB_NAME = 'test_info'
-DB_VERSION = '1.0.0'
+DB_NAME = "test_info"
+DB_VERSION = "1.0.0"
 
 
 @pytest.fixture(
-    scope='module',
+    scope="module",
     autouse=True,
 )
 def db(tmpdir_factory, persistent_repository):
@@ -30,57 +30,53 @@ def db(tmpdir_factory, persistent_repository):
 
     db = audformat.Database(
         DB_NAME,
-        source='https://audeering.github.io/audb/',
+        source="https://audeering.github.io/audb/",
         usage=audformat.define.Usage.UNRESTRICTED,
-        languages=['de', 'English'],
-        description='audb.info unit test database',
-        meta={'foo': 'bar'}
+        languages=["de", "English"],
+        description="audb.info unit test database",
+        meta={"foo": "bar"},
     )
-    db.media['media'] = audformat.Media()
-    db.schemes['scheme1'] = audformat.Scheme()
-    db.splits['split'] = audformat.Split()
-    db.raters['rater'] = audformat.Rater()
-    db.attachments['attachment'] = audformat.Attachment('file.txt')
-    db['table1'] = audformat.Table(
+    db.media["media"] = audformat.Media()
+    db.schemes["scheme1"] = audformat.Scheme()
+    db.splits["split"] = audformat.Split()
+    db.raters["rater"] = audformat.Rater()
+    db.attachments["attachment"] = audformat.Attachment("file.txt")
+    db["table1"] = audformat.Table(
         audformat.filewise_index(
-            ['f11.wav', 'f12.wav', 'f13.wav'],
+            ["f11.wav", "f12.wav", "f13.wav"],
         ),
-        media_id='media',
-        split_id='split',
+        media_id="media",
+        split_id="split",
     )
-    db['table1']['column'] = audformat.Column(
-        scheme_id='scheme1',
-        rater_id='rater',
+    db["table1"]["column"] = audformat.Column(
+        scheme_id="scheme1",
+        rater_id="rater",
     )
-    db['table2'] = audformat.Table(
+    db["table2"] = audformat.Table(
         audformat.segmented_index(
-            ['f21.wav', 'f22.wav', 'f22.wav'],
-            [0, 0, .5],
-            [1, .5, 1],
+            ["f21.wav", "f22.wav", "f22.wav"],
+            [0, 0, 0.5],
+            [1, 0.5, 1],
         ),
-        media_id='media',
-        split_id='split',
+        media_id="media",
+        split_id="split",
     )
-    db['table2']['column'] = audformat.Column(
-        scheme_id='scheme1',
-        rater_id='rater',
+    db["table2"]["column"] = audformat.Column(
+        scheme_id="scheme1",
+        rater_id="rater",
     )
-    db['misc-in-scheme'] = audformat.MiscTable(
-        pd.Index([0, 1], name='idx')
-    )
-    db['misc-not-in-scheme'] = audformat.MiscTable(
-        pd.Index([0, 1], name='idx')
-    )
-    db.schemes['scheme2'] = audformat.Scheme(
-        'int',
-        labels='misc-in-scheme',
+    db["misc-in-scheme"] = audformat.MiscTable(pd.Index([0, 1], name="idx"))
+    db["misc-not-in-scheme"] = audformat.MiscTable(pd.Index([0, 1], name="idx"))
+    db.schemes["scheme2"] = audformat.Scheme(
+        "int",
+        labels="misc-in-scheme",
     )
 
     # create db + audio files
 
     db_root = tmpdir_factory.mktemp(DB_VERSION)
     sampling_rate = 8000
-    audeer.touch(audeer.path(db_root, db.attachments['attachment'].path))
+    audeer.touch(audeer.path(db_root, db.attachments["attachment"].path))
     for table in list(db.tables):
         for file in db[table].files:
             audiofile.write(
@@ -115,32 +111,26 @@ def test_header(db):
     # Load header without loading misc tables
     header = audb.info.header(DB_NAME, load_tables=False)
     assert str(header) == str(db)
-    error_msg = 'No file found for table with path'
+    error_msg = "No file found for table with path"
     with pytest.raises(RuntimeError, match=error_msg):
-        assert 0 in header.schemes['scheme2']
+        assert 0 in header.schemes["scheme2"]
     # Load header with tables
     header = audb.info.header(DB_NAME)
     assert str(header) == str(db)
-    assert 0 in header.schemes['scheme2']
+    assert 0 in header.schemes["scheme2"]
 
 
 def test_bit_depths():
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
     assert audb.info.bit_depths(DB_NAME) == set(
-        [
-            deps.bit_depth(file) for file in deps.media
-            if deps.bit_depth(file)
-        ]
+        [deps.bit_depth(file) for file in deps.media if deps.bit_depth(file)]
     )
 
 
 def test_channels():
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
     assert audb.info.channels(DB_NAME) == set(
-        [
-            deps.channels(file) for file in deps.media
-            if deps.channels(file)
-        ]
+        [deps.channels(file) for file in deps.media if deps.channels(file)]
     )
 
 
@@ -149,24 +139,24 @@ def test_description(db):
 
 
 @pytest.mark.parametrize(
-    'tables, media',
+    "tables, media",
     [
         (None, None),
         ([], None),
         (None, []),
-        ('', ''),
-        ('table1', None),
-        ('misc-in-scheme', None),
-        ('misc-not-in-scheme', None),
-        (None, ['f11.wav', 'f12.wav']),
-        ('table1', ['f11.wav', 'f12.wav']),
+        ("", ""),
+        ("table1", None),
+        ("misc-in-scheme", None),
+        ("misc-not-in-scheme", None),
+        (None, ["f11.wav", "f12.wav"]),
+        ("table1", ["f11.wav", "f12.wav"]),
         # Error as tables and media do not overlap
         pytest.param(
-            'table2',
-            ['f11.wav', 'f12.wav'],
+            "table2",
+            ["f11.wav", "f12.wav"],
             marks=pytest.mark.xfail(raises=ValueError),
         ),
-    ]
+    ],
 )
 def test_duration(tables, media):
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
@@ -180,23 +170,15 @@ def test_duration(tables, media):
         verbose=False,
     )
     expected_duration = pd.to_timedelta(
-        sum(
-            [
-                deps.duration(file) for file in db.files
-            ]
-        ),
-        unit='s',
+        sum([deps.duration(file) for file in db.files]),
+        unit="s",
     )
     assert duration == expected_duration
 
 
 def test_formats():
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
-    assert audb.info.formats(DB_NAME) == set(
-        [
-            deps.format(file) for file in deps.media
-        ]
-    )
+    assert audb.info.formats(DB_NAME) == set([deps.format(file) for file in deps.media])
 
 
 def test_languages(db):
@@ -234,10 +216,7 @@ def test_raters(db):
 def test_sampling_rates():
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
     assert audb.info.sampling_rates(DB_NAME) == set(
-        [
-            deps.sampling_rate(file) for file in deps.media
-            if deps.sampling_rate(file)
-        ]
+        [deps.sampling_rate(file) for file in deps.media if deps.sampling_rate(file)]
     )
 
 
@@ -245,13 +224,13 @@ def test_schemes(db):
     # Load schemes without loading misc tables
     schemes = audb.info.schemes(DB_NAME, load_tables=False)
     assert str(schemes) == str(db.schemes)
-    error_msg = 'No file found for table with path'
+    error_msg = "No file found for table with path"
     with pytest.raises(RuntimeError, match=error_msg):
-        assert 0 in schemes['scheme2']
+        assert 0 in schemes["scheme2"]
     # Load header with tables
     schemes = audb.info.schemes(DB_NAME)
     str(schemes) == str(db.schemes)
-    assert 0 in schemes['scheme2']
+    assert 0 in schemes["scheme2"]
 
 
 def test_splits(db):

@@ -12,8 +12,8 @@ def test_visiting_private_repos(private_and_public_repository):
 
     """
     audb.load(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
         only_metadata=True,
         verbose=False,
     )
@@ -30,8 +30,8 @@ def test_visiting_non_existing_repos(non_existing_repository):
 
     """
     audb.load(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
         only_metadata=True,
         verbose=False,
     )

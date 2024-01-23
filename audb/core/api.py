@@ -20,8 +20,8 @@ from audb.core.repository import Repository
 
 
 def available(
-        *,
-        only_latest: bool = False,
+    *,
+    only_latest: bool = False,
 ) -> pd.DataFrame:
     r"""List all databases that are available to the user.
 
@@ -34,7 +34,7 @@ def available(
 
     Examples:
         >>> df = audb.available(only_latest=True)
-        >>> df.loc[['air', 'emodb']]
+        >>> df.loc[["air", "emodb"]]
                    backend                                    host   repository version
         name
         air    artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.2
@@ -51,7 +51,7 @@ def available(
                 # see https://github.com/audeering/audbackend/issues/132
                 for p in backend._repo.path:
                     name = p.name
-                    for version in [str(x).split('/')[-1] for x in p / 'db']:
+                    for version in [str(x).split("/")[-1] for x in p / "db"]:
                         databases.append(
                             [
                                 name,
@@ -62,9 +62,9 @@ def available(
                             ]
                         )
             else:
-                for path, version in backend.ls('/'):
+                for path, version in backend.ls("/"):
                     if path.endswith(define.HEADER_FILE):
-                        name = path.split('/')[1]
+                        name = path.split("/")[1]
                         databases.append(
                             [
                                 name,
@@ -79,28 +79,29 @@ def available(
 
     df = pd.DataFrame.from_records(
         databases,
-        columns=['name', 'backend', 'host', 'repository', 'version'],
+        columns=["name", "backend", "host", "repository", "version"],
     )
     if only_latest:
         # Pick latest version for every database, see
         # https://stackoverflow.com/a/53842408
         df = df[
-            df['version'] == df.groupby('name')['version'].transform(
+            df["version"]
+            == df.groupby("name")["version"].transform(
                 lambda x: audeer.sort_versions(x)[-1]
             )
         ]
     else:
         # Sort by version
-        df = df.sort_values(by=['version'], key=audeer.sort_versions)
-    df = df.sort_values(by=['name'])
-    return df.set_index('name')
+        df = df.sort_values(by=["version"], key=audeer.sort_versions)
+    df = df.sort_values(by=["name"])
+    return df.set_index("name")
 
 
 def cached(
-        cache_root: str = None,
-        *,
-        name: str = None,
-        shared: bool = False,
+    cache_root: str = None,
+    *,
+    name: str = None,
+    shared: bool = False,
 ) -> pd.DataFrame:
     r"""List available databases and flavors in the cache.
 
@@ -128,8 +129,8 @@ def cached(
 
     Examples:
         >>> db = audb.load(
-        ...     'emodb',
-        ...     version='1.4.1',
+        ...     "emodb",
+        ...     version="1.4.1",
         ...     only_metadata=True,
         ...     full_path=False,
         ...     verbose=False,
@@ -147,20 +148,18 @@ def cached(
         sampling_rate        None
 
     """  # noqa: E501
-    cache_root = audeer.path(
-        cache_root or default_cache_root(shared=shared)
-    )
+    cache_root = audeer.path(cache_root or default_cache_root(shared=shared))
 
     columns = [
-        'name',
-        'flavor_id',
-        'version',
-        'complete',
-        'bit_depth',
-        'channels',
-        'format',
-        'mixdown',
-        'sampling_rate',
+        "name",
+        "flavor_id",
+        "version",
+        "complete",
+        "bit_depth",
+        "channels",
+        "format",
+        "mixdown",
+        "sampling_rate",
     ]
     df = pd.DataFrame([], columns=columns)
 
@@ -180,7 +179,7 @@ def cached(
             version = os.path.basename(version_path)
 
             # Skip tmp folder (e.g. 1.0.0~)
-            if version.endswith('~'):  # pragma: no cover
+            if version.endswith("~"):  # pragma: no cover
                 continue
 
             flavor_id_paths = audeer.list_dir_names(version_path)
@@ -210,18 +209,18 @@ def cached(
                         flavor_id_path,
                         load_data=False,
                     )
-                    flavor = db.meta['audb']['flavor']
-                    complete = db.meta['audb']['complete']
+                    flavor = db.meta["audb"]["flavor"]
+                    complete = db.meta["audb"]["complete"]
                     df.loc[flavor_id_path] = [
                         database,
                         flavor_id,
                         version,
                         complete,
-                        flavor['bit_depth'],
-                        flavor['channels'],
-                        flavor['format'],
-                        flavor['mixdown'],
-                        flavor['sampling_rate'],
+                        flavor["bit_depth"],
+                        flavor["channels"],
+                        flavor["format"],
+                        flavor["mixdown"],
+                        flavor["sampling_rate"],
                     ]
 
     # Replace NaN with None
@@ -229,11 +228,11 @@ def cached(
 
 
 def dependencies(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
-        verbose: bool = False,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> Dependencies:
     r"""Database dependencies.
 
@@ -248,8 +247,8 @@ def dependencies(
         dependency object
 
     Examples:
-        >>> deps = dependencies('emodb', version='1.4.1')
-        >>> deps.version('db.emotion.csv')
+        >>> deps = dependencies("emodb", version="1.4.1")
+        >>> deps.version("db.emotion.csv")
         '1.1.0'
 
     """
@@ -272,7 +271,7 @@ def dependencies(
             # If loading pickled cached file fails, load again from backend
             backend = utils.lookup_backend(name, version)
             with tempfile.TemporaryDirectory() as tmp_root:
-                archive = backend.join('/', name, define.DB + '.zip')
+                archive = backend.join("/", name, define.DB + ".zip")
                 backend.get_archive(
                     archive,
                     tmp_root,
@@ -326,14 +325,14 @@ def exists(
 
     Examples:
         >>> db = audb.load(
-        ...     'emodb',
-        ...     version='1.4.1',
+        ...     "emodb",
+        ...     version="1.4.1",
         ...     only_metadata=True,
         ...     verbose=False,
         ... )
-        >>> audb.exists('emodb', version='1.4.1')
+        >>> audb.exists("emodb", version="1.4.1")
         True
-        >>> audb.exists('emodb', version='1.4.1', format='wav')
+        >>> audb.exists("emodb", version="1.4.1", format="wav")
         False
 
     """
@@ -350,10 +349,14 @@ def exists(
         sampling_rate=sampling_rate,
     )
 
-    cache_roots = [
-        default_cache_root(True),  # check shared cache first
-        default_cache_root(False),
-    ] if cache_root is None else [cache_root]
+    cache_roots = (
+        [
+            default_cache_root(True),  # check shared cache first
+            default_cache_root(False),
+        ]
+        if cache_root is None
+        else [cache_root]
+    )
     for cache_root in cache_roots:
         db_root = audeer.path(cache_root, relative_flavor_path)
         if os.path.exists(db_root):
@@ -409,7 +412,7 @@ def flavor_path(
             is requested
 
     Examples:
-        >>> flavor_path('emodb', version='1.4.1').split(os.path.sep)
+        >>> flavor_path("emodb", version="1.4.1").split(os.path.sep)
         ['emodb', '1.4.1', 'd3b62a9b']
 
     """
@@ -425,7 +428,7 @@ def flavor_path(
 
 
 def latest_version(
-        name,
+    name,
 ) -> str:
     r"""Latest version of database.
 
@@ -439,7 +442,7 @@ def latest_version(
         RuntimeError: if no version exists for the requested database
 
     Examples:
-        >>> latest_version('emodb')
+        >>> latest_version("emodb")
         '1.4.1'
 
     """
@@ -452,10 +455,10 @@ def latest_version(
 
 
 def remove_media(
-        name: str,
-        files: typing.Union[str, typing.Sequence[str]],
-        *,
-        verbose: bool = False,
+    name: str,
+    files: typing.Union[str, typing.Sequence[str]],
+    *,
+    verbose: bool = False,
 ):
     r"""Remove media from all versions.
 
@@ -474,13 +477,11 @@ def remove_media(
         files = [files]
 
     for version in versions(name):
-
         backend = utils.lookup_backend(name, version)
 
         with tempfile.TemporaryDirectory() as db_root:
-
             # download dependencies
-            archive = backend.join('/', name, define.DB + '.zip')
+            archive = backend.join("/", name, define.DB + ".zip")
             deps_path = backend.get_archive(
                 archive,
                 db_root,
@@ -495,7 +496,7 @@ def remove_media(
             for file in audeer.progress_bar(
                 files,
                 disable=not verbose,
-                desc=f'Remove media from v{version}',
+                desc=f"Remove media from v{version}",
             ):
                 if file in deps.media:
                     archive = deps.archive(file)
@@ -503,22 +504,21 @@ def remove_media(
                     # if archive exists in this version,
                     # remove file from it and re-publish
                     remote_archive = backend.join(
-                        '/',
+                        "/",
                         name,
                         define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-                        archive + '.zip',
+                        archive + ".zip",
                     )
                     if backend.exists(remote_archive, version):
-
                         files_in_archive = backend.get_archive(
                             remote_archive,
                             db_root,
                             version,
                         )
 
-                        if os.name == 'nt':  # pragma: no cover
+                        if os.name == "nt":  # pragma: no cover
                             files_in_archive = [
-                                file.replace(os.path.sep, '/')
+                                file.replace(os.path.sep, "/")
                                 for file in files_in_archive
                             ]
 
@@ -540,7 +540,7 @@ def remove_media(
             # upload dependencies
             if upload:
                 deps.save(deps_path)
-                remote_archive = backend.join('/', name, define.DB + '.zip')
+                remote_archive = backend.join("/", name, define.DB + ".zip")
                 backend.put_archive(
                     db_root,
                     remote_archive,
@@ -551,8 +551,8 @@ def remove_media(
 
 
 def repository(
-        name: str,
-        version: str,
+    name: str,
+    version: str,
 ) -> Repository:
     r"""Return repository that stores the requested database.
 
@@ -572,20 +572,17 @@ def repository(
         RuntimeError: if database or version is not found
 
     Examples:
-        >>> audb.repository('emodb', '1.4.1')
+        >>> audb.repository("emodb", "1.4.1")
         Repository('data-public', 'https://audeering.jfrog.io/artifactory', 'artifactory')
 
     """  # noqa: E501
     if not versions(name):
-        raise RuntimeError(
-            f"Cannot find database "
-            f"'{name}'."
-        )
+        raise RuntimeError(f"Cannot find database " f"'{name}'.")
     return utils._lookup(name, version)[0]
 
 
 def versions(
-        name: str,
+    name: str,
 ) -> typing.List[str]:
     r"""Available versions of database.
 
@@ -596,7 +593,7 @@ def versions(
         list of versions
 
     Examples:
-        >>> versions('emodb')
+        >>> versions("emodb")
         ['1.1.0', '1.1.1', '1.2.0', '1.3.0', '1.4.0', '1.4.1']
 
     """
@@ -606,7 +603,7 @@ def versions(
         if isinstance(backend, audbackend.Artifactory):
             # Avoid using ls() on Artifactory
             # see https://github.com/devopshq/artifactory/issues/423
-            folder = backend.join('/', name, 'db')
+            folder = backend.join("/", name, "db")
             path = audbackend.core.artifactory._artifactory_path(
                 backend._expand(folder),
                 backend._username,
@@ -615,10 +612,10 @@ def versions(
             if path.exists():
                 for p in path:
                     version = p.parts[-1]
-                    header = p.joinpath(f'db-{version}.yaml')
+                    header = p.joinpath(f"db-{version}.yaml")
                     if header.exists():
                         vs.extend([version])
         else:
-            header = backend.join('/', name, 'db.yaml')
+            header = backend.join("/", name, "db.yaml")
             vs.extend(backend.versions(header, suppress_backend_errors=True))
     return audeer.sort_versions(vs)

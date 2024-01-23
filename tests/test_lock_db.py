@@ -12,7 +12,7 @@ import audformat.testing
 import audb
 
 
-DB_NAME = 'test_lock'
+DB_NAME = "test_lock"
 
 
 class SlowFileSystem(audbackend.FileSystem):
@@ -22,13 +22,14 @@ class SlowFileSystem(audbackend.FileSystem):
     This ensures that timeouts are reached in the tests.
 
     """
+
     def _get_file(self, *args):
         time.sleep(0.1)
         super()._get_file(*args)
 
 
 audbackend.register(
-    'slow-file-system',
+    "slow-file-system",
     SlowFileSystem,
 )
 
@@ -39,12 +40,13 @@ class CrashFileSystem(audbackend.FileSystem):
     Raises an exception when getting a file from the backend.
 
     """
+
     def _get_file(self, *args):
         raise RuntimeError()
 
 
 audbackend.register(
-    'crash-file-system',
+    "crash-file-system",
     CrashFileSystem,
 )
 
@@ -58,7 +60,7 @@ def lock_paths(cache):
                 cache,
                 DB_NAME,
                 version,
-                '.lock',
+                ".lock",
             )
         )
         paths.append(
@@ -67,35 +69,29 @@ def lock_paths(cache):
                 DB_NAME,
                 version,
                 audb.Flavor().short_id,
-                '.lock',
+                ".lock",
             )
         )
     return paths
 
 
 @pytest.fixture(
-    scope='function',
+    scope="function",
     autouse=True,
 )
 def assert_lock_file_is_deleted():
     r"""Tests if all lock files are deleted."""
     assert not any(
-        [
-            os.path.exists(path)
-            for path in lock_paths(audb.default_cache_root())
-        ]
+        [os.path.exists(path) for path in lock_paths(audb.default_cache_root())]
     )
     yield
     assert not any(
-        [
-            os.path.exists(path)
-            for path in lock_paths(audb.default_cache_root())
-        ]
+        [os.path.exists(path) for path in lock_paths(audb.default_cache_root())]
     )
 
 
 @pytest.fixture(
-    scope='function',
+    scope="function",
     autouse=True,
 )
 def set_repositories(persistent_repository, request):
@@ -110,7 +106,7 @@ def set_repositories(persistent_repository, request):
 
 
 @pytest.fixture(
-    scope='module',
+    scope="module",
     autouse=True,
 )
 def dbs(tmpdir_factory, persistent_repository):
@@ -121,30 +117,30 @@ def dbs(tmpdir_factory, persistent_repository):
     to a module wide repository.
 
     """
-    db_root = tmpdir_factory.mktemp('db')
+    db_root = tmpdir_factory.mktemp("db")
 
     # create db
 
     db = audformat.testing.create_db(minimal=True)
     db.name = DB_NAME
-    db.schemes['scheme'] = audformat.Scheme()
+    db.schemes["scheme"] = audformat.Scheme()
     audformat.testing.add_table(
         db,
-        'table',
-        'filewise',
+        "table",
+        "filewise",
         num_files=[0, 1, 2],
     )
-    db.attachments['file'] = audformat.Attachment('extra/file.txt')
-    db.attachments['folder'] = audformat.Attachment('extra/folder')
-    audeer.mkdir(audeer.path(db_root, 'extra/folder/sub-folder'))
+    db.attachments["file"] = audformat.Attachment("extra/file.txt")
+    db.attachments["folder"] = audformat.Attachment("extra/folder")
+    audeer.mkdir(audeer.path(db_root, "extra/folder/sub-folder"))
     for file in [
-            'extra/file.txt',
-            'extra/folder/file1.txt',
-            'extra/folder/file2.txt',
-            'extra/folder/sub-folder/file3.txt',
+        "extra/file.txt",
+        "extra/folder/file1.txt",
+        "extra/folder/file2.txt",
+        "extra/folder/sub-folder/file3.txt",
     ]:
-        with open(audeer.path(db_root, file), 'w') as fp:
-            fp.write('Some text')
+        with open(audeer.path(db_root, file), "w") as fp:
+            fp.write("Some text")
     db.save(db_root)
     audformat.testing.create_audio_files(db)
 
@@ -152,7 +148,7 @@ def dbs(tmpdir_factory, persistent_repository):
 
     audb.publish(
         db_root,
-        '1.0.0',
+        "1.0.0",
         persistent_repository,
         verbose=False,
     )
@@ -161,16 +157,16 @@ def dbs(tmpdir_factory, persistent_repository):
 
     audformat.testing.add_table(
         db,
-        'empty',
-        'filewise',
+        "empty",
+        "filewise",
         num_files=0,
     )
     db.save(db_root)
     audb.publish(
         db_root,
-        '2.0.0',
+        "2.0.0",
         persistent_repository,
-        previous_version='1.0.0',
+        previous_version="1.0.0",
         verbose=False,
     )
 
@@ -178,38 +174,37 @@ def dbs(tmpdir_factory, persistent_repository):
 def load_deps():
     return audb.dependencies(
         DB_NAME,
-        version='1.0.0',
+        version="1.0.0",
     )
 
 
 @pytest.mark.parametrize(
-    'set_repositories',
-    ['slow-file-system'],
+    "set_repositories",
+    ["slow-file-system"],
     indirect=True,
 )
 @pytest.mark.parametrize(
-    'multiprocessing',
+    "multiprocessing",
     [
         False,
         True,
     ],
 )
 @pytest.mark.parametrize(
-    'num_workers',
+    "num_workers",
     [
         10,
-    ]
+    ],
 )
 def test_lock_dependencies(
-        set_repositories,
-        multiprocessing,
-        num_workers,
+    set_repositories,
+    multiprocessing,
+    num_workers,
 ):
-
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
     # when multiprocessing=True on Windows and macOS
-    if multiprocessing and sys.platform in ['win32', 'darwin']:
+    if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
     result = audeer.run_tasks(
@@ -225,34 +220,33 @@ def test_lock_dependencies(
 def load_header():
     return audb.info.header(
         DB_NAME,
-        version='1.0.0',
+        version="1.0.0",
     )
 
 
 @pytest.mark.parametrize(
-    'set_repositories',
-    ['slow-file-system'],
+    "set_repositories",
+    ["slow-file-system"],
     indirect=True,
 )
 @pytest.mark.parametrize(
-    'multiprocessing',
+    "multiprocessing",
     [
         False,
         True,
     ],
 )
 @pytest.mark.parametrize(
-    'num_workers',
+    "num_workers",
     [
         10,
-    ]
+    ],
 )
 def test_lock_header(set_repositories, multiprocessing, num_workers):
-
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
     # when multiprocessing=True on Windows and macOS
-    if multiprocessing and sys.platform in ['win32', 'darwin']:
+    if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
     result = audeer.run_tasks(
@@ -268,52 +262,51 @@ def test_lock_header(set_repositories, multiprocessing, num_workers):
 def load_db(timeout):
     return audb.load(
         DB_NAME,
-        version='1.0.0',
+        version="1.0.0",
         timeout=timeout,
         verbose=False,
     )
 
 
 @pytest.mark.parametrize(
-    'set_repositories',
-    ['slow-file-system'],
+    "set_repositories",
+    ["slow-file-system"],
     indirect=True,
 )
 @pytest.mark.parametrize(
-    'multiprocessing',
+    "multiprocessing",
     [
         False,
         True,
-    ]
+    ],
 )
 @pytest.mark.parametrize(
-    'num_workers, timeout, expected',
+    "num_workers, timeout, expected",
     [
         (2, -1, 2),
         (2, 9999, 2),
         (2, 0, 1),
-    ]
+    ],
 )
 def test_lock_load(
-        set_repositories,
-        multiprocessing,
-        num_workers,
-        timeout,
-        expected,
+    set_repositories,
+    multiprocessing,
+    num_workers,
+    timeout,
+    expected,
 ):
-
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
     # when multiprocessing=True on Windows and macOS
-    if multiprocessing and sys.platform in ['win32', 'darwin']:
+    if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
     warns = not multiprocessing and num_workers != expected
     params = [([timeout], {})] * num_workers
     if warns:
         with pytest.warns(
-                UserWarning,
-                match=audb.core.define.TIMEOUT_MSG,
+            UserWarning,
+            match=audb.core.define.TIMEOUT_MSG,
         ):
             result = audeer.run_tasks(
                 load_db,
@@ -334,26 +327,24 @@ def test_lock_load(
 
 
 @pytest.mark.parametrize(
-    'set_repositories',
-    ['crash-file-system'],
+    "set_repositories",
+    ["crash-file-system"],
     indirect=True,
 )
 def test_lock_load_crash(set_repositories):
-
     with pytest.raises(audbackend.BackendError):
         load_db(-1)
 
 
 @pytest.mark.parametrize(
-    'set_repositories',
-    ['file-system'],
+    "set_repositories",
+    ["file-system"],
     indirect=True,
 )
 def test_lock_load_from_cached_versions(
-        persistent_repository,
-        set_repositories,
+    persistent_repository,
+    set_repositories,
 ):
-
     # ensure immediate timeout if cache folder is locked
     cached_version_timeout = audb.core.define.CACHED_VERSIONS_TIMEOUT
     audb.core.define.CACHED_VERSIONS_TIMEOUT = 0
@@ -361,15 +352,15 @@ def test_lock_load_from_cached_versions(
     # load version 1.0.0
     db_v1 = audb.load(
         DB_NAME,
-        version='1.0.0',
+        version="1.0.0",
         verbose=False,
     )
 
     # load new files added in version 2.0.0
     audb.load(
         DB_NAME,
-        version='2.0.0',
-        tables='empty',
+        version="2.0.0",
+        tables="empty",
         verbose=False,
     )
 
@@ -379,7 +370,7 @@ def test_lock_load_from_cached_versions(
         audb.Repository(
             name=persistent_repository.name,
             host=persistent_repository.host,
-            backend='crash-file-system',
+            backend="crash-file-system",
         ),
     ]
 
@@ -396,8 +387,8 @@ def test_lock_load_from_cached_versions(
     with pytest.raises(audbackend.BackendError):
         audb.load(
             DB_NAME,
-            version='2.0.0',
-            tables='table',
+            version="2.0.0",
+            tables="table",
             only_metadata=True,
             verbose=False,
         )
@@ -409,8 +400,8 @@ def test_lock_load_from_cached_versions(
     # -> loading missing table from cache succeeds
     audb.load(
         DB_NAME,
-        version='2.0.0',
-        tables='table',
+        version="2.0.0",
+        tables="table",
         only_metadata=True,
         verbose=False,
     )
@@ -424,7 +415,7 @@ def test_lock_load_from_cached_versions(
     with pytest.raises(audbackend.BackendError):
         audb.load(
             DB_NAME,
-            version='2.0.0',
+            version="2.0.0",
             verbose=False,
         )
 
@@ -435,7 +426,7 @@ def test_lock_load_from_cached_versions(
     # -> loading missing media from cache succeeds
     audb.load(
         DB_NAME,
-        version='2.0.0',
+        version="2.0.0",
         verbose=False,
     )
 
@@ -446,40 +437,39 @@ def test_lock_load_from_cached_versions(
 def load_attachment():
     return audb.load_attachment(
         DB_NAME,
-        'folder',
-        version='1.0.0',
+        "folder",
+        version="1.0.0",
         verbose=False,
     )
 
 
 @pytest.mark.parametrize(
-    'set_repositories',
-    ['slow-file-system'],
+    "set_repositories",
+    ["slow-file-system"],
     indirect=True,
 )
 @pytest.mark.parametrize(
-    'multiprocessing',
+    "multiprocessing",
     [
         False,
         True,
-    ]
+    ],
 )
 @pytest.mark.parametrize(
-    'num_workers',
+    "num_workers",
     [
         4,
-    ]
+    ],
 )
 def test_lock_load_attachment(
-        set_repositories,
-        multiprocessing,
-        num_workers,
+    set_repositories,
+    multiprocessing,
+    num_workers,
 ):
-
     # Avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
     # when multiprocessing=True on Windows and macOS
-    if multiprocessing and sys.platform in ['win32', 'darwin']:
+    if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
     result = audeer.run_tasks(
@@ -495,53 +485,52 @@ def test_lock_load_attachment(
 def load_media(timeout):
     return audb.load_media(
         DB_NAME,
-        'audio/001.wav',
-        version='1.0.0',
+        "audio/001.wav",
+        version="1.0.0",
         timeout=timeout,
         verbose=False,
     )
 
 
 @pytest.mark.parametrize(
-    'set_repositories',
-    ['slow-file-system'],
+    "set_repositories",
+    ["slow-file-system"],
     indirect=True,
 )
 @pytest.mark.parametrize(
-    'multiprocessing',
+    "multiprocessing",
     [
         False,
         True,
-    ]
+    ],
 )
 @pytest.mark.parametrize(
-    'num_workers, timeout, expected',
+    "num_workers, timeout, expected",
     [
         (2, -1, 2),
         (2, 9999, 2),
         (2, 0, 1),
-    ]
+    ],
 )
 def test_lock_load_media(
-        set_repositories,
-        multiprocessing,
-        num_workers,
-        timeout,
-        expected,
+    set_repositories,
+    multiprocessing,
+    num_workers,
+    timeout,
+    expected,
 ):
-
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
     # when multiprocessing=True on Windows and macOS
-    if multiprocessing and sys.platform in ['win32', 'darwin']:
+    if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
     warns = not multiprocessing and num_workers != expected
     params = [([timeout], {})] * num_workers
     if warns:
         with pytest.warns(
-                UserWarning,
-                match=audb.core.define.TIMEOUT_MSG,
+            UserWarning,
+            match=audb.core.define.TIMEOUT_MSG,
         ):
             result = audeer.run_tasks(
                 load_media,
@@ -564,36 +553,35 @@ def test_lock_load_media(
 def load_table():
     return audb.load_table(
         DB_NAME,
-        'table',
-        version='1.0.0',
+        "table",
+        version="1.0.0",
         verbose=False,
     )
 
 
 @pytest.mark.parametrize(
-    'set_repositories',
-    ['slow-file-system'],
+    "set_repositories",
+    ["slow-file-system"],
     indirect=True,
 )
 @pytest.mark.parametrize(
-    'multiprocessing',
+    "multiprocessing",
     [
         False,
         True,
     ],
 )
 @pytest.mark.parametrize(
-    'num_workers',
+    "num_workers",
     [
         10,
-    ]
+    ],
 )
 def test_lock_load_table(set_repositories, multiprocessing, num_workers):
-
     # avoid
     # AttributeError: module pytest has no attribute CACHE_ROOT
     # when multiprocessing=True on Windows and macOS
-    if multiprocessing and sys.platform in ['win32', 'darwin']:
+    if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
     result = audeer.run_tasks(
