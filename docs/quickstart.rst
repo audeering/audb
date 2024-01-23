@@ -7,9 +7,9 @@
 
     audb.config.REPOSITORIES = [
         audb.Repository(
-            name='data-public',
-            host='https://audeering.jfrog.io/artifactory',
-            backend='artifactory',
+            name="data-public",
+            host="https://audeering.jfrog.io/artifactory",
+            backend="artifactory",
         )
     ]
 
@@ -38,15 +38,15 @@ Let's load version 1.4.1 of the emodb_ database.
     :hide-code:
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
         only_metadata=True,
         verbose=False,
     )
 
 .. code-block:: python
 
-    db = audb.load('emodb', version='1.4.1', verbose=False)
+    db = audb.load("emodb", version="1.4.1", verbose=False)
 
 This downloads the database header,
 all the media files,
@@ -80,14 +80,14 @@ we can inspect the corresponding scheme.
 
 .. jupyter-execute::
 
-    db.schemes['emotion']
+    db.schemes["emotion"]
 
 Finally, we get the actual annotations
 as a :class:`pandas.DataFrame`.
 
 .. jupyter-execute::
 
-    df = db['emotion'].get()  # get table
+    df = db["emotion"].get()  # get table
     df[:3]  # show first three entries
 
 
