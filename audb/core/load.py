@@ -379,8 +379,8 @@ def _get_attachments_from_backend(
             version,
             tmp_root=db_root_tmp,
         )
-        src_path = os.path.join(db_root_tmp, path)
-        dst_path = os.path.join(db_root, path)
+        src_path = audeer.path(db_root_tmp, path)
+        dst_path = audeer.path(db_root, path)
         audeer.mkdir(os.path.dirname(dst_path))
         audeer.move_file(
             src_path,
@@ -576,7 +576,7 @@ def _load_attachments(
     missing_attachments = []
     for attachment in attachments:
         path = db.attachments[attachment].path
-        path = os.path.join(db_root, path)
+        path = audeer.path(db_root, path)
         if not os.path.exists(path):
             missing_attachments.append(attachment)
 
