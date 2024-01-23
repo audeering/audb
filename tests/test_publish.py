@@ -460,7 +460,7 @@ def test_publish(dbs, persistent_repository, version):
 
     df = audb.available(only_latest=True)
     assert DB_NAME in df.index
-    assert df[df.index == DB_NAME]['version'][0] == latest_version
+    assert df[df.index == DB_NAME]['version'].iat[0] == latest_version
 
     for file in db.files:
         name = archives[file] if file in archives else file

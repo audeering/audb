@@ -309,13 +309,22 @@ def test_lock_load(
         return
 
     warns = not multiprocessing and num_workers != expected
-    with pytest.warns(
-            UserWarning if warns else None,
-            match=audb.core.define.TIMEOUT_MSG,
-    ):
+    params = [([timeout], {})] * num_workers
+    if warns:
+        with pytest.warns(
+                UserWarning,
+                match=audb.core.define.TIMEOUT_MSG,
+        ):
+            result = audeer.run_tasks(
+                load_db,
+                params,
+                num_workers=num_workers,
+                multiprocessing=multiprocessing,
+            )
+    else:
         result = audeer.run_tasks(
             load_db,
-            [([timeout], {})] * num_workers,
+            params,
             num_workers=num_workers,
             multiprocessing=multiprocessing,
         )
@@ -528,13 +537,22 @@ def test_lock_load_media(
         return
 
     warns = not multiprocessing and num_workers != expected
-    with pytest.warns(
-            UserWarning if warns else None,
-            match=audb.core.define.TIMEOUT_MSG,
-    ):
+    params = [([timeout], {})] * num_workers
+    if warns:
+        with pytest.warns(
+                UserWarning,
+                match=audb.core.define.TIMEOUT_MSG,
+        ):
+            result = audeer.run_tasks(
+                load_media,
+                params,
+                num_workers=num_workers,
+                multiprocessing=multiprocessing,
+            )
+    else:
         result = audeer.run_tasks(
             load_media,
-            [([timeout], {})] * num_workers,
+            params,
             num_workers=num_workers,
             multiprocessing=multiprocessing,
         )

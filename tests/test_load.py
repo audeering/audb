@@ -148,7 +148,8 @@ def dbs(tmpdir_factory, persistent_repository):
     db_root = tmpdir_factory.mktemp(version)
     paths[version] = str(db_root)
 
-    db['train'].df['label'][0] = None
+    row = db['train'].index[0]
+    db['train'].df.at[row, 'label'] = None
     shutil.copytree(
         audeer.path(previous_db_root, 'extra'),
         audeer.path(db_root, 'extra'),
@@ -313,7 +314,7 @@ def test_load(dbs, format, version, only_metadata):
     # Assert database exists in cache
     assert audb.exists(DB_NAME, version=version, format=format)
     df = audb.cached()
-    assert df.loc[db_root]['version'] == resolved_version
+    assert df.loc[db_root, 'version'] == resolved_version
 
     # Assert files duration are stored as hidden attribute
     if not only_metadata:
@@ -429,7 +430,7 @@ def test_load_from_cache(dbs):
     # Assert database exists in cache
     assert audb.exists(DB_NAME, version=version, format=format)
     df = audb.cached()
-    assert df.loc[db_root]['version'] == version
+    assert df.loc[db_root, 'version'] == version
 
     # Assert media files are identical and exist
     pd.testing.assert_index_equal(db.files, db_original.files)
@@ -456,7 +457,7 @@ def test_load_from_cache(dbs):
     # Assert database exists in cache
     assert audb.exists(DB_NAME, version=version, format=format)
     df = audb.cached()
-    assert df.loc[db_root]['version'] == version
+    assert df.loc[db_root, 'version'] == version
 
     # Assert media files are identical and exist
     pd.testing.assert_index_equal(db.files, db_original.files)
