@@ -11,18 +11,18 @@ import audb
 pytest.NUM_WORKERS = 5
 
 
-@pytest.fixture(scope='package', autouse=True)
+@pytest.fixture(scope="package", autouse=True)
 def cleanup_coverage_files():
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
-        '.coverage.*',
+        ".coverage.*",
     )
     for file in glob.glob(path):
         os.remove(file)
 
 
 # ===== CACHE =====
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def cache(tmpdir_factory):
     r"""Temp folder as cache.
 
@@ -31,7 +31,7 @@ def cache(tmpdir_factory):
     in each test.
 
     """
-    cache = tmpdir_factory.mktemp('cache')
+    cache = tmpdir_factory.mktemp("cache")
     current_cache = audb.config.CACHE_ROOT
     audb.config.CACHE_ROOT = str(cache)
 
@@ -40,7 +40,7 @@ def cache(tmpdir_factory):
     audb.config.CACHE_ROOT = current_cache
 
 
-@pytest.fixture(scope='module', autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def persistent_cache(tmpdir_factory):
     r"""Temp folder as module wide cache.
 
@@ -54,7 +54,7 @@ def persistent_cache(tmpdir_factory):
     and access the cache folder.
 
     """
-    cache = tmpdir_factory.mktemp('cache')
+    cache = tmpdir_factory.mktemp("cache")
     current_cache = audb.config.CACHE_ROOT
     audb.config.CACHE_ROOT = str(cache)
 
@@ -63,7 +63,7 @@ def persistent_cache(tmpdir_factory):
     audb.config.CACHE_ROOT = current_cache
 
 
-@pytest.fixture(scope='package', autouse=True)
+@pytest.fixture(scope="package", autouse=True)
 def shared_cache(tmpdir_factory):
     r"""Temp folder as shared cache.
 
@@ -72,12 +72,12 @@ def shared_cache(tmpdir_factory):
     across all tests.
 
     """
-    cache = tmpdir_factory.mktemp('shared_cache')
+    cache = tmpdir_factory.mktemp("shared_cache")
     audb.config.SHARED_CACHE_ROOT = str(cache)
     return cache
 
 
-@pytest.fixture(scope='package', autouse=True)
+@pytest.fixture(scope="package", autouse=True)
 def hide_default_caches():
     r"""Hide default audb cache settings during testing.
 
@@ -97,23 +97,23 @@ def hide_default_caches():
     # Don't clean audb.config.SHARED_CACHE_ROOT
     # as it is set by shared_cache anyway
 
-    env_cache = os.environ.get('AUDB_CACHE_ROOT', None)
-    env_shared_cache = os.environ.get('AUDB_SHARED_CACHE_ROOT', None)
+    env_cache = os.environ.get("AUDB_CACHE_ROOT", None)
+    env_shared_cache = os.environ.get("AUDB_SHARED_CACHE_ROOT", None)
     if env_cache is not None:
-        del os.environ['AUDB_CACHE_ROOT']
+        del os.environ["AUDB_CACHE_ROOT"]
     if env_shared_cache is not None:
-        del os.environ['AUDB_SHARED_CACHE_ROOT']
+        del os.environ["AUDB_SHARED_CACHE_ROOT"]
 
     yield
 
     if env_cache is not None:
-        os.environ['AUDB_CACHE_ROOT'] = env_cache
+        os.environ["AUDB_CACHE_ROOT"] = env_cache
     if env_shared_cache is not None:
-        os.environ['AUDB_SHARED_CACHE_ROOT'] = env_shared_cache
+        os.environ["AUDB_SHARED_CACHE_ROOT"] = env_shared_cache
 
 
 # ===== REPOSITORIES =====
-@pytest.fixture(scope='function', autouse=False)
+@pytest.fixture(scope="function", autouse=False)
 def repository(tmpdir_factory):
     r"""Temp folder as repository.
 
@@ -123,12 +123,12 @@ def repository(tmpdir_factory):
     inside the test.
 
     """
-    host = tmpdir_factory.mktemp('host')
-    name = 'data-unittests-local'
+    host = tmpdir_factory.mktemp("host")
+    name = "data-unittests-local"
     repository = audb.Repository(
         name=name,
         host=host,
-        backend='file-system',
+        backend="file-system",
     )
     audeer.mkdir(audeer.path(host, name))
     current_repositories = audb.config.REPOSITORIES
@@ -139,7 +139,7 @@ def repository(tmpdir_factory):
     audb.config.REPOSITORIES = current_repositories
 
 
-@pytest.fixture(scope='module', autouse=False)
+@pytest.fixture(scope="module", autouse=False)
 def persistent_repository(tmpdir_factory):
     r"""Temp folder as module wide repository.
 
@@ -159,12 +159,12 @@ def persistent_repository(tmpdir_factory):
     in the same module.
 
     """
-    host = tmpdir_factory.mktemp('host')
-    name = 'data-unittests-local'
+    host = tmpdir_factory.mktemp("host")
+    name = "data-unittests-local"
     repository = audb.Repository(
         name=name,
         host=host,
-        backend='file-system',
+        backend="file-system",
     )
     audeer.mkdir(audeer.path(host, name))
     current_repositories = audb.config.REPOSITORIES
@@ -175,7 +175,7 @@ def persistent_repository(tmpdir_factory):
     audb.config.REPOSITORIES = current_repositories
 
 
-@pytest.fixture(scope='module', autouse=False)
+@pytest.fixture(scope="module", autouse=False)
 def private_and_public_repository():
     r"""Private and public repository on Artifactory.
 
@@ -188,12 +188,12 @@ def private_and_public_repository():
     until it finds the requested database.
 
     """
-    host = 'https://audeering.jfrog.io/artifactory'
-    backend = 'artifactory'
+    host = "https://audeering.jfrog.io/artifactory"
+    backend = "artifactory"
     current_repositories = audb.config.REPOSITORIES
     audb.config.REPOSITORIES = [
-        audb.Repository('data-private', host, backend),
-        audb.Repository('data-public', host, backend),
+        audb.Repository("data-private", host, backend),
+        audb.Repository("data-public", host, backend),
     ]
 
     yield repository
@@ -201,7 +201,7 @@ def private_and_public_repository():
     audb.config.REPOSITORIES = current_repositories
 
 
-@pytest.fixture(scope='module', autouse=False)
+@pytest.fixture(scope="module", autouse=False)
 def non_existing_repository():
     r"""Non-existing repository on Artifactory.
 
@@ -214,12 +214,12 @@ def non_existing_repository():
     until it finds the requested database.
 
     """
-    host = 'https://audeering.jfrog.io/artifactory'
-    backend = 'artifactory'
+    host = "https://audeering.jfrog.io/artifactory"
+    backend = "artifactory"
     current_repositories = audb.config.REPOSITORIES
     audb.config.REPOSITORIES = [
-        audb.Repository('non-existing', host, backend),
-        audb.Repository('data-public', host, backend),
+        audb.Repository("non-existing", host, backend),
+        audb.Repository("data-public", host, backend),
     ]
 
     yield repository
@@ -227,7 +227,7 @@ def non_existing_repository():
     audb.config.REPOSITORIES = current_repositories
 
 
-@pytest.fixture(scope='package', autouse=True)
+@pytest.fixture(scope="package", autouse=True)
 def hide_default_repositories():
     r"""Hide default audb repositories during testing."""
     audb.config.REPOSITORIES = []

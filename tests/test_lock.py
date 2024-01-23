@@ -25,13 +25,9 @@ def job(lock, wait, sleep):
 
 
 def test_lock(tmpdir):
-
     # create two lock folders
 
-    lock_folders = [
-        audeer.mkdir(audeer.path(tmpdir, str(idx)))
-        for idx in range(2)
-    ]
+    lock_folders = [audeer.mkdir(audeer.path(tmpdir, str(idx))) for idx in range(2)]
 
     # lock 1 and 2
 

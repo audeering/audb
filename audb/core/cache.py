@@ -7,10 +7,10 @@ from audb.core.flavor import Flavor
 
 
 def database_cache_root(
-        name: str,
-        version: str,
-        cache_root: str = None,
-        flavor: Flavor = None,
+    name: str,
+    version: str,
+    cache_root: str = None,
+    flavor: Flavor = None,
 ) -> str:
     r"""Create and return database cache folder.
 
@@ -51,7 +51,7 @@ def database_cache_root(
 
 
 def database_tmp_root(
-        db_root: str,
+    db_root: str,
 ) -> str:
     r"""Create and return temporary database cache folder.
 
@@ -64,13 +64,13 @@ def database_tmp_root(
         path to temporary cache folder
 
     """
-    tmp_root = db_root + '~'
+    tmp_root = db_root + "~"
     tmp_root = audeer.mkdir(tmp_root)
     return tmp_root
 
 
 def default_cache_root(
-        shared=False,
+    shared=False,
 ) -> str:
     r"""Default cache folder.
 
@@ -95,13 +95,7 @@ def default_cache_root(
 
     """
     if shared:
-        cache = (
-            os.environ.get('AUDB_SHARED_CACHE_ROOT')
-            or config.SHARED_CACHE_ROOT
-        )
+        cache = os.environ.get("AUDB_SHARED_CACHE_ROOT") or config.SHARED_CACHE_ROOT
     else:
-        cache = (
-            os.environ.get('AUDB_CACHE_ROOT')
-            or config.CACHE_ROOT
-        )
+        cache = os.environ.get("AUDB_CACHE_ROOT") or config.CACHE_ROOT
     return audeer.path(cache)

@@ -26,8 +26,8 @@ class Flavor(audobject.Object):
 
     .. code-block::  python
 
-        original_file = '/org/path/file.flac'
-        converted_file = '/new/path/file.wav'
+        original_file = "/org/path/file.flac"
+        converted_file = "/new/path/file.wav"
 
         # convert file to 16 kHz
         flavor = Flavor(sampling_rate=16000)
@@ -48,20 +48,21 @@ class Flavor(audobject.Object):
             is requested
 
     """
+
     def __init__(
-            self,
-            *,
-            bit_depth: int = None,
-            channels: typing.Union[int, typing.Sequence[int]] = None,
-            format: str = None,
-            mixdown: bool = False,
-            sampling_rate: int = None,
+        self,
+        *,
+        bit_depth: int = None,
+        channels: typing.Union[int, typing.Sequence[int]] = None,
+        format: str = None,
+        mixdown: bool = False,
+        sampling_rate: int = None,
     ):
         if bit_depth is not None:
             bit_depth = int(bit_depth)
             if bit_depth not in define.BIT_DEPTHS:
                 raise ValueError(
-                    f'Bit depth has to be one of '
+                    f"Bit depth has to be one of "
                     f"{define.BIT_DEPTHS}, not {bit_depth}."
                 )
 
@@ -73,16 +74,15 @@ class Flavor(audobject.Object):
         if format is not None:
             if format not in define.FORMATS:
                 raise ValueError(
-                    f'Format has to be one of '
-                    f"{define.FORMATS}, not '{format}'."
+                    f"Format has to be one of " f"{define.FORMATS}, not '{format}'."
                 )
 
         if sampling_rate is not None:
             sampling_rate = int(sampling_rate)
             if sampling_rate not in define.SAMPLING_RATES:
                 raise ValueError(
-                    f'Sampling_rate has to be one of '
-                    f'{define.SAMPLING_RATES}, not {sampling_rate}.'
+                    f"Sampling_rate has to be one of "
+                    f"{define.SAMPLING_RATES}, not {sampling_rate}."
                 )
 
         self.bit_depth = bit_depth
@@ -97,8 +97,8 @@ class Flavor(audobject.Object):
         r"""Sampling rate in Hz."""
 
     def destination(
-            self,
-            file: str,
+        self,
+        file: str,
     ) -> str:
         r"""Return converted file path.
 
@@ -115,13 +115,13 @@ class Flavor(audobject.Object):
         if self.format is not None:
             format = audeer.file_extension(file).lower()
             if format != self.format:
-                file = f'{file[:-len(format)]}{self.format}'
+                file = f"{file[:-len(format)]}{self.format}"
         return file
 
     def path(
-            self,
-            name: str,
-            version: str,
+        self,
+        name: str,
+        version: str,
     ) -> str:
         r"""Flavor path.
 
@@ -137,7 +137,7 @@ class Flavor(audobject.Object):
 
     @property
     def short_id(
-            self,
+        self,
     ) -> str:
         r"""Short flavor ID.
 
@@ -148,11 +148,11 @@ class Flavor(audobject.Object):
         return self.id[-8:]
 
     def _check_convert(
-            self,
-            file: str,
-            bit_depth: typing.Optional[int],
-            channels: typing.Optional[int],
-            sampling_rate: typing.Optional[int],
+        self,
+        file: str,
+        bit_depth: typing.Optional[int],
+        channels: typing.Optional[int],
+        sampling_rate: typing.Optional[int],
     ) -> bool:
         r"""Check if file needs to be converted to flavor."""
         format = audeer.file_extension(file).lower()
@@ -195,10 +195,9 @@ class Flavor(audobject.Object):
         return convert
 
     def _remix(
-            self,
-            signal: np.ndarray,
+        self,
+        signal: np.ndarray,
     ) -> np.ndarray:
-
         if self.channels is None and not self.mixdown:
             return signal
         else:
@@ -206,31 +205,32 @@ class Flavor(audobject.Object):
                 signal,
                 self.channels,
                 self.mixdown,
-                upmix='repeat',
+                upmix="repeat",
             )
 
     def _resample(
-            self,
-            signal: np.ndarray,
-            sampling_rate: int,
+        self,
+        signal: np.ndarray,
+        sampling_rate: int,
     ) -> (np.ndarray, int):
         r"""Resample signal to flavor."""
-        if (self.sampling_rate is not None) and \
-                (sampling_rate != self.sampling_rate):
+        if (self.sampling_rate is not None) and (sampling_rate != self.sampling_rate):
             signal = audresample.resample(
-                signal, sampling_rate, self.sampling_rate,
+                signal,
+                sampling_rate,
+                self.sampling_rate,
             )
             sampling_rate = self.sampling_rate
         return signal, sampling_rate
 
     def __call__(
-            self,
-            src_path: str,
-            dst_path: str,
-            *,
-            src_bit_depth: int = None,
-            src_channels: int = None,
-            src_sampling_rate: int = None,
+        self,
+        src_path: str,
+        dst_path: str,
+        *,
+        src_bit_depth: int = None,
+        src_channels: int = None,
+        src_sampling_rate: int = None,
     ):
         r"""Convert file to flavor.
 
@@ -268,24 +268,19 @@ class Flavor(audobject.Object):
             )
 
         if not self._check_convert(
-                src_path, src_bit_depth, src_channels, src_sampling_rate
+            src_path, src_bit_depth, src_channels, src_sampling_rate
         ):
-
             # file already satisfies flavor
             if src_path != dst_path:
                 shutil.copy(src_path, dst_path)
 
         else:
-
             # convert file to flavor
             signal, sampling_rate = audiofile.read(src_path, always_2d=True)
             signal = self._remix(signal)
             signal, sampling_rate = self._resample(signal, sampling_rate)
             bit_depth = (
-                self.bit_depth
-                or src_bit_depth
-                or audiofile.bit_depth(src_path)
-                or 16
+                self.bit_depth or src_bit_depth or audiofile.bit_depth(src_path) or 16
             )
             audiofile.write(
                 dst_path,

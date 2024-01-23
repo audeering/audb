@@ -9,12 +9,11 @@ import audb.core.define as define
 
 
 class FolderLock:
-
     def __init__(
-            self,
-            folders: typing.Union[str, typing.Sequence[str]],
-            *,
-            timeout: float = -1,
+        self,
+        folders: typing.Union[str, typing.Sequence[str]],
+        *,
+        timeout: float = -1,
     ):
         r"""Lock one or more folders.
 
@@ -38,13 +37,10 @@ class FolderLock:
         folders = audeer.to_list(folders)
         files = [audeer.path(folder, define.LOCK_FILE) for folder in folders]
 
-        self.locks = [
-            filelock.SoftFileLock(file)
-            for file in files
-        ]
+        self.locks = [filelock.SoftFileLock(file) for file in files]
         self.timeout = timeout
 
-    def __enter__(self) -> 'FolderLock':
+    def __enter__(self) -> "FolderLock":
         r"""Acquire the lock(s)."""
         for lock in self.locks:
             lock.acquire(self.timeout)

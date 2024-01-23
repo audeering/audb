@@ -70,7 +70,7 @@ There are four ways to change the default locations:
 
 .. code-block:: python
 
-    audb.load('emodb', ..., cache_root='/cache/root/audb')
+    audb.load("emodb", ..., cache_root="/cache/root/audb")
 
 2. System-wide by setting the following system variables
 
@@ -83,12 +83,12 @@ There are four ways to change the default locations:
 
 .. jupyter-execute::
 
-    audb.config.SHARED_CACHE_ROOT = '/new/shared/cache/audb'
+    audb.config.SHARED_CACHE_ROOT = "/new/shared/cache/audb"
     audb.default_cache_root(shared=True)
 
 .. jupyter-execute::
 
-    audb.config.CACHE_ROOT = '/new/local/cache/audb'
+    audb.config.CACHE_ROOT = "/new/local/cache/audb"
     audb.default_cache_root(shared=False)
 
 4. System wide by

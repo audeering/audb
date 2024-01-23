@@ -32,21 +32,21 @@ class Dependencies:
         Columns: [archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version]
         Index: []
         >>> # Request dependencies for emodb 1.4.1
-        >>> deps = audb.dependencies('emodb', version='1.4.1')
+        >>> deps = audb.dependencies("emodb", version="1.4.1")
         >>> # List all files or archives
         >>> deps.files[:3]
         ['db.emotion.csv', 'db.files.csv', 'wav/03a01Fa.wav']
         >>> deps.archives[:2]
         ['005d2b91-5317-0c80-d602-6d55f0323f8c', '014f82d8-3491-fd00-7397-c3b2ac3b2875']
         >>> # Access properties for a given file
-        >>> deps.archive('wav/03a01Fa.wav')
+        >>> deps.archive("wav/03a01Fa.wav")
         'c1f5cc6f-6d00-348a-ba3b-4adaa2436aad'
-        >>> deps.duration('wav/03a01Fa.wav')
+        >>> deps.duration("wav/03a01Fa.wav")
         1.89825
-        >>> deps.removed('wav/03a01Fa.wav')
+        >>> deps.removed("wav/03a01Fa.wav")
         False
         >>> # Check if a file is part of the dependencies
-        >>> 'wav/03a01Fa.wav' in deps
+        >>> "wav/03a01Fa.wav" in deps
         True
 
     """  # noqa: E501
@@ -54,8 +54,8 @@ class Dependencies:
     def __init__(self):
         data = {}
         for name, dtype in zip(
-                define.DEPEND_FIELD_NAMES.values(),
-                define.DEPEND_FIELD_DTYPES.values(),
+            define.DEPEND_FIELD_NAMES.values(),
+            define.DEPEND_FIELD_DTYPES.values(),
         ):
             data[name] = pd.Series(dtype=dtype)
         self._df = pd.DataFrame(data)
@@ -119,11 +119,7 @@ class Dependencies:
             list of attachments
 
         """
-        return list(
-            self._df[
-                self._df['type'] == define.DependType.ATTACHMENT
-            ].index
-        )
+        return list(self._df[self._df["type"] == define.DependType.ATTACHMENT].index)
 
     @property
     def attachment_ids(self) -> typing.List[str]:
@@ -133,11 +129,7 @@ class Dependencies:
             list of attachment IDs
 
         """
-        return list(
-            self._df[
-                self._df['type'] == define.DependType.ATTACHMENT
-            ].archive
-        )
+        return list(self._df[self._df["type"] == define.DependType.ATTACHMENT].archive)
 
     @property
     def files(self) -> typing.List[str]:
@@ -157,11 +149,7 @@ class Dependencies:
             list of media
 
         """
-        return list(
-            self._df[
-                self._df['type'] == define.DependType.MEDIA
-            ].index
-        )
+        return list(self._df[self._df["type"] == define.DependType.MEDIA].index)
 
     @property
     def removed_media(self) -> typing.List[str]:
@@ -173,8 +161,8 @@ class Dependencies:
         """
         return list(
             self._df[
-                (self._df['type'] == define.DependType.MEDIA)
-                & (self._df['removed'] == 1)
+                (self._df["type"] == define.DependType.MEDIA)
+                & (self._df["removed"] == 1)
             ].index
         )
 
@@ -200,11 +188,7 @@ class Dependencies:
             list of tables
 
         """
-        return list(
-            self._df[
-                self._df['type'] == define.DependType.META
-            ].index
-        )
+        return list(self._df[self._df["type"] == define.DependType.META].index)
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
@@ -295,7 +279,7 @@ class Dependencies:
         self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
         path = audeer.path(path)
         extension = audeer.file_extension(path)
-        if extension not in ['csv', 'pkl']:
+        if extension not in ["csv", "pkl"]:
             raise ValueError(
                 f"File extension of 'path' has to be 'csv' or 'pkl' "
                 f"not '{extension}'"
@@ -306,12 +290,13 @@ class Dependencies:
                 os.strerror(errno.ENOENT),
                 path,
             )
-        if extension == 'pkl':
+        if extension == "pkl":
             self._df = pd.read_pickle(path)
-        elif extension == 'csv':
+        elif extension == "csv":
             # Data type of dependency columns
             dtype_mapping = {
-                name: dtype for name, dtype in zip(
+                name: dtype
+                for name, dtype in zip(
                     define.DEPEND_FIELD_NAMES.values(),
                     define.DEPEND_FIELD_DTYPES.values(),
                 )
@@ -359,9 +344,9 @@ class Dependencies:
 
         """
         path = audeer.path(path)
-        if path.endswith('csv'):
+        if path.endswith("csv"):
             self._df.to_csv(path)
-        elif path.endswith('pkl'):
+        elif path.endswith("pkl"):
             self._df.to_pickle(
                 path,
                 protocol=4,  # supported by Python >= 3.4
@@ -392,11 +377,11 @@ class Dependencies:
         return self._df.version[file]
 
     def _add_attachment(
-            self,
-            file: str,
-            version: str,
-            archive: str,
-            checksum: str,
+        self,
+        file: str,
+        version: str,
+        archive: str,
+        checksum: str,
     ):
         r"""Add or update attachment.
 
@@ -410,35 +395,35 @@ class Dependencies:
         format = audeer.file_extension(file).lower()
 
         self._df.loc[file] = [
-            archive,                       # archive
-            0,                             # bit_depth
-            0,                             # channels
-            checksum,                      # checksum
-            0.0,                           # duration
-            format,                        # format
-            0,                             # removed
-            0,                             # sampling_rate
+            archive,  # archive
+            0,  # bit_depth
+            0,  # channels
+            checksum,  # checksum
+            0.0,  # duration
+            format,  # format
+            0,  # removed
+            0,  # sampling_rate
             define.DependType.ATTACHMENT,  # type
-            version,                       # version
+            version,  # version
         ]
 
     def _add_media(
-            self,
-            values: typing.Sequence[
-                typing.Tuple[
-                    str,    # file
-                    str,    # archive
-                    int,    # bit_depth
-                    int,    # channels
-                    str,    # checksum
-                    float,  # duration
-                    str,    # format
-                    int,    # removed
-                    float,  # sampling_rate
-                    int,    # type
-                    str,    # version
-                ]
-            ],
+        self,
+        values: typing.Sequence[
+            typing.Tuple[
+                str,  # file
+                str,  # archive
+                int,  # bit_depth
+                int,  # channels
+                str,  # checksum
+                float,  # duration
+                str,  # format
+                int,  # removed
+                float,  # sampling_rate
+                int,  # type
+                str,  # version
+            ]
+        ],
     ):
         r"""Add media files.
 
@@ -449,17 +434,17 @@ class Dependencies:
         """
         df = pd.DataFrame.from_records(
             values,
-            columns=['file'] + list(define.DEPEND_FIELD_NAMES.values()),
-        ).set_index('file')
+            columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
+        ).set_index("file")
 
         self._df = pd.concat([self._df, df])
 
     def _add_meta(
-            self,
-            file: str,
-            version: str,
-            archive: str,
-            checksum: str,
+        self,
+        file: str,
+        version: str,
+        archive: str,
+        checksum: str,
     ):
         r"""Add or update table file.
 
@@ -473,16 +458,16 @@ class Dependencies:
         format = audeer.file_extension(file).lower()
 
         self._df.loc[file] = [
-            archive,                 # archive
-            0,                       # bit_depth
-            0,                       # channels
-            checksum,                # checksum
-            0.0,                     # duration
-            format,                  # format
-            0,                       # removed
-            0,                       # sampling_rate
+            archive,  # archive
+            0,  # bit_depth
+            0,  # channels
+            checksum,  # checksum
+            0.0,  # duration
+            format,  # format
+            0,  # removed
+            0,  # sampling_rate
             define.DependType.META,  # type
-            version,                 # version
+            version,  # version
         ]
 
     def _drop(self, file: str):
@@ -501,25 +486,25 @@ class Dependencies:
             file: relative file path
 
         """
-        self._df.at[file, 'removed'] = 1
+        self._df.at[file, "removed"] = 1
 
     def _update_media(
-            self,
-            values: typing.Sequence[
-                typing.Tuple[
-                    str,    # file
-                    str,    # archive
-                    int,    # bit_depth
-                    int,    # channels
-                    str,    # checksum
-                    float,  # duration
-                    str,    # format
-                    int,    # removed
-                    float,  # sampling_rate
-                    int,    # type
-                    str,    # version
-                ]
-            ],
+        self,
+        values: typing.Sequence[
+            typing.Tuple[
+                str,  # file
+                str,  # archive
+                int,  # bit_depth
+                int,  # channels
+                str,  # checksum
+                float,  # duration
+                str,  # format
+                int,  # removed
+                float,  # sampling_rate
+                int,  # type
+                str,  # version
+            ]
+        ],
     ):
         r"""Update media files.
 
@@ -530,15 +515,15 @@ class Dependencies:
         """
         df = pd.DataFrame.from_records(
             values,
-            columns=['file'] + list(define.DEPEND_FIELD_NAMES.values()),
-        ).set_index('file')
+            columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
+        ).set_index("file")
 
         self._df.loc[df.index] = df
 
     def _update_media_version(
-            self,
-            files: typing.Sequence[str],
-            version: str,
+        self,
+        files: typing.Sequence[str],
+        version: str,
     ):
         r"""Update version of media files.
 
@@ -552,10 +537,10 @@ class Dependencies:
 
 
 def error_message_missing_object(
-        object_type: str,
-        missing_object_id: typing.Union[str, typing.Sequence],
-        database_name: str = None,
-        database_version: str = None,
+    object_type: str,
+    missing_object_id: typing.Union[str, typing.Sequence],
+    database_name: str = None,
+    database_version: str = None,
 ) -> str:
     r"""Error message for missing objects.
 
@@ -573,34 +558,26 @@ def error_message_missing_object(
         error message
 
     """
-    if object_type == 'media':
-        object_name = f'{object_type} file'
+    if object_type == "media":
+        object_name = f"{object_type} file"
     else:
         object_name = object_type
 
     if isinstance(missing_object_id, str):
-        msg = (
-            f"Could not find a {object_name} "
-            f"matching '{missing_object_id}'"
-        )
+        msg = f"Could not find a {object_name} " f"matching '{missing_object_id}'"
     else:
-        msg = (
-            f"Could not find the {object_name} "
-            f"'{missing_object_id[0]}'"
-        )
+        msg = f"Could not find the {object_name} " f"'{missing_object_id[0]}'"
     if database_name is not None and database_version is not None:
-        msg += f' in {database_name} v{database_version}'
+        msg += f" in {database_name} v{database_version}"
     return msg
 
 
 def filter_deps(
-        requested_deps: typing.Optional[
-            typing.Union[str, typing.Sequence[str]]
-        ],
-        available_deps: typing.Sequence[str],
-        deps_type: str,
-        database_name: str = None,
-        database_version: str = None,
+    requested_deps: typing.Optional[typing.Union[str, typing.Sequence[str]]],
+    available_deps: typing.Sequence[str],
+    deps_type: str,
+    database_name: str = None,
+    database_version: str = None,
 ) -> typing.Sequence[str]:
     r"""Filter dependency files by requested files.
 

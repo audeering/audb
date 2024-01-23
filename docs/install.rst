@@ -18,7 +18,7 @@ Under Ubuntu you can install it with
 
 .. code-block:: bash
 
-    $ sudo apt-get install libsndfile1
+    $ sudo apt install libsndfile1
 
 In order to handle all possible audio files,
 please make sure ffmpeg_,
@@ -29,7 +29,7 @@ Under Ubuntu this can be achieved with
 
 .. code-block:: bash
 
-    $ sudo apt-get install ffmpeg mediainfo sox libsox-fmt-mp3
+    $ sudo apt install ffmpeg mediainfo sox libsox-fmt-mp3
 
 Under Windows you have to install those libraries manually,
 and ensure that they are added to the ``PATH`` variable.

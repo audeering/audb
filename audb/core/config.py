@@ -27,28 +27,28 @@ def load_configuration_file(config_file: str):
 
     """
     if os.path.exists(config_file):
-        with open(config_file, 'r') as cf:
+        with open(config_file, "r") as cf:
             config = yaml.load(cf, Loader=yaml.BaseLoader)
     else:
         config = {}
 
     # Check that we have provided a valid repositories configuration
-    if 'repositories' in config:
-        if len(config['repositories']) == 0:
+    if "repositories" in config:
+        if len(config["repositories"]) == 0:
             raise ValueError(
                 "You cannot specify an empty 'repositories:' section "
                 f"in the configuration file '{USER_CONFIG_FILE}'."
             )
-        for n, repo in enumerate(config['repositories']):
-            if 'host' not in repo:
+        for n, repo in enumerate(config["repositories"]):
+            if "host" not in repo:
                 raise ValueError(
                     f"Your repository is missing a 'host' entry: '{repo}'."
                 )
-            if 'backend' not in repo:
+            if "backend" not in repo:
                 raise ValueError(
                     f"Your repository is missing a 'backend' entry: '{repo}'."
                 )
-            if 'name' not in repo:
+            if "name" not in repo:
                 raise ValueError(
                     f"Your repository is missing a 'name' entry: '{repo}'."
                 )
@@ -79,18 +79,18 @@ class config:
     Examples:
         >>> config.CACHE_ROOT
         '~/audb'
-        >>> config.CACHE_ROOT = '~/caches/audb'
+        >>> config.CACHE_ROOT = "~/caches/audb"
         >>> config.CACHE_ROOT
         '~/caches/audb'
 
     """
 
-    CACHE_ROOT = global_config['cache_root']
+    CACHE_ROOT = global_config["cache_root"]
     r"""Default user cache folder."""
 
     REPOSITORIES = [
-        Repository(r['name'], r['host'], r['backend'])
-        for r in global_config['repositories']
+        Repository(r["name"], r["host"], r["backend"])
+        for r in global_config["repositories"]
     ]
     r"""Repositories, will be iterated in given order.
 
@@ -104,5 +104,5 @@ class config:
 
     """
 
-    SHARED_CACHE_ROOT = global_config['shared_cache_root']
+    SHARED_CACHE_ROOT = global_config["shared_cache_root"]
     r"""Shared cache folder."""

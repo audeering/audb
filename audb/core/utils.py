@@ -11,7 +11,7 @@ from audb.core.repository import Repository
 
 
 def access_backend(
-        repository: Repository,
+    repository: Repository,
 ) -> audbackend.Backend:
     r"""Helper function to access backend."""
     backend = audbackend.access(
@@ -25,8 +25,8 @@ def access_backend(
 
 
 def lookup_backend(
-        name: str,
-        version: str,
+    name: str,
+    version: str,
 ) -> audbackend.Backend:
     r"""Return backend of requested database.
 
@@ -50,8 +50,8 @@ def lookup_backend(
 
 
 def mkdir_tree(
-        files: typing.Sequence[str],
-        root: str,
+    files: typing.Sequence[str],
+    root: str,
 ):
     r"""Helper function to create folder tree."""
     folders = set()
@@ -62,8 +62,8 @@ def mkdir_tree(
 
 
 def _lookup(
-        name: str,
-        version: str,
+    name: str,
+    version: str,
 ) -> typing.Tuple[Repository, audbackend.Backend]:
     r"""Helper function to look up database in all repositories.
 
@@ -71,22 +71,18 @@ def _lookup(
 
     """
     for repository in config.REPOSITORIES:
-
         try:
             backend = access_backend(repository)
         except audbackend.BackendError:
             continue
 
-        header = backend.join('/', name, 'db.yaml')
+        header = backend.join("/", name, "db.yaml")
 
         if backend.exists(header, version, suppress_backend_errors=True):
             return repository, backend
 
     raise RuntimeError(
-        f"Cannot find version "
-        f"'{version}' "
-        f"for database "
-        f"'{name}'."
+        f"Cannot find version " f"'{version}' " f"for database " f"'{name}'."
     )
 
 

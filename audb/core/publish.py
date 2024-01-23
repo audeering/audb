@@ -18,9 +18,9 @@ from audb.core.repository import Repository
 
 
 def _check_for_duplicates(
-        db: audformat.Database,
-        num_workers: int,
-        verbose: bool,
+    db: audformat.Database,
+    num_workers: int,
+    verbose: bool,
 ):
     r"""Ensures tables do not contain duplicated index entries."""
 
@@ -33,15 +33,15 @@ def _check_for_duplicates(
         params=[([table_id], {}) for table_id in table_ids],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Check tables for duplicates',
+        task_description="Check tables for duplicates",
     )
 
 
 def _check_for_missing_media(
-        db: audformat.Database,
-        db_root: str,
-        db_root_files: typing.Set[str],
-        deps: Dependencies,
+    db: audformat.Database,
+    db_root: str,
+    db_root_files: typing.Set[str],
+    deps: Dependencies,
 ):
     r"""Check for media that is not in root and not in dependencies."""
     db_files = db.files
@@ -54,11 +54,11 @@ def _check_for_missing_media(
         missing_files = sorted(list(missing_files))
         number_of_presented_files = 20
         error_msg = (
-            f'The following '
-            f'{len(missing_files)} '
-            f'files are referenced in tables '
-            f'that cannot be found on disk '
-            f'and are not yet part of the database: '
+            f"The following "
+            f"{len(missing_files)} "
+            f"files are referenced in tables "
+            f"that cannot be found on disk "
+            f"and are not yet part of the database: "
             f"{missing_files[:number_of_presented_files]}"
         )
         if len(missing_files) <= number_of_presented_files:
@@ -70,11 +70,11 @@ def _check_for_missing_media(
 
 
 def _find_attachments(
-        db: audformat.Database,
-        db_root: str,
-        version: str,
-        deps: Dependencies,
-        verbose: bool,
+    db: audformat.Database,
+    db_root: str,
+    version: str,
+    deps: Dependencies,
+    verbose: bool,
 ) -> typing.List[str]:
     r"""Find altered, new or removed attachments and update 'deps'."""
     for attachment_id in deps.attachment_ids:
@@ -83,9 +83,8 @@ def _find_attachments(
             deps._drop(path)
 
     # check attachments are valid
-    db_files = list(db.files) + [f'db.{t}.csv' for t in db.tables]
+    db_files = list(db.files) + [f"db.{t}.csv" for t in db.tables]
     for attachment_id in db.attachments:
-
         path = db.attachments[attachment_id].path
         for file in db_files:
             if file.startswith(path):
@@ -126,9 +125,9 @@ def _find_attachments(
     # add dependencies to new or updated attachments
     attachment_ids = []
     for attachment_id in audeer.progress_bar(
-            list(db.attachments),
-            desc='Find attachments',
-            disable=not verbose,
+        list(db.attachments),
+        desc="Find attachments",
+        disable=not verbose,
     ):
         # use one archive per attachment ID
         path = db.attachments[attachment_id].path
@@ -143,10 +142,7 @@ def _find_attachments(
                 db.attachments[attachment_id].files
         else:
             checksum = audeer.md5(audeer.path(db_root, path))
-            if (
-                    path not in deps
-                    or checksum != deps.checksum(path)
-            ):
+            if path not in deps or checksum != deps.checksum(path):
                 deps._add_attachment(
                     file=path,
                     version=version,
@@ -159,14 +155,14 @@ def _find_attachments(
 
 
 def _find_media(
-        db: audformat.Database,
-        db_root: str,
-        db_root_files: typing.Set[str],
-        version: str,
-        deps: Dependencies,
-        archives: typing.Mapping[str, str],
-        num_workers: int,
-        verbose: bool,
+    db: audformat.Database,
+    db_root: str,
+    db_root_files: typing.Set[str],
+    version: str,
+    deps: Dependencies,
+    archives: typing.Mapping[str, str],
+    num_workers: int,
+    verbose: bool,
 ) -> typing.Set[str]:
     r"""Find archives with new, altered or removed media and update 'deps'."""
     media_archives = set()
@@ -197,7 +193,7 @@ def _find_media(
             if file in archives:
                 archive = archives[file]
             else:
-                archive = audeer.uid(from_string=file.replace('\\', '/'))
+                archive = audeer.uid(from_string=file.replace("\\", "/"))
             values = _media_values(
                 db_root,
                 file,
@@ -226,7 +222,7 @@ def _find_media(
         params=[([file], {}) for file in db_media_in_root],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Find media',
+        task_description="Find media",
     )
     # Add updated and new media to dependencies
     # and sort them by paths
@@ -250,26 +246,26 @@ def _find_media(
 
 
 def _find_tables(
-        db: audformat.Database,
-        db_root: str,
-        version: str,
-        deps: Dependencies,
-        verbose: bool,
+    db: audformat.Database,
+    db_root: str,
+    version: str,
+    deps: Dependencies,
+    verbose: bool,
 ) -> typing.List[str]:
     r"""Find altered, new or removed tables and update 'deps'."""
     # release dependencies to removed tables
 
-    db_tables = [f'db.{table}.csv' for table in list(db)]
+    db_tables = [f"db.{table}.csv" for table in list(db)]
     for file in set(deps.tables) - set(db_tables):
         deps._drop(file)
 
     tables = []
     for table in audeer.progress_bar(
-            list(db),
-            desc='Find tables',
-            disable=not verbose,
+        list(db),
+        desc="Find tables",
+        disable=not verbose,
     ):
-        file = f'db.{table}.csv'
+        file = f"db.{table}.csv"
         checksum = audeer.md5(os.path.join(db_root, file))
         if file not in deps or checksum != deps.checksum(file):
             deps._add_meta(file, version, table, checksum)
@@ -279,7 +275,7 @@ def _find_tables(
 
 
 def _get_root_files(
-        db_root: str,
+    db_root: str,
 ) -> typing.Set[str]:
     r"""Return list of files in root directory."""
     db_root_files = audeer.list_file_names(
@@ -287,19 +283,19 @@ def _get_root_files(
         basenames=True,
         recursive=True,
     )
-    if os.name == 'nt':  # pragma: no cover
+    if os.name == "nt":  # pragma: no cover
         # convert '\\' to '/'
-        db_root_files = [file.replace('\\', '/') for file in db_root_files]
+        db_root_files = [file.replace("\\", "/") for file in db_root_files]
 
     return set(db_root_files)
 
 
 def _media_values(
-        root: str,
-        file: str,
-        version: str,
-        archive: str,
-        checksum: str,
+    root: str,
+    file: str,
+    version: str,
+    archive: str,
+    checksum: str,
 ) -> typing.Tuple[str, str, int, int, str, float, str, int, float, int, str]:
     r"""Return values of a media entry in dependencies."""
     format = audeer.file_extension(file).lower()
@@ -336,20 +332,20 @@ def _media_values(
 
 
 def _put_attachments(
-        attachments: typing.List[str],
-        db_root: str,
-        db: audformat.Database,
-        version: str,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    attachments: typing.List[str],
+    db_root: str,
+    db: audformat.Database,
+    version: str,
+    backend: audbackend.Backend,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ):
     def job(attachment_id: str):
         archive_file = backend.join(
-            '/',
+            "/",
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            attachment_id + '.zip',
+            attachment_id + ".zip",
         )
         files = db.attachments[attachment_id].files
         backend.put_archive(db_root, archive_file, version, files=files)
@@ -359,24 +355,23 @@ def _put_attachments(
         params=[([attachment_id], {}) for attachment_id in attachments],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Put attachments',
+        task_description="Put attachments",
     )
 
 
 def _put_media(
-        media_archives: typing.Set[str],
-        db_root: str,
-        db_name: str,
-        version: str,
-        previous_version: typing.Optional[str],
-        deps: Dependencies,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    media_archives: typing.Set[str],
+    db_root: str,
+    db_name: str,
+    version: str,
+    previous_version: typing.Optional[str],
+    deps: Dependencies,
+    backend: audbackend.Backend,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ):
     r"""Upload archives with new, altered or removed media files."""
     if media_archives:
-
         # create a mapping from archives to media files
         map_archive_to_files = collections.defaultdict(list)
         for file in deps.media:
@@ -385,16 +380,15 @@ def _put_media(
 
         def job(archive):
             if archive in map_archive_to_files:
-
                 files = map_archive_to_files[archive]
                 for file in files:
                     update_media.append(file)
 
                 archive_file = backend.join(
-                    '/',
+                    "/",
                     db_name,
                     define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-                    archive + '.zip',
+                    archive + ".zip",
                 )
 
                 if previous_version is not None:
@@ -437,27 +431,27 @@ def _put_media(
             params=[([archive], {}) for archive in media_archives],
             num_workers=num_workers,
             progress_bar=verbose,
-            task_description='Put media',
+            task_description="Put media",
         )
         deps._update_media_version(update_media, version)
 
 
 def _put_tables(
-        tables: typing.List[str],
-        db_root: str,
-        db_name: str,
-        version: str,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    tables: typing.List[str],
+    db_root: str,
+    db_name: str,
+    version: str,
+    backend: audbackend.Backend,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ):
     def job(table: str):
-        file = f'db.{table}.csv'
+        file = f"db.{table}.csv"
         archive_file = backend.join(
-            '/',
+            "/",
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.META],
-            table + '.zip',
+            table + ".zip",
         )
         backend.put_archive(db_root, archive_file, version, files=file)
 
@@ -466,20 +460,20 @@ def _put_tables(
         params=[([table], {}) for table in tables],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Put tables',
+        task_description="Put tables",
     )
 
 
 def publish(
-        db_root: str,
-        version: str,
-        repository: Repository,
-        *,
-        archives: typing.Mapping[str, str] = None,
-        previous_version: typing.Optional[str] = 'latest',
-        cache_root: str = None,
-        num_workers: typing.Optional[int] = 1,
-        verbose: bool = True,
+    db_root: str,
+    version: str,
+    repository: Repository,
+    *,
+    archives: typing.Mapping[str, str] = None,
+    previous_version: typing.Optional[str] = "latest",
+    cache_root: str = None,
+    num_workers: typing.Optional[int] = 1,
+    verbose: bool = True,
 ) -> Dependencies:
     r"""Publish database.
 
@@ -587,12 +581,9 @@ def publish(
     # Enforce error if version cannot be converted to audeer.StrictVersion
     audeer.StrictVersion(version)
     if (
-            previous_version is not None
-            and previous_version != 'latest'
-            and (
-                audeer.StrictVersion(version)
-                <= audeer.StrictVersion(previous_version)
-            )
+        previous_version is not None
+        and previous_version != "latest"
+        and (audeer.StrictVersion(version) <= audeer.StrictVersion(previous_version))
     ):
         raise ValueError(
             "'previous_version' needs to be smaller than 'version', "
@@ -608,16 +599,13 @@ def publish(
 
     backend = utils.access_backend(repository)
 
-    remote_header = backend.join('/', db.name, define.HEADER_FILE)
+    remote_header = backend.join("/", db.name, define.HEADER_FILE)
     versions = backend.versions(remote_header, suppress_backend_errors=True)
     if version in versions:
         raise RuntimeError(
-            'A version '
-            f"'{version}' "
-            'already exists for database '
-            f"'{db.name}'."
+            "A version " f"'{version}' " "already exists for database " f"'{db.name}'."
         )
-    if previous_version == 'latest':
+    if previous_version == "latest":
         if len(versions) > 0:
             previous_version = versions[-1]
         else:
@@ -693,7 +681,7 @@ def publish(
     # as the IDs are included in the filenames of the archives
     # uploaded to the backend
     allowed_chars = audbackend.core.utils.BACKEND_ALLOWED_CHARS
-    allowed_chars = allowed_chars.replace('/', '')
+    allowed_chars = allowed_chars.replace("/", "")
     allowed_chars_compiled = re.compile(allowed_chars)
     for table_id in list(db):
         if allowed_chars_compiled.fullmatch(table_id) is None:
@@ -729,9 +717,9 @@ def publish(
     # make sure all tables are stored in CSV format
     for table_id in list(db):
         table = db[table_id]
-        table_path = os.path.join(db_root, f'db.{table_id}')
+        table_path = os.path.join(db_root, f"db.{table_id}")
         table_ext = audformat.define.TableStorageFormat.CSV
-        if not os.path.exists(table_path + f'.{table_ext}'):
+        if not os.path.exists(table_path + f".{table_ext}"):
             table.save(table_path, storage_format=table_ext)
 
     # check archives
@@ -739,23 +727,31 @@ def publish(
 
     # publish attachments
     attachments = _find_attachments(db, db_root, version, deps, verbose)
-    _put_attachments(attachments, db_root, db, version, backend, num_workers,
-                     verbose)
+    _put_attachments(attachments, db_root, db, version, backend, num_workers, verbose)
 
     # publish tables
     tables = _find_tables(db, db_root, version, deps, verbose)
-    _put_tables(tables, db_root, db.name, version, backend, num_workers,
-                verbose)
+    _put_tables(tables, db_root, db.name, version, backend, num_workers, verbose)
 
     # publish media
-    media_archives = _find_media(db, db_root, db_root_files, version, deps,
-                                 archives, num_workers, verbose)
-    _put_media(media_archives, db_root, db.name, version, previous_version,
-               deps, backend, num_workers, verbose)
+    media_archives = _find_media(
+        db, db_root, db_root_files, version, deps, archives, num_workers, verbose
+    )
+    _put_media(
+        media_archives,
+        db_root,
+        db.name,
+        version,
+        previous_version,
+        deps,
+        backend,
+        num_workers,
+        verbose,
+    )
 
     # publish dependencies and header
     deps.save(deps_path)
-    archive_file = backend.join('/', db.name, define.DB + '.zip')
+    archive_file = backend.join("/", db.name, define.DB + ".zip")
     backend.put_archive(
         db_root,
         archive_file,
@@ -764,7 +760,7 @@ def publish(
     )
     try:
         local_header = os.path.join(db_root, define.HEADER_FILE)
-        remote_header = backend.join('/', db.name, define.HEADER_FILE)
+        remote_header = backend.join("/", db.name, define.HEADER_FILE)
         backend.put_file(local_header, remote_header, version)
     except Exception:  # pragma: no cover
         # after the header is published

@@ -25,16 +25,14 @@ from audb.core.lock import FolderLock
 from audb.core.utils import lookup_backend
 
 
-CachedVersions = typing.Sequence[
-    typing.Tuple[audeer.StrictVersion, str, Dependencies],
-]
+CachedVersions = typing.Sequence[typing.Tuple[audeer.StrictVersion, str, Dependencies],]
 
 
 def _cached_versions(
-        name: str,
-        version: str,
-        flavor: Flavor,
-        cache_root: typing.Optional[str],
+    name: str,
+    version: str,
+    flavor: Flavor,
+    cache_root: typing.Optional[str],
 ) -> CachedVersions:
     r"""Find other cached versions of same flavor."""
     df = cached(cache_root=cache_root, name=name)
@@ -46,12 +44,12 @@ def _cached_versions(
 
     cached_versions = []
     for flavor_root, row in df.iterrows():
-        if row['flavor_id'] == flavor.short_id:
-            if row['version'] == version:
+        if row["flavor_id"] == flavor.short_id:
+            if row["version"] == version:
                 continue
             deps = dependencies(
                 name,
-                version=row['version'],
+                version=row["version"],
                 cache_root=cache_root,
             )
             # as it is more likely we find files
@@ -59,7 +57,7 @@ def _cached_versions(
             cached_versions.insert(
                 0,
                 (
-                    audeer.StrictVersion(row['version']),
+                    audeer.StrictVersion(row["version"]),
                     str(flavor_root),
                     deps,
                 ),
@@ -69,20 +67,20 @@ def _cached_versions(
 
 
 def _cached_files(
-        files: typing.Sequence[str],
-        deps: Dependencies,
-        cached_versions: CachedVersions,
-        flavor: typing.Optional[Flavor],
-        verbose: bool,
+    files: typing.Sequence[str],
+    deps: Dependencies,
+    cached_versions: CachedVersions,
+    flavor: typing.Optional[Flavor],
+    verbose: bool,
 ) -> (typing.Sequence[typing.Union[str, str]], typing.Sequence[str]):
     r"""Find cached files."""
     cached_files = []
     missing_files = []
 
     for file in audeer.progress_bar(
-            files,
-            desc='Cached files',
-            disable=not verbose,
+        files,
+        desc="Cached files",
+        disable=not verbose,
     ):
         found = False
         file_version = audeer.StrictVersion(deps.version(file))
@@ -113,10 +111,10 @@ def _cached_files(
 
 
 def _copy_path(
-        path: str,
-        root_src: str,
-        root_tmp: str,
-        root_dst: str,
+    path: str,
+    root_src: str,
+    root_tmp: str,
+    root_dst: str,
 ):
     r"""Copy file."""
     src_path = os.path.join(root_src, path)
@@ -132,10 +130,10 @@ def _copy_path(
 
 
 def _database_check_complete(
-        db: audformat.Database,
-        db_root: str,
-        flavor: Flavor,
-        deps: Dependencies,
+    db: audformat.Database,
+    db_root: str,
+    flavor: Flavor,
+    deps: Dependencies,
 ):
     def check() -> bool:
         complete = True
@@ -155,9 +153,9 @@ def _database_check_complete(
 
     if check():
         db_root_tmp = database_tmp_root(db_root)
-        db.meta['audb']['complete'] = True
+        db.meta["audb"]["complete"] = True
         db_original = audformat.Database.load(db_root, load_data=False)
-        db_original.meta['audb']['complete'] = True
+        db_original.meta["audb"]["complete"] = True
         db_original.save(db_root_tmp, header_only=True)
         audeer.move_file(
             os.path.join(db_root_tmp, define.HEADER_FILE),
@@ -167,30 +165,30 @@ def _database_check_complete(
 
 
 def _database_is_complete(
-        db: audformat.Database,
+    db: audformat.Database,
 ) -> bool:
     complete = False
-    if 'audb' in db.meta:
-        if 'complete' in db.meta['audb']:
-            complete = db.meta['audb']['complete']
+    if "audb" in db.meta:
+        if "complete" in db.meta["audb"]:
+            complete = db.meta["audb"]["complete"]
     return complete
 
 
 def _files_duration(
-        db: audformat.Database,
-        deps: Dependencies,
-        files: typing.Sequence[str],
-        format: typing.Optional[str],
+    db: audformat.Database,
+    deps: Dependencies,
+    files: typing.Sequence[str],
+    format: typing.Optional[str],
 ):
     field = define.DEPEND_FIELD_NAMES[define.DependField.DURATION]
     durs = deps().loc[files, field]
     durs = durs[durs > 0]
-    durs = pd.to_timedelta(durs, unit='s')
-    durs.index.name = 'file'
+    durs = pd.to_timedelta(durs, unit="s")
+    durs.index.name = "file"
     if format is not None:
         durs.index = audformat.utils.replace_file_extension(durs.index, format)
     # Norm file path under Windows to include `\`
-    if os.name == 'nt':  # pragma: nocover as tested in Windows runner
+    if os.name == "nt":  # pragma: nocover as tested in Windows runner
         durs.index = audformat.utils.map_file_path(
             durs.index,
             os.path.normpath,
@@ -200,14 +198,14 @@ def _files_duration(
 
 
 def _get_attachments_from_cache(
-        attachments: typing.Sequence[str],
-        db_root: str,
-        db: audformat.Database,
-        deps: Dependencies,
-        cached_versions: CachedVersions,
-        flavor: Flavor,
-        num_workers: int,
-        verbose: bool,
+    attachments: typing.Sequence[str],
+    db_root: str,
+    db: audformat.Database,
+    deps: Dependencies,
+    cached_versions: CachedVersions,
+    flavor: Flavor,
+    num_workers: int,
+    verbose: bool,
 ) -> typing.Sequence[str]:
     r"""Copy files from cache.
 
@@ -236,10 +234,9 @@ def _get_attachments_from_cache(
     paths = [db.attachments[attachment].path for attachment in attachments]
 
     with FolderLock(
-            db_root_cached,
-            timeout=define.CACHED_VERSIONS_TIMEOUT,
+        db_root_cached,
+        timeout=define.CACHED_VERSIONS_TIMEOUT,
     ):
-
         cached_paths, missing_paths = _cached_files(
             paths,
             deps,
@@ -247,9 +244,7 @@ def _get_attachments_from_cache(
             flavor,
             verbose,
         )
-        missing_attachments = [
-            deps.archive(path) for path in missing_paths
-        ]
+        missing_attachments = [deps.archive(path) for path in missing_paths]
         db_root_tmp = database_tmp_root(db_root)
 
         def job(cache_root: str, file: str):
@@ -260,7 +255,7 @@ def _get_attachments_from_cache(
             params=[([root, path], {}) for root, path in cached_paths],
             num_workers=num_workers,
             progress_bar=verbose,
-            task_description='Copy attachments',
+            task_description="Copy attachments",
         )
 
         audeer.rmdir(db_root_tmp)
@@ -269,14 +264,14 @@ def _get_attachments_from_cache(
 
 
 def _get_files_from_cache(
-        files: typing.Sequence[str],
-        files_type: str,
-        db_root: str,
-        deps: Dependencies,
-        cached_versions: CachedVersions,
-        flavor: Flavor,
-        num_workers: int,
-        verbose: bool,
+    files: typing.Sequence[str],
+    files_type: str,
+    db_root: str,
+    deps: Dependencies,
+    cached_versions: CachedVersions,
+    flavor: Flavor,
+    num_workers: int,
+    verbose: bool,
 ) -> typing.Sequence[str]:
     r"""Copy files from cache.
 
@@ -307,10 +302,9 @@ def _get_files_from_cache(
 
     try:
         with FolderLock(
-                db_root_cached,
-                timeout=define.CACHED_VERSIONS_TIMEOUT,
+            db_root_cached,
+            timeout=define.CACHED_VERSIONS_TIMEOUT,
         ):
-
             cached_files, missing_files = _cached_files(
                 files,
                 deps,
@@ -321,7 +315,7 @@ def _get_files_from_cache(
             db_root_tmp = database_tmp_root(db_root)
 
             # Tables are also cached as PKL files
-            if files_type == 'table':
+            if files_type == "table":
 
                 def job(cache_root: str, file: str):
                     file_pkl = audeer.replace_file_extension(
@@ -341,7 +335,7 @@ def _get_files_from_cache(
                 params=[([root, file], {}) for root, file in cached_files],
                 num_workers=num_workers,
                 progress_bar=verbose,
-                task_description=f'Copy {files_type}',
+                task_description=f"Copy {files_type}",
             )
 
             audeer.rmdir(db_root_tmp)
@@ -353,13 +347,13 @@ def _get_files_from_cache(
 
 
 def _get_attachments_from_backend(
-        db: audformat.Database,
-        attachments: typing.Sequence[str],
-        db_root: str,
-        deps: Dependencies,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    db: audformat.Database,
+    attachments: typing.Sequence[str],
+    db_root: str,
+    deps: Dependencies,
+    backend: audbackend.Backend,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ):
     r"""Load attachments from backend."""
     db_root_tmp = database_tmp_root(db_root)
@@ -374,10 +368,10 @@ def _get_attachments_from_backend(
         archive = deps.archive(path)
         version = deps.version(path)
         archive = backend.join(
-            '/',
+            "/",
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            archive + '.zip',
+            archive + ".zip",
         )
         backend.get_archive(
             archive,
@@ -398,21 +392,21 @@ def _get_attachments_from_backend(
         params=[([path], {}) for path in paths],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Load attachments',
+        task_description="Load attachments",
     )
 
     audeer.rmdir(db_root_tmp)
 
 
 def _get_media_from_backend(
-        name: str,
-        media: typing.Sequence[str],
-        db_root: str,
-        flavor: typing.Optional[Flavor],
-        deps: Dependencies,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    name: str,
+    media: typing.Sequence[str],
+    db_root: str,
+    flavor: typing.Optional[Flavor],
+    deps: Dependencies,
+    backend: audbackend.Backend,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ):
     r"""Load media from backend."""
     # figure out archives
@@ -442,10 +436,10 @@ def _get_media_from_backend(
 
     def job(archive: str, version: str):
         archive = backend.join(
-            '/',
+            "/",
             name,
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-            archive + '.zip',
+            archive + ".zip",
         )
         # extract and move all files that are stored in the archive,
         # even if only a single file from the archive was requested
@@ -456,8 +450,8 @@ def _get_media_from_backend(
             tmp_root=db_root_tmp,
         )
         for file in files:
-            if os.name == 'nt':  # pragma: no cover
-                file = file.replace(os.sep, '/')
+            if os.name == "nt":  # pragma: no cover
+                file = file.replace(os.sep, "/")
             if flavor is not None:
                 bit_depth = deps.bit_depth(file)
                 channels = deps.channels(file)
@@ -485,30 +479,30 @@ def _get_media_from_backend(
         params=[([archive, version], {}) for archive, version in archives],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Load media',
+        task_description="Load media",
     )
 
     audeer.rmdir(db_root_tmp)
 
 
 def _get_tables_from_backend(
-        db: audformat.Database,
-        tables: typing.Sequence[str],
-        db_root: str,
-        deps: Dependencies,
-        backend: audbackend.Backend,
-        num_workers: typing.Optional[int],
-        verbose: bool,
+    db: audformat.Database,
+    tables: typing.Sequence[str],
+    db_root: str,
+    deps: Dependencies,
+    backend: audbackend.Backend,
+    num_workers: typing.Optional[int],
+    verbose: bool,
 ):
     r"""Load tables from backend."""
     db_root_tmp = database_tmp_root(db_root)
 
     def job(table: str):
         archive = backend.join(
-            '/',
+            "/",
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.META],
-            deps.archive(table) + '.zip',
+            deps.archive(table) + ".zip",
         )
         backend.get_archive(
             archive,
@@ -517,7 +511,7 @@ def _get_tables_from_backend(
             tmp_root=db_root_tmp,
         )
         table_id = table[3:-4]
-        table_path = os.path.join(db_root_tmp, f'db.{table_id}')
+        table_path = os.path.join(db_root_tmp, f"db.{table_id}")
         db[table_id].load(table_path)
         db[table_id].save(
             table_path,
@@ -527,7 +521,7 @@ def _get_tables_from_backend(
             audformat.define.TableStorageFormat.PICKLE,
             audformat.define.TableStorageFormat.CSV,
         ]:
-            file = f'db.{table_id}.{storage_format}'
+            file = f"db.{table_id}.{storage_format}"
             audeer.move_file(
                 os.path.join(db_root_tmp, file),
                 os.path.join(db_root, file),
@@ -538,24 +532,24 @@ def _get_tables_from_backend(
         params=[([table], {}) for table in tables],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Load tables',
+        task_description="Load tables",
     )
 
     audeer.rmdir(db_root_tmp)
 
 
 def _load_attachments(
-        attachments: typing.Sequence[str],
-        backend: audbackend.Backend,
-        db_root: str,
-        db: audformat.Database,
-        version: str,
-        cached_versions: typing.Optional[CachedVersions],
-        deps: Dependencies,
-        flavor: Flavor,
-        cache_root: str,
-        num_workers: int,
-        verbose: bool,
+    attachments: typing.Sequence[str],
+    backend: audbackend.Backend,
+    db_root: str,
+    db: audformat.Database,
+    version: str,
+    cached_versions: typing.Optional[CachedVersions],
+    deps: Dependencies,
+    flavor: Flavor,
+    cache_root: str,
+    num_workers: int,
+    verbose: bool,
 ) -> typing.Optional[CachedVersions]:
     r"""Load attachments to cache.
 
@@ -622,18 +616,18 @@ def _load_attachments(
 
 
 def _load_files(
-        files: typing.Sequence[str],
-        files_type: str,
-        backend: audbackend.Backend,
-        db_root: str,
-        db: audformat.Database,
-        version: str,
-        cached_versions: typing.Optional[CachedVersions],
-        deps: Dependencies,
-        flavor: Flavor,
-        cache_root: str,
-        num_workers: int,
-        verbose: bool,
+    files: typing.Sequence[str],
+    files_type: str,
+    backend: audbackend.Backend,
+    db_root: str,
+    db: audformat.Database,
+    version: str,
+    cached_versions: typing.Optional[CachedVersions],
+    deps: Dependencies,
+    flavor: Flavor,
+    cache_root: str,
+    num_workers: int,
+    verbose: bool,
 ) -> typing.Optional[CachedVersions]:
     r"""Load files to cache.
 
@@ -700,7 +694,7 @@ def _load_files(
         if missing_files:
             if backend is None:
                 backend = lookup_backend(db.name, version)
-            if files_type == 'media':
+            if files_type == "media":
                 _get_media_from_backend(
                     db.name,
                     missing_files,
@@ -711,7 +705,7 @@ def _load_files(
                     num_workers,
                     verbose,
                 )
-            elif files_type == 'table':
+            elif files_type == "table":
                 _get_tables_from_backend(
                     db,
                     missing_files,
@@ -726,7 +720,7 @@ def _load_files(
 
 
 def _misc_tables_used_in_scheme(
-        db: audformat.Database,
+    db: audformat.Database,
 ) -> typing.List[str]:
     r"""List of misc tables that are used inside a scheme."""
     misc_tables_used_in_scheme = []
@@ -738,11 +732,11 @@ def _misc_tables_used_in_scheme(
 
 
 def _missing_files(
-        files: typing.Sequence[str],
-        files_type: str,
-        db_root: str,
-        flavor: Flavor,
-        verbose: bool,
+    files: typing.Sequence[str],
+    files_type: str,
+    db_root: str,
+    flavor: Flavor,
+    verbose: bool,
 ) -> typing.Sequence[str]:
     r"""List missing files.
 
@@ -768,13 +762,13 @@ def _missing_files(
     """
     missing_files = []
 
-    if files_type == 'table':
-        files = [f'db.{file}.csv' for file in files]
+    if files_type == "table":
+        files = [f"db.{file}.csv" for file in files]
 
     for file in audeer.progress_bar(
-            files,
-            desc=f'Missing {files_type}',
-            disable=not verbose,
+        files,
+        desc=f"Missing {files_type}",
+        disable=not verbose,
     ):
         path = os.path.join(db_root, file)
         if not os.path.exists(path):
@@ -784,10 +778,10 @@ def _missing_files(
 
 
 def _remove_media(
-        db: audformat.Database,
-        deps: Dependencies,
-        num_workers: int,
-        verbose: bool,
+    db: audformat.Database,
+    deps: Dependencies,
+    num_workers: int,
+    verbose: bool,
 ):
     removed_files = deps.removed_media
     if removed_files:
@@ -799,12 +793,12 @@ def _remove_media(
 
 
 def _update_path(
-        db: audformat.Database,
-        root: str,
-        full_path: bool,
-        format: typing.Optional[str],
-        num_workers: int,
-        verbose: bool,
+    db: audformat.Database,
+    root: str,
+    full_path: bool,
+    format: typing.Optional[str],
+    num_workers: int,
+    verbose: bool,
 ):
     r"""Change the file path in all tables.
 
@@ -827,7 +821,7 @@ def _update_path(
                 root,
             )
             # Norm file path under Windows to include `\`
-            if os.name == 'nt':  # pragma: nocover as tested in Windows runner
+            if os.name == "nt":  # pragma: nocover as tested in Windows runner
                 table._df.index = audformat.utils.map_file_path(
                     table._df.index,
                     os.path.normpath,
@@ -844,16 +838,16 @@ def _update_path(
         params=[([table], {}) for table in tables],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description='Update file path',
+        task_description="Update file path",
     )
 
 
 def filtered_dependencies(
-        name: str,
-        version: str,
-        media: typing.Union[str, typing.Sequence[str]],
-        tables: typing.Union[str, typing.Sequence[str]],
-        cache_root: str = None,
+    name: str,
+    version: str,
+    media: typing.Union[str, typing.Sequence[str]],
+    tables: typing.Union[str, typing.Sequence[str]],
+    cache_root: str = None,
 ) -> pd.DataFrame:
     r"""Filter media by tables.
 
@@ -880,7 +874,7 @@ def filtered_dependencies(
     else:
         # Load header to get list of tables
         db = load_header(name, version=version, cache_root=cache_root)
-        tables = filter_deps(tables, list(db), 'table')
+        tables = filter_deps(tables, list(db), "table")
         tables = [t for t in tables if t not in list(db.misc_tables)]
         # Gather media files from tables
         available_media = []
@@ -892,40 +886,35 @@ def filtered_dependencies(
                 cache_root=cache_root,
                 verbose=False,
             )
-            available_media += list(
-                df.index.get_level_values('file').unique()
-            )
+            available_media += list(df.index.get_level_values("file").unique())
 
         if len(available_media) > 0:
-            media = filter_deps(media, deps.media, 'media', name, version)
-            available_media = [
-                m for m in media
-                if m in list(set(available_media))
-            ]
+            media = filter_deps(media, deps.media, "media", name, version)
+            available_media = [m for m in media if m in list(set(available_media))]
         df = deps().loc[available_media]
 
     return df
 
 
 def load(
-        name: str,
-        *,
-        version: str = None,
-        only_metadata: bool = False,
-        bit_depth: int = None,
-        channels: typing.Union[int, typing.Sequence[int]] = None,
-        format: str = None,
-        mixdown: bool = False,
-        sampling_rate: int = None,
-        attachments: typing.Union[str, typing.Sequence[str]] = None,
-        tables: typing.Union[str, typing.Sequence[str]] = None,
-        media: typing.Union[str, typing.Sequence[str]] = None,
-        removed_media: bool = False,
-        full_path: bool = True,
-        cache_root: str = None,
-        num_workers: typing.Optional[int] = 1,
-        timeout: float = -1,
-        verbose: bool = True,
+    name: str,
+    *,
+    version: str = None,
+    only_metadata: bool = False,
+    bit_depth: int = None,
+    channels: typing.Union[int, typing.Sequence[int]] = None,
+    format: str = None,
+    mixdown: bool = False,
+    sampling_rate: int = None,
+    attachments: typing.Union[str, typing.Sequence[str]] = None,
+    tables: typing.Union[str, typing.Sequence[str]] = None,
+    media: typing.Union[str, typing.Sequence[str]] = None,
+    removed_media: bool = False,
+    full_path: bool = True,
+    cache_root: str = None,
+    num_workers: typing.Optional[int] = 1,
+    timeout: float = -1,
+    verbose: bool = True,
 ) -> typing.Optional[audformat.Database]:
     r"""Load database.
 
@@ -1015,9 +1004,9 @@ def load(
 
     Examples:
         >>> db = audb.load(
-        ...     'emodb',
-        ...     version='1.4.1',
-        ...     tables=['emotion', 'files'],
+        ...     "emodb",
+        ...     version="1.4.1",
+        ...     tables=["emotion", "files"],
         ...     only_metadata=True,
         ...     full_path=False,
         ...     verbose=False,
@@ -1041,8 +1030,8 @@ def load(
     db_root = database_cache_root(name, version, cache_root, flavor)
 
     if verbose:  # pragma: no cover
-        print(f'Get:   {name} v{version}')
-        print(f'Cache: {db_root}')
+        print(f"Get:   {name} v{version}")
+        print(f"Cache: {db_root}")
 
     deps = dependencies(
         name,
@@ -1053,7 +1042,6 @@ def load(
 
     try:
         with FolderLock(db_root, timeout=timeout):
-
             # Start with database header without tables
             db, backend = load_header_to(
                 db_root,
@@ -1067,12 +1055,11 @@ def load(
 
             # load attachments
             if not db_is_complete and not only_metadata:
-
                 # filter attachments
                 requested_attachments = filter_deps(
                     attachments,
                     db.attachments,
-                    'attachment',
+                    "attachment",
                 )
 
                 cached_versions = _load_attachments(
@@ -1090,27 +1077,28 @@ def load(
                 )
 
             # filter tables (convert regexp pattern to list of tables)
-            requested_tables = filter_deps(tables, list(db), 'table')
+            requested_tables = filter_deps(tables, list(db), "table")
 
             # add/split into misc tables used in a scheme
             # and all other (misc) tables
             requested_misc_tables = _misc_tables_used_in_scheme(db)
             requested_tables = [
-                table for table in requested_tables
+                table
+                for table in requested_tables
                 if table not in requested_misc_tables
             ]
 
             # load missing tables
             if not db_is_complete:
                 for _tables in [
-                        requested_misc_tables,
-                        requested_tables,
+                    requested_misc_tables,
+                    requested_tables,
                 ]:
                     # need to load misc tables used in a scheme first
                     # as loading is done in parallel
                     cached_versions = _load_files(
                         _tables,
-                        'table',
+                        "table",
                         backend,
                         db_root,
                         db,
@@ -1130,13 +1118,13 @@ def load(
 
             # load tables
             for table in requested_tables:
-                db[table].load(os.path.join(db_root, f'db.{table}'))
+                db[table].load(os.path.join(db_root, f"db.{table}"))
 
             # filter media
             requested_media = filter_deps(
                 media,
                 db.files,
-                'media',
+                "media",
                 name,
                 version,
             )
@@ -1145,7 +1133,7 @@ def load(
             if not db_is_complete and not only_metadata:
                 cached_versions = _load_files(
                     requested_media,
-                    'media',
+                    "media",
                     backend,
                     db_root,
                     db,
@@ -1199,12 +1187,12 @@ def load(
 
 
 def load_attachment(
-        name: str,
-        attachment: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
-        verbose: bool = True,
+    name: str,
+    attachment: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
+    verbose: bool = True,
 ) -> typing.List[str]:
     r"""Load attachment(s) of database.
 
@@ -1225,9 +1213,9 @@ def load_attachment(
 
     Examples:
         >>> paths = load_attachment(
-        ...     'emodb',
-        ...     'bibtex',
-        ...     version='1.4.1',
+        ...     "emodb",
+        ...     "bibtex",
+        ...     version="1.4.1",
         ...     verbose=False,
         ... )
         >>> os.path.basename(paths[0])
@@ -1240,8 +1228,8 @@ def load_attachment(
     db_root = database_cache_root(name, version, cache_root)
 
     if verbose:  # pragma: no cover
-        print(f'Get:   {name} v{version}')
-        print(f'Cache: {db_root}')
+        print(f"Get:   {name} v{version}")
+        print(f"Cache: {db_root}")
 
     deps = dependencies(
         name,
@@ -1252,7 +1240,7 @@ def load_attachment(
 
     if attachment not in deps.archives:
         msg = error_message_missing_object(
-            'attachment',
+            "attachment",
             [attachment],
             name,
             version,
@@ -1260,7 +1248,6 @@ def load_attachment(
         raise ValueError(msg)
 
     with FolderLock(db_root):
-
         # Start with database header
         db, backend = load_header_to(
             db_root,
@@ -1290,10 +1277,10 @@ def load_attachment(
 
 
 def load_header(
-        name: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
 ) -> audformat.Database:
     r"""Load header of database.
 
@@ -1319,13 +1306,13 @@ def load_header(
 
 
 def load_header_to(
-        db_root: str,
-        name: str,
-        version: str,
-        *,
-        flavor: Flavor = None,
-        add_audb_meta: bool = False,
-        overwrite: bool = False,
+    db_root: str,
+    name: str,
+    version: str,
+    *,
+    flavor: Flavor = None,
+    add_audb_meta: bool = False,
+    overwrite: bool = False,
 ) -> typing.Tuple[audformat.Database, typing.Optional[audbackend.Backend]]:
     r"""Load database header from folder or backend.
 
@@ -1353,18 +1340,18 @@ def load_header_to(
     local_header = os.path.join(db_root, define.HEADER_FILE)
     if overwrite or not os.path.exists(local_header):
         backend = lookup_backend(name, version)
-        remote_header = backend.join('/', name, define.HEADER_FILE)
+        remote_header = backend.join("/", name, define.HEADER_FILE)
         if add_audb_meta:
             db_root_tmp = database_tmp_root(db_root)
             local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
         backend.get_file(remote_header, local_header, version)
         if add_audb_meta:
             db = audformat.Database.load(db_root_tmp, load_data=False)
-            db.meta['audb'] = {
-                'root': db_root,
-                'version': version,
-                'flavor': flavor.arguments,
-                'complete': False,
+            db.meta["audb"] = {
+                "root": db_root,
+                "version": version,
+                "flavor": flavor.arguments,
+                "complete": False,
             }
             db.save(db_root_tmp, header_only=True)
             audeer.move_file(
@@ -1377,19 +1364,19 @@ def load_header_to(
 
 
 def load_media(
-        name: str,
-        media: typing.Union[str, typing.Sequence[str]],
-        *,
-        version: str = None,
-        bit_depth: int = None,
-        channels: typing.Union[int, typing.Sequence[int]] = None,
-        format: str = None,
-        mixdown: bool = False,
-        sampling_rate: int = None,
-        cache_root: str = None,
-        num_workers: typing.Optional[int] = 1,
-        timeout: float = -1,
-        verbose: bool = True,
+    name: str,
+    media: typing.Union[str, typing.Sequence[str]],
+    *,
+    version: str = None,
+    bit_depth: int = None,
+    channels: typing.Union[int, typing.Sequence[int]] = None,
+    format: str = None,
+    mixdown: bool = False,
+    sampling_rate: int = None,
+    cache_root: str = None,
+    num_workers: typing.Optional[int] = 1,
+    timeout: float = -1,
+    verbose: bool = True,
 ) -> typing.Optional[typing.List]:
     r"""Load media file(s).
 
@@ -1441,10 +1428,10 @@ def load_media(
 
     Examples:
         >>> paths = load_media(
-        ...     'emodb',
-        ...     ['wav/03a01Fa.wav'],
-        ...     version='1.4.1',
-        ...     format='flac',
+        ...     "emodb",
+        ...     ["wav/03a01Fa.wav"],
+        ...     version="1.4.1",
+        ...     format="flac",
         ...     verbose=False,
         ... )
         >>> paths[0].split(os.path.sep)[-5:]
@@ -1469,8 +1456,8 @@ def load_media(
     db_root = database_cache_root(name, version, cache_root, flavor)
 
     if verbose:  # pragma: no cover
-        print(f'Get:   {name} v{version}')
-        print(f'Cache: {db_root}')
+        print(f"Get:   {name} v{version}")
+        print(f"Cache: {db_root}")
 
     deps = dependencies(
         name,
@@ -1483,7 +1470,7 @@ def load_media(
     for media_file in media:
         if media_file not in available_files:
             msg = error_message_missing_object(
-                'media',
+                "media",
                 [media_file],
                 name,
                 version,
@@ -1492,7 +1479,6 @@ def load_media(
 
     try:
         with FolderLock(db_root, timeout=timeout):
-
             # Start with database header without tables
             db, backend = load_header_to(
                 db_root,
@@ -1508,7 +1494,7 @@ def load_media(
             if not db_is_complete:
                 _load_files(
                     media,
-                    'media',
+                    "media",
                     backend,
                     db_root,
                     db,
@@ -1522,12 +1508,8 @@ def load_media(
                 )
 
             if format is not None:
-                media = [
-                    audeer.replace_file_extension(m, format) for m in media
-                ]
-            files = [
-                os.path.join(db_root, os.path.normpath(m)) for m in media
-            ]
+                media = [audeer.replace_file_extension(m, format) for m in media]
+            files = [os.path.join(db_root, os.path.normpath(m)) for m in media]
 
     except filelock.Timeout:
         utils.timeout_warning()
@@ -1536,13 +1518,13 @@ def load_media(
 
 
 def load_table(
-        name: str,
-        table: str,
-        *,
-        version: str = None,
-        cache_root: str = None,
-        num_workers: typing.Optional[int] = 1,
-        verbose: bool = True,
+    name: str,
+    table: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
+    num_workers: typing.Optional[int] = 1,
+    verbose: bool = True,
 ) -> pd.DataFrame:
     r"""Load a database table.
 
@@ -1574,9 +1556,9 @@ def load_table(
 
     Examples:
         >>> df = load_table(
-        ...     'emodb',
-        ...     'emotion',
-        ...     version='1.4.1',
+        ...     "emodb",
+        ...     "emotion",
+        ...     version="1.4.1",
         ...     verbose=False,
         ... )
         >>> df[:3]
@@ -1593,8 +1575,8 @@ def load_table(
     db_root = database_cache_root(name, version, cache_root)
 
     if verbose:  # pragma: no cover
-        print(f'Get:   {name} v{version}')
-        print(f'Cache: {db_root}')
+        print(f"Get:   {name} v{version}")
+        print(f"Cache: {db_root}")
 
     deps = dependencies(
         name,
@@ -1605,7 +1587,7 @@ def load_table(
 
     if table not in deps.table_ids:
         msg = error_message_missing_object(
-            'table',
+            "table",
             [table],
             name,
             version,
@@ -1613,7 +1595,6 @@ def load_table(
         raise ValueError(msg)
 
     with FolderLock(db_root):
-
         # Start with database header without tables
         db, backend = load_header_to(
             db_root,
@@ -1624,14 +1605,14 @@ def load_table(
         # Load table
         tables = _misc_tables_used_in_scheme(db) + [table]
         for table in tables:
-            table_file = os.path.join(db_root, f'db.{table}')
+            table_file = os.path.join(db_root, f"db.{table}")
             if not (
-                    os.path.exists(f'{table_file}.csv')
-                    or os.path.exists(f'{table_file}.pkl')
+                os.path.exists(f"{table_file}.csv")
+                or os.path.exists(f"{table_file}.pkl")
             ):
                 _load_files(
                     [table],
-                    'table',
+                    "table",
                     backend,
                     db_root,
                     db,

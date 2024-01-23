@@ -53,9 +53,9 @@ you would use the following repository.
 .. jupyter-execute::
 
     repository = audb.Repository(
-        name='data-local',
-        host='/data',
-        backend='file-system',
+        name="data-local",
+        host="/data",
+        backend="file-system",
     )
 
 The default repositories are configured in :attr:`audb.config.REPOSITORIES`
