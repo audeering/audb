@@ -1271,7 +1271,7 @@ def load_attachment(
         )
 
     attachment_files = db.attachments[attachment].files
-    attachment_files = [os.path.join(db_root, a) for a in attachment_files]
+    attachment_files = [audeer.path(db_root, a) for a in attachment_files]
 
     return attachment_files
 
