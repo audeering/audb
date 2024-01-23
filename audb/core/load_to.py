@@ -134,8 +134,8 @@ def _get_attachments(
             tmp_root=db_root_tmp,
         )
         audeer.move_file(
-            os.path.join(db_root_tmp, path),
-            os.path.join(db_root, path),
+            audeer.path(db_root_tmp, path),
+            audeer.path(db_root, path),
         )
 
     audeer.run_tasks(
