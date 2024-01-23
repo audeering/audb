@@ -130,7 +130,7 @@ def repository(tmpdir_factory):
         host=host,
         backend="file-system",
     )
-    audeer.mkdir(audeer.path(host, name))
+    audeer.mkdir(host, name)
     current_repositories = audb.config.REPOSITORIES
     audb.config.REPOSITORIES = [repository]
 
@@ -166,7 +166,7 @@ def persistent_repository(tmpdir_factory):
         host=host,
         backend="file-system",
     )
-    audeer.mkdir(audeer.path(host, name))
+    audeer.mkdir(host, name)
     current_repositories = audb.config.REPOSITORIES
     audb.config.REPOSITORIES = [repository]
 

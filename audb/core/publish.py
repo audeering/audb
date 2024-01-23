@@ -95,7 +95,7 @@ def _find_attachments(
                     f"contains '{file}'."
                 )
 
-        path = audeer.path(db.root, db.attachments[attachment_id].path)
+        path = os.path.join(db.root, db.attachments[attachment_id].path)
         if os.path.exists(path):
             if os.path.isdir(path):
                 folders = audeer.list_dir_names(
@@ -105,7 +105,7 @@ def _find_attachments(
                     basenames=True,
                 )
                 for folder in folders:
-                    if not os.listdir(audeer.path(path, folder)):
+                    if not os.listdir(os.path.join(path, folder)):
                         raise RuntimeError(
                             "An attachment must not "
                             "contain empty sub-folders. "
@@ -131,7 +131,7 @@ def _find_attachments(
     ):
         # use one archive per attachment ID
         path = db.attachments[attachment_id].path
-        if not os.path.exists(audeer.path(db_root, path)):
+        if not os.path.exists(os.path.join(db_root, path)):
             if path not in deps:
                 # Raise FileNotFoundError
                 #
@@ -141,7 +141,7 @@ def _find_attachments(
                 # which raises a FileNotFoundError in this case
                 db.attachments[attachment_id].files
         else:
-            checksum = audeer.md5(audeer.path(db_root, path))
+            checksum = audeer.md5(os.path.join(db_root, path))
             if path not in deps or checksum != deps.checksum(path):
                 deps._add_attachment(
                     file=path,

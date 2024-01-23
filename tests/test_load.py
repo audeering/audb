@@ -91,11 +91,11 @@ def dbs(tmpdir_factory, persistent_repository):
     db_root = tmpdir_factory.mktemp(version)
     paths[version] = str(db_root)
 
-    audeer.mkdir(audeer.path(db_root, "extra/folder/sub-folder"))
-    audeer.touch(audeer.path(db_root, "extra/file.txt"))
-    audeer.touch(audeer.path(db_root, "extra/folder/file1.txt"))
-    audeer.touch(audeer.path(db_root, "extra/folder/file2.txt"))
-    audeer.touch(audeer.path(db_root, "extra/folder/sub-folder/file3.txt"))
+    audeer.mkdir(db_root, "extra/folder/sub-folder")
+    audeer.touch(db_root, "extra/file.txt")
+    audeer.touch(db_root, "extra/folder/file1.txt")
+    audeer.touch(db_root, "extra/folder/file2.txt")
+    audeer.touch(db_root, "extra/folder/sub-folder/file3.txt")
     db.save(db_root)
     audformat.testing.create_audio_files(db)
     archives = db["files"]["speaker"].get().dropna().to_dict()
@@ -741,7 +741,7 @@ def test_load_to_update(tmpdir, dbs, only_metadata):
                 db.attachments[attachment_id].path,
             )
             if os.path.isdir(attachment):
-                audeer.touch(audeer.path(attachment, "other-file.txt"))
+                audeer.touch(attachment, "other-file.txt")
             else:
                 with open(attachment, "a") as fp:
                     fp.write("next")

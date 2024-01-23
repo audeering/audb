@@ -148,7 +148,7 @@ def cached(
         sampling_rate        None
 
     """  # noqa: E501
-    cache_root = audeer.path(cache_root or default_cache_root(shared=shared))
+    cache_root = audeer.path(cache_root) or default_cache_root(shared=shared)
 
     columns = [
         "name",
@@ -355,10 +355,10 @@ def exists(
             default_cache_root(False),
         ]
         if cache_root is None
-        else [cache_root]
+        else [audeer.path(cache_root, follow_symlink=True)]
     )
     for cache_root in cache_roots:
-        db_root = audeer.path(cache_root, relative_flavor_path)
+        db_root = os.path.join(cache_root, relative_flavor_path)
         if os.path.exists(db_root):
             return True
 

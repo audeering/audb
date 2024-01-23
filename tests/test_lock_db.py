@@ -132,7 +132,7 @@ def dbs(tmpdir_factory, persistent_repository):
     )
     db.attachments["file"] = audformat.Attachment("extra/file.txt")
     db.attachments["folder"] = audformat.Attachment("extra/folder")
-    audeer.mkdir(audeer.path(db_root, "extra/folder/sub-folder"))
+    audeer.mkdir(db_root, "extra/folder/sub-folder")
     for file in [
         "extra/file.txt",
         "extra/folder/file1.txt",

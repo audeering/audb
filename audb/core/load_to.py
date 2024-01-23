@@ -133,11 +133,9 @@ def _get_attachments(
             version,
             tmp_root=db_root_tmp,
         )
-        src_path = audeer.path(db_root_tmp, path)
-        dst_path = audeer.path(db_root, path)
         audeer.move_file(
-            src_path,
-            dst_path,
+            os.path.join(db_root_tmp, path),
+            os.path.join(db_root, path),
         )
 
     audeer.run_tasks(
@@ -297,7 +295,7 @@ def load_to(
     if version is None:
         version = latest_version(name)
 
-    db_root = audeer.path(root)
+    db_root = audeer.path(root, follow_symlink=True)
     db_root_tmp = database_tmp_root(db_root)
 
     # remove files with a wrong checksum
