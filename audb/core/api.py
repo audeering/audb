@@ -148,7 +148,7 @@ def cached(
         sampling_rate        None
 
     """  # noqa: E501
-    cache_root = audeer.path(cache_root) or default_cache_root(shared=shared)
+    cache_root = audeer.path(cache_root or default_cache_root(shared=shared))
 
     columns = [
         "name",

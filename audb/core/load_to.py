@@ -133,9 +133,11 @@ def _get_attachments(
             version,
             tmp_root=db_root_tmp,
         )
+        src_path = audeer.path(db_root_tmp, path)
+        dst_path = audeer.path(db_root, path)
         audeer.move_file(
-            audeer.path(db_root_tmp, path),
-            audeer.path(db_root, path),
+            src_path,
+            dst_path,
         )
 
     audeer.run_tasks(
