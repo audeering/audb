@@ -1271,8 +1271,10 @@ def load_attachment(
         )
 
     attachment_files = db.attachments[attachment].files
-    attachment_files = [audeer.path(db_root, a) for a in attachment_files]
-
+    attachment_files = [
+        os.path.join(db_root, os.path.normpath(file))  # convert "/" to os.sep
+        for file in attachment_files
+    ]
     return attachment_files
 
 
@@ -1509,7 +1511,10 @@ def load_media(
 
             if format is not None:
                 media = [audeer.replace_file_extension(m, format) for m in media]
-            files = [os.path.join(db_root, os.path.normpath(m)) for m in media]
+            files = [
+                os.path.join(db_root, os.path.normpath(file))  # convert "/" to os.sep
+                for file in media
+            ]
 
     except filelock.Timeout:
         utils.timeout_warning()
