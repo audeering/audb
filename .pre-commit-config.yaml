@@ -13,9 +13,11 @@ default_language_version:
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.276
+    rev: v0.1.8
     hooks:
       - id: ruff
+        args: [ --fix ]
+      - id: ruff-format
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.4
     hooks:
