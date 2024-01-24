@@ -28,7 +28,6 @@ exclude_patterns = [
     "Thumbs.db",
     ".DS_Store",
 ]
-templates_path = ["_templates"]
 pygments_style = None
 extensions = [
     "sphinx.ext.graphviz",
