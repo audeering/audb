@@ -3,6 +3,7 @@ ipykernel
 jupyter-sphinx
 pyarrow
 sphinx >=3.5.4
+sphinx-apipages >=0.1.2
 sphinx-audeering-theme >=1.2.1
 sphinx-autodoc-typehints
 sphinx-copybutton
