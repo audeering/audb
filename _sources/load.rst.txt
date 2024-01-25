@@ -7,9 +7,9 @@
 
     audb.config.REPOSITORIES = [
         audb.Repository(
-            name='data-public',
-            host='https://audeering.jfrog.io/artifactory',
-            backend='artifactory',
+            name="data-public",
+            host="https://audeering.jfrog.io/artifactory",
+            backend="artifactory",
         )
     ]
 
@@ -23,7 +23,7 @@
 
     def series_to_html(self):
         df = self.to_frame()
-        df.columns = ['']
+        df.columns = [""]
         return df._repr_html_()
 
 
@@ -31,9 +31,9 @@
         return self.to_frame(index=False)._repr_html_()
 
 
-    setattr(pd.Series, '_repr_html_', series_to_html)
-    setattr(pd.Index, '_repr_html_', index_to_html)
-    pd.set_option('display.max_rows', 6)
+    setattr(pd.Series, "_repr_html_", series_to_html)
+    setattr(pd.Index, "_repr_html_", index_to_html)
+    pd.set_option("display.max_rows", 6)
 
 
 .. _load:
@@ -55,8 +55,8 @@ even if a new version of the database is published.
     :hide-code:
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
         only_metadata=True,
         verbose=False,
     )
@@ -64,8 +64,8 @@ even if a new version of the database is published.
 .. code-block:: python
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
         verbose=False,
     )
 
@@ -84,13 +84,13 @@ and can be requested as a :class:`pandas.DataFrame`.
 
 .. jupyter-execute::
 
-    db['emotion'].get()
+    db["emotion"].get()
 
 Or you can directly request single columns as :class:`pandas.Series`.
 
 .. jupyter-execute::
 
-    db['files']['duration'].get()
+    db["files"]["duration"].get()
 
 As you can see the index of the returned object
 holds the path to the corresponding media files.
@@ -153,9 +153,9 @@ inside the :ref:`cache <caching>`.
     :hide-code:
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
-        format='flac',
+        "emodb",
+        version="1.4.1",
+        format="flac",
         sampling_rate=44100,
         only_metadata=True,
         verbose=False,
@@ -164,28 +164,28 @@ inside the :ref:`cache <caching>`.
 .. code-block:: python
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
-        format='flac',
+        "emodb",
+        version="1.4.1",
+        format="flac",
         sampling_rate=44100,
         verbose=False,
     )
 
 The flavor information of a database is stored
-inside the ``db.meta['audb']`` dictionary.
+inside the ``db.meta["audb"]`` dictionary.
 
 .. jupyter-execute::
 
-    db.meta['audb']['flavor']
+    db.meta["audb"]["flavor"]
 
 You can list all available flavors and their locations in the cache with:
 
 .. jupyter-execute::
 
     df = audb.cached()
-    df[['name', 'version', 'complete', 'format', 'sampling_rate']]
+    df[["name", "version", "complete", "format", "sampling_rate"]]
 
-The entry ``'complete'`` tells you if a database flavor is completely cached,
+The entry ``"complete"`` tells you if a database flavor is completely cached,
 or if some table or media files are still missing.
 
 
@@ -203,8 +203,8 @@ but all the tables and the header.
 .. jupyter-execute::
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
         only_metadata=True,
         verbose=False,
     )
@@ -221,8 +221,8 @@ It can list all table definitions.
 .. jupyter-execute::
 
     audb.info.tables(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
     )
 
 Or get the total duration of all media files.
@@ -230,8 +230,8 @@ Or get the total duration of all media files.
 .. jupyter-execute::
 
     audb.info.duration(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
     )
 
 See :mod:`audb.info` for a list of all available options.
@@ -255,14 +255,14 @@ but only the table(s) and media of the *test* set.
 Or, if we want the data of a specific speaker,
 we can do the following.
 First, we download the table with information
-about the speakers (here ``db['files']``):
+about the speakers (here ``db["files"]``):
 
 .. jupyter-execute::
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
-        tables=['files'],
+        "emodb",
+        version="1.4.1",
+        tables=["files"],
         only_metadata=True,
         full_path=False,
         verbose=False,
@@ -279,7 +279,7 @@ and therefore match the paths on the backend.
 
 .. jupyter-execute::
 
-    speaker = db['files']['speaker'].get()
+    speaker = db["files"]["speaker"].get()
     speaker
 
 Now, we use the column with speaker IDs
@@ -288,7 +288,7 @@ that belong to speaker 3.
 
 .. jupyter-execute::
 
-    media = db['files'].files[speaker == 3]
+    media = db["files"].files[speaker == 3]
     media
 
 Finally, we load the database again
@@ -300,8 +300,8 @@ only the data of this speaker.
     :hide-code:
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
         media=media,
         full_path=False,
         only_metadata=True,
@@ -311,8 +311,8 @@ only the data of this speaker.
 .. code-block:: python
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
         media=media,
         full_path=False,
         verbose=False,
@@ -324,7 +324,7 @@ from the tables.
 
 .. jupyter-execute::
 
-    db['emotion'].get()
+    db["emotion"].get()
 
 
 .. _corresponding audformat documentation: https://audeering.github.io/audformat/accessing-data.html

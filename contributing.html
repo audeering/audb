@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.6.1
+                v1.6.2
               </div>
             
           
@@ -189,7 +189,7 @@ even if you pull new changes from the Github repository.</p>
 <div class="section" id="coding-convention">
 <h2>Coding Convention<a class="headerlink" href="#coding-convention" title="Permalink to this heading">¶</a></h2>
 <p>We follow the <a class="reference external" href="http://www.python.org/dev/peps/pep-0008/">PEP8</a> convention for Python code
-and check for correct syntax with <a class="reference external" href="https://beta.ruff.rs">ruff</a>.
+and use <a class="reference external" href="https://beta.ruff.rs">ruff</a> as a linter and code formatter.
 In addition,
 we check for common spelling errors with <a class="reference external" href="https://github.com/codespell-project/codespell/">codespell</a>.
 Both tools and possible exceptions
@@ -206,7 +206,8 @@ every time you create a commit.</p>
 <p>You can also install <a class="reference external" href="https://beta.ruff.rs">ruff</a> and <a class="reference external" href="https://github.com/codespell-project/codespell/">codespell</a>
 and call it directly:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">ruff</span> <span class="n">codespell</span>  <span class="c1"># consider system wide installation</span>
-<span class="n">ruff</span> <span class="n">check</span> <span class="o">.</span>
+<span class="n">ruff</span> <span class="n">check</span> <span class="o">--</span><span class="n">fix</span> <span class="o">.</span>  <span class="c1"># lint all Python files, and fix any fixable errors</span>
+<span class="n">ruff</span> <span class="nb">format</span> <span class="o">.</span>  <span class="c1"># format code of all Python files</span>
 <span class="n">codespell</span>
 </pre></div>
 </div>
@@ -282,7 +283,7 @@ It can be installed with:</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/11/16 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/01/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -290,7 +291,7 @@ It can be installed with:</p>
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2023 audEERING GmbH
+      &copy; 2020-2024 audEERING GmbH
     </p>
   </div> 
 

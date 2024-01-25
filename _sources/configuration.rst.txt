@@ -38,5 +38,5 @@ using :class:`audb.config`.
 
 .. jupyter-execute::
 
-    audb.config.CACHE_ROOT = '/user/cache'
+    audb.config.CACHE_ROOT = "/user/cache"
     audb.config.CACHE_ROOT

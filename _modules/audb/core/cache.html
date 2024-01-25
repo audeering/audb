@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.1
+                v1.6.2
               </div>
             
           
@@ -160,10 +160,10 @@
 
 
 <span class="k">def</span> <span class="nf">database_cache_root</span><span class="p">(</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create and return database cache folder.</span>
 
@@ -183,19 +183,12 @@
             <span class="n">default_cache_root</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span>
         <span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">cache_roots</span> <span class="o">=</span> <span class="p">[</span><span class="n">cache_root</span><span class="p">]</span>
+        <span class="n">cache_roots</span> <span class="o">=</span> <span class="p">[</span><span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">follow_symlink</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
     <span class="k">for</span> <span class="n">cache_root</span> <span class="ow">in</span> <span class="n">cache_roots</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">flavor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">db_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
-                <span class="n">cache_root</span><span class="p">,</span>
-                <span class="n">name</span><span class="p">,</span>
-                <span class="n">version</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">db_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">db_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
-                <span class="n">cache_root</span><span class="p">,</span>
-                <span class="n">flavor</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">),</span>
-            <span class="p">)</span>
+            <span class="n">db_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">flavor</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">db_root</span><span class="p">):</span>
             <span class="k">break</span>
 
@@ -204,7 +197,7 @@
 
 
 <span class="k">def</span> <span class="nf">database_tmp_root</span><span class="p">(</span>
-        <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create and return temporary database cache folder.</span>
 
@@ -217,13 +210,13 @@
 <span class="sd">        path to temporary cache folder</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tmp_root</span> <span class="o">=</span> <span class="n">db_root</span> <span class="o">+</span> <span class="s1">&#39;~&#39;</span>
+    <span class="n">tmp_root</span> <span class="o">=</span> <span class="n">db_root</span> <span class="o">+</span> <span class="s2">&quot;~&quot;</span>
     <span class="n">tmp_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tmp_root</span>
 
 
 <div class="viewcode-block" id="default_cache_root"><a class="viewcode-back" href="../../../api/audb.default_cache_root.html#audb.default_cache_root">[docs]</a><span class="k">def</span> <span class="nf">default_cache_root</span><span class="p">(</span>
-        <span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default cache folder.</span>
 
@@ -248,16 +241,10 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">shared</span><span class="p">:</span>
-        <span class="n">cache</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;AUDB_SHARED_CACHE_ROOT&#39;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">SHARED_CACHE_ROOT</span>
-        <span class="p">)</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUDB_SHARED_CACHE_ROOT&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">SHARED_CACHE_ROOT</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">cache</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;AUDB_CACHE_ROOT&#39;</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">cache</span><span class="p">)</span></div>
+        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUDB_CACHE_ROOT&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+    <span class="k">return</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">follow_symlink</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
@@ -273,7 +260,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/11/16 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/01/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -281,7 +268,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2023 audEERING GmbH
+      &copy; 2020-2024 audEERING GmbH
     </p>
   </div> 
 

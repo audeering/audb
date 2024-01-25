@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.1
+                v1.6.2
               </div>
             
           
@@ -179,8 +179,8 @@
 
 <span class="sd">    .. code-block::  python</span>
 
-<span class="sd">        original_file = &#39;/org/path/file.flac&#39;</span>
-<span class="sd">        converted_file = &#39;/new/path/file.wav&#39;</span>
+<span class="sd">        original_file = &quot;/org/path/file.flac&quot;</span>
+<span class="sd">        converted_file = &quot;/new/path/file.wav&quot;</span>
 
 <span class="sd">        # convert file to 16 kHz</span>
 <span class="sd">        flavor = Flavor(sampling_rate=16000)</span>
@@ -201,20 +201,21 @@
 <span class="sd">            is requested</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">bit_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">channels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">mixdown</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">bit_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">channels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mixdown</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">bit_depth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">bit_depth</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bit_depth</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">bit_depth</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">define</span><span class="o">.</span><span class="n">BIT_DEPTHS</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Bit depth has to be one of &#39;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Bit depth has to be one of &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">BIT_DEPTHS</span><span class="si">}</span><span class="s2">, not </span><span class="si">{</span><span class="n">bit_depth</span><span class="si">}</span><span class="s2">.&quot;</span>
                 <span class="p">)</span>
 
@@ -226,16 +227,15 @@
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">define</span><span class="o">.</span><span class="n">FORMATS</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Format has to be one of &#39;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">FORMATS</span><span class="si">}</span><span class="s2">, not &#39;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Format has to be one of &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">FORMATS</span><span class="si">}</span><span class="s2">, not &#39;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
                 <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">sampling_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sampling_rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sampling_rate</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sampling_rate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">define</span><span class="o">.</span><span class="n">SAMPLING_RATES</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Sampling_rate has to be one of &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">SAMPLING_RATES</span><span class="si">}</span><span class="s1">, not </span><span class="si">{</span><span class="n">sampling_rate</span><span class="si">}</span><span class="s1">.&#39;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Sampling_rate has to be one of &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">SAMPLING_RATES</span><span class="si">}</span><span class="s2">, not </span><span class="si">{</span><span class="n">sampling_rate</span><span class="si">}</span><span class="s2">.&quot;</span>
                 <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">bit_depth</span> <span class="o">=</span> <span class="n">bit_depth</span>
@@ -250,8 +250,8 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sampling rate in Hz.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Flavor.destination"><a class="viewcode-back" href="../../../api/audb.Flavor.html#audb.Flavor.destination">[docs]</a>    <span class="k">def</span> <span class="nf">destination</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return converted file path.</span>
 
@@ -268,13 +268,13 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">format</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">:</span>
-                <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="nb">format</span><span class="p">)]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="nb">format</span><span class="p">)]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="n">file</span></div>
 
 <div class="viewcode-block" id="Flavor.path"><a class="viewcode-back" href="../../../api/audb.Flavor.html#audb.Flavor.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flavor path.</span>
 
@@ -290,7 +290,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">short_id</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Short flavor ID.</span>
 
@@ -301,11 +301,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">[</span><span class="o">-</span><span class="mi">8</span><span class="p">:]</span>
 
     <span class="k">def</span> <span class="nf">_check_convert</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">bit_depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-            <span class="n">channels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-            <span class="n">sampling_rate</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">bit_depth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">channels</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">sampling_rate</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if file needs to be converted to flavor.&quot;&quot;&quot;</span>
         <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -348,10 +348,9 @@
         <span class="k">return</span> <span class="n">convert</span>
 
     <span class="k">def</span> <span class="nf">_remix</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixdown</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">signal</span>
         <span class="k">else</span><span class="p">:</span>
@@ -359,31 +358,32 @@
                 <span class="n">signal</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mixdown</span><span class="p">,</span>
-                <span class="n">upmix</span><span class="o">=</span><span class="s1">&#39;repeat&#39;</span><span class="p">,</span>
+                <span class="n">upmix</span><span class="o">=</span><span class="s2">&quot;repeat&quot;</span><span class="p">,</span>
             <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_resample</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-            <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resample signal to flavor.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> \
-                <span class="p">(</span><span class="n">sampling_rate</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">sampling_rate</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">):</span>
             <span class="n">signal</span> <span class="o">=</span> <span class="n">audresample</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span>
-                <span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">,</span>
+                <span class="n">signal</span><span class="p">,</span>
+                <span class="n">sampling_rate</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span>
         <span class="k">return</span> <span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span>
 
 <div class="viewcode-block" id="Flavor.__call__"><a class="viewcode-back" href="../../../api/audb.Flavor.html#audb.Flavor.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">src_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">dst_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">src_bit_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">src_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">src_sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">src_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">dst_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">src_bit_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">src_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">src_sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert file to flavor.</span>
 
@@ -421,24 +421,19 @@
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_convert</span><span class="p">(</span>
-                <span class="n">src_path</span><span class="p">,</span> <span class="n">src_bit_depth</span><span class="p">,</span> <span class="n">src_channels</span><span class="p">,</span> <span class="n">src_sampling_rate</span>
+            <span class="n">src_path</span><span class="p">,</span> <span class="n">src_bit_depth</span><span class="p">,</span> <span class="n">src_channels</span><span class="p">,</span> <span class="n">src_sampling_rate</span>
         <span class="p">):</span>
-
             <span class="c1"># file already satisfies flavor</span>
             <span class="k">if</span> <span class="n">src_path</span> <span class="o">!=</span> <span class="n">dst_path</span><span class="p">:</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-
             <span class="c1"># convert file to flavor</span>
             <span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">always_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remix</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
             <span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resample</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">)</span>
             <span class="n">bit_depth</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">bit_depth</span>
-                <span class="ow">or</span> <span class="n">src_bit_depth</span>
-                <span class="ow">or</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">src_path</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="mi">16</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bit_depth</span> <span class="ow">or</span> <span class="n">src_bit_depth</span> <span class="ow">or</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">src_path</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">16</span>
             <span class="p">)</span>
             <span class="n">audiofile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
                 <span class="n">dst_path</span><span class="p">,</span>
@@ -461,7 +456,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/11/16 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/01/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -469,7 +464,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2023 audEERING GmbH
+      &copy; 2020-2024 audEERING GmbH
     </p>
   </div> 
 

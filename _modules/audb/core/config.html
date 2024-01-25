@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.1
+                v1.6.2
               </div>
             
           
@@ -180,28 +180,28 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
             <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">BaseLoader</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="c1"># Check that we have provided a valid repositories configuration</span>
-    <span class="k">if</span> <span class="s1">&#39;repositories&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;repositories&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;repositories&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;repositories&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;You cannot specify an empty &#39;repositories:&#39; section &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;in the configuration file &#39;</span><span class="si">{</span><span class="n">USER_CONFIG_FILE</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
             <span class="p">)</span>
-        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">repo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;repositories&#39;</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="s1">&#39;host&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repo</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">repo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;repositories&quot;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="s2">&quot;host&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repo</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Your repository is missing a &#39;host&#39; entry: &#39;</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
                 <span class="p">)</span>
-            <span class="k">if</span> <span class="s1">&#39;backend&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repo</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;backend&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repo</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Your repository is missing a &#39;backend&#39; entry: &#39;</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
                 <span class="p">)</span>
-            <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repo</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repo</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Your repository is missing a &#39;name&#39; entry: &#39;</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
                 <span class="p">)</span>
@@ -232,18 +232,18 @@
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; config.CACHE_ROOT</span>
 <span class="sd">        &#39;~/audb&#39;</span>
-<span class="sd">        &gt;&gt;&gt; config.CACHE_ROOT = &#39;~/caches/audb&#39;</span>
+<span class="sd">        &gt;&gt;&gt; config.CACHE_ROOT = &quot;~/caches/audb&quot;</span>
 <span class="sd">        &gt;&gt;&gt; config.CACHE_ROOT</span>
 <span class="sd">        &#39;~/caches/audb&#39;</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;cache_root&#39;</span><span class="p">]</span>
+    <span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s2">&quot;cache_root&quot;</span><span class="p">]</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default user cache folder.&quot;&quot;&quot;</span>
 
     <span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">Repository</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;backend&#39;</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;repositories&#39;</span><span class="p">]</span>
+        <span class="n">Repository</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;backend&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">global_config</span><span class="p">[</span><span class="s2">&quot;repositories&quot;</span><span class="p">]</span>
     <span class="p">]</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repositories, will be iterated in given order.</span>
 
@@ -257,7 +257,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">SHARED_CACHE_ROOT</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;shared_cache_root&#39;</span><span class="p">]</span>
+    <span class="n">SHARED_CACHE_ROOT</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s2">&quot;shared_cache_root&quot;</span><span class="p">]</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shared cache folder.&quot;&quot;&quot;</span></div>
 </pre></div>
 
@@ -274,7 +274,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/11/16 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/01/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -282,7 +282,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2023 audEERING GmbH
+      &copy; 2020-2024 audEERING GmbH
     </p>
   </div> 
 

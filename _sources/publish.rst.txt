@@ -4,7 +4,7 @@
 
     import pandas as pd
 
-    pd.set_option('display.max_columns', 7)
+    pd.set_option("display.max_columns", 7)
 
 .. Make sure we have no left-overs
 .. jupyter-execute::
@@ -14,17 +14,17 @@
     import shutil
 
     folders = [
-        './age-test-1.0.0',
-        './age-test-1.1.0',
-        './data',
+        "./age-test-1.0.0",
+        "./age-test-1.1.0",
+        "./data",
     ]
     for folder in folders:
         if os.path.exists(folder):
             shutil.rmtree(folder)
 
     # create repository
-    os.mkdir('./data')
-    os.mkdir('./data/data-local')
+    os.mkdir("./data")
+    os.mkdir("./data/data-local")
 
 
 .. _publish:
@@ -50,17 +50,17 @@ with the :mod:`audformat.testing` module.
 
     import audformat.testing
 
-    build_dir = './age-test-1.0.0'
+    build_dir = "./age-test-1.0.0"
 
     db = audformat.testing.create_db(minimal=True)
-    db.name = 'age-test'
-    db.license = 'CC0-1.0'
-    db.schemes['age'] = audformat.Scheme('int', minimum=20, maximum=90)
+    db.name = "age-test"
+    db.license = "CC0-1.0"
+    db.schemes["age"] = audformat.Scheme("int", minimum=20, maximum=90)
     audformat.testing.add_table(
         db,
-        table_id='age',
-        index_type='filewise',
-        columns='age',
+        table_id="age",
+        index_type="filewise",
+        columns="age",
         num_files=3,
     )
     db.save(build_dir)
@@ -77,7 +77,7 @@ Containing a few random annotations.
 
 .. jupyter-execute::
 
-    db['age'].get()
+    db["age"].get()
 
 
 Publish the first version
@@ -91,9 +91,9 @@ to publish the database to.
     import audb
 
     repository = audb.Repository(
-        name='data-local',
-        host='./data',
-        backend='file-system',
+        name="data-local",
+        host="./data",
+        backend="file-system",
     )
 
 Then we select the folder,
@@ -102,7 +102,7 @@ and pick a version for publishing it.
 
 .. jupyter-execute::
 
-    deps = audb.publish(build_dir, '1.0.0', repository, verbose=False)
+    deps = audb.publish(build_dir, "1.0.0", repository, verbose=False)
 
 It returns a :class:`audb.Dependencies` object
 that specifies
@@ -122,12 +122,12 @@ We can compare this with the files stored in the repository.
 
     def list_files(path):
         for root, dirs, files in os.walk(path):
-            level = root.replace(path, '').count(os.sep)
-            indent = ' ' * 2 * (level)
-            print(f'{indent}{os.path.basename(root)}/')
-            subindent = ' ' * 2 * (level + 1)
+            level = root.replace(path, "").count(os.sep)
+            indent = " " * 2 * (level)
+            print(f"{indent}{os.path.basename(root)}/")
+            subindent = " " * 2 * (level + 1)
             for f in files:
-                print(f'{subindent}{f}')
+                print(f"{subindent}{f}")
 
     list_files(repository.host)
 
@@ -162,11 +162,11 @@ to a new folder.
 
 .. jupyter-execute::
 
-    build_dir = './age-test-1.1.0'
+    build_dir = "./age-test-1.1.0"
     db = audb.load_to(
         build_dir,
-        'age-test',
-        version='1.0.0',
+        "age-test",
+        version="1.0.0",
         only_metadata=True,
         verbose=False,
     )
@@ -176,11 +176,11 @@ and add the age annotation of 22 to it.
 
 .. jupyter-execute::
 
-    index = audformat.filewise_index(['audio/004.wav'])
-    db['age'].extend_index(index, inplace=True)
-    db['age']['age'].set([22], index=index)
+    index = audformat.filewise_index(["audio/004.wav"])
+    db["age"].extend_index(index, inplace=True)
+    db["age"]["age"].set([22], index=index)
 
-    db['age'].get()
+    db["age"].get()
 
 We save it to the database build folder,
 overwrite the old table,
@@ -201,9 +201,9 @@ and will only publish those.
 
     deps = audb.publish(
         build_dir,
-        '1.1.0',
+        "1.1.0",
         repository,
-        previous_version='1.0.0',
+        previous_version="1.0.0",
         verbose=False,
     )
     deps()

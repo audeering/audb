@@ -7,9 +7,9 @@
 
     audb.config.REPOSITORIES = [
         audb.Repository(
-            name='data-public',
-            host='https://audeering.jfrog.io/artifactory',
-            backend='artifactory',
+            name="data-public",
+            host="https://audeering.jfrog.io/artifactory",
+            backend="artifactory",
         )
     ]
 
@@ -21,34 +21,32 @@ Quickstart
 The most common task is to load a database
 with :func:`audb.load`.
 
-Let's first see which databases are available to load.
+Let's first see which databases are available
+on our `public Artifactory server`_.
+
 
 .. jupyter-execute::
 
     import audb
 
-    audb.available()
+    audb.available(only_latest=True)
 
-As you can see we provide the emodb_ database
-as small example database,
-which we `have published`_
-to our `public Artifactory server`_.
-Let's load the database.
+Let's load version 1.4.1 of the emodb_ database.
 
 .. Load with only_metadata=True in the background
 .. jupyter-execute::
     :hide-code:
 
     db = audb.load(
-        'emodb',
-        version='1.4.1',
+        "emodb",
+        version="1.4.1",
         only_metadata=True,
         verbose=False,
     )
 
 .. code-block:: python
 
-    db = audb.load('emodb', version='1.4.1', verbose=False)
+    db = audb.load("emodb", version="1.4.1", verbose=False)
 
 This downloads the database header,
 all the media files,
@@ -82,17 +80,16 @@ we can inspect the corresponding scheme.
 
 .. jupyter-execute::
 
-    db.schemes['emotion']
+    db.schemes["emotion"]
 
 Finally, we get the actual annotations
 as a :class:`pandas.DataFrame`.
 
 .. jupyter-execute::
 
-    df = db['emotion'].get()  # get table
+    df = db["emotion"].get()  # get table
     df[:3]  # show first three entries
 
 
-.. _emodb: http://emodb.bilderbar.info/start.html
-.. _have published: https://github.com/audeering/emodb
+.. _emodb: https://github.com/audeering/emodb
 .. _public Artifactory server: https://audeering.jfrog.io/artifactory

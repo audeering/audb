@@ -7,9 +7,9 @@
 
     audb.config.REPOSITORIES = [
         audb.Repository(
-            name='data-public',
-            host='https://audeering.jfrog.io/artifactory',
-            backend='artifactory',
+            name="data-public",
+            host="https://audeering.jfrog.io/artifactory",
+            backend="artifactory",
         )
     ]
 
@@ -20,7 +20,7 @@
 
     import pandas as pd
 
-    pd.set_option('display.max_columns', 7)
+    pd.set_option("display.max_columns", 7)
 
 
 .. _database-dependencies:
@@ -45,7 +45,7 @@ You request a :class:`audb.Dependencies` object with
 
 .. jupyter-execute::
 
-    deps = audb.dependencies('emodb', version='1.4.1')
+    deps = audb.dependencies("emodb", version="1.4.1")
 
 You can see all entries by calling the returned object.
 
@@ -58,7 +58,7 @@ You can also use it to request certain aspects, e.g.
 
 .. jupyter-execute::
 
-    deps.duration('wav/03a01Fa.wav')
+    deps.duration("wav/03a01Fa.wav")
 
 See :class:`audb.Dependencies` for all available methods.
 
@@ -72,7 +72,7 @@ in the database dependency table.
 
 .. jupyter-execute::
 
-    deps = audb.dependencies('emodb', version='1.4.1')
+    deps = audb.dependencies("emodb", version="1.4.1")
     df = deps()
     df.duration[:10]
 
@@ -81,7 +81,7 @@ you can get their overall duration with:
 
 .. jupyter-execute::
 
-    audb.info.duration('emodb', version='1.4.1')
+    audb.info.duration("emodb", version="1.4.1")
 
 The duration of parts of a database
 can be calculated
@@ -95,10 +95,10 @@ of the emodb database.
 
     import numpy as np
 
-    df = audb.load_table('emodb', 'emotion', version='1.4.1', verbose=False)
+    df = audb.load_table("emodb", "emotion", version="1.4.1", verbose=False)
     files = df.index[:10]
     duration_in_sec = np.sum([deps.duration(f) for f in files])
-    pd.to_timedelta(duration_in_sec, unit='s')
+    pd.to_timedelta(duration_in_sec, unit="s")
 
 If your table is a segmented table,
 and you would like to get the duration
@@ -110,14 +110,14 @@ from the ``start`` and ``end`` entries.
 
 .. code-block:: python
 
-    df = audb.load_table('database-with-segmented-tables', 'segmented-table')
+    df = audb.load_table("database-with-segmented-tables", "segmented-table")
     audformat.utils.duration(df.dropna())
 
 Or you can count the duration of all segments within your database.
 
 .. code-block:: python
 
-    db = audb.load('database-with-segmented-tables', only_metadata=True)
+    db = audb.load("database-with-segmented-tables", only_metadata=True)
     audformat.utils.duration(db.segments)
 
 If your database contains files
@@ -130,5 +130,5 @@ to calculate the duration on the fly.
 
 .. code-block:: python
 
-    db = audb.load('database-with-videos')
+    db = audb.load("database-with-videos")
     audformat.utils.duration(db.files, num_workers=4)

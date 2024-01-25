@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.1
+                v1.6.2
               </div>
             
           
@@ -185,21 +185,21 @@
 <span class="sd">        Columns: [archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version]</span>
 <span class="sd">        Index: []</span>
 <span class="sd">        &gt;&gt;&gt; # Request dependencies for emodb 1.4.1</span>
-<span class="sd">        &gt;&gt;&gt; deps = audb.dependencies(&#39;emodb&#39;, version=&#39;1.4.1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; deps = audb.dependencies(&quot;emodb&quot;, version=&quot;1.4.1&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; # List all files or archives</span>
 <span class="sd">        &gt;&gt;&gt; deps.files[:3]</span>
 <span class="sd">        [&#39;db.emotion.csv&#39;, &#39;db.files.csv&#39;, &#39;wav/03a01Fa.wav&#39;]</span>
 <span class="sd">        &gt;&gt;&gt; deps.archives[:2]</span>
 <span class="sd">        [&#39;005d2b91-5317-0c80-d602-6d55f0323f8c&#39;, &#39;014f82d8-3491-fd00-7397-c3b2ac3b2875&#39;]</span>
 <span class="sd">        &gt;&gt;&gt; # Access properties for a given file</span>
-<span class="sd">        &gt;&gt;&gt; deps.archive(&#39;wav/03a01Fa.wav&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; deps.archive(&quot;wav/03a01Fa.wav&quot;)</span>
 <span class="sd">        &#39;c1f5cc6f-6d00-348a-ba3b-4adaa2436aad&#39;</span>
-<span class="sd">        &gt;&gt;&gt; deps.duration(&#39;wav/03a01Fa.wav&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; deps.duration(&quot;wav/03a01Fa.wav&quot;)</span>
 <span class="sd">        1.89825</span>
-<span class="sd">        &gt;&gt;&gt; deps.removed(&#39;wav/03a01Fa.wav&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; deps.removed(&quot;wav/03a01Fa.wav&quot;)</span>
 <span class="sd">        False</span>
 <span class="sd">        &gt;&gt;&gt; # Check if a file is part of the dependencies</span>
-<span class="sd">        &gt;&gt;&gt; &#39;wav/03a01Fa.wav&#39; in deps</span>
+<span class="sd">        &gt;&gt;&gt; &quot;wav/03a01Fa.wav&quot; in deps</span>
 <span class="sd">        True</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
@@ -207,8 +207,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-                <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_DTYPES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+            <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+            <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_DTYPES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
         <span class="p">):</span>
             <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -272,11 +272,7 @@
 <span class="sd">            list of attachments</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span>
-            <span class="p">]</span><span class="o">.</span><span class="n">index</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">attachment_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -286,11 +282,7 @@
 <span class="sd">            list of attachment IDs</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span>
-            <span class="p">]</span><span class="o">.</span><span class="n">archive</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span><span class="p">]</span><span class="o">.</span><span class="n">archive</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -310,11 +302,7 @@
 <span class="sd">            list of media</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span>
-            <span class="p">]</span><span class="o">.</span><span class="n">index</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">removed_media</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -326,8 +314,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span>
-                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">)</span>
-                <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s1">&#39;removed&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;removed&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
             <span class="p">]</span><span class="o">.</span><span class="n">index</span>
         <span class="p">)</span>
 
@@ -353,11 +341,7 @@
 <span class="sd">            list of tables</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span>
-            <span class="p">]</span><span class="o">.</span><span class="n">index</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Dependencies.archive"><a class="viewcode-back" href="../../../api/audb.Dependencies.html#audb.Dependencies.archive">[docs]</a>    <span class="k">def</span> <span class="nf">archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Name of archive the file belongs to.</span>
@@ -448,7 +432,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">extension</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="s1">&#39;pkl&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;pkl&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;File extension of &#39;path&#39; has to be &#39;csv&#39; or &#39;pkl&#39; &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;not &#39;</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
@@ -459,12 +443,13 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">),</span>
                 <span class="n">path</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;pkl&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;pkl&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;csv&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
             <span class="c1"># Data type of dependency columns</span>
             <span class="n">dtype_mapping</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">name</span><span class="p">:</span> <span class="n">dtype</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">:</span> <span class="n">dtype</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
                     <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
                     <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_DTYPES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
                 <span class="p">)</span>
@@ -512,9 +497,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;csv&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;pkl&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;pkl&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
                 <span class="n">path</span><span class="p">,</span>
                 <span class="n">protocol</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># supported by Python &gt;= 3.4</span>
@@ -545,11 +530,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">version</span><span class="p">[</span><span class="n">file</span><span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">_add_attachment</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add or update attachment.</span>
 
@@ -563,35 +548,35 @@
         <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">archive</span><span class="p">,</span>                       <span class="c1"># archive</span>
-            <span class="mi">0</span><span class="p">,</span>                             <span class="c1"># bit_depth</span>
-            <span class="mi">0</span><span class="p">,</span>                             <span class="c1"># channels</span>
-            <span class="n">checksum</span><span class="p">,</span>                      <span class="c1"># checksum</span>
-            <span class="mf">0.0</span><span class="p">,</span>                           <span class="c1"># duration</span>
-            <span class="nb">format</span><span class="p">,</span>                        <span class="c1"># format</span>
-            <span class="mi">0</span><span class="p">,</span>                             <span class="c1"># removed</span>
-            <span class="mi">0</span><span class="p">,</span>                             <span class="c1"># sampling_rate</span>
+            <span class="n">archive</span><span class="p">,</span>  <span class="c1"># archive</span>
+            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># bit_depth</span>
+            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># channels</span>
+            <span class="n">checksum</span><span class="p">,</span>  <span class="c1"># checksum</span>
+            <span class="mf">0.0</span><span class="p">,</span>  <span class="c1"># duration</span>
+            <span class="nb">format</span><span class="p">,</span>  <span class="c1"># format</span>
+            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># removed</span>
+            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># sampling_rate</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span><span class="p">,</span>  <span class="c1"># type</span>
-            <span class="n">version</span><span class="p">,</span>                       <span class="c1"># version</span>
+            <span class="n">version</span><span class="p">,</span>  <span class="c1"># version</span>
         <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_add_media</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
-                <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># file</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># archive</span>
-                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># bit_depth</span>
-                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># channels</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># checksum</span>
-                    <span class="nb">float</span><span class="p">,</span>  <span class="c1"># duration</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># format</span>
-                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># removed</span>
-                    <span class="nb">float</span><span class="p">,</span>  <span class="c1"># sampling_rate</span>
-                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># type</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># version</span>
-                <span class="p">]</span>
-            <span class="p">],</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># file</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># archive</span>
+                <span class="nb">int</span><span class="p">,</span>  <span class="c1"># bit_depth</span>
+                <span class="nb">int</span><span class="p">,</span>  <span class="c1"># channels</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># checksum</span>
+                <span class="nb">float</span><span class="p">,</span>  <span class="c1"># duration</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># format</span>
+                <span class="nb">int</span><span class="p">,</span>  <span class="c1"># removed</span>
+                <span class="nb">float</span><span class="p">,</span>  <span class="c1"># sampling_rate</span>
+                <span class="nb">int</span><span class="p">,</span>  <span class="c1"># type</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># version</span>
+            <span class="p">]</span>
+        <span class="p">],</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add media files.</span>
 
@@ -602,17 +587,17 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
             <span class="n">values</span><span class="p">,</span>
-            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">,</span> <span class="n">df</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_add_meta</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add or update table file.</span>
 
@@ -626,16 +611,16 @@
         <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">archive</span><span class="p">,</span>                 <span class="c1"># archive</span>
-            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># bit_depth</span>
-            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># channels</span>
-            <span class="n">checksum</span><span class="p">,</span>                <span class="c1"># checksum</span>
-            <span class="mf">0.0</span><span class="p">,</span>                     <span class="c1"># duration</span>
-            <span class="nb">format</span><span class="p">,</span>                  <span class="c1"># format</span>
-            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># removed</span>
-            <span class="mi">0</span><span class="p">,</span>                       <span class="c1"># sampling_rate</span>
+            <span class="n">archive</span><span class="p">,</span>  <span class="c1"># archive</span>
+            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># bit_depth</span>
+            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># channels</span>
+            <span class="n">checksum</span><span class="p">,</span>  <span class="c1"># checksum</span>
+            <span class="mf">0.0</span><span class="p">,</span>  <span class="c1"># duration</span>
+            <span class="nb">format</span><span class="p">,</span>  <span class="c1"># format</span>
+            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># removed</span>
+            <span class="mi">0</span><span class="p">,</span>  <span class="c1"># sampling_rate</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">,</span>  <span class="c1"># type</span>
-            <span class="n">version</span><span class="p">,</span>                 <span class="c1"># version</span>
+            <span class="n">version</span><span class="p">,</span>  <span class="c1"># version</span>
         <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -654,25 +639,25 @@
 <span class="sd">            file: relative file path</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;removed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;removed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_update_media</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
-                <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># file</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># archive</span>
-                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># bit_depth</span>
-                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># channels</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># checksum</span>
-                    <span class="nb">float</span><span class="p">,</span>  <span class="c1"># duration</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># format</span>
-                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># removed</span>
-                    <span class="nb">float</span><span class="p">,</span>  <span class="c1"># sampling_rate</span>
-                    <span class="nb">int</span><span class="p">,</span>    <span class="c1"># type</span>
-                    <span class="nb">str</span><span class="p">,</span>    <span class="c1"># version</span>
-                <span class="p">]</span>
-            <span class="p">],</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span>
+            <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># file</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># archive</span>
+                <span class="nb">int</span><span class="p">,</span>  <span class="c1"># bit_depth</span>
+                <span class="nb">int</span><span class="p">,</span>  <span class="c1"># channels</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># checksum</span>
+                <span class="nb">float</span><span class="p">,</span>  <span class="c1"># duration</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># format</span>
+                <span class="nb">int</span><span class="p">,</span>  <span class="c1"># removed</span>
+                <span class="nb">float</span><span class="p">,</span>  <span class="c1"># sampling_rate</span>
+                <span class="nb">int</span><span class="p">,</span>  <span class="c1"># type</span>
+                <span class="nb">str</span><span class="p">,</span>  <span class="c1"># version</span>
+            <span class="p">]</span>
+        <span class="p">],</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update media files.</span>
 
@@ -683,15 +668,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
             <span class="n">values</span><span class="p">,</span>
-            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
 
     <span class="k">def</span> <span class="nf">_update_media_version</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update version of media files.</span>
 
@@ -705,10 +690,10 @@
 
 
 <span class="k">def</span> <span class="nf">error_message_missing_object</span><span class="p">(</span>
-        <span class="n">object_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">missing_object_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">],</span>
-        <span class="n">database_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">database_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">object_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">missing_object_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">],</span>
+    <span class="n">database_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">database_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error message for missing objects.</span>
 
@@ -726,34 +711,26 @@
 <span class="sd">        error message</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">object_type</span> <span class="o">==</span> <span class="s1">&#39;media&#39;</span><span class="p">:</span>
-        <span class="n">object_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">object_type</span><span class="si">}</span><span class="s1"> file&#39;</span>
+    <span class="k">if</span> <span class="n">object_type</span> <span class="o">==</span> <span class="s2">&quot;media&quot;</span><span class="p">:</span>
+        <span class="n">object_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">object_type</span><span class="si">}</span><span class="s2"> file&quot;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">object_name</span> <span class="o">=</span> <span class="n">object_type</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">missing_object_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Could not find a </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2"> &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;matching &#39;</span><span class="si">{</span><span class="n">missing_object_id</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-        <span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not find a </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2"> &quot;</span> <span class="sa">f</span><span class="s2">&quot;matching &#39;</span><span class="si">{</span><span class="n">missing_object_id</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Could not find the </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2"> &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">missing_object_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-        <span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not find the </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2"> &quot;</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">missing_object_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
     <span class="k">if</span> <span class="n">database_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">database_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; in </span><span class="si">{</span><span class="n">database_name</span><span class="si">}</span><span class="s1"> v</span><span class="si">{</span><span class="n">database_version</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; in </span><span class="si">{</span><span class="n">database_name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">database_version</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">return</span> <span class="n">msg</span>
 
 
 <span class="k">def</span> <span class="nf">filter_deps</span><span class="p">(</span>
-        <span class="n">requested_deps</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
-            <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-        <span class="p">],</span>
-        <span class="n">available_deps</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">deps_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">database_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">database_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">requested_deps</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span>
+    <span class="n">available_deps</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">deps_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">database_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">database_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Filter dependency files by requested files.</span>
 
@@ -819,7 +796,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2023/11/16 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/01/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -827,7 +804,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2023 audEERING GmbH
+      &copy; 2020-2024 audEERING GmbH
     </p>
   </div> 
 
