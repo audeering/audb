@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.6.2 (2024-01-25)
+--------------------------
+
+* Changed: depend on ``audeer>=2.0.0``
+* Changed: speed up ``audb.versions()``
+* Fixed: ``pandas`` deprecation warnings
+* Fixed: make documentation independent
+  of the number of public datasets
+
+
 Version 1.6.1 (2023-11-16)
 --------------------------
 
