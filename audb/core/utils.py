@@ -58,7 +58,7 @@ def mkdir_tree(
     for file in files:
         folders.add(os.path.dirname(file))
     for folder in folders:
-        audeer.mkdir(os.path.join(root, folder))
+        audeer.mkdir(root, folder)
 
 
 def _lookup(

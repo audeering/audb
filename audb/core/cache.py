@@ -30,19 +30,12 @@ def database_cache_root(
             default_cache_root(False),
         ]
     else:
-        cache_roots = [cache_root]
+        cache_roots = [audeer.path(cache_root, follow_symlink=True)]
     for cache_root in cache_roots:
         if flavor is None:
-            db_root = audeer.path(
-                cache_root,
-                name,
-                version,
-            )
+            db_root = os.path.join(cache_root, name, version)
         else:
-            db_root = audeer.path(
-                cache_root,
-                flavor.path(name, version),
-            )
+            db_root = os.path.join(cache_root, flavor.path(name, version))
         if os.path.exists(db_root):
             break
 
@@ -98,4 +91,4 @@ def default_cache_root(
         cache = os.environ.get("AUDB_SHARED_CACHE_ROOT") or config.SHARED_CACHE_ROOT
     else:
         cache = os.environ.get("AUDB_CACHE_ROOT") or config.CACHE_ROOT
-    return audeer.path(cache)
+    return audeer.path(cache, follow_symlink=True)

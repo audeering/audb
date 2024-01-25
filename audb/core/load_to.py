@@ -297,7 +297,7 @@ def load_to(
     if version is None:
         version = latest_version(name)
 
-    db_root = audeer.path(root)
+    db_root = audeer.path(root, follow_symlink=True)
     db_root_tmp = database_tmp_root(db_root)
 
     # remove files with a wrong checksum

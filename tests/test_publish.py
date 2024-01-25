@@ -102,12 +102,12 @@ def dbs(tmpdir_factory):
         [0, 1, 1, 2],
         index=audformat.filewise_index(db.files[:4]),
     )
-    audeer.mkdir(audeer.path(db_root, "extra/folder"))
-    audeer.touch(audeer.path(db_root, "extra/file.txt"))
-    audeer.touch(audeer.path(db_root, "extra/folder/file1.txt"))
-    audeer.touch(audeer.path(db_root, "extra/folder/file2.txt"))
-    audeer.mkdir(audeer.path(db_root, "extra/folder/sub-folder"))
-    audeer.touch(audeer.path(db_root, "extra/folder/sub-folder/file3.txt"))
+    audeer.mkdir(db_root, "extra/folder")
+    audeer.touch(db_root, "extra/file.txt")
+    audeer.touch(db_root, "extra/folder/file1.txt")
+    audeer.touch(db_root, "extra/folder/file2.txt")
+    audeer.mkdir(db_root, "extra/folder/sub-folder")
+    audeer.touch(db_root, "extra/folder/sub-folder/file3.txt")
     # Create one file with different content to force different checksum
     file_with_different_content = audeer.path(
         db_root,
@@ -157,7 +157,7 @@ def dbs(tmpdir_factory):
         audeer.path(db_root, "extra"),
     )
     os.remove(audeer.path(db_root, "extra/folder/file2.txt"))
-    audeer.touch(audeer.path(db_root, "extra/folder/file3.txt"))
+    audeer.touch(db_root, "extra/folder/file3.txt")
     db["files"].extend_index(audformat.filewise_index(LONG_PATH), inplace=True)
     db.save(db_root)
     audformat.testing.create_audio_files(db)
@@ -496,7 +496,7 @@ def test_publish_attachment(tmpdir, repository):
         audb.publish(db_path, "1.0.0", repository)
 
     # Publish database, path is not allowed to be a symlink
-    audeer.mkdir(audeer.path(db_path, folder_path))
+    audeer.mkdir(db_path, folder_path)
     os.symlink(
         audeer.path(db_path, folder_path),
         audeer.path(db_path, file_path),
@@ -510,7 +510,7 @@ def test_publish_attachment(tmpdir, repository):
         audb.publish(db_path, "1.0.0", repository)
 
     os.remove(os.path.join(db_path, file_path))
-    audeer.touch(audeer.path(db_path, file_path))
+    audeer.touch(db_path, file_path)
     db.save(db_path)
 
     # File exist now, folder is empty
@@ -527,7 +527,7 @@ def test_publish_attachment(tmpdir, repository):
 
     # Add empty sub-folder
     subfolder_path = f"{folder_path}/sub-folder"
-    audeer.mkdir(audeer.path(db_path, subfolder_path))
+    audeer.mkdir(db_path, subfolder_path)
     assert db.attachments["folder"].files == []
     error_msg = (
         "An attachment must not "
@@ -540,7 +540,7 @@ def test_publish_attachment(tmpdir, repository):
 
     # Add file to folder, sub-folder still empty
     file2_path = f"{folder_path}/file.txt"
-    audeer.touch(audeer.path(db_path, file2_path))
+    audeer.touch(db_path, file2_path)
     assert db.attachments["file"].files == [file_path]
     assert db.attachments["folder"].files == [file2_path]
     with pytest.raises(RuntimeError, match=error_msg):
@@ -548,7 +548,7 @@ def test_publish_attachment(tmpdir, repository):
 
     # Add file to sub-folder
     file3_path = f"{subfolder_path}/file.txt"
-    audeer.touch(audeer.path(db_path, file3_path))
+    audeer.touch(db_path, file3_path)
     assert db.attachments["file"].files == [file_path]
     assert db.attachments["folder"].files == [file2_path, file3_path]
 
@@ -774,7 +774,7 @@ def test_publish_error_allowed_chars(tmpdir, repository):
     # on the backends
 
     # Prepare database files
-    db_path = audeer.mkdir(audeer.path(tmpdir, "db"))
+    db_path = audeer.mkdir(tmpdir, "db")
     audio_file = audeer.path(db_path, "f1.wav")
     attachment_file = audeer.path(db_path, "attachment.txt")
     signal = np.zeros((2, 1000))
@@ -837,8 +837,8 @@ def test_publish_error_changed_deps_file_type(tmpdir, repository):
         "But attachment 'attachment' contains 'data/file.wav'."
     )
     db_name = "test_publish_error_changed_deps_file_type-1"
-    db_path = audeer.mkdir(audeer.path(tmpdir, "db"))
-    data_path = audeer.mkdir(audeer.path(db_path, "data"))
+    db_path = audeer.mkdir(tmpdir, "db")
+    data_path = audeer.mkdir(db_path, "data")
     signal = np.zeros((2, 1000))
     sampling_rate = 8000
     audiofile.write(audeer.path(data_path, "file.wav"), signal, sampling_rate)
@@ -856,8 +856,8 @@ def test_publish_error_changed_deps_file_type(tmpdir, repository):
         "But attachment 'attachment' contains 'db.table.csv'."
     )
     db_name = "test_publish_error_changed_deps_file_type-2"
-    db_path = audeer.mkdir(audeer.path(tmpdir, "db"))
-    data_path = audeer.mkdir(audeer.path(db_path, "data"))
+    db_path = audeer.mkdir(tmpdir, "db")
+    data_path = audeer.mkdir(db_path, "data")
     signal = np.zeros((2, 1000))
     sampling_rate = 8000
     audiofile.write(audeer.path(data_path, "file.wav"), signal, sampling_rate)
@@ -875,8 +875,8 @@ def test_publish_error_changed_deps_file_type(tmpdir, repository):
         "But attachment 'attachment' contains 'data/file2.wav'."
     )
     db_name = "test_publish_error_changed_deps_file_type-3"
-    db_path = audeer.mkdir(audeer.path(tmpdir, "db"))
-    data_path = audeer.mkdir(audeer.path(db_path, "data"))
+    db_path = audeer.mkdir(tmpdir, "db")
+    data_path = audeer.mkdir(db_path, "data")
     signal = np.zeros((2, 1000))
     sampling_rate = 8000
     audiofile.write(audeer.path(data_path, "file1.wav"), signal, sampling_rate)
@@ -902,15 +902,15 @@ def test_publish_error_changed_deps_file_type(tmpdir, repository):
         "But attachment 'attachment' contains 'db.table2.csv'."
     )
     db_name = "test_publish_error_changed_deps_file_type-4"
-    db_path = audeer.mkdir(audeer.path(tmpdir, "db"))
-    data_path = audeer.mkdir(audeer.path(db_path, "data"))
+    db_path = audeer.mkdir(tmpdir, "db")
+    data_path = audeer.mkdir(db_path, "data")
     signal = np.zeros((2, 1000))
     sampling_rate = 8000
     audiofile.write(audeer.path(data_path, "file.wav"), signal, sampling_rate)
     db = audformat.Database(db_name)
     db["table1"] = audformat.Table(audformat.filewise_index("data/file.wav"))
     db.attachments["attachment"] = audformat.Attachment("db.table2.csv")
-    audeer.touch(audeer.path(db_path, "db.table2.csv"))
+    audeer.touch(db_path, "db.table2.csv")
     db.save(db_path)
     audb.publish(db_path, "1.0.0", repository)
     audeer.rmdir(db_path)
@@ -942,8 +942,8 @@ def test_publish_error_repository_does_not_exist(tmpdir, repository):
 )
 def test_publish_error_uppercase_file_extension(tmpdir, repository, file):
     # Prepare files
-    db_path = audeer.mkdir(audeer.path(tmpdir, "db"))
-    audeer.touch(audeer.path(db_path, file))
+    db_path = audeer.mkdir(tmpdir, "db")
+    audeer.touch(db_path, file)
     # Prepare database
     db = audformat.Database("db")
     db["table"] = audformat.Table(audformat.filewise_index([file]))
@@ -964,7 +964,7 @@ def test_publish_error_version(tmpdir, repository):
     # are allowed
 
     # Create simple database
-    db_path = audeer.mkdir(audeer.path(tmpdir, "db"))
+    db_path = audeer.mkdir(tmpdir, "db")
     audio_file = audeer.path(db_path, "f1.wav")
     signal = np.zeros((2, 1000))
     sampling_rate = 8000
@@ -1225,8 +1225,8 @@ def test_update_database_without_media(tmpdir, persistent_repository):
         assert not os.path.exists(path)
 
     # add new attachment
-    audeer.mkdir(audeer.path(build_root, "extra"))
-    audeer.touch(audeer.path(build_root, "extra/new.txt"))
+    audeer.mkdir(build_root, "extra")
+    audeer.touch(build_root, "extra/new.txt")
     db.attachments[new_attachment] = audformat.Attachment("extra/new.txt")
 
     db.save(build_root)
