@@ -160,6 +160,7 @@ def test_description(db):
 )
 def test_duration(tables, media):
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
+    print(f"{deps()=}")
     duration = audb.info.duration(DB_NAME, tables=tables, media=media)
     db = audb.load(
         DB_NAME,

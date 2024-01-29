@@ -1,5 +1,6 @@
 import typing
 
+import numpy as np
 import pandas as pd
 
 import audformat
@@ -105,8 +106,8 @@ def bit_depths(
         {16}
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(df[df.type == define.DependType.MEDIA].bit_depth)
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(deps._table_column("bit_depth", "type", define.DependType.MEDIA))
 
 
 def channels(
@@ -141,8 +142,8 @@ def channels(
         {1}
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(df[df.type == define.DependType.MEDIA].channels)
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(deps._table_column("channels", "type", define.DependType.MEDIA))
 
 
 def description(
@@ -211,9 +212,9 @@ def duration(
         Timedelta('0 days 00:00:01.898250')
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
     return pd.to_timedelta(
-        df[df.type == define.DependType.MEDIA].duration.sum(),
+        np.sum(deps._table_column("duration", "type", define.DependType.MEDIA)),
         unit="s",
     )
 
@@ -276,8 +277,8 @@ def formats(
         {'wav'}
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(df[df.type == define.DependType.MEDIA].format)
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(deps._table_column("format", "type", define.DependType.MEDIA))
 
 
 def header(
@@ -605,8 +606,8 @@ def sampling_rates(
         {16000}
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(df[df.type == define.DependType.MEDIA].sampling_rate)
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(deps._table_column("sampling_rate", "type", define.DependType.MEDIA))
 
 
 def schemes(

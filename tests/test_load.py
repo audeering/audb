@@ -87,6 +87,9 @@ def dbs(tmpdir_factory, persistent_repository):
 
     # publish 1.0.0
 
+    print()
+    print("===== VERSION 1.0.0 =================================")
+    print()
     version = "1.0.0"
     db_root = tmpdir_factory.mktemp(version)
     paths[version] = str(db_root)
@@ -99,16 +102,20 @@ def dbs(tmpdir_factory, persistent_repository):
     db.save(db_root)
     audformat.testing.create_audio_files(db)
     archives = db["files"]["speaker"].get().dropna().to_dict()
-    audb.publish(
+    deps = audb.publish(
         db_root,
         version,
         persistent_repository,
         archives=archives,
         verbose=False,
     )
+    print(deps())
 
     # publish 1.1.0, add table, remove attachment file
 
+    print()
+    print("===== VERSION 1.1.0 =================================")
+    print()
     previous_db_root = db_root
     version = "1.1.0"
     db_root = tmpdir_factory.mktemp(version)
@@ -132,15 +139,19 @@ def dbs(tmpdir_factory, persistent_repository):
         audeer.path(previous_db_root, "db.csv"),
         audeer.path(db_root, "db.csv"),
     )
-    audb.publish(
+    deps = audb.publish(
         db_root,
         version,
         persistent_repository,
         verbose=False,
     )
+    print(deps())
 
     # publish 1.1.1, change label
 
+    print()
+    print("===== VERSION 1.1.1 =================================")
+    print()
     previous_db_root = db_root
     version = "1.1.1"
     db_root = tmpdir_factory.mktemp(version)
@@ -159,15 +170,19 @@ def dbs(tmpdir_factory, persistent_repository):
         audeer.path(previous_db_root, "db.csv"),
         audeer.path(db_root, "db.csv"),
     )
-    audb.publish(
+    deps = audb.publish(
         db_root,
         version,
         persistent_repository,
         verbose=False,
     )
+    print(deps())
 
     # publish 2.0.0, alter and remove media, remove attachment
 
+    print()
+    print("===== VERSION 2.0.0 =================================")
+    print()
     previous_db_root = db_root
     version = "2.0.0"
     db_root = tmpdir_factory.mktemp(version)
@@ -195,15 +210,19 @@ def dbs(tmpdir_factory, persistent_repository):
         os.path.join(previous_db_root, "db.csv"),
         os.path.join(db_root, "db.csv"),
     )
-    audb.publish(
+    deps = audb.publish(
         db_root,
         version,
         persistent_repository,
         verbose=False,
     )
+    print(deps())
 
     # publish 3.0.0, remove table, alter attachment file
 
+    print()
+    print("===== VERSION 3.0.0 =================================")
+    print()
     previous_db_root = db_root
     version = "3.0.0"
     db_root = tmpdir_factory.mktemp(version)
@@ -223,12 +242,13 @@ def dbs(tmpdir_factory, persistent_repository):
         os.path.join(previous_db_root, "db.csv"),
         os.path.join(db_root, "db.csv"),
     )
-    audb.publish(
+    deps = audb.publish(
         db_root,
         version,
         persistent_repository,
         verbose=False,
     )
+    print(deps())
 
     return paths
 
