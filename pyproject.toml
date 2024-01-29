@@ -41,6 +41,7 @@ dependencies = [
     'audresample >=0.1.6',
     'filelock',
     'oyaml',
+    'pyarrow',
 ]
 # Get version dynamically from git
 # (needs setuptools_scm tools config below)
