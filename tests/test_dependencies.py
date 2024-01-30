@@ -80,6 +80,8 @@ def test_contains(deps):
 def test_get_item(deps):
     assert deps["db.files.csv"] == ENTRIES["db.files.csv"]
     assert deps["file.wav"] == ENTRIES["file.wav"]
+    with pytest.raises(KeyError, match="non.existing"):
+        deps["non.existing"]
 
 
 def test_archives(deps):
@@ -112,6 +114,8 @@ def test_archive(deps):
         == ENTRIES["file.wav"][audb.core.define.DependField.ARCHIVE]
     )
     assert isinstance(deps.archive("file.wav"), str)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.archive("non.existing")
 
 
 def test_bit_depth(deps):
@@ -120,6 +124,8 @@ def test_bit_depth(deps):
         == ENTRIES["file.wav"][audb.core.define.DependField.BIT_DEPTH]
     )
     assert isinstance(deps.bit_depth("file.wav"), int)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.bit_depth("non.existing")
 
 
 def test_channels(deps):
@@ -128,6 +134,8 @@ def test_channels(deps):
         == ENTRIES["file.wav"][audb.core.define.DependField.CHANNELS]
     )
     assert isinstance(deps.channels("file.wav"), int)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.channels("non.existing")
 
 
 def test_checksum(deps):
@@ -136,6 +144,8 @@ def test_checksum(deps):
         == ENTRIES["file.wav"][audb.core.define.DependField.CHECKSUM]
     )
     assert isinstance(deps.checksum("file.wav"), str)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.checksum("non.existing")
 
 
 def test_duration(deps):
@@ -144,6 +154,8 @@ def test_duration(deps):
         == ENTRIES["file.wav"][audb.core.define.DependField.DURATION]
     )
     assert isinstance(deps.duration("file.wav"), float)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.duration("non.existing")
 
 
 def test_format(deps):
@@ -152,11 +164,15 @@ def test_format(deps):
         == ENTRIES["file.wav"][audb.core.define.DependField.FORMAT]
     )
     assert isinstance(deps.format("file.wav"), str)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.format("non.existing")
 
 
 def test_removed(deps):
     assert not deps.removed("file.wav")
     assert isinstance(deps.removed("file.wav"), bool)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.removed("non.existing")
 
 
 def test_load_save(deps):
@@ -185,6 +201,8 @@ def test_sampling_rate(deps):
         == ENTRIES["file.wav"][audb.core.define.DependField.SAMPLING_RATE]
     )
     assert isinstance(deps.sampling_rate("file.wav"), int)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.sampling_rate("non.existing")
 
 
 def test_type(deps):
@@ -192,6 +210,8 @@ def test_type(deps):
         deps.type("file.wav") == ENTRIES["file.wav"][audb.core.define.DependField.TYPE]
     )
     assert isinstance(deps.type("file.wav"), int)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.type("non.existing")
 
 
 def test_version(deps):
@@ -200,6 +220,8 @@ def test_version(deps):
         == ENTRIES["file.wav"][audb.core.define.DependField.VERSION]
     )
     assert isinstance(deps.version("file.wav"), str)
+    with pytest.raises(KeyError, match="non.existing"):
+        deps.version("non.existing")
 
 
 def test_len(deps):
