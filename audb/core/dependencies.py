@@ -67,6 +67,21 @@ class Dependencies:
         # TODO: replace by directly creating an empty table
         self._table = pa.Table.from_pandas(self._df)
         self._dataset = dataset.dataset(self._table)
+        self._schema = pa.schema(
+            [
+                ("file", pa.string()),
+                ("archive", pa.string()),
+                ("bit_depth", pa.int32()),
+                ("channels", pa.int32()),
+                ("checksum", pa.string()),
+                ("duration", pa.float64()),
+                ("format", pa.string()),
+                ("removed", pa.int32()),
+                ("sampling_rate", pa.int32()),
+                ("type", pa.int32()),
+                ("version", pa.string()),
+            ]
+        )
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -322,27 +337,13 @@ class Dependencies:
             # TODO: check if the conversion is faster when providing dtypes
             self._table = pa.Table.from_pandas(df, preserve_index=False)
         elif extension == "csv":
-            # Data type of dependency columns
-            column_types = {
-                "file": pa.string(),
-                "archive": pa.string(),
-                "bit_depth": pa.int32(),
-                "channels": pa.int32(),
-                "checksum": pa.string(),
-                "duration": pa.float64(),
-                "format": pa.string(),
-                "removed": pa.int32(),
-                "sampling_rate": pa.int32(),
-                "type": pa.int32(),
-                "version": pa.string(),
-            }
             self._table = csv.read_csv(
                 path,
                 read_options=csv.ReadOptions(
-                    column_names=list(dtype_mapping.keys()),
+                    column_names=self._schema.names,
                     skip_rows=1,
                 ),
-                convert_options=csv.ConvertOptions(column_types=column_types),
+                convert_options=csv.ConvertOptions(column_types=self._schema),
             )
 
     def removed(self, file: str) -> bool:
@@ -431,19 +432,23 @@ class Dependencies:
 
         """
         format = audeer.file_extension(file).lower()
-
-        self._df.loc[file] = [
-            archive,  # archive
-            0,  # bit_depth
-            0,  # channels
-            checksum,  # checksum
-            0.0,  # duration
-            format,  # format
-            0,  # removed
-            0,  # sampling_rate
-            define.DependType.ATTACHMENT,  # type
-            version,  # version
-        ]
+        table = pa.Table.from_pydict(
+            {
+                "file": pa.array([file]),
+                "archive": pa.array([archive]),
+                "bit_depth": pa.array([0]),
+                "channels": pa.array([0]),
+                "checksum": pa.array([checksum]),
+                "duration": pa.array([0.0]),
+                "format": pa.array([format]),
+                "removed": pa.array([0]),
+                "sampling_rate": pa.array([0]),
+                "type": pa.array([define.DependType.ATTACHMENT]),
+                "version": pa.array([version]),
+            },
+            schema=self._schema,
+        )
+        self._table = pa.concat_tables([self._table, table])
 
     def _add_media(
         self,
@@ -470,10 +475,30 @@ class Dependencies:
                 where each tuple holds the values of a new media entry
 
         """
-        df = pd.DataFrame.from_records(
+        df = pd.DataFrame.from_pylist(
             values,
             columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
         ).set_index("file")
+
+        # [{'a': t[0], 'b': t[1], 'c': t[2], 'd': t[3]} for t in l]
+        table = pa.Table.from_pylist(
+            [
+                {
+                    "file": value[0],
+                    "archive": value[1],
+                    "bit_depth": value[2],
+                    "channels": ...,
+                    "checksum": pa.array([checksum]),
+                    "duration": pa.array([0.0]),
+                    "format": pa.array([format]),
+                    "removed": pa.array([0]),
+                    "sampling_rate": pa.array([0]),
+                    "type": pa.array([define.DependType.ATTACHMENT]),
+                    "version": pa.array([version]),
+                },
+            schema=self._schema,
+        )
+
 
         self._df = pd.concat([self._df, df])
 
