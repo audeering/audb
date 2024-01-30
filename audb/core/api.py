@@ -601,6 +601,8 @@ def versions(
     for repository in config.REPOSITORIES:
         backend = utils.access_backend(repository)
         if isinstance(backend, audbackend.Artifactory):
+            import artifactory
+
             # Avoid using ls() on Artifactory
             # see https://github.com/devopshq/artifactory/issues/423
             folder = backend.join("/", name, "db")
@@ -609,12 +611,22 @@ def versions(
                 backend._username,
                 backend._api_key,
             )
-            if path.exists():
-                for p in path:
-                    version = p.parts[-1]
-                    header = p.joinpath(f"db-{version}.yaml")
-                    if header.exists():
-                        vs.extend([version])
+            try:
+                if path.exists():
+                    for p in path:
+                        version = p.parts[-1]
+                        header = p.joinpath(f"db-{version}.yaml")
+                        if header.exists():
+                            vs.extend([version])
+            except artifactory.ArtifactoryException:  # pragma: nocover
+                # This tackles the case of missing repo
+                # or missing read permissions.
+                # We cannot test this at the moment
+                # on the public Artifactory server.
+                # Because after trying
+                # to connect to a repo without read access
+                # the connection is also blocked for valid repos.
+                pass
         else:
             header = backend.join("/", name, "db.yaml")
             vs.extend(backend.versions(header, suppress_backend_errors=True))
