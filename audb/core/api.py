@@ -621,9 +621,10 @@ def versions(
             except artifactory.ArtifactoryException:  # pragma: nocover
                 # This tackles the case of missing repo
                 # or missing read permissions.
-                # We cannot test this at the moment,
-                # because when using a repo without read access
-                # on the public Artifactory server
+                # We cannot test this at the moment
+                # on the public Artifactory server.
+                # Because after trying
+                # to connect to a repo without read access
                 # the connection is also blocked for valid repos.
                 pass
         else:
