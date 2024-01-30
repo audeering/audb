@@ -7,6 +7,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.csv as csv
 import pyarrow.dataset as dataset
+import pyarrow.parquet as parquet
 
 import audeer
 
@@ -75,6 +76,7 @@ class Dependencies:
         """
         df = self._table.to_pandas()
         df.set_index("file", inplace=True)  # TODO: replace "file"
+        df.index.rename("", inplace=True)
         return df
 
     def __contains__(self, file: str) -> bool:
@@ -293,7 +295,6 @@ class Dependencies:
             FileNotFoundError: if ``path`` does not exists
 
         """
-        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
         path = audeer.path(path)
         extension = audeer.file_extension(path)
         if extension not in ["csv", "pkl"]:
@@ -307,38 +308,37 @@ class Dependencies:
                 os.strerror(errno.ENOENT),
                 path,
             )
+        if extension == "parquet":
+            self._table = parquet.read_table(path)
         if extension == "pkl":
-            self._df = pd.read_pickle(path)
+            # Legacy cache format
+            df = pd.read_pickle(path)
+            df.index.rename("file", inplace=True)
+            df = df.reset_index()
+            # TODO: check if the conversion is faster when providing dtypes
+            self._table = pa.Table.from_pandas(df, preserve_index=False)
         elif extension == "csv":
-            column_names = ["file"] + list(define.DEPEND_FIELD_NAMES.values())
-
-            read_options = csv.ReadOptions(
-                column_names=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
-            )
-            # Set the data types with the following
-            # convert_options = pyarrow.csv.ConvertOptions()
-            table = csv.read_csv(
-                path,
-                read_options=csv.ReadOptions(column_names=column_names),
-                convert_options=None,
-            )
-
             # Data type of dependency columns
-            dtype_mapping = {
-                name: dtype
-                for name, dtype in zip(
-                    define.DEPEND_FIELD_NAMES.values(),
-                    define.DEPEND_FIELD_DTYPES.values(),
-                )
+            column_types = {
+                "file": pa.string(),
+                "archive": pa.string(),
+                "bit_depth": pa.int32(),
+                "channels": pa.int32(),
+                "checksum": pa.string(),
+                "duration": pa.float64(),
+                "format": pa.string(),
+                "removed": pa.int32(),
+                "sampling_rate": pa.int32(),
+                "type": pa.int32(),
+                "version": pa.string(),
             }
-            # Data type of index
-            index = 0
-            dtype_mapping[index] = str
-            self._df = pd.read_csv(
+            self._table = csv.read_csv(
                 path,
-                index_col=index,
-                na_filter=False,
-                dtype=dtype_mapping,
+                read_options=csv.ReadOptions(
+                    column_names=list(dtype_mapping.keys()),
+                    skip_rows=1,
+                ),
+                convert_options=csv.ConvertOptions(column_types=column_types),
             )
 
     def removed(self, file: str) -> bool:
@@ -372,17 +372,17 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv`` or ``pkl``
+                File extension can be ``csv`` or ``parquet``
 
         """
         path = audeer.path(path)
         if path.endswith("csv"):
-            self._df.to_csv(path)
-        elif path.endswith("pkl"):
-            self._df.to_pickle(
-                path,
-                protocol=4,  # supported by Python >= 3.4
-            )
+            # For legacy reasons
+            # don't store column name for `"file"`
+            table = self._table.rename_columns(["file", ""])
+            csv.write_csv(table, path)
+        elif path.endswith("parquet"):
+            parquet.write_table(self._table, path)
 
     def type(self, file: str) -> int:
         r"""Type of file.
