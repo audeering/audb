@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.6.3 (2024-01-30)
+--------------------------
+
+* Fixed: ``audb.versions()``
+  when ``audb.config.REPOSITORIES``
+  includes non-existing Artifactory repositories
+  or Artifactory repositories without read access
+
+
 Version 1.6.2 (2024-01-25)
 --------------------------
 
