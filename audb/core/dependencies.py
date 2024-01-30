@@ -7,6 +7,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.csv as csv
 import pyarrow.dataset as dataset
+from pyarrow.lib import ArrowInvalid
 import pyarrow.parquet as parquet
 
 import audeer
@@ -89,8 +90,11 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        mask = dataset.field("file") == file
-        return self._dataset.count_rows(filter=mask) > 0
+        try:
+            self._table_row(file)
+            return True
+        except ArrowInvalid:
+            return False
 
     def __getitem__(self, file: str) -> typing.List:
         r"""File information.
