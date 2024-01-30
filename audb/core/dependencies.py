@@ -90,11 +90,8 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        try:
-            self._table_row(file)
-            return True
-        except ArrowInvalid:
-            return False
+        row = self._table_row(file)
+        return len(row) > 0
 
     def __getitem__(self, file: str) -> typing.List:
         r"""File information.
@@ -107,6 +104,9 @@ class Dependencies:
 
         """
         row = self._table_row(file)
+        # Raise KeyError if file is not in `self`
+        if len(row) == 0:
+            raise KeyError(file)
         return [value for column, value in row if column != "file"]
 
     def __len__(self) -> int:
@@ -568,8 +568,11 @@ class Dependencies:
         # `.take([0], filter=mask)`
         # is 10x faster than
         # `.filter(mask).to_table()`
-        list_of_row_dicts = self._dataset.take([0], filter=mask).to_pylist()
-        return list_of_row_dicts[0]
+        try:
+            list_of_row_dicts = self._dataset.take([0], filter=mask).to_pylist()
+            return list_of_row_dicts[0]
+        except ArrowInvalid:  # if file cannot be found
+            return {}
 
     def _update_media(
         self,
