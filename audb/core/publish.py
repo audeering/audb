@@ -296,10 +296,8 @@ def _media_values(
     version: str,
     archive: str,
     checksum: str,
-) -> typing.Tuple[str, str, int, int, str, float, str, int, float, int, str]:
+) -> typing.Tuple[str, str, int, int, str, float, int, str]:
     r"""Return values of a media entry in dependencies."""
-    format = audeer.file_extension(file).lower()
-
     try:
         path = os.path.join(root, file)
         bit_depth = audiofile.bit_depth(path)
@@ -311,6 +309,7 @@ def _media_values(
     except FileNotFoundError:  # pragma: nocover
         # If sox or mediafile are not installed
         # we get a FileNotFoundError error
+        format = audeer.file_extension(file).lower()
         raise RuntimeError(
             f"sox and mediainfo have to be installed "
             f"to publish '{format}' media files."
@@ -323,10 +322,7 @@ def _media_values(
         channels,
         checksum,
         duration,
-        format,
-        0,  # removed
         sampling_rate,
-        define.DependType.MEDIA,
         version,
     )
 
