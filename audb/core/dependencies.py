@@ -7,6 +7,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.csv as csv
 import pyarrow.dataset as dataset
+from pyarrow.lib import ArrowIndexError
 from pyarrow.lib import ArrowInvalid
 import pyarrow.parquet as parquet
 
@@ -57,16 +58,8 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        data = {}
-        for name, dtype in zip(
-            define.DEPEND_FIELD_NAMES.values(),
-            define.DEPEND_FIELD_DTYPES.values(),
-        ):
-            data[name] = pd.Series(dtype=dtype)
-        self._df = pd.DataFrame(data)
-        # TODO: replace by directly creating an empty table
-        self._table = pa.Table.from_pandas(self._df)
-        self._dataset = dataset.dataset(self._table)
+        self._table = None
+        self._dataset = None
         self._schema = pa.schema(
             [
                 ("file", pa.string()),
@@ -118,21 +111,15 @@ class Dependencies:
             list with meta information
 
         """
-        row = self._table_row(file)
-        # Raise KeyError if file is not in `self`
-        if len(row) == 0:
-            raise KeyError(file)
-        return [value for column, value in row if column != "file"]
+        row = self._table_row(file, raise_error=True)
+        return [value for column, value in row.items() if column != "file"]
 
     def __len__(self) -> int:
         r"""Number of all media, table, attachment files."""
         return len(self._table)
 
     def __str__(self) -> str:  # noqa: D105
-        # TODO: find a ncie representation
-        # as the following takes ages for large tables
-        df = self()
-        return df.to_string()
+        return self._table.slice(length=5).to_pandas().set_index("file").to_string()
 
     @property
     def archives(self) -> typing.List[str]:
@@ -193,8 +180,8 @@ class Dependencies:
             list of media
 
         """
-        mask = (ds.field("type") == audb.core.define.DependType.MEDIA) & (
-            ds.field("removed") == 1
+        mask = (dataset.field("type") == define.DependType.MEDIA) & (
+            dataset.field("removed") == 1
         )
         return self._table.filter(mask).column("file").to_pylist()
 
@@ -232,7 +219,7 @@ class Dependencies:
             archive name
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
         return row["archive"]
 
     def bit_depth(self, file: str) -> int:
@@ -245,7 +232,7 @@ class Dependencies:
             bit depth
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
         return int(row["bit_depth"])
 
     def channels(self, file: str) -> int:
@@ -258,7 +245,7 @@ class Dependencies:
             number of channels
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
         return int(row["channels"])
 
     def checksum(self, file: str) -> str:
@@ -271,7 +258,7 @@ class Dependencies:
             checksum of file
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
         return row["checksum"]
 
     def duration(self, file: str) -> float:
@@ -284,7 +271,7 @@ class Dependencies:
             duration in seconds
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
         return float(row["duration"])
 
     def format(self, file: str) -> str:
@@ -297,7 +284,7 @@ class Dependencies:
             file format (always lower case)
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
         return row["format"]
 
     def load(self, path: str):
@@ -356,7 +343,8 @@ class Dependencies:
             ``True`` if file was removed
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
+        print(f"{row=}")
         return bool(row["removed"])
 
     def sampling_rate(self, file: str) -> int:
@@ -369,7 +357,7 @@ class Dependencies:
             sampling rate in Hz
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
         return int(row["sampling_rate"])
 
     def save(self, path: str):
@@ -384,7 +372,9 @@ class Dependencies:
         if path.endswith("csv"):
             # For legacy reasons
             # don't store column name for `"file"`
-            table = self._table.rename_columns(["file", ""])
+            columns = self._table.column_names
+            columns[0] = ""
+            table = self._table.rename_columns(columns)
             csv.write_csv(table, path)
         elif path.endswith("parquet"):
             parquet.write_table(self._table, path)
@@ -399,7 +389,7 @@ class Dependencies:
             type
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
         return int(row["type"])
 
     def version(self, file: str) -> str:
@@ -412,7 +402,7 @@ class Dependencies:
             version string
 
         """
-        row = self._table_row(file)
+        row = self._table_row(file, raise_error=True)
         return row["version"]
 
     def _add_attachment(
@@ -431,24 +421,20 @@ class Dependencies:
             checksum: checksum of file
 
         """
-        format = audeer.file_extension(file).lower()
-        table = pa.Table.from_pydict(
-            {
-                "file": pa.array([file]),
-                "archive": pa.array([archive]),
-                "bit_depth": pa.array([0]),
-                "channels": pa.array([0]),
-                "checksum": pa.array([checksum]),
-                "duration": pa.array([0.0]),
-                "format": pa.array([format]),
-                "removed": pa.array([0]),
-                "sampling_rate": pa.array([0]),
-                "type": pa.array([define.DependType.ATTACHMENT]),
-                "version": pa.array([version]),
-            },
-            schema=self._schema,
-        )
-        self._table = pa.concat_tables([self._table, table])
+        row = {
+            "file": file,
+            "archive": archive,
+            "bit_depth": 0,
+            "channels": 0,
+            "checksum": checksum,
+            "duration": 0.0,
+            "format": audeer.file_extension(file).lower(),
+            "removed": 0,
+            "sampling_rate": 0,
+            "type": define.DependType.ATTACHMENT,
+            "version": version,
+        }
+        self._table_add_rows([row])
 
     def _add_media(
         self,
@@ -460,10 +446,7 @@ class Dependencies:
                 int,  # channels
                 str,  # checksum
                 float,  # duration
-                str,  # format
-                int,  # removed
-                float,  # sampling_rate
-                int,  # type
+                int,  # sampling_rate
                 str,  # version
             ]
         ],
@@ -475,32 +458,23 @@ class Dependencies:
                 where each tuple holds the values of a new media entry
 
         """
-        df = pd.DataFrame.from_pylist(
-            values,
-            columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
-        ).set_index("file")
-
-        # [{'a': t[0], 'b': t[1], 'c': t[2], 'd': t[3]} for t in l]
-        table = pa.Table.from_pylist(
-            [
-                {
-                    "file": value[0],
-                    "archive": value[1],
-                    "bit_depth": value[2],
-                    "channels": ...,
-                    "checksum": pa.array([checksum]),
-                    "duration": pa.array([0.0]),
-                    "format": pa.array([format]),
-                    "removed": pa.array([0]),
-                    "sampling_rate": pa.array([0]),
-                    "type": pa.array([define.DependType.ATTACHMENT]),
-                    "version": pa.array([version]),
-                },
-            schema=self._schema,
-        )
-
-
-        self._df = pd.concat([self._df, df])
+        rows = [
+            {
+                "file": value[0],
+                "archive": value[1],
+                "bit_depth": value[2],
+                "channels": value[3],
+                "checksum": value[4],
+                "duration": value[5],
+                "format": audeer.file_extension(value[0]).lower(),
+                "removed": 0,
+                "sampling_rate": value[6],
+                "type": define.DependType.MEDIA,
+                "version": value[7],
+            }
+            for value in values
+        ]
+        self._table_add_rows(rows)
 
     def _add_meta(
         self,
@@ -518,20 +492,20 @@ class Dependencies:
             version: version string
 
         """
-        format = audeer.file_extension(file).lower()
-
-        self._df.loc[file] = [
-            archive,  # archive
-            0,  # bit_depth
-            0,  # channels
-            checksum,  # checksum
-            0.0,  # duration
-            format,  # format
-            0,  # removed
-            0,  # sampling_rate
-            define.DependType.META,  # type
-            version,  # version
-        ]
+        row = {
+            "file": file,
+            "archive": archive,
+            "bit_depth": 0,
+            "channels": 0,
+            "checksum": checksum,
+            "duration": 0.0,
+            "format": audeer.file_extension(file).lower(),
+            "removed": 0,
+            "sampling_rate": 0,
+            "type": define.DependType.META,
+            "version": version,
+        }
+        self._table_add_rows([row])
 
     def _drop(self, file: str):
         r"""Drop file from table.
@@ -540,7 +514,12 @@ class Dependencies:
             file: relative file path
 
         """
-        self._df.drop(file, inplace=True)
+        # Check first if `file` is in table
+        # and raise `KeyError` if not
+        self._table_row(file, raise_error=True)
+        # If `file` is in table remove it
+        mask = dataset.field("file") != file
+        self._table = self._table.filter(mask)
 
     def _remove(self, file: str):
         r"""Mark file as removed.
@@ -549,7 +528,51 @@ class Dependencies:
             file: relative file path
 
         """
-        self._df.at[file, "removed"] = 1
+        # We cannot change values directly in a arrow table,
+        # hence we remove the matching row
+        # and add it as a new one
+        # TODO: is there a better way
+        # (e.g. replacing the "removed" column instead,
+        # as proposed in https://stackoverflow.com/a/73779252)
+        row = self._table_row(file, raise_error=True)
+        row["removed"] = 1
+        # Remove old row
+        mask = dataset.field("file") != file
+        self._table = self._table.filter(mask)
+        # Add new row
+        table = pa.Table.from_pylist([row], schema=self._schema)
+        self._table_append(table)
+
+    def _table_add_rows(
+        self,
+        rows: typing.Sequence[typing.Dict[str, typing.Any]],
+    ):
+        r"""Add rows.
+
+        Args:
+            rows: list of tuples,
+                where each tuple holds the values of a new row
+
+        """
+        table = pa.Table.from_pylist(rows, schema=self._schema)
+        self._table_append(table)
+
+    def _table_append(
+        self,
+        table: pa.Table,
+    ):
+        r"""Append table to dependency table.
+
+        Args:
+            table: table to append
+
+        """
+        if self._table is None:
+            self._table = table
+        else:
+            self._table = pa.concat_tables([self._table, table])
+        # Update dataset every time table changes
+        self._dataset = dataset.dataset(table)
 
     def _table_column(
         self,
@@ -577,13 +600,16 @@ class Dependencies:
             table = self._table.filter(mask).column(column)
         return table.to_pylist()
 
-    def _table_row(self, file: str) -> typing.Dict:
+    def _table_row(self, file: str, raise_error: bool = False) -> typing.Dict:
         r"""Table row corresponding to file.
 
         The file column is included in the returned row.
 
         Args:
             file: relative file path
+            raise_error: if ``True``
+                it raises a ``KeyError``
+                if ``file`` is not in dependency table
 
         Returns:
             row as dictionary with columns as keys
@@ -595,9 +621,14 @@ class Dependencies:
         # `.filter(mask).to_table()`
         try:
             list_of_row_dicts = self._dataset.take([0], filter=mask).to_pylist()
-            return list_of_row_dicts[0]
-        except ArrowInvalid:  # if file cannot be found
-            return {}
+            row = list_of_row_dicts[0]
+            return row
+        except (ArrowIndexError, ArrowInvalid):  # if file cannot be found
+            row = {}
+            if raise_error:
+                row[file]
+            else:
+                return row
 
     def _update_media(
         self,
@@ -624,12 +655,12 @@ class Dependencies:
                 where each tuple holds the new values for a media entry
 
         """
-        df = pd.DataFrame.from_records(
-            values,
-            columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
-        ).set_index("file")
-
-        self._df.loc[df.index] = df
+        # Remove all selected files
+        files = [value[0] for value in values]
+        mask = dataset.field("file").isin(files)
+        self._table = self._table.filter(~mask)
+        # Add updates as new entries
+        self._add_media(values)
 
     def _update_media_version(
         self,
@@ -643,8 +674,19 @@ class Dependencies:
             version: version string
 
         """
-        field = define.DEPEND_FIELD_NAMES[define.DependField.VERSION]
-        self._df.loc[files, field] = version
+
+        def update_version(row):
+            row["version"] = version
+
+        rows = [
+            update_version(self._table_row(file, raise_error=True)) for file in files
+        ]
+        # Remove all selected files
+        mask = dataset.field("file").isin(files)
+        self._table = self._table.filter(~mask)
+        # Add updates as new entries
+        table = pa.Table.from_pylist(rows, schema=self._schema)
+        self._table_append(table)
 
 
 def error_message_missing_object(
