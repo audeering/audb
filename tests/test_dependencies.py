@@ -316,4 +316,17 @@ def test_add_media(deps):
     ]
     deps._add_media(values) 
     assert len(deps) == 4
-    # ...
+    assert deps.archive(file1) == archive1
+    assert deps.bit_depth(file1) == bit_depth1
+    assert deps.channels(file1) == channels1
+    assert deps.checksum(file1) == checksum1
+    assert deps.duration(file1) == duration1
+    assert deps.sampling_rate(file1) == sampling_rate1
+    assert deps.version(file1) == version1
+    assert deps.archive(file2) == archive2
+    assert deps.bit_depth(file2) == bit_depth2
+    assert deps.channels(file2) == channels2
+    assert deps.checksum(file2) == checksum2
+    assert deps.duration(file2) == duration2
+    assert deps.sampling_rate(file2) == sampling_rate2
+    assert deps.version(file2) == version2
