@@ -105,8 +105,8 @@ def bit_depths(
         {16}
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(df[df.type == define.DependType.MEDIA].bit_depth)
+    table = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(table._table_column("bit_depth", "type", define.DependType.MEDIA))
 
 
 def channels(
@@ -141,8 +141,8 @@ def channels(
         {1}
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(df[df.type == define.DependType.MEDIA].channels)
+    table = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(table._table_column("channels", "type", define.DependType.MEDIA))
 
 
 def description(
@@ -211,9 +211,9 @@ def duration(
         Timedelta('0 days 00:00:01.898250')
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
+    table = filtered_dependencies(name, version, media, tables, cache_root)
     return pd.to_timedelta(
-        df[df.type == define.DependType.MEDIA].duration.sum(),
+        np.sum(table._table_column("duration", "type", define.DependType.MEDIA)),
         unit="s",
     )
 
@@ -276,8 +276,8 @@ def formats(
         {'wav'}
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(df[df.type == define.DependType.MEDIA].format)
+    table = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(table._table_column("format", "type", define.DependType.MEDIA))
 
 
 def header(
@@ -605,8 +605,8 @@ def sampling_rates(
         {16000}
 
     """
-    df = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(df[df.type == define.DependType.MEDIA].sampling_rate)
+    table = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(table._table_column("sampling_rates", "type", define.DependType.MEDIA))
 
 
 def schemes(

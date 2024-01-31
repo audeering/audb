@@ -4,6 +4,8 @@ import typing
 
 import filelock
 import pandas as pd
+import pyarrow as pa
+import pyarrow.dataset as dataset
 
 import audbackend
 import audeer
@@ -180,21 +182,18 @@ def _files_duration(
     files: typing.Sequence[str],
     format: typing.Optional[str],
 ):
-    field = define.DEPEND_FIELD_NAMES[define.DependField.DURATION]
-    durs = deps().loc[files, field]
-    durs = durs[durs > 0]
-    durs = pd.to_timedelta(durs, unit="s")
-    durs.index.name = "file"
+    mask = dataset.field("file").isin(files) & dataset.field("duration") > 0
+    table = deps._table.filter(mask)
+    files = table.column("file").to_pylist()
+    durations = table.column("duration").to_pylist()
+    durations = pd.to_timedelta(durations, unit="s")
     if format is not None:
-        durs.index = audformat.utils.replace_file_extension(durs.index, format)
+        files = [audeer.replace_file_extension(file, format) for file in files]
     # Norm file path under Windows to include `\`
-    if os.name == "nt":  # pragma: nocover as tested in Windows runner
-        durs.index = audformat.utils.map_file_path(
-            durs.index,
-            os.path.normpath,
-        )
-    durs.index = audformat.utils.expand_file_path(durs.index, db.root)
-    db._files_duration = durs.to_dict()
+    # if os.name == "nt":  # pragma: nocover as tested in Windows runner
+    #     files = [os.path.normpath(file) for file in files]
+    files = [audeer.path(db.root, file) for file in files]
+    db._files_duration = {file: duration for file, duration in zip(files, durations)}
 
 
 def _get_attachments_from_cache(
@@ -496,6 +495,8 @@ def _get_tables_from_backend(
 ):
     r"""Load tables from backend."""
     db_root_tmp = database_tmp_root(db_root)
+
+    print(f"{deps=}")
 
     def job(table: str):
         archive = backend.join(
@@ -848,7 +849,7 @@ def filtered_dependencies(
     media: typing.Union[str, typing.Sequence[str]],
     tables: typing.Union[str, typing.Sequence[str]],
     cache_root: str = None,
-) -> pd.DataFrame:
+) -> pa.Table:
     r"""Filter media by tables.
 
     Return all media files from ``media``
@@ -870,7 +871,7 @@ def filtered_dependencies(
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     if tables is None and media is None:
-        df = deps()
+        table = deps._table
     else:
         # Load header to get list of tables
         db = load_header(name, version=version, cache_root=cache_root)
@@ -891,9 +892,10 @@ def filtered_dependencies(
         if len(available_media) > 0:
             media = filter_deps(media, deps.media, "media", name, version)
             available_media = [m for m in media if m in list(set(available_media))]
-        df = deps().loc[available_media]
+        mask = dataset.field("file").isin(available_media)
+        table = self._table.filter(mask)
 
-    return df
+    return table
 
 
 def load(

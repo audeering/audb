@@ -83,9 +83,26 @@ class Dependencies:
             table with dependencies
 
         """
-        df = self._table.to_pandas()
-        df.set_index("file", inplace=True)  # TODO: replace "file"
-        df.index.rename("", inplace=True)
+        if self._table is None:
+            df = pd.DataFrame(
+                [],
+                columns=[
+                    "archive",
+                    "bit_depth",
+                    "channels",
+                    "checksum",
+                    "duration",
+                    "format",
+                    "removed",
+                    "sampling_rate",
+                    "type",
+                    "version",
+                ],
+            )
+        else:
+            df = self._table.to_pandas()
+            df.set_index("file", inplace=True)
+            df.index.rename("", inplace=True)
         return df
 
     def __contains__(self, file: str) -> bool:
@@ -116,10 +133,19 @@ class Dependencies:
 
     def __len__(self) -> int:
         r"""Number of all media, table, attachment files."""
-        return len(self._table)
+        if self._table is None:
+            length = 0
+        else:
+            length = len(self._table)
+        return length
 
     def __str__(self) -> str:  # noqa: D105
-        return self._table.slice(length=5).to_pandas().set_index("file").to_string()
+        if self._table is None:
+            _str = ""
+        else:
+            df = self._table.slice(length=5).to_pandas().set_index("file")
+            _str = df.to_string()
+        return _str
 
     @property
     def archives(self) -> typing.List[str]:
@@ -332,6 +358,7 @@ class Dependencies:
                 ),
                 convert_options=csv.ConvertOptions(column_types=self._schema),
             )
+        self._dataset = dataset.dataset(self._table)
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
@@ -593,12 +620,14 @@ class Dependencies:
             selected values from ``column`` as list
 
         """
-        if filter_column is None:
-            table = self._table.column(column)
+        if self._table is None:
+            column = []
+        elif filter_column is None:
+            column = self._table.column(column).to_pylist()
         else:
             mask = dataset.field(filter_column) == match
-            table = self._table.filter(mask).column(column)
-        return table.to_pylist()
+            column = self._table.filter(mask).column(column).to_pylist()
+        return column
 
     def _table_row(self, file: str, raise_error: bool = False) -> typing.Dict:
         r"""Table row corresponding to file.
@@ -623,7 +652,11 @@ class Dependencies:
             list_of_row_dicts = self._dataset.take([0], filter=mask).to_pylist()
             row = list_of_row_dicts[0]
             return row
-        except (ArrowIndexError, ArrowInvalid):  # if file cannot be found
+        except (
+            ArrowIndexError,
+            ArrowInvalid,
+            AttributeError,
+        ):  # if file cannot be found
             row = {}
             if raise_error:
                 row[file]
