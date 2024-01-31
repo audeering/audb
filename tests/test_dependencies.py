@@ -260,3 +260,60 @@ def test_str(deps):
         "file.wav      archive2         16         2  917338b854ad9c72f76bc9a68818dcd8      1.23    wav        0          16000     1   1.0.0"  # noqa: E501
     )
     assert str(deps) == expected_str
+
+
+# === Test hidden methods ===
+def test_add_attachment(deps):
+    file = "attachment.txt"
+    version = "1.0.0"
+    archive = "andhfner"
+    checksum = "asndmsknfporkrgfk3l"
+    deps._add_attachment(file, version, archive, checksum)
+    assert len(deps) == 3
+    assert deps.version(file) == version
+    assert deps.archive(file) == archive
+    assert deps.checksum(file) == checksum
+
+
+def test_add_media(deps):
+    file1 = "file1.wav"
+    archive1 = "archive1"
+    bit_depth1 = 16
+    channels1 = 1
+    checksum1 = "jsdfjioergjiergnmo"
+    duration1 = 2.3
+    sampling_rate1 = 16000
+    version1 = "1.1.0"
+    file2 = "file2.wav"
+    archive2 = "archive2"
+    bit_depth2 = 24
+    channels2 = 1
+    checksum2 = "masdfmiosedascrf34"
+    duration2 = 5.6
+    sampling_rate2 = 44100
+    version2 = "1.2.0"
+    values = [
+        (
+            file1,
+            archive1,
+            bit_depth1,
+            channels1,
+            checksum1,
+            duration1,
+            sampling_rate1,
+            version1,
+        ),
+        (
+            file2,
+            archive2,
+            bit_depth2,
+            channels2,
+            checksum2,
+            duration2,
+            sampling_rate2,
+            version2,
+        ),
+    ]
+    deps._add_media(values) 
+    assert len(deps) == 4
+    # ...

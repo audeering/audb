@@ -230,6 +230,8 @@ def dbs(tmpdir_factory, persistent_repository):
         verbose=False,
     )
 
+    assert False
+
     return paths
 
 
@@ -300,6 +302,10 @@ def test_load(dbs, format, version, only_metadata):
     )
     db_root = db.meta["audb"]["root"]
 
+    deps = audb.dependencies(DB_NAME, version="1.0.0")
+    print(f'1.0.0: {deps()=}')
+    deps = audb.dependencies(DB_NAME, version="3.0.0")
+    print(f'3.0.0: {deps()=}')
     # Load original database from folder (expected database)
     resolved_version = version or audb.latest_version(DB_NAME)
     db_original = audformat.Database.load(dbs[resolved_version])

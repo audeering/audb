@@ -182,7 +182,7 @@ def _files_duration(
     files: typing.Sequence[str],
     format: typing.Optional[str],
 ):
-    mask = dataset.field("file").isin(files) & dataset.field("duration") > 0
+    mask = (dataset.field("file").isin(files)) & (dataset.field("duration") > 0)
     table = deps._table.filter(mask)
     files = table.column("file").to_pylist()
     durations = table.column("duration").to_pylist()
@@ -893,7 +893,7 @@ def filtered_dependencies(
             media = filter_deps(media, deps.media, "media", name, version)
             available_media = [m for m in media if m in list(set(available_media))]
         mask = dataset.field("file").isin(available_media)
-        table = self._table.filter(mask)
+        table = deps._table.filter(mask)
 
     return table
 

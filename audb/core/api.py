@@ -163,7 +163,9 @@ def cached(
     ]
     df = pd.DataFrame([], columns=columns)
 
+    print(f'{cache_root=}')
     if not os.path.exists(cache_root):
+        print('does not exists')
         return df
 
     database_paths = audeer.list_dir_names(cache_root)
@@ -175,6 +177,7 @@ def cached(
             continue
 
         version_paths = audeer.list_dir_names(database_path)
+        print(f'{version_paths=}')
         for version_path in version_paths:
             version = os.path.basename(version_path)
 
@@ -183,6 +186,8 @@ def cached(
                 continue
 
             flavor_id_paths = audeer.list_dir_names(version_path)
+            print(f'{version_path=}')
+            print(f'{audeer.list_file_names(version_path, basenames=True, recursive=True)=}')
 
             # Skip old audb cache (e.g. 1 as flavor)
             files = audeer.list_file_names(version_path)
@@ -197,6 +202,9 @@ def cached(
                 # as those stem from audb<1.0.0.
                 # We only look for db.csv
                 # as we switched to db.pkl with audb>=1.0.5
+                print(f'{files=}')
+                print(f'{deps_path=}')
+                print(f'{deps_path_cached=}')
                 continue  # pragma: no cover
 
             for flavor_id_path in flavor_id_paths:

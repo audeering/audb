@@ -85,8 +85,9 @@ def _find_attachments(
             for attachment_id in deps.attachment_ids
             if attachment_id not in db.attachments
         ]
-        mask = dataset.field("archive").isin(removed_attachments)
-        deps._table = deps._table.filter(~mask)
+        if len(removed_attachments) > 0:
+            mask = dataset.field("archive").isin(removed_attachments)
+            deps._table = deps._table.filter(~mask)
 
     # check attachments are valid
     db_files = list(db.files) + [f"db.{t}.csv" for t in db.tables]
@@ -172,16 +173,21 @@ def _find_media(
 ) -> typing.Set[str]:
     r"""Find archives with new, altered or removed media and update 'deps'."""
     db_media = set(db.files)
+    media_archives = set()
 
     # release dependencies to removed media
     # and select according archives for upload
     if deps._table is not None:
         removed_files = set(deps.media) - db_media
-        mask = dataset.field("file").isin(removed_files)
-        media_archives = set(deps._table.filter(mask).column("archive").to_pylist())
-        deps._table = deps._table.filter(~mask)
-    else:
-        media_archives = set()
+        if len(removed_files) > 0:
+            print(f'PUBLISH: {removed_files=}')
+            print(f'PUBLISH: {deps()=}')
+            mask = dataset.field("file").isin(removed_files)
+            media_archives = set(
+                deps._table.filter(mask).column("archive").to_pylist()
+            )
+            deps._table = deps._table.filter(~mask)
+            print(f'PUBLISH: {deps()=}')
 
     # limit to relevant media
     db_media_in_root = db_media.intersection(db_root_files)
@@ -267,11 +273,9 @@ def _find_tables(
     if deps._table is not None:
         db_tables = [f"db.{table}.csv" for table in list(db)]
         removed_tables = set(deps.tables) - set(db_tables)
-        mask = dataset.field("file").isin(removed_tables)
-        print(f"{str(deps)=}")
-        t = deps._table.filter(~mask)
-        print(f"{t=}")
-        deps._table = deps._table.filter(~mask)
+        if len(removed_tables) > 0:
+            mask = dataset.field("file").isin(removed_tables)
+            deps._table = deps._table.filter(~mask)
 
     tables = []
     for table in audeer.progress_bar(

@@ -11,7 +11,7 @@ HEADER_FILE = f"{DB}.yaml"
 
 # Dependencies
 DEPENDENCIES_FILE = f"{DB}.csv"
-CACHED_DEPENDENCIES_FILE = f"{DB}.pkl"
+CACHED_DEPENDENCIES_FILE = f"{DB}.parquet"
 
 # Cache lock
 CACHED_VERSIONS_TIMEOUT = 10  # Timeout to acquire access to cached versions

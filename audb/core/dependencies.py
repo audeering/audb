@@ -371,7 +371,6 @@ class Dependencies:
 
         """
         row = self._table_row(file, raise_error=True)
-        print(f"{row=}")
         return bool(row["removed"])
 
     def sampling_rate(self, file: str) -> int:
@@ -652,11 +651,8 @@ class Dependencies:
             list_of_row_dicts = self._dataset.take([0], filter=mask).to_pylist()
             row = list_of_row_dicts[0]
             return row
-        except (
-            ArrowIndexError,
-            ArrowInvalid,
-            AttributeError,
-        ):  # if file cannot be found
+        except (ArrowIndexError, ArrowInvalid, AttributeError):  
+            # if file cannot be found
             row = {}
             if raise_error:
                 row[file]
@@ -710,6 +706,7 @@ class Dependencies:
 
         def update_version(row):
             row["version"] = version
+            return row
 
         rows = [
             update_version(self._table_row(file, raise_error=True)) for file in files
