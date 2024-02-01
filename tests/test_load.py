@@ -250,8 +250,6 @@ def dbs(tmpdir_factory, persistent_repository):
     )
     print(deps())
 
-    assert False
-
     return paths
 
 

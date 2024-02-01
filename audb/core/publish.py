@@ -182,9 +182,7 @@ def _find_media(
         removed_files = set(deps.media) - db_media
         if len(removed_files) > 0:
             mask = dataset.field("file").isin(removed_files)
-            media_archives = set(
-                deps._table.filter(mask).column("archive").to_pylist()
-            )
+            media_archives = set(deps._table.filter(mask).column("archive").to_pylist())
             table = deps._table.filter(~mask)
             deps._table_replace(table)
 

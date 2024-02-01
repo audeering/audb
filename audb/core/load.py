@@ -4,7 +4,6 @@ import typing
 
 import filelock
 import pandas as pd
-import pyarrow as pa
 import pyarrow.dataset as dataset
 
 import audbackend
@@ -189,8 +188,8 @@ def _files_duration(
     table = deps._table.filter(mask)
     files = table.column("file").to_pylist()
     # except ArrowTypeError:
-        # If no row matches the request
-        #files = []
+    # If no row matches the request
+    # files = []
     durations = table.column("duration").to_pylist()
     durations = pd.to_timedelta(durations, unit="s")
     if format is not None:
@@ -853,7 +852,7 @@ def filtered_dependencies(
     media: typing.Union[str, typing.Sequence[str]],
     tables: typing.Union[str, typing.Sequence[str]],
     cache_root: str = None,
-) -> pa.Table:
+) -> Dependencies:
     r"""Filter media by tables.
 
     Return all media files from ``media``
@@ -875,7 +874,7 @@ def filtered_dependencies(
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     if tables is None and media is None:
-        table = deps._table
+        return deps
     else:
         # Load header to get list of tables
         db = load_header(name, version=version, cache_root=cache_root)
@@ -896,10 +895,15 @@ def filtered_dependencies(
         if len(available_media) > 0:
             media = filter_deps(media, deps.media, "media", name, version)
             available_media = [m for m in media if m in list(set(available_media))]
-        mask = dataset.field("file").isin(available_media)
-        table = deps._table.filter(mask)
 
-    return table
+        if len(available_media) > 0:
+            mask = dataset.field("file").isin(available_media)
+            table = deps._table.filter(mask)
+            deps._table_replace(table)
+        else:
+            return Dependencies()
+
+    return deps
 
 
 def load(

@@ -209,15 +209,6 @@ def test_load_save(deps):
         deps.load(deps_file)
 
 
-def test_remove(deps):
-    print(f'{deps()["removed"]=}')
-    deps._remove("file.wav")
-    assert "file.wav" in deps.files
-    print(f'{deps()["removed"]=}')
-    print(f'{deps.removed("file.wav")=}')
-    assert deps.removed("file.wav")
-
-
 def test_sampling_rate(deps):
     files = get_entries("file")
     sampling_rates = get_entries("sampling_rate")

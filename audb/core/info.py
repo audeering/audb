@@ -106,8 +106,8 @@ def bit_depths(
         {16}
 
     """
-    table = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(table._table_column("bit_depth", "type", define.DependType.MEDIA))
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(deps._table_column("bit_depth", "type", define.DependType.MEDIA))
 
 
 def channels(
@@ -142,8 +142,8 @@ def channels(
         {1}
 
     """
-    table = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(table._table_column("channels", "type", define.DependType.MEDIA))
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(deps._table_column("channels", "type", define.DependType.MEDIA))
 
 
 def description(
@@ -212,9 +212,9 @@ def duration(
         Timedelta('0 days 00:00:01.898250')
 
     """
-    table = filtered_dependencies(name, version, media, tables, cache_root)
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
     return pd.to_timedelta(
-        np.sum(table._table_column("duration", "type", define.DependType.MEDIA)),
+        np.sum(deps._table_column("duration", "type", define.DependType.MEDIA)),
         unit="s",
     )
 
@@ -277,8 +277,8 @@ def formats(
         {'wav'}
 
     """
-    table = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(table._table_column("format", "type", define.DependType.MEDIA))
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(deps._table_column("format", "type", define.DependType.MEDIA))
 
 
 def header(
@@ -606,8 +606,8 @@ def sampling_rates(
         {16000}
 
     """
-    table = filtered_dependencies(name, version, media, tables, cache_root)
-    return set(table._table_column("sampling_rates", "type", define.DependType.MEDIA))
+    deps = filtered_dependencies(name, version, media, tables, cache_root)
+    return set(deps._table_column("sampling_rate", "type", define.DependType.MEDIA))
 
 
 def schemes(

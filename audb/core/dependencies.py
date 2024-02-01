@@ -406,6 +406,12 @@ class Dependencies:
                 path,
                 write_options=csv.WriteOptions(quoting_style="none"),
             )
+        elif path.endswith("pkl"):
+            # Legacy cache format
+            df = self._table.to_pandas()
+            df.set_index("file", inplace=True)
+            df.index.name = ""
+            df.to_pickle(path, protocol=4)
         elif path.endswith("parquet"):
             parquet.write_table(self._table, path)
 
