@@ -401,7 +401,11 @@ class Dependencies:
             columns = self._table.column_names
             columns[0] = ""
             table = self._table.rename_columns(columns)
-            csv.write_csv(table, path)
+            csv.write_csv(
+                table,
+                path,
+                write_options=csv.WriteOptions(quoting_style="none"),
+            )
         elif path.endswith("parquet"):
             parquet.write_table(self._table, path)
 
@@ -574,13 +578,20 @@ class Dependencies:
         self,
         rows: typing.Sequence[typing.Dict[str, typing.Any]],
     ):
-        r"""Add rows.
+        r"""Add or replace rows.
 
         Args:
             rows: list of tuples,
                 where each tuple holds the values of a new row
 
         """
+        # Remove rows with matching `"file"`
+        if self._table is not None:
+            files = [row["file"] for row in rows]
+            mask = dataset.field("file").isin(files)
+            table = self._table.filter(~mask)
+            self._table_replace(table)
+        # Append new rows
         table = pa.Table.from_pylist(rows, schema=self._schema)
         self._table_append(table)
 
@@ -596,6 +607,7 @@ class Dependencies:
         """
         if self._table is not None:
             table = pa.concat_tables([self._table, table])
+            table = table.combine_chunks()
         self._table_replace(table)
 
     def _table_column(
@@ -721,12 +733,7 @@ class Dependencies:
         rows = [
             update_version(self._table_row(file, raise_error=True)) for file in files
         ]
-        # Remove all selected files
-        mask = dataset.field("file").isin(files)
-        self._table = self._table.filter(~mask)
-        # Add updates as new entries
-        table = pa.Table.from_pylist(rows, schema=self._schema)
-        self._table_append(table)
+        self._table_add_rows(rows)
 
 
 def error_message_missing_object(

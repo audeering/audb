@@ -184,15 +184,13 @@ def _find_media(
     if deps._table is not None:
         removed_files = set(deps.media) - db_media
         if len(removed_files) > 0:
-            print(f'PUBLISH: {removed_files=}')
-            print(f'PUBLISH: {deps()=}')
+            print(f"PUBLISH: removed media '{removed_files=}'")
             mask = dataset.field("file").isin(removed_files)
             media_archives = set(
                 deps._table.filter(mask).column("archive").to_pylist()
             )
             table = deps._table.filter(~mask)
             deps._table_replace(table)
-            print(f'PUBLISH: {deps()=}')
 
     # limit to relevant media
     db_media_in_root = db_media.intersection(db_root_files)
@@ -262,6 +260,8 @@ def _find_media(
         if not deps.removed(file) and deps.version(file) == version:
             media_archives.add(deps.archive(file))
 
+    print(f"PUBLISH: media archives to be updated '{media_archives}'")
+
     return media_archives
 
 
@@ -279,6 +279,7 @@ def _find_tables(
         db_tables = [f"db.{table}.csv" for table in list(db)]
         removed_tables = set(deps.tables) - set(db_tables)
         if len(removed_tables) > 0:
+            print(f"PUBLISH: removed table '{removed_tables=}'")
             mask = dataset.field("file").isin(removed_tables)
             table = deps._table.filter(~mask)
             deps._table_replace(table)
@@ -294,6 +295,8 @@ def _find_tables(
         if file not in deps or checksum != deps.checksum(file):
             deps._add_meta(file, version, table, checksum)
             tables.append(table)
+
+    print(f"PUBLISH: tables to be updated '{tables}'")
 
     return tables
 

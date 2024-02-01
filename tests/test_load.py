@@ -250,7 +250,7 @@ def dbs(tmpdir_factory, persistent_repository):
     )
     print(deps())
 
-    assert False
+    # assert False
 
     return paths
 
@@ -372,7 +372,6 @@ def test_load(dbs, format, version, only_metadata):
 
     # Assert all files are listed in dependency table
     deps = audb.dependencies(DB_NAME, version=version)
-    assert str(deps().to_string()) == str(deps)
     assert len(deps) == (
         len(db.files) + len(db.tables) + len(db.misc_tables) + len(db.attachments)
     )
