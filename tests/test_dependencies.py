@@ -263,11 +263,13 @@ def test_str(deps):
 
 
 # === Test hidden methods ===
-def test_add_attachment(deps):
-    file = "attachment.txt"
-    version = "1.0.0"
-    archive = "andhfner"
-    checksum = "asndmsknfporkrgfk3l"
+@pytest.mark.parametrize(
+    "file, version, archive, checksum",
+    [
+        ("attachment.txt", "1.0.0", "andhfner", "asndmsknfporkrgfk3l"),
+    ],
+)
+def test_add_attachment(deps, file, version, archive, checksum):
     deps._add_attachment(file, version, archive, checksum)
     assert len(deps) == 3
     assert deps.version(file) == version
@@ -275,58 +277,78 @@ def test_add_attachment(deps):
     assert deps.checksum(file) == checksum
 
 
-def test_add_media(deps):
-    file1 = "file1.wav"
-    archive1 = "archive1"
-    bit_depth1 = 16
-    channels1 = 1
-    checksum1 = "jsdfjioergjiergnmo"
-    duration1 = 2.3
-    sampling_rate1 = 16000
-    version1 = "1.1.0"
-    file2 = "file2.wav"
-    archive2 = "archive2"
-    bit_depth2 = 24
-    channels2 = 1
-    checksum2 = "masdfmiosedascrf34"
-    duration2 = 5.6
-    sampling_rate2 = 44100
-    version2 = "1.2.0"
-    values = [
-        (
-            file1,
-            archive1,
-            bit_depth1,
-            channels1,
-            checksum1,
-            duration1,
-            sampling_rate1,
-            version1,
-        ),
-        (
-            file2,
-            archive2,
-            bit_depth2,
-            channels2,
-            checksum2,
-            duration2,
-            sampling_rate2,
-            version2,
-        ),
-    ]
-    deps._add_media(values) 
+@pytest.mark.parametrize(
+    "values",
+    [
+        [
+            (
+                "file1.wav",
+                "archive1",
+                16,
+                1,
+                "jsdfjioergjiergnmo",
+                2.3,
+                16000,
+                "1.1.0",
+            ),
+            (
+                "file2.wav",
+                "archive2",
+                24,
+                1,
+                "masdfmiosedascrf34",
+                5.6,
+                44100,
+                "1.2.0",
+            ),
+        ],
+    ],
+)
+def test_add_media(deps, values):
+    deps._add_media(values)
     assert len(deps) == 4
-    assert deps.archive(file1) == archive1
-    assert deps.bit_depth(file1) == bit_depth1
-    assert deps.channels(file1) == channels1
-    assert deps.checksum(file1) == checksum1
-    assert deps.duration(file1) == duration1
-    assert deps.sampling_rate(file1) == sampling_rate1
-    assert deps.version(file1) == version1
-    assert deps.archive(file2) == archive2
-    assert deps.bit_depth(file2) == bit_depth2
-    assert deps.channels(file2) == channels2
-    assert deps.checksum(file2) == checksum2
-    assert deps.duration(file2) == duration2
-    assert deps.sampling_rate(file2) == sampling_rate2
-    assert deps.version(file2) == version2
+    for (
+        file,
+        archive,
+        bit_depth,
+        channels,
+        checksum,
+        duration,
+        sampling_rate,
+        version,
+    ) in values:
+        assert deps.archive(file) == archive
+        assert deps.bit_depth(file) == bit_depth
+        assert deps.channels(file) == channels
+        assert deps.checksum(file) == checksum
+        assert deps.duration(file) == duration
+        assert deps.sampling_rate(file) == sampling_rate
+        assert deps.version(file) == version
+
+
+@pytest.mark.parametrize(
+    "file, version, archive, checksum",
+    [
+        ("db.table1.csv", "2.1.0", "table1", "asddfnfpork45rgfl"),
+    ],
+)
+def test_add_meta(deps, file, version, archive, checksum):
+    deps._add_meta(file, version, archive, checksum)
+    assert len(deps) == 3
+    assert deps.version(file) == version
+    assert deps.archive(file) == archive
+    assert deps.checksum(file) == checksum
+
+
+@pytest.mark.parametrize(
+    "file",
+    [
+        ("file.wav"),
+        ("db.files.csv"),
+    ],
+)
+def test_drop(deps, file):
+    assert file in deps
+    deps._drop(file)
+    assert len(deps) == 1
+    assert file not in deps

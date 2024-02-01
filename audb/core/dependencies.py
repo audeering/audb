@@ -341,16 +341,16 @@ class Dependencies:
                 path,
             )
         if extension == "parquet":
-            self._table = parquet.read_table(path)
+            table = parquet.read_table(path)
         if extension == "pkl":
             # Legacy cache format
             df = pd.read_pickle(path)
             df.index.rename("file", inplace=True)
             df = df.reset_index()
             # TODO: check if the conversion is faster when providing dtypes
-            self._table = pa.Table.from_pandas(df, preserve_index=False)
+            table = pa.Table.from_pandas(df, preserve_index=False)
         elif extension == "csv":
-            self._table = csv.read_csv(
+            table = csv.read_csv(
                 path,
                 read_options=csv.ReadOptions(
                     column_names=self._schema.names,
@@ -358,7 +358,7 @@ class Dependencies:
                 ),
                 convert_options=csv.ConvertOptions(column_types=self._schema),
             )
-        self._dataset = dataset.dataset(self._table)
+        self._table_replace(table)
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
@@ -545,7 +545,8 @@ class Dependencies:
         self._table_row(file, raise_error=True)
         # If `file` is in table remove it
         mask = dataset.field("file") != file
-        self._table = self._table.filter(mask)
+        table = self._table.filter(mask)
+        self._table_replace(table)
 
     def _remove(self, file: str):
         r"""Mark file as removed.
@@ -593,12 +594,9 @@ class Dependencies:
             table: table to append
 
         """
-        if self._table is None:
-            self._table = table
-        else:
-            self._table = pa.concat_tables([self._table, table])
-        # Update dataset every time table changes
-        self._dataset = dataset.dataset(table)
+        if self._table is not None:
+            table = pa.concat_tables([self._table, table])
+        self._table_replace(table)
 
     def _table_column(
         self,
@@ -651,13 +649,27 @@ class Dependencies:
             list_of_row_dicts = self._dataset.take([0], filter=mask).to_pylist()
             row = list_of_row_dicts[0]
             return row
-        except (ArrowIndexError, ArrowInvalid, AttributeError):  
+        except (ArrowIndexError, ArrowInvalid, AttributeError):
             # if file cannot be found
             row = {}
             if raise_error:
                 row[file]
             else:
                 return row
+
+    def _table_replace(
+        self,
+        table: pa.Table,
+    ):
+        r"""Replace dependency table.
+
+        Args:
+            table: new table
+
+        """
+        self._table = table
+        # Update dataset every time table changes
+        self._dataset = dataset.dataset(self._table)
 
     def _update_media(
         self,
