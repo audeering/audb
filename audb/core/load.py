@@ -184,8 +184,6 @@ def _files_duration(
 ):
     if len(files) == 0:
         return
-    print(f'{deps()["duration"]=}')
-    print(f'{files=}')
     # mask = (dataset.field("file").isin(files)) & (dataset.field("duration") > 0)
     mask = dataset.field("file").isin(files)
     table = deps._table.filter(mask)
@@ -450,19 +448,16 @@ def _get_media_from_backend(
         )
         # extract and move all files that are stored in the archive,
         # even if only a single file from the archive was requested
-        print(f'{version=}')
         files = backend.get_archive(
             archive,
             db_root_tmp,
             version,
             tmp_root=db_root_tmp,
         )
-        print(f'{files=}')
         for file in files:
             if os.name == "nt":  # pragma: no cover
                 file = file.replace(os.sep, "/")
             if flavor is not None:
-                print(f'{deps()=}')
                 bit_depth = deps.bit_depth(file)
                 channels = deps.channels(file)
                 sampling_rate = deps.sampling_rate(file)
@@ -506,8 +501,6 @@ def _get_tables_from_backend(
 ):
     r"""Load tables from backend."""
     db_root_tmp = database_tmp_root(db_root)
-
-    print(f"{deps=}")
 
     def job(table: str):
         archive = backend.join(
