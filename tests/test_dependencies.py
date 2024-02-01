@@ -272,6 +272,8 @@ def test_str(deps):
 def test_add_attachment(deps, file, version, archive, checksum):
     deps._add_attachment(file, version, archive, checksum)
     assert len(deps) == 3
+    # Ensure we only have one chunk in table
+    assert len(deps._table.column("file").chunks) == 1
     assert deps.version(file) == version
     assert deps.archive(file) == archive
     assert deps.checksum(file) == checksum
@@ -307,6 +309,8 @@ def test_add_attachment(deps, file, version, archive, checksum):
 def test_add_media(deps, values):
     deps._add_media(values)
     assert len(deps) == 4
+    # Ensure we only have one chunk in table
+    assert len(deps._table.column("file").chunks) == 1
     for (
         file,
         archive,
@@ -335,6 +339,8 @@ def test_add_media(deps, values):
 def test_add_meta(deps, file, version, archive, checksum):
     deps._add_meta(file, version, archive, checksum)
     assert len(deps) == 3
+    # Ensure we only have one chunk in table
+    assert len(deps._table.column("file").chunks) == 1
     assert deps.version(file) == version
     assert deps.archive(file) == archive
     assert deps.checksum(file) == checksum
@@ -350,6 +356,8 @@ def test_add_meta(deps, file, version, archive, checksum):
 def test_drop(deps, file):
     assert file in deps
     deps._drop(file)
+    # Ensure we only have one chunk in table
+    assert len(deps._table.column("file").chunks) == 1
     assert len(deps) == 1
     assert file not in deps
 
@@ -388,6 +396,8 @@ def test_remove(deps, file):
 def test_update_media(deps, values):
     deps._update_media(values)
     assert len(deps) == 2
+    # Ensure we only have one chunk in table
+    assert len(deps._table.column("file").chunks) == 1
     for (
         file,
         archive,
@@ -417,5 +427,7 @@ def test_update_media(deps, values):
 def test_update_media_version(deps, files, version):
     deps._update_media_version(files, version)
     assert len(deps) == 2
+    # Ensure we only have one chunk in table
+    assert len(deps._table.column("file").chunks) == 1
     for file in files:
         assert deps.version(file) == version

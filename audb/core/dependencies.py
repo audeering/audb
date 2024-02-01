@@ -504,7 +504,7 @@ class Dependencies:
             }
             for value in values
         ]
-        self._table_add_rows(rows)
+        self._table_add_rows(rows, replace=False)
 
     def _add_meta(
         self,
@@ -577,16 +577,20 @@ class Dependencies:
     def _table_add_rows(
         self,
         rows: typing.Sequence[typing.Dict[str, typing.Any]],
+        *,
+        replace: bool = True,
     ):
         r"""Add or replace rows.
 
         Args:
             rows: list of tuples,
                 where each tuple holds the values of a new row
+            replace: if existing entries should be replaced
+                based on the ``"file"`` column
 
         """
         # Remove rows with matching `"file"`
-        if self._table is not None:
+        if self._table is not None and replace:
             files = [row["file"] for row in rows]
             mask = dataset.field("file").isin(files)
             table = self._table.filter(~mask)
@@ -607,6 +611,11 @@ class Dependencies:
         """
         if self._table is not None:
             table = pa.concat_tables([self._table, table])
+            # Ensure we have a single chunk in the table.
+            # This ensures we do not have too many small chunks,
+            # and ensures that writing to CSV will not result
+            # in repeating a row
+            # (which it does if an empty chunk is in table)
             table = table.combine_chunks()
         self._table_replace(table)
 
