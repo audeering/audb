@@ -86,6 +86,7 @@ def _find_attachments(
             if attachment_id not in db.attachments
         ]
         if len(removed_attachments) > 0:
+            print(f"PUBLISH: removed attachments '{removed_attachments}'")
             mask = dataset.field("archive").isin(removed_attachments)
             table = deps._table.filter(~mask)
             deps._table_replace(table)
@@ -159,6 +160,8 @@ def _find_attachments(
                 )
                 attachment_ids.append(attachment_id)
 
+    print(f"PUBLISH: attachments to be updated '{list(attachment_ids)}'")
+
     return list(attachment_ids)
 
 
@@ -188,7 +191,7 @@ def _find_media(
                 deps._table.filter(mask).column("archive").to_pylist()
             )
             table = deps._table.filter(~mask)
-            deps._table_update(table)
+            deps._table_replace(table)
             print(f'PUBLISH: {deps()=}')
 
     # limit to relevant media
