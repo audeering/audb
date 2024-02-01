@@ -352,3 +352,70 @@ def test_drop(deps, file):
     deps._drop(file)
     assert len(deps) == 1
     assert file not in deps
+
+
+@pytest.mark.parametrize(
+    "file",
+    [
+        ("file.wav"),
+        ("db.files.csv"),
+    ],
+)
+def test_remove(deps, file):
+    assert not deps.removed(file)
+    deps._remove(file)
+    assert len(deps) == 2
+    assert deps.removed(file)
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        [
+            (
+                "file.wav",
+                "archive1",
+                16,
+                1,
+                "jsdfjioergjiergnmo",
+                2.3,
+                16000,
+                "1.1.0",
+            ),
+        ],
+    ],
+)
+def test_update_media(deps, values):
+    deps._update_media(values)
+    assert len(deps) == 2
+    for (
+        file,
+        archive,
+        bit_depth,
+        channels,
+        checksum,
+        duration,
+        sampling_rate,
+        version,
+    ) in values:
+        assert deps.archive(file) == archive
+        assert deps.bit_depth(file) == bit_depth
+        assert deps.channels(file) == channels
+        assert deps.checksum(file) == checksum
+        assert deps.duration(file) == duration
+        assert deps.sampling_rate(file) == sampling_rate
+        assert deps.version(file) == version
+
+
+@pytest.mark.parametrize(
+    "files, version",
+    [
+        (["file.wav"], "3.0.0"),
+        (["file.wav", "db.files.csv"], "4.0.0"),
+    ],
+)
+def test_update_media_version(deps, files, version):
+    deps._update_media_version(files, version)
+    assert len(deps) == 2
+    for file in files:
+        assert deps.version(file) == version

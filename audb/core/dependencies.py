@@ -681,10 +681,7 @@ class Dependencies:
                 int,  # channels
                 str,  # checksum
                 float,  # duration
-                str,  # format
-                int,  # removed
-                float,  # sampling_rate
-                int,  # type
+                int,  # sampling_rate
                 str,  # version
             ]
         ],
@@ -699,7 +696,8 @@ class Dependencies:
         # Remove all selected files
         files = [value[0] for value in values]
         mask = dataset.field("file").isin(files)
-        self._table = self._table.filter(~mask)
+        table = self._table.filter(~mask)
+        self._table_replace(table)
         # Add updates as new entries
         self._add_media(values)
 

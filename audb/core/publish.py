@@ -87,7 +87,8 @@ def _find_attachments(
         ]
         if len(removed_attachments) > 0:
             mask = dataset.field("archive").isin(removed_attachments)
-            deps._table = deps._table.filter(~mask)
+            table = deps._table.filter(~mask)
+            deps._table_replace(table)
 
     # check attachments are valid
     db_files = list(db.files) + [f"db.{t}.csv" for t in db.tables]
@@ -186,7 +187,8 @@ def _find_media(
             media_archives = set(
                 deps._table.filter(mask).column("archive").to_pylist()
             )
-            deps._table = deps._table.filter(~mask)
+            table = deps._table.filter(~mask)
+            deps._table_update(table)
             print(f'PUBLISH: {deps()=}')
 
     # limit to relevant media
@@ -275,7 +277,8 @@ def _find_tables(
         removed_tables = set(deps.tables) - set(db_tables)
         if len(removed_tables) > 0:
             mask = dataset.field("file").isin(removed_tables)
-            deps._table = deps._table.filter(~mask)
+            table = deps._table.filter(~mask)
+            deps._table_replace(table)
 
     tables = []
     for table in audeer.progress_bar(
