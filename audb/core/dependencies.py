@@ -155,8 +155,10 @@ class Dependencies:
             list of archives
 
         """
-        archives = self._table_column("archive")
-        return sorted(list(set(archives)))
+        if self._table is None:
+            return []
+        else:
+            return self._to_list(self._table.column("archive").unique())
 
     @property
     def attachments(self) -> typing.List[str]:
@@ -206,10 +208,17 @@ class Dependencies:
             list of media
 
         """
-        mask = (dataset.field("type") == define.DependType.MEDIA) & (
-            dataset.field("removed") == 1
-        )
-        return self._table.filter(mask).column("file").to_pylist()
+        if self._table is None:
+            return []
+        else:
+            # First look for removed files
+            # as usually we don't have those
+            mask = dataset.field("removed") == 1
+            table = self._table.filter(mask)
+            if len(table) == 0:
+                return []
+            mask = dataset.field("type") == define.DependType.MEDIA
+            return self._to_list(table.filter(mask).column("file"))
 
     @property
     def table_ids(self) -> typing.List[str]:
@@ -650,11 +659,11 @@ class Dependencies:
         if self._table is None:
             column = []
         elif filter_column is None:
-            column = self._table.column(column).to_pylist()
+            column = self._table.column(column)
         else:
             mask = dataset.field(filter_column) == match
-            column = self._table.filter(mask).column(column).to_pylist()
-        return column
+            column = self._table.filter(mask).column(column)
+        return self._to_list(column)
 
     def _table_row(self, file: str, raise_error: bool = False) -> typing.Dict:
         r"""Table row corresponding to file.
@@ -676,8 +685,11 @@ class Dependencies:
         # is 10x faster than
         # `.filter(mask).to_table()`
         try:
-            list_of_row_dicts = self._dataset.take([0], filter=mask).to_pylist()
-            row = list_of_row_dicts[0]
+            table = self._dataset.take([0], filter=mask)
+            row = {
+                column: values.to_numpy()[0]
+                for column, values in zip(table.column_names, table.columns)
+            }
             return row
         except (ArrowIndexError, ArrowInvalid, AttributeError):
             # if file cannot be found
@@ -700,6 +712,17 @@ class Dependencies:
         self._table = table
         # Update dataset every time table changes
         self._dataset = dataset.dataset(self._table)
+
+    def _to_list(self, table: pa.Table):
+        r"""Convert pyarrow table to Python list.
+
+        As reported in https://github.com/apache/arrow/issues/34354
+        it's faster to first convert to numpy.
+
+        Args:
+            table: table or column to convert to list
+        """
+        return table.to_numpy(zero_copy_only=False).tolist()
 
     def _update_media(
         self,

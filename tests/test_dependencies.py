@@ -385,6 +385,11 @@ def test_remove(deps, file):
     ],
 )
 def test_update_media(deps, values):
+    # TODO:
+    # this should raise an error
+    # if a file that should be updated
+    # is not available
+    # (at the moment it is silently added)
     deps._update_media(values)
     assert len(deps) == 2
     # Ensure we only have one chunk in table
@@ -416,6 +421,11 @@ def test_update_media(deps, values):
     ],
 )
 def test_update_media_version(deps, files, version):
+    # TODO:
+    # this should raise an error
+    # if a file that should be updated
+    # is not available
+    # (at the moment it is silently added)
     deps._update_media_version(files, version)
     assert len(deps) == 2
     # Ensure we only have one chunk in table
