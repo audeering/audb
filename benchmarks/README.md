@@ -53,7 +53,7 @@ from CSV, pickle, or parquet**
 
 **Writing a dependency file
 with 1,000,000 entries
-to CSV, pickle, or parquet
+to CSV, pickle, or parquet**
 
 | Origin                            | CSV    | pickle | parquet |
 | --------------------------------- | ------ | ------ | ------- |
@@ -62,36 +62,42 @@ to CSV, pickle, or parquet
 | pyarrow.Table                     | 0.25 s |        | 0.24 s  |
 
 
+## Parsing dependencies
+
+Compares representing the dependencies internally
+as a `pyarrow.Table` object
+or as a `pandas.DataFrame`.
+
+
 | Method                               | pyarrow.Table | pandas.DataFrame |
 | ------------------------------------ | ------------- | ---------------- |
-| `Dependency.__call__()`              | 0.353 s       |                  |
-| `Dependency.__contains__()`          | 0.002 s       |
-| `Dependency.__get_item__()`          | 0.001 s       | 
-| `Dependency.__len__()`               | 0.000 s       |
-| `Dependency.__str__()`               | 0.003 s       |
-| `Dependency.archives`                | 0.779 s       |
-| `Dependency.attachments`             | 0.051 s       |
-| `Dependency.attachment_ids`          | 0.055 s       |
-| `Dependency.files`                   | 0.384 s       |
-| `Dependency.media`                   | 0.360 s       |
-| `Dependency.removed_media`           | 0.348 s       |
-| `Dependency.table_ids`               | 0.059 s       |
-| `Dependency.tables`                  | 0.054 s       |
-| `Dependency.archive()`               | 0.001 s       |
-| `Dependency.bit_depth()`             | 0.001 s       |
-| `Dependency.channels()`              | 0.001 s       |
-| `Dependency.checksum()`              | 0.002 s       |
-| `Dependency.duration()`              | 0.002 s       |
-| `Dependency.format()`                | 0.001 s       |
-| `Dependency.removed()`               | 0.002 s       |
-| `Dependency.sampling_rate()`         | 0.001 s       |
-| `Dependency.type()`                  | 0.001 s       |
-| `Dependency.version()`               | 0.001 s       |
-| `Dependency._add_attachment()`       | 0.125 s       |
-| `Dependency._add_media()`            | 0.045 s       |
-| `Dependency._add_meta()`             | 0.098 s       |
-| `Dependency._drop()`                 | 0.038 s       |
-| `Dependency._remove()`               | 0.050 s       |
-| `Dependency._update_media()`         | 0.081 s       |
-| `Dependency._update_media_version()` | 1.178 s       |
-
+| `Dependency.__call__()`              | 0.353 s       | 0.000 s          |
+| `Dependency.__contains__()`          | 0.002 s       | 0.087 s          |
+| `Dependency.__get_item__()`          | 0.001 s       | 0.000 s          |
+| `Dependency.__len__()`               | 0.000 s       | 0.000 s          |
+| `Dependency.__str__()`               | 0.003 s       | 16.240 s         |
+| `Dependency.archives`                | 0.779 s       | 0.412 s          |
+| `Dependency.attachments`             | 0.051 s       | 0.036 s          |
+| `Dependency.attachment_ids`          | 0.055 s       | 0.027 s          |
+| `Dependency.files`                   | 0.384 s       | 0.038 s          |
+| `Dependency.media`                   | 0.360 s       | 0.106 s          |
+| `Dependency.removed_media`           | 0.348 s       | 0.103 s          |
+| `Dependency.table_ids`               | 0.059 s       | 0.036 s          |
+| `Dependency.tables`                  | 0.054 s       | 0.036 s          |
+| `Dependency.archive()`               | 0.001 s       | 0.000 s          |
+| `Dependency.bit_depth()`             | 0.001 s       | 0.000 s          |
+| `Dependency.channels()`              | 0.001 s       | 0.000 s          |
+| `Dependency.checksum()`              | 0.002 s       | 0.000 s          |
+| `Dependency.duration()`              | 0.002 s       | 0.000 s          |
+| `Dependency.format()`                | 0.001 s       | 0.000 s          |
+| `Dependency.removed()`               | 0.002 s       | 0.000 s          |
+| `Dependency.sampling_rate()`         | 0.001 s       | 0.000 s          |
+| `Dependency.type()`                  | 0.001 s       | 0.000 s          |
+| `Dependency.version()`               | 0.001 s       | 0.000 s          |
+| `Dependency._add_attachment()`       | 0.125 s       | 0.071 s          |
+| `Dependency._add_media()`            | 0.045 s       | 0.066 s          |
+| `Dependency._add_meta()`             | 0.098 s       | 0.118 s          |
+| `Dependency._drop()`                 | 0.038 s       | 0.209 s          |
+| `Dependency._remove()`               | 0.050 s       | 0.063 s          |
+| `Dependency._update_media()`         | 0.081 s       | 0.064 s          |
+| `Dependency._update_media_version()` | 1.178 s       | 0.008 s          |
