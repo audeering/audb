@@ -347,8 +347,11 @@ class Dependencies:
             df = pd.read_pickle(path)
             df.index.rename("file", inplace=True)
             df = df.reset_index()
-            # TODO: check if the conversion is faster when providing dtypes
-            table = pa.Table.from_pandas(df, preserve_index=False)
+            table = pa.Table.from_pandas(
+                df,
+                preserve_index=False,
+                schema=self._schema,
+            )
         elif extension == "csv":
             table = csv.read_csv(
                 path,
