@@ -60,7 +60,6 @@ if not os.path.exists(data_cache):
     for column, dtype in zip(df.columns, dtypes):
         df[column] = df[column].astype(dtype)
     df.set_index("file", inplace=True)
-    print(df)
     df.index.name = ""
     df.to_pickle(data_cache)
 else:
