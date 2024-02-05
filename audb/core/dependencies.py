@@ -98,7 +98,7 @@ class Dependencies:
         return len(self._df)
 
     def __str__(self) -> str:  # noqa: D105
-        return self._df.to_string()
+        return str(self._df)
 
     @property
     def archives(self) -> typing.List[str]:
