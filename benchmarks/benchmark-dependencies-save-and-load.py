@@ -6,6 +6,7 @@ import string
 import time
 
 import pandas as pd
+import polars
 import pyarrow as pa
 import pyarrow.csv as csv
 import pyarrow.parquet as parquet
@@ -81,6 +82,19 @@ schema = pa.schema(
         ("version", pa.string()),
     ]
 )
+polars_dtype = {
+    "file": polars.String(),
+    "archive": polars.String(),
+    "bit_depth": polars.Int32(),
+    "channels": polars.Int32(),
+    "checksum": polars.String(),
+    "duration": polars.Float64(),
+    "format": polars.String(),
+    "removed": polars.Int32(),
+    "sampling_rate": polars.Int32(),
+    "type": polars.Int32(),
+    "version": polars.String(),
+}
 
 # ===== Benchmark storing data =====
 folder = audeer.path(cache, "files")
@@ -118,6 +132,11 @@ csv.write_csv(
     write_options=csv.WriteOptions(quoting_style="none"),
 )
 print(f"pyarrow.Table -> CSV: {time.time() -t:.2f} s")
+
+_df = polars.from_pandas(_df)
+t = time.time()
+_df.write_csv(file, quote_style="never")
+print(f"polars.DataFrame -> CSV: {time.time() -t:.2f} s")
 
 # -------------------------------------------------------------------------
 print("=== Write to PKL file ===")
@@ -188,6 +207,13 @@ _table = csv.read_csv(
     convert_options=csv.ConvertOptions(column_types=schema),
 )
 print(f"CSV -> pyarrow.Table: {time.time() -t:.2f} s")
+
+t = time.time()
+_df = polars.read_csv(
+    file,
+    dtypes=polars_dtype,
+)
+print(f"CSV -> polars.DataFrame: {time.time() -t:.2f} s")
 
 # -------------------------------------------------------------------------
 print("=== Read PKL file ===")
