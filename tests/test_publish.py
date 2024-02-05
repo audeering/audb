@@ -405,13 +405,17 @@ def test_publish(dbs, persistent_repository, version):
     assert (number_of_media_files_in_custom_archives - number_of_custom_archives) == (
         number_of_media_files - number_of_media_archives
     )
-    # Check if media files are sorted.
+    # Check if media files are sorted for each version.
     # This does mean that media files are
     # always sorted by alphabetical order
     # but only in this specific test case.
     # Here we're testing for determinism rather
     # than ordering
-    assert deps.media == sorted(deps.media)
+    files = deps.media
+    versions = [deps.version(file) for file in files]
+    for version in set(versions):
+        files_in_version = sorted([f for f, v in zip(files, versions) if v == version])
+        assert files_in_version == sorted(files_in_version)
 
     for archive in set(archives.values()):
         assert archive in deps.archives

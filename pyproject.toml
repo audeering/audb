@@ -41,6 +41,7 @@ dependencies = [
     'audresample >=0.1.6',
     'filelock',
     'oyaml',
+    'pyarrow',
 ]
 # Get version dynamically from git
 # (needs setuptools_scm tools config below)
@@ -81,6 +82,7 @@ addopts = '''
     --cov-report term-missing
     --cov-report xml
     --ignore=docs/
+    --ignore=benchmarks/
 '''
 
 

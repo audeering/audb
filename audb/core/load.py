@@ -4,6 +4,7 @@ import typing
 
 import filelock
 import pandas as pd
+import pyarrow.dataset as dataset
 
 import audbackend
 import audeer
@@ -180,21 +181,24 @@ def _files_duration(
     files: typing.Sequence[str],
     format: typing.Optional[str],
 ):
-    field = define.DEPEND_FIELD_NAMES[define.DependField.DURATION]
-    durs = deps().loc[files, field]
-    durs = durs[durs > 0]
-    durs = pd.to_timedelta(durs, unit="s")
-    durs.index.name = "file"
+    if len(files) == 0:
+        return
+    # mask = (dataset.field("file").isin(files)) & (dataset.field("duration") > 0)
+    mask = dataset.field("file").isin(files)
+    table = deps._table.filter(mask)
+    files = table.column("file").to_pylist()
+    # except ArrowTypeError:
+    # If no row matches the request
+    # files = []
+    durations = table.column("duration").to_pylist()
+    durations = pd.to_timedelta(durations, unit="s")
     if format is not None:
-        durs.index = audformat.utils.replace_file_extension(durs.index, format)
+        files = [audeer.replace_file_extension(file, format) for file in files]
     # Norm file path under Windows to include `\`
-    if os.name == "nt":  # pragma: nocover as tested in Windows runner
-        durs.index = audformat.utils.map_file_path(
-            durs.index,
-            os.path.normpath,
-        )
-    durs.index = audformat.utils.expand_file_path(durs.index, db.root)
-    db._files_duration = durs.to_dict()
+    # if os.name == "nt":  # pragma: nocover as tested in Windows runner
+    #     files = [os.path.normpath(file) for file in files]
+    files = [audeer.path(db.root, file) for file in files]
+    db._files_duration = {file: duration for file, duration in zip(files, durations)}
 
 
 def _get_attachments_from_cache(
@@ -848,7 +852,7 @@ def filtered_dependencies(
     media: typing.Union[str, typing.Sequence[str]],
     tables: typing.Union[str, typing.Sequence[str]],
     cache_root: str = None,
-) -> pd.DataFrame:
+) -> Dependencies:
     r"""Filter media by tables.
 
     Return all media files from ``media``
@@ -870,7 +874,7 @@ def filtered_dependencies(
     """
     deps = dependencies(name, version=version, cache_root=cache_root)
     if tables is None and media is None:
-        df = deps()
+        return deps
     else:
         # Load header to get list of tables
         db = load_header(name, version=version, cache_root=cache_root)
@@ -891,9 +895,15 @@ def filtered_dependencies(
         if len(available_media) > 0:
             media = filter_deps(media, deps.media, "media", name, version)
             available_media = [m for m in media if m in list(set(available_media))]
-        df = deps().loc[available_media]
 
-    return df
+        if len(available_media) > 0:
+            mask = dataset.field("file").isin(available_media)
+            table = deps._table.filter(mask)
+            deps._table_replace(table)
+        else:
+            return Dependencies()
+
+    return deps
 
 
 def load(

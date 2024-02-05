@@ -19,48 +19,6 @@ LOCK_FILE = ".lock"
 TIMEOUT_MSG = "Lock could not be acquired. Timeout exceeded."
 
 
-class DependField:
-    r"""Fields stored in dependency table."""
-
-    ARCHIVE = 0
-    BIT_DEPTH = 1
-    CHANNELS = 2
-    CHECKSUM = 3
-    DURATION = 4
-    FORMAT = 5
-    REMOVED = 6
-    SAMPLING_RATE = 7
-    TYPE = 8
-    VERSION = 9
-
-
-DEPEND_FIELD_NAMES = {
-    DependField.ARCHIVE: "archive",
-    DependField.BIT_DEPTH: "bit_depth",
-    DependField.CHANNELS: "channels",
-    DependField.CHECKSUM: "checksum",
-    DependField.DURATION: "duration",
-    DependField.FORMAT: "format",
-    DependField.REMOVED: "removed",
-    DependField.SAMPLING_RATE: "sampling_rate",
-    DependField.TYPE: "type",
-    DependField.VERSION: "version",
-}
-
-DEPEND_FIELD_DTYPES = {
-    DependField.ARCHIVE: str,
-    DependField.BIT_DEPTH: int,
-    DependField.CHANNELS: int,
-    DependField.CHECKSUM: str,
-    DependField.DURATION: float,
-    DependField.FORMAT: str,
-    DependField.REMOVED: int,
-    DependField.SAMPLING_RATE: int,
-    DependField.TYPE: int,
-    DependField.VERSION: str,
-}
-
-
 class DependType:
     r"""Dependency file types."""
 
