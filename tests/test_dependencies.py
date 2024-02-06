@@ -229,4 +229,4 @@ def test_len(deps):
 
 
 def test_str(deps):
-    assert str(deps) == deps._df.to_string()
+    assert str(deps) == str(deps._df)
