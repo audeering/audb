@@ -478,9 +478,12 @@ class Dependencies:
 
         """
         # self._df.drop is slow,
-        # see https://stackoverflow.com/a/53394627
-        self._df = self._df[~self._df.index.isin(files)]
+        # see https://stackoverflow.com/a/53394627.
+        # The solution presented in https://stackoverflow.com/a/53395360
         # self._df = self._df.loc[self._df.index.drop(files)]
+        # which is claimed to be faster,
+        # isn't.
+        self._df = self._df[~self._df.index.isin(files)]
 
     def _remove(self, file: str):
         r"""Mark file as removed.
