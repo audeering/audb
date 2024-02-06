@@ -77,10 +77,13 @@ def _find_attachments(
     verbose: bool,
 ) -> typing.List[str]:
     r"""Find altered, new or removed attachments and update 'deps'."""
-    for attachment_id in deps.attachment_ids:
-        if attachment_id not in db.attachments:
-            path = deps._df.index[deps._df.archive == attachment_id][0]
-            deps._drop(path)
+    # drop removed attachments from dependency table
+    removed_attachments = [
+        deps._df.index[deps._df.archive == attachment_id][0]
+        for attachment_id in deps.attachment_ids
+        if attachment_id not in db.attachments
+    ]
+    deps._drop(removed_attachments)
 
     # check attachments are valid
     db_files = list(db.files) + [f"db.{t}.csv" for t in db.tables]
@@ -170,9 +173,10 @@ def _find_media(
 
     # release dependencies to removed media
     # and select according archives for upload
-    for file in set(deps.media) - db_media:
+    removed_files = set(deps.media) - db_media
+    for file in removed_files:
         media_archives.add(deps.archive(file))
-        deps._drop(file)
+    deps._drop(removed_files)
 
     # limit to relevant media
     db_media_in_root = db_media.intersection(db_root_files)
@@ -256,8 +260,7 @@ def _find_tables(
     # release dependencies to removed tables
 
     db_tables = [f"db.{table}.csv" for table in list(db)]
-    for file in set(deps.tables) - set(db_tables):
-        deps._drop(file)
+    deps._drop(set(deps.tables) - set(db_tables))
 
     tables = []
     for table in audeer.progress_bar(
