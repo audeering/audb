@@ -302,13 +302,13 @@ class Dependencies:
             }
             # Data type of index
             index = 0
-            dtype_mapping[index] = str
             self._df = pd.read_csv(
                 path,
                 index_col=index,
                 na_filter=False,
                 dtype=dtype_mapping,
             )
+            self._df.index = self._df.index.astype("string")
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
@@ -522,7 +522,12 @@ class Dependencies:
             values,
             columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
         ).set_index("file")
-
+        df.index = df.index.astype("string")
+        for name, dtype in zip(
+            define.DEPEND_FIELD_NAMES.values(),
+            define.DEPEND_FIELD_DTYPES.values(),
+        ):
+            df[name] = df[name].astype(dtype)
         self._df.loc[df.index] = df
 
     def _update_media_version(
