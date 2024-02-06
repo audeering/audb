@@ -133,10 +133,11 @@ csv.write_csv(
 )
 print(f"pyarrow.Table -> CSV: {time.time() -t:.2f} s")
 
-_df = polars.from_pandas(_df)
-t = time.time()
-_df.write_csv(file, quote_style="never")
-print(f"polars.DataFrame -> CSV: {time.time() -t:.2f} s")
+# _df = _df.rename(columns={"file": ""})
+# _df = polars.from_pandas(_df)
+# t = time.time()
+# _df.write_csv(file, quote_style="never")
+# print(f"polars.DataFrame -> CSV: {time.time() -t:.2f} s")
 
 # -------------------------------------------------------------------------
 print("=== Write to PKL file ===")
@@ -171,9 +172,34 @@ print("=== Read CSV file ===")
 file = audeer.path(folder, "df.csv")
 
 t = time.time()
-dtype_mapping = {column: dtype for column, dtype in zip(columns, dtypes)}
+# dtype_mapping = {column: dtype for column, dtype in zip(columns, dtypes)}
+# dtype_mapping = {
+#     # "": "string[pyarrow]",
+#     "archive": "string[pyarrow]",
+#     "bit_depth": "int32[pyarrow]",
+#     "channels": "int32[pyarrow]",
+#     "checksum": "string[pyarrow]",
+#     "duration": "float64[pyarrow]",
+#     "format": "string[pyarrow]",
+#     "removed": "int32[pyarrow]",
+#     "sampling_rate": "int32[pyarrow]",
+#     "type": "int32[pyarrow]",
+#     "version": "string[pyarrow]",
+# }
+dtype_mapping = {
+    # "": "string",
+    "archive": "string",
+    "bit_depth": "int32",
+    "channels": "int32",
+    "checksum": "string",
+    "duration": "float64",
+    "format": "string",
+    "removed": "int32",
+    "sampling_rate": "int32",
+    "type": "int32",
+    "version": "string",
+}
 index_col = 0
-dtype_mapping[index_col] = str
 _df = pd.read_csv(
     file,
     index_col=index_col,
@@ -181,7 +207,52 @@ _df = pd.read_csv(
     dtype=dtype_mapping,
     header=0,
 )
+_df.index = _df.index.astype("string")
 print(f"CSV -> pandas.DataFrame: {time.time() -t:.2f} s")
+print(_df.dtypes)
+
+t = time.time()
+# dtype_mapping = {column: dtype for column, dtype in zip(columns, dtypes)}
+dtype_mapping = {
+    # "": "string[pyarrow]",
+    "archive": "string[pyarrow]",
+    "bit_depth": "int32[pyarrow]",
+    "channels": "int32[pyarrow]",
+    "checksum": "string[pyarrow]",
+    "duration": "float64[pyarrow]",
+    "format": "string[pyarrow]",
+    "removed": "int32[pyarrow]",
+    "sampling_rate": "int32[pyarrow]",
+    "type": "int32[pyarrow]",
+    "version": "string[pyarrow]",
+}
+# dtype_mapping = {
+#     # "": "string",
+#     "archive": "string",
+#     "bit_depth": "int32",
+#     "channels": "int32",
+#     "checksum": "string",
+#     "duration": "float64",
+#     "format": "string",
+#     "removed": "int32",
+#     "sampling_rate": "int32",
+#     "type": "int32",
+#     "version": "string",
+# }
+index_col = 0
+# dtype_mapping[index_col] = str
+_df = pd.read_csv(
+    file,
+    index_col=index_col,
+    na_filter=False,
+    dtype=dtype_mapping,
+    header=0,
+    engine="pyarrow",
+    # dtype_backend="pyarrow",
+)
+_df.index = _df.index.astype("string")
+print(f"CSV -[pyarrow]> pandas.DataFrame: {time.time() -t:.2f} s")
+print(_df.dtypes)
 
 t = time.time()
 _table = csv.read_csv(
