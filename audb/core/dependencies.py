@@ -108,8 +108,7 @@ class Dependencies:
             list of archives
 
         """
-        archives = self._df.archive.to_list()
-        return sorted(list(set(archives)))
+        return sorted(self._df.archive.unique().tolist())
 
     @property
     def attachments(self) -> typing.List[str]:
