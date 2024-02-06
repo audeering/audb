@@ -48,16 +48,16 @@ DEPEND_FIELD_NAMES = {
 }
 
 DEPEND_FIELD_DTYPES = {
-    DependField.ARCHIVE: "string",
+    DependField.ARCHIVE: "object",
     DependField.BIT_DEPTH: "int32",
     DependField.CHANNELS: "int32",
-    DependField.CHECKSUM: "string",
+    DependField.CHECKSUM: "object",
     DependField.DURATION: "float64",
-    DependField.FORMAT: "string",
+    DependField.FORMAT: "object",
     DependField.REMOVED: "int32",
     DependField.SAMPLING_RATE: "int32",
     DependField.TYPE: "int32",
-    DependField.VERSION: "string",
+    DependField.VERSION: "object",
 }
 
 
