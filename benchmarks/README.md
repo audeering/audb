@@ -23,9 +23,9 @@ This benchmark provides insights
 how to best represent
 the dependency table internally.
 
-Results based on commit 4bbcc07,
-using `pandas.DataFrame`
-to represent the dependency table.
+Results for a dependency table containing 1,000,000 files
+represented by `pandas.DataFrame`
+as of commit 4bbcc07.
 
 | Method                                         | Execution time |
 | ---------------------------------------------- | -------------- |
