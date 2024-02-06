@@ -302,13 +302,13 @@ class Dependencies:
             }
             # Data type of index
             index = 0
-            dtype_mapping[index] = str
             self._df = pd.read_csv(
                 path,
                 index_col=index,
                 na_filter=False,
                 dtype=dtype_mapping,
             )
+            self._df.index = self._df.index.astype("string")
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
