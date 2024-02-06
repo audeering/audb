@@ -307,7 +307,6 @@ class Dependencies:
                 na_filter=False,
                 dtype=dtype_mapping,
             )
-            self._df.index = self._df.index.astype("string")
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.

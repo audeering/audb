@@ -53,7 +53,6 @@ if not os.path.exists(data_cache):
         df[column] = df[column].astype(dtype)
     df.set_index("file", inplace=True)
     df.index.name = None
-    df.index = df.index.astype("string")
     df.to_pickle(data_cache)
 
 # === Create dependency object ===
