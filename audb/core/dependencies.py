@@ -91,7 +91,7 @@ class Dependencies:
             list with meta information
 
         """
-        return list(self._df.loc[file])
+        return self._df.loc[file].tolist()
 
     def __len__(self) -> int:
         r"""Number of all media, table, attachment files."""
@@ -118,7 +118,7 @@ class Dependencies:
             list of attachments
 
         """
-        return list(self._df[self._df["type"] == define.DependType.ATTACHMENT].index)
+        return self._df[self._df["type"] == define.DependType.ATTACHMENT].index.tolist()
 
     @property
     def attachment_ids(self) -> typing.List[str]:
@@ -128,7 +128,9 @@ class Dependencies:
             list of attachment IDs
 
         """
-        return list(self._df[self._df["type"] == define.DependType.ATTACHMENT].archive)
+        return self._df[
+            self._df["type"] == define.DependType.ATTACHMENT
+        ].archive.tolist()
 
     @property
     def files(self) -> typing.List[str]:
@@ -138,7 +140,7 @@ class Dependencies:
             list of files
 
         """
-        return list(self._df.index)
+        return self._df.index.tolist()
 
     @property
     def media(self) -> typing.List[str]:
@@ -148,7 +150,7 @@ class Dependencies:
             list of media
 
         """
-        return list(self._df[self._df["type"] == define.DependType.MEDIA].index)
+        return self._df[self._df["type"] == define.DependType.MEDIA].index.tolist()
 
     @property
     def removed_media(self) -> typing.List[str]:
@@ -158,12 +160,9 @@ class Dependencies:
             list of media
 
         """
-        return list(
-            self._df[
-                (self._df["type"] == define.DependType.MEDIA)
-                & (self._df["removed"] == 1)
-            ].index
-        )
+        return self._df[
+            (self._df["type"] == define.DependType.MEDIA) & (self._df["removed"] == 1)
+        ].index.tolist()
 
     @property
     def table_ids(self) -> typing.List[str]:
@@ -187,7 +186,7 @@ class Dependencies:
             list of tables
 
         """
-        return list(self._df[self._df["type"] == define.DependType.META].index)
+        return self._df[self._df["type"] == define.DependType.META].index.tolist()
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
