@@ -33,17 +33,17 @@ to represent the dependency table.
 | `Dependency.__contains__()`                    |        0.000 s |
 | `Dependency.__get_item__()`                    |        0.000 s |
 | `Dependency.__len__()`                         |        0.000 s |
-| `Dependency.__str__()`                         |        0.015 s |
-| `Dependency.archives`                          |        0.121 s |
-| `Dependency.attachments`                       |        0.021 s |
-| `Dependency.attachment_ids`                    |        0.022 s |
-| `Dependency.files`                             |        0.028 s |
-| `Dependency.media`                             |        0.098 s |
-| `Dependency.removed_media`                     |        0.094 s |
-| `Dependency.table_ids`                         |        0.031 s |
-| `Dependency.tables`                            |        0.021 s |
+| `Dependency.__str__()`                         |        0.006 s |
+| `Dependency.archives`                          |        0.147 s |
+| `Dependency.attachments`                       |        0.045 s |
+| `Dependency.attachment_ids`                    |        0.045 s |
+| `Dependency.files`                             |        0.185 s |
+| `Dependency.media`                             |        0.264 s |
+| `Dependency.removed_media`                     |        0.250 s |
+| `Dependency.table_ids`                         |        0.053 s |
+| `Dependency.tables`                            |        0.046 s |
 | `Dependency.archive(1000 files)`               |        0.005 s |
-| `Dependency.bit_depth(1000 files)`             |        0.005 s |
+| `Dependency.bit_depth(1000 files)`             |        0.004 s |
 | `Dependency.channels(1000 files)`              |        0.004 s |
 | `Dependency.checksum(1000 files)`              |        0.004 s |
 | `Dependency.duration(1000 files)`              |        0.004 s | 
@@ -52,10 +52,10 @@ to represent the dependency table.
 | `Dependency.sampling_rate(1000 files)`         |        0.004 s |
 | `Dependency.type(1000 files)`                  |        0.005 s |
 | `Dependency.version(1000 files)`               |        0.004 s |
-| `Dependency._add_attachment()`                 |        0.075 s |
-| `Dependency._add_media(1000 files)`            |        0.066 s |
-| `Dependency._add_meta()`                       |        0.118 s |
-| `Dependency._drop()`                           |        0.094 s |
-| `Dependency._remove()`                         |        0.072 s |
-| `Dependency._update_media()`                   |        0.085 s |
+| `Dependency._add_attachment()`                 |        0.061 s |
+| `Dependency._add_media(1000 files)`            |        0.050 s |
+| `Dependency._add_meta()`                       |        0.124 s |
+| `Dependency._drop()`                           |        0.078 s |
+| `Dependency._remove()`                         |        0.068 s |
+| `Dependency._update_media()`                   |        0.073 s |
 | `Dependency._update_media_version(1000 files)` |        0.008 s |

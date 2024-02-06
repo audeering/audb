@@ -17,59 +17,43 @@ random.seed(1)
 cache = audeer.mkdir("./cache")
 
 
-def active_branch():
-    head_dir = audeer.path("..", ".git", "HEAD")
-    with open(head_dir, "r") as f:
-        content = f.read().splitlines()
-    for line in content:
-        if line[0:4] == "ref:":
-            return line.partition("refs/heads/")[2]
-
-
 # === Dependency pandas.DataFrame ===
 data_cache = audeer.path(cache, "df.pkl")
 num_rows = 1000000
-dtypes = [str, str, int, int, str, float, str, int, int, int, str]
-columns = [
-    "file",
-    "archive",
-    "bit_depth",
-    "channels",
-    "checksum",
-    "duration",
-    "format",
-    "removed",
-    "sampling_rate",
-    "type",
-    "version",
-]
 if not os.path.exists(data_cache):
+    bit_depths = [0, 16, 24]
+    channels = [0, 1, 2]
+    formats = ["csv", "wav", "txt"]
+    sampling_rates = [0, 16000, 44100]
+    types = [0, 1, 2]
+    versions = ["1.0.0", "1.1.0"]
     records = [
         {
             "file": f"file-{n}.wav",
             "archive": f"archive-{n}",
-            "bit_depth": random.choices([0, 16, 24], weights=[0.1, 0.8, 0.1])[0],
-            "channels": random.choices([0, 1, 2], weights=[0.1, 0.8, 0.1])[0],
+            "bit_depth": random.choices(bit_depths, weights=[0.1, 0.8, 0.1])[0],
+            "channels": random.choices(channels, weights=[0.1, 0.8, 0.1])[0],
             "checksum": hashlib.md5(
                 pickle.dumps(random.choice(string.ascii_letters))
             ).hexdigest(),
             "duration": 10 * random.random(),
-            "format": random.choices(["csv", "wav", "txt"], weights=[0.1, 0.8, 0.1])[0],
+            "format": random.choices(formats, weights=[0.1, 0.8, 0.1])[0],
             "removed": random.choices([0, 1], weights=[0.1, 0.9])[0],
-            "sampling_rate": random.choices(
-                [0, 16000, 44100],
-                weights=[0.1, 0.8, 0.1],
-            )[0],
-            "type": random.choices([0, 1, 2], weights=[0.1, 0.8, 0.1])[0],
-            "version": random.choices(["1.0.0", "1.1.0"], weights=[0.2, 0.8])[0],
+            "sampling_rate": random.choices(sampling_rates, weights=[0.1, 0.8, 0.1])[0],
+            "type": random.choices(types, weights=[0.1, 0.8, 0.1])[0],
+            "version": random.choices(versions, weights=[0.2, 0.8])[0],
         }
         for n in range(num_rows)
     ]
     df = pd.DataFrame.from_records(records)
-    for column, dtype in zip(df.columns, dtypes):
+    for column, dtype in zip(
+        audb.core.define.DEPEND_FIELD_NAMES.values(),
+        audb.core.define.DEPEND_FIELD_DTYPES.values(),
+    ):
         df[column] = df[column].astype(dtype)
     df.set_index("file", inplace=True)
-    df.index.name = ""
+    df.index.name = None
+    df.index = df.index.astype("string")
     df.to_pickle(data_cache)
 
 # === Create dependency object ===
@@ -183,37 +167,22 @@ t = time.time()
 deps._add_attachment("attachment.txt", "1.0.0", "archive", "checksum")
 print(f"Dependency._add_attachment(): {time.time() -t:.3f} s")
 
-if active_branch() == "deps-parquet":
-    values = [
-        (
-            f"file-new-{n}.wav",  # file
-            f"archive-new-{n}",  # archive
-            16,  # bit_depth
-            1,  # channels
-            f"checksum-{n}",  # checksum
-            0.4,  # duration
-            16000,  # sampling_rate
-            "1.0.0",  # version
-        )
-        for n in range(n_files)
-    ]
-else:
-    values = [
-        (
-            f"file-new-{n}.wav",  # file
-            f"archive-new-{n}",  # archive
-            16,  # bit_depth
-            1,  # channels
-            f"checksum-{n}",  # checksum
-            0.4,  # duration
-            "wav",  # format
-            0,  # removed
-            16000,  # sampling_rate
-            1,  # type
-            "1.0.0",  # version
-        )
-        for n in range(n_files)
-    ]
+values = [
+    (
+        f"file-new-{n}.wav",  # file
+        f"archive-new-{n}",  # archive
+        16,  # bit_depth
+        1,  # channels
+        f"checksum-{n}",  # checksum
+        0.4,  # duration
+        "wav",  # format
+        0,  # removed
+        16000,  # sampling_rate
+        1,  # type
+        "1.0.0",  # version
+    )
+    for n in range(n_files)
+]
 
 t = time.time()
 deps._add_media(values)
