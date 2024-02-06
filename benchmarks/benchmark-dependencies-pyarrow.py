@@ -16,6 +16,16 @@ random.seed(1)
 
 cache = audeer.mkdir("./cache")
 
+
+def active_branch():
+    head_dir = audeer.path("..", ".git", "HEAD")
+    with open(head_dir, "r") as f:
+        content = f.read().splitlines()
+    for line in content:
+        if line[0:4] == "ref:":
+            return line.partition("refs/heads/")[2]
+
+
 # === Dependency pandas.DataFrame ===
 data_cache = audeer.path(cache, "df.pkl")
 num_rows = 1000000
@@ -85,9 +95,9 @@ t = time.time()
 len(deps)
 print(f"Dependency.__len__(): {time.time() -t:.3f} s")
 
-# t = time.time()
-# str(deps)
-# print(f"Dependency.__str__(): {time.time() -t:.3f} s")
+t = time.time()
+str(deps)
+print(f"Dependency.__str__(): {time.time() -t:.3f} s")
 
 t = time.time()
 deps.archives
@@ -121,70 +131,89 @@ t = time.time()
 deps.tables
 print(f"Dependency.tables: {time.time() -t:.3f} s")
 
-t = time.time()
-[deps.archive(file) for file in files[:10000]]
-print(f"Dependency.archive(): {time.time() -t:.3f} s")
+n_files = 1000
+_files = files[:n_files]
 
 t = time.time()
-[deps.bit_depth(file) for file in files]
-print(f"Dependency.bit_depth(): {time.time() -t:.3f} s")
+[deps.archive(file) for file in _files]
+print(f"Dependency.archive({n_files} files): {time.time() -t:.3f} s")
 
 t = time.time()
-[deps.channels(file) for file in files]
-print(f"Dependency.channels(): {time.time() -t:.3f} s")
+[deps.bit_depth(file) for file in _files]
+print(f"Dependency.bit_depth({n_files} files): {time.time() -t:.3f} s")
 
 t = time.time()
-[deps.checksum(file) for file in files]
-print(f"Dependency.checksum(): {time.time() -t:.3f} s")
+[deps.channels(file) for file in _files]
+print(f"Dependency.channels({n_files} files): {time.time() -t:.3f} s")
 
 t = time.time()
-[deps.duration(file) for file in files]
-print(f"Dependency.duration(): {time.time() -t:.3f} s")
+[deps.checksum(file) for file in _files]
+print(f"Dependency.checksum({n_files} files): {time.time() -t:.3f} s")
 
 t = time.time()
-[deps.format(file) for file in files]
-print(f"Dependency.format(): {time.time() -t:.3f} s")
+[deps.duration(file) for file in _files]
+print(f"Dependency.duration({n_files} files): {time.time() -t:.3f} s")
 
 t = time.time()
-[deps.removed(file) for file in files]
-print(f"Dependency.removed(): {time.time() -t:.3f} s")
+[deps.format(file) for file in _files]
+print(f"Dependency.format({n_files} files): {time.time() -t:.3f} s")
 
 t = time.time()
-[deps.sampling_rate(file) for file in files]
-print(f"Dependency.sampling_rate(): {time.time() -t:.3f} s")
+[deps.removed(file) for file in _files]
+print(f"Dependency.removed({n_files} files): {time.time() -t:.3f} s")
 
 t = time.time()
-[deps.type(file) for file in files]
-print(f"Dependency.type(): {time.time() -t:.3f} s")
+[deps.sampling_rate(file) for file in _files]
+print(f"Dependency.sampling_rate({n_files} files): {time.time() -t:.3f} s")
 
 t = time.time()
-[deps.version(file) for file in files]
-print(f"Dependency.version(): {time.time() -t:.3f} s")
+[deps.type(file) for file in _files]
+print(f"Dependency.type({n_files} files): {time.time() -t:.3f} s")
+
+t = time.time()
+[deps.version(file) for file in _files]
+print(f"Dependency.version({n_files} files): {time.time() -t:.3f} s")
 
 # -------------------------------------------------------------------------
 t = time.time()
 deps._add_attachment("attachment.txt", "1.0.0", "archive", "checksum")
 print(f"Dependency._add_attachment(): {time.time() -t:.3f} s")
 
-values = [
-    (
-        f"file-new-{n}.wav",  # file
-        f"archive-new-{n}",  # archive
-        16,  # bit_depth
-        1,  # channels
-        f"checksum-{n}",  # checksum
-        0.4,  # duration
-        # "wav",  # format
-        # 0,  # removed
-        16000,  # sampling_rate
-        # 1,  # type
-        "1.0.0",  # version
-    )
-    for n in range(1000)
-]
+if active_branch() == "deps-parquet":
+    values = [
+        (
+            f"file-new-{n}.wav",  # file
+            f"archive-new-{n}",  # archive
+            16,  # bit_depth
+            1,  # channels
+            f"checksum-{n}",  # checksum
+            0.4,  # duration
+            16000,  # sampling_rate
+            "1.0.0",  # version
+        )
+        for n in range(n_files)
+    ]
+else:
+    values = [
+        (
+            f"file-new-{n}.wav",  # file
+            f"archive-new-{n}",  # archive
+            16,  # bit_depth
+            1,  # channels
+            f"checksum-{n}",  # checksum
+            0.4,  # duration
+            "wav",  # format
+            0,  # removed
+            16000,  # sampling_rate
+            1,  # type
+            "1.0.0",  # version
+        )
+        for n in range(n_files)
+    ]
+
 t = time.time()
 deps._add_media(values)
-print(f"Dependency._add_media(): {time.time() -t:.3f} s")
+print(f"Dependency._add_media({n_files} files): {time.time() -t:.3f} s")
 
 t = time.time()
 deps._add_meta("db.new-table.csv", "1.0.0", "archive", "checksum")
@@ -203,5 +232,5 @@ deps._update_media(values)
 print(f"Dependency._update_media(): {time.time() -t:.3f} s")
 
 t = time.time()
-deps._update_media_version([f"file-{n}.wav" for n in range(1000)], "version")
-print(f"Dependency._update_media_version(): {time.time() -t:.3f} s")
+deps._update_media_version([f"file-{n}.wav" for n in range(n_files)], "version")
+print(f"Dependency._update_media_version({n_files} files): {time.time() -t:.3f} s")

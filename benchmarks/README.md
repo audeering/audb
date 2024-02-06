@@ -69,35 +69,35 @@ as a `pyarrow.Table` object
 or as a `pandas.DataFrame`.
 
 
-| Method                               | pyarrow.Table | pandas.DataFrame |
-| ------------------------------------ | ------------- | ---------------- |
-| `Dependency.__call__()`              | 0.353 s       | 0.000 s          |
-| `Dependency.__contains__()`          | 0.002 s       | 0.087 s          |
-| `Dependency.__get_item__()`          | 0.001 s       | 0.000 s          |
-| `Dependency.__len__()`               | 0.000 s       | 0.000 s          |
-| `Dependency.__str__()`               | 0.003 s       | 16.240 s         |
-| `Dependency.archives`                | 0.119 s       | 0.412 s          |
-| `Dependency.attachments`             | 0.020 s       | 0.036 s          |
-| `Dependency.attachment_ids`          | 0.018 s       | 0.027 s          |
-| `Dependency.files`                   | 0.045 s       | 0.038 s          |
-| `Dependency.media`                   | 0.087 s       | 0.106 s          |
-| `Dependency.removed_media`           | 0.095 s       | 0.103 s          |
-| `Dependency.table_ids`               | 0.025 s       | 0.036 s          |
-| `Dependency.tables`                  | 0.017 s       | 0.036 s          |
-| `Dependency.archive()`               | 0.001 s       | 0.000 s          |
-| `Dependency.bit_depth()`             | 0.001 s       | 0.000 s          |
-| `Dependency.channels()`              | 0.001 s       | 0.000 s          |
-| `Dependency.checksum()`              | 0.002 s       | 0.000 s          |
-| `Dependency.duration()`              | 0.002 s       | 0.000 s          |
-| `Dependency.format()`                | 0.001 s       | 0.000 s          |
-| `Dependency.removed()`               | 0.002 s       | 0.000 s          |
-| `Dependency.sampling_rate()`         | 0.001 s       | 0.000 s          |
-| `Dependency.type()`                  | 0.001 s       | 0.000 s          |
-| `Dependency.version()`               | 0.001 s       | 0.000 s          |
-| `Dependency._add_attachment()`       | 0.072 s       | 0.071 s          |
-| `Dependency._add_media()`            | 0.042 s       | 0.066 s          |
-| `Dependency._add_meta()`             | 0.086 s       | 0.118 s          |
-| `Dependency._drop()`                 | 0.055 s       | 0.209 s          |
-| `Dependency._remove()`               | 0.067 s       | 0.063 s          |
-| `Dependency._update_media()`         | 0.112 s       | 0.064 s          |
-| `Dependency._update_media_version()` | 1.103 s       | 0.008 s          |
+| Method                                         | pyarrow.Table | pandas.DataFrame |
+| ---------------------------------------------- | ------------- | ---------------- |
+| `Dependency.__call__()`                        |       0.315 s |          0.000 s |
+| `Dependency.__contains__()`                    |       0.001 s |          0.089 s |
+| `Dependency.__get_item__()`                    |       0.001 s |          0.000 s |
+| `Dependency.__len__()`                         |       0.000 s |          0.000 s |
+| `Dependency.__str__()`                         |       0.006 s |          0.006 s |
+| `Dependency.archives`                          |       0.124 s |          0.413 s |
+| `Dependency.attachments`                       |       0.019 s |          0.021 s |
+| `Dependency.attachment_ids`                    |       0.022 s |          0.022 s |
+| `Dependency.files`                             |       0.039 s |          0.029 s |
+| `Dependency.media`                             |       0.090 s |          0.094 s |
+| `Dependency.removed_media`                     |       0.097 s |          0.092 s |
+| `Dependency.table_ids`                         |       0.022 s |          0.030 s |
+| `Dependency.tables`                            |       0.018 s |          0.021 s |
+| `Dependency.archive(1000 files)`               |       0.884 s |          0.005 s |
+| `Dependency.bit_depth(1000 files)`             |       1.044 s |          0.004 s |
+| `Dependency.channels(1000 files)`              |       1.018 s |          0.004 s |
+| `Dependency.checksum(1000 files)`              |       0.963 s |          0.004 s |
+| `Dependency.duration(1000 files)`              |       1.299 s |          0.004 s | 
+| `Dependency.format(1000 files)`                |       1.037 s |          0.004 s |
+| `Dependency.removed(1000 files)`               |       1.507 s |          0.004 s |
+| `Dependency.sampling_rate(1000 files)`         |       1.116 s |          0.004 s |
+| `Dependency.type(1000 files)`                  |       1.271 s |          0.004 s |
+| `Dependency.version(1000 files)`               |       0.886 s |          0.004 s |
+| `Dependency._add_attachment()`                 |       0.090 s |          0.073 s |
+| `Dependency._add_media(1000 files)`            |       0.044 s |          0.068 s |
+| `Dependency._add_meta()`                       |       0.112 s |          0.118 s |
+| `Dependency._drop()`                           |       0.026 s |          0.209 s |
+| `Dependency._remove()`                         |       0.057 s |          0.062 s |
+| `Dependency._update_media()`                   |       0.103 s |          0.064 s |
+| `Dependency._update_media_version(1000 files)` |       1.043 s |          0.008 s |
