@@ -83,6 +83,10 @@ t = time.time()
 deps()
 print(f"Dependency.__call__(): {time.time() -t:.3f} s")
 
+# Access the index one time.
+# Further calls will be faster
+file in deps
+
 t = time.time()
 file in deps
 print(f"Dependency.__contains__(): {time.time() -t:.3f} s")

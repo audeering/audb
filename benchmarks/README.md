@@ -72,7 +72,7 @@ or as a `pandas.DataFrame`.
 | Method                                         | pyarrow.Table | pandas.DataFrame |
 | ---------------------------------------------- | ------------- | ---------------- |
 | `Dependency.__call__()`                        |       0.315 s |          0.000 s |
-| `Dependency.__contains__()`                    |       0.001 s |          0.089 s |
+| `Dependency.__contains__()`                    |       0.001 s |          0.000 s |
 | `Dependency.__get_item__()`                    |       0.001 s |          0.000 s |
 | `Dependency.__len__()`                         |       0.000 s |          0.000 s |
 | `Dependency.__str__()`                         |       0.006 s |          0.006 s |
