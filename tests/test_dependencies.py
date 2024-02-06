@@ -83,6 +83,11 @@ def test_init(deps):
 def test_call(deps):
     expected_df = pd.DataFrame.from_records(ROWS).set_index("file")
     expected_df.index = expected_df.index.astype("string")
+    for name, dtype in zip(
+        audb.core.define.DEPEND_FIELD_NAMES.values(),
+        audb.core.define.DEPEND_FIELD_DTYPES.values(),
+    ):
+        expected_df[name] = expected_df[name].astype(dtype)
     df = deps()
     pd.testing.assert_frame_equal(df, expected_df)
 
@@ -201,6 +206,8 @@ def test_load_save(deps):
     deps2.load(deps_file)
     pd.testing.assert_frame_equal(deps(), deps2())
     os.remove(deps_file)
+    # Expected dtypes
+    assert list(deps2._df.dtypes) == list(audb.core.define.DEPEND_FIELD_DTYPES.values())
     # Wrong extension or file missng
     with pytest.raises(ValueError, match=r".*'txt'.*"):
         deps2.load("deps.txt")

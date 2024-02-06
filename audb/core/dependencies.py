@@ -522,7 +522,12 @@ class Dependencies:
             values,
             columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
         ).set_index("file")
-
+        df.index = df.index.astype("string")
+        for name, dtype in zip(
+            define.DEPEND_FIELD_NAMES.values(),
+            define.DEPEND_FIELD_DTYPES.values(),
+        ):
+            df[name] = df[name].astype(dtype)
         self._df.loc[df.index] = df
 
     def _update_media_version(
