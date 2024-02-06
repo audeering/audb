@@ -470,14 +470,20 @@ class Dependencies:
             version,  # version
         ]
 
-    def _drop(self, file: str):
-        r"""Drop file from table.
+    def _drop(self, files: typing.Sequence[str]):
+        r"""Drop files from table.
 
         Args:
-            file: relative file path
+            files: relative file paths
 
         """
-        self._df.drop(file, inplace=True)
+        # self._df.drop is slow,
+        # see https://stackoverflow.com/a/53394627.
+        # The solution presented in https://stackoverflow.com/a/53395360
+        # self._df = self._df.loc[self._df.index.drop(files)]
+        # which is claimed to be faster,
+        # isn't.
+        self._df = self._df[~self._df.index.isin(files)]
 
     def _remove(self, file: str):
         r"""Mark file as removed.
