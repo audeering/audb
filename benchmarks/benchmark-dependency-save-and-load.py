@@ -183,6 +183,18 @@ for dtype in dtypes:
     df.to_csv(file)
     print(f"pandas.DataFrame[{dtype}] -> CSV: {time.time() -t:.2f} s")
 
+# Use object and copy to pyarrow before writing
+_df = df.copy()
+_df = astype(_df, "object")
+t = time.time()
+_df = astype(_df, "pyarrow")
+_df.to_csv(file)
+print(
+    "pandas.DataFrame[object] "
+    "-> pandas.DataFrame[pyarrow] "
+    f"-> CSV: {time.time() -t:.2f} s"
+)
+
 for dtype in dtypes:
     _df = df.copy()
     _df = astype(_df, dtype)
@@ -199,6 +211,28 @@ for dtype in dtypes:
         write_options=csv.WriteOptions(quoting_style="none"),
     )
     print(f"pandas.DataFrame[{dtype}] -> pyarrow.Table -> CSV: {time.time() -t:.2f} s")
+
+# Use object and copy to pyarrow before writing
+_df = df.copy()
+_df = astype(_df, "object")
+t = time.time()
+_df = astype(_df, "pyarrow")
+_df.index = _df.index.rename("file")
+_df = _df.reset_index()
+table = pa.Table.from_pandas(_df, preserve_index=False, schema=pyarrow_schema)
+_columns = table.column_names
+_columns = ["" if c == "file" else c for c in _columns]
+_table = table.rename_columns(_columns)
+csv.write_csv(
+    _table,
+    file,
+    write_options=csv.WriteOptions(quoting_style="none"),
+)
+print(
+    "pandas.DataFrame[object] "
+    "-> pandas.DataFrame[pyarrow] "
+    f"-> pyarrow.Table -> CSV: {time.time() -t:.2f} s"
+)
 
 t = time.time()
 _table = table.rename_columns(_columns)
@@ -220,6 +254,18 @@ for dtype in dtypes:
     t = time.time()
     _df.to_pickle(file, protocol=4)
     print(f"pandas.DataFrame[{dtype}] -> PKL: {time.time() -t:.2f} s")
+
+# Use object and copy to pyarrow before writing
+_df = df.copy()
+_df = astype(_df, "object")
+t = time.time()
+_df = astype(_df, "pyarrow")
+_df.to_pickle(file, protocol=4)
+print(
+    "pandas.DataFrame[object] "
+    "-> pandas.DataFrame[pyarrow] "
+    f"-> PKL: {time.time() -t:.2f} s"
+)
 
 # -------------------------------------------------------------------------
 print()
@@ -260,6 +306,24 @@ for engine in [None, "c", "pyarrow"]:
         _df.index = _df.index.astype(dtype)
         assert _df.archive.dtype == dtype
 
+    # Convert pyarrow dtypes to object
+    t = time.time()
+    index_col = 0
+    _df = pd.read_csv(
+        file,
+        index_col=index_col,
+        na_filter=False,
+        dtype=dtype_mapping["pyarrow"],
+        header=0,
+        engine=engine,
+    )
+    _df = astype(_df, "object")
+    print(
+        f"CSV -[{engine}]> pandas.DataFrame[pyarrow] "
+        f"-> pandas.DataFrame[object]: {time.time() -t:.2f} s"
+    )
+
+
 for dtype in dtypes:
     t = time.time()
     _table = csv.read_csv(
@@ -293,11 +357,46 @@ for dtype in dtypes:
         types_mapper=types_mapper,
     )
     _df.set_index("file", inplace=True)
-    _df.index.name = ""
+    _df.index.name = None
     print(f"CSV -> pyarrow.Table -> pd.DataFrame[{dtype}]: {time.time() -t:.2f} s")
     if dtype == "pyarrow":
         dtype = "string[pyarrow]"
     assert _df.archive.dtype == dtype
+
+# Convert pyarrow dtypes to object
+t = time.time()
+_table = csv.read_csv(
+    file,
+    read_options=csv.ReadOptions(
+        column_names=table.column_names,
+        skip_rows=1,
+    ),
+    convert_options=csv.ConvertOptions(column_types=pyarrow_schema),
+)
+_df = _table.to_pandas(
+    # We could convert to categories,
+    # but it slows down reading
+    # => TODO: check if processing is faster when using categories
+    #
+    # Convert all strings to categories
+    # strings_to_categorical=True,
+    # Select columns to convert to categories
+    # categories=["format", "version"],
+    #
+    # Speed up conversion,
+    # but might increase memory usage
+    # => TODO: measure memory consumption
+    deduplicate_objects=False,
+    types_mapper=pd.ArrowDtype,
+)
+_df.set_index("file", inplace=True)
+_df.index.name = None
+_df = astype(_df, "object")
+print(
+    "CSV -> pyarrow.Table "
+    "-> pd.DataFrame[pyarrow]"
+    f"-> pandas.DataFrame[object]: {time.time() -t:.2f} s"
+)
 
 t = time.time()
 _table = csv.read_csv(
@@ -322,6 +421,18 @@ for dtype in dtypes:
     t = time.time()
     _df = pd.read_pickle(file)
     print(f"PKL -> pd.DataFrame[{dtype}]: {time.time() -t:.2f} s")
+
+# Convert pyarrow dtypes to object
+_df = df.copy()
+_df = astype(_df, "pyarrow")
+_df.to_pickle(file)
+t = time.time()
+_df = pd.read_pickle(file)
+_df = astype(_df, "object")
+print(
+    "PKL -> pd.DataFrame[pyarrow] "
+    f"-> pandas.DataFrame[object]: {time.time() -t:.2f} s"
+)
 
 # -------------------------------------------------------------------------
 print()
