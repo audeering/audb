@@ -52,7 +52,7 @@ as of commit 91528e4.
 |------------------------------------------------|----------|----------|-----------|
 | Dependencies.\_\_call__()                       |    0.000 |    0.000 |     0.000 |
 | Dependencies.\_\_contains_\_()                   |    0.000 |    0.000 |     0.000 |
-| Dependencies.\__get_item__()                   |    0.000 |    0.000 |     0.001 |
+| Dependencies._\_get_item_\_()                   |    0.000 |    0.000 |     0.001 |
 | Dependencies.\__len__()                        |    0.000 |    0.000 |     0.000 |
 | Dependencies.\__str__()                        |    0.012 |    0.010 |     0.013 |
 | Dependencies.archives                          |    0.278 |    0.223 |     0.284 |
