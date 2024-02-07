@@ -50,11 +50,11 @@ as of commit 91528e4.
 
 | method                                         |   string |   object |   pyarrow |
 |------------------------------------------------|----------|----------|-----------|
-| Dependencies.__call__()                        |    0.000 |    0.000 |     0.000 |
-| Dependencies.__contains__()                    |    0.000 |    0.000 |     0.000 |
-| Dependencies.__get_item__()                    |    0.000 |    0.000 |     0.001 |
-| Dependencies.__len__()                         |    0.000 |    0.000 |     0.000 |
-| Dependencies.__str__()                         |    0.012 |    0.010 |     0.013 |
+| Dependencies.\__call\__()                      |    0.000 |    0.000 |     0.000 |
+| Dependencies.\__contains\__()                  |    0.000 |    0.000 |     0.000 |
+| Dependencies.\__get_item\__()                  |    0.000 |    0.000 |     0.001 |
+| Dependencies.\__len\__()                       |    0.000 |    0.000 |     0.000 |
+| Dependencies.\__str\__()                       |    0.012 |    0.010 |     0.013 |
 | Dependencies.archives                          |    0.278 |    0.223 |     0.284 |
 | Dependencies.attachments                       |    0.053 |    0.029 |     0.034 |
 | Dependencies.attachment_ids                    |    0.052 |    0.029 |     0.033 |
