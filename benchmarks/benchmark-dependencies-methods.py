@@ -33,6 +33,19 @@ def astype(df, dtype):
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("object")
         df.index = df.index.astype("object")
+        # Set dtypes in library
+        audb.core.define.DEPEND_FIELD_DTYPES = {
+            "archive": "object",
+            "bit_depth": "int32",
+            "channels": "int32",
+            "checksum": "object",
+            "duration": "float64",
+            "format": "object",
+            "removed": "int32",
+            "sampling_rate": "int32",
+            "type": "int32",
+            "version": "object",
+        }
     elif dtype == "string":
         # Use `string` to represent strings
         df["archive"] = df["archive"].astype("string")
@@ -46,6 +59,19 @@ def astype(df, dtype):
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("string")
         df.index = df.index.astype("string")
+        # Set dtypes in library
+        audb.core.define.DEPEND_FIELD_DTYPES = {
+            "archive": "string",
+            "bit_depth": "int32",
+            "channels": "int32",
+            "checksum": "string",
+            "duration": "float64",
+            "format": "string",
+            "removed": "int32",
+            "sampling_rate": "int32",
+            "type": "int32",
+            "version": "string",
+        }
     elif dtype == "pyarrow":
         # Use `pyarrow` to represent all dtypes
         df["archive"] = df["archive"].astype("string[pyarrow]")
@@ -59,6 +85,19 @@ def astype(df, dtype):
         df["type"] = df["type"].astype("int32[pyarrow]")
         df["version"] = df["version"].astype("string[pyarrow]")
         df.index = df.index.astype("string[pyarrow]")
+        # Set dtypes in library
+        audb.core.define.DEPEND_FIELD_DTYPES = {
+            "archive": "string[pyarrow]",
+            "bit_depth": "int32[pyarrow]",
+            "channels": "int32[pyarrow]",
+            "checksum": "string[pyarrow]",
+            "duration": "float64[pyarrow]",
+            "format": "string[pyarrow]",
+            "removed": "int32[pyarrow]",
+            "sampling_rate": "int32[pyarrow]",
+            "type": "int32[pyarrow]",
+            "version": "string[pyarrow]",
+        }
     return df
 
 
@@ -115,6 +154,16 @@ results.index.name = "method"
 for dtype in dtypes:
     deps.load(data_cache)
     deps._df = astype(deps._df, dtype)
+
+    # Check we have the expected dtypes
+    # in dependency table
+    # and library
+    if dtype == "pyarrow":
+        expected_dtype = "string[pyarrow]"
+    else:
+        expected_dtype = dtype
+    assert deps._df.archive.dtype == expected_dtype
+    assert audb.core.define.DEPEND_FIELD_DTYPES["archive"] == expected_dtype
 
     method = "Dependencies.__call__()"
     t0 = time.time()
