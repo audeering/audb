@@ -457,10 +457,34 @@ for dtype in dtypes:
     _df.to_parquet(file, index=False, engine="pyarrow")
     t = time.time()
     _table = parquet.read_table(file)
-    _df = _table.to_pandas()
+    if dtype == "object":
+        types_mapper = None
+    elif dtype == "string":
+        types_mapper = {pa.string(): pd.StringDtype()}.get
+    elif dtype == "pyarrow":
+        types_mapper = pd.ArrowDtype
+    _df = _table.to_pandas(
+        # We could convert to categories,
+        # but it slows down reading
+        # => TODO: check if processing is faster when using categories
+        #
+        # Convert all strings to categories
+        # strings_to_categorical=True,
+        # Select columns to convert to categories
+        # categories=["format", "version"],
+        #
+        # Speed up conversion,
+        # but might increase memory usage
+        # => TODO: measure memory consumption
+        deduplicate_objects=False,
+        types_mapper=types_mapper,
+    )
     _df.set_index("file", inplace=True)
-    _df.index.name = ""
-    print(f"PARQUET -> pyarrow.Table -> pandas.DataFrame: {time.time() -t:.2f} s")
+    _df.index.name = None
+    print(
+        "PARQUET -> pyarrow.Table "
+        f"-> pandas.DataFrame[{dtype}]: {time.time() -t:.2f} s"
+    )
 
 t = time.time()
 _table = parquet.read_table(file)
