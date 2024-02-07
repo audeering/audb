@@ -9,3 +9,4 @@ venv/
 __init__.pyc
 coverage.xml
 docs/api/
+benchmarks/cache/

@@ -13,6 +13,14 @@ on the following machine:
 * Linux: Ubuntu 22.04
 * Python: 3.10
 
+Before running any benchmark,
+make sure to install missing requirements with:
+
+```bash
+$ cd benchmarks/
+$ pip install -r requirements.txt
+```
+
 
 ## audb.Dependencies methods
 
@@ -23,39 +31,52 @@ This benchmark provides insights
 how to best represent
 the dependency table internally.
 
-Results for a dependency table containing 1,000,000 files
-represented by `pandas.DataFrame`
-as of commit 4bbcc07.
+To run the benchmark execute:
 
-| Method                                         | Execution time |
-| ---------------------------------------------- | -------------- |
-| `Dependency.__call__()`                        |        0.000 s |
-| `Dependency.__contains__()`                    |        0.000 s |
-| `Dependency.__get_item__()`                    |        0.000 s |
-| `Dependency.__len__()`                         |        0.000 s |
-| `Dependency.__str__()`                         |        0.006 s |
-| `Dependency.archives`                          |        0.147 s |
-| `Dependency.attachments`                       |        0.045 s |
-| `Dependency.attachment_ids`                    |        0.045 s |
-| `Dependency.files`                             |        0.185 s |
-| `Dependency.media`                             |        0.264 s |
-| `Dependency.removed_media`                     |        0.250 s |
-| `Dependency.table_ids`                         |        0.053 s |
-| `Dependency.tables`                            |        0.046 s |
-| `Dependency.archive(1000 files)`               |        0.005 s |
-| `Dependency.bit_depth(1000 files)`             |        0.004 s |
-| `Dependency.channels(1000 files)`              |        0.004 s |
-| `Dependency.checksum(1000 files)`              |        0.004 s |
-| `Dependency.duration(1000 files)`              |        0.004 s | 
-| `Dependency.format(1000 files)`                |        0.004 s |
-| `Dependency.removed(1000 files)`               |        0.004 s |
-| `Dependency.sampling_rate(1000 files)`         |        0.004 s |
-| `Dependency.type(1000 files)`                  |        0.005 s |
-| `Dependency.version(1000 files)`               |        0.004 s |
-| `Dependency._add_attachment()`                 |        0.061 s |
-| `Dependency._add_media(1000 files)`            |        0.050 s |
-| `Dependency._add_meta()`                       |        0.124 s |
-| `Dependency._drop()`                           |        0.078 s |
-| `Dependency._remove()`                         |        0.068 s |
-| `Dependency._update_media()`                   |        0.073 s |
-| `Dependency._update_media_version(1000 files)` |        0.008 s |
+```bash
+$ python benchmark-dependencies-methods.py
+```
+
+Execution times in seconds
+of `audb.Dependencies` methods
+for a dependency table
+containing 1,000,000 files
+stored as a `pandas.DataFrame`
+using different dtype representations
+(storing string as `string`,
+storing string as `object`,
+using `pyarrow` dtypes)
+as of commit 91528e4.
+
+| method                                         |   string |   object |   pyarrow |
+|------------------------------------------------|----------|----------|-----------|
+| Dependencies.__call__()                        |    0.000 |    0.000 |     0.000 |
+| Dependencies.__contains__()                    |    0.000 |    0.000 |     0.000 |
+| Dependencies.__get_item__()                    |    0.000 |    0.000 |     0.001 |
+| Dependencies.__len__()                         |    0.000 |    0.000 |     0.000 |
+| Dependencies.__str__()                         |    0.012 |    0.010 |     0.013 |
+| Dependencies.archives                          |    0.278 |    0.223 |     0.284 |
+| Dependencies.attachments                       |    0.053 |    0.029 |     0.034 |
+| Dependencies.attachment_ids                    |    0.052 |    0.029 |     0.033 |
+| Dependencies.files                             |    0.056 |    0.026 |     0.084 |
+| Dependencies.media                             |    0.273 |    0.156 |     0.166 |
+| Dependencies.removed_media                     |    0.246 |    0.140 |     0.154 |
+| Dependencies.table_ids                         |    0.070 |    0.045 |     0.044 |
+| Dependencies.tables                            |    0.053 |    0.029 |     0.034 |
+| Dependencies.archive(1000 files)               |    0.014 |    0.013 |     0.025 |
+| Dependencies.bit_depth(1000 files)             |    0.013 |    0.014 |     0.022 |
+| Dependencies.channels(1000 files)              |    0.013 |    0.014 |     0.022 |
+| Dependencies.checksum(1000 files)              |    0.014 |    0.013 |     0.025 |
+| Dependencies.duration(1000 files)              |    0.014 |    0.013 |     0.022 |
+| Dependencies.format(1000 files)                |    0.014 |    0.013 |     0.024 |
+| Dependencies.removed(1000 files)               |    0.013 |    0.013 |     0.022 |
+| Dependencies.sampling_rate(1000 files)         |    0.014 |    0.014 |     0.022 |
+| Dependencies.type(1000 files)                  |    0.013 |    0.013 |     0.021 |
+| Dependencies.version(1000 files)               |    0.014 |    0.013 |     0.025 |
+| Dependencies._add_attachment()                 |    0.114 |    0.112 |     0.387 |
+| Dependencies._add_media(1000 files)            |    0.114 |    0.111 |     0.147 |
+| Dependencies._add_meta()                       |    0.224 |    0.238 |     0.283 |
+| Dependencies._drop()                           |    0.166 |    0.166 |     0.243 |
+| Dependencies._remove()                         |    0.109 |    0.114 |     0.113 |
+| Dependencies._update_media()                   |    0.156 |    0.155 |     0.276 |
+| Dependencies._update_media_version(1000 files) |    0.010 |    0.010 |     0.044 |
