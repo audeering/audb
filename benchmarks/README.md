@@ -80,3 +80,61 @@ as of commit 91528e4.
 | Dependencies._remove()                         |    0.068 |    0.068 |     0.064 |
 | Dependencies._update_media()                   |    0.071 |    0.072 |     0.125 |
 | Dependencies._update_media_version(1000 files) |    0.008 |    0.008 |     0.017 |
+
+
+## audb.Dependencies loading/writing to file
+
+Benchmarks how fast a dependency table
+can be written to disk
+or read from disk
+using different file formats
+(csv, pickle, parquet)
+and different internal representations
+(`pandas.DataFrame` with different dtypes,
+and `pyarrow.Table`).
+
+To run the benchmark execute:
+
+```bash
+$ python benchmark-dependencies-save-and-load.py
+```
+
+Reading times in seconds
+for a dependency table
+containing 1,000,000 files.
+
+| method                                                    |   csv |   pickle |   parquet |
+|-----------------------------------------------------------|-------|----------|-----------|
+| pd.DataFrame[object]                                      | 2.022 |    0.641 |     0.469 |
+| pd.DataFrame[string]                                      | 2.032 |    0.660 |     0.597 |
+| pd.DataFrame[pyarrow]                                     | 2.031 |    0.222 |     0.928 |
+| pd.DataFrame[object] -> pd.DataFrame[pyarrow]             | 2.248 |    0.446 |           |
+| pd.DataFrame[object] -> pa.Table                          | 0.515 |          |           |
+| pd.DataFrame[string] -> pa.Table                          | 0.652 |          |           |
+| pd.DataFrame[pyarrow] -> pa.Table                         | 0.234 |          |           |
+| pd.DataFrame[object] -> pd.DataFrame[pyarrow] -> pa.Table | 0.481 |          |           |
+| pa.Table                                                  | 0.252 |          |     0.236 |
+
+Writing times in seconds
+for a dependency table
+containing 1,000,000 files.
+
+| method                                                              |   csv |   pickle |   parquet |
+|---------------------------------------------------------------------|-------|----------|-----------|
+| \-\-\-\-> pd.DataFrame[object]                                      | 1.115 |    0.232 |     0.351 |
+| \-\-\-\-> pd.DataFrame[string]                                      | 1.126 |    0.212 |     0.325 |
+| \-\-\-\-> pd.DataFrame[pyarrow]                                     | 2.611 |    0.027 |     0.288 |
+| \-\-\-\-> pd.DataFrame[pyarrow] -> pd.DataFrame[object]             | 2.759 |    0.262 |           |
+| -c\--> pd.DataFrame[object]                                         | 1.144 |          |           |
+| -c\--> pd.DataFrame[string]                                         | 1.097 |          |           |
+| -c\--> pd.DataFrame[pyarrow]                                        | 2.578 |          |           |
+| -c\--> pd.DataFrame[pyarrow] -> pd.DataFrame[object]                | 2.763 |          |           |
+| -pa-> pd.DataFrame[object]                                          | 0.448 |          |           |
+| -pa-> pd.DataFrame[string]                                          | 0.398 |          |           |
+| -pa-> pd.DataFrame[pyarrow]                                         | 0.557 |          |           |
+| -pa-> pd.DataFrame[pyarrow] -> pd.DataFrame[object]                 | 0.723 |          |           |
+| \-\-\-\-> pa.Table -> pd.DataFrame[object]                          | 0.315 |          |     0.215 |
+| \-\-\-\-> pa.Table -> pd.DataFrame[string]                          | 0.316 |          |     0.314 |
+| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow]                         | 0.109 |          |     0.069 |
+| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow] -> pd.DataFrame[object] | 0.335 |          |           |
+| \-\-\-\-> pa.Table                                                  | 0.049 |          |     0.051 |
