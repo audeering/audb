@@ -52,31 +52,31 @@ as of commit 91528e4.
 |------------------------------------------------|----------|----------|-----------|
 | Dependencies.\_\_call__()                      |    0.000 |    0.000 |     0.000 |
 | Dependencies.\_\_contains__()                  |    0.000 |    0.000 |     0.000 |
-| Dependencies.\_\_get_item__()                  |    0.000 |    0.000 |     0.001 |
+| Dependencies.\_\_get_item__()                  |    0.000 |    0.000 |     0.000 |
 | Dependencies.\_\_len__()                       |    0.000 |    0.000 |     0.000 |
-| Dependencies.\_\_str__()                       |    0.012 |    0.010 |     0.013 |
-| Dependencies.archives                          |    0.278 |    0.223 |     0.284 |
-| Dependencies.attachments                       |    0.053 |    0.029 |     0.034 |
-| Dependencies.attachment_ids                    |    0.052 |    0.029 |     0.033 |
-| Dependencies.files                             |    0.056 |    0.026 |     0.084 |
-| Dependencies.media                             |    0.273 |    0.156 |     0.166 |
-| Dependencies.removed_media                     |    0.246 |    0.140 |     0.154 |
-| Dependencies.table_ids                         |    0.070 |    0.045 |     0.044 |
-| Dependencies.tables                            |    0.053 |    0.029 |     0.034 |
-| Dependencies.archive(1000 files)               |    0.014 |    0.013 |     0.025 |
-| Dependencies.bit_depth(1000 files)             |    0.013 |    0.014 |     0.022 |
-| Dependencies.channels(1000 files)              |    0.013 |    0.014 |     0.022 |
-| Dependencies.checksum(1000 files)              |    0.014 |    0.013 |     0.025 |
-| Dependencies.duration(1000 files)              |    0.014 |    0.013 |     0.022 |
-| Dependencies.format(1000 files)                |    0.014 |    0.013 |     0.024 |
-| Dependencies.removed(1000 files)               |    0.013 |    0.013 |     0.022 |
-| Dependencies.sampling_rate(1000 files)         |    0.014 |    0.014 |     0.022 |
-| Dependencies.type(1000 files)                  |    0.013 |    0.013 |     0.021 |
-| Dependencies.version(1000 files)               |    0.014 |    0.013 |     0.025 |
-| Dependencies._add_attachment()                 |    0.114 |    0.112 |     0.387 |
-| Dependencies._add_media(1000 files)            |    0.114 |    0.111 |     0.147 |
-| Dependencies._add_meta()                       |    0.224 |    0.238 |     0.283 |
-| Dependencies._drop()                           |    0.166 |    0.166 |     0.243 |
-| Dependencies._remove()                         |    0.109 |    0.114 |     0.113 |
-| Dependencies._update_media()                   |    0.156 |    0.155 |     0.276 |
-| Dependencies._update_media_version(1000 files) |    0.010 |    0.010 |     0.044 |
+| Dependencies.\_\_str__()                       |    0.006 |    0.005 |     0.007 |
+| Dependencies.archives                          |    0.141 |    0.116 |     0.144 |
+| Dependencies.attachments                       |    0.029 |    0.018 |     0.017 |
+| Dependencies.attachment_ids                    |    0.029 |    0.018 |     0.017 |
+| Dependencies.files                             |    0.030 |    0.012 |     0.043 |
+| Dependencies.media                             |    0.127 |    0.072 |     0.086 |
+| Dependencies.removed_media                     |    0.117 |    0.069 |     0.081 |
+| Dependencies.table_ids                         |    0.037 |    0.026 |     0.023 |
+| Dependencies.tables                            |    0.028 |    0.017 |     0.017 |
+| Dependencies.archive(1000 files)               |    0.005 |    0.005 |     0.007 |
+| Dependencies.bit_depth(1000 files)             |    0.004 |    0.004 |     0.006 |
+| Dependencies.channels(1000 files)              |    0.004 |    0.004 |     0.006 |
+| Dependencies.checksum(1000 files)              |    0.004 |    0.004 |     0.006 |
+| Dependencies.duration(1000 files)              |    0.004 |    0.004 |     0.006 |
+| Dependencies.format(1000 files)                |    0.004 |    0.004 |     0.006 |
+| Dependencies.removed(1000 files)               |    0.004 |    0.004 |     0.006 |
+| Dependencies.sampling_rate(1000 files)         |    0.004 |    0.004 |     0.006 |
+| Dependencies.type(1000 files)                  |    0.004 |    0.004 |     0.006 |
+| Dependencies.version(1000 files)               |    0.004 |    0.004 |     0.006 |
+| Dependencies._add_attachment()                 |    0.055 |    0.056 |     0.207 |
+| Dependencies._add_media(1000 files)            |    0.049 |    0.050 |     0.060 |
+| Dependencies._add_meta()                       |    0.120 |    0.128 |     0.138 |
+| Dependencies._drop()                           |    0.075 |    0.075 |     0.117 |
+| Dependencies._remove()                         |    0.068 |    0.068 |     0.064 |
+| Dependencies._update_media()                   |    0.071 |    0.072 |     0.125 |
+| Dependencies._update_media_version(1000 files) |    0.008 |    0.008 |     0.017 |
