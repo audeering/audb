@@ -99,7 +99,9 @@ To run the benchmark execute:
 $ python benchmark-dependencies-save-and-load.py
 ```
 
-Reading times in seconds
+**Writing**
+
+Execution times in seconds
 for a dependency table
 containing 1,000,000 files.
 
@@ -115,9 +117,14 @@ containing 1,000,000 files.
 | pd.DataFrame[object] -> pd.DataFrame[pyarrow] -> pa.Table | 0.481 |          |           |
 | pa.Table                                                  | 0.252 |          |     0.236 |
 
-Writing times in seconds
+**Reading**
+
+Execution times in seconds
 for a dependency table
 containing 1,000,000 files.
+-c\-\-> stands for using the `c` engine
+and -pa-> for using the `pyarrow` engine
+with `pandas.read_csv()`.
 
 | method                                                              |   csv |   pickle |   parquet |
 |---------------------------------------------------------------------|-------|----------|-----------|
