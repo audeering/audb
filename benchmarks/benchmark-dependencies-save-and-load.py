@@ -5,10 +5,12 @@ import random
 import string
 import time
 
+import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.csv as csv
 import pyarrow.parquet as parquet
+import tabulate
 
 import audeer
 
@@ -171,34 +173,39 @@ audeer.mkdir(folder)
 
 dtypes = ["object", "string", "pyarrow"]
 
-# -------------------------------------------------------------------------
+# ===== WRITING ===========================================================
+results = pd.DataFrame(columns=["csv", "pickle", "parquet"])
+results.index.name = "method"
+
 print()
-print("=== Write to CSV file ===")
+print("* Write to CSV file.", end="", flush=True)
 file = audeer.path(folder, "df.csv")
 
 for dtype in dtypes:
     _df = df.copy()
     _df = astype(_df, dtype)
-    t = time.time()
+    t0 = time.time()
     df.to_csv(file)
-    print(f"pandas.DataFrame[{dtype}] -> CSV: {time.time() -t:.2f} s")
+    t = time.time() - t0
+    method = f"pd.DataFrame[{dtype}]"
+    results.at[method, "csv"] = t
+    print(".", end="", flush=True)
 
 # Use object and copy to pyarrow before writing
 _df = df.copy()
 _df = astype(_df, "object")
-t = time.time()
+t0 = time.time()
 _df = astype(_df, "pyarrow")
 _df.to_csv(file)
-print(
-    "pandas.DataFrame[object] "
-    "-> pandas.DataFrame[pyarrow] "
-    f"-> CSV: {time.time() -t:.2f} s"
-)
+t = time.time() - t0
+method = "pd.DataFrame[object] -> pd.DataFrame[pyarrow]"
+results.at[method, "csv"] = t
+print(".", end="", flush=True)
 
 for dtype in dtypes:
     _df = df.copy()
     _df = astype(_df, dtype)
-    t = time.time()
+    t0 = time.time()
     _df.index = _df.index.rename("file")
     _df = _df.reset_index()
     table = pa.Table.from_pandas(_df, preserve_index=False, schema=pyarrow_schema)
@@ -210,12 +217,15 @@ for dtype in dtypes:
         file,
         write_options=csv.WriteOptions(quoting_style="none"),
     )
-    print(f"pandas.DataFrame[{dtype}] -> pyarrow.Table -> CSV: {time.time() -t:.2f} s")
+    t = time.time() - t0
+    method = f"pd.DataFrame[{dtype}] -> pa.Table"
+    results.at[method, "csv"] = t
+    print(".", end="", flush=True)
 
 # Use object and copy to pyarrow before writing
 _df = df.copy()
 _df = astype(_df, "object")
-t = time.time()
+t0 = time.time()
 _df = astype(_df, "pyarrow")
 _df.index = _df.index.rename("file")
 _df = _df.reset_index()
@@ -228,69 +238,96 @@ csv.write_csv(
     file,
     write_options=csv.WriteOptions(quoting_style="none"),
 )
-print(
-    "pandas.DataFrame[object] "
-    "-> pandas.DataFrame[pyarrow] "
-    f"-> pyarrow.Table -> CSV: {time.time() -t:.2f} s"
-)
+t = time.time() - t0
+method = "pd.DataFrame[object] -> pd.DataFrame[pyarrow] -> pa.Table"
+results.at[method, "csv"] = t
+print(".", end="", flush=True)
 
-t = time.time()
+t0 = time.time()
 _table = table.rename_columns(_columns)
 csv.write_csv(
     _table,
     file,
     write_options=csv.WriteOptions(quoting_style="none"),
 )
-print(f"pyarrow.Table -> CSV: {time.time() -t:.2f} s")
+t = time.time() - t0
+method = "pa.Table"
+results.at[method, "csv"] = t
+print(".")
 
 # -------------------------------------------------------------------------
-print()
-print("=== Write to PKL file ===")
+print("* Write to PKL file.", end="", flush=True)
 file = audeer.path(folder, "df.pkl")
 
 for dtype in dtypes:
     _df = df.copy()
     _df = astype(_df, dtype)
-    t = time.time()
+    t0 = time.time()
     _df.to_pickle(file, protocol=4)
-    print(f"pandas.DataFrame[{dtype}] -> PKL: {time.time() -t:.2f} s")
+    t = time.time() - t0
+    method = f"pd.DataFrame[{dtype}]"
+    results.at[method, "pickle"] = t
+    print(".", end="", flush=True)
 
 # Use object and copy to pyarrow before writing
 _df = df.copy()
 _df = astype(_df, "object")
-t = time.time()
+t0 = time.time()
 _df = astype(_df, "pyarrow")
 _df.to_pickle(file, protocol=4)
-print(
-    "pandas.DataFrame[object] "
-    "-> pandas.DataFrame[pyarrow] "
-    f"-> PKL: {time.time() -t:.2f} s"
-)
+t = time.time() - t0
+method = "pd.DataFrame[object] -> pd.DataFrame[pyarrow]"
+results.at[method, "pickle"] = t
+print(".")
 
 # -------------------------------------------------------------------------
-print()
-print("=== Write to PARQUET file ===")
+print("* Write to PARQUET file.", end="", flush=True)
 file = audeer.path(folder, "df.parquet")
 
 for dtype in dtypes:
     _df = df.copy()
     _df = astype(_df, dtype)
-    t = time.time()
+    t0 = time.time()
     _df.to_parquet(file, engine="pyarrow")
-    print(f"pandas.DataFrame[{dtype}] -> PARQUET: {time.time() -t:.2f} s")
+    t = time.time() - t0
+    method = f"pd.DataFrame[{dtype}]"
+    results.at[method, "parquet"] = t
+    print(".", end="", flush=True)
 
-t = time.time()
+t0 = time.time()
 parquet.write_table(table, file)
-print(f"pyarrow.Table -> PARQUET: {time.time() -t:.2f} s")
-
-# -------------------------------------------------------------------------
+t = time.time() - t0
+method = "pa.Table"
+results.at[method, "parquet"] = t
+print(".")
 print()
-print("=== Read CSV file ===")
+
+# ===== Print results =====
+print(f"Results for writing {num_rows} lines.")
+print()
+results = results.replace(np.nan, None)
+results = tabulate.tabulate(results, headers="keys", tablefmt="github", floatfmt=".3f")
+print(results)
+
+
+# ===== READING ===========================================================
+results = pd.DataFrame(columns=["csv", "pickle", "parquet"])
+results.index.name = "method"
+
+print()
+print("* Read CSV file.", end="", flush=True)
 file = audeer.path(folder, "df.csv")
 
 for engine in [None, "c", "pyarrow"]:
+    if engine is None:
+        arrow = "---->"
+    elif engine == "pyarrow":
+        arrow = "-pa->"
+    elif engine == "c":
+        arrow = "-c-->"
+
     for dtype in dtypes:
-        t = time.time()
+        t0 = time.time()
         index_col = 0
         _df = pd.read_csv(
             file,
@@ -300,14 +337,17 @@ for engine in [None, "c", "pyarrow"]:
             header=0,
             engine=engine,
         )
-        print(f"CSV -[{engine}]> pandas.DataFrame[{dtype}]: {time.time() -t:.2f} s")
+        t = time.time() - t0
+        method = f"{arrow} pd.DataFrame[{dtype}]"
+        results.at[method, "csv"] = t
         if dtype == "pyarrow":
             dtype = "string[pyarrow]"
         _df.index = _df.index.astype(dtype)
         assert _df.archive.dtype == dtype
+        print(".", end="", flush=True)
 
     # Convert pyarrow dtypes to object
-    t = time.time()
+    t0 = time.time()
     index_col = 0
     _df = pd.read_csv(
         file,
@@ -318,14 +358,14 @@ for engine in [None, "c", "pyarrow"]:
         engine=engine,
     )
     _df = astype(_df, "object")
-    print(
-        f"CSV -[{engine}]> pandas.DataFrame[pyarrow] "
-        f"-> pandas.DataFrame[object]: {time.time() -t:.2f} s"
-    )
+    t = time.time() - t0
+    method = f"{arrow} pd.DataFrame[pyarrow] -> pd.DataFrame[object]"
+    results.at[method, "csv"] = t
+    print(".", end="", flush=True)
 
 
 for dtype in dtypes:
-    t = time.time()
+    t0 = time.time()
     _table = csv.read_csv(
         file,
         read_options=csv.ReadOptions(
@@ -358,13 +398,16 @@ for dtype in dtypes:
     )
     _df.set_index("file", inplace=True)
     _df.index.name = None
-    print(f"CSV -> pyarrow.Table -> pd.DataFrame[{dtype}]: {time.time() -t:.2f} s")
+    t = time.time() - t0
+    method = f"----> pa.Table -> pd.DataFrame[{dtype}]"
+    results.at[method, "csv"] = t
     if dtype == "pyarrow":
         dtype = "string[pyarrow]"
     assert _df.archive.dtype == dtype
+    print(".", end="", flush=True)
 
 # Convert pyarrow dtypes to object
-t = time.time()
+t0 = time.time()
 _table = csv.read_csv(
     file,
     read_options=csv.ReadOptions(
@@ -392,13 +435,12 @@ _df = _table.to_pandas(
 _df.set_index("file", inplace=True)
 _df.index.name = None
 _df = astype(_df, "object")
-print(
-    "CSV -> pyarrow.Table "
-    "-> pd.DataFrame[pyarrow]"
-    f"-> pandas.DataFrame[object]: {time.time() -t:.2f} s"
-)
+t = time.time() - t0
+method = "----> pa.Table -> pd.DataFrame[pyarrow] -> pd.DataFrame[object]"
+results.at[method, "csv"] = t
+print(".", end="", flush=True)
 
-t = time.time()
+t0 = time.time()
 _table = csv.read_csv(
     file,
     read_options=csv.ReadOptions(
@@ -407,36 +449,40 @@ _table = csv.read_csv(
     ),
     convert_options=csv.ConvertOptions(column_types=pyarrow_schema),
 )
-print(f"CSV -> pyarrow.Table: {time.time() -t:.2f} s")
+t = time.time() - t0
+method = "----> pa.Table"
+results.at[method, "csv"] = t
+print(".")
 
 # -------------------------------------------------------------------------
-print()
-print("=== Read PKL file ===")
+print("* Read PKL file.", end="", flush=True)
 file = audeer.path(folder, "df.pkl")
 
 for dtype in dtypes:
     _df = df.copy()
     _df = astype(_df, dtype)
     _df.to_pickle(file)
-    t = time.time()
+    t0 = time.time()
     _df = pd.read_pickle(file)
-    print(f"PKL -> pd.DataFrame[{dtype}]: {time.time() -t:.2f} s")
+    t = time.time() - t0
+    method = f"----> pd.DataFrame[{dtype}]"
+    results.at[method, "pickle"] = t
+    print(".", end="", flush=True)
 
 # Convert pyarrow dtypes to object
 _df = df.copy()
 _df = astype(_df, "pyarrow")
 _df.to_pickle(file)
-t = time.time()
+t0 = time.time()
 _df = pd.read_pickle(file)
 _df = astype(_df, "object")
-print(
-    "PKL -> pd.DataFrame[pyarrow] "
-    f"-> pandas.DataFrame[object]: {time.time() -t:.2f} s"
-)
+t = time.time() - t0
+method = "----> pd.DataFrame[pyarrow] -> pd.DataFrame[object]"
+results.at[method, "pickle"] = t
+print(".")
 
 # -------------------------------------------------------------------------
-print()
-print("=== Read PARQUET file ===")
+print("* Read PARQUET file.", end="", flush=True)
 file = audeer.path(folder, "df.parquet")
 
 for dtype in dtypes:
@@ -445,9 +491,12 @@ for dtype in dtypes:
     _df.index.rename("file", inplace=True)
     _df = _df.reset_index()
     _df.to_parquet(file, index=False, engine="pyarrow")
-    t = time.time()
+    t0 = time.time()
     _df = pd.read_parquet(file, engine="pyarrow")
-    print(f"PARQUET -> pandas.DataFrame[{dtype}]: {time.time() -t:.2f} s")
+    t = time.time() - t0
+    method = f"----> pd.DataFrame[{dtype}]"
+    results.at[method, "parquet"] = t
+    print(".", end="", flush=True)
 
 for dtype in dtypes:
     _df = df.copy()
@@ -455,7 +504,7 @@ for dtype in dtypes:
     _df.index.rename("file", inplace=True)
     _df = _df.reset_index()
     _df.to_parquet(file, index=False, engine="pyarrow")
-    t = time.time()
+    t0 = time.time()
     _table = parquet.read_table(file)
     if dtype == "object":
         types_mapper = None
@@ -481,11 +530,22 @@ for dtype in dtypes:
     )
     _df.set_index("file", inplace=True)
     _df.index.name = None
-    print(
-        "PARQUET -> pyarrow.Table "
-        f"-> pandas.DataFrame[{dtype}]: {time.time() -t:.2f} s"
-    )
+    t = time.time() - t0
+    method = f"----> pa.Table -> pd.DataFrame[{dtype}]"
+    results.at[method, "parquet"] = t
+    print(".", end="", flush=True)
 
-t = time.time()
+t0 = time.time()
 _table = parquet.read_table(file)
-print(f"PARQUET -> pyarrow.Table: {time.time() -t:.2f} s")
+t = time.time() - t0
+method = "----> pa.Table"
+results.at[method, "parquet"] = t
+print(".")
+print()
+
+# ===== Print results =====
+print(f"Results for reading {num_rows} lines.")
+print()
+results = results.replace(np.nan, None)
+results = tabulate.tabulate(results, headers="keys", tablefmt="github", floatfmt=".3f")
+print(results)
