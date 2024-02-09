@@ -145,7 +145,7 @@ if not os.path.exists(data_cache):
 deps = audb.Dependencies()
 deps.load(data_cache)
 file = "file-10.wav"
-n_files = 1000
+n_files = 10000
 _files = deps._df.index[:n_files].tolist()
 dtypes = ["string", "object", "pyarrow"]
 results = pd.DataFrame(columns=dtypes)
@@ -175,15 +175,15 @@ for dtype in dtypes:
     # Further calls will be faster
     file in deps
 
-    method = "Dependencies.__contains__()"
+    method = f"Dependencies.__contains__({n_files} files)"
     t0 = time.time()
-    file in deps
+    [file in deps for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
-    method = "Dependencies.__get_item__()"
+    method = f"Dependencies.__get_item__({n_files} files)"
     t0 = time.time()
-    deps[file]
+    [deps[file] for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
@@ -344,7 +344,7 @@ for dtype in dtypes:
 
     method = "Dependencies._drop()"
     t0 = time.time()
-    deps._drop(["file-9000.wav"])
+    deps._drop(["file-90000.wav"])
     t = time.time() - t0
     results.at[method, dtype] = t
 
