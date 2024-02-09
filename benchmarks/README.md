@@ -145,3 +145,55 @@ with `pandas.read_csv()`.
 | \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow]                         | 0.109 |          |     0.069 |
 | \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow] -> pd.DataFrame[object] | 0.335 |          |           |
 | \-\-\-\-> pa.Table                                                  | 0.049 |          |     0.051 |
+
+
+### File sizes
+
+Storing a dependency table with 1,000,000 entries resulted in:
+
+* 102 MB for csv
+* 131 MB for pickle
+* 20 MB for parquet
+
+When zipped all files can be further reduced by 50%.
+
+
+### Memory consumption
+
+Besides the execution time,
+memory consumption might also be considered.
+We use [memray](https://github.com/bloomberg/memray) v1.11.0,
+to measure it.
+As the evaluation of the results cannot be easily automated,
+the investigation was done manually
+by creating single Python scripts
+containing code for the desired operations,
+running `memray`
+and inspecting the results.
+
+**Writing**
+
+When writing to files
+there is no memory overhead
+when converting a `pandas.DataFrame`
+first to `pyarrow.Table`.
+Hence, we don't have to compare results.
+
+**Reading**
+
+Peak memory consumption when reading a dependency table containing 1,000,000 files.
+
+| method                                      |     csv | pickle | parquet |
+| ------------------------------------------- | ------- | ------ | ------- |
+| \-\-\-\-> pd.DataFrame[object]              |  391 MB | 275 MB |  754 MB |
+| \-\-\-\-> pd.DataFrame[string]              |  356 MB | 275 MB |  874 MB |
+| \-\-\-\-> pd.DataFrame[pyarrow]             |  696 MB | 161 MB |  903 MB |
+| \-c--> pd.DataFrame[object]                 |  390 MB |        |         |
+| \-c--> pd.DataFrame[string]                 |  356 MB |        |         |
+| \-c--> pd.DataFrame[pyarrow]                |  696 MB |        |         |
+| \-pa-> pd.DataFrame[object]                 | 1295 MB |        |         |
+| \-pa-> pd.DataFrame[string]                 | 1333 MB |        |         |
+| \-pa-> pd.DataFrame[pyarrow]                | 1420 MB |        |         |
+| \-\-\-\-> pa.Table                          |  530 MB |        |  381 MB |
+| \-\-\-\-> pa.Table -> pd.DataFrame[object]  |  994 MB |        |  897 MB |
+| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow] |  541 MB |        |  437 MB |
