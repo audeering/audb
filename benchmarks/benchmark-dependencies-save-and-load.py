@@ -381,18 +381,8 @@ for dtype in dtypes:
     elif dtype == "pyarrow":
         types_mapper = pd.ArrowDtype
     _df = _table.to_pandas(
-        # We could convert to categories,
-        # but it slows down reading
-        # => TODO: check if processing is faster when using categories
-        #
-        # Convert all strings to categories
-        # strings_to_categorical=True,
-        # Select columns to convert to categories
-        # categories=["format", "version"],
-        #
         # Speed up conversion,
-        # but might increase memory usage
-        # => TODO: measure memory consumption
+        # increase memory usage by ~20 MB
         deduplicate_objects=False,
         types_mapper=types_mapper,
     )
@@ -417,18 +407,8 @@ _table = csv.read_csv(
     convert_options=csv.ConvertOptions(column_types=pyarrow_schema),
 )
 _df = _table.to_pandas(
-    # We could convert to categories,
-    # but it slows down reading
-    # => TODO: check if processing is faster when using categories
-    #
-    # Convert all strings to categories
-    # strings_to_categorical=True,
-    # Select columns to convert to categories
-    # categories=["format", "version"],
-    #
     # Speed up conversion,
-    # but might increase memory usage
-    # => TODO: measure memory consumption
+    # increase memory usage by ~20 MB
     deduplicate_objects=False,
     types_mapper=pd.ArrowDtype,
 )
@@ -513,18 +493,8 @@ for dtype in dtypes:
     elif dtype == "pyarrow":
         types_mapper = pd.ArrowDtype
     _df = _table.to_pandas(
-        # We could convert to categories,
-        # but it slows down reading
-        # => TODO: check if processing is faster when using categories
-        #
-        # Convert all strings to categories
-        # strings_to_categorical=True,
-        # Select columns to convert to categories
-        # categories=["format", "version"],
-        #
         # Speed up conversion,
-        # but might increase memory usage
-        # => TODO: measure memory consumption
+        # increase memory usage by ~20 MB
         deduplicate_objects=False,
         types_mapper=types_mapper,
     )
