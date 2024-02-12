@@ -3,6 +3,8 @@ import os
 import pandas as pd
 import pytest
 
+import audeer
+
 import audb
 
 
@@ -139,14 +141,42 @@ def test_archive(deps):
         deps.archive("non.existing")
 
 
-def test_bit_depth(deps):
-    files = get_entries("file")
-    bit_depths = get_entries("bit_depth")
-    for file, bit_depth in zip(files, bit_depths):
-        assert deps.bit_depth(file) == bit_depth
-        assert isinstance(deps.bit_depth(file), int)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.bit_depth("non.existing")
+@pytest.mark.parametrize(
+    "file, expected",
+    [
+        ([], []),
+        ("db.files.csv", 0),
+        ("file.wav", 16),
+        (["db.files.csv"], [0]),
+        (["db.files.csv", "file.wav"], [0, 16]),
+        pytest.param(
+            "",
+            None,
+            marks=pytest.mark.xfail(raises=KeyError),
+        ),
+        pytest.param(
+            "non-existing",
+            None,
+            marks=pytest.mark.xfail(raises=KeyError),
+        ),
+        pytest.param(
+            [""],
+            None,
+            marks=pytest.mark.xfail(raises=KeyError),
+        ),
+        pytest.param(
+            ["non-existing"],
+            None,
+            marks=pytest.mark.xfail(raises=KeyError),
+        ),
+    ],
+)
+def test_bit_depth(deps, file, expected):
+    bit_depth = deps.bit_depth(file)
+    assert bit_depth == expected
+    assert type(bit_depth) == type(expected)
+    for bit_depth in audeer.to_list(bit_depth):
+        assert isinstance(bit_depth, int)
 
 
 def test_channels(deps):
