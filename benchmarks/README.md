@@ -45,8 +45,7 @@ stored as a `pandas.DataFrame`
 using different dtype representations
 (storing string as `string`,
 storing string as `object`,
-using `pyarrow` dtypes)
-as of commit 91528e4.
+using `pyarrow` dtypes).
 
 | method                                          |   string |   object |   pyarrow |
 |-------------------------------------------------|----------|----------|-----------|
