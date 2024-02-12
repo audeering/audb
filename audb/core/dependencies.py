@@ -3,6 +3,7 @@ import os
 import re
 import typing
 
+import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.csv as csv
@@ -58,8 +59,29 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
+        # pyarrow table representation
         self._table = None
+
+        # pyarrow.dataset for faster searches
+        # TODO: check if we need to store it,
+        # or could calculate it on the fly
         self._dataset = None
+
+        # Index cache
+        self._index = None
+
+        # Column caches
+        self._archive = None
+        self._bit_depth = None
+        self._channeks = None
+        self._checksum = None
+        self._duration = None
+        self._format = None
+        self._removed = None
+        self._sampling_rate = None
+        self._type = None
+        self._version = None
+
         self._schema = pa.schema(
             [
                 ("file", pa.string()),
@@ -115,8 +137,7 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        row = self._table_row(file)
-        return len(row) > 0
+        return file in self._index
 
     def __getitem__(self, file: str) -> typing.List:
         r"""File information.
@@ -128,7 +149,8 @@ class Dependencies:
             list with meta information
 
         """
-        row = self._table_row(file, raise_error=True)
+        idx = self._index[file]
+        row = self._table.take([idx]).to_pylist()[0]
         return [value for column, value in row.items() if column != "file"]
 
     def __len__(self) -> int:
@@ -267,8 +289,13 @@ class Dependencies:
             bit depth
 
         """
-        row = self._table_row(file, raise_error=True)
-        return int(row["bit_depth"])
+        if self._bit_depth is None:
+            self._bit_depth = self._cache_column("bit_depth")
+        if isinstance(file, str):
+            idx = self._index[file]
+        else:
+            idx = [self._index[f] for f in file]
+        return self._bit_depth[idx].tolist()
 
     def channels(self, file: str) -> int:
         r"""Number of channels of media file.
@@ -555,6 +582,18 @@ class Dependencies:
         }
         self._table_add_rows([row])
 
+    def _cache_column(self, column: str) -> np.ndarray:
+        r"""Store content in cache.
+
+        Args:
+            column: name of table column to store
+
+        Returns:
+            column values
+
+        """
+        return self._table.column(column).to_numpy()
+
     def _drop(self, files: typing.Sequence[str]):
         r"""Drop files from table.
 
@@ -712,6 +751,7 @@ class Dependencies:
         self._table = table
         # Update dataset every time table changes
         self._dataset = dataset.dataset(self._table)
+        self._index = {str(file): n for n, file in enumerate(table.column("file"))}
 
     def _to_list(self, table: pa.Table):
         r"""Convert pyarrow table to Python list.
