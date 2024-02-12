@@ -51,34 +51,34 @@ using `pyarrow` dtypes).
 |-------------------------------------------------|----------|----------|-----------|
 | Dependencies.\_\_call__()                       |    0.000 |    0.000 |     0.000 |
 | Dependencies.\_\_contains__(10000 files)        |    0.005 |    0.004 |     0.004 |
-| Dependencies.\_\_get_item__(10000 files)        |    0.322 |    0.224 |     0.900 |
+| Dependencies.\_\_get_item__(10000 files)        |    0.317 |    0.224 |     0.909 |
 | Dependencies.\_\_len__()                        |    0.000 |    0.000 |     0.000 |
 | Dependencies.\_\_str__()                        |    0.006 |    0.005 |     0.006 |
-| Dependencies.archives                           |    0.144 |    0.116 |     0.152 |
-| Dependencies.attachments                        |    0.030 |    0.018 |     0.018 |
-| Dependencies.attachment_ids                     |    0.029 |    0.018 |     0.018 |
-| Dependencies.files                              |    0.030 |    0.011 |     0.046 |
-| Dependencies.media                              |    0.129 |    0.073 |     0.095 |
-| Dependencies.removed_media                      |    0.117 |    0.070 |     0.087 |
-| Dependencies.table_ids                          |    0.037 |    0.026 |     0.023 |
+| Dependencies.archives                           |    0.143 |    0.115 |     0.148 |
+| Dependencies.attachments                        |    0.029 |    0.018 |     0.017 |
+| Dependencies.attachment_ids                     |    0.029 |    0.018 |     0.017 |
+| Dependencies.files                              |    0.031 |    0.011 |     0.045 |
+| Dependencies.media                              |    0.135 |    0.072 |     0.091 |
+| Dependencies.removed_media                      |    0.123 |    0.068 |     0.086 |
+| Dependencies.table_ids                          |    0.036 |    0.026 |     0.026 |
 | Dependencies.tables                             |    0.029 |    0.017 |     0.017 |
-| Dependencies.archive(10000 files)               |    0.045 |    0.042 |     0.065 |
+| Dependencies.archive(10000 files)               |    0.046 |    0.045 |     0.066 |
 | Dependencies.bit_depth(10000 files)             |    0.024 |    0.024 |     0.045 |
-| Dependencies.channels(10000 files)              |    0.023 |    0.023 |     0.045 |
+| Dependencies.channels(10000 files)              |    0.024 |    0.024 |     0.043 |
 | Dependencies.checksum(10000 files)              |    0.026 |    0.023 |     0.047 |
-| Dependencies.duration(10000 files)              |    0.023 |    0.023 |     0.043 |
-| Dependencies.format(10000 files)                |    0.026 |    0.023 |     0.047 |
-| Dependencies.removed(10000 files)               |    0.023 |    0.023 |     0.043 |
-| Dependencies.sampling_rate(10000 files)         |    0.023 |    0.023 |     0.043 |
-| Dependencies.type(10000 files)                  |    0.023 |    0.023 |     0.043 |
-| Dependencies.version(10000 files)               |    0.026 |    0.023 |     0.047 |
-| Dependencies._add_attachment()                  |    0.055 |    0.062 |     0.220 |
-| Dependencies._add_media(10000 files)            |    0.057 |    0.057 |     0.066 |
-| Dependencies._add_meta()                        |    0.117 |    0.129 |     0.145 |
-| Dependencies._drop()                            |    0.075 |    0.078 |     0.121 |
-| Dependencies._remove()                          |    0.061 |    0.069 |     0.064 |
-| Dependencies._update_media()                    |    0.087 |    0.086 |     0.145 |
-| Dependencies._update_media_version(10000 files) |    0.011 |    0.011 |     0.020 |
+| Dependencies.duration(10000 files)              |    0.023 |    0.024 |     0.044 |
+| Dependencies.format(10000 files)                |    0.026 |    0.024 |     0.049 |
+| Dependencies.removed(10000 files)               |    0.024 |    0.023 |     0.045 |
+| Dependencies.sampling_rate(10000 files)         |    0.024 |    0.023 |     0.044 |
+| Dependencies.type(10000 files)                  |    0.024 |    0.023 |     0.045 |
+| Dependencies.version(10000 files)               |    0.026 |    0.023 |     0.049 |
+| Dependencies._add_attachment()                  |    0.060 |    0.063 |     0.231 |
+| Dependencies._add_media(10000 files)            |    0.059 |    0.064 |     0.080 |
+| Dependencies._add_meta()                        |    0.050 |    0.068 |     0.066 |
+| Dependencies._drop()                            |    0.077 |    0.085 |     0.138 |
+| Dependencies._remove()                          |    0.063 |    0.066 |     0.069 |
+| Dependencies._update_media()                    |    0.089 |    0.087 |     0.172 |
+| Dependencies._update_media_version(10000 files) |    0.011 |    0.011 |     0.025 |
 
 
 ## audb.Dependencies loading/writing to file
