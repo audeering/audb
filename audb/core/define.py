@@ -1,5 +1,7 @@
 import os
 
+import pyarrow as pa
+
 
 # Configuration files
 CONFIG_FILE = os.path.join("etc", "audb.yaml")
@@ -17,6 +19,20 @@ CACHED_DEPENDENCIES_FILE = f"{DB}.pkl"
 CACHED_VERSIONS_TIMEOUT = 10  # Timeout to acquire access to cached versions
 LOCK_FILE = ".lock"
 TIMEOUT_MSG = "Lock could not be acquired. Timeout exceeded."
+
+
+DEPEND_FIELDS = {
+    "archive": pa.string(),
+    "bit_depth": pa.int32(),
+    "channels": pa.int32(),
+    "checksum": pa.string(),
+    "duration": pa.float64(),
+    "format": pa.string(),
+    "removed": pa.int32(),
+    "sampling_rate": pa.int32(),
+    "type": pa.int32(),
+    "version": pa.string(),
+}
 
 
 class DependType:

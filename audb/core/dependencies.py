@@ -70,33 +70,14 @@ class Dependencies:
         # Index cache
         self._index = None
 
-        # Column caches
-        self._archive = None
-        self._bit_depth = None
-        self._channeks = None
-        self._checksum = None
-        self._duration = None
-        self._format = None
-        self._removed = None
-        self._sampling_rate = None
-        self._type = None
-        self._version = None
-
-        self._schema = pa.schema(
-            [
-                ("file", pa.string()),
-                ("archive", pa.string()),
-                ("bit_depth", pa.int32()),
-                ("channels", pa.int32()),
-                ("checksum", pa.string()),
-                ("duration", pa.float64()),
-                ("format", pa.string()),
-                ("removed", pa.int32()),
-                ("sampling_rate", pa.int32()),
-                ("type", pa.int32()),
-                ("version", pa.string()),
-            ]
-        )
+        # Column cache and pyarrow dtype schema
+        self._column_cache = {}
+        schema = []
+        for name, dtype in define.DEPEND_FIELDS.items():
+            self._column_cache[name] = None
+            schema.append((name, dtype))
+        schema.append(("file", pa.string()))
+        self._schema = pa.schema(schema)
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -150,8 +131,7 @@ class Dependencies:
 
         """
         idx = self._index[file]
-        row = self._table.take([idx]).to_pylist()[0]
-        return [value for column, value in row.items() if column != "file"]
+        return [self._column(name)[idx] for name in define.DEPEND_FIELDS]
 
     def __len__(self) -> int:
         r"""Number of all media, table, attachment files."""
@@ -190,7 +170,8 @@ class Dependencies:
             list of attachments
 
         """
-        return self._table_column("file", "type", define.DependType.ATTACHMENT)
+        mask = self._column("type") == define.DependType.ATTACHMENT
+        return self._column("file")[mask].tolist()
 
     @property
     def attachment_ids(self) -> typing.List[str]:
@@ -200,7 +181,8 @@ class Dependencies:
             list of attachment IDs
 
         """
-        return self._table_column("archive", "type", define.DependType.ATTACHMENT)
+        mask = self._column("type") == define.DependType.ATTACHMENT
+        return self._column("archive")[mask].tolist()
 
     @property
     def files(self) -> typing.List[str]:
@@ -210,7 +192,7 @@ class Dependencies:
             list of files
 
         """
-        return self._table_column("file")
+        return self._column("file").tolist()
 
     @property
     def media(self) -> typing.List[str]:
@@ -220,7 +202,8 @@ class Dependencies:
             list of media
 
         """
-        return self._table_column("file", "type", define.DependType.MEDIA)
+        mask = self._column("type") == define.DependType.MEDIA
+        return self._column("file")[mask].tolist()
 
     @property
     def removed_media(self) -> typing.List[str]:
@@ -230,17 +213,22 @@ class Dependencies:
             list of media
 
         """
-        if self._table is None:
-            return []
-        else:
-            # First look for removed files
-            # as usually we don't have those
-            mask = dataset.field("removed") == 1
-            table = self._table.filter(mask)
-            if len(table) == 0:
-                return []
-            mask = dataset.field("type") == define.DependType.MEDIA
-            return self._to_list(table.filter(mask).column("file"))
+        mask = (
+            self._column("type") == define.DependType.MEDIA
+            and self._column("removed") == 1
+        )
+        return self._column("file")[mask].tolist()
+        # if self._table is None:
+        #     return []
+        # else:
+        #     # First look for removed files
+        #     # as usually we don't have those
+        #     mask = dataset.field("removed") == 1
+        #     table = self._table.filter(mask)
+        #     if len(table) == 0:
+        #         return []
+        #     mask = dataset.field("type") == define.DependType.MEDIA
+        #     return self._to_list(table.filter(mask).column("file"))
 
     @property
     def table_ids(self) -> typing.List[str]:
@@ -264,7 +252,8 @@ class Dependencies:
             list of tables
 
         """
-        return self._table_column("file", "type", define.DependType.META)
+        mask = self._column("type") == define.DependType.META
+        return self._column("file")[mask].tolist()
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
@@ -279,75 +268,80 @@ class Dependencies:
         row = self._table_row(file, raise_error=True)
         return row["archive"]
 
-    def bit_depth(self, file: str) -> int:
+    def bit_depth(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[int, typing.List[int]]:
         r"""Bit depth of media file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
             bit depth
 
         """
-        if self._bit_depth is None:
-            self._bit_depth = self._cache_column("bit_depth")
-        if isinstance(file, str):
-            idx = self._index[file]
-        else:
-            idx = [self._index[f] for f in file]
-        return self._bit_depth[idx].tolist()
+        return self._column_loc("bit_depth", files)
 
-    def channels(self, file: str) -> int:
+    def channels(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) ->  typing.Union[int, typing.List[int]]:
         r"""Number of channels of media file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
             number of channels
 
         """
-        row = self._table_row(file, raise_error=True)
-        return int(row["channels"])
+        return self._column_loc("channels", files)
 
-    def checksum(self, file: str) -> str:
+    def checksum(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[str, typing.List[str]]:
         r"""Checksum of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            checksum of file
+            checksum of file(s)
 
         """
-        row = self._table_row(file, raise_error=True)
-        return row["checksum"]
+        return self._column_loc("checksum", files)
 
-    def duration(self, file: str) -> float:
+    def duration(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[float, typing.List[float]]:
         r"""Duration of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
             duration in seconds
 
         """
-        row = self._table_row(file, raise_error=True)
-        return float(row["duration"])
+        return self._column_loc("duration", files)
 
-    def format(self, file: str) -> str:
+    def format(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[str, typing.List[str]]:
         r"""Format of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            file format (always lower case)
+            file(s) format (always lower case)
 
         """
-        row = self._table_row(file, raise_error=True)
-        return row["format"]
+        return self._column_loc("format", files)
 
     def load(self, path: str):
         r"""Read dependencies from file.
@@ -399,31 +393,35 @@ class Dependencies:
             )
         self._table_replace(table)
 
-    def removed(self, file: str) -> bool:
+    def removed(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[bool, typing.List[bool]]:
         r"""Check if file is marked as removed.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
             ``True`` if file was removed
 
         """
-        row = self._table_row(file, raise_error=True)
-        return bool(row["removed"])
+        return self._column_loc("removed", files)
 
-    def sampling_rate(self, file: str) -> int:
+    def sampling_rate(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[int, typing.List[int]]:
         r"""Sampling rate of media file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
             sampling rate in Hz
 
         """
-        row = self._table_row(file, raise_error=True)
-        return int(row["sampling_rate"])
+        return self._column_loc("sampling_rate", files)
 
     def save(self, path: str):
         r"""Write dependencies to file.
@@ -454,31 +452,35 @@ class Dependencies:
         elif path.endswith("parquet"):
             parquet.write_table(self._table, path)
 
-    def type(self, file: str) -> int:
+    def type(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[int, typing.List[int]]:
         r"""Type of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
             type
 
         """
-        row = self._table_row(file, raise_error=True)
-        return int(row["type"])
+        return self._column_loc("type", files)
 
-    def version(self, file: str) -> str:
+    def version(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[str, typing.List[str]]:
         r"""Version of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
             version string
 
         """
-        row = self._table_row(file, raise_error=True)
-        return row["version"]
+        return self._column_loc("version", files)
 
     def _add_attachment(
         self,
@@ -582,8 +584,11 @@ class Dependencies:
         }
         self._table_add_rows([row])
 
-    def _cache_column(self, column: str) -> np.ndarray:
-        r"""Store content in cache.
+    def _column(
+        self,
+        column: str,
+    ) -> np.ndarray:
+        r"""Store column content in cache and return values.
 
         Args:
             column: name of table column to store
@@ -592,7 +597,37 @@ class Dependencies:
             column values
 
         """
-        return self._table.column(column).to_numpy()
+        if self._table is None:
+            return np.array()
+
+        if self._column_cache[column] is None:
+            self._column_cache[column] = self._table.column(column).to_numpy()
+        return self._column_cache[column]
+
+    def _column_loc(
+        self,
+        column: str,
+        files: typing.Union[str, typing.Sequence[str]] = None,
+    ) -> typing.List:
+        r"""Get column content for selected files.
+
+        Args:
+            column: name of table column to store
+            files: file(s) to return column values for
+
+        Returns:
+            selected column values
+
+        """
+        column = self._column(column)
+        if files is None:
+            return column.tolist()
+        else:
+            idx = self._file_to_idx(files)
+            if len(idx) == 1:
+                return column[idx[0]]
+            else:
+                return column[idx].tolist()
 
     def _drop(self, files: typing.Sequence[str]):
         r"""Drop files from table.
@@ -603,11 +638,30 @@ class Dependencies:
         """
         # Check first if `file` is in table
         # and raise `KeyError` if not
-        self._table_row(file, raise_error=True)
+        self._file_to_idx(files)
         # If `file` is in table remove it
-        mask = dataset.field("file") != file
-        table = self._table.filter(mask)
+        mask = dataset.field("file").isin(files)
+        table = self._table.filter(~mask)
         self._table_replace(table)
+
+    def _file_to_idx(
+        self,
+        files: typing.Union[str, typing.Sequence],
+    ) -> typing.Union[int, typing.List[int]]:
+        r"""Convert file names to integer index values.
+
+        Args:
+            files: file name(s)
+
+        Returns:
+            row indices corresponding to file name(s)
+
+        """
+        if isinstance(files, str):
+            idx = [self._index[files]]
+        else:
+            idx = [self._index[file] for file in files]
+        return idx
 
     def _remove(self, file: str):
         r"""Mark file as removed.
@@ -625,8 +679,7 @@ class Dependencies:
         row = self._table_row(file, raise_error=True)
         row["removed"] = 1
         # Remove old row
-        mask = dataset.field("file") != file
-        self._table = self._table.filter(mask)
+        self._drop([file])
         # Add new row
         table = pa.Table.from_pylist([row], schema=self._schema)
         self._table_append(table)
@@ -649,9 +702,7 @@ class Dependencies:
         # Remove rows with matching `"file"`
         if self._table is not None and replace:
             files = [row["file"] for row in rows]
-            mask = dataset.field("file").isin(files)
-            table = self._table.filter(~mask)
-            self._table_replace(table)
+            self._drop(files)
         # Append new rows
         table = pa.Table.from_pylist(rows, schema=self._schema)
         self._table_append(table)
@@ -675,34 +726,6 @@ class Dependencies:
             # (which it does if an empty chunk is in table)
             table = table.combine_chunks()
         self._table_replace(table)
-
-    def _table_column(
-        self,
-        column: str,
-        filter_column: str = None,
-        match: str = None,
-    ):
-        r"""Table column based on matched value in other column.
-
-        Args:
-            column: selected column
-            filter_column: selected column
-                to filter rows
-                based on ``match``
-            match: value to select rows in ``filter_column``
-
-        Returns:
-            selected values from ``column`` as list
-
-        """
-        if self._table is None:
-            column = []
-        elif filter_column is None:
-            column = self._table.column(column)
-        else:
-            mask = dataset.field(filter_column) == match
-            column = self._table.filter(mask).column(column)
-        return self._to_list(column)
 
     def _table_row(self, file: str, raise_error: bool = False) -> typing.Dict:
         r"""Table row corresponding to file.
@@ -788,9 +811,7 @@ class Dependencies:
         """
         # Remove all selected files
         files = [value[0] for value in values]
-        mask = dataset.field("file").isin(files)
-        table = self._table.filter(~mask)
-        self._table_replace(table)
+        self._drop(files)
         # Add updates as new entries
         self._add_media(values)
 
