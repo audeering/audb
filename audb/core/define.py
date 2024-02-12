@@ -22,6 +22,7 @@ TIMEOUT_MSG = "Lock could not be acquired. Timeout exceeded."
 
 
 DEPEND_FIELDS = {
+    "file": pa.string(),
     "archive": pa.string(),
     "bit_depth": pa.int32(),
     "channels": pa.int32(),

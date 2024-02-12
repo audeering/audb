@@ -76,7 +76,6 @@ class Dependencies:
         for name, dtype in define.DEPEND_FIELDS.items():
             self._column_cache[name] = None
             schema.append((name, dtype))
-        schema.append(("file", pa.string()))
         self._schema = pa.schema(schema)
 
     def __call__(self) -> pd.DataFrame:
@@ -213,9 +212,9 @@ class Dependencies:
             list of media
 
         """
-        mask = (
-            self._column("type") == define.DependType.MEDIA
-            and self._column("removed") == 1
+        mask = np.logical_and(
+            self._column("type") == define.DependType.MEDIA,
+            self._column("removed") == 1
         )
         return self._column("file")[mask].tolist()
         # if self._table is None:
@@ -636,6 +635,8 @@ class Dependencies:
             files: relative file paths
 
         """
+        if len(files) == 0:
+            return
         # Check first if `file` is in table
         # and raise `KeyError` if not
         self._file_to_idx(files)
@@ -701,7 +702,10 @@ class Dependencies:
         """
         # Remove rows with matching `"file"`
         if self._table is not None and replace:
-            files = [row["file"] for row in rows]
+            files = [
+                row["file"] for row in rows
+                if row["file"] in self
+            ]
             self._drop(files)
         # Append new rows
         table = pa.Table.from_pylist(rows, schema=self._schema)
@@ -774,7 +778,10 @@ class Dependencies:
         self._table = table
         # Update dataset every time table changes
         self._dataset = dataset.dataset(self._table)
-        self._index = {str(file): n for n, file in enumerate(table.column("file"))}
+        # Clear index and column cache as data may have chaaged
+        for name, dtype in define.DEPEND_FIELDS.items():
+            self._column_cache[name] = None
+        self._index = {file: n for n, file in enumerate(self._column("file"))}
 
     def _to_list(self, table: pa.Table):
         r"""Convert pyarrow table to Python list.
@@ -828,15 +835,35 @@ class Dependencies:
 
         """
 
-        def update_version(row):
-            row["version"] = version
-            return row
+        # def update_version(row):
+        #     row["version"] = version
+        #     return row
 
-        rows = [
-            update_version(self._table_row(file, raise_error=True)) for file in files
-        ]
-        self._table_add_rows(rows)
+        # rows = [
+        #     update_version(self._table_row(file, raise_error=True)) for file in files
+        # ]
+        # rows = 
+        # if len(files) > 0:
+        #     idx = [self._index[file] for file in files]
+        #     rows = [self._column(name)[idx] for name in define.DEPEND_FIELDS]
 
+        # self._table_add_rows(rows)
+
+        if len(files) > 0:
+            mask = dataset.field("file").isin(files)
+            table = self._table.filter(~mask)
+            new_table = self._table.filter(mask)
+            new_table = new_table.drop("version")
+            new_column = [version] * len(new_table)
+            new_table = new_table.append_column("version", [new_column])
+            table = pa.concat_tables([table, new_table])
+            # Ensure we have a single chunk in the table.
+            # This ensures we do not have too many small chunks,
+            # and ensures that writing to CSV will not result
+            # in repeating a row
+            # (which it does if an empty chunk is in table)
+            table = table.combine_chunks()
+            self._table_replace(table)
 
 def error_message_missing_object(
     object_type: str,

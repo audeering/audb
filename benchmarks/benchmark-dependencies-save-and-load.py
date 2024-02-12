@@ -429,6 +429,7 @@ _table = csv.read_csv(
     ),
     convert_options=csv.ConvertOptions(column_types=pyarrow_schema),
 )
+_index = {file: n for n, file in enumerate(_table.column("file"))}
 t = time.time() - t0
 method = "----> pa.Table"
 results.at[method, "csv"] = t
@@ -507,6 +508,7 @@ for dtype in dtypes:
 
 t0 = time.time()
 _table = parquet.read_table(file)
+_index = {file: n for n, file in enumerate(_table.column("file"))}
 t = time.time() - t0
 method = "----> pa.Table"
 results.at[method, "parquet"] = t
