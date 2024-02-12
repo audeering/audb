@@ -210,7 +210,7 @@ class Dependencies:
             bit depth
 
         """
-        return int(self._df.bit_depth[file])
+        return self._column_loc("bit_depth", file, int)
 
     def channels(self, file: str) -> int:
         r"""Number of channels of media file.
@@ -222,7 +222,7 @@ class Dependencies:
             number of channels
 
         """
-        return int(self._df.channels[file])
+        return self._column_loc("channels", file, int)
 
     def checksum(self, file: str) -> str:
         r"""Checksum of file.
@@ -234,7 +234,7 @@ class Dependencies:
             checksum of file
 
         """
-        return self._df.checksum[file]
+        return self._column_loc("checksum", file)
 
     def duration(self, file: str) -> float:
         r"""Duration of file.
@@ -246,7 +246,7 @@ class Dependencies:
             duration in seconds
 
         """
-        return float(self._df.duration[file])
+        return self._column_loc("duration", file, float)
 
     def format(self, file: str) -> str:
         r"""Format of file.
@@ -258,7 +258,7 @@ class Dependencies:
             file format (always lower case)
 
         """
-        return self._df.format[file]
+        return self._column_loc("format", file)
 
     def load(self, path: str):
         r"""Read dependencies from file.
@@ -319,7 +319,7 @@ class Dependencies:
             ``True`` if file was removed
 
         """
-        return bool(self._df.removed[file])
+        return self._column_loc("removed", file, bool)
 
     def sampling_rate(self, file: str) -> int:
         r"""Sampling rate of media file.
@@ -331,7 +331,7 @@ class Dependencies:
             sampling rate in Hz
 
         """
-        return int(self._df.sampling_rate[file])
+        return self._column_loc("sampling_rate", file, int)
 
     def save(self, path: str):
         r"""Write dependencies to file.
@@ -360,7 +360,7 @@ class Dependencies:
             type
 
         """
-        return int(self._df.type[file])
+        return self._column_loc("type", file, int)
 
     def version(self, file: str) -> str:
         r"""Version of file.
@@ -372,7 +372,7 @@ class Dependencies:
             version string
 
         """
-        return self._df.version[file]
+        return self._column_loc("version", file)
 
     def _add_attachment(
         self,
@@ -467,6 +467,18 @@ class Dependencies:
             define.DependType.META,  # type
             version,  # version
         ]
+
+    def _column_loc(
+        self,
+        column: str,
+        files: typing.Union[str, typing.Sequence[str]],
+        dtype: typing.Callable = None,
+    ) -> typing.Union[typing.Any, typing.List[typing.Any]]:
+        r"""Column content for selected files."""
+        value = self._df.at[files, column]
+        if dtype is not None:
+            value = dtype(value)
+        return value
 
     def _drop(self, files: typing.Sequence[str]):
         r"""Drop files from table.
