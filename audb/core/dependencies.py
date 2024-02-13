@@ -4,6 +4,8 @@ import re
 import typing
 
 import pandas as pd
+import pyarrow as pa
+import pyarrow.csv as csv
 
 import audeer
 
@@ -59,6 +61,23 @@ class Dependencies:
         ):
             data[name] = pd.Series(dtype=dtype)
         self._df = pd.DataFrame(data)
+        # pyarrow schema
+        # used for reading and writing files
+        self._schema = pa.schema(
+            [
+                ("file", pa.string()),
+                ("archive", pa.string()),
+                ("bit_depth", pa.int32()),
+                ("channels", pa.int32()),
+                ("checksum", pa.string()),
+                ("duration", pa.float64()),
+                ("format", pa.string()),
+                ("removed", pa.int32()),
+                ("sampling_rate", pa.int32()),
+                ("type", pa.int32()),
+                ("version", pa.string()),
+            ]
+        )
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -309,23 +328,21 @@ class Dependencies:
         if extension == "pkl":
             self._df = pd.read_pickle(path)
         elif extension == "csv":
-            # Data type of dependency columns
-            dtype_mapping = {
-                name: dtype
-                for name, dtype in zip(
-                    define.DEPEND_FIELD_NAMES.values(),
-                    define.DEPEND_FIELD_DTYPES.values(),
-                )
-            }
-            # Data type of index
-            index = 0
-            self._df = pd.read_csv(
+            table = csv.read_csv(
                 path,
-                index_col=index,
-                na_filter=False,
-                dtype=dtype_mapping,
+                read_options=csv.ReadOptions(
+                    column_names=self._schema.names,
+                    skip_rows=1,
+                ),
+                convert_options=csv.ConvertOptions(column_types=self._schema),
             )
+            self._df = table.to_pandas(
+                deduplicate_objects=False,
+                types_mapper=pd.ArrowDtype,  # use pyarrow dtypes
+            )
+            self._df.set_index("file", inplace=True)
             self._df.index.name = None
+
         # Set dtype of index for both CSV and PKL
         # to make backward compatiple
         # with old pickle files in cache
@@ -372,7 +389,19 @@ class Dependencies:
         """
         path = audeer.path(path)
         if path.endswith("csv"):
-            self._df.to_csv(path)
+            table = pa.Table.from_pandas(
+                self._df.reset_index().rename(columns={"index": "file"}),
+                preserve_index=False,
+                schema=self._schema,
+            )
+            columns = table.column_names
+            columns = ["" if c == "file" else c for c in columns]
+            table = table.rename_columns(columns)
+            csv.write_csv(
+                table,
+                path,
+                write_options=csv.WriteOptions(quoting_style="none"),
+            )
         elif path.endswith("pkl"):
             self._df.to_pickle(
                 path,

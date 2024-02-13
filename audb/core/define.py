@@ -48,16 +48,16 @@ DEPEND_FIELD_NAMES = {
 }
 
 DEPEND_FIELD_DTYPES = {
-    DependField.ARCHIVE: "string",
-    DependField.BIT_DEPTH: "int32",
-    DependField.CHANNELS: "int32",
-    DependField.CHECKSUM: "string",
-    DependField.DURATION: "float64",
-    DependField.FORMAT: "string",
-    DependField.REMOVED: "int32",
-    DependField.SAMPLING_RATE: "int32",
-    DependField.TYPE: "int32",
-    DependField.VERSION: "string",
+    DependField.ARCHIVE: "string[pyarrow]",
+    DependField.BIT_DEPTH: "int32[pyarrow]",
+    DependField.CHANNELS: "int32[pyarrow]",
+    DependField.CHECKSUM: "string[pyarrow]",
+    DependField.DURATION: "float64[pyarrow]",
+    DependField.FORMAT: "string[pyarrow]",
+    DependField.REMOVED: "int32[pyarrow]",
+    DependField.SAMPLING_RATE: "int32[pyarrow]",
+    DependField.TYPE: "int32[pyarrow]",
+    DependField.VERSION: "string[pyarrow]",
 }
 
 DEPEND_INDEX_DTYPE = "object"

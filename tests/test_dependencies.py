@@ -219,6 +219,10 @@ def test_load_save(deps):
     deps.save(deps_file)
     deps2 = audb.Dependencies()
     deps2.load(deps_file)
+    print(f"{deps._df=}")
+    print(f"{deps2._df=}")
+    print(f"{deps._df.archive.dtype=}")
+    print(f"{deps2._df.archive.dtype=}")
     pd.testing.assert_frame_equal(deps(), deps2())
     os.remove(deps_file)
     # Expected dtypes
