@@ -3,8 +3,6 @@ import os
 import pandas as pd
 import pytest
 
-import audeer
-
 import audb
 
 
@@ -36,14 +34,6 @@ ROWS = [
         "version": "1.0.0",
     },
 ]
-
-
-def get_entries(column):
-    return [row[column] for row in ROWS]
-
-
-def test_get_entries():
-    assert get_entries("archive") == ["archive1", "archive2"]
 
 
 @pytest.fixture(
@@ -108,11 +98,11 @@ def test_get_item(deps):
 
 
 def test_archives(deps):
-    assert deps.archives == get_entries("archive")
+    assert deps.archives == ["archive1", "archive2"]
 
 
 def test_files(deps):
-    assert deps.files == get_entries("file")
+    assert deps.files == ["db.files.csv", "file.wav"]
 
 
 def test_media(deps):
@@ -131,102 +121,95 @@ def test_tables(deps):
     assert deps.tables == ["db.files.csv"]
 
 
-def test_archive(deps):
-    files = get_entries("file")
-    archives = get_entries("archive")
-    for file, archive in zip(files, archives):
-        assert deps.archive(file) == archive
-        assert isinstance(deps.archive(file), str)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.archive("non.existing")
+@pytest.mark.parametrize(
+    "files",
+    [
+        "",
+        "non-existing",
+        [""],
+        ["non-existing"],
+    ],
+)
+@pytest.mark.parametrize(
+    "method, expected_error",
+    [
+        ("archive", KeyError),
+        ("bit_depth", KeyError),
+        ("channels", KeyError),
+        ("checksum", KeyError),
+        ("duration", KeyError),
+        ("format", KeyError),
+        ("removed", KeyError),
+        ("sampling_rate", KeyError),
+        ("type", KeyError),
+        ("version", KeyError),
+    ],
+)
+def test_error_file_based_methods(deps, files, method, expected_error):
+    """Test errors for all file based methods of audb.Dependencies.
+
+    Test all methods that have ``files`` as argument,
+    and return an entry from a column
+    of the dependency table
+    for the selected files.
+
+    """
+    deps_method = getattr(deps, method)
+    with pytest.raises(expected_error):
+        deps_method(files)
 
 
 @pytest.mark.parametrize(
-    "file, expected",
+    "files",
     [
-        ([], []),
-        ("db.files.csv", 0),
-        ("file.wav", 16),
-        (["db.files.csv"], [0]),
-        (["db.files.csv", "file.wav"], [0, 16]),
-        pytest.param(
-            "",
-            None,
-            marks=pytest.mark.xfail(raises=KeyError),
-        ),
-        pytest.param(
-            "non-existing",
-            None,
-            marks=pytest.mark.xfail(raises=KeyError),
-        ),
-        pytest.param(
-            [""],
-            None,
-            marks=pytest.mark.xfail(raises=KeyError),
-        ),
-        pytest.param(
-            ["non-existing"],
-            None,
-            marks=pytest.mark.xfail(raises=KeyError),
-        ),
+        "db.files.csv",
+        "file.wav",
+        ["db.files.csv"],
+        ["db.files.csv", "file.wav"],
     ],
 )
-def test_bit_depth(deps, file, expected):
-    bit_depth = deps.bit_depth(file)
-    assert bit_depth == expected
-    assert type(bit_depth) == type(expected)
-    for bit_depth in audeer.to_list(bit_depth):
-        assert isinstance(bit_depth, int)
+@pytest.mark.parametrize(
+    "method, expected_dtype",
+    [
+        ("archive", str),
+        ("bit_depth", int),
+        ("channels", int),
+        ("checksum", str),
+        ("duration", float),
+        ("format", str),
+        ("removed", bool),
+        ("sampling_rate", int),
+        ("type", int),
+        ("version", str),
+    ],
+)
+def test_file_bases_methods(deps, files, method, expected_dtype):
+    """Test all file based methods of audb.Dependencies.
 
+    Test all methods that have ``files`` as argument,
+    and return an entry from a column
+    of the dependency table
+    for the selected files.
 
-def test_channels(deps):
-    files = get_entries("file")
-    channels = get_entries("channels")
-    for file, channel in zip(files, channels):
-        assert deps.channels(file) == channel
-        assert isinstance(deps.channels(file), int)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.channels("non.existing")
-
-
-def test_checksum(deps):
-    files = get_entries("file")
-    checksums = get_entries("checksum")
-    for file, checksum in zip(files, checksums):
-        assert deps.checksum(file) == checksum
-        assert isinstance(deps.checksum(file), str)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.checksum("non.existing")
-
-
-def test_duration(deps):
-    files = get_entries("file")
-    durations = get_entries("duration")
-    for file, duration in zip(files, durations):
-        assert deps.duration(file) == duration
-        assert isinstance(deps.duration(file), float)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.duration("non.existing")
-
-
-def test_format(deps):
-    files = get_entries("file")
-    formats = get_entries("format")
-    for file, format in zip(files, formats):
-        assert deps.format(file) == format
-        assert isinstance(deps.format(file), str)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.format("non.existing")
-
-
-def test_removed(deps):
-    files = get_entries("file")
-    removeds = get_entries("removed")
-    for file, removed in zip(files, removeds):
-        assert deps.removed(file) == removed
-        assert isinstance(deps.removed(file), bool)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.removed("non.existing")
+    """
+    deps_method = getattr(deps, method)
+    result = deps_method(files)
+    if not isinstance(files, list):
+        for row in ROWS:
+            if row["file"] == files:
+                assert result == row[method]
+                assert isinstance(result, expected_dtype)
+                break
+    else:
+        expected = []
+        for file in files:
+            for row in ROWS:
+                if row["file"] == file:
+                    expected.append(row[method])
+                    break
+        assert result == expected
+        for result in result:
+            assert isinstance(result, expected_dtype)
 
 
 def test_load_save(deps):
@@ -243,36 +226,6 @@ def test_load_save(deps):
         deps2.load("deps.txt")
     with pytest.raises(FileNotFoundError):
         deps.load(deps_file)
-
-
-def test_sampling_rate(deps):
-    files = get_entries("file")
-    sampling_rates = get_entries("sampling_rate")
-    for file, sampling_rate in zip(files, sampling_rates):
-        assert deps.sampling_rate(file) == sampling_rate
-        assert isinstance(deps.sampling_rate(file), int)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.sampling_rate("non.existing")
-
-
-def test_type(deps):
-    files = get_entries("file")
-    types = get_entries("type")
-    for file, type in zip(files, types):
-        assert deps.type(file) == type
-        assert isinstance(deps.type(file), int)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.type("non.existing")
-
-
-def test_version(deps):
-    files = get_entries("file")
-    versions = get_entries("version")
-    for file, version in zip(files, versions):
-        assert deps.version(file) == version
-        assert isinstance(deps.version(file), str)
-    with pytest.raises(KeyError, match="non.existing"):
-        deps.version("non.existing")
 
 
 def test_len(deps):
