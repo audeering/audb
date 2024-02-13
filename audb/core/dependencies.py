@@ -188,77 +188,95 @@ class Dependencies:
         """
         return self._df[self._df["type"] == define.DependType.META].index.tolist()
 
-    def archive(self, file: str) -> str:
-        r"""Name of archive the file belongs to.
+    def archive(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[str, typing.List[str]]:
+        r"""Name of archive a file belong to.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            archive name
+            archive name(s)
 
         """
-        return self._df.archive[file]
+        return self._column_loc("archive", files)
 
-    def bit_depth(self, file: str) -> int:
+    def bit_depth(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[int, typing.List[int]]:
         r"""Bit depth of media file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            bit depth
+            bit depth(s)
 
         """
-        return self._column_loc("bit_depth", file, int)
+        return self._column_loc("bit_depth", files, int)
 
-    def channels(self, file: str) -> int:
+    def channels(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[int, typing.List[int]]:
         r"""Number of channels of media file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            number of channels
+            number(s) of channels
 
         """
-        return self._column_loc("channels", file, int)
+        return self._column_loc("channels", files, int)
 
-    def checksum(self, file: str) -> str:
+    def checksum(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[str, typing.List[str]]:
         r"""Checksum of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            checksum of file
+            checksum of file(s)
 
         """
-        return self._column_loc("checksum", file)
+        return self._column_loc("checksum", files)
 
-    def duration(self, file: str) -> float:
+    def duration(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[float, typing.List[float]]:
         r"""Duration of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            duration in seconds
+            duration(s) in seconds
 
         """
-        return self._column_loc("duration", file, float)
+        return self._column_loc("duration", files, float)
 
-    def format(self, file: str) -> str:
+    def format(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[str, typing.List[str]]:
         r"""Format of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            file format (always lower case)
+            file format(s) (always lower case)
 
         """
-        return self._column_loc("format", file)
+        return self._column_loc("format", files)
 
     def load(self, path: str):
         r"""Read dependencies from file.
@@ -309,29 +327,35 @@ class Dependencies:
             )
             self._df.index = self._df.index.astype("string")
 
-    def removed(self, file: str) -> bool:
+    def removed(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[bool, typing.List[bool]]:
         r"""Check if file is marked as removed.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
             ``True`` if file was removed
 
         """
-        return self._column_loc("removed", file, bool)
+        return self._column_loc("removed", files, bool)
 
-    def sampling_rate(self, file: str) -> int:
+    def sampling_rate(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[int, typing.List[int]]:
         r"""Sampling rate of media file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            sampling rate in Hz
+            sampling rate(s) in Hz
 
         """
-        return self._column_loc("sampling_rate", file, int)
+        return self._column_loc("sampling_rate", files, int)
 
     def save(self, path: str):
         r"""Write dependencies to file.
@@ -350,29 +374,35 @@ class Dependencies:
                 protocol=4,  # supported by Python >= 3.4
             )
 
-    def type(self, file: str) -> int:
+    def type(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[int, typing.List[int]]:
         r"""Type of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            type
+            type(s)
 
         """
-        return self._column_loc("type", file, int)
+        return self._column_loc("type", files, int)
 
-    def version(self, file: str) -> str:
+    def version(
+        self,
+        files: typing.Union[str, typing.Sequence[str]],
+    ) -> typing.Union[str, typing.List[str]]:
         r"""Version of file.
 
         Args:
-            file: relative file path
+            files: relative file path(s)
 
         Returns:
-            version string
+            version string(s)
 
         """
-        return self._column_loc("version", file)
+        return self._column_loc("version", files)
 
     def _add_attachment(
         self,
@@ -475,10 +505,21 @@ class Dependencies:
         dtype: typing.Callable = None,
     ) -> typing.Union[typing.Any, typing.List[typing.Any]]:
         r"""Column content for selected files."""
-        value = self._df.at[files, column]
-        if dtype is not None:
-            value = dtype(value)
-        return value
+        # Single file
+        if isinstance(files, str):
+            value = self._df.at[files, column]
+            if dtype is not None:
+                value = dtype(value)
+            return value
+
+        # Multiple files
+        else:
+            values = self._df.loc[files, column]
+            if dtype is not None:
+                values = [dtype(value) for value in values]
+            else:
+                values = values.tolist()
+            return values
 
     def _drop(self, files: typing.Sequence[str]):
         r"""Drop files from table.
