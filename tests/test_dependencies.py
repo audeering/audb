@@ -44,7 +44,7 @@ def deps():
     df = pd.DataFrame.from_records(ROWS)
     df.set_index("file", inplace=True)
     # Ensure correct dtype
-    df.index = df.index.astype("string")
+    df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
     for name, dtype in zip(
         audb.core.define.DEPEND_FIELD_NAMES.values(),
         audb.core.define.DEPEND_FIELD_DTYPES.values(),
@@ -74,7 +74,7 @@ def test_init(deps):
 
 def test_call(deps):
     expected_df = pd.DataFrame.from_records(ROWS).set_index("file")
-    expected_df.index = expected_df.index.astype("string")
+    expected_df.index = expected_df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
     for name, dtype in zip(
         audb.core.define.DEPEND_FIELD_NAMES.values(),
         audb.core.define.DEPEND_FIELD_DTYPES.values(),
