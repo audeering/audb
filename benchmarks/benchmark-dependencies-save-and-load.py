@@ -396,7 +396,14 @@ for dtype in dtypes:
         elif dtype == "string":
             types_mapper = {pa.string(): pd.StringDtype()}.get
         elif dtype == "pyarrow":
-            types_mapper = pd.ArrowDtype
+            # Ensure we use pd.StringDtype("pyarrow")
+            # and not pd.ArrowDtype(pa.string())
+            # see https://pandas.pydata.org/docs/user_guide/pyarrow.html
+            types_mapper = {
+                pa.string(): pd.StringDtype("pyarrow"),
+                pa.int32(): pd.ArrowDtype(pa.int32()),
+                pa.float64(): pd.ArrowDtype(pa.float64()),
+            }.get
         _df = _table.to_pandas(
             # Speed up conversion,
             # increase memory usage by ~20 MB
@@ -408,8 +415,13 @@ for dtype in dtypes:
         t = time.time() - t0
     results.at[method, "csv"] = t
     if dtype == "pyarrow":
-        dtype = "string[pyarrow]"
-    assert _df.archive.dtype == dtype
+        assert _df.archive.dtype == "string[pyarrow]"
+        assert _df.type.dtype == "int32[pyarrow]"
+        assert _df.duration.dtype == "float64[pyarrow]"
+    else:
+        assert _df.archive.dtype == dtype
+        assert _df.type.dtype == "int32"
+        assert _df.duration.dtype == "float"
     print(".", end="", flush=True)
 
 # Convert pyarrow dtypes to object
@@ -535,6 +547,7 @@ with memray.Tracker(audeer.path(result_dir, memray_file)):
     t0 = time.time()
     _table = parquet.read_table(file)
     t = time.time() - t0
+    results.at[method, "parquet"] = t
 print(".")
 print()
 
