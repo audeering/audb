@@ -50,45 +50,45 @@ using `pyarrow` dtypes).
 | method                                          |   string |   object |   pyarrow |
 |-------------------------------------------------|----------|----------|-----------|
 | Dependencies.\_\_call__()                       |    0.000 |    0.000 |     0.000 |
-| Dependencies.\_\_contains__(10000 files)        |    0.005 |    0.004 |     0.004 |
-| Dependencies.\_\_get_item__(10000 files)        |    0.316 |    0.219 |     0.903 |
+| Dependencies.\_\_contains__(10000 files)        |    0.004 |    0.005 |     0.004 |
+| Dependencies.\_\_get_item__(10000 files)        |    0.319 |    0.225 |     0.871 |
 | Dependencies.\_\_len__()                        |    0.000 |    0.000 |     0.000 |
 | Dependencies.\_\_str__()                        |    0.005 |    0.005 |     0.006 |
-| Dependencies.archives                           |    0.143 |    0.118 |     0.144 |
-| Dependencies.attachments                        |    0.029 |    0.018 |     0.018 |
-| Dependencies.attachment_ids                     |    0.028 |    0.017 |     0.017 |
-| Dependencies.files                              |    0.030 |    0.011 |     0.043 |
-| Dependencies.media                              |    0.132 |    0.071 |     0.086 |
-| Dependencies.removed_media                      |    0.123 |    0.068 |     0.081 |
-| Dependencies.table_ids                          |    0.035 |    0.025 |     0.023 |
-| Dependencies.tables                             |    0.028 |    0.017 |     0.017 |
-| Dependencies.archive(10000 files)               |    0.028 |    0.025 |     0.047 |
-| Dependencies.archive([10000 files])             |    0.134 |    0.008 |     0.224 |
-| Dependencies.bit_depth(10000 files)             |    0.026 |    0.024 |     0.045 |
-| Dependencies.bit_depth([10000 files])           |    0.140 |    0.002 |     0.224 |
-| Dependencies.channels(10000 files)              |    0.025 |    0.024 |     0.044 |
-| Dependencies.channels([10000 files])            |    0.140 |    0.002 |     0.224 |
-| Dependencies.checksum(10000 files)              |    0.027 |    0.025 |     0.047 |
-| Dependencies.checksum([10000 files])            |    0.142 |    0.002 |     0.220 |
-| Dependencies.duration(10000 files)              |    0.025 |    0.025 |     0.044 |
-| Dependencies.duration([10000 files])            |    0.139 |    0.002 |     0.223 |
-| Dependencies.format(10000 files)                |    0.027 |    0.023 |     0.047 |
-| Dependencies.format([10000 files])              |    0.142 |    0.002 |     0.221 |
-| Dependencies.removed(10000 files)               |    0.025 |    0.024 |     0.044 |
-| Dependencies.removed([10000 files])             |    0.140 |    0.002 |     0.224 |
-| Dependencies.sampling_rate(10000 files)         |    0.026 |    0.024 |     0.045 |
-| Dependencies.sampling_rate([10000 files])       |    0.140 |    0.002 |     0.223 |
-| Dependencies.type(10000 files)                  |    0.026 |    0.024 |     0.045 |
-| Dependencies.type([10000 files])                |    0.141 |    0.002 |     0.225 |
-| Dependencies.version(10000 files)               |    0.027 |    0.023 |     0.047 |
-| Dependencies.version([10000 files])             |    0.142 |    0.002 |     0.226 |
-| Dependencies._add_attachment()                  |    0.059 |    0.062 |     0.210 |
-| Dependencies._add_media(10000 files)            |    0.058 |    0.057 |     0.066 |
-| Dependencies._add_meta()                        |    0.115 |    0.133 |     0.145 |
-| Dependencies._drop()                            |    0.075 |    0.076 |     0.118 |
-| Dependencies._remove()                          |    0.062 |    0.069 |     0.065 |
-| Dependencies._update_media()                    |    0.087 |    0.090 |     0.144 |
-| Dependencies._update_media_version(10000 files) |    0.011 |    0.011 |     0.021 |
+| Dependencies.archives                           |    0.142 |    0.112 |     0.140 |
+| Dependencies.attachments                        |    0.024 |    0.018 |     0.017 |
+| Dependencies.attachment_ids                     |    0.027 |    0.018 |     0.019 |
+| Dependencies.files                              |    0.011 |    0.011 |     0.010 |
+| Dependencies.media                              |    0.105 |    0.070 |     0.064 |
+| Dependencies.removed_media                      |    0.102 |    0.062 |     0.063 |
+| Dependencies.table_ids                          |    0.032 |    0.026 |     0.023 |
+| Dependencies.tables                             |    0.024 |    0.017 |     0.017 |
+| Dependencies.archive(10000 files)               |    0.028 |    0.026 |     0.050 |
+| Dependencies.archive([10000 files])             |    0.008 |    0.008 |     0.008 |
+| Dependencies.bit_depth(10000 files)             |    0.024 |    0.024 |     0.044 |
+| Dependencies.bit_depth([10000 files])           |    0.002 |    0.002 |     0.004 |
+| Dependencies.channels(10000 files)              |    0.024 |    0.024 |     0.045 |
+| Dependencies.channels([10000 files])            |    0.002 |    0.002 |     0.005 |
+| Dependencies.checksum(10000 files)              |    0.025 |    0.024 |     0.048 |
+| Dependencies.checksum([10000 files])            |    0.002 |    0.002 |     0.002 |
+| Dependencies.duration(10000 files)              |    0.024 |    0.025 |     0.044 |
+| Dependencies.duration([10000 files])            |    0.003 |    0.003 |     0.004 |
+| Dependencies.format(10000 files)                |    0.026 |    0.023 |     0.049 |
+| Dependencies.format([10000 files])              |    0.002 |    0.002 |     0.002 |
+| Dependencies.removed(10000 files)               |    0.024 |    0.024 |     0.044 |
+| Dependencies.removed([10000 files])             |    0.002 |    0.002 |     0.004 |
+| Dependencies.sampling_rate(10000 files)         |    0.024 |    0.024 |     0.046 |
+| Dependencies.sampling_rate([10000 files])       |    0.002 |    0.002 |     0.004 |
+| Dependencies.type(10000 files)                  |    0.024 |    0.024 |     0.044 |
+| Dependencies.type([10000 files])                |    0.002 |    0.002 |     0.004 |
+| Dependencies.version(10000 files)               |    0.026 |    0.024 |     0.049 |
+| Dependencies.version([10000 files])             |    0.002 |    0.002 |     0.002 |
+| Dependencies._add_attachment()                  |    0.055 |    0.055 |     0.178 |
+| Dependencies._add_media(10000 files)            |    0.055 |    0.055 |     0.066 |
+| Dependencies._add_meta()                        |    0.120 |    0.124 |     0.122 |
+| Dependencies._drop()                            |    0.076 |    0.076 |     0.118 |
+| Dependencies._remove()                          |    0.068 |    0.069 |     0.065 |
+| Dependencies._update_media()                    |    0.081 |    0.079 |     0.138 |
+| Dependencies._update_media_version(10000 files) |    0.012 |    0.011 |     0.021 |
 
 
 ## audb.Dependencies loading/writing to file
@@ -116,15 +116,15 @@ containing 1,000,000 files.
 
 | method                                                    |   csv |   pickle |   parquet |
 |-----------------------------------------------------------|-------|----------|-----------|
-| pd.DataFrame[object]                                      | 2.022 |    0.641 |     0.469 |
-| pd.DataFrame[string]                                      | 2.032 |    0.660 |     0.597 |
-| pd.DataFrame[pyarrow]                                     | 2.031 |    0.222 |     0.928 |
-| pd.DataFrame[object] -> pd.DataFrame[pyarrow]             | 2.248 |    0.446 |           |
-| pd.DataFrame[object] -> pa.Table                          | 0.515 |          |           |
-| pd.DataFrame[string] -> pa.Table                          | 0.652 |          |           |
-| pd.DataFrame[pyarrow] -> pa.Table                         | 0.234 |          |           |
-| pd.DataFrame[object] -> pd.DataFrame[pyarrow] -> pa.Table | 0.481 |          |           |
-| pa.Table                                                  | 0.252 |          |     0.236 |
+| pd.DataFrame[object]                                      | 2.002 |    0.638 |     0.485 |
+| pd.DataFrame[string]                                      | 2.026 |    0.649 |     0.505 |
+| pd.DataFrame[pyarrow]                                     | 2.023 |    0.294 |     0.273 |
+| pd.DataFrame[object] -> pd.DataFrame[pyarrow]             | 2.187 |    0.498 |           |
+| pd.DataFrame[object] -> pa.Table                          | 0.509 |          |           |
+| pd.DataFrame[string] -> pa.Table                          | 0.576 |          |           |
+| pd.DataFrame[pyarrow] -> pa.Table                         | 0.277 |          |           |
+| pd.DataFrame[object] -> pd.DataFrame[pyarrow] -> pa.Table | 0.459 |          |           |
+| pa.Table                                                  | 0.249 |          |     0.239 |
 
 **Reading**
 
@@ -137,23 +137,23 @@ with `pandas.read_csv()`.
 
 | method                                                              |   csv |   pickle |   parquet |
 |---------------------------------------------------------------------|-------|----------|-----------|
-| \-\-\-\-> pd.DataFrame[object]                                      | 1.115 |    0.232 |     0.351 |
-| \-\-\-\-> pd.DataFrame[string]                                      | 1.126 |    0.212 |     0.325 |
-| \-\-\-\-> pd.DataFrame[pyarrow]                                     | 2.611 |    0.027 |     0.288 |
-| \-\-\-\-> pd.DataFrame[pyarrow] -> pd.DataFrame[object]             | 2.759 |    0.262 |           |
-| -c\--> pd.DataFrame[object]                                         | 1.144 |          |           |
-| -c\--> pd.DataFrame[string]                                         | 1.097 |          |           |
-| -c\--> pd.DataFrame[pyarrow]                                        | 2.578 |          |           |
-| -c\--> pd.DataFrame[pyarrow] -> pd.DataFrame[object]                | 2.763 |          |           |
-| -pa-> pd.DataFrame[object]                                          | 0.448 |          |           |
-| -pa-> pd.DataFrame[string]                                          | 0.398 |          |           |
-| -pa-> pd.DataFrame[pyarrow]                                         | 0.557 |          |           |
-| -pa-> pd.DataFrame[pyarrow] -> pd.DataFrame[object]                 | 0.723 |          |           |
-| \-\-\-\-> pa.Table -> pd.DataFrame[object]                          | 0.315 |          |     0.215 |
-| \-\-\-\-> pa.Table -> pd.DataFrame[string]                          | 0.316 |          |     0.314 |
-| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow]                         | 0.109 |          |     0.069 |
-| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow] -> pd.DataFrame[object] | 0.335 |          |           |
-| \-\-\-\-> pa.Table                                                  | 0.049 |          |     0.051 |
+| \-\-\-\-> pd.DataFrame[object]                                      | 1.110 |    0.240 |     0.376 |
+| \-\-\-\-> pd.DataFrame[string]                                      | 1.158 |    0.255 |     0.399 |
+| \-\-\-\-> pd.DataFrame[pyarrow]                                     | 2.493 |    0.092 |     0.408 |
+| \-\-\-\-> pd.DataFrame[pyarrow] -> pd.DataFrame[object]             | 2.673 |    0.289 |           |
+| -c\--> pd.DataFrame[object]                                         | 1.154 |          |           |
+| -c\--> pd.DataFrame[string]                                         | 1.101 |          |           |
+| -c\--> pd.DataFrame[pyarrow]                                        | 2.472 |          |           |
+| -c\--> pd.DataFrame[pyarrow] -> pd.DataFrame[object]                | 2.655 |          |           |
+| -pa-> pd.DataFrame[object]                                          | 0.460 |          |           |
+| -pa-> pd.DataFrame[string]                                          | 0.436 |          |           |
+| -pa-> pd.DataFrame[pyarrow]                                         | 0.575 |          |           |
+| -pa-> pd.DataFrame[pyarrow] -> pd.DataFrame[object]                 | 0.791 |          |           |
+| \-\-\-\-> pa.Table -> pd.DataFrame[object]                          | 0.271 |          |     0.225 |
+| \-\-\-\-> pa.Table -> pd.DataFrame[string]                          | 0.308 |          |     0.318 |
+| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow]                         | 0.113 |          |     0.085 |
+| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow] -> pd.DataFrame[object] | 0.384 |          |           |
+| \-\-\-\-> pa.Table                                                  | 0.050 |          |     0.065 |
 
 
 ### File sizes
@@ -170,15 +170,14 @@ When zipped all files can be further reduced by 50%.
 ### Memory consumption
 
 Besides the execution time,
-memory consumption might also be considered.
+memory consumption is also measured
+when running the benchmark script.
 We use [memray](https://github.com/bloomberg/memray) v1.11.0,
 to measure it.
-As the evaluation of the results cannot be easily automated,
-the investigation was done manually
-by creating single Python scripts
-containing code for the desired operations,
-running `memray`
-and inspecting the results.
+It stores its evaluation results in binary files
+in the folder ``results``.
+Those files are then manually evaluated
+using ``memray tree <file>``.
 
 **Writing**
 
@@ -192,17 +191,22 @@ Hence, we don't have to compare results.
 
 Peak memory consumption when reading a dependency table containing 1,000,000 files.
 
-| method                                      |     csv | pickle | parquet |
-| ------------------------------------------- | ------- | ------ | ------- |
-| \-\-\-\-> pd.DataFrame[object]              |  391 MB | 275 MB |  754 MB |
-| \-\-\-\-> pd.DataFrame[string]              |  356 MB | 275 MB |  874 MB |
-| \-\-\-\-> pd.DataFrame[pyarrow]             |  696 MB | 161 MB |  903 MB |
-| \-c--> pd.DataFrame[object]                 |  390 MB |        |         |
-| \-c--> pd.DataFrame[string]                 |  356 MB |        |         |
-| \-c--> pd.DataFrame[pyarrow]                |  696 MB |        |         |
-| \-pa-> pd.DataFrame[object]                 | 1295 MB |        |         |
-| \-pa-> pd.DataFrame[string]                 | 1333 MB |        |         |
-| \-pa-> pd.DataFrame[pyarrow]                | 1420 MB |        |         |
-| \-\-\-\-> pa.Table                          |  530 MB |        |  381 MB |
-| \-\-\-\-> pa.Table -> pd.DataFrame[object]  |  994 MB |        |  897 MB |
-| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow] |  541 MB |        |  437 MB |
+| method                                                              |     csv |   pickle |   parquet |
+|---------------------------------------------------------------------|---------|----------|-----------|
+| \-\-\-\-> pd.DataFrame[object]                                      |  357 MB |   291 MB |    354 MB |
+| \-\-\-\-> pd.DataFrame[string]                                      |  323 MB |   334 MB |    465 MB |
+| \-\-\-\-> pd.DataFrame[pyarrow]                                     |  495 MB |   240 MB |    400 MB |
+| \-\-\-\-> pd.DataFrame[pyarrow] -> pd.DataFrame[object]             |  502 MB |   340 MB |           |
+| -c\--> pd.DataFrame[object]                                         |  359 MB |          |           |
+| -c\--> pd.DataFrame[string]                                         |  277 MB |          |           |
+| -c\--> pd.DataFrame[pyarrow]                                        |  501 MB |          |           |
+| -c\--> pd.DataFrame[pyarrow] -> pd.DataFrame[object]                |  459 MB |          |           |
+| -pa-> pd.DataFrame[object]                                          | 1029 MB |          |           |
+| -pa-> pd.DataFrame[string]                                          |  353 MB |          |           |
+| -pa-> pd.DataFrame[pyarrow]                                         |  396 MB |          |           |
+| -pa-> pd.DataFrame[pyarrow] -> pd.DataFrame[object]                 |  528 MB |          |           |
+| \-\-\-\-> pa.Table -> pd.DataFrame[object]                          |  443 MB |          |    360 MB |
+| \-\-\-\-> pa.Table -> pd.DataFrame[string]                          |  325 MB |          |    305 MB |
+| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow]                         |   29 MB |          |     15 MB |
+| \-\-\-\-> pa.Table -> pd.DataFrame[pyarrow] -> pd.DataFrame[object] |  418 MB |          |           |
+| \-\-\-\-> pa.Table                                                  |   16 MB |          |      1 MB |
