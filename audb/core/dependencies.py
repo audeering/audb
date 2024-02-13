@@ -338,7 +338,15 @@ class Dependencies:
             )
             self._df = table.to_pandas(
                 deduplicate_objects=False,
-                types_mapper=pd.ArrowDtype,  # use pyarrow dtypes
+                # Convert to pyarrow dtypes,
+                # but ensure we use pd.StringDtype("pyarrow")
+                # and not pd.ArrowDtype(pa.string())
+                # see https://pandas.pydata.org/docs/user_guide/pyarrow.html
+                types_mapper={
+                    pa.string(): pd.StringDtype("pyarrow"),
+                    pa.int32(): pd.ArrowDtype(pa.int32()),
+                    pa.float64(): pd.ArrowDtype(pa.float64()),
+                }.get,  # we have to provide a callable, not a dict
             )
             self._df.set_index("file", inplace=True)
             self._df.index.name = None
