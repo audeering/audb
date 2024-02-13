@@ -192,7 +192,7 @@ class Dependencies:
         self,
         files: typing.Union[str, typing.Sequence[str]],
     ) -> typing.Union[str, typing.List[str]]:
-        r"""Name of archive the file(s) belong to.
+        r"""Name of archive a file belong to.
 
         Args:
             files: relative file path(s)
@@ -207,7 +207,7 @@ class Dependencies:
         self,
         files: typing.Union[str, typing.Sequence[str]],
     ) -> typing.Union[int, typing.List[int]]:
-        r"""Bit depth of media file(s).
+        r"""Bit depth of media file.
 
         Args:
             files: relative file path(s)
@@ -222,13 +222,13 @@ class Dependencies:
         self,
         files: typing.Union[str, typing.Sequence[str]],
     ) -> typing.Union[int, typing.List[int]]:
-        r"""Number of channels of media file(s).
+        r"""Number of channels of media file.
 
         Args:
             files: relative file path(s)
 
         Returns:
-            number of channels
+            number(s) of channels
 
         """
         return self._column_loc("channels", files, int)
@@ -237,7 +237,7 @@ class Dependencies:
         self,
         files: typing.Union[str, typing.Sequence[str]],
     ) -> typing.Union[str, typing.List[str]]:
-        r"""Checksum of file(s).
+        r"""Checksum of file.
 
         Args:
             files: relative file path(s)
@@ -252,13 +252,13 @@ class Dependencies:
         self,
         files: typing.Union[str, typing.Sequence[str]],
     ) -> typing.Union[float, typing.List[float]]:
-        r"""Duration of file(s).
+        r"""Duration of file.
 
         Args:
             files: relative file path(s)
 
         Returns:
-            duration in seconds
+            duration(s) in seconds
 
         """
         return self._column_loc("duration", files, float)
@@ -267,7 +267,7 @@ class Dependencies:
         self,
         files: typing.Union[str, typing.Sequence[str]],
     ) -> typing.Union[str, typing.List[str]]:
-        r"""Format of file(s).
+        r"""Format of file.
 
         Args:
             files: relative file path(s)
@@ -346,13 +346,13 @@ class Dependencies:
         self,
         files: typing.Union[str, typing.Sequence[str]],
     ) -> typing.Union[int, typing.List[int]]:
-        r"""Sampling rate of media file(s).
+        r"""Sampling rate of media file.
 
         Args:
             files: relative file path(s)
 
         Returns:
-            sampling rate in Hz
+            sampling rate(s) in Hz
 
         """
         return self._column_loc("sampling_rate", files, int)
@@ -378,7 +378,7 @@ class Dependencies:
         self,
         files: typing.Union[str, typing.Sequence[str]],
     ) -> typing.Union[int, typing.List[int]]:
-        r"""Type of file(s).
+        r"""Type of file.
 
         Args:
             files: relative file path(s)
@@ -393,7 +393,7 @@ class Dependencies:
         self,
         files: typing.Union[str, typing.Sequence[str]],
     ) -> typing.Union[str, typing.List[str]]:
-        r"""Version of file(s).
+        r"""Version of file.
 
         Args:
             files: relative file path(s)
