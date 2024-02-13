@@ -60,6 +60,8 @@ DEPEND_FIELD_DTYPES = {
     DependField.VERSION: "string",
 }
 
+DEPEND_INDEX_DTYPE = "object"
+
 
 class DependType:
     r"""Dependency file types."""

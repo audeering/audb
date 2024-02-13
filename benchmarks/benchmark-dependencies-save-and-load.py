@@ -5,6 +5,7 @@ import random
 import string
 import time
 
+import memray
 import numpy as np
 import pandas as pd
 import pyarrow as pa
@@ -20,6 +21,9 @@ import audb
 random.seed(1)
 
 cache = audeer.mkdir("./cache")
+result_dir = audeer.path("./results")
+audeer.rmdir(result_dir)
+audeer.mkdir(result_dir)
 
 
 def astype(df, dtype):
@@ -36,7 +40,7 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32")
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("object")
-        df.index = df.index.astype("object")
+        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
     elif dtype == "string":
         # Use `string` to represent strings
         df["archive"] = df["archive"].astype("string")
@@ -49,7 +53,7 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32")
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("string")
-        df.index = df.index.astype("string")
+        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
     elif dtype == "pyarrow":
         # Use `pyarrow` to represent all dtypes
         df["archive"] = df["archive"].astype("string[pyarrow]")
@@ -62,7 +66,7 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32[pyarrow]")
         df["type"] = df["type"].astype("int32[pyarrow]")
         df["version"] = df["version"].astype("string[pyarrow]")
-        df.index = df.index.astype("string[pyarrow]")
+        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
     return df
 
 
@@ -102,7 +106,7 @@ if not os.path.exists(data_cache):
         df[column] = df[column].astype(dtype)
     df.set_index("file", inplace=True)
     df.index.name = None
-    df.index = df.index.astype("string")
+    df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
     df.to_pickle(data_cache)
 else:
     df = pd.read_pickle(data_cache)
@@ -257,9 +261,9 @@ print(".")
 
 # -------------------------------------------------------------------------
 print("* Write to PKL file.", end="", flush=True)
-file = audeer.path(folder, "df.pkl")
 
 for dtype in dtypes:
+    file = audeer.path(folder, f"df-{dtype}.pkl")
     _df = df.copy()
     _df = astype(_df, dtype)
     t0 = time.time()
@@ -272,6 +276,7 @@ for dtype in dtypes:
 # Use object and copy to pyarrow before writing
 _df = df.copy()
 _df = astype(_df, "object")
+file = audeer.path(folder, "df-pyarrow.pkl")
 t0 = time.time()
 _df = astype(_df, "pyarrow")
 _df.to_pickle(file, protocol=4)
@@ -314,6 +319,11 @@ print(results)
 results = pd.DataFrame(columns=["csv", "pickle", "parquet"])
 results.index.name = "method"
 
+
+def method_to_filename(method):
+    return method.replace(" ", "-").replace("[", "-").replace("]", "-").replace(">", "")
+
+
 print()
 print("* Read CSV file.", end="", flush=True)
 file = audeer.path(folder, "df.csv")
@@ -327,44 +337,85 @@ for engine in [None, "c", "pyarrow"]:
         arrow = "-c-->"
 
     for dtype in dtypes:
+        method = f"{arrow} pd.DataFrame[{dtype}]"
+        memray_file = f"memray-csv-{method_to_filename(method)}.bin"
+        with memray.Tracker(audeer.path(result_dir, memray_file)):
+            t0 = time.time()
+            index_col = 0
+            _df = pd.read_csv(
+                file,
+                index_col=index_col,
+                na_filter=False,
+                dtype=dtype_mapping[dtype],
+                header=0,
+                engine=engine,
+            )
+            t = time.time() - t0
+        results.at[method, "csv"] = t
+        if dtype == "pyarrow":
+            dtype = "string[pyarrow]"
+        _df.index = _df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        assert _df.archive.dtype == dtype
+        print(".", end="", flush=True)
+
+    # Convert pyarrow dtypes to object
+    method = f"{arrow} pd.DataFrame[pyarrow] -> pd.DataFrame[object]"
+    memray_file = f"memray-csv-{method_to_filename(method)}.bin"
+    with memray.Tracker(audeer.path(result_dir, memray_file)):
         t0 = time.time()
         index_col = 0
         _df = pd.read_csv(
             file,
             index_col=index_col,
             na_filter=False,
-            dtype=dtype_mapping[dtype],
+            dtype=dtype_mapping["pyarrow"],
             header=0,
             engine=engine,
         )
+        _df = astype(_df, "object")
         t = time.time() - t0
-        method = f"{arrow} pd.DataFrame[{dtype}]"
-        results.at[method, "csv"] = t
-        if dtype == "pyarrow":
-            dtype = "string[pyarrow]"
-        _df.index = _df.index.astype(dtype)
-        assert _df.archive.dtype == dtype
-        print(".", end="", flush=True)
-
-    # Convert pyarrow dtypes to object
-    t0 = time.time()
-    index_col = 0
-    _df = pd.read_csv(
-        file,
-        index_col=index_col,
-        na_filter=False,
-        dtype=dtype_mapping["pyarrow"],
-        header=0,
-        engine=engine,
-    )
-    _df = astype(_df, "object")
-    t = time.time() - t0
-    method = f"{arrow} pd.DataFrame[pyarrow] -> pd.DataFrame[object]"
     results.at[method, "csv"] = t
     print(".", end="", flush=True)
 
 
 for dtype in dtypes:
+    method = f"----> pa.Table -> pd.DataFrame[{dtype}]"
+    memray_file = f"memray-csv-{method_to_filename(method)}.bin"
+    with memray.Tracker(audeer.path(result_dir, memray_file)):
+        t0 = time.time()
+        _table = csv.read_csv(
+            file,
+            read_options=csv.ReadOptions(
+                column_names=table.column_names,
+                skip_rows=1,
+            ),
+            convert_options=csv.ConvertOptions(column_types=pyarrow_schema),
+        )
+        if dtype == "object":
+            types_mapper = None
+        elif dtype == "string":
+            types_mapper = {pa.string(): pd.StringDtype()}.get
+        elif dtype == "pyarrow":
+            types_mapper = pd.ArrowDtype
+        _df = _table.to_pandas(
+            # Speed up conversion,
+            # increase memory usage by ~20 MB
+            deduplicate_objects=False,
+            types_mapper=types_mapper,
+        )
+        _df.set_index("file", inplace=True)
+        _df.index.name = None
+        t = time.time() - t0
+    results.at[method, "csv"] = t
+    if dtype == "pyarrow":
+        dtype = "string[pyarrow]"
+    assert _df.archive.dtype == dtype
+    print(".", end="", flush=True)
+
+# Convert pyarrow dtypes to object
+method = "----> pa.Table -> pd.DataFrame[pyarrow] -> pd.DataFrame[object]"
+memray_file = f"memray-csv-{method_to_filename(method)}.bin"
+with memray.Tracker(audeer.path(result_dir, memray_file)):
     t0 = time.time()
     _table = csv.read_csv(
         file,
@@ -374,90 +425,58 @@ for dtype in dtypes:
         ),
         convert_options=csv.ConvertOptions(column_types=pyarrow_schema),
     )
-    if dtype == "object":
-        types_mapper = None
-    elif dtype == "string":
-        types_mapper = {pa.string(): pd.StringDtype()}.get
-    elif dtype == "pyarrow":
-        types_mapper = pd.ArrowDtype
     _df = _table.to_pandas(
         # Speed up conversion,
         # increase memory usage by ~20 MB
         deduplicate_objects=False,
-        types_mapper=types_mapper,
+        types_mapper=pd.ArrowDtype,
     )
     _df.set_index("file", inplace=True)
     _df.index.name = None
+    _df = astype(_df, "object")
     t = time.time() - t0
-    method = f"----> pa.Table -> pd.DataFrame[{dtype}]"
-    results.at[method, "csv"] = t
-    if dtype == "pyarrow":
-        dtype = "string[pyarrow]"
-    assert _df.archive.dtype == dtype
-    print(".", end="", flush=True)
-
-# Convert pyarrow dtypes to object
-t0 = time.time()
-_table = csv.read_csv(
-    file,
-    read_options=csv.ReadOptions(
-        column_names=table.column_names,
-        skip_rows=1,
-    ),
-    convert_options=csv.ConvertOptions(column_types=pyarrow_schema),
-)
-_df = _table.to_pandas(
-    # Speed up conversion,
-    # increase memory usage by ~20 MB
-    deduplicate_objects=False,
-    types_mapper=pd.ArrowDtype,
-)
-_df.set_index("file", inplace=True)
-_df.index.name = None
-_df = astype(_df, "object")
-t = time.time() - t0
-method = "----> pa.Table -> pd.DataFrame[pyarrow] -> pd.DataFrame[object]"
 results.at[method, "csv"] = t
 print(".", end="", flush=True)
 
-t0 = time.time()
-_table = csv.read_csv(
-    file,
-    read_options=csv.ReadOptions(
-        column_names=table.column_names,
-        skip_rows=1,
-    ),
-    convert_options=csv.ConvertOptions(column_types=pyarrow_schema),
-)
-t = time.time() - t0
 method = "----> pa.Table"
+memray_file = f"memray-csv-{method_to_filename(method)}.bin"
+with memray.Tracker(audeer.path(result_dir, memray_file)):
+    t0 = time.time()
+    _table = csv.read_csv(
+        file,
+        read_options=csv.ReadOptions(
+            column_names=table.column_names,
+            skip_rows=1,
+        ),
+        convert_options=csv.ConvertOptions(column_types=pyarrow_schema),
+    )
+    t = time.time() - t0
 results.at[method, "csv"] = t
 print(".")
 
 # -------------------------------------------------------------------------
 print("* Read PKL file.", end="", flush=True)
-file = audeer.path(folder, "df.pkl")
 
 for dtype in dtypes:
-    _df = df.copy()
-    _df = astype(_df, dtype)
-    _df.to_pickle(file)
-    t0 = time.time()
-    _df = pd.read_pickle(file)
-    t = time.time() - t0
+    file = audeer.path(folder, f"df-{dtype}.pkl")
     method = f"----> pd.DataFrame[{dtype}]"
+    memray_file = f"memray-pkl-{method_to_filename(method)}.bin"
+    with memray.Tracker(audeer.path(result_dir, memray_file)):
+        t0 = time.time()
+        _df = pd.read_pickle(file)
+        t = time.time() - t0
     results.at[method, "pickle"] = t
     print(".", end="", flush=True)
 
 # Convert pyarrow dtypes to object
-_df = df.copy()
-_df = astype(_df, "pyarrow")
-_df.to_pickle(file)
-t0 = time.time()
-_df = pd.read_pickle(file)
-_df = astype(_df, "object")
-t = time.time() - t0
+file = audeer.path(folder, "df-pyarrow.pkl")
 method = "----> pd.DataFrame[pyarrow] -> pd.DataFrame[object]"
+memray_file = f"memray-pkl-{method_to_filename(method)}.bin"
+with memray.Tracker(audeer.path(result_dir, memray_file)):
+    t0 = time.time()
+    _df = pd.read_pickle(file)
+    _df = astype(_df, "object")
+    t = time.time() - t0
 results.at[method, "pickle"] = t
 print(".")
 
@@ -471,10 +490,12 @@ for dtype in dtypes:
     _df.index.rename("file", inplace=True)
     _df = _df.reset_index()
     _df.to_parquet(file, index=False, engine="pyarrow")
-    t0 = time.time()
-    _df = pd.read_parquet(file, engine="pyarrow")
-    t = time.time() - t0
     method = f"----> pd.DataFrame[{dtype}]"
+    memray_file = f"memray-parquet-{method_to_filename(method)}.bin"
+    with memray.Tracker(audeer.path(result_dir, memray_file)):
+        t0 = time.time()
+        _df = pd.read_parquet(file, engine="pyarrow")
+        t = time.time() - t0
     results.at[method, "parquet"] = t
     print(".", end="", flush=True)
 
@@ -484,32 +505,36 @@ for dtype in dtypes:
     _df.index.rename("file", inplace=True)
     _df = _df.reset_index()
     _df.to_parquet(file, index=False, engine="pyarrow")
-    t0 = time.time()
-    _table = parquet.read_table(file)
     if dtype == "object":
         types_mapper = None
     elif dtype == "string":
         types_mapper = {pa.string(): pd.StringDtype()}.get
     elif dtype == "pyarrow":
         types_mapper = pd.ArrowDtype
-    _df = _table.to_pandas(
-        # Speed up conversion,
-        # increase memory usage by ~20 MB
-        deduplicate_objects=False,
-        types_mapper=types_mapper,
-    )
-    _df.set_index("file", inplace=True)
-    _df.index.name = None
-    t = time.time() - t0
     method = f"----> pa.Table -> pd.DataFrame[{dtype}]"
+    memray_file = f"memray-parquet-{method_to_filename(method)}.bin"
+    with memray.Tracker(audeer.path(result_dir, memray_file)):
+        t0 = time.time()
+        _table = parquet.read_table(file)
+        _df = _table.to_pandas(
+            # Speed up conversion,
+            # increase memory usage by ~20 MB
+            deduplicate_objects=False,
+            types_mapper=types_mapper,
+        )
+        _df.set_index("file", inplace=True)
+        _df.index.name = None
+        t = time.time() - t0
     results.at[method, "parquet"] = t
     print(".", end="", flush=True)
 
-t0 = time.time()
-_table = parquet.read_table(file)
-t = time.time() - t0
-method = "----> pa.Table"
 results.at[method, "parquet"] = t
+method = "----> pa.Table"
+memray_file = f"memray-parquet-{method_to_filename(method)}.bin"
+with memray.Tracker(audeer.path(result_dir, memray_file)):
+    t0 = time.time()
+    _table = parquet.read_table(file)
+    t = time.time() - t0
 print(".")
 print()
 

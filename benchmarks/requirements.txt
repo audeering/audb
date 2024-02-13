@@ -1,2 +1,3 @@
+memray ==1.11.0
 pyarrow
 tabulate
