@@ -341,7 +341,7 @@ class Dependencies:
                 ),
                 convert_options=csv.ConvertOptions(column_types=self._schema),
             )
-            self._df = self._table_to_pandas(table)
+            self._df = self._table_to_dataframe(table)
 
         elif extension == "parquet":
             table = parquet.read_table(path)
@@ -405,7 +405,7 @@ class Dependencies:
                 protocol=4,  # supported by Python >= 3.4
             )
         elif path.endswith("parquet"):
-            table = self._dataframe_to_table(self._df)
+            table = self._dataframe_to_table(self._df, file_column=True)
             parquet.write_table(table, path)
 
     def type(
@@ -556,11 +556,19 @@ class Dependencies:
                 values = values.tolist()
             return values
 
-    def _dataframe_to_table(self, df: pd.DataFrame) -> pa.Table:
+    def _dataframe_to_table(
+        self,
+        df: pd.DataFrame,
+        *,
+        file_column: bool = False,
+    ) -> pa.Table:
         r"""Convert pandas dataframe to pyarrow table.
 
         Args:
             df: dependency table as pandas dataframe
+            file_column: if ``False``
+                the ``"file"`` column
+                is renamed to ``""``
 
         Returns:
             dependency table as pyarrow table
@@ -571,9 +579,10 @@ class Dependencies:
             preserve_index=False,
             schema=self._schema,
         )
-        columns = table.column_names
-        columns = ["" if c == "file" else c for c in columns]
-        table = table.rename_columns(columns)
+        if not file_column:
+            columns = table.column_names
+            columns = ["" if c == "file" else c for c in columns]
+            table = table.rename_columns(columns)
         return table
 
     def _drop(self, files: typing.Sequence[str]):

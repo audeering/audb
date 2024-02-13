@@ -1,7 +1,7 @@
-import os
-
 import pandas as pd
 import pytest
+
+import audeer
 
 import audb
 
@@ -214,20 +214,22 @@ def test_file_bases_methods(deps, files, method, expected_dtype):
             assert isinstance(result, expected_dtype)
 
 
-def test_load_save(deps):
-    deps_file = "deps.csv"
+@pytest.mark.parametrize("file", ["deps.csv", "deps.pkl", "deps.parquet"])
+def test_load_save(tmpdir, deps, file):
+    deps_file = audeer.path(tmpdir, file)
     deps.save(deps_file)
     deps2 = audb.Dependencies()
     deps2.load(deps_file)
     pd.testing.assert_frame_equal(deps(), deps2())
-    os.remove(deps_file)
-    # Expected dtypes
     assert list(deps2._df.dtypes) == list(audb.core.define.DEPEND_FIELD_DTYPES.values())
+
+
+def test_load_save_errors(deps):
     # Wrong extension or file missng
     with pytest.raises(ValueError, match=r".*'txt'.*"):
-        deps2.load("deps.txt")
+        deps.load("deps.txt")
     with pytest.raises(FileNotFoundError):
-        deps.load(deps_file)
+        deps.load("deps.csv")
 
 
 def test_len(deps):
