@@ -325,7 +325,11 @@ class Dependencies:
                 na_filter=False,
                 dtype=dtype_mapping,
             )
-            self._df.index = self._df.index.astype("string")
+        # Set dtype of index for both CSV and PKL
+        # to make backward compatiple
+        # with old pickle files in cache
+        # that might use `string` as dtype
+        self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
 
     def removed(
         self,
@@ -464,6 +468,7 @@ class Dependencies:
             values,
             columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
         ).set_index("file")
+        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
 
         self._df = pd.concat([self._df, df])
 
@@ -574,7 +579,7 @@ class Dependencies:
             values,
             columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
         ).set_index("file")
-        df.index = df.index.astype("string")
+        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
         for name, dtype in zip(
             define.DEPEND_FIELD_NAMES.values(),
             define.DEPEND_FIELD_DTYPES.values(),

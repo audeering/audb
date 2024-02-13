@@ -10,3 +10,4 @@ __init__.pyc
 coverage.xml
 docs/api/
 benchmarks/cache/
+benchmarks/results/
