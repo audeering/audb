@@ -407,7 +407,6 @@ def load_to(
         verbose=verbose,
     )
 
-    print(audeer.list_file_names(db_root_tmp, recursive=True))
     # remove the temporal directory
     # to signal all files were correctly loaded
     try:
