@@ -189,7 +189,7 @@ def cached(
             if (
                 define.DEPENDENCIES_FILE not in files
                 and define.LEGACY_DEPENDENCIES_FILE not in files
-                and define.LEGACY_CACHED_DEPENDENCIES_FILE not in files
+                and define.CACHED_DEPENDENCIES_FILE not in files
             ):
                 # Skip all cache entries
                 # that don't contain a dependency file
@@ -265,7 +265,7 @@ def dependencies(
             file_found = False
             for deps_file in [
                 define.DEPENDENCIES_FILE,
-                define.LEGACY_CACHED_DEPENDENCIES_FILE,
+                define.CACHED_DEPENDENCIES_FILE,
             ]:
                 deps_path = os.path.join(db_root, deps_file)
                 if os.path.exists(deps_path):
@@ -285,17 +285,17 @@ def dependencies(
                     version,
                     verbose=verbose,
                 )
+                # Load parquet or csv from tmp dir
+                # and store as pickle in cache
                 deps_path = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
                 legacy_path = os.path.join(tmp_root, define.LEGACY_DEPENDENCIES_FILE)
-                cached_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
+                cached_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
                 if os.path.exists(deps_path):
-                    # Copy parquet file from tmp dir to cache
-                    audeer.move_file(deps_path, cached_path)
-                    deps.load(cached_path)
+                    deps.load(deps_path)
                 else:
-                    # Load CSV file from tmp dir and store as parquet in cache
                     deps.load(legacy_path)
-                    deps.save(cached_path)
+                # Store as pickle in cache
+                deps.save(cached_path)
 
     return deps
 

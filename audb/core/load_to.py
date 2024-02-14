@@ -390,8 +390,10 @@ def load_to(
 
     # save dependencies
 
+    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCIES_FILE)
+    deps.save(dep_path_tmp)
     audeer.move_file(
-        deps._path,
+        dep_path_tmp,
         os.path.join(db_root, define.DEPENDENCIES_FILE),
     )
 
@@ -405,6 +407,7 @@ def load_to(
         verbose=verbose,
     )
 
+    print(audeer.list_file_names(db_root_tmp, recursive=True))
     # remove the temporal directory
     # to signal all files were correctly loaded
     try:

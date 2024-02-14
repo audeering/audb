@@ -823,7 +823,7 @@ def test_publish_error_messages(
                 dbs[version],
                 audb.core.define.DEPENDENCIES_FILE,
             )
-            shutil.copyfile(deps._path, path)
+            deps.save(path)
         audb.publish(
             dbs[version],
             version,
