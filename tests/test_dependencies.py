@@ -45,6 +45,7 @@ def deps():
     df.set_index("file", inplace=True)
     # Ensure correct dtype
     df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+    df.index.name = None
     for name, dtype in zip(
         audb.core.define.DEPEND_FIELD_NAMES.values(),
         audb.core.define.DEPEND_FIELD_DTYPES.values(),
@@ -75,6 +76,7 @@ def test_init(deps):
 def test_call(deps):
     expected_df = pd.DataFrame.from_records(ROWS).set_index("file")
     expected_df.index = expected_df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+    expected_df.index.name = None
     for name, dtype in zip(
         audb.core.define.DEPEND_FIELD_NAMES.values(),
         audb.core.define.DEPEND_FIELD_DTYPES.values(),
@@ -251,7 +253,6 @@ def test_len(deps):
 def test_str(deps):
     expected_str = (
         "               archive  bit_depth  channels  ... sampling_rate  type version\n"  # noqa: E501
-        "file                                         ...                            \n"  # noqa: E501
         "db.files.csv  archive1          0         0  ...             0     0   1.0.0\n"  # noqa: E501
         "file.wav      archive2         16         2  ...         16000     1   1.0.0\n"  # noqa: E501
         "\n"

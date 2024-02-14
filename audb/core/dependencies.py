@@ -337,6 +337,7 @@ class Dependencies:
                 na_filter=False,
                 dtype=dtype_mapping,
             )
+            self._df.index.name = None
         # Set dtype of index for both CSV and PKL
         # to make backward compatiple
         # with old pickle files in cache
