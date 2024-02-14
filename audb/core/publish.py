@@ -168,14 +168,12 @@ def _find_media(
     verbose: bool,
 ) -> typing.Set[str]:
     r"""Find archives with new, altered or removed media and update 'deps'."""
-    media_archives = set()
     db_media = set(db.files)
 
     # release dependencies to removed media
     # and select according archives for upload
     removed_files = set(deps.media) - db_media
-    for file in removed_files:
-        media_archives.add(deps.archive(file))
+    media_archives = deps.archive(list(removed_files))
     deps._drop(removed_files)
 
     # limit to relevant media
@@ -242,11 +240,16 @@ def _find_media(
         deps._add_media(add_media)
 
     # select archives with new or altered files for upload
-    for file in deps.media:
-        if not deps.removed(file) and deps.version(file) == version:
-            media_archives.add(deps.archive(file))
+    media_archives += [
+        archive
+        for archive, _version, removed in zip(
+            deps.archive(deps.media),
+            deps.version(deps.media),
+            deps.removed(deps.media),
+        )
+    ]
 
-    return media_archives
+    return set(media_archives)
 
 
 def _find_tables(

@@ -143,8 +143,9 @@ def _database_check_complete(
         for table in deps.tables:
             if not os.path.exists(os.path.join(db_root, table)):
                 return False
-        for media in deps.media:
-            if not deps.removed(media):
+        removed = deps.removed(deps.media)
+        for n, media in enumerate(deps.media):
+            if not removed[n]:
                 path = os.path.join(db_root, media)
                 path = flavor.destination(path)
                 if not os.path.exists(path):
@@ -244,7 +245,7 @@ def _get_attachments_from_cache(
             flavor,
             verbose,
         )
-        missing_attachments = [deps.archive(path) for path in missing_paths]
+        missing_attachments = deps.archive(missing_paths)
         db_root_tmp = database_tmp_root(db_root)
 
         def job(cache_root: str, file: str):
@@ -410,21 +411,18 @@ def _get_media_from_backend(
 ):
     r"""Load media from backend."""
     # figure out archives
-    archives = set()
-    archive_names = set()
-    for file in media:
-        archive_name = deps.archive(file)
-        archive_version = deps.version(file)
-        archives.add((archive_name, archive_version))
-        archive_names.add(archive_name)
+    names = deps.archive(media)
+    versions = deps.version(media)
+    archive_names = set(names)
+    archives = set([(name, version) for name, version in zip(names, versions)])
     # collect all files that will be extracted,
     # if we have more files than archives
     if len(deps.files) > len(deps.archives):
-        files = list()
-        for file in deps.media:
-            archive = deps.archive(file)
-            if archive in archive_names:
-                files.append(file)
+        files = [
+            file
+            for file, archive in zip(deps.media, deps.archive(deps.media))
+            if archive in archive_names
+        ]
         media = files
 
     # create folder tree to avoid race condition
@@ -449,22 +447,23 @@ def _get_media_from_backend(
             version,
             tmp_root=db_root_tmp,
         )
-        for file in files:
+        if flavor is not None:
+            bit_depth = deps.bit_depth(files)
+            channels = deps.channels(files)
+            sampling_rate = deps.sampling_rate(files)
+        for n, file in enumerate(files):
             if os.name == "nt":  # pragma: no cover
                 file = file.replace(os.sep, "/")
             if flavor is not None:
-                bit_depth = deps.bit_depth(file)
-                channels = deps.channels(file)
-                sampling_rate = deps.sampling_rate(file)
                 src_path = os.path.join(db_root_tmp, file)
                 file = flavor.destination(file)
                 dst_path = os.path.join(db_root_tmp, file)
                 flavor(
                     src_path,
                     dst_path,
-                    src_bit_depth=bit_depth,
-                    src_channels=channels,
-                    src_sampling_rate=sampling_rate,
+                    src_bit_depth=bit_depth[n],
+                    src_channels=channels[n],
+                    src_sampling_rate=sampling_rate[n],
                 )
                 if src_path != dst_path:
                     os.remove(src_path)
