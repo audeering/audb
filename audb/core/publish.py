@@ -652,14 +652,13 @@ def publish(
             cache_root=cache_root,
             verbose=verbose,
         )
-        if audeer.md5(deps_path) != audeer.md5(previous_deps._path):
+        if not deps().equals(previous_deps()):
             raise RuntimeError(
                 f"You want to depend on '{previous_version}' "
                 f"of {db.name}, "
-                f"but the MD5 sum of your "
-                f"'{deps_file}' file "
+                f"but the dependency file '{deps_file}' "
                 f"in {db_root} "
-                f"does not match the MD5 sum of the corresponding file "
+                f"does not match the dependency file "
                 f"for the requested version in the repository. "
                 f"Did you forgot to call "
                 f"'audb.load_to({db_root}, {db.name}, "
