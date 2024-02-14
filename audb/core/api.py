@@ -189,7 +189,7 @@ def cached(
             if (
                 define.DEPENDENCIES_FILE not in files
                 and define.LEGACY_DEPENDENCIES_FILE not in files
-                and define.CACHED_DEPENDENCIES_FILE not in files
+                and define.LEGACY_CACHED_DEPENDENCIES_FILE not in files
             ):
                 # Skip all cache entries
                 # that don't contain a dependency file
@@ -265,7 +265,7 @@ def dependencies(
             file_found = False
             for deps_file in [
                 define.DEPENDENCIES_FILE,
-                define.CACHED_DEPENDENCIES_FILE,
+                define.LEGACY_CACHED_DEPENDENCIES_FILE,
             ]:
                 deps_path = os.path.join(db_root, deps_file)
                 if os.path.exists(deps_path):
