@@ -260,13 +260,23 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
-    deps_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
 
     deps = Dependencies()
 
     with FolderLock(db_root):
         try:
-            deps.load(deps_path)
+            file_found = False
+            for deps_file in [
+                define.DEPENDENCIES_FILE,
+                define.CACHED_DEPENDENCIES_FILE,
+            ]:
+                deps_path = os.path.join(db_root, deps_file)
+                if os.path.exists(deps_path):
+                    deps.load(deps_path)
+                    file_found = True
+                    break
+            if not file_found:
+                raise FileNotFoundError
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
             # If loading pickled cached file fails, load again from backend
             backend = utils.lookup_backend(name, version)
@@ -278,8 +288,23 @@ def dependencies(
                     version,
                     verbose=verbose,
                 )
-                deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
-                deps.save(deps_path)
+                # Look first for legacy file,
+                # that would correspond to cached pickle file
+                legacy_deps_path = os.path.join(
+                    tmp_root, define.LEGACY_DEPENDENCIES_FILE
+                )
+                cached_deps_path = os.path.join(
+                    db_root, define.CACHED_DEPENDENCIES_FILE
+                )
+                if os.path.exists(legacy_deps_path):
+                    deps.load(legacy_deps_path)
+                    deps.save(cached_deps_path)
+                else:
+                    # New dependency files are stored directly in cache
+                    deps_path = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
+                    cached_deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
+                    audeer.move_file(deps_path, cached_deps_path)
+                    deps.load(cached_deps_path)
 
     return deps
 

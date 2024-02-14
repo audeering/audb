@@ -390,10 +390,8 @@ def load_to(
 
     # save dependencies
 
-    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCIES_FILE)
-    deps.save(dep_path_tmp)
     audeer.move_file(
-        dep_path_tmp,
+        deps._path,
         os.path.join(db_root, define.DEPENDENCIES_FILE),
     )
 

@@ -79,6 +79,8 @@ class Dependencies:
                 ("version", pa.string()),
             ]
         )
+        # Store location of last loaded dependency file
+        self._path = None
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -352,6 +354,7 @@ class Dependencies:
         # with old pickle files in cache
         # that might use `string` as dtype
         self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
+        self._path = path
 
     def removed(
         self,

@@ -10,7 +10,8 @@ DB = "db"
 HEADER_FILE = f"{DB}.yaml"
 
 # Dependencies
-DEPENDENCIES_FILE = f"{DB}.csv"
+DEPENDENCIES_FILE = f"{DB}.parquet"
+LEGACY_DEPENDENCIES_FILE = f"{DB}.csv"
 CACHED_DEPENDENCIES_FILE = f"{DB}.pkl"
 
 # Cache lock
