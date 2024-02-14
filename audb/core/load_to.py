@@ -49,14 +49,16 @@ def _find_media(
     media = []
 
     def job(file: str):
-        if not deps.removed(file):
-            full_file = os.path.join(db_root, file)
-            if not os.path.exists(full_file):
-                media.append(file)
+        full_file = os.path.join(db_root, file)
+        if not os.path.exists(full_file):
+            media.append(file)
 
+    files = [
+        file for file, removed in zip(db.files, deps.removed(db.files)) if not removed
+    ]
     audeer.run_tasks(
         job,
-        params=[([file], {}) for file in db.files],
+        params=[([file], {}) for file in files],
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Find media",
@@ -165,9 +167,12 @@ def _get_media(
     utils.mkdir_tree(media, db_root_tmp)
 
     # figure out archives
-    archives = set()
-    for file in media:
-        archives.add((deps.archive(file), deps.version(file)))
+    archives = set(
+        [
+            (name, version)
+            for name, version in zip(deps.archive(media), deps.version(media))
+        ]
+    )
 
     def job(archive: str, version: str):
         archive = backend.join(
