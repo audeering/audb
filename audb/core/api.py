@@ -278,7 +278,7 @@ def dependencies(
             if not file_found:
                 raise FileNotFoundError
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
-            # If loading pickled cached file fails, load again from backend
+            # If loading cached file fails, load again from backend
             backend = utils.lookup_backend(name, version)
             with tempfile.TemporaryDirectory() as tmp_root:
                 archive = backend.join("/", name, define.DB + ".zip")
@@ -288,23 +288,17 @@ def dependencies(
                     version,
                     verbose=verbose,
                 )
-                # Look first for legacy file,
-                # that would correspond to cached pickle file
-                legacy_deps_path = os.path.join(
-                    tmp_root, define.LEGACY_DEPENDENCIES_FILE
-                )
-                cached_deps_path = os.path.join(
-                    db_root, define.CACHED_DEPENDENCIES_FILE
-                )
-                if os.path.exists(legacy_deps_path):
-                    deps.load(legacy_deps_path)
-                    deps.save(cached_deps_path)
+                deps_path = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
+                legacy_path = os.path.join(tmp_root, define.LEGACY_DEPENDENCIES_FILE)
+                cached_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
+                if os.path.exists(deps_path):
+                    # Copy parquet file from tmp dir to cache
+                    audeer.move_file(deps_path, cached_path)
+                    deps.load(cached_path)
                 else:
-                    # New dependency files are stored directly in cache
-                    deps_path = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
-                    cached_deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
-                    audeer.move_file(deps_path, cached_deps_path)
-                    deps.load(cached_deps_path)
+                    # Load CSV file from tmp dir and store as parquet in cache
+                    deps.load(legacy_path)
+                    deps.save(cached_path)
 
     return deps
 
