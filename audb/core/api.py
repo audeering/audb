@@ -185,18 +185,15 @@ def cached(
             flavor_id_paths = audeer.list_dir_names(version_path)
 
             # Skip old audb cache (e.g. 1 as flavor)
-            files = audeer.list_file_names(version_path)
-            deps_path = os.path.join(version_path, define.DEPENDENCIES_FILE)
-            deps_path_cached = os.path.join(
-                version_path,
-                define.CACHED_DEPENDENCIES_FILE,
-            )
-            if deps_path not in files and deps_path_cached not in files:
+            files = audeer.list_file_names(version_path, basenames=True)
+            if (
+                define.DEPENDENCIES_FILE not in files
+                and define.LEGACY_DEPENDENCIES_FILE not in files
+                and define.CACHED_DEPENDENCIES_FILE not in files
+            ):
                 # Skip all cache entries
-                # that don't contain a db.csv or db.pkl file
+                # that don't contain a dependency file
                 # as those stem from audb<1.0.0.
-                # We only look for db.csv
-                # as we switched to db.pkl with audb>=1.0.5
                 continue  # pragma: no cover
 
             for flavor_id_path in flavor_id_paths:
