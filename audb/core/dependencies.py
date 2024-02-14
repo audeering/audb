@@ -388,7 +388,7 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv`` or ``pkl``
+                File extension can be ``csv``, ``pkl``, or ``parquet``
 
         """
         path = audeer.path(path)
