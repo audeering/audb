@@ -7,6 +7,23 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.6.4 (2024-02-23)
+--------------------------
+
+* Fixed: in ``audb.publish()``
+  updating of multi-file archives
+  that have been published
+  before the version
+  given by the ``previous_version`` argument
+* Fixed: speed up most methods
+  of ``audb.Dependencies``
+* Fixed: dtype of the index
+  of the data frame
+  returned by ``audb.Dependencies.__call__()``
+  is now ``string``
+  instead of ``object``
+
+
 Version 1.6.3 (2024-01-30)
 --------------------------
 
