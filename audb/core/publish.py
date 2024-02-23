@@ -410,7 +410,7 @@ def _put_media(
                             backend.get_archive(
                                 archive_file,
                                 tmp_root,
-                                previous_version,
+                                deps.version(missing_files[0]),
                             )
                             for missing_file in missing_files:
                                 src_path = os.path.join(tmp_root, missing_file)
