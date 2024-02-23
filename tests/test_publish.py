@@ -386,6 +386,9 @@ def test_publish(tmpdir, dbs, persistent_repository, version):
         with pytest.raises(RuntimeError):
             audb.latest_version(DB_NAME)
 
+    # Copy database folder to build folder
+    # to avoid storing `db.csv` files
+    # inside the database folders
     build_dir = audeer.path(tmpdir, "build")
     shutil.copytree(dbs[version], build_dir)
     archives = db["files"]["speaker"].get().dropna().to_dict()
@@ -571,18 +574,19 @@ def test_publish_change_archive(tmpdir, dbs, repository):
     """Test removing file from archive.
 
     When a file is removed,
-    that is stored in an archive
+    which is stored in an archive
     together with other files,
     the archive needs to be updated.
-    This has also to work,
-    if the archive was not added
+
+    As described in
+    https://github.com/audeering/audb/issues/377
+    this was failing
+    when the archive was not added
     in ``previous_version``,
     but an earlier version.
 
-    See https://github.com/audeering/audb/issues/377
-
     """
-    # Publish version 1.0.0
+    # Store two files in an archive in version 1.0.0
     build_dir = audeer.path(tmpdir, "build")
     shutil.copytree(dbs["1.0.0"], build_dir)
     archives = {
@@ -597,7 +601,7 @@ def test_publish_change_archive(tmpdir, dbs, repository):
         previous_version=None,
         verbose=False,
     )
-    # Remove `audio/003.wav` for version 2.0.0
+    # Remove a file stored in another archive for version 2.0.0
     os.remove(audeer.path(build_dir, "audio/003.wav"))
     audb.publish(
         build_dir,
@@ -607,7 +611,8 @@ def test_publish_change_archive(tmpdir, dbs, repository):
         previous_version="1.0.0",
         verbose=False,
     )
-    # Remove `audio/001.wav` to require archive update
+    # Remove file `audio/001.wav`
+    # to require archive update
     # of archive added in version "1.0.0"
     audeer.rmdir(build_dir)
     db = audb.load_to(
