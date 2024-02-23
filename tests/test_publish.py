@@ -53,6 +53,7 @@ def dbs(tmpdir_factory):
     #   - audio/002.wav
     #   - audio/003.wav
     #   - audio/004.wav
+    #   - audio/005.wav
     # attachment files:
     #   - extra/file.txt
     #   - extra/folder/file1.txt
@@ -140,6 +141,7 @@ def dbs(tmpdir_factory):
     #   - audio/002.wav
     #   - audio/003.wav
     #   - audio/004.wav
+    #   - audio/005.wav
     #   - audio/.../audio/new.wav  # >260 chars
     # attachment files:
     #   - extra/file.txt
@@ -181,10 +183,10 @@ def dbs(tmpdir_factory):
     #   - misc-in-scheme
     #   - misc-not-in-scheme
     # media:
-    #   - audio/001.wav
     #   - audio/002.wav
     #   - audio/003.wav
     #   - audio/004.wav
+    #   - audio/005.wav
     #   - audio/.../audio/new.wav  # >260 chars
     # schemes:
     #   - speaker
@@ -210,10 +212,10 @@ def dbs(tmpdir_factory):
     #   - misc-in-scheme
     #   - misc-not-in-scheme
     # media:
-    #   - audio/001.wav
     #   - audio/002.wav
     #   - audio/003.wav
     #   - audio/004.wav
+    #   - audio/005.wav
     #   - audio/.../audio/new.wav  # >260 chars
     # schemes:
     #   - speaker
@@ -234,10 +236,10 @@ def dbs(tmpdir_factory):
     #   - misc-in-scheme
     #   - misc-not-in-scheme
     # media:
-    #   - audio/001.wav
     #   - audio/002.wav
     #   - audio/003.wav
     #   - audio/004.wav
+    #   - audio/005.wav
     #   - audio/.../audio/new.wav  # >260 chars
     #   - file0.wav
     #   - ...
@@ -273,10 +275,7 @@ def dbs(tmpdir_factory):
     #   - audio/002.wav
     #   - audio/003.wav
     #   - audio/004.wav
-    #   - audio/.../audio/new.wav  # >260 chars
-    #   - file0.wav
-    #   - ...
-    #   - file19.wav
+    #   - audio/005.wav
     # schemes:
     #   - scheme
     #   - speaker
