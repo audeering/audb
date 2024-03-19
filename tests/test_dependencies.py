@@ -99,11 +99,20 @@ def test_contains(deps):
 
 
 def test_equals(deps):
+    # empty table vs. empty table
+    empty_deps = audb.Dependencies()
+    assert empty_deps == empty_deps
+    assert empty_deps == audb.Dependencies()
+    # empty table vs. example table
     assert deps != audb.Dependencies()
+    # example table vs. example table
     assert deps == deps
     _deps = audb.Dependencies()
-    _deps._df = deps._df
+    _deps._df = deps._df.copy()
     assert deps == _deps
+    # example table vs. different table
+    _deps._df.loc["db.files.csv", "channels"] = 4
+    assert deps != _deps
 
 
 def test_get_item(deps):
