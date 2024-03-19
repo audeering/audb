@@ -216,6 +216,14 @@ def test_file_bases_methods(deps, files, method, expected_dtype):
 
 @pytest.mark.parametrize("file", ["deps.csv", "deps.pkl", "deps.parquet"])
 def test_load_save(tmpdir, deps, file):
+    """Test consistency of dependency table after save/load cycle.
+
+    Dependency values and data types
+    should remain identical
+    when first storing and then loading from a file.
+    This should hold for all possible file formats.
+
+    """
     deps_file = audeer.path(tmpdir, file)
     deps.save(deps_file)
     deps2 = audb.Dependencies()
