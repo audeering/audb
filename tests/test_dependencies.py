@@ -98,6 +98,14 @@ def test_contains(deps):
     assert "not.csv" not in deps
 
 
+def test_equals(deps):
+    assert deps != audb.Dependencies()
+    assert deps == deps
+    _deps = audb.Dependencies()
+    _deps._df = deps._df
+    assert deps == _deps
+
+
 def test_get_item(deps):
     assert deps["db.files.csv"] == list(ROWS[0].values())[1:]
     assert deps["file.wav"] == list(ROWS[1].values())[1:]

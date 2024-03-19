@@ -81,6 +81,18 @@ class Dependencies:
         """
         return file in self._df.index
 
+    def __eq__(self, other: "Dependencies") -> bool:
+        r"""Check if two dependencies table are equal.
+
+        Args:
+            other: dependency table to compare against
+
+        Returns:
+            ``True`` if both dependency tables have the same entries
+
+        """
+        return self._df.equals(other._df)
+
     def __getitem__(self, file: str) -> typing.List:
         r"""File information.
 
