@@ -82,7 +82,7 @@ class Dependencies:
         return file in self._df.index
 
     def __eq__(self, other: "Dependencies") -> bool:
-        r"""Check if two dependencies table are equal.
+        r"""Check if two dependency tables are equal.
 
         Args:
             other: dependency table to compare against
