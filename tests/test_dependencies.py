@@ -233,9 +233,11 @@ def test_load_save(tmpdir, deps, file):
 
 
 def test_load_save_errors(deps):
-    # Wrong extension or file missng
+    """Test possible errors when loading/saving."""
+    # Wrong file extension
     with pytest.raises(ValueError, match=r".*'txt'.*"):
         deps.load("deps.txt")
+    # File missing
     with pytest.raises(FileNotFoundError):
         deps.load("deps.csv")
 
