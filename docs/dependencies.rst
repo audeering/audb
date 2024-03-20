@@ -37,7 +37,7 @@ if its content hasn't changed.
 We keep track of those dependencies
 and store some additional metadata about the audio files
 like duration and number of channels
-in a dependency table in a file :file:`db.csv`
+in a dependency table in a file :file:`db.parquet`
 for every version of a database.
 
 You request a :class:`audb.Dependencies` object with
