@@ -257,23 +257,13 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
+    cached_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
 
     deps = Dependencies()
 
     with FolderLock(db_root):
         try:
-            file_found = False
-            for deps_file in [
-                define.DEPENDENCIES_FILE,
-                define.CACHED_DEPENDENCIES_FILE,
-            ]:
-                deps_path = os.path.join(db_root, deps_file)
-                if os.path.exists(deps_path):
-                    deps.load(deps_path)
-                    file_found = True
-                    break
-            if not file_found:
-                raise FileNotFoundError
+            deps.load(cached_path)
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
             # If loading cached file fails, load again from backend
             backend = utils.lookup_backend(name, version)
