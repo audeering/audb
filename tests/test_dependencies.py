@@ -232,6 +232,24 @@ def test_load_save(tmpdir, deps, file):
     assert list(deps2._df.dtypes) == list(audb.core.define.DEPEND_FIELD_DTYPES.values())
 
 
+def test_load_save_backward_compatibility(tmpdir, deps):
+    """Test backward compatibility with old pickle cache files.
+
+    As the dtype of the index has changed,
+    we need to make sure this is corrected
+    when loading old cache files.
+
+    """
+    deps_file = audeer.path(tmpdir, "deps.pkl")
+    # Change dtype of index from object to string
+    # to mimic previous behavior
+    deps._df.index = deps._df.index.astype("string")
+    deps.save(deps_file)
+    deps2 = audb.Dependencies()
+    deps2.load(deps_file)
+    assert deps2._df.index.dtype == audb.core.define.DEPEND_INDEX_DTYPE
+
+
 def test_load_save_errors(deps):
     """Test possible errors when loading/saving."""
     # Wrong file extension
