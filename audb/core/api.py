@@ -279,7 +279,6 @@ def dependencies(
                 # and store as pickle in cache
                 deps_path = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
                 legacy_path = os.path.join(tmp_root, define.LEGACY_DEPENDENCIES_FILE)
-                cached_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
                 if os.path.exists(deps_path):
                     deps.load(deps_path)
                 else:
