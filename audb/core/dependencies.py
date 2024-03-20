@@ -331,6 +331,12 @@ class Dependencies:
             )
         if extension == "pkl":
             self._df = pd.read_pickle(path)
+            # Correct dtype of index
+            # to make backward compatiple
+            # with old pickle files in cache
+            # that might use `string` as dtype
+            if self._df.index.dtype != define.DEPEND_INDEX_DTYPE:
+                self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
 
         elif extension == "csv":
             table = csv.read_csv(
@@ -346,12 +352,6 @@ class Dependencies:
         elif extension == "parquet":
             table = parquet.read_table(path)
             self._df = self._table_to_dataframe(table)
-
-        # Set dtype of index for both CSV and PKL
-        # to make backward compatiple
-        # with old pickle files in cache
-        # that might use `string` as dtype
-        self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
 
     def removed(
         self,
@@ -633,6 +633,7 @@ class Dependencies:
         )
         df.set_index("file", inplace=True)
         df.index.name = None
+        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
         return df
 
     def _update_media(
