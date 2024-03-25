@@ -182,6 +182,7 @@ def private_and_public_repository():
     Configure the following repositories:
     * data-private: repo on public Artifactory without access
     * data-public: repo on public Artifactory with anonymous access
+    * data-public2: repo on public Artifactory with anonymous access
 
     Note, that the order of the repos is important.
     audb will visit the repos in the given order
@@ -194,6 +195,7 @@ def private_and_public_repository():
     audb.config.REPOSITORIES = [
         audb.Repository("data-private", host, backend),
         audb.Repository("data-public", host, backend),
+        audb.Repository("data-public2", host, backend),
     ]
 
     yield repository

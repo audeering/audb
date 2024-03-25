@@ -62,7 +62,7 @@ def available(
                                     version,
                                 ]
                             )
-                    except FileNotFoundError:  # pragma: nocover
+                    except FileNotFoundError:
                         # If the `db` folder does not exist,
                         # we do not include the dataset
                         pass
