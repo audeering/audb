@@ -42,3 +42,4 @@ def test_available_broken_dataset(private_and_public_repository):
     """
     df = audb.available(only_latest=True)
     assert len(df) > 0
+    assert "broken-dataset" not in df
