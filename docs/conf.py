@@ -72,6 +72,7 @@ graphviz_output_format = "svg"
 apipages_hidden_methods = [
     "__call__",
     "__contains__",
+    "__eq__",
     "__getitem__",
     "__len__",
 ]
