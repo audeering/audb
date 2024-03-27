@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.6.5 (2024-03-27)
+--------------------------
+
+* Added: ``audb.Dependencies.__eq__()``
+  to be able to compare two dependency tables
+* Fixed: let ``audb.available()``
+  skip non-complete datasets
+  instead of raising an error
+
+
 Version 1.6.4 (2024-02-23)
 --------------------------
 
