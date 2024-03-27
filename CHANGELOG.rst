@@ -7,7 +7,7 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
-Version 1.6.5 (2024-03-27)
+Version 1.6.5 (2024-03-28)
 --------------------------
 
 * Added: ``audb.Dependencies.__eq__()``
