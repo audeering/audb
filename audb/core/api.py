@@ -51,16 +51,21 @@ def available(
                 # see https://github.com/audeering/audbackend/issues/132
                 for p in backend._repo.path:
                     name = p.name
-                    for version in [str(x).split("/")[-1] for x in p / "db"]:
-                        databases.append(
-                            [
-                                name,
-                                repository.backend,
-                                repository.host,
-                                repository.name,
-                                version,
-                            ]
-                        )
+                    try:
+                        for version in [str(x).split("/")[-1] for x in p / "db"]:
+                            databases.append(
+                                [
+                                    name,
+                                    repository.backend,
+                                    repository.host,
+                                    repository.name,
+                                    version,
+                                ]
+                            )
+                    except FileNotFoundError:
+                        # If the `db` folder does not exist,
+                        # we do not include the dataset
+                        pass
             else:
                 for path, version in backend.ls("/"):
                     if path.endswith(define.HEADER_FILE):
