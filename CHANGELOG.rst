@@ -13,7 +13,7 @@ Version 1.6.5 (2024-03-28)
 * Added: ``audb.Dependencies.__eq__()``
   to compare two dependency tables
 * Fixed: let ``audb.available()``
-  skip non-complete datasets
+  skip incomplete datasets
   instead of raising an error
 
 
