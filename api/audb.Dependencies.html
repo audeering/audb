@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.6.5
               </div>
             
           
@@ -113,6 +113,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Dependencies</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#call">__call__()</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contains">__contains__()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#eq">__eq__()</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#getitem">__getitem__()</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#len">__len__()</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#archive">archive()</a></li>
@@ -252,7 +253,7 @@ but also what version of the file is required.</p>
 <dd><p>Return dependencies as a table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>table with dependencies</p>
@@ -276,6 +277,26 @@ but also what version of the file is required.</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if a dependency to the file exists</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="eq">
+<h2>__eq__()<a class="headerlink" href="#eq" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.Dependencies.__eq__">
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if two dependency tables are equal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#audb.Dependencies" title="audb.core.dependencies.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dependencies</span></code></a>) – dependency table to compare against</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if both dependency tables have the same entries</p>
 </dd>
 </dl>
 </dd></dl>
@@ -692,7 +713,7 @@ i.e. <code class="docutils literal notranslate"><span class="pre">db.&lt;id&gt;.
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/02/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

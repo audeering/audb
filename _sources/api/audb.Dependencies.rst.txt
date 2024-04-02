@@ -14,6 +14,10 @@
 --------------------
 .. automethod:: Dependencies.__contains__
     
+\_\_eq\_\_\(\)
+--------------
+.. automethod:: Dependencies.__eq__
+    
 \_\_getitem\_\_\(\)
 -------------------
 .. automethod:: Dependencies.__getitem__

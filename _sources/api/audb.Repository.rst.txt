@@ -6,6 +6,10 @@
 .. autoclass:: Repository
 
 
+\_\_eq\_\_\(\)
+--------------
+.. automethod:: Repository.__eq__
+    
 backend
 -------
 .. autoattribute:: Repository.backend

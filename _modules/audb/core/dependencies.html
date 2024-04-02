@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.6.5
               </div>
             
           
@@ -233,6 +233,18 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span></div>
+
+<div class="viewcode-block" id="Dependencies.__eq__"><a class="viewcode-back" href="../../../api/audb.Dependencies.html#audb.Dependencies.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Dependencies&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if two dependency tables are equal.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other: dependency table to compare against</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ``True`` if both dependency tables have the same entries</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">_df</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dependencies.__getitem__"><a class="viewcode-back" href="../../../api/audb.Dependencies.html#audb.Dependencies.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;File information.</span>
@@ -817,7 +829,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/02/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

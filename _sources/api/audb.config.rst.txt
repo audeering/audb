@@ -6,6 +6,10 @@
 .. autoclass:: config
 
 
+\_\_eq\_\_\(\)
+--------------
+.. automethod:: config.__eq__
+    
 CACHE\_ROOT
 -----------
 .. autoattribute:: config.CACHE_ROOT

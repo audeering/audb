@@ -10,6 +10,10 @@
 ----------------
 .. automethod:: Flavor.__call__
     
+\_\_eq\_\_\(\)
+--------------
+.. automethod:: Flavor.__eq__
+    
 arguments
 ---------
 .. autoattribute:: Flavor.arguments

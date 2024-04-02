@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.4
+                v1.6.5
               </div>
             
           
@@ -204,16 +204,21 @@
                 <span class="c1"># see https://github.com/audeering/audbackend/issues/132</span>
                 <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
                     <span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span>
-                    <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;db&quot;</span><span class="p">]:</span>
-                        <span class="n">databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="p">[</span>
-                                <span class="n">name</span><span class="p">,</span>
-                                <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
-                                <span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
-                                <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                                <span class="n">version</span><span class="p">,</span>
-                            <span class="p">]</span>
-                        <span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;db&quot;</span><span class="p">]:</span>
+                            <span class="n">databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="n">name</span><span class="p">,</span>
+                                    <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+                                    <span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+                                    <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                    <span class="n">version</span><span class="p">,</span>
+                                <span class="p">]</span>
+                            <span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                        <span class="c1"># If the `db` folder does not exist,</span>
+                        <span class="c1"># we do not include the dataset</span>
+                        <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">):</span>
@@ -799,7 +804,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/02/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
