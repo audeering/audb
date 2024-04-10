@@ -44,12 +44,12 @@ def available(
     databases = []
     for repository in config.REPOSITORIES:
         try:
-            backend = utils.access_backend(repository)
-            if isinstance(backend, audbackend.Artifactory):
+            backend_interface = repository()
+            if repository.backend == "artifactory":
                 # avoid backend.ls('/')
                 # which is very slow on Artifactory
                 # see https://github.com/audeering/audbackend/issues/132
-                for p in backend._repo.path:
+                for p in backend_interface.backend._repo.path:
                     name = p.name
                     try:
                         for version in [str(x).split("/")[-1] for x in p / "db"]:
@@ -67,7 +67,7 @@ def available(
                         # we do not include the dataset
                         pass
             else:
-                for path, version in backend.ls("/"):
+                for path, version in backend_interface.ls("/"):
                     if path.endswith(define.HEADER_FILE):
                         name = path.split("/")[1]
                         databases.append(
@@ -604,14 +604,15 @@ def versions(
     """
     vs = []
     for repository in config.REPOSITORIES:
-        backend = utils.access_backend(repository)
-        if isinstance(backend, audbackend.Artifactory):
+        backend_interface = repository()
+        backend = backend_interface.backend
+        if repository.backend == "artifactory":
             import artifactory
 
             # Avoid using ls() on Artifactory
             # see https://github.com/devopshq/artifactory/issues/423
             folder = backend.join("/", name, "db")
-            path = audbackend.core.artifactory._artifactory_path(
+            path = audbackend.core.backend.artifactory._artifactory_path(
                 backend._expand(folder),
                 backend._username,
                 backend._api_key,
@@ -633,6 +634,6 @@ def versions(
                 # the connection is also blocked for valid repos.
                 pass
         else:
-            header = backend.join("/", name, "db.yaml")
-            vs.extend(backend.versions(header, suppress_backend_errors=True))
+            header = backend_interface.join("/", name, "db.yaml")
+            vs.extend(backend_interface.versions(header, suppress_backend_errors=True))
     return audeer.sort_versions(vs)

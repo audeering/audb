@@ -83,7 +83,7 @@ Containing a few random annotations.
 Publish the first version
 -------------------------
 
-We define a repository on the :class:`audbackend.FileSystem` backend
+We define a repository on the local file system
 to publish the database to.
 
 .. jupyter-execute::

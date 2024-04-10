@@ -11,7 +11,6 @@ import audformat
 import audiofile
 
 from audb.core import define
-from audb.core import utils
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
 from audb.core.repository import Repository
@@ -339,7 +338,7 @@ def _put_attachments(
     db_root: str,
     db: audformat.Database,
     version: str,
-    backend: audbackend.Backend,
+    backend: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -369,7 +368,7 @@ def _put_media(
     version: str,
     previous_version: typing.Optional[str],
     deps: Dependencies,
-    backend: audbackend.Backend,
+    backend: typing.type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -444,7 +443,7 @@ def _put_tables(
     db_root: str,
     db_name: str,
     version: str,
-    backend: audbackend.Backend,
+    backend: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -600,7 +599,7 @@ def publish(
         verbose=verbose,
     )
 
-    backend = utils.access_backend(repository)
+    backend = repository()
 
     remote_header = backend.join("/", db.name, define.HEADER_FILE)
     versions = backend.versions(remote_header, suppress_backend_errors=True)
