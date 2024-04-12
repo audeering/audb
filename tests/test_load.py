@@ -129,8 +129,8 @@ def dbs(tmpdir_factory, persistent_repository):
     db.save(db_root)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        audeer.path(previous_db_root, "db.csv"),
-        audeer.path(db_root, "db.csv"),
+        audeer.path(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
+        audeer.path(db_root, audb.core.define.DEPENDENCIES_FILE),
     )
     audb.publish(
         db_root,
@@ -156,8 +156,8 @@ def dbs(tmpdir_factory, persistent_repository):
     db.save(db_root)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        audeer.path(previous_db_root, "db.csv"),
-        audeer.path(db_root, "db.csv"),
+        audeer.path(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
+        audeer.path(db_root, audb.core.define.DEPENDENCIES_FILE),
     )
     audb.publish(
         db_root,
@@ -192,8 +192,8 @@ def dbs(tmpdir_factory, persistent_repository):
     db.save(db_root)
 
     shutil.copy(
-        os.path.join(previous_db_root, "db.csv"),
-        os.path.join(db_root, "db.csv"),
+        os.path.join(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
+        os.path.join(db_root, audb.core.define.DEPENDENCIES_FILE),
     )
     audb.publish(
         db_root,
@@ -220,8 +220,8 @@ def dbs(tmpdir_factory, persistent_repository):
     db.save(db_root)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        os.path.join(previous_db_root, "db.csv"),
-        os.path.join(db_root, "db.csv"),
+        os.path.join(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
+        os.path.join(db_root, audb.core.define.DEPENDENCIES_FILE),
     )
     audb.publish(
         db_root,

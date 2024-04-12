@@ -615,10 +615,12 @@ def publish(
             previous_version = None
 
     # load database and dependencies
-    deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
     deps = Dependencies()
-    if os.path.exists(deps_path):
-        deps.load(deps_path)
+    for deps_file in [define.DEPENDENCIES_FILE, define.LEGACY_DEPENDENCIES_FILE]:
+        deps_path = os.path.join(db_root, deps_file)
+        if os.path.exists(deps_path):
+            deps.load(deps_path)
+            break
 
     # check if database folder depends on the right version
 
@@ -626,7 +628,7 @@ def publish(
     if previous_version is None and len(deps) > 0:
         raise RuntimeError(
             f"You did not set a dependency to a previous version, "
-            f"but you have a '{define.DEPENDENCIES_FILE}' file present "
+            f"but you have a '{deps_file}' file present "
             f"in {db_root}."
         )
 
@@ -644,32 +646,25 @@ def publish(
 
     # dependencies do not match version
     if previous_version is not None and len(deps) > 0:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            previous_deps_path = os.path.join(
-                tmp_dir,
-                define.DEPENDENCIES_FILE,
+        previous_deps = dependencies(
+            db.name,
+            version=previous_version,
+            cache_root=cache_root,
+            verbose=verbose,
+        )
+        if not deps().equals(previous_deps()):
+            raise RuntimeError(
+                f"You want to depend on '{previous_version}' "
+                f"of {db.name}, "
+                f"but the dependency file '{deps_file}' "
+                f"in {db_root} "
+                f"does not match the dependency file "
+                f"for the requested version in the repository. "
+                f"Did you forgot to call "
+                f"'audb.load_to({db_root}, {db.name}, "
+                f"version='{previous_version}') "
+                f"or modified the file manually?"
             )
-            previous_deps = dependencies(
-                db.name,
-                version=previous_version,
-                cache_root=cache_root,
-                verbose=verbose,
-            )
-            previous_deps.save(previous_deps_path)
-            if audeer.md5(deps_path) != audeer.md5(previous_deps_path):
-                raise RuntimeError(
-                    f"You want to depend on '{previous_version}' "
-                    f"of {db.name}, "
-                    f"but the MD5 sum of your "
-                    f"'{define.DEPENDENCIES_FILE}' file "
-                    f"in {db_root} "
-                    f"does not match the MD5 sum of the corresponding file "
-                    f"for the requested version in the repository. "
-                    f"Did you forgot to call "
-                    f"'audb.load_to({db_root}, {db.name}, "
-                    f"version='{previous_version}') "
-                    f"or modified the file manually?"
-                )
 
     # load database with table data
     db = audformat.Database.load(
@@ -753,6 +748,7 @@ def publish(
     )
 
     # publish dependencies and header
+    deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
     deps.save(deps_path)
     archive_file = backend.join("/", db.name, define.DB + ".zip")
     backend.put_archive(
