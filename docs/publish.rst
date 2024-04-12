@@ -11,20 +11,27 @@
     :hide-code:
 
     import os
-    import shutil
+    import tempfile
+
+    import audb
+    import audeer
+
+
+    _cwd_root = os.getcwd()
+    _tmp_root = tempfile.mkdtemp()
+    os.chdir(_tmp_root)
 
     folders = [
         "./age-test-1.0.0",
         "./age-test-1.1.0",
-        "./data",
+        "./data/data-local",
+        "./cache",
     ]
     for folder in folders:
-        if os.path.exists(folder):
-            shutil.rmtree(folder)
+        audeer.rmdir(folder)
+        audeer.mkdir(folder)
 
-    # create repository
-    os.mkdir("./data")
-    os.mkdir("./data/data-local")
+    audb.config.CACHE_ROOT = "./cache"
 
 
 .. _publish:
@@ -249,6 +256,5 @@ to see how to load and use a database.
 .. jupyter-execute::
     :hide-code:
 
-    for folder in folders:
-        if os.path.exists(folder):
-            shutil.rmtree(folder)
+    os.chdir(_cwd_root)
+    audeer.rmdir(_tmp_root)

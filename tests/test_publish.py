@@ -1205,10 +1205,10 @@ def test_update_database(dbs, persistent_repository):
     error_msg = (
         f"You want to depend on '{audb.latest_version(DB_NAME)}' "
         f"of {DB_NAME}, "
-        f"but the MD5 sum of your "
-        f"'{audb.core.define.DEPENDENCIES_FILE}' file "
+        f"but the dependency file "
+        f"'{audb.core.define.DEPENDENCIES_FILE}' "
         f"in {dbs[version]} "
-        f"does not match the MD5 sum of the corresponding file "
+        f"does not match the dependency file "
         f"for the requested version in the repository. "
         f"Did you forgot to call "
         f"'audb.load_to({dbs[version]}, {DB_NAME}, "
