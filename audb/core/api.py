@@ -185,18 +185,15 @@ def cached(
             flavor_id_paths = audeer.list_dir_names(version_path)
 
             # Skip old audb cache (e.g. 1 as flavor)
-            files = audeer.list_file_names(version_path)
-            deps_path = os.path.join(version_path, define.DEPENDENCIES_FILE)
-            deps_path_cached = os.path.join(
-                version_path,
-                define.CACHED_DEPENDENCIES_FILE,
-            )
-            if deps_path not in files and deps_path_cached not in files:
+            files = audeer.list_file_names(version_path, basenames=True)
+            if (
+                define.DEPENDENCIES_FILE not in files
+                and define.LEGACY_DEPENDENCIES_FILE not in files
+                and define.CACHED_DEPENDENCIES_FILE not in files
+            ):
                 # Skip all cache entries
-                # that don't contain a db.csv or db.pkl file
+                # that don't contain a dependency file
                 # as those stem from audb<1.0.0.
-                # We only look for db.csv
-                # as we switched to db.pkl with audb>=1.0.5
                 continue  # pragma: no cover
 
             for flavor_id_path in flavor_id_paths:
@@ -260,15 +257,15 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
-    deps_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
+    cached_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
 
     deps = Dependencies()
 
     with FolderLock(db_root):
         try:
-            deps.load(deps_path)
+            deps.load(cached_path)
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
-            # If loading pickled cached file fails, load again from backend
+            # If loading cached file fails, load again from backend
             backend = utils.lookup_backend(name, version)
             with tempfile.TemporaryDirectory() as tmp_root:
                 archive = backend.join("/", name, define.DB + ".zip")
@@ -278,8 +275,16 @@ def dependencies(
                     version,
                     verbose=verbose,
                 )
-                deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
-                deps.save(deps_path)
+                # Load parquet or csv from tmp dir
+                # and store as pickle in cache
+                deps_path = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
+                legacy_path = os.path.join(tmp_root, define.LEGACY_DEPENDENCIES_FILE)
+                if os.path.exists(deps_path):
+                    deps.load(deps_path)
+                else:
+                    deps.load(legacy_path)
+                # Store as pickle in cache
+                deps.save(cached_path)
 
     return deps
 

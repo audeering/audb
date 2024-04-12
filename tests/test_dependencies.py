@@ -1,7 +1,7 @@
-import os
-
 import pandas as pd
 import pytest
+
+import audeer
 
 import audb
 
@@ -214,20 +214,50 @@ def test_file_bases_methods(deps, files, method, expected_dtype):
             assert isinstance(result, expected_dtype)
 
 
-def test_load_save(deps):
-    deps_file = "deps.csv"
+@pytest.mark.parametrize("file", ["deps.csv", "deps.pkl", "deps.parquet"])
+def test_load_save(tmpdir, deps, file):
+    """Test consistency of dependency table after save/load cycle.
+
+    Dependency values and data types
+    should remain identical
+    when first storing and then loading from a file.
+    This should hold for all possible file formats.
+
+    """
+    deps_file = audeer.path(tmpdir, file)
     deps.save(deps_file)
     deps2 = audb.Dependencies()
     deps2.load(deps_file)
     pd.testing.assert_frame_equal(deps(), deps2())
-    os.remove(deps_file)
-    # Expected dtypes
     assert list(deps2._df.dtypes) == list(audb.core.define.DEPEND_FIELD_DTYPES.values())
-    # Wrong extension or file missng
+
+
+def test_load_save_backward_compatibility(tmpdir, deps):
+    """Test backward compatibility with old pickle cache files.
+
+    As the dtype of the index has changed,
+    we need to make sure this is corrected
+    when loading old cache files.
+
+    """
+    deps_file = audeer.path(tmpdir, "deps.pkl")
+    # Change dtype of index from object to string
+    # to mimic previous behavior
+    deps._df.index = deps._df.index.astype("string")
+    deps.save(deps_file)
+    deps2 = audb.Dependencies()
+    deps2.load(deps_file)
+    assert deps2._df.index.dtype == audb.core.define.DEPEND_INDEX_DTYPE
+
+
+def test_load_save_errors(deps):
+    """Test possible errors when loading/saving."""
+    # Wrong file extension
     with pytest.raises(ValueError, match=r".*'txt'.*"):
-        deps2.load("deps.txt")
+        deps.load("deps.txt")
+    # File missing
     with pytest.raises(FileNotFoundError):
-        deps.load(deps_file)
+        deps.load("deps.csv")
 
 
 def test_len(deps):

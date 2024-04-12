@@ -4,6 +4,9 @@ import re
 import typing
 
 import pandas as pd
+import pyarrow as pa
+import pyarrow.csv as csv
+import pyarrow.parquet as parquet
 
 import audeer
 
@@ -59,6 +62,23 @@ class Dependencies:
         ):
             data[name] = pd.Series(dtype=dtype)
         self._df = pd.DataFrame(data)
+        # pyarrow schema
+        # used for reading and writing files
+        self._schema = pa.schema(
+            [
+                ("file", pa.string()),
+                ("archive", pa.string()),
+                ("bit_depth", pa.int32()),
+                ("channels", pa.int32()),
+                ("checksum", pa.string()),
+                ("duration", pa.float64()),
+                ("format", pa.string()),
+                ("removed", pa.int32()),
+                ("sampling_rate", pa.int32()),
+                ("type", pa.int32()),
+                ("version", pa.string()),
+            ]
+        )
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -285,19 +305,22 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv`` or ``pkl``
+                File extension can be ``csv``
+                ``pkl``,
+                or ``parquet``
 
         Raises:
-            ValueError: if file extension is not ``csv`` or ``pkl``
+            ValueError: if file extension is not one of
+                ``csv``, ``pkl``, ``parquet``
             FileNotFoundError: if ``path`` does not exists
 
         """
         self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
         path = audeer.path(path)
         extension = audeer.file_extension(path)
-        if extension not in ["csv", "pkl"]:
+        if extension not in ["csv", "pkl", "parquet"]:
             raise ValueError(
-                f"File extension of 'path' has to be 'csv' or 'pkl' "
+                f"File extension of 'path' has to be 'csv', 'pkl', or 'parquet' "
                 f"not '{extension}'"
             )
         if not os.path.exists(path):
@@ -308,29 +331,27 @@ class Dependencies:
             )
         if extension == "pkl":
             self._df = pd.read_pickle(path)
+            # Correct dtype of index
+            # to make backward compatiple
+            # with old pickle files in cache
+            # that might use `string` as dtype
+            if self._df.index.dtype != define.DEPEND_INDEX_DTYPE:
+                self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
+
         elif extension == "csv":
-            # Data type of dependency columns
-            dtype_mapping = {
-                name: dtype
-                for name, dtype in zip(
-                    define.DEPEND_FIELD_NAMES.values(),
-                    define.DEPEND_FIELD_DTYPES.values(),
-                )
-            }
-            # Data type of index
-            index = 0
-            self._df = pd.read_csv(
+            table = csv.read_csv(
                 path,
-                index_col=index,
-                na_filter=False,
-                dtype=dtype_mapping,
+                read_options=csv.ReadOptions(
+                    column_names=self._schema.names,
+                    skip_rows=1,
+                ),
+                convert_options=csv.ConvertOptions(column_types=self._schema),
             )
-            self._df.index.name = None
-        # Set dtype of index for both CSV and PKL
-        # to make backward compatiple
-        # with old pickle files in cache
-        # that might use `string` as dtype
-        self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
+            self._df = self._table_to_dataframe(table)
+
+        elif extension == "parquet":
+            table = parquet.read_table(path)
+            self._df = self._table_to_dataframe(table)
 
     def removed(
         self,
@@ -367,17 +388,25 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv`` or ``pkl``
+                File extension can be ``csv``, ``pkl``, or ``parquet``
 
         """
         path = audeer.path(path)
         if path.endswith("csv"):
-            self._df.to_csv(path)
+            table = self._dataframe_to_table(self._df)
+            csv.write_csv(
+                table,
+                path,
+                write_options=csv.WriteOptions(quoting_style="none"),
+            )
         elif path.endswith("pkl"):
             self._df.to_pickle(
                 path,
                 protocol=4,  # supported by Python >= 3.4
             )
+        elif path.endswith("parquet"):
+            table = self._dataframe_to_table(self._df, file_column=True)
+            parquet.write_table(table, path)
 
     def type(
         self,
@@ -527,6 +556,35 @@ class Dependencies:
                 values = values.tolist()
             return values
 
+    def _dataframe_to_table(
+        self,
+        df: pd.DataFrame,
+        *,
+        file_column: bool = False,
+    ) -> pa.Table:
+        r"""Convert pandas dataframe to pyarrow table.
+
+        Args:
+            df: dependency table as pandas dataframe
+            file_column: if ``False``
+                the ``"file"`` column
+                is renamed to ``""``
+
+        Returns:
+            dependency table as pyarrow table
+
+        """
+        table = pa.Table.from_pandas(
+            df.reset_index().rename(columns={"index": "file"}),
+            preserve_index=False,
+            schema=self._schema,
+        )
+        if not file_column:
+            columns = table.column_names
+            columns = ["" if c == "file" else c for c in columns]
+            table = table.rename_columns(columns)
+        return table
+
     def _drop(self, files: typing.Sequence[str]):
         r"""Drop files from table.
 
@@ -550,6 +608,33 @@ class Dependencies:
 
         """
         self._df.at[file, "removed"] = 1
+
+    def _table_to_dataframe(self, table: pa.Table) -> pd.DataFrame:
+        r"""Convert pyarrow table to pandas dataframe.
+
+        Args:
+            table: dependency table as pyarrow table
+
+        Returns:
+            dependency table as pandas dataframe
+
+        """
+        df = table.to_pandas(
+            deduplicate_objects=False,
+            # Convert to pyarrow dtypes,
+            # but ensure we use pd.StringDtype("pyarrow")
+            # and not pd.ArrowDtype(pa.string())
+            # see https://pandas.pydata.org/docs/user_guide/pyarrow.html
+            types_mapper={
+                pa.string(): pd.StringDtype("pyarrow"),
+                pa.int32(): pd.ArrowDtype(pa.int32()),
+                pa.float64(): pd.ArrowDtype(pa.float64()),
+            }.get,  # we have to provide a callable, not a dict
+        )
+        df.set_index("file", inplace=True)
+        df.index.name = None
+        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
+        return df
 
     def _update_media(
         self,
