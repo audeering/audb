@@ -368,7 +368,7 @@ def _put_media(
     version: str,
     previous_version: typing.Optional[str],
     deps: Dependencies,
-    backend: typing.type[audbackend.interface.Base],
+    backend: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
