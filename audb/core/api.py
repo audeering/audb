@@ -49,7 +49,7 @@ def available(
                 # avoid backend.ls('/')
                 # which is very slow on Artifactory
                 # see https://github.com/audeering/audbackend/issues/132
-                for p in backend_interface.backend._repo.path:
+                for p in backend_interface.backend.path("/"):
                     name = p.name
                     try:
                         for version in [str(x).split("/")[-1] for x in p / "db"]:
@@ -612,11 +612,7 @@ def versions(
             # Avoid using ls() on Artifactory
             # see https://github.com/devopshq/artifactory/issues/423
             folder = backend.join("/", name, "db")
-            path = audbackend.core.backend.artifactory._artifactory_path(
-                backend._expand(folder),
-                backend._username,
-                backend._api_key,
-            )
+            path = backend.path(folder)
             try:
                 if path.exists():
                     for p in path:
