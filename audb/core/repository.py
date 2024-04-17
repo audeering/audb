@@ -23,7 +23,10 @@ class Repository:
 
     """
 
-    backend_registry = {}
+    backend_registry = {
+        "file-system": audbackend.backend.FileSystem,
+        "artifactory": audbackend.backend.Artifactory,
+    }
     r"""Backend registry."""
 
     def __init__(
@@ -57,13 +60,13 @@ class Repository:
         """
         backend_class = self.backend_registry[self.backend]
         backend = backend_class(self.host, self.name)
-        with backend:
-            if self.name == "artifactory":
-                # Legacy interface on Artifactory
-                interface = audbackend.interface.Maven(backend)
-            else:
-                interface = audbackend.interface.Versioned(backend)
-            return interface
+        backend.open()
+        if self.backend == "artifactory":
+            # Maven version file structure on Artifactory
+            interface = audbackend.interface.Maven(backend)
+        else:
+            interface = audbackend.interface.Versioned(backend)
+        return interface
 
     @classmethod
     def register(
@@ -82,7 +85,7 @@ class Repository:
 
         Examples:
             >>> import audbackend
-            >>> register("file-system", audbackend.class.FileSystem)
+            >>> Repository.register("file-system", audbackend.backend.FileSystem)
 
         """
-        cls.backend_register[backend_name] = backend_class
+        cls.backend_registry[backend_name] = backend_class
