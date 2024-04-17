@@ -33,7 +33,7 @@ classifiers = [
 ]
 requires-python = '>=3.8'
 dependencies = [
-    'git+ssh://git@github.com/audeering/audbackend#artifactory-authentication',
+    'audbackend@git+https://github.com/audeering/audbackend#egg=artifactory-authentication',
     'audeer >=2.0.0',
     'audformat >=1.1.1',
     'audiofile >=1.0.0',
