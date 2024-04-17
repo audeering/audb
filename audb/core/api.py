@@ -274,10 +274,10 @@ def dependencies(
             deps.load(deps_path)
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
             # If loading pickled cached file fails, load again from backend
-            backend = utils.lookup_backend(name, version)
+            backend_interface = utils.lookup_backend(name, version)
             with tempfile.TemporaryDirectory() as tmp_root:
-                archive = backend.join("/", name, define.DB + ".zip")
-                backend.get_archive(
+                archive = backend_interface.join("/", name, define.DB + ".zip")
+                backend_interface.get_archive(
                     archive,
                     tmp_root,
                     version,
@@ -482,12 +482,12 @@ def remove_media(
         files = [files]
 
     for version in versions(name):
-        backend = utils.lookup_backend(name, version)
+        backend_interface = utils.lookup_backend(name, version)
 
         with tempfile.TemporaryDirectory() as db_root:
             # download dependencies
-            archive = backend.join("/", name, define.DB + ".zip")
-            deps_path = backend.get_archive(
+            archive = backend_interface.join("/", name, define.DB + ".zip")
+            deps_path = backend_interface.get_archive(
                 archive,
                 db_root,
                 version,
@@ -508,14 +508,14 @@ def remove_media(
 
                     # if archive exists in this version,
                     # remove file from it and re-publish
-                    remote_archive = backend.join(
+                    remote_archive = backend_interface.join(
                         "/",
                         name,
                         define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
                         archive + ".zip",
                     )
-                    if backend.exists(remote_archive, version):
-                        files_in_archive = backend.get_archive(
+                    if backend_interface.exists(remote_archive, version):
+                        files_in_archive = backend_interface.get_archive(
                             remote_archive,
                             db_root,
                             version,
@@ -531,7 +531,7 @@ def remove_media(
                         if file in files_in_archive:
                             os.remove(os.path.join(db_root, file))
                             files_in_archive.remove(file)
-                            backend.put_archive(
+                            backend_interface.put_archive(
                                 db_root,
                                 remote_archive,
                                 version,
@@ -545,8 +545,8 @@ def remove_media(
             # upload dependencies
             if upload:
                 deps.save(deps_path)
-                remote_archive = backend.join("/", name, define.DB + ".zip")
-                backend.put_archive(
+                remote_archive = backend_interface.join("/", name, define.DB + ".zip")
+                backend_interface.put_archive(
                     db_root,
                     remote_archive,
                     version,

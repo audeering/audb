@@ -26,7 +26,7 @@ def lookup_backend(
         version: version string
 
     Returns:
-        backend
+        backend interface
 
     Raises:
         RuntimeError: if database is not found
@@ -58,14 +58,14 @@ def _lookup(
     """
     for repository in config.REPOSITORIES:
         try:
-            backend = repository()
+            backend_interface = repository()
         except audbackend.BackendError:
             continue
 
-        header = backend.join("/", name, "db.yaml")
+        header = backend_interface.join("/", name, "db.yaml")
 
-        if backend.exists(header, version, suppress_backend_errors=True):
-            return repository, backend
+        if backend_interface.exists(header, version, suppress_backend_errors=True):
+            return repository, backend_interface
 
     raise RuntimeError(
         f"Cannot find version " f"'{version}' " f"for database " f"'{name}'."

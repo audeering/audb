@@ -351,7 +351,7 @@ def _get_attachments_from_backend(
     attachments: typing.Sequence[str],
     db_root: str,
     deps: Dependencies,
-    backend: audbackend.Backend,
+    backend_interface: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -367,13 +367,13 @@ def _get_attachments_from_backend(
     def job(path: str):
         archive = deps.archive(path)
         version = deps.version(path)
-        archive = backend.join(
+        archive = backend_interface.join(
             "/",
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
             archive + ".zip",
         )
-        backend.get_archive(
+        backend_interface.get_archive(
             archive,
             db_root_tmp,
             version,
@@ -404,7 +404,7 @@ def _get_media_from_backend(
     db_root: str,
     flavor: typing.Optional[Flavor],
     deps: Dependencies,
-    backend: audbackend.Backend,
+    backend_interface: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -435,7 +435,7 @@ def _get_media_from_backend(
     utils.mkdir_tree(media, db_root_tmp)
 
     def job(archive: str, version: str):
-        archive = backend.join(
+        archive = backend_interface.join(
             "/",
             name,
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
@@ -443,7 +443,7 @@ def _get_media_from_backend(
         )
         # extract and move all files that are stored in the archive,
         # even if only a single file from the archive was requested
-        files = backend.get_archive(
+        files = backend_interface.get_archive(
             archive,
             db_root_tmp,
             version,
@@ -490,7 +490,7 @@ def _get_tables_from_backend(
     tables: typing.Sequence[str],
     db_root: str,
     deps: Dependencies,
-    backend: audbackend.Backend,
+    backend_interface: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -498,13 +498,13 @@ def _get_tables_from_backend(
     db_root_tmp = database_tmp_root(db_root)
 
     def job(table: str):
-        archive = backend.join(
+        archive = backend_interface.join(
             "/",
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.META],
             deps.archive(table) + ".zip",
         )
-        backend.get_archive(
+        backend_interface.get_archive(
             archive,
             db_root_tmp,
             deps.version(table),
@@ -540,7 +540,7 @@ def _get_tables_from_backend(
 
 def _load_attachments(
     attachments: typing.Sequence[str],
-    backend: audbackend.Backend,
+    backend_interface: typing.Type[audbackend.interface.Base],
     db_root: str,
     db: audformat.Database,
     version: str,
@@ -555,7 +555,7 @@ def _load_attachments(
 
     Args:
         attachments: list of attachment IDs
-        backend: backend object
+        backend_interface: backend object
         db_root: database root
         db: database object
         version: database version
@@ -600,14 +600,14 @@ def _load_attachments(
                 verbose,
             )
         if missing_attachments:
-            if backend is None:
-                backend = lookup_backend(db.name, version)
+            if backend_interface is None:
+                backend_interface = lookup_backend(db.name, version)
             _get_attachments_from_backend(
                 db,
                 missing_attachments,
                 db_root,
                 deps,
-                backend,
+                backend_interface,
                 num_workers,
                 verbose,
             )
@@ -618,7 +618,7 @@ def _load_attachments(
 def _load_files(
     files: typing.Sequence[str],
     files_type: str,
-    backend: audbackend.Backend,
+    backend_interface: typing.Type[audbackend.interface.Base],
     db_root: str,
     db: audformat.Database,
     version: str,
@@ -647,7 +647,7 @@ def _load_files(
         files_type: ``'media'``,
             ``'table'``,
             or ``'attachment'``
-        backend: backend object
+        backend_interface: backend object
         db_root: database root
         db: database object
         version: database version
@@ -692,8 +692,8 @@ def _load_files(
                 verbose,
             )
         if missing_files:
-            if backend is None:
-                backend = lookup_backend(db.name, version)
+            if backend_interface is None:
+                backend_interface = lookup_backend(db.name, version)
             if files_type == "media":
                 _get_media_from_backend(
                     db.name,
@@ -701,7 +701,7 @@ def _load_files(
                     db_root,
                     flavor,
                     deps,
-                    backend,
+                    backend_interface,
                     num_workers,
                     verbose,
                 )
@@ -711,7 +711,7 @@ def _load_files(
                     missing_files,
                     db_root,
                     deps,
-                    backend,
+                    backend_interface,
                     num_workers,
                     verbose,
                 )
@@ -1043,7 +1043,7 @@ def load(
     try:
         with FolderLock(db_root, timeout=timeout):
             # Start with database header without tables
-            db, backend = load_header_to(
+            db, backend_interface = load_header_to(
                 db_root,
                 name,
                 version,
@@ -1064,7 +1064,7 @@ def load(
 
                 cached_versions = _load_attachments(
                     requested_attachments,
-                    backend,
+                    backend_interface,
                     db_root,
                     db,
                     version,
@@ -1099,7 +1099,7 @@ def load(
                     cached_versions = _load_files(
                         _tables,
                         "table",
-                        backend,
+                        backend_interface,
                         db_root,
                         db,
                         version,
@@ -1134,7 +1134,7 @@ def load(
                 cached_versions = _load_files(
                     requested_media,
                     "media",
-                    backend,
+                    backend_interface,
                     db_root,
                     db,
                     version,
@@ -1249,7 +1249,7 @@ def load_attachment(
 
     with FolderLock(db_root):
         # Start with database header
-        db, backend = load_header_to(
+        db, backend_interface = load_header_to(
             db_root,
             name,
             version,
@@ -1258,7 +1258,7 @@ def load_attachment(
         # Load attachment
         _load_attachments(
             [attachment],
-            backend,
+            backend_interface,
             db_root,
             db,
             version,
@@ -1315,7 +1315,10 @@ def load_header_to(
     flavor: Flavor = None,
     add_audb_meta: bool = False,
     overwrite: bool = False,
-) -> typing.Tuple[audformat.Database, typing.Optional[audbackend.Backend]]:
+) -> typing.Tuple[
+    audformat.Database,
+    typing.Optional[typing.Type[audbackend.interface.Base]],
+]:
     r"""Load database header from folder or backend.
 
     If the database header cannot be found in ``db_root``
@@ -1338,15 +1341,15 @@ def load_header_to(
         database header and backend
 
     """
-    backend = None
+    backend_interface = None
     local_header = os.path.join(db_root, define.HEADER_FILE)
     if overwrite or not os.path.exists(local_header):
-        backend = lookup_backend(name, version)
-        remote_header = backend.join("/", name, define.HEADER_FILE)
+        backend_interface = lookup_backend(name, version)
+        remote_header = backend_interface.join("/", name, define.HEADER_FILE)
         if add_audb_meta:
             db_root_tmp = database_tmp_root(db_root)
             local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
-        backend.get_file(remote_header, local_header, version)
+        backend_interface.get_file(remote_header, local_header, version)
         if add_audb_meta:
             db = audformat.Database.load(db_root_tmp, load_data=False)
             db.meta["audb"] = {
@@ -1362,7 +1365,7 @@ def load_header_to(
             )
             audeer.rmdir(db_root_tmp)
 
-    return audformat.Database.load(db_root, load_data=False), backend
+    return audformat.Database.load(db_root, load_data=False), backend_interface
 
 
 def load_media(
@@ -1482,7 +1485,7 @@ def load_media(
     try:
         with FolderLock(db_root, timeout=timeout):
             # Start with database header without tables
-            db, backend = load_header_to(
+            db, backend_interface = load_header_to(
                 db_root,
                 name,
                 version,
@@ -1497,7 +1500,7 @@ def load_media(
                 _load_files(
                     media,
                     "media",
-                    backend,
+                    backend_interface,
                     db_root,
                     db,
                     version,
@@ -1601,7 +1604,7 @@ def load_table(
 
     with FolderLock(db_root):
         # Start with database header without tables
-        db, backend = load_header_to(
+        db, backend_interface = load_header_to(
             db_root,
             name,
             version,
@@ -1618,7 +1621,7 @@ def load_table(
                 _load_files(
                     [table],
                     "table",
-                    backend,
+                    backend_interface,
                     db_root,
                     db,
                     version,

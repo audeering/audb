@@ -338,19 +338,19 @@ def _put_attachments(
     db_root: str,
     db: audformat.Database,
     version: str,
-    backend: typing.Type[audbackend.interface.Base],
+    backend_interface: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
     def job(attachment_id: str):
-        archive_file = backend.join(
+        archive_file = backend_interface.join(
             "/",
             db.name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
             attachment_id + ".zip",
         )
         files = db.attachments[attachment_id].files
-        backend.put_archive(db_root, archive_file, version, files=files)
+        backend_interface.put_archive(db_root, archive_file, version, files=files)
 
     audeer.run_tasks(
         job,
@@ -368,7 +368,7 @@ def _put_media(
     version: str,
     previous_version: typing.Optional[str],
     deps: Dependencies,
-    backend: typing.Type[audbackend.interface.Base],
+    backend_interface: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -386,7 +386,7 @@ def _put_media(
                 for file in files:
                     update_media.append(file)
 
-                archive_file = backend.join(
+                archive_file = backend_interface.join(
                     "/",
                     db_name,
                     define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
@@ -406,7 +406,7 @@ def _put_media(
                             missing_files.append(file)
                     if missing_files:
                         with tempfile.TemporaryDirectory() as tmp_root:
-                            backend.get_archive(
+                            backend_interface.get_archive(
                                 archive_file,
                                 tmp_root,
                                 deps.version(missing_files[0]),
@@ -420,7 +420,7 @@ def _put_media(
                                     dst_path,
                                 )
 
-                backend.put_archive(
+                backend_interface.put_archive(
                     db_root,
                     archive_file,
                     version,
@@ -443,19 +443,19 @@ def _put_tables(
     db_root: str,
     db_name: str,
     version: str,
-    backend: typing.Type[audbackend.interface.Base],
+    backend_interface: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
     def job(table: str):
         file = f"db.{table}.csv"
-        archive_file = backend.join(
+        archive_file = backend_interface.join(
             "/",
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.META],
             table + ".zip",
         )
-        backend.put_archive(db_root, archive_file, version, files=file)
+        backend_interface.put_archive(db_root, archive_file, version, files=file)
 
     audeer.run_tasks(
         job,
@@ -599,10 +599,10 @@ def publish(
         verbose=verbose,
     )
 
-    backend = repository()
+    backend_interface = repository()
 
-    remote_header = backend.join("/", db.name, define.HEADER_FILE)
-    versions = backend.versions(remote_header, suppress_backend_errors=True)
+    remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
+    versions = backend_interface.versions(remote_header, suppress_backend_errors=True)
     if version in versions:
         raise RuntimeError(
             "A version " f"'{version}' " "already exists for database " f"'{db.name}'."
@@ -729,11 +729,15 @@ def publish(
 
     # publish attachments
     attachments = _find_attachments(db, db_root, version, deps, verbose)
-    _put_attachments(attachments, db_root, db, version, backend, num_workers, verbose)
+    _put_attachments(
+        attachments, db_root, db, version, backend_interface, num_workers, verbose
+    )
 
     # publish tables
     tables = _find_tables(db, db_root, version, deps, verbose)
-    _put_tables(tables, db_root, db.name, version, backend, num_workers, verbose)
+    _put_tables(
+        tables, db_root, db.name, version, backend_interface, num_workers, verbose
+    )
 
     # publish media
     media_archives = _find_media(
@@ -746,15 +750,15 @@ def publish(
         version,
         previous_version,
         deps,
-        backend,
+        backend_interface,
         num_workers,
         verbose,
     )
 
     # publish dependencies and header
     deps.save(deps_path)
-    archive_file = backend.join("/", db.name, define.DB + ".zip")
-    backend.put_archive(
+    archive_file = backend_interface.join("/", db.name, define.DB + ".zip")
+    backend_interface.put_archive(
         db_root,
         archive_file,
         version,
@@ -762,14 +766,14 @@ def publish(
     )
     try:
         local_header = os.path.join(db_root, define.HEADER_FILE)
-        remote_header = backend.join("/", db.name, define.HEADER_FILE)
-        backend.put_file(local_header, remote_header, version)
+        remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
+        backend_interface.put_file(local_header, remote_header, version)
     except Exception:  # pragma: no cover
         # after the header is published
         # the new version becomes visible,
         # so if something goes wrong here
         # we better clean up
-        if backend.exists(remote_header, version):
-            backend.remove_file(remote_header, version)
+        if backend_interface.exists(remote_header, version):
+            backend_interface.remove_file(remote_header, version)
 
     return deps
