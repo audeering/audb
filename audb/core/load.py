@@ -602,6 +602,7 @@ def _load_attachments(
         if missing_attachments:
             if backend_interface is None:
                 backend_interface = lookup_backend(db.name, version)
+                backend_interface.backend.open()
             _get_attachments_from_backend(
                 db,
                 missing_attachments,
@@ -612,7 +613,7 @@ def _load_attachments(
                 verbose,
             )
 
-    return cached_versions
+    return cached_versions, backend_interface
 
 
 def _load_files(
@@ -694,6 +695,7 @@ def _load_files(
         if missing_files:
             if backend_interface is None:
                 backend_interface = lookup_backend(db.name, version)
+                backend_interface.backend.open()
             if files_type == "media":
                 _get_media_from_backend(
                     db.name,
@@ -716,7 +718,7 @@ def _load_files(
                     verbose,
                 )
 
-    return cached_versions
+    return cached_versions, backend_interface
 
 
 def _misc_tables_used_in_scheme(
@@ -1062,7 +1064,7 @@ def load(
                     "attachment",
                 )
 
-                cached_versions = _load_attachments(
+                cached_versions, backend_interface = _load_attachments(
                     requested_attachments,
                     backend_interface,
                     db_root,
@@ -1096,7 +1098,7 @@ def load(
                 ]:
                     # need to load misc tables used in a scheme first
                     # as loading is done in parallel
-                    cached_versions = _load_files(
+                    cached_versions, backend_interface = _load_files(
                         _tables,
                         "table",
                         backend_interface,
@@ -1131,7 +1133,7 @@ def load(
 
             # load missing media
             if not db_is_complete and not only_metadata:
-                cached_versions = _load_files(
+                cached_versions, backend_interface = _load_files(
                     requested_media,
                     "media",
                     backend_interface,
@@ -1179,6 +1181,9 @@ def load(
                     flavor,
                     deps,
                 )
+
+            if backend_interface is not None:
+                backend_interface.backend.close()
 
     except filelock.Timeout:
         utils.timeout_warning()
@@ -1275,6 +1280,8 @@ def load_attachment(
         os.path.join(db_root, os.path.normpath(file))  # convert "/" to os.sep
         for file in attachment_files
     ]
+    if backend_interface is not None:
+        backend_interface.backend.close()
     return attachment_files
 
 
@@ -1302,7 +1309,10 @@ def load_header(
     db_root = database_cache_root(name, version, cache_root)
 
     with FolderLock(db_root):
-        db, _ = load_header_to(db_root, name, version)
+        db, backend_interface = load_header_to(db_root, name, version)
+
+    if backend_interface is not None:
+        backend_interface.backend.close()
 
     return db
 
@@ -1345,6 +1355,7 @@ def load_header_to(
     local_header = os.path.join(db_root, define.HEADER_FILE)
     if overwrite or not os.path.exists(local_header):
         backend_interface = lookup_backend(name, version)
+        backend_interface.backend.open()
         remote_header = backend_interface.join("/", name, define.HEADER_FILE)
         if add_audb_meta:
             db_root_tmp = database_tmp_root(db_root)
@@ -1497,7 +1508,7 @@ def load_media(
 
             # load missing media
             if not db_is_complete:
-                _load_files(
+                _, backend_interface = _load_files(
                     media,
                     "media",
                     backend_interface,
@@ -1518,6 +1529,9 @@ def load_media(
                 os.path.join(db_root, os.path.normpath(file))  # convert "/" to os.sep
                 for file in media
             ]
+
+            if backend_interface is not None:
+                backend_interface.backend.close()
 
     except filelock.Timeout:
         utils.timeout_warning()
@@ -1618,7 +1632,7 @@ def load_table(
                 os.path.exists(f"{table_file}.csv")
                 or os.path.exists(f"{table_file}.pkl")
             ):
-                _load_files(
+                _, backend_interface = _load_files(
                     [table],
                     "table",
                     backend_interface,
@@ -1634,5 +1648,8 @@ def load_table(
                 )
             table = audformat.Table()
             table.load(table_file)
+
+        if backend_interface is not None:
+            backend_interface.backend.close()
 
     return table._df

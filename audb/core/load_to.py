@@ -331,7 +331,7 @@ def load_to(
         db_root_tmp,
         name,
         version,
-        overwrite=True,
+        overwrite=True,  # this connects to backend
     )
     db_header.save(db_root_tmp, header_only=True)
 
@@ -403,6 +403,7 @@ def load_to(
             num_workers,
             verbose,
         )
+    backend_interface.backend.close()
 
     # save dependencies
 
