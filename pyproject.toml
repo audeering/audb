@@ -33,7 +33,7 @@ classifiers = [
 ]
 requires-python = '>=3.8'
 dependencies = [
-    'audbackend @ @ git+https://github.com/audeering/audbackend.git@dev',
+    'audbackend @ git+https://github.com/audeering/audbackend.git@dev',
     'audeer >=2.0.0',
     'audformat >=1.1.1',
     'audiofile >=1.0.0',
