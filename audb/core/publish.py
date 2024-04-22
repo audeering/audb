@@ -600,181 +600,183 @@ def publish(
     )
 
     backend_interface = repository()
-    backend_interface.backend.open()
-
-    remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
-    versions = backend_interface.versions(remote_header, suppress_backend_errors=True)
-    if version in versions:
-        raise RuntimeError(
-            "A version " f"'{version}' " "already exists for database " f"'{db.name}'."
+    with backend_interface.backend:
+        remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
+        versions = backend_interface.versions(
+            remote_header,
+            suppress_backend_errors=True,
         )
-    if previous_version == "latest":
-        if len(versions) > 0:
-            previous_version = versions[-1]
-        else:
-            previous_version = None
-
-    # load database and dependencies
-    deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
-    deps = Dependencies()
-    if os.path.exists(deps_path):
-        deps.load(deps_path)
-
-    # check if database folder depends on the right version
-
-    # dependencies shouldn't be there
-    if previous_version is None and len(deps) > 0:
-        raise RuntimeError(
-            f"You did not set a dependency to a previous version, "
-            f"but you have a '{define.DEPENDENCIES_FILE}' file present "
-            f"in {db_root}."
-        )
-
-    # dependencies missing
-    if previous_version is not None and len(deps) == 0:
-        raise RuntimeError(
-            f"You want to depend on '{previous_version}' "
-            f"of {db.name}, "
-            f"but you don't have a '{define.DEPENDENCIES_FILE}' file present "
-            f"in {db_root}. "
-            f"Did you forgot to call "
-            f"'audb.load_to({db_root}, {db.name}, "
-            f"version={previous_version}?"
-        )
-
-    # dependencies do not match version
-    if previous_version is not None and len(deps) > 0:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            previous_deps_path = os.path.join(
-                tmp_dir,
-                define.DEPENDENCIES_FILE,
+        if version in versions:
+            raise RuntimeError(
+                f"A version '{version}' already exists for database '{db.name}'."
             )
-            previous_deps = dependencies(
-                db.name,
-                version=previous_version,
-                cache_root=cache_root,
-                verbose=verbose,
+        if previous_version == "latest":
+            if len(versions) > 0:
+                previous_version = versions[-1]
+            else:
+                previous_version = None
+
+        # load database and dependencies
+        deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
+        deps = Dependencies()
+        if os.path.exists(deps_path):
+            deps.load(deps_path)
+
+        # check if database folder depends on the right version
+
+        # dependencies shouldn't be there
+        if previous_version is None and len(deps) > 0:
+            raise RuntimeError(
+                f"You did not set a dependency to a previous version, "
+                f"but you have a '{define.DEPENDENCIES_FILE}' file present "
+                f"in {db_root}."
             )
-            previous_deps.save(previous_deps_path)
-            if audeer.md5(deps_path) != audeer.md5(previous_deps_path):
+
+        # dependencies missing
+        if previous_version is not None and len(deps) == 0:
+            raise RuntimeError(
+                f"You want to depend on '{previous_version}' "
+                f"of {db.name}, "
+                f"but you don't have a '{define.DEPENDENCIES_FILE}' file present "
+                f"in {db_root}. "
+                f"Did you forgot to call "
+                f"'audb.load_to({db_root}, {db.name}, "
+                f"version={previous_version}?"
+            )
+
+        # dependencies do not match version
+        if previous_version is not None and len(deps) > 0:
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                previous_deps_path = os.path.join(
+                    tmp_dir,
+                    define.DEPENDENCIES_FILE,
+                )
+                previous_deps = dependencies(
+                    db.name,
+                    version=previous_version,
+                    cache_root=cache_root,
+                    verbose=verbose,
+                )
+                previous_deps.save(previous_deps_path)
+                if audeer.md5(deps_path) != audeer.md5(previous_deps_path):
+                    raise RuntimeError(
+                        f"You want to depend on '{previous_version}' "
+                        f"of {db.name}, "
+                        f"but the MD5 sum of your "
+                        f"'{define.DEPENDENCIES_FILE}' file "
+                        f"in {db_root} "
+                        f"does not match the MD5 sum of the corresponding file "
+                        f"for the requested version in the repository. "
+                        f"Did you forgot to call "
+                        f"'audb.load_to({db_root}, {db.name}, "
+                        f"version='{previous_version}') "
+                        f"or modified the file manually?"
+                    )
+
+        # load database with table data
+        db = audformat.Database.load(
+            db_root,
+            load_data=True,
+            num_workers=num_workers,
+            verbose=verbose,
+        )
+
+        # ensure table and attachment IDs
+        # contain only chars allowed by the backend
+        # as the IDs are included in the filenames of the archives
+        # uploaded to the backend
+        allowed_chars = audbackend.core.utils.BACKEND_ALLOWED_CHARS
+        allowed_chars = allowed_chars.replace("/", "")
+        allowed_chars_compiled = re.compile(allowed_chars)
+        for table_id in list(db):
+            if allowed_chars_compiled.fullmatch(table_id) is None:
                 raise RuntimeError(
-                    f"You want to depend on '{previous_version}' "
-                    f"of {db.name}, "
-                    f"but the MD5 sum of your "
-                    f"'{define.DEPENDENCIES_FILE}' file "
-                    f"in {db_root} "
-                    f"does not match the MD5 sum of the corresponding file "
-                    f"for the requested version in the repository. "
-                    f"Did you forgot to call "
-                    f"'audb.load_to({db_root}, {db.name}, "
-                    f"version='{previous_version}') "
-                    f"or modified the file manually?"
+                    "Table IDs must only contain chars from "
+                    f"{allowed_chars[:-1]}, "
+                    f"which is not the case for table '{table_id}'."
+                )
+        for attachment_id in list(db.attachments):
+            if allowed_chars_compiled.fullmatch(attachment_id) is None:
+                raise RuntimeError(
+                    "Attachment IDs must only contain chars from "
+                    f"{allowed_chars[:-1]}, "
+                    f"which is not the case for attachment '{attachment_id}'."
                 )
 
-    # load database with table data
-    db = audformat.Database.load(
-        db_root,
-        load_data=True,
-        num_workers=num_workers,
-        verbose=verbose,
-    )
-
-    # ensure table and attachment IDs
-    # contain only chars allowed by the backend
-    # as the IDs are included in the filenames of the archives
-    # uploaded to the backend
-    allowed_chars = audbackend.core.utils.BACKEND_ALLOWED_CHARS
-    allowed_chars = allowed_chars.replace("/", "")
-    allowed_chars_compiled = re.compile(allowed_chars)
-    for table_id in list(db):
-        if allowed_chars_compiled.fullmatch(table_id) is None:
+        # check all tables are conform with audformat
+        if not db.is_portable:
             raise RuntimeError(
-                "Table IDs must only contain chars from "
-                f"{allowed_chars[:-1]}, "
-                f"which is not the case for table '{table_id}'."
+                "Some files in the tables have absolute paths "
+                "or use '\\', '.', '..' in its path. "
+                "Please replace those paths by relative paths, "
+                "use folder names instead of dots, "
+                "and avoid Windows path notation."
             )
-    for attachment_id in list(db.attachments):
-        if allowed_chars_compiled.fullmatch(attachment_id) is None:
-            raise RuntimeError(
-                "Attachment IDs must only contain chars from "
-                f"{allowed_chars[:-1]}, "
-                f"which is not the case for attachment '{attachment_id}'."
-            )
+        _check_for_duplicates(db, num_workers, verbose)
 
-    # check all tables are conform with audformat
-    if not db.is_portable:
-        raise RuntimeError(
-            "Some files in the tables have absolute paths "
-            "or use '\\', '.', '..' in its path. "
-            "Please replace those paths by relative paths, "
-            "use folder names instead of dots, "
-            "and avoid Windows path notation."
+        # check all media referenced in a table exist
+        # on disk or are already part of the database
+        db_root_files = _get_root_files(db_root)
+        _check_for_missing_media(db, db_root, db_root_files, deps)
+
+        # make sure all tables are stored in CSV format
+        for table_id in list(db):
+            table = db[table_id]
+            table_path = os.path.join(db_root, f"db.{table_id}")
+            table_ext = audformat.define.TableStorageFormat.CSV
+            if not os.path.exists(table_path + f".{table_ext}"):
+                table.save(table_path, storage_format=table_ext)
+
+        # check archives
+        archives = archives or {}
+
+        # publish attachments
+        attachments = _find_attachments(db, db_root, version, deps, verbose)
+        _put_attachments(
+            attachments, db_root, db, version, backend_interface, num_workers, verbose
         )
-    _check_for_duplicates(db, num_workers, verbose)
 
-    # check all media referenced in a table exist
-    # on disk or are already part of the database
-    db_root_files = _get_root_files(db_root)
-    _check_for_missing_media(db, db_root, db_root_files, deps)
+        # publish tables
+        tables = _find_tables(db, db_root, version, deps, verbose)
+        _put_tables(
+            tables, db_root, db.name, version, backend_interface, num_workers, verbose
+        )
 
-    # make sure all tables are stored in CSV format
-    for table_id in list(db):
-        table = db[table_id]
-        table_path = os.path.join(db_root, f"db.{table_id}")
-        table_ext = audformat.define.TableStorageFormat.CSV
-        if not os.path.exists(table_path + f".{table_ext}"):
-            table.save(table_path, storage_format=table_ext)
+        # publish media
+        media_archives = _find_media(
+            db, db_root, db_root_files, version, deps, archives, num_workers, verbose
+        )
+        _put_media(
+            media_archives,
+            db_root,
+            db.name,
+            version,
+            previous_version,
+            deps,
+            backend_interface,
+            num_workers,
+            verbose,
+        )
 
-    # check archives
-    archives = archives or {}
+        # publish dependencies and header
+        deps.save(deps_path)
+        archive_file = backend_interface.join("/", db.name, define.DB + ".zip")
+        backend_interface.put_archive(
+            db_root,
+            archive_file,
+            version,
+            files=define.DEPENDENCIES_FILE,
+        )
+        try:
+            local_header = os.path.join(db_root, define.HEADER_FILE)
+            remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
+            backend_interface.put_file(local_header, remote_header, version)
+        except Exception:  # pragma: no cover
+            # after the header is published
+            # the new version becomes visible,
+            # so if something goes wrong here
+            # we better clean up
+            if backend_interface.exists(remote_header, version):
+                backend_interface.remove_file(remote_header, version)
 
-    # publish attachments
-    attachments = _find_attachments(db, db_root, version, deps, verbose)
-    _put_attachments(
-        attachments, db_root, db, version, backend_interface, num_workers, verbose
-    )
-
-    # publish tables
-    tables = _find_tables(db, db_root, version, deps, verbose)
-    _put_tables(
-        tables, db_root, db.name, version, backend_interface, num_workers, verbose
-    )
-
-    # publish media
-    media_archives = _find_media(
-        db, db_root, db_root_files, version, deps, archives, num_workers, verbose
-    )
-    _put_media(
-        media_archives,
-        db_root,
-        db.name,
-        version,
-        previous_version,
-        deps,
-        backend_interface,
-        num_workers,
-        verbose,
-    )
-
-    # publish dependencies and header
-    deps.save(deps_path)
-    archive_file = backend_interface.join("/", db.name, define.DB + ".zip")
-    backend_interface.put_archive(
-        db_root,
-        archive_file,
-        version,
-        files=define.DEPENDENCIES_FILE,
-    )
-    try:
-        local_header = os.path.join(db_root, define.HEADER_FILE)
-        remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
-        backend_interface.put_file(local_header, remote_header, version)
-    except Exception:  # pragma: no cover
-        # after the header is published
-        # the new version becomes visible,
-        # so if something goes wrong here
-        # we better clean up
-        if backend_interface.exists(remote_header, version):
-            backend_interface.remove_file(remote_header, version)
-
-    return deps
+        return deps
