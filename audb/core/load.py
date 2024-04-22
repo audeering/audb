@@ -11,8 +11,8 @@ import audformat
 
 from audb.core import define
 from audb.core import utils
+from audb.core.api import _dependencies
 from audb.core.api import cached
-from audb.core.api import dependencies
 from audb.core.api import latest_version
 from audb.core.cache import database_cache_root
 from audb.core.cache import database_tmp_root
@@ -47,7 +47,7 @@ def _cached_versions(
         if row["flavor_id"] == flavor.short_id:
             if row["version"] == version:
                 continue
-            deps = dependencies(
+            deps, _ = _dependencies(
                 name,
                 version=row["version"],
                 cache_root=cache_root,
@@ -870,23 +870,33 @@ def filtered_dependencies(
         filtered dependencies
 
     """
-    deps = dependencies(name, version=version, cache_root=cache_root)
+    deps, backend_interface = _dependencies(
+        name,
+        version=version,
+        cache_root=cache_root,
+    )
     if tables is None and media is None:
         df = deps()
     else:
         # Load header to get list of tables
-        db = load_header(name, version=version, cache_root=cache_root)
+        db, backend_interface = load_header(
+            name,
+            version=version,
+            cache_root=cache_root,
+            backend_interface=backend_interface,
+        )
         tables = filter_deps(tables, list(db), "table")
         tables = [t for t in tables if t not in list(db.misc_tables)]
         # Gather media files from tables
         available_media = []
         for table in tables:
-            df = load_table(
+            df, backend_interface = _load_table(
                 name,
                 table,
                 version=version,
                 cache_root=cache_root,
                 verbose=False,
+                backend_interface=backend_interface,
             )
             available_media += list(df.index.get_level_values("file").unique())
 
@@ -894,6 +904,9 @@ def filtered_dependencies(
             media = filter_deps(media, deps.media, "media", name, version)
             available_media = [m for m in media if m in list(set(available_media))]
         df = deps().loc[available_media]
+
+    if backend_interface is not None:
+        backend_interface.backend.close()
 
     return df
 
@@ -1035,7 +1048,7 @@ def load(
         print(f"Get:   {name} v{version}")
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
+    deps, backend_interface = _dependencies(
         name,
         version=version,
         cache_root=cache_root,
@@ -1051,6 +1064,7 @@ def load(
                 version,
                 flavor=flavor,
                 add_audb_meta=True,
+                backend_interface=backend_interface,
             )
 
             db_is_complete = _database_is_complete(db)
@@ -1227,6 +1241,49 @@ def load_attachment(
         'burkhardt2005emodb.bib'
 
     """
+    attachments, backend_interface = _load_attachment(
+        name,
+        attachment,
+        version=version,
+        cache_root=cache_root,
+        verbose=verbose,
+    )
+    if backend_interface is not None:
+        backend_interface.backend.close()
+    return attachments
+
+
+def _load_attachment(
+    name: str,
+    attachment: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
+    verbose: bool = True,
+    backend_interface: typing.Type[audbackend.interface.Base] = None,
+) -> typing.List[str]:
+    r"""Load attachment(s) of database.
+
+    Args:
+        name: name of database
+        attachment: attachment ID to load
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+        verbose: show debug messages
+        backend_interface: backend interface.
+            If ``None``,
+            it looks for the next backend,
+            on which the database is available
+
+    Returns:
+        list of file paths belonging to attachment, backend interface
+
+    Raises:
+        ValueError: if an attachment ID is requested
+            that is not part of the database
+
+    """
     if version is None:
         version = latest_version(name)
 
@@ -1236,7 +1293,7 @@ def load_attachment(
         print(f"Get:   {name} v{version}")
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
+    deps, backend_interface = _dependencies(
         name,
         version=version,
         cache_root=cache_root,
@@ -1258,6 +1315,7 @@ def load_attachment(
             db_root,
             name,
             version,
+            backend_interface=backend_interface,
         )
 
         # Load attachment
@@ -1280,9 +1338,7 @@ def load_attachment(
         os.path.join(db_root, os.path.normpath(file))  # convert "/" to os.sep
         for file in attachment_files
     ]
-    if backend_interface is not None:
-        backend_interface.backend.close()
-    return attachment_files
+    return attachment_files, backend_interface
 
 
 def load_header(
@@ -1290,7 +1346,8 @@ def load_header(
     *,
     version: str = None,
     cache_root: str = None,
-) -> audformat.Database:
+    backend_interface: typing.Type[audbackend.interface.Base] = None,
+) -> typing.Tuple[audformat.Database, typing.Type[audbackend.interface.Base]]:
     r"""Load header of database.
 
     Args:
@@ -1298,9 +1355,13 @@ def load_header(
         version: version of database
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
+        backend_interface: backend interface.
+            If ``None``,
+            it looks for the next backend,
+            on which the database is available
 
     Returns:
-        database object without table data
+        database object without table data, backend interface
 
     """
     if version is None:
@@ -1309,12 +1370,14 @@ def load_header(
     db_root = database_cache_root(name, version, cache_root)
 
     with FolderLock(db_root):
-        db, backend_interface = load_header_to(db_root, name, version)
+        db, backend_interface = load_header_to(
+            db_root,
+            name,
+            version,
+            backend_interface=backend_interface,
+        )
 
-    if backend_interface is not None:
-        backend_interface.backend.close()
-
-    return db
+    return db, backend_interface
 
 
 def load_header_to(
@@ -1325,6 +1388,7 @@ def load_header_to(
     flavor: Flavor = None,
     add_audb_meta: bool = False,
     overwrite: bool = False,
+    backend_interface: typing.Type[audbackend.interface.Base] = None,
 ) -> typing.Tuple[
     audformat.Database,
     typing.Optional[typing.Type[audbackend.interface.Base]],
@@ -1346,12 +1410,15 @@ def load_header_to(
             to the database header before storing it in cache
         overwrite: always load header from backend
             and overwrite the one found in ``db_root``
+        backend_interface: backend interface.
+            If ``None``,
+            it looks for the next backend,
+            on which the database is available
 
     Returns:
         database header and backend
 
     """
-    backend_interface = None
     local_header = os.path.join(db_root, define.HEADER_FILE)
     if overwrite or not os.path.exists(local_header):
         backend_interface = lookup_backend(name, version)
@@ -1454,9 +1521,97 @@ def load_media(
         ['emodb', '1.4.1', '40bb2241', 'wav', '03a01Fa.flac']
 
     """
+    files, backend_interface = _load_media(
+        name,
+        media,
+        version=version,
+        bit_depth=bit_depth,
+        channels=channels,
+        format=format,
+        mixdown=mixdown,
+        sampling_rate=sampling_rate,
+        cache_root=cache_root,
+        num_workers=num_workers,
+        timeout=timeout,
+        verbose=verbose,
+    )
+    if backend_interface is not None:
+        backend_interface.backend.close()
+    return files
+
+
+def _load_media(
+    name: str,
+    media: typing.Union[str, typing.Sequence[str]],
+    *,
+    version: str = None,
+    bit_depth: int = None,
+    channels: typing.Union[int, typing.Sequence[int]] = None,
+    format: str = None,
+    mixdown: bool = False,
+    sampling_rate: int = None,
+    cache_root: str = None,
+    num_workers: typing.Optional[int] = 1,
+    timeout: float = -1,
+    verbose: bool = True,
+    backend_interface: typing.Type[audbackend.interface.Base] = None,
+) -> typing.Tuple[typing.Optional[typing.List], typing.Type[audbackend.interface.Base]]:
+    r"""Load media file(s).
+
+    If you are interested in media files
+    and not the corresponding tables,
+    you can use :func:`audb.load_media`
+    to load them.
+    This will not download any table files
+    to your disk,
+    but share the cache with :func:`audb.load`.
+
+    Args:
+        name: name of database
+        media: load media files provided in the list
+        version: version of database
+        bit_depth: bit depth, one of ``16``, ``24``, ``32``
+        channels: channel selection, see :func:`audresample.remix`.
+            Note that media files with too few channels
+            will be first upsampled by repeating the existing channels.
+            E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,
+            and ``channels=[1]`` returns the second channel
+            of all multi-channel files
+            and all mono files
+        format: file format, one of ``'flac'``, ``'wav'``
+        mixdown: apply mono mix-down
+        sampling_rate: sampling rate in Hz, one of
+            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+        num_workers: number of parallel jobs or 1 for sequential
+            processing. If ``None`` will be set to the number of
+            processors on the machine multiplied by 5
+        timeout: maximum wait time if another thread or process is already
+            accessing the database. If timeout is reached, ``None`` is
+            returned. If timeout < 0 the method will block until the
+            database can be accessed
+        verbose: show debug messages
+        backend_interface: backend interface.
+            If ``None``,
+            it looks for the next backend,
+            on which the database is available
+
+    Returns:
+        paths to media files
+
+    Raises:
+        ValueError: if a media file is requested
+            that is not part of the database
+        ValueError: if a non-supported ``bit_depth``,
+            ``format``,
+            or ``sampling_rate``
+            is requested
+
+    """
     media = audeer.to_list(media)
     if len(media) == 0:
-        return []
+        return [], backend_interface
 
     if version is None:
         version = latest_version(name)
@@ -1475,7 +1630,7 @@ def load_media(
         print(f"Get:   {name} v{version}")
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
+    deps, backend_interface = _dependencies(
         name,
         version=version,
         cache_root=cache_root,
@@ -1502,6 +1657,7 @@ def load_media(
                 version,
                 flavor=flavor,
                 add_audb_meta=True,
+                backend_interface=backend_interface,
             )
 
             db_is_complete = _database_is_complete(db)
@@ -1530,13 +1686,10 @@ def load_media(
                 for file in media
             ]
 
-            if backend_interface is not None:
-                backend_interface.backend.close()
-
     except filelock.Timeout:
         utils.timeout_warning()
 
-    return files
+    return files, backend_interface
 
 
 def load_table(
@@ -1591,6 +1744,62 @@ def load_table(
         wav/03a01Wa.wav      anger                0.95
 
     """
+    df, backend_interface = _load_table(
+        name,
+        table,
+        version=version,
+        cache_root=cache_root,
+        num_workers=num_workers,
+        verbose=verbose,
+    )
+    if backend_interface is not None:
+        backend_interface.backend.close()
+    return df
+
+
+def _load_table(
+    name: str,
+    table: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
+    num_workers: typing.Optional[int] = 1,
+    verbose: bool = True,
+    backend_interface: typing.Type[audbackend.interface.Base] = None,
+) -> typing.Tuple[pd.DataFrame, typing.Type[audbackend.interface.Base]]:
+    r"""Load a database table.
+
+    If you are interested in a single table
+    from a database
+    you can use :func:`audb.load_table`
+    to directly load it.
+    This will not download any media files
+    to your disk,
+    but share the cache with :func:`audb.load`.
+
+    Args:
+        name: name of database
+        table: load table from database
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+        num_workers: number of parallel jobs or 1 for sequential
+            processing. If ``None`` will be set to the number of
+            processors on the machine multiplied by 5
+        verbose: show debug messages
+        backend_interface: backend interface.
+            If ``None``,
+            it looks for the next backend,
+            on which the database is available
+
+    Returns:
+        database table
+
+    Raises:
+        ValueError: if a table is requested
+            that is not part of the database
+
+    """
     if version is None:
         version = latest_version(name)
 
@@ -1600,7 +1809,7 @@ def load_table(
         print(f"Get:   {name} v{version}")
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
+    deps, backend_interface = _dependencies(
         name,
         version=version,
         cache_root=cache_root,
@@ -1622,6 +1831,7 @@ def load_table(
             db_root,
             name,
             version,
+            backend_interface=backend_interface,
         )
 
         # Load table
@@ -1649,7 +1859,4 @@ def load_table(
             table = audformat.Table()
             table.load(table_file)
 
-        if backend_interface is not None:
-            backend_interface.backend.close()
-
-    return table._df
+    return table._df, backend_interface

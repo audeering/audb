@@ -6,9 +6,9 @@ import audformat
 
 from audb.core import define
 from audb.core.api import dependencies
+from audb.core.load import _load_table
 from audb.core.load import filtered_dependencies
 from audb.core.load import load_header
-from audb.core.load import load_table
 
 
 def attachments(
@@ -307,18 +307,23 @@ def header(
         'emodb'
 
     """
-    db = load_header(name, version=version, cache_root=cache_root)
+    db, backend_interface = load_header(name, version=version, cache_root=cache_root)
     if load_tables:
         for scheme in db.schemes.values():
             if scheme.uses_table:
                 table = scheme.labels
-                load_table(
+                _load_table(
                     name,
                     table,
                     version=version,
                     cache_root=cache_root,
                     verbose=False,
+                    backend_interface=backend_interface,
                 )
+
+    if backend_interface is not None:
+        backend_interface.backend.close()
+
     return db
 
 

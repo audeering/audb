@@ -233,6 +233,63 @@ def cached(
     return df.where(pd.notnull(df), None)
 
 
+def _dependencies(
+    name: str,
+    *,
+    version: str = None,
+    cache_root: str = None,
+    verbose: bool = False,
+) -> typing.Tuple[Dependencies, typing.Type[audbackend.interface.Base]]:
+    r"""Database dependencies.
+
+    This private function exists,
+    to be able to return the used backend,
+    without exposing this to the public API.
+
+    Args:
+        name: name of database
+        version: version of database
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+        verbose: show debug messages
+
+    Returns:
+        dependency object, backend interface object
+
+    """
+    if version is None:
+        version = latest_version(name)
+
+    db_root = database_cache_root(
+        name,
+        version,
+        cache_root=cache_root,
+    )
+    deps_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
+
+    deps = Dependencies()
+
+    backend_interface = None
+    with FolderLock(db_root):
+        try:
+            deps.load(deps_path)
+        except (AttributeError, FileNotFoundError, ValueError, EOFError):
+            # If loading pickled cached file fails, load again from backend
+            backend_interface = utils.lookup_backend(name, version)
+            with tempfile.TemporaryDirectory() as tmp_root:
+                archive = backend_interface.join("/", name, define.DB + ".zip")
+                backend_interface.get_archive(
+                    archive,
+                    tmp_root,
+                    version,
+                    verbose=verbose,
+                )
+                deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
+                deps.save(deps_path)
+
+    return deps, backend_interface
+
+
 def dependencies(
     name: str,
     *,
@@ -258,36 +315,12 @@ def dependencies(
         '1.1.0'
 
     """
-    if version is None:
-        version = latest_version(name)
-
-    db_root = database_cache_root(
+    deps, _ = _dependencies(
         name,
-        version,
+        version=version,
         cache_root=cache_root,
+        verbose=verbose,
     )
-    deps_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
-
-    deps = Dependencies()
-
-    with FolderLock(db_root):
-        try:
-            deps.load(deps_path)
-        except (AttributeError, FileNotFoundError, ValueError, EOFError):
-            # If loading pickled cached file fails, load again from backend
-            backend_interface = utils.lookup_backend(name, version)
-            with tempfile.TemporaryDirectory() as tmp_root:
-                archive = backend_interface.join("/", name, define.DB + ".zip")
-                backend_interface.get_archive(
-                    archive,
-                    tmp_root,
-                    version,
-                    verbose=verbose,
-                )
-                backend_interface.backend.close()
-                deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
-                deps.save(deps_path)
-
     return deps
 
 
