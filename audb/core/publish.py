@@ -600,6 +600,7 @@ def publish(
     )
 
     backend_interface = repository()
+    backend_interface.backend.open()
 
     remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
     versions = backend_interface.versions(remote_header, suppress_backend_errors=True)

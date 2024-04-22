@@ -45,14 +45,32 @@ def available(
     for repository in config.REPOSITORIES:
         try:
             backend_interface = repository()
-            if repository.backend == "artifactory":
-                # avoid backend.ls('/')
-                # which is very slow on Artifactory
-                # see https://github.com/audeering/audbackend/issues/132
-                for p in backend_interface.backend.path("/"):
-                    name = p.name
-                    try:
-                        for version in [str(x).split("/")[-1] for x in p / "db"]:
+            with backend_interface.backend as backend:
+                if repository.backend == "artifactory":
+                    # avoid backend.ls('/')
+                    # which is very slow on Artifactory
+                    # see https://github.com/audeering/audbackend/issues/132
+                    for p in backend.path("/"):
+                        name = p.name
+                        try:
+                            for version in [str(x).split("/")[-1] for x in p / "db"]:
+                                databases.append(
+                                    [
+                                        name,
+                                        repository.backend,
+                                        repository.host,
+                                        repository.name,
+                                        version,
+                                    ]
+                                )
+                        except FileNotFoundError:
+                            # If the `db` folder does not exist,
+                            # we do not include the dataset
+                            pass
+                else:
+                    for path, version in backend_interface.ls("/"):
+                        if path.endswith(define.HEADER_FILE):
+                            name = path.split("/")[1]
                             databases.append(
                                 [
                                     name,
@@ -62,23 +80,6 @@ def available(
                                     version,
                                 ]
                             )
-                    except FileNotFoundError:
-                        # If the `db` folder does not exist,
-                        # we do not include the dataset
-                        pass
-            else:
-                for path, version in backend_interface.ls("/"):
-                    if path.endswith(define.HEADER_FILE):
-                        name = path.split("/")[1]
-                        databases.append(
-                            [
-                                name,
-                                repository.backend,
-                                repository.host,
-                                repository.name,
-                                version,
-                            ]
-                        )
         except audbackend.BackendError:
             continue
 
@@ -283,6 +284,7 @@ def dependencies(
                     version,
                     verbose=verbose,
                 )
+                backend_interface.backend.close()
                 deps.load(os.path.join(tmp_root, define.DEPENDENCIES_FILE))
                 deps.save(deps_path)
 
@@ -605,31 +607,33 @@ def versions(
     vs = []
     for repository in config.REPOSITORIES:
         backend_interface = repository()
-        backend = backend_interface.backend
-        if repository.backend == "artifactory":
-            import artifactory
+        with backend_interface.backend as backend:
+            if repository.backend == "artifactory":
+                import artifactory
 
-            # Avoid using ls() on Artifactory
-            # see https://github.com/devopshq/artifactory/issues/423
-            folder = backend.join("/", name, "db")
-            path = backend.path(folder)
-            try:
-                if path.exists():
-                    for p in path:
-                        version = p.parts[-1]
-                        header = p.joinpath(f"db-{version}.yaml")
-                        if header.exists():
-                            vs.extend([version])
-            except artifactory.ArtifactoryException:  # pragma: nocover
-                # This tackles the case of missing repo
-                # or missing read permissions.
-                # We cannot test this at the moment
-                # on the public Artifactory server.
-                # Because after trying
-                # to connect to a repo without read access
-                # the connection is also blocked for valid repos.
-                pass
-        else:
-            header = backend_interface.join("/", name, "db.yaml")
-            vs.extend(backend_interface.versions(header, suppress_backend_errors=True))
+                # Avoid using ls() on Artifactory
+                # see https://github.com/devopshq/artifactory/issues/423
+                folder = backend.join("/", name, "db")
+                path = backend.path(folder)
+                try:
+                    if path.exists():
+                        for p in path:
+                            version = p.parts[-1]
+                            header = p.joinpath(f"db-{version}.yaml")
+                            if header.exists():
+                                vs.extend([version])
+                except artifactory.ArtifactoryException:  # pragma: nocover
+                    # This tackles the case of missing repo
+                    # or missing read permissions.
+                    # We cannot test this at the moment
+                    # on the public Artifactory server.
+                    # Because after trying
+                    # to connect to a repo without read access
+                    # the connection is also blocked for valid repos.
+                    pass
+            else:
+                header = backend_interface.join("/", name, "db.yaml")
+                vs.extend(
+                    backend_interface.versions(header, suppress_backend_errors=True)
+                )
     return audeer.sort_versions(vs)

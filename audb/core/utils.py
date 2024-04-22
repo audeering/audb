@@ -59,6 +59,7 @@ def _lookup(
     for repository in config.REPOSITORIES:
         try:
             backend_interface = repository()
+            backend_interface.backend.open()
         except audbackend.BackendError:
             continue
 

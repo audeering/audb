@@ -60,7 +60,6 @@ class Repository:
         """
         backend_class = self.backend_registry[self.backend]
         backend = backend_class(self.host, self.name)
-        backend.open()
         if self.backend == "artifactory":
             # Maven version file structure on Artifactory
             interface = audbackend.interface.Maven(backend)
