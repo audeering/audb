@@ -604,7 +604,10 @@ def versions(
     """
     vs = []
     for repository in config.REPOSITORIES:
-        backend = utils.access_backend(repository)
+        try:
+            backend = utils.access_backend(repository)
+        except audbackend.BackendError:
+            continue
         if isinstance(backend, audbackend.Artifactory):
             import artifactory
 
