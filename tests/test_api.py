@@ -1,7 +1,5 @@
 import os
 
-import pandas as pd
-
 import audeer
 import audformat
 
@@ -75,10 +73,6 @@ def test_versions(tmpdir, repository):
     version = "1.0.0"
     build_dir = audeer.mkdir(tmpdir, "build")
     db = audformat.Database(name)
-    index = pd.Index(["a"], name="speaker")
-    db["table"] = audformat.MiscTable(index)
-    db["table"]["column"] = audformat.Column()
-    db["table"]["column"].set([0])
     db.save(build_dir)
     audb.publish(build_dir, version, repository)
 
