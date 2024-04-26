@@ -1,6 +1,9 @@
 import os
 
+import pandas as pd
+
 import audeer
+import audformat
 
 import audb
 
@@ -43,3 +46,40 @@ def test_available_broken_dataset(private_and_public_repository):
     df = audb.available(only_latest=True)
     assert len(df) > 0
     assert "broken-dataset" not in df
+
+
+def test_versions(tmpdir, repository):
+    """Test versions() for non existing repositories.
+
+    As ``audb.versions()`` does not use ``audb.core.utils._lookup()``
+    to get the backend of the corresponding database,
+    but goes through all provided backends to collect versions
+    of the requested database,
+    we need to ensure,
+    that it does not crash
+    when a repository does not exist.
+
+    See https://github.com/audeering/audb/issues/389.
+
+    """
+    # Add non existing repository to the list of configured repositories
+    audb.config.REPOSITORIES += [
+        audb.Repository(
+            name="non-existing-repo",
+            host="non-existing-host",
+            backend="file-system",
+        )
+    ]
+    # Publish a dataset to the existing repository
+    name = "mydb"
+    version = "1.0.0"
+    build_dir = audeer.mkdir(tmpdir, "build")
+    db = audformat.Database(name)
+    index = pd.Index(["a"], name="speaker")
+    db["table"] = audformat.MiscTable(index)
+    db["table"]["column"] = audformat.Column()
+    db["table"]["column"].set([0])
+    db.save(build_dir)
+    audb.publish(build_dir, version, repository)
+
+    assert audb.versions(name) == [version]
