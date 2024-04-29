@@ -300,24 +300,65 @@ def _media_values(
     archive: str,
     checksum: str,
 ) -> typing.Tuple[str, str, int, int, str, float, str, int, float, int, str]:
-    r"""Return values of a media entry in dependencies."""
-    format = audeer.file_extension(file).lower()
+    r"""Return values of a media entry in dependencies.
 
-    try:
-        path = os.path.join(root, file)
-        bit_depth = audiofile.bit_depth(path)
-        if bit_depth is None:  # pragma: nocover (non SND files)
-            bit_depth = 0
-        channels = audiofile.channels(path)
-        duration = audiofile.duration(path, sloppy=True)
-        sampling_rate = audiofile.sampling_rate(path)
-    except FileNotFoundError:  # pragma: nocover
-        # If sox or mediafile are not installed
-        # we get a FileNotFoundError error
-        raise RuntimeError(
-            f"sox and mediainfo have to be installed "
-            f"to publish '{format}' media files."
-        )
+    The dependency table expects the following columns:
+
+    * file
+    * archive
+    * bit depth
+    * channels
+    * checksum
+    * duration
+    * format
+    * removed
+    * sampling rate
+    * dependency type
+    * version
+
+    Args:
+        root: root of database
+        file: relative media file path
+        version: database version
+        archive: archive the media file is stored in
+        checksum: checksum of the media file
+
+    Returns:
+        Tuple with a row to be added to the dependency table,
+        containing entries for `
+
+    """
+    # Allow media file extensions,
+    # that do not support audio/video metadata
+    # (e.g. channels, sampling rate)
+    special_formats = ["txt"]
+
+    dependency_type = define.DependType.MEDIA
+    format = audeer.file_extension(file).lower()
+    removed = 0
+
+    if format in special_formats:
+        bit_depth = 0
+        channels = 0
+        duration = 0.0
+        sampling_rate = 0
+    else:
+        # Inspect media file to get audio/video metadata
+        try:
+            path = os.path.join(root, file)
+            bit_depth = audiofile.bit_depth(path)
+            if bit_depth is None:  # pragma: nocover (non SND files)
+                bit_depth = 0
+            channels = audiofile.channels(path)
+            duration = audiofile.duration(path, sloppy=True)
+            sampling_rate = audiofile.sampling_rate(path)
+        except FileNotFoundError:  # pragma: nocover
+            # If sox or mediafile are not installed
+            # we get a FileNotFoundError error
+            raise RuntimeError(
+                f"sox and mediainfo have to be installed "
+                f"to publish '{format}' media files."
+            )
 
     return (
         file,
@@ -327,9 +368,9 @@ def _media_values(
         checksum,
         duration,
         format,
-        0,  # removed
+        removed,
         sampling_rate,
-        define.DependType.MEDIA,
+        dependency_type,
         version,
     )
 
