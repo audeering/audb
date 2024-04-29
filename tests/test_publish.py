@@ -45,6 +45,7 @@ def dbs(tmpdir_factory):
     #
     # tables:
     #   - emotion
+    #   - files
     # misc tables:
     #   - misc-in-scheme
     #   - misc-not-in-scheme
@@ -133,6 +134,7 @@ def dbs(tmpdir_factory):
     #
     # tables:
     #   - emotion
+    #   - files
     # misc tables:
     #   - misc-in-scheme
     #   - misc-not-in-scheme
@@ -179,6 +181,7 @@ def dbs(tmpdir_factory):
     #
     # tables:
     #   - emotion
+    #   - files
     # misc tables:
     #   - misc-in-scheme
     #   - misc-not-in-scheme
@@ -208,6 +211,7 @@ def dbs(tmpdir_factory):
     #
     # tables:
     #   - emotion
+    #   - files
     # misc tables:
     #   - misc-in-scheme
     #   - misc-not-in-scheme
@@ -232,6 +236,7 @@ def dbs(tmpdir_factory):
     #
     # tables:
     #   - emotion
+    #   - files
     # misc tables:
     #   - misc-in-scheme
     #   - misc-not-in-scheme
@@ -267,6 +272,7 @@ def dbs(tmpdir_factory):
     #
     # tables:
     #   - emotion
+    #   - files
     # misc tables:
     #   - misc-in-scheme
     #   - misc-not-in-scheme
@@ -1072,7 +1078,7 @@ def test_publish_text_media_files(tmpdir, dbs, repository):
     index = audformat.filewise_index(["data/file1.txt"])
     db["files"] = audformat.Table(index)
     db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
-    db["files"]["speaker"].set(["speaker-a"])
+    db["files"]["speaker"].set(["adam"])
     db.save(build_dir)
 
     # Publish database, containing text media file
@@ -1091,6 +1097,45 @@ def test_publish_text_media_files(tmpdir, dbs, repository):
     db = audb.load(name, version=version, verbose=False, full_path=False)
     assert db.files == [file]
     assert list(db) == ["files"]
+    assert os.path.exists(audeer.path(db.root, file))
+
+    error_msg = f"Media file '{file}' does not support requesting a flavor."
+    with pytest.raises(RuntimeError, match=error_msg):
+        db = audb.load(name, version=version, channels=[0], verbose=False)
+
+    # Publish database, containing text and media files
+    audeer.rmdir(build_dir)
+    shutil.copytree(dbs["1.0.0"], build_dir)  # start with db containing audio files
+    db = audformat.Database.load(build_dir)
+    speaker = db["files"]["speaker"].get()
+    files = list(db.files)
+    tables = list(db)
+    data_dir = audeer.mkdir(build_dir, "data")
+    with open(audeer.path(data_dir, "file1.txt"), "w") as file:
+        file.write("Text written by a person.\n")
+    index = audformat.filewise_index(["data/file1.txt"])
+    db["files"].extend_index(index, inplace=True)
+    db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
+    db["files"]["speaker"].set(list(speaker.values) + ["adam"])
+    db.name = name
+    db.save(build_dir)
+
+    # Publish database, containing text media file
+    version = "2.0.0"
+    deps = audb.publish(build_dir, version, repository, previous_version=None)
+
+    assert deps.table_ids == tables
+    file = "data/file1.txt"
+    assert deps.media == files + [file]
+    assert deps.bit_depth(file) == 0
+    assert deps.channels(file) == 0
+    assert deps.duration(file) == 0.0
+    assert deps.format(file) == "txt"
+    assert deps.sampling_rate(file) == 0
+
+    db = audb.load(name, version=version, verbose=False, full_path=False)
+    assert db.files == files + [file]
+    assert list(db) == tables
     assert os.path.exists(audeer.path(db.root, file))
 
     error_msg = f"Media file '{file}' does not support requesting a flavor."
