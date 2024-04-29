@@ -1093,6 +1093,10 @@ def test_publish_text_media_files(tmpdir, dbs, repository):
     assert list(db) == ["files"]
     assert os.path.exists(audeer.path(db.root, file))
 
+    error_msg = f"Media file '{file}' does not support requesting a flavor."
+    with pytest.raises(RuntimeError, match=error_msg):
+        db = audb.load(name, version=version, channels=[0], verbose=False)
+
 
 def test_update_database(dbs, persistent_repository):
     version = "2.1.0"
