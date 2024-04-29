@@ -324,8 +324,7 @@ def _media_values(
         checksum: checksum of the media file
 
     Returns:
-        Tuple with a row to be added to the dependency table,
-        containing entries for `
+        row to be added to the dependency table as tuple
 
     """
     dependency_type = define.DependType.MEDIA
