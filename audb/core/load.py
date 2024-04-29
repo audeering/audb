@@ -1007,7 +1007,7 @@ def load(
             or ``sampling_rate``
             is requested
         RuntimeError: if a flavor is requested,
-            but the dataset contains media files,
+            but the database contains media files,
             that don't contain audio,
             e.g. text files
 
