@@ -328,37 +328,34 @@ def _media_values(
         containing entries for `
 
     """
-    # Allow media file extensions,
-    # that do not support audio/video metadata
-    # (e.g. channels, sampling rate)
-    special_formats = ["txt"]
-
     dependency_type = define.DependType.MEDIA
     format = audeer.file_extension(file).lower()
     removed = 0
 
-    if format in special_formats:
+    # Inspect media file to get audio/video metadata
+    try:
+        path = os.path.join(root, file)
+        bit_depth = audiofile.bit_depth(path)
+        if bit_depth is None:  # pragma: nocover (non SND files)
+            bit_depth = 0
+        channels = audiofile.channels(path)
+        duration = audiofile.duration(path, sloppy=True)
+        sampling_rate = audiofile.sampling_rate(path)
+    except FileNotFoundError:  # pragma: nocover
+        # If sox or mediafile are not installed
+        # we get a FileNotFoundError error
+        raise RuntimeError(
+            f"sox and mediainfo have to be installed "
+            f"to publish '{format}' media files."
+        )
+    except RuntimeError:
+        # Skip audio/video metadata for media files,
+        # that don't support them
+        # (e.g. text files)
         bit_depth = 0
         channels = 0
         duration = 0.0
         sampling_rate = 0
-    else:
-        # Inspect media file to get audio/video metadata
-        try:
-            path = os.path.join(root, file)
-            bit_depth = audiofile.bit_depth(path)
-            if bit_depth is None:  # pragma: nocover (non SND files)
-                bit_depth = 0
-            channels = audiofile.channels(path)
-            duration = audiofile.duration(path, sloppy=True)
-            sampling_rate = audiofile.sampling_rate(path)
-        except FileNotFoundError:  # pragma: nocover
-            # If sox or mediafile are not installed
-            # we get a FileNotFoundError error
-            raise RuntimeError(
-                f"sox and mediainfo have to be installed "
-                f"to publish '{format}' media files."
-            )
 
     return (
         file,
