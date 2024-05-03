@@ -253,21 +253,9 @@ for dtype in dtypes:
     t = time.time() - t0
     results.at[method, dtype] = t
 
-    method = f"Dependencies.archive([{n_files} files])"
-    t0 = time.time()
-    deps.archive(_files)
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
     method = f"Dependencies.bit_depth({n_files} files)"
     t0 = time.time()
     [deps.bit_depth(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    method = f"Dependencies.bit_depth([{n_files} files])"
-    t0 = time.time()
-    deps.bit_depth(_files)
     t = time.time() - t0
     results.at[method, dtype] = t
 
@@ -277,21 +265,9 @@ for dtype in dtypes:
     t = time.time() - t0
     results.at[method, dtype] = t
 
-    method = f"Dependencies.channels([{n_files} files])"
-    t0 = time.time()
-    deps.channels(_files)
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
     method = f"Dependencies.checksum({n_files} files)"
     t0 = time.time()
     [deps.checksum(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    method = f"Dependencies.checksum([{n_files} files])"
-    t0 = time.time()
-    deps.checksum(_files)
     t = time.time() - t0
     results.at[method, dtype] = t
 
@@ -301,21 +277,9 @@ for dtype in dtypes:
     t = time.time() - t0
     results.at[method, dtype] = t
 
-    method = f"Dependencies.duration([{n_files} files])"
-    t0 = time.time()
-    deps.duration(_files)
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
     method = f"Dependencies.format({n_files} files)"
     t0 = time.time()
     [deps.format(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    method = f"Dependencies.format([{n_files} files])"
-    t0 = time.time()
-    deps.format(_files)
     t = time.time() - t0
     results.at[method, dtype] = t
 
@@ -325,21 +289,9 @@ for dtype in dtypes:
     t = time.time() - t0
     results.at[method, dtype] = t
 
-    method = f"Dependencies.removed([{n_files} files])"
-    t0 = time.time()
-    deps.removed(_files)
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
     method = f"Dependencies.sampling_rate({n_files} files)"
     t0 = time.time()
     [deps.sampling_rate(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    method = f"Dependencies.sampling_rate([{n_files} files])"
-    t0 = time.time()
-    deps.sampling_rate(_files)
     t = time.time() - t0
     results.at[method, dtype] = t
 
@@ -349,21 +301,9 @@ for dtype in dtypes:
     t = time.time() - t0
     results.at[method, dtype] = t
 
-    method = f"Dependencies.type([{n_files} files])"
-    t0 = time.time()
-    deps.type(_files)
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
     method = f"Dependencies.version({n_files} files)"
     t0 = time.time()
     [deps.version(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    method = f"Dependencies.version([{n_files} files])"
-    t0 = time.time()
-    deps.version(_files)
     t = time.time() - t0
     results.at[method, dtype] = t
 
