@@ -3,8 +3,3 @@ pytest
 pytest-cov
 pytest-console-scripts
 pytest-doctestplus
-# We experienced an error on MacOS runners,
-# see https://github.com/audeering/audresample/issues/57
-# In https://github.com/apple/ml-stable-diffusion/issues/8
-# it is proposed to use version 4.66.1 of tqdm to fix this.
-tqdm==4.66.1

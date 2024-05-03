@@ -1,5 +1,6 @@
 import glob
 import os
+import platform
 
 import pytest
 
@@ -8,7 +9,14 @@ import audeer
 import audb
 
 
-pytest.NUM_WORKERS = 5
+if platform.system() == "Darwin":
+    # Avoid multi-threading on MacOS runner,
+    # as it might fail from time to time
+    # (memory issue?), see
+    # https://github.com/audeering/audresample/issues/57
+    pytest.NUM_WORKERS = 1
+else:
+    pytest.NUM_WORKERS = 5
 
 
 @pytest.fixture(scope="package", autouse=True)
