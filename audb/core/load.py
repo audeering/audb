@@ -459,13 +459,18 @@ def _get_media_from_backend(
                 src_path = os.path.join(db_root_tmp, file)
                 file = flavor.destination(file)
                 dst_path = os.path.join(db_root_tmp, file)
-                flavor(
-                    src_path,
-                    dst_path,
-                    src_bit_depth=bit_depth,
-                    src_channels=channels,
-                    src_sampling_rate=sampling_rate,
-                )
+                try:
+                    flavor(
+                        src_path,
+                        dst_path,
+                        src_bit_depth=bit_depth,
+                        src_channels=channels,
+                        src_sampling_rate=sampling_rate,
+                    )
+                except RuntimeError:
+                    raise RuntimeError(
+                        f"Media file '{file}' does not support requesting a flavor."
+                    )
                 if src_path != dst_path:
                     os.remove(src_path)
 
@@ -1001,6 +1006,10 @@ def load(
             ``format``,
             or ``sampling_rate``
             is requested
+        RuntimeError: if a flavor is requested,
+            but the database contains media files,
+            that don't contain audio,
+            e.g. text files
 
     Examples:
         >>> db = audb.load(

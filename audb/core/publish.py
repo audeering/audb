@@ -300,9 +300,38 @@ def _media_values(
     archive: str,
     checksum: str,
 ) -> typing.Tuple[str, str, int, int, str, float, str, int, float, int, str]:
-    r"""Return values of a media entry in dependencies."""
-    format = audeer.file_extension(file).lower()
+    r"""Return values of a media entry in dependencies.
 
+    The dependency table expects the following columns:
+
+    * file
+    * archive
+    * bit depth
+    * channels
+    * checksum
+    * duration
+    * format
+    * removed
+    * sampling rate
+    * dependency type
+    * version
+
+    Args:
+        root: root of database
+        file: relative media file path
+        version: database version
+        archive: archive the media file is stored in
+        checksum: checksum of the media file
+
+    Returns:
+        row to be added to the dependency table as tuple
+
+    """
+    dependency_type = define.DependType.MEDIA
+    format = audeer.file_extension(file).lower()
+    removed = 0
+
+    # Inspect media file to get audio/video metadata
     try:
         path = os.path.join(root, file)
         bit_depth = audiofile.bit_depth(path)
@@ -318,6 +347,14 @@ def _media_values(
             f"sox and mediainfo have to be installed "
             f"to publish '{format}' media files."
         )
+    except RuntimeError:
+        # Skip audio/video metadata for media files,
+        # that don't support them
+        # (e.g. text files)
+        bit_depth = 0
+        channels = 0
+        duration = 0.0
+        sampling_rate = 0
 
     return (
         file,
@@ -327,9 +364,9 @@ def _media_values(
         checksum,
         duration,
         format,
-        0,  # removed
+        removed,
         sampling_rate,
-        define.DependType.MEDIA,
+        dependency_type,
         version,
     )
 
