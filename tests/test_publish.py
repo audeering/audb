@@ -407,7 +407,7 @@ def test_publish(tmpdir, dbs, persistent_repository, version):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    backend = audb.core.utils.lookup_backend(DB_NAME, version)
+    backend_interface = audb.core.utils.lookup_backend(DB_NAME, version)
     number_of_media_files_in_custom_archives = len(set(archives.keys()))
     number_of_custom_archives = len(set(archives.values()))
     number_of_media_files = len(deps.media)
@@ -456,8 +456,8 @@ def test_publish(tmpdir, dbs, persistent_repository, version):
 
     for file in db.files:
         name = archives[file] if file in archives else file
-        file_path = backend.join("/", db.name, "media", name)
-        backend.exists(file_path, version)
+        file_path = backend_interface.join("/", db.name, "media", name)
+        backend_interface.exists(file_path, version)
         path = os.path.join(dbs[version], file)
         assert deps.checksum(file) == audeer.md5(path)
         if deps.format(file) in [

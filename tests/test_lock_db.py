@@ -15,7 +15,7 @@ import audb
 DB_NAME = "test_lock"
 
 
-class SlowFileSystem(audbackend.FileSystem):
+class SlowFileSystem(audbackend.backend.FileSystem):
     r"""Emulate a slow file system.
 
     Introduces a short delay when getting a file from the backend.
@@ -28,13 +28,10 @@ class SlowFileSystem(audbackend.FileSystem):
         super()._get_file(*args)
 
 
-audbackend.register(
-    "slow-file-system",
-    SlowFileSystem,
-)
+audb.Repository.register("slow-file-system", SlowFileSystem)
 
 
-class CrashFileSystem(audbackend.FileSystem):
+class CrashFileSystem(audbackend.backend.FileSystem):
     r"""Emulate a file system that crashes.
 
     Raises an exception when getting a file from the backend.
@@ -45,10 +42,7 @@ class CrashFileSystem(audbackend.FileSystem):
         raise RuntimeError()
 
 
-audbackend.register(
-    "crash-file-system",
-    CrashFileSystem,
-)
+audb.Repository.register("crash-file-system", CrashFileSystem)
 
 
 def lock_paths(cache):

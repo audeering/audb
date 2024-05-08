@@ -46,15 +46,33 @@ def available(
     databases = []
     for repository in config.REPOSITORIES:
         try:
-            backend = utils.access_backend(repository)
-            if isinstance(backend, audbackend.Artifactory):
-                # avoid backend.ls('/')
-                # which is very slow on Artifactory
-                # see https://github.com/audeering/audbackend/issues/132
-                for p in backend._repo.path:
-                    name = p.name
-                    try:
-                        for version in [str(x).split("/")[-1] for x in p / "db"]:
+            backend_interface = repository.create_backend_interface()
+            with backend_interface.backend as backend:
+                if repository.backend == "artifactory":
+                    # avoid backend_interface.ls('/')
+                    # which is very slow on Artifactory
+                    # see https://github.com/audeering/audbackend/issues/132
+                    for p in backend.path("/"):
+                        name = p.name
+                        try:
+                            for version in [str(x).split("/")[-1] for x in p / "db"]:
+                                databases.append(
+                                    [
+                                        name,
+                                        repository.backend,
+                                        repository.host,
+                                        repository.name,
+                                        version,
+                                    ]
+                                )
+                        except FileNotFoundError:
+                            # If the `db` folder does not exist,
+                            # we do not include the dataset
+                            pass
+                else:
+                    for path, version in backend_interface.ls("/"):
+                        if path.endswith(define.HEADER_FILE):
+                            name = path.split("/")[1]
                             databases.append(
                                 [
                                     name,
@@ -64,23 +82,6 @@ def available(
                                     version,
                                 ]
                             )
-                    except FileNotFoundError:
-                        # If the `db` folder does not exist,
-                        # we do not include the dataset
-                        pass
-            else:
-                for path, version in backend.ls("/"):
-                    if path.endswith(define.HEADER_FILE):
-                        name = path.split("/")[1]
-                        databases.append(
-                            [
-                                name,
-                                repository.backend,
-                                repository.host,
-                                repository.name,
-                                version,
-                            ]
-                        )
         except audbackend.BackendError:
             continue
 
@@ -272,8 +273,8 @@ def dependencies(
             deps.load(cached_deps_file)
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
             # If loading cached file fails, load again from backend
-            backend = utils.lookup_backend(name, version)
-            deps = download_dependencies(backend, name, version, verbose)
+            backend_interface = utils.lookup_backend(name, version)
+            deps = download_dependencies(backend_interface, name, version, verbose)
             # Store as pickle in cache
             deps.save(cached_deps_file)
 
@@ -473,8 +474,8 @@ def remove_media(
         files = [files]
 
     for version in versions(name):
-        backend = utils.lookup_backend(name, version)
-        deps = download_dependencies(backend, name, version, verbose)
+        backend_interface = utils.lookup_backend(name, version)
+        deps = download_dependencies(backend_interface, name, version, verbose)
 
         with tempfile.TemporaryDirectory() as db_root:
             # Track if we need to upload the dependency table again
@@ -490,14 +491,14 @@ def remove_media(
 
                     # if archive exists in this version,
                     # remove file from it and re-publish
-                    remote_archive = backend.join(
+                    remote_archive = backend_interface.join(
                         "/",
                         name,
                         define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
                         archive + ".zip",
                     )
-                    if backend.exists(remote_archive, version):
-                        files_in_archive = backend.get_archive(
+                    if backend_interface.exists(remote_archive, version):
+                        files_in_archive = backend_interface.get_archive(
                             remote_archive,
                             db_root,
                             version,
@@ -513,7 +514,7 @@ def remove_media(
                         if file in files_in_archive:
                             os.remove(os.path.join(db_root, file))
                             files_in_archive.remove(file)
-                            backend.put_archive(
+                            backend_interface.put_archive(
                                 db_root,
                                 remote_archive,
                                 version,
@@ -526,7 +527,7 @@ def remove_media(
 
             # upload dependencies
             if upload:
-                upload_dependencies(backend, deps, db_root, name, version)
+                upload_dependencies(backend_interface, deps, db_root, name, version)
 
 
 def repository(
@@ -579,41 +580,48 @@ def versions(
     vs = []
     for repository in config.REPOSITORIES:
         try:
-            backend = utils.access_backend(repository)
+            backend_interface = repository.create_backend_interface()
+            with backend_interface.backend as backend:
+                if repository.backend == "artifactory":
+                    import artifactory
+
+                    # Do not use `backend_interface.versions()` on Artifactory,
+                    # as calling `backend_interface.ls()` is slow on Artifactory,
+                    # see https://github.com/devopshq/artifactory/issues/423.
+                    # Instead, use `backend.path()`
+                    # from the low level backend object
+                    # to return an ArtifactoryPath object,
+                    # which allows to walk through the dataset directory
+                    # and to collect all existing versions.
+                    folder = backend.join("/", name, "db")
+                    path = backend.path(folder)
+                    try:
+                        if path.exists():
+                            for p in path:
+                                version = p.parts[-1]
+                                header = p.joinpath(f"db-{version}.yaml")
+                                if header.exists():
+                                    vs.extend([version])
+                    except artifactory.ArtifactoryException:  # pragma: nocover
+                        # This tackles the case of missing read permissions.
+                        # We cannot test this at the moment
+                        # on the public Artifactory server.
+                        # Because after trying
+                        # to connect to a path without read access
+                        # the connection is also blocked for valid paths.
+                        pass
+                else:
+                    header = backend_interface.join("/", name, "db.yaml")
+                    vs.extend(
+                        backend_interface.versions(
+                            header,
+                            suppress_backend_errors=True,
+                        )
+                    )
         except audbackend.BackendError:
             # If the backend cannot be accessed,
             # e.g. host or repository do not exist,
             # we skip it
             # and continue with the next repository
             continue
-        if isinstance(backend, audbackend.Artifactory):
-            import artifactory
-
-            # Avoid using ls() on Artifactory
-            # see https://github.com/devopshq/artifactory/issues/423
-            folder = backend.join("/", name, "db")
-            path = audbackend.core.artifactory._artifactory_path(
-                backend._expand(folder),
-                backend._username,
-                backend._api_key,
-            )
-            try:
-                if path.exists():
-                    for p in path:
-                        version = p.parts[-1]
-                        header = p.joinpath(f"db-{version}.yaml")
-                        if header.exists():
-                            vs.extend([version])
-            except artifactory.ArtifactoryException:  # pragma: nocover
-                # This tackles the case of missing repo
-                # or missing read permissions.
-                # We cannot test this at the moment
-                # on the public Artifactory server.
-                # Because after trying
-                # to connect to a repo without read access
-                # the connection is also blocked for valid repos.
-                pass
-        else:
-            header = backend.join("/", name, "db.yaml")
-            vs.extend(backend.versions(header, suppress_backend_errors=True))
     return audeer.sort_versions(vs)
