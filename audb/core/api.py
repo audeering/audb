@@ -607,6 +607,10 @@ def versions(
         try:
             backend = utils.access_backend(repository)
         except audbackend.BackendError:
+            # If the backend cannot be accessed,
+            # e.g. host or repository do not exist,
+            # we skip it
+            # and continue with the next repository
             continue
         if isinstance(backend, audbackend.Artifactory):
             import artifactory

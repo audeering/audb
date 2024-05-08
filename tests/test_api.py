@@ -61,14 +61,13 @@ def test_versions(tmpdir, repository):
 
     """
     # Add non existing repository to the list of configured repositories
-    audb.config.REPOSITORIES += [
-        audb.Repository(
-            name="non-existing-repo",
-            host="non-existing-host",
-            backend="file-system",
-        )
-    ]
-    # Publish a dataset to the existing repository
+    non_existing_repository = audb.Repository(
+        name="non-existing-repo",
+        host="non-existing-host",
+        backend="file-system",
+    )
+    audb.config.REPOSITORIES += [non_existing_repository]
+    # Publish a dataset to an existing repository
     name = "mydb"
     version = "1.0.0"
     build_dir = audeer.mkdir(tmpdir, "build")
