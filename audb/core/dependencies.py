@@ -764,10 +764,10 @@ def download_dependencies(
 ) -> Dependencies:
     r"""Load dependency file from backend.
 
-    This downloads the dependency file
-    for the requested database name and version
+    Download dependency file
+    for requested database
     to a temporary folder,
-    and returns an dependency object
+    and return an dependency object
     loaded from that file.
 
     Args:
@@ -820,7 +820,8 @@ def upload_dependencies(
 ):
     r"""Upload dependency file to backend.
 
-    Store a dependency file in the database root folder,
+    Store a dependency file
+    in the local database root folder,
     and upload it to the backend.
 
     Args:
