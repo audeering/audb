@@ -64,6 +64,7 @@ class Dependencies:
         ):
             data[name] = pd.Series(dtype=dtype)
         self._df = pd.DataFrame(data)
+        self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
         # pyarrow schema
         # used for reading and writing files
         self._schema = pa.schema(
