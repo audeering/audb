@@ -783,6 +783,7 @@ def download_dependencies(
     with tempfile.TemporaryDirectory() as tmp_root:
         # Load `db.parquet` file,
         # or if non-existent `db.zip`
+        # from backend
         remote_deps_file = backend.join("/", name, define.DEPENDENCIES_FILE)
         if backend.exists(remote_deps_file, version):
             local_deps_file = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
@@ -804,8 +805,7 @@ def download_dependencies(
                 version,
                 verbose=verbose,
             )
-        # Load parquet or csv from tmp dir
-        # and store as pickle in cache
+        # Create deps object from downloaded file
         deps = Dependencies()
         deps.load(local_deps_file)
     return deps
