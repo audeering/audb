@@ -748,25 +748,20 @@ def publish(
     )
 
     # publish dependencies and header
-    deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
-    deps.save(deps_path)
-    archive_file = backend.join("/", db.name, define.DB + ".zip")
-    backend.put_archive(
-        db_root,
-        archive_file,
-        version,
-        files=define.DEPENDENCIES_FILE,
-    )
+    local_deps_file = os.path.join(db_root, define.DEPENDENCIES_FILE)
+    remote_deps_file = backend.join("/", db.name, define.DEPENDENCIES_FILE)
+    deps.save(local_deps_file)
+    backend.put_file(local_deps_file, remote_deps_file, version)
     try:
-        local_header = os.path.join(db_root, define.HEADER_FILE)
-        remote_header = backend.join("/", db.name, define.HEADER_FILE)
-        backend.put_file(local_header, remote_header, version)
+        local_header_file = os.path.join(db_root, define.HEADER_FILE)
+        remote_header_file = backend.join("/", db.name, define.HEADER_FILE)
+        backend.put_file(local_header_file, remote_header_file, version)
     except Exception:  # pragma: no cover
         # after the header is published
         # the new version becomes visible,
         # so if something goes wrong here
         # we better clean up
-        if backend.exists(remote_header, version):
-            backend.remove_file(remote_header, version)
+        if backend.exists(remote_header_file, version):
+            backend.remove_file(remote_header_file, version)
 
     return deps

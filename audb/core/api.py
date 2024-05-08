@@ -262,34 +262,18 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
-    cached_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
-
-    deps = Dependencies()
+    cached_deps_file = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
 
     with FolderLock(db_root):
         try:
-            deps.load(cached_path)
+            deps = Dependencies()
+            deps.load(cached_deps_file)
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
             # If loading cached file fails, load again from backend
             backend = utils.lookup_backend(name, version)
-            with tempfile.TemporaryDirectory() as tmp_root:
-                archive = backend.join("/", name, define.DB + ".zip")
-                backend.get_archive(
-                    archive,
-                    tmp_root,
-                    version,
-                    verbose=verbose,
-                )
-                # Load parquet or csv from tmp dir
-                # and store as pickle in cache
-                deps_path = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
-                legacy_path = os.path.join(tmp_root, define.LEGACY_DEPENDENCIES_FILE)
-                if os.path.exists(deps_path):
-                    deps.load(deps_path)
-                else:
-                    deps.load(legacy_path)
-                # Store as pickle in cache
-                deps.save(cached_path)
+            deps = _download_dependencies(backend, name, version, verbose)
+            # Store as pickle in cache
+            deps.save(cached_deps_file)
 
     return deps
 
@@ -488,19 +472,10 @@ def remove_media(
 
     for version in versions(name):
         backend = utils.lookup_backend(name, version)
+        deps = _download_dependencies(backend, name, version, verbose)
 
         with tempfile.TemporaryDirectory() as db_root:
-            # download dependencies
-            archive = backend.join("/", name, define.DB + ".zip")
-            deps_path = backend.get_archive(
-                archive,
-                db_root,
-                version,
-                verbose=verbose,
-            )[0]
-            deps_path = os.path.join(db_root, deps_path)
-            deps = Dependencies()
-            deps.load(deps_path)
+            # Track if we need to upload the dependency table again
             upload = False
 
             for file in audeer.progress_bar(
@@ -549,15 +524,7 @@ def remove_media(
 
             # upload dependencies
             if upload:
-                deps.save(deps_path)
-                remote_archive = backend.join("/", name, define.DB + ".zip")
-                backend.put_archive(
-                    db_root,
-                    remote_archive,
-                    version,
-                    files=define.DEPENDENCIES_FILE,
-                    verbose=verbose,
-                )
+                _upload_dependencies(backend, deps, db_root, name, version)
 
 
 def repository(
@@ -641,3 +608,84 @@ def versions(
             header = backend.join("/", name, "db.yaml")
             vs.extend(backend.versions(header, suppress_backend_errors=True))
     return audeer.sort_versions(vs)
+
+
+def _download_dependencies(
+    backend: typing.Type[audbackend.Backend],
+    name: str,
+    version: str,
+    verbose: bool,
+) -> Dependencies:
+    r"""Load dependency file from backend.
+
+    This downloads the dependency file
+    for the requested database name and version
+    to a temporary folder,
+    and returns an dependency object
+    loaded from that file.
+
+    Args:
+        backend: backend interface
+        name: database name
+        version: database version
+        verbose: if ``True`` a message is shown during download
+
+    Returns:
+        dependency object
+
+    """
+    with tempfile.TemporaryDirectory() as tmp_root:
+        # Load `db.parquet` file,
+        # or if non-existent `db.zip`
+        remote_deps_file = backend.join("/", name, define.DEPENDENCIES_FILE)
+        if backend.exists(remote_deps_file, version):
+            local_deps_file = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
+            backend.get_file(
+                remote_deps_file,
+                local_deps_file,
+                version,
+                verbose=verbose,
+            )
+        else:
+            remote_deps_file = backend.join("/", name, define.DB + ".zip")
+            local_deps_file = os.path.join(
+                tmp_root,
+                define.LEGACY_DEPENDENCIES_FILE,
+            )
+            backend.get_archive(
+                remote_deps_file,
+                tmp_root,
+                version,
+                verbose=verbose,
+            )
+        # Load parquet or csv from tmp dir
+        # and store as pickle in cache
+        deps = Dependencies()
+        deps.load(local_deps_file)
+    return deps
+
+
+def _upload_dependencies(
+    backend: typing.Type[audbackend.Backend],
+    deps: Dependencies,
+    db_root: str,
+    name: str,
+    version: str,
+):
+    r"""Upload dependency file to backend.
+
+    Store a dependency file in the database root folder,
+    and upload it to the backend.
+
+    Args:
+        backend: backend interface
+        deps: dependency object
+        db_root: database root folder
+        name: database name
+        version: database version
+
+    """
+    local_deps_file = os.path.join(db_root, define.DEPENDENCIES_FILE)
+    remote_deps_file = backend.join("/", name, define.DEPENDENCIES_FILE)
+    deps.save(local_deps_file)
+    backend.put_file(local_deps_file, remote_deps_file, version)
