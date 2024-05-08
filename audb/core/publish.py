@@ -14,6 +14,7 @@ from audb.core import define
 from audb.core import utils
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
+from audb.core.dependencies import upload_dependencies
 from audb.core.repository import Repository
 
 
@@ -785,15 +786,7 @@ def publish(
     )
 
     # publish dependencies and header
-    deps_path = os.path.join(db_root, define.DEPENDENCIES_FILE)
-    deps.save(deps_path)
-    archive_file = backend.join("/", db.name, define.DB + ".zip")
-    backend.put_archive(
-        db_root,
-        archive_file,
-        version,
-        files=define.DEPENDENCIES_FILE,
-    )
+    upload_dependencies(backend, deps, db_root, db.name, version)
     try:
         local_header = os.path.join(db_root, define.HEADER_FILE)
         remote_header = backend.join("/", db.name, define.HEADER_FILE)

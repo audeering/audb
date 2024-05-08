@@ -14,6 +14,8 @@ from audb.core.cache import database_cache_root
 from audb.core.cache import default_cache_root
 from audb.core.config import config
 from audb.core.dependencies import Dependencies
+from audb.core.dependencies import download_dependencies
+from audb.core.dependencies import upload_dependencies
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
 from audb.core.repository import Repository
@@ -262,34 +264,18 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
-    cached_path = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
-
-    deps = Dependencies()
+    cached_deps_file = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
 
     with FolderLock(db_root):
         try:
-            deps.load(cached_path)
+            deps = Dependencies()
+            deps.load(cached_deps_file)
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
             # If loading cached file fails, load again from backend
             backend = utils.lookup_backend(name, version)
-            with tempfile.TemporaryDirectory() as tmp_root:
-                archive = backend.join("/", name, define.DB + ".zip")
-                backend.get_archive(
-                    archive,
-                    tmp_root,
-                    version,
-                    verbose=verbose,
-                )
-                # Load parquet or csv from tmp dir
-                # and store as pickle in cache
-                deps_path = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
-                legacy_path = os.path.join(tmp_root, define.LEGACY_DEPENDENCIES_FILE)
-                if os.path.exists(deps_path):
-                    deps.load(deps_path)
-                else:
-                    deps.load(legacy_path)
-                # Store as pickle in cache
-                deps.save(cached_path)
+            deps = download_dependencies(backend, name, version, verbose)
+            # Store as pickle in cache
+            deps.save(cached_deps_file)
 
     return deps
 
@@ -488,19 +474,10 @@ def remove_media(
 
     for version in versions(name):
         backend = utils.lookup_backend(name, version)
+        deps = download_dependencies(backend, name, version, verbose)
 
         with tempfile.TemporaryDirectory() as db_root:
-            # download dependencies
-            archive = backend.join("/", name, define.DB + ".zip")
-            deps_path = backend.get_archive(
-                archive,
-                db_root,
-                version,
-                verbose=verbose,
-            )[0]
-            deps_path = os.path.join(db_root, deps_path)
-            deps = Dependencies()
-            deps.load(deps_path)
+            # Track if we need to upload the dependency table again
             upload = False
 
             for file in audeer.progress_bar(
@@ -549,15 +526,7 @@ def remove_media(
 
             # upload dependencies
             if upload:
-                deps.save(deps_path)
-                remote_archive = backend.join("/", name, define.DB + ".zip")
-                backend.put_archive(
-                    db_root,
-                    remote_archive,
-                    version,
-                    files=define.DEPENDENCIES_FILE,
-                    verbose=verbose,
-                )
+                upload_dependencies(backend, deps, db_root, name, version)
 
 
 def repository(
