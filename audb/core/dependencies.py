@@ -1,6 +1,7 @@
 import errno
 import os
 import re
+import tempfile
 import typing
 
 import pandas as pd
@@ -8,6 +9,7 @@ import pyarrow as pa
 import pyarrow.csv as csv
 import pyarrow.parquet as parquet
 
+import audbackend
 import audeer
 
 from audb.core import define
@@ -752,3 +754,84 @@ def filter_deps(
                 raise ValueError(msg)
 
     return requested_deps
+
+
+def download_dependencies(
+    backend: typing.Type[audbackend.Backend],
+    name: str,
+    version: str,
+    verbose: bool,
+) -> Dependencies:
+    r"""Load dependency file from backend.
+
+    This downloads the dependency file
+    for the requested database name and version
+    to a temporary folder,
+    and returns an dependency object
+    loaded from that file.
+
+    Args:
+        backend: backend interface
+        name: database name
+        version: database version
+        verbose: if ``True`` a message is shown during download
+
+    Returns:
+        dependency object
+
+    """
+    with tempfile.TemporaryDirectory() as tmp_root:
+        # Load `db.parquet` file,
+        # or if non-existent `db.zip`
+        remote_deps_file = backend.join("/", name, define.DEPENDENCIES_FILE)
+        if backend.exists(remote_deps_file, version):
+            local_deps_file = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
+            backend.get_file(
+                remote_deps_file,
+                local_deps_file,
+                version,
+                verbose=verbose,
+            )
+        else:
+            remote_deps_file = backend.join("/", name, define.DB + ".zip")
+            local_deps_file = os.path.join(
+                tmp_root,
+                define.LEGACY_DEPENDENCIES_FILE,
+            )
+            backend.get_archive(
+                remote_deps_file,
+                tmp_root,
+                version,
+                verbose=verbose,
+            )
+        # Load parquet or csv from tmp dir
+        # and store as pickle in cache
+        deps = Dependencies()
+        deps.load(local_deps_file)
+    return deps
+
+
+def upload_dependencies(
+    backend: typing.Type[audbackend.Backend],
+    deps: Dependencies,
+    db_root: str,
+    name: str,
+    version: str,
+):
+    r"""Upload dependency file to backend.
+
+    Store a dependency file in the database root folder,
+    and upload it to the backend.
+
+    Args:
+        backend: backend interface
+        deps: dependency object
+        db_root: database root folder
+        name: database name
+        version: database version
+
+    """
+    local_deps_file = os.path.join(db_root, define.DEPENDENCIES_FILE)
+    remote_deps_file = backend.join("/", name, define.DEPENDENCIES_FILE)
+    deps.save(local_deps_file)
+    backend.put_file(local_deps_file, remote_deps_file, version)

@@ -14,6 +14,8 @@ from audb.core.cache import database_cache_root
 from audb.core.cache import default_cache_root
 from audb.core.config import config
 from audb.core.dependencies import Dependencies
+from audb.core.dependencies import download_dependencies
+from audb.core.dependencies import upload_dependencies
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
 from audb.core.repository import Repository
@@ -271,7 +273,7 @@ def dependencies(
         except (AttributeError, FileNotFoundError, ValueError, EOFError):
             # If loading cached file fails, load again from backend
             backend = utils.lookup_backend(name, version)
-            deps = _download_dependencies(backend, name, version, verbose)
+            deps = download_dependencies(backend, name, version, verbose)
             # Store as pickle in cache
             deps.save(cached_deps_file)
 
@@ -472,7 +474,7 @@ def remove_media(
 
     for version in versions(name):
         backend = utils.lookup_backend(name, version)
-        deps = _download_dependencies(backend, name, version, verbose)
+        deps = download_dependencies(backend, name, version, verbose)
 
         with tempfile.TemporaryDirectory() as db_root:
             # Track if we need to upload the dependency table again
@@ -524,7 +526,7 @@ def remove_media(
 
             # upload dependencies
             if upload:
-                _upload_dependencies(backend, deps, db_root, name, version)
+                upload_dependencies(backend, deps, db_root, name, version)
 
 
 def repository(
@@ -608,84 +610,3 @@ def versions(
             header = backend.join("/", name, "db.yaml")
             vs.extend(backend.versions(header, suppress_backend_errors=True))
     return audeer.sort_versions(vs)
-
-
-def _download_dependencies(
-    backend: typing.Type[audbackend.Backend],
-    name: str,
-    version: str,
-    verbose: bool,
-) -> Dependencies:
-    r"""Load dependency file from backend.
-
-    This downloads the dependency file
-    for the requested database name and version
-    to a temporary folder,
-    and returns an dependency object
-    loaded from that file.
-
-    Args:
-        backend: backend interface
-        name: database name
-        version: database version
-        verbose: if ``True`` a message is shown during download
-
-    Returns:
-        dependency object
-
-    """
-    with tempfile.TemporaryDirectory() as tmp_root:
-        # Load `db.parquet` file,
-        # or if non-existent `db.zip`
-        remote_deps_file = backend.join("/", name, define.DEPENDENCIES_FILE)
-        if backend.exists(remote_deps_file, version):
-            local_deps_file = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
-            backend.get_file(
-                remote_deps_file,
-                local_deps_file,
-                version,
-                verbose=verbose,
-            )
-        else:
-            remote_deps_file = backend.join("/", name, define.DB + ".zip")
-            local_deps_file = os.path.join(
-                tmp_root,
-                define.LEGACY_DEPENDENCIES_FILE,
-            )
-            backend.get_archive(
-                remote_deps_file,
-                tmp_root,
-                version,
-                verbose=verbose,
-            )
-        # Load parquet or csv from tmp dir
-        # and store as pickle in cache
-        deps = Dependencies()
-        deps.load(local_deps_file)
-    return deps
-
-
-def _upload_dependencies(
-    backend: typing.Type[audbackend.Backend],
-    deps: Dependencies,
-    db_root: str,
-    name: str,
-    version: str,
-):
-    r"""Upload dependency file to backend.
-
-    Store a dependency file in the database root folder,
-    and upload it to the backend.
-
-    Args:
-        backend: backend interface
-        deps: dependency object
-        db_root: database root folder
-        name: database name
-        version: database version
-
-    """
-    local_deps_file = os.path.join(db_root, define.DEPENDENCIES_FILE)
-    remote_deps_file = backend.join("/", name, define.DEPENDENCIES_FILE)
-    deps.save(local_deps_file)
-    backend.put_file(local_deps_file, remote_deps_file, version)
