@@ -63,7 +63,18 @@ def deps():
     return deps
 
 
-def test_init():
+def test_instantiation():
+    r"""Test instantiation of audb.Dependencies.
+
+    During instantiation of ``audb.Dependencies``
+    an empty dataframe is created under ``self._df``,
+    that stores the dependency table.
+    This test ensures,
+    that the dataframe
+    contains the correct column names and data types,
+    and the correct name and data type of its index.
+
+    """
     deps = audb.Dependencies()
     expected_columns = [
         "archive",
