@@ -139,12 +139,18 @@ We can compare this with the files stored in the repository.
 
     list_files(repository.host)
 
-As you can see all media files are stored inside the :file:`media/` folder,
-all tables inside the :file:`meta/` folder,
-the database header inside the :file:`db/` folder
-as :file:`db-1.0.0.yaml`,
-and the database dependency file inside the :file:`db/` folder
-inside :file:`db-1.0.0.zip`.
+As you can see all media files are stored
+inside the ``media/`` folder,
+all tables inside the ``meta/`` folder,
+the database header in the file ``db.yaml``,
+and the database dependencies
+in the file ``db.parquet``.
+Note,
+that the structure of the folders
+used for versioning
+depends on the backend,
+and differs slightly
+for an Artifactory backend.
 
 To load the database,
 or see which databases are available in your repository,
