@@ -7,6 +7,33 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.7.0 (2024-05-10)
+--------------------------
+
+* Added: experimental support for text files
+  as media files
+* Added: dependency on ``pyarrow``
+* Changed: depend on ``audbackend>=2.0.0``
+* Changed: dependency table dataframe
+  returned by ``audb.Dependencies.__call__()``
+  now uses ``pyarrow`` based data types
+* Changed: dependency table
+  is now stored as PARQUET file
+  on the backend,
+  instead as a CSV file
+* Changed: improve speed
+  of loading dependency table to the cache.
+  E.g. for the database musan with version 1.0.0
+  time is reduced by 35%
+* Changed: improve speed
+  of downloading a database to the cache.
+  E.g. for the database musan with version 1.0.0
+  time is reduced by 40%
+  when using 8 threads
+* Fixed: ``audb.versions()``
+  for non-existing repositories
+
+
 Version 1.6.5 (2024-03-28)
 --------------------------
 
