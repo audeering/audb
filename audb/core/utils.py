@@ -10,24 +10,10 @@ from audb.core.config import config
 from audb.core.repository import Repository
 
 
-def access_backend(
-    repository: Repository,
-) -> audbackend.Backend:
-    r"""Helper function to access backend."""
-    backend = audbackend.access(
-        repository.backend,
-        repository.host,
-        repository.name,
-    )
-    if isinstance(backend, audbackend.Artifactory):
-        backend._use_legacy_file_structure()
-    return backend
-
-
 def lookup_backend(
     name: str,
     version: str,
-) -> audbackend.Backend:
+) -> typing.Type[audbackend.interface.Base]:
     r"""Return backend of requested database.
 
     If the database is stored in several repositories,
@@ -40,7 +26,7 @@ def lookup_backend(
         version: version string
 
     Returns:
-        backend
+        backend interface
 
     Raises:
         RuntimeError: if database is not found
@@ -64,7 +50,7 @@ def mkdir_tree(
 def _lookup(
     name: str,
     version: str,
-) -> typing.Tuple[Repository, audbackend.Backend]:
+) -> typing.Tuple[Repository, typing.Type[audbackend.interface.Base]]:
     r"""Helper function to look up database in all repositories.
 
     Returns repository, version and backend object.
@@ -72,14 +58,16 @@ def _lookup(
     """
     for repository in config.REPOSITORIES:
         try:
-            backend = access_backend(repository)
+            backend_interface = repository.create_backend_interface()
+            backend_interface.backend.open()
         except audbackend.BackendError:
             continue
 
-        header = backend.join("/", name, "db.yaml")
-
-        if backend.exists(header, version, suppress_backend_errors=True):
-            return repository, backend
+        header = backend_interface.join("/", name, "db.yaml")
+        if backend_interface.exists(header, version, suppress_backend_errors=True):
+            return repository, backend_interface
+        else:
+            backend_interface.backend.close()
 
     raise RuntimeError(
         f"Cannot find version " f"'{version}' " f"for database " f"'{name}'."

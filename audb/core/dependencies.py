@@ -758,7 +758,7 @@ def filter_deps(
 
 
 def download_dependencies(
-    backend: typing.Type[audbackend.Backend],
+    backend_interface: typing.Type[audbackend.interface.Base],
     name: str,
     version: str,
     verbose: bool,
@@ -772,7 +772,7 @@ def download_dependencies(
     loaded from that file.
 
     Args:
-        backend: backend interface
+        backend_interface: backend interface
         name: database name
         version: database version
         verbose: if ``True`` a message is shown during download
@@ -785,22 +785,22 @@ def download_dependencies(
         # Load `db.parquet` file,
         # or if non-existent `db.zip`
         # from backend
-        remote_deps_file = backend.join("/", name, define.DEPENDENCIES_FILE)
-        if backend.exists(remote_deps_file, version):
+        remote_deps_file = backend_interface.join("/", name, define.DEPENDENCIES_FILE)
+        if backend_interface.exists(remote_deps_file, version):
             local_deps_file = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
-            backend.get_file(
+            backend_interface.get_file(
                 remote_deps_file,
                 local_deps_file,
                 version,
                 verbose=verbose,
             )
         else:
-            remote_deps_file = backend.join("/", name, define.DB + ".zip")
+            remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
             local_deps_file = os.path.join(
                 tmp_root,
                 define.LEGACY_DEPENDENCIES_FILE,
             )
-            backend.get_archive(
+            backend_interface.get_archive(
                 remote_deps_file,
                 tmp_root,
                 version,
@@ -813,7 +813,7 @@ def download_dependencies(
 
 
 def upload_dependencies(
-    backend: typing.Type[audbackend.Backend],
+    backend_interface: typing.Type[audbackend.interface.Base],
     deps: Dependencies,
     db_root: str,
     name: str,
@@ -826,7 +826,7 @@ def upload_dependencies(
     and upload it to the backend.
 
     Args:
-        backend: backend interface
+        backend_interface: backend interface
         deps: dependency object
         db_root: database root folder
         name: database name
@@ -834,6 +834,6 @@ def upload_dependencies(
 
     """
     local_deps_file = os.path.join(db_root, define.DEPENDENCIES_FILE)
-    remote_deps_file = backend.join("/", name, define.DEPENDENCIES_FILE)
+    remote_deps_file = backend_interface.join("/", name, define.DEPENDENCIES_FILE)
     deps.save(local_deps_file)
-    backend.put_file(local_deps_file, remote_deps_file, version)
+    backend_interface.put_file(local_deps_file, remote_deps_file, version)

@@ -108,7 +108,7 @@ def _get_attachments(
     db_root_tmp: str,
     db_name: str,
     deps: Dependencies,
-    backend: audbackend.Backend,
+    backend_interface: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -121,13 +121,13 @@ def _get_attachments(
     def job(path: str):
         archive = deps.archive(path)
         version = deps.version(path)
-        archive = backend.join(
+        archive = backend_interface.join(
             "/",
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
             archive + ".zip",
         )
-        backend.get_archive(
+        backend_interface.get_archive(
             archive,
             db_root_tmp,
             version,
@@ -155,7 +155,7 @@ def _get_media(
     db_root_tmp: str,
     db_name: str,
     deps: Dependencies,
-    backend: audbackend.Backend,
+    backend_interface: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -170,13 +170,13 @@ def _get_media(
         archives.add((deps.archive(file), deps.version(file)))
 
     def job(archive: str, version: str):
-        archive = backend.join(
+        archive = backend_interface.join(
             "/",
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
             archive + ".zip",
         )
-        files = backend.get_archive(
+        files = backend_interface.get_archive(
             archive,
             db_root_tmp,
             version,
@@ -203,7 +203,7 @@ def _get_tables(
     db_root_tmp: str,
     db_name: str,
     deps: Dependencies,
-    backend: audbackend.Backend,
+    backend_interface: typing.Type[audbackend.interface.Base],
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -219,13 +219,13 @@ def _get_tables(
         )
         if os.path.exists(path_pkl):
             os.remove(path_pkl)
-        archive = backend.join(
+        archive = backend_interface.join(
             "/",
             db_name,
             define.DEPEND_TYPE_NAMES[define.DependType.META],
             deps.archive(table) + ".zip",
         )
-        backend.get_archive(
+        backend_interface.get_archive(
             archive,
             db_root_tmp,
             deps.version(table),
@@ -327,7 +327,7 @@ def load_to(
 
     # load database header without tables from backend
 
-    db_header, backend = load_header_to(
+    db_header, backend_interface = load_header_to(
         db_root_tmp,
         name,
         version,
@@ -348,7 +348,7 @@ def load_to(
             db_root_tmp,
             name,
             deps,
-            backend,
+            backend_interface,
             num_workers,
             verbose,
         )
@@ -356,7 +356,16 @@ def load_to(
     # get altered and new tables
 
     tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
-    _get_tables(tables, db_root, db_root_tmp, name, deps, backend, num_workers, verbose)
+    _get_tables(
+        tables,
+        db_root,
+        db_root_tmp,
+        name,
+        deps,
+        backend_interface,
+        num_workers,
+        verbose,
+    )
 
     # load database
 
@@ -385,7 +394,14 @@ def load_to(
     if not only_metadata:
         media = _find_media(db, db_root, deps, num_workers, verbose)
         _get_media(
-            media, db_root, db_root_tmp, name, deps, backend, num_workers, verbose
+            media,
+            db_root,
+            db_root_tmp,
+            name,
+            deps,
+            backend_interface,
+            num_workers,
+            verbose,
         )
 
     # save dependencies
