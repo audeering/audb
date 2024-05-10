@@ -24,19 +24,19 @@ Version 1.7.0 (2024-05-10)
   to access files in the repository
 * Changed: improve speed
   of loading dependency table to the cache.
-  E.g. for the database musan with version 1.0.0
-  time is reduced by 35%
+  E.g. for version 1.0.0 of the database musan
+  loading time is reduced by 35%
 * Changed: improve speed
   of downloading a database to the cache.
-  E.g. for the database musan with version 1.0.0
-  time is reduced by 40%
+  E.g. for version 1.0.0 of the database musan
+  loading time is reduced by 40%
   when using 8 threads
 * Changed: depend on ``audbackend>=2.0.0``
 * Changed: dependency table dataframe
   returned by ``audb.Dependencies.__call__()``
   now uses ``pyarrow`` based data types
 * Changed: dependency table
-  is now stored as PARQUET file
+  is now stored as a PARQUET file
   on the backend,
   instead as a CSV file
 * Fixed: ``audb.versions()``
