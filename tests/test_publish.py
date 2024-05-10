@@ -393,7 +393,7 @@ def test_publish(tmpdir, dbs, persistent_repository, version):
             audb.latest_version(DB_NAME)
 
     # Copy database folder to build folder
-    # to avoid storing `db.csv` files
+    # to avoid storing dependency table files
     # inside the database folders
     build_dir = audeer.path(tmpdir, "build")
     shutil.copytree(dbs[version], build_dir)
