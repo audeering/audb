@@ -63,7 +63,19 @@ def deps():
     return deps
 
 
-def test_init(deps):
+def test_instantiation():
+    r"""Test instantiation of audb.Dependencies.
+
+    During instantiation of ``audb.Dependencies``
+    an empty dataframe is created under ``self._df``,
+    that stores the dependency table.
+    This test ensures,
+    that the dataframe
+    contains the correct column names and data types,
+    and the correct name and data type of its index.
+
+    """
+    deps = audb.Dependencies()
     expected_columns = [
         "archive",
         "bit_depth",
@@ -76,6 +88,14 @@ def test_init(deps):
         "type",
         "version",
     ]
+    expected_df = pd.DataFrame(columns=expected_columns)
+    expected_df.index = expected_df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+    for name, dtype in zip(
+        audb.core.define.DEPEND_FIELD_NAMES.values(),
+        audb.core.define.DEPEND_FIELD_DTYPES.values(),
+    ):
+        expected_df[name] = expected_df[name].astype(dtype)
+    pd.testing.assert_frame_equal(deps._df, expected_df)
     assert list(deps._df.columns) == expected_columns
     df = deps()
     assert list(df.columns) == expected_columns
