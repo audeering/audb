@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.6.5
+                v1.7.0
               </div>
             
           
@@ -253,7 +253,7 @@ but also what version of the file is required.</p>
 <dd><p>Return dependencies as a table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>table with dependencies</p>
@@ -522,11 +522,14 @@ but also what version of the file is required.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to file.
-File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code> or <code class="docutils literal notranslate"><span class="pre">pkl</span></code></p>
+File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code>
+<code class="docutils literal notranslate"><span class="pre">pkl</span></code>,
+or <code class="docutils literal notranslate"><span class="pre">parquet</span></code></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if file extension is not <code class="docutils literal notranslate"><span class="pre">csv</span></code> or <code class="docutils literal notranslate"><span class="pre">pkl</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if file extension is not one of
+    <code class="docutils literal notranslate"><span class="pre">csv</span></code>, <code class="docutils literal notranslate"><span class="pre">pkl</span></code>, <code class="docutils literal notranslate"><span class="pre">parquet</span></code></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.12)"><strong>FileNotFoundError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">path</span></code> does not exists</p></li>
 </ul>
 </dd>
@@ -611,7 +614,7 @@ File extension can be <code class="docutils literal notranslate"><span class="pr
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to file.
-File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code> or <code class="docutils literal notranslate"><span class="pre">pkl</span></code></p>
+File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code>, <code class="docutils literal notranslate"><span class="pre">pkl</span></code>, or <code class="docutils literal notranslate"><span class="pre">parquet</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -713,7 +716,7 @@ i.e. <code class="docutils literal notranslate"><span class="pre">db.&lt;id&gt;.
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

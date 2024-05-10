@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.5
+                v1.7.0
               </div>
             
           
@@ -164,9 +164,9 @@
 <span class="kn">import</span> <span class="nn">audiofile</span>
 
 <span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
-<span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">audb.core.api</span> <span class="kn">import</span> <span class="n">dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
+<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">upload_dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.repository</span> <span class="kn">import</span> <span class="n">Repository</span>
 
 
@@ -453,9 +453,38 @@
     <span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return values of a media entry in dependencies.&quot;&quot;&quot;</span>
-    <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return values of a media entry in dependencies.</span>
 
+<span class="sd">    The dependency table expects the following columns:</span>
+
+<span class="sd">    * file</span>
+<span class="sd">    * archive</span>
+<span class="sd">    * bit depth</span>
+<span class="sd">    * channels</span>
+<span class="sd">    * checksum</span>
+<span class="sd">    * duration</span>
+<span class="sd">    * format</span>
+<span class="sd">    * removed</span>
+<span class="sd">    * sampling rate</span>
+<span class="sd">    * dependency type</span>
+<span class="sd">    * version</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        root: root of database</span>
+<span class="sd">        file: relative media file path</span>
+<span class="sd">        version: database version</span>
+<span class="sd">        archive: archive the media file is stored in</span>
+<span class="sd">        checksum: checksum of the media file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        row to be added to the dependency table as tuple</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dependency_type</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span>
+    <span class="nb">format</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">removed</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Inspect media file to get audio/video metadata</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
         <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -471,6 +500,14 @@
             <span class="sa">f</span><span class="s2">&quot;sox and mediainfo have to be installed &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;to publish &#39;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2">&#39; media files.&quot;</span>
         <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+        <span class="c1"># Skip audio/video metadata for media files,</span>
+        <span class="c1"># that don&#39;t support them</span>
+        <span class="c1"># (e.g. text files)</span>
+        <span class="n">bit_depth</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">sampling_rate</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">file</span><span class="p">,</span>
@@ -480,9 +517,9 @@
         <span class="n">checksum</span><span class="p">,</span>
         <span class="n">duration</span><span class="p">,</span>
         <span class="nb">format</span><span class="p">,</span>
-        <span class="mi">0</span><span class="p">,</span>  <span class="c1"># removed</span>
+        <span class="n">removed</span><span class="p">,</span>
         <span class="n">sampling_rate</span><span class="p">,</span>
-        <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">,</span>
+        <span class="n">dependency_type</span><span class="p">,</span>
         <span class="n">version</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -492,19 +529,19 @@
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">attachment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="s2">&quot;/&quot;</span><span class="p">,</span>
             <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span><span class="p">],</span>
             <span class="n">attachment_id</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">files</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment_id</span><span class="p">]</span><span class="o">.</span><span class="n">files</span>
-        <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">)</span>
+        <span class="n">backend_interface</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
         <span class="n">job</span><span class="p">,</span>
@@ -522,7 +559,7 @@
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">previous_version</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
@@ -540,7 +577,7 @@
                 <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
                     <span class="n">update_media</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
-                <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="s2">&quot;/&quot;</span><span class="p">,</span>
                     <span class="n">db_name</span><span class="p">,</span>
                     <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">],</span>
@@ -560,7 +597,7 @@
                             <span class="n">missing_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">missing_files</span><span class="p">:</span>
                         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_root</span><span class="p">:</span>
-                            <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+                            <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
                                 <span class="n">archive_file</span><span class="p">,</span>
                                 <span class="n">tmp_root</span><span class="p">,</span>
                                 <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">missing_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
@@ -574,7 +611,7 @@
                                     <span class="n">dst_path</span><span class="p">,</span>
                                 <span class="p">)</span>
 
-                <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
+                <span class="n">backend_interface</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
                     <span class="n">db_root</span><span class="p">,</span>
                     <span class="n">archive_file</span><span class="p">,</span>
                     <span class="n">version</span><span class="p">,</span>
@@ -597,19 +634,19 @@
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">db_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-        <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="s2">&quot;/&quot;</span><span class="p">,</span>
             <span class="n">db_name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
             <span class="n">table</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">backend_interface</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">archive_file</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">file</span><span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">run_tasks</span><span class="p">(</span>
         <span class="n">job</span><span class="p">,</span>
@@ -753,10 +790,15 @@
         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">backend</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">access_backend</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span>
+    <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
 
-    <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
-    <span class="n">versions</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">suppress_backend_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+        <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+        <span class="n">versions</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span>
+            <span class="n">remote_header</span><span class="p">,</span>
+            <span class="n">suppress_backend_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
     <span class="k">if</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="s2">&quot;A version &quot;</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&#39; &quot;</span> <span class="s2">&quot;already exists for database &quot;</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
@@ -768,10 +810,12 @@
             <span class="n">previous_version</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># load database and dependencies</span>
-    <span class="n">deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
     <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">deps_path</span><span class="p">):</span>
-        <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">deps_file</span> <span class="ow">in</span> <span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">LEGACY_DEPENDENCIES_FILE</span><span class="p">]:</span>
+        <span class="n">deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">deps_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">deps_path</span><span class="p">):</span>
+            <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
+            <span class="k">break</span>
 
     <span class="c1"># check if database folder depends on the right version</span>
 
@@ -779,7 +823,7 @@
     <span class="k">if</span> <span class="n">previous_version</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">deps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;You did not set a dependency to a previous version, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;but you have a &#39;</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="si">}</span><span class="s2">&#39; file present &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;but you have a &#39;</span><span class="si">{</span><span class="n">deps_file</span><span class="si">}</span><span class="s2">&#39; file present &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;in </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
 
@@ -797,32 +841,25 @@
 
     <span class="c1"># dependencies do not match version</span>
     <span class="k">if</span> <span class="n">previous_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">deps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
-            <span class="n">previous_deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">tmp_dir</span><span class="p">,</span>
-                <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">,</span>
+        <span class="n">previous_deps</span> <span class="o">=</span> <span class="n">dependencies</span><span class="p">(</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">version</span><span class="o">=</span><span class="n">previous_version</span><span class="p">,</span>
+            <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">previous_deps</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;You want to depend on &#39;</span><span class="si">{</span><span class="n">previous_version</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;of </span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;but the dependency file &#39;</span><span class="si">{</span><span class="n">deps_file</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;in </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;does not match the dependency file &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;for the requested version in the repository. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Did you forgot to call &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;audb.load_to(</span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;version=&#39;</span><span class="si">{</span><span class="n">previous_version</span><span class="si">}</span><span class="s2">&#39;) &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;or modified the file manually?&quot;</span>
             <span class="p">)</span>
-            <span class="n">previous_deps</span> <span class="o">=</span> <span class="n">dependencies</span><span class="p">(</span>
-                <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">version</span><span class="o">=</span><span class="n">previous_version</span><span class="p">,</span>
-                <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
-                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">previous_deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">previous_deps_path</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">audeer</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span> <span class="o">!=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">previous_deps_path</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;You want to depend on &#39;</span><span class="si">{</span><span class="n">previous_version</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;of </span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;but the MD5 sum of your &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="si">}</span><span class="s2">&#39; file &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;in </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2"> &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;does not match the MD5 sum of the corresponding file &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;for the requested version in the repository. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Did you forgot to call &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;&#39;audb.load_to(</span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;version=&#39;</span><span class="si">{</span><span class="n">previous_version</span><span class="si">}</span><span class="s2">&#39;) &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;or modified the file manually?&quot;</span>
-                <span class="p">)</span>
 
     <span class="c1"># load database with table data</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
@@ -881,50 +918,48 @@
     <span class="c1"># check archives</span>
     <span class="n">archives</span> <span class="o">=</span> <span class="n">archives</span> <span class="ow">or</span> <span class="p">{}</span>
 
-    <span class="c1"># publish attachments</span>
-    <span class="n">attachments</span> <span class="o">=</span> <span class="n">_find_attachments</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
-    <span class="n">_put_attachments</span><span class="p">(</span><span class="n">attachments</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+        <span class="c1"># publish attachments</span>
+        <span class="n">attachments</span> <span class="o">=</span> <span class="n">_find_attachments</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="n">_put_attachments</span><span class="p">(</span>
+            <span class="n">attachments</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">backend_interface</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span>
+        <span class="p">)</span>
 
-    <span class="c1"># publish tables</span>
-    <span class="n">tables</span> <span class="o">=</span> <span class="n">_find_tables</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
-    <span class="n">_put_tables</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="c1"># publish tables</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="n">_find_tables</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="n">_put_tables</span><span class="p">(</span>
+            <span class="n">tables</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">backend_interface</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span>
+        <span class="p">)</span>
 
-    <span class="c1"># publish media</span>
-    <span class="n">media_archives</span> <span class="o">=</span> <span class="n">_find_media</span><span class="p">(</span>
-        <span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db_root_files</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">archives</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span>
-    <span class="p">)</span>
-    <span class="n">_put_media</span><span class="p">(</span>
-        <span class="n">media_archives</span><span class="p">,</span>
-        <span class="n">db_root</span><span class="p">,</span>
-        <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="n">version</span><span class="p">,</span>
-        <span class="n">previous_version</span><span class="p">,</span>
-        <span class="n">deps</span><span class="p">,</span>
-        <span class="n">backend</span><span class="p">,</span>
-        <span class="n">num_workers</span><span class="p">,</span>
-        <span class="n">verbose</span><span class="p">,</span>
-    <span class="p">)</span>
+        <span class="c1"># publish media</span>
+        <span class="n">media_archives</span> <span class="o">=</span> <span class="n">_find_media</span><span class="p">(</span>
+            <span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db_root_files</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">archives</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span>
+        <span class="p">)</span>
+        <span class="n">_put_media</span><span class="p">(</span>
+            <span class="n">media_archives</span><span class="p">,</span>
+            <span class="n">db_root</span><span class="p">,</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">previous_version</span><span class="p">,</span>
+            <span class="n">deps</span><span class="p">,</span>
+            <span class="n">backend_interface</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
 
-    <span class="c1"># publish dependencies and header</span>
-    <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
-    <span class="n">archive_file</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
-    <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
-        <span class="n">db_root</span><span class="p">,</span>
-        <span class="n">archive_file</span><span class="p">,</span>
-        <span class="n">version</span><span class="p">,</span>
-        <span class="n">files</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">local_header</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
-        <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
-        <span class="n">backend</span><span class="o">.</span><span class="n">put_file</span><span class="p">(</span><span class="n">local_header</span><span class="p">,</span> <span class="n">remote_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="c1"># after the header is published</span>
-        <span class="c1"># the new version becomes visible,</span>
-        <span class="c1"># so if something goes wrong here</span>
-        <span class="c1"># we better clean up</span>
-        <span class="k">if</span> <span class="n">backend</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
-            <span class="n">backend</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="c1"># publish dependencies and header</span>
+        <span class="n">upload_dependencies</span><span class="p">(</span><span class="n">backend_interface</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">local_header</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+            <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+            <span class="n">backend_interface</span><span class="o">.</span><span class="n">put_file</span><span class="p">(</span><span class="n">local_header</span><span class="p">,</span> <span class="n">remote_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="c1"># after the header is published</span>
+            <span class="c1"># the new version becomes visible,</span>
+            <span class="c1"># so if something goes wrong here</span>
+            <span class="c1"># we better clean up</span>
+            <span class="k">if</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+                <span class="n">backend_interface</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">deps</span></div>
 </pre></div>
@@ -942,7 +977,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

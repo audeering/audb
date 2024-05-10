@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.5
+                v1.7.0
               </div>
             
           
@@ -167,6 +167,8 @@
 <span class="kn">from</span> <span class="nn">audb.core.cache</span> <span class="kn">import</span> <span class="n">default_cache_root</span>
 <span class="kn">from</span> <span class="nn">audb.core.config</span> <span class="kn">import</span> <span class="n">config</span>
 <span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
+<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">download_dependencies</span>
+<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">upload_dependencies</span>
 <span class="kn">from</span> <span class="nn">audb.core.flavor</span> <span class="kn">import</span> <span class="n">Flavor</span>
 <span class="kn">from</span> <span class="nn">audb.core.lock</span> <span class="kn">import</span> <span class="n">FolderLock</span>
 <span class="kn">from</span> <span class="nn">audb.core.repository</span> <span class="kn">import</span> <span class="n">Repository</span>
@@ -197,15 +199,33 @@
     <span class="n">databases</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">repository</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">backend</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">access_backend</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Artifactory</span><span class="p">):</span>
-                <span class="c1"># avoid backend.ls(&#39;/&#39;)</span>
-                <span class="c1"># which is very slow on Artifactory</span>
-                <span class="c1"># see https://github.com/audeering/audbackend/issues/132</span>
-                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
-                    <span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;db&quot;</span><span class="p">]:</span>
+            <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span> <span class="k">as</span> <span class="n">backend</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">repository</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
+                    <span class="c1"># avoid backend_interface.ls(&#39;/&#39;)</span>
+                    <span class="c1"># which is very slow on Artifactory</span>
+                    <span class="c1"># see https://github.com/audeering/audbackend/issues/132</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;db&quot;</span><span class="p">]:</span>
+                                <span class="n">databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                    <span class="p">[</span>
+                                        <span class="n">name</span><span class="p">,</span>
+                                        <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+                                        <span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+                                        <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                        <span class="n">version</span><span class="p">,</span>
+                                    <span class="p">]</span>
+                                <span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                            <span class="c1"># If the `db` folder does not exist,</span>
+                            <span class="c1"># we do not include the dataset</span>
+                            <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">):</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
                             <span class="n">databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                                 <span class="p">[</span>
                                     <span class="n">name</span><span class="p">,</span>
@@ -215,23 +235,6 @@
                                     <span class="n">version</span><span class="p">,</span>
                                 <span class="p">]</span>
                             <span class="p">)</span>
-                    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-                        <span class="c1"># If the `db` folder does not exist,</span>
-                        <span class="c1"># we do not include the dataset</span>
-                        <span class="k">pass</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">):</span>
-                        <span class="n">name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-                        <span class="n">databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="p">[</span>
-                                <span class="n">name</span><span class="p">,</span>
-                                <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
-                                <span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
-                                <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                                <span class="n">version</span><span class="p">,</span>
-                            <span class="p">]</span>
-                        <span class="p">)</span>
         <span class="k">except</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">BackendError</span><span class="p">:</span>
             <span class="k">continue</span>
 
@@ -343,18 +346,15 @@
             <span class="n">flavor_id_paths</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">list_dir_names</span><span class="p">(</span><span class="n">version_path</span><span class="p">)</span>
 
             <span class="c1"># Skip old audb cache (e.g. 1 as flavor)</span>
-            <span class="n">files</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">list_file_names</span><span class="p">(</span><span class="n">version_path</span><span class="p">)</span>
-            <span class="n">deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">version_path</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
-            <span class="n">deps_path_cached</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">version_path</span><span class="p">,</span>
-                <span class="n">define</span><span class="o">.</span><span class="n">CACHED_DEPENDENCIES_FILE</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">deps_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span> <span class="ow">and</span> <span class="n">deps_path_cached</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">list_file_names</span><span class="p">(</span><span class="n">version_path</span><span class="p">,</span> <span class="n">basenames</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span>
+                <span class="ow">and</span> <span class="n">define</span><span class="o">.</span><span class="n">LEGACY_DEPENDENCIES_FILE</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span>
+                <span class="ow">and</span> <span class="n">define</span><span class="o">.</span><span class="n">CACHED_DEPENDENCIES_FILE</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span>
+            <span class="p">):</span>
                 <span class="c1"># Skip all cache entries</span>
-                <span class="c1"># that don&#39;t contain a db.csv or db.pkl file</span>
+                <span class="c1"># that don&#39;t contain a dependency file</span>
                 <span class="c1"># as those stem from audb&lt;1.0.0.</span>
-                <span class="c1"># We only look for db.csv</span>
-                <span class="c1"># as we switched to db.pkl with audb&gt;=1.0.5</span>
                 <span class="k">continue</span>  <span class="c1"># pragma: no cover</span>
 
             <span class="k">for</span> <span class="n">flavor_id_path</span> <span class="ow">in</span> <span class="n">flavor_id_paths</span><span class="p">:</span>
@@ -418,26 +418,18 @@
         <span class="n">version</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">CACHED_DEPENDENCIES_FILE</span><span class="p">)</span>
-
-    <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
+    <span class="n">cached_deps_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">CACHED_DEPENDENCIES_FILE</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">FolderLock</span><span class="p">(</span><span class="n">db_root</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
+            <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
+            <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cached_deps_file</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">):</span>
-            <span class="c1"># If loading pickled cached file fails, load again from backend</span>
-            <span class="n">backend</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
-            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_root</span><span class="p">:</span>
-                <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
-                <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
-                    <span class="n">archive</span><span class="p">,</span>
-                    <span class="n">tmp_root</span><span class="p">,</span>
-                    <span class="n">version</span><span class="p">,</span>
-                    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">))</span>
-                <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
+            <span class="c1"># If loading cached file fails, load again from backend</span>
+            <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+            <span class="n">deps</span> <span class="o">=</span> <span class="n">download_dependencies</span><span class="p">(</span><span class="n">backend_interface</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+            <span class="c1"># Store as pickle in cache</span>
+            <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">cached_deps_file</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">deps</span></div>
 
@@ -635,20 +627,11 @@
         <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">files</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="n">backend</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">deps</span> <span class="o">=</span> <span class="n">download_dependencies</span><span class="p">(</span><span class="n">backend_interface</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">db_root</span><span class="p">:</span>
-            <span class="c1"># download dependencies</span>
-            <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
-            <span class="n">deps_path</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
-                <span class="n">archive</span><span class="p">,</span>
-                <span class="n">db_root</span><span class="p">,</span>
-                <span class="n">version</span><span class="p">,</span>
-                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">deps_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">deps_path</span><span class="p">)</span>
-            <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
-            <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
+            <span class="c1"># Track if we need to upload the dependency table again</span>
             <span class="n">upload</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span>
@@ -661,14 +644,14 @@
 
                     <span class="c1"># if archive exists in this version,</span>
                     <span class="c1"># remove file from it and re-publish</span>
-                    <span class="n">remote_archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">remote_archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                         <span class="s2">&quot;/&quot;</span><span class="p">,</span>
                         <span class="n">name</span><span class="p">,</span>
                         <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">],</span>
                         <span class="n">archive</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">,</span>
                     <span class="p">)</span>
-                    <span class="k">if</span> <span class="n">backend</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">remote_archive</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
-                        <span class="n">files_in_archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+                    <span class="k">if</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">remote_archive</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+                        <span class="n">files_in_archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
                             <span class="n">remote_archive</span><span class="p">,</span>
                             <span class="n">db_root</span><span class="p">,</span>
                             <span class="n">version</span><span class="p">,</span>
@@ -684,7 +667,7 @@
                         <span class="k">if</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files_in_archive</span><span class="p">:</span>
                             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
                             <span class="n">files_in_archive</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-                            <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
+                            <span class="n">backend_interface</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
                                 <span class="n">db_root</span><span class="p">,</span>
                                 <span class="n">remote_archive</span><span class="p">,</span>
                                 <span class="n">version</span><span class="p">,</span>
@@ -697,15 +680,7 @@
 
             <span class="c1"># upload dependencies</span>
             <span class="k">if</span> <span class="n">upload</span><span class="p">:</span>
-                <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">deps_path</span><span class="p">)</span>
-                <span class="n">remote_archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
-                <span class="n">backend</span><span class="o">.</span><span class="n">put_archive</span><span class="p">(</span>
-                    <span class="n">db_root</span><span class="p">,</span>
-                    <span class="n">remote_archive</span><span class="p">,</span>
-                    <span class="n">version</span><span class="p">,</span>
-                    <span class="n">files</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">,</span>
-                    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-                <span class="p">)</span></div>
+                <span class="n">upload_dependencies</span><span class="p">(</span><span class="n">backend_interface</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="repository"><a class="viewcode-back" href="../../../api/audb.repository.html#audb.repository">[docs]</a><span class="k">def</span> <span class="nf">repository</span><span class="p">(</span>
@@ -757,37 +732,51 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">vs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">repository</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span><span class="p">:</span>
-        <span class="n">backend</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">access_backend</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Artifactory</span><span class="p">):</span>
-            <span class="kn">import</span> <span class="nn">artifactory</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span> <span class="k">as</span> <span class="n">backend</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">repository</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
+                    <span class="kn">import</span> <span class="nn">artifactory</span>
 
-            <span class="c1"># Avoid using ls() on Artifactory</span>
-            <span class="c1"># see https://github.com/devopshq/artifactory/issues/423</span>
-            <span class="n">folder</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">)</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">artifactory</span><span class="o">.</span><span class="n">_artifactory_path</span><span class="p">(</span>
-                <span class="n">backend</span><span class="o">.</span><span class="n">_expand</span><span class="p">(</span><span class="n">folder</span><span class="p">),</span>
-                <span class="n">backend</span><span class="o">.</span><span class="n">_username</span><span class="p">,</span>
-                <span class="n">backend</span><span class="o">.</span><span class="n">_api_key</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
-                        <span class="n">version</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                        <span class="n">header</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;db-</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">.yaml&quot;</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                            <span class="n">vs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">version</span><span class="p">])</span>
-            <span class="k">except</span> <span class="n">artifactory</span><span class="o">.</span><span class="n">ArtifactoryException</span><span class="p">:</span>  <span class="c1"># pragma: nocover</span>
-                <span class="c1"># This tackles the case of missing repo</span>
-                <span class="c1"># or missing read permissions.</span>
-                <span class="c1"># We cannot test this at the moment</span>
-                <span class="c1"># on the public Artifactory server.</span>
-                <span class="c1"># Because after trying</span>
-                <span class="c1"># to connect to a repo without read access</span>
-                <span class="c1"># the connection is also blocked for valid repos.</span>
-                <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">header</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db.yaml&quot;</span><span class="p">)</span>
-            <span class="n">vs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">suppress_backend_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                    <span class="c1"># Do not use `backend_interface.versions()` on Artifactory,</span>
+                    <span class="c1"># as calling `backend_interface.ls()` is slow on Artifactory,</span>
+                    <span class="c1"># see https://github.com/devopshq/artifactory/issues/423.</span>
+                    <span class="c1"># Instead, use `backend.path()`</span>
+                    <span class="c1"># from the low level backend object</span>
+                    <span class="c1"># to return an ArtifactoryPath object,</span>
+                    <span class="c1"># which allows to walk through the dataset directory</span>
+                    <span class="c1"># and to collect all existing versions.</span>
+                    <span class="n">folder</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">)</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+                                <span class="n">version</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                                <span class="n">header</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;db-</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">.yaml&quot;</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                                    <span class="n">vs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">version</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="n">artifactory</span><span class="o">.</span><span class="n">ArtifactoryException</span><span class="p">:</span>  <span class="c1"># pragma: nocover</span>
+                        <span class="c1"># This tackles the case of missing read permissions.</span>
+                        <span class="c1"># We cannot test this at the moment</span>
+                        <span class="c1"># on the public Artifactory server.</span>
+                        <span class="c1"># Because after trying</span>
+                        <span class="c1"># to connect to a path without read access</span>
+                        <span class="c1"># the connection is also blocked for valid paths.</span>
+                        <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">header</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db.yaml&quot;</span><span class="p">)</span>
+                    <span class="n">vs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                        <span class="n">backend_interface</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span>
+                            <span class="n">header</span><span class="p">,</span>
+                            <span class="n">suppress_backend_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+        <span class="k">except</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">BackendError</span><span class="p">:</span>
+            <span class="c1"># If the backend cannot be accessed,</span>
+            <span class="c1"># e.g. host or repository do not exist,</span>
+            <span class="c1"># we skip it</span>
+            <span class="c1"># and continue with the next repository</span>
+            <span class="k">continue</span>
     <span class="k">return</span> <span class="n">audeer</span><span class="o">.</span><span class="n">sort_versions</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span></div>
 </pre></div>
 
@@ -804,7 +793,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

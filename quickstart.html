@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.6.5
+                v1.7.0
               </div>
             
           
@@ -222,7 +222,7 @@ on our <a class="reference external" href="https://audeering.jfrog.io/artifactor
       <td>artifactory</td>
       <td>https://audeering.jfrog.io/artifactory</td>
       <td>data-public</td>
-      <td>1.2.0</td>
+      <td>1.3.0</td>
     </tr>
     <tr>
       <th>emodb</th>
@@ -269,7 +269,7 @@ all the media files,
 and tables with annotations
 to a caching folder on your machine.
 The database is then returned
-as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
+as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
 <p>Each database comes with a description,
 which is a good starting point
 to learn what the database is all about.</p>
@@ -286,7 +286,7 @@ to learn what the database is all about.</p>
 </div>
 </div>
 <p>The annotations of a database are stored in
-tables represented by <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Table.html#audformat.Table" title="(in audformat vv1.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Table</span></code></a>.</p>
+tables represented by <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Table.html#audformat.Table" title="(in audformat vv1.1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Table</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
@@ -321,8 +321,8 @@ files:
 </div>
 </div>
 </div>
-<p>Each table contains columns (<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Column.html#audformat.Column" title="(in audformat vv1.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Column</span></code></a>)
-that have corresponding schemes (<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Scheme.html#audformat.Scheme" title="(in audformat vv1.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Scheme</span></code></a>)
+<p>Each table contains columns (<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Column.html#audformat.Column" title="(in audformat vv1.1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Column</span></code></a>)
+that have corresponding schemes (<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Scheme.html#audformat.Scheme" title="(in audformat vv1.1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Scheme</span></code></a>)
 describing its content.
 For example,
 to get an idea about the emotion annotations
@@ -343,7 +343,7 @@ labels: [anger, boredom, disgust, fear, happiness, sadness, neutral]
 </div>
 </div>
 <p>Finally, we get the actual annotations
-as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
+as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>  <span class="c1"># get table</span>
@@ -424,7 +424,7 @@ as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/s
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

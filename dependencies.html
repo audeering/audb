@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.6.5
+                v1.7.0
               </div>
             
           
@@ -173,7 +173,7 @@ if its content hasn’t changed.</p>
 <p>We keep track of those dependencies
 and store some additional metadata about the audio files
 like duration and number of channels
-in a dependency table in a file <code class="file docutils literal notranslate"><span class="pre">db.csv</span></code>
+in a dependency table in a file <code class="file docutils literal notranslate"><span class="pre">db.parquet</span></code>
 for every version of a database.</p>
 <p>You request a <a class="reference internal" href="api/audb.Dependencies.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> object with
 <a class="reference internal" href="api/audb.dependencies.html#audb.dependencies" title="audb.dependencies"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.dependencies()</span></code></a>.</p>
@@ -306,17 +306,17 @@ in the database dependency table.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>db.emotion.csv     0.000000
-db.files.csv       0.000000
-wav/03a01Fa.wav    1.898250
-wav/03a01Nc.wav    1.611250
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>db.emotion.csv          0.0
+db.files.csv            0.0
+wav/03a01Fa.wav     1.89825
+wav/03a01Nc.wav     1.61125
 wav/03a01Wa.wav    1.877813
-wav/03a02Fc.wav    2.006250
+wav/03a02Fc.wav     2.00625
 wav/03a02Nc.wav    1.439812
 wav/03a02Ta.wav    1.735688
 wav/03a02Wb.wav    2.123625
 wav/03a02Wc.wav    1.498063
-Name: duration, dtype: float64
+Name: duration, dtype: double[pyarrow]
 </pre></div>
 </div>
 </div>
@@ -363,7 +363,7 @@ of the emodb database.</p>
 and you would like to get the duration
 of its segments
 that contain a label
-you can use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv1.1.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
+you can use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv1.1.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
 which calculates the duration
 from the <code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> entries.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s2">&quot;database-with-segmented-tables&quot;</span><span class="p">,</span> <span class="s2">&quot;segmented-table&quot;</span><span class="p">)</span>
@@ -380,7 +380,7 @@ for which no duration information is stored
 in the dependency table of the database,
 like MP4 files,
 you have to download the database first
-and use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv1.1.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
+and use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv1.1.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
 to calculate the duration on the fly.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;database-with-videos&quot;</span><span class="p">)</span>
 <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -412,7 +412,7 @@ to calculate the duration on the fly.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

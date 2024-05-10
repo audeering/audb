@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.5
+                v1.7.0
               </div>
             
           
@@ -154,10 +154,15 @@
 <span></span><span class="kn">import</span> <span class="nn">errno</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
+<span class="kn">import</span> <span class="nn">pyarrow.csv</span> <span class="k">as</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">pyarrow.parquet</span> <span class="k">as</span> <span class="nn">parquet</span>
 
+<span class="kn">import</span> <span class="nn">audbackend</span>
 <span class="kn">import</span> <span class="nn">audeer</span>
 
 <span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
@@ -212,6 +217,24 @@
         <span class="p">):</span>
             <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_INDEX_DTYPE</span><span class="p">)</span>
+        <span class="c1"># pyarrow schema</span>
+        <span class="c1"># used for reading and writing files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;archive&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;bit_depth&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;channels&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;checksum&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;duration&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">float64</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;removed&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;sampling_rate&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="Dependencies.__call__"><a class="viewcode-back" href="../../../api/audb.Dependencies.html#audb.Dependencies.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return dependencies as a table.</span>
@@ -432,19 +455,22 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            path: path to file.</span>
-<span class="sd">                File extension can be ``csv`` or ``pkl``</span>
+<span class="sd">                File extension can be ``csv``</span>
+<span class="sd">                ``pkl``,</span>
+<span class="sd">                or ``parquet``</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if file extension is not ``csv`` or ``pkl``</span>
+<span class="sd">            ValueError: if file extension is not one of</span>
+<span class="sd">                ``csv``, ``pkl``, ``parquet``</span>
 <span class="sd">            FileNotFoundError: if ``path`` does not exists</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">extension</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">file_extension</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;pkl&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;parquet&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;File extension of &#39;path&#39; has to be &#39;csv&#39; or &#39;pkl&#39; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;File extension of &#39;path&#39; has to be &#39;csv&#39;, &#39;pkl&#39;, or &#39;parquet&#39; &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;not &#39;</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -455,24 +481,27 @@
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;pkl&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="c1"># Correct dtype of index</span>
+            <span class="c1"># to make backward compatiple</span>
+            <span class="c1"># with old pickle files in cache</span>
+            <span class="c1"># that might use `string` as dtype</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_INDEX_DTYPE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_INDEX_DTYPE</span><span class="p">)</span>
+
         <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
-            <span class="c1"># Data type of dependency columns</span>
-            <span class="n">dtype_mapping</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">name</span><span class="p">:</span> <span class="n">dtype</span>
-                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-                    <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                    <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_DTYPES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                <span class="p">)</span>
-            <span class="p">}</span>
-            <span class="c1"># Data type of index</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
                 <span class="n">path</span><span class="p">,</span>
-                <span class="n">index_col</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
-                <span class="n">na_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_mapping</span><span class="p">,</span>
+                <span class="n">read_options</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">ReadOptions</span><span class="p">(</span>
+                    <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">names</span><span class="p">,</span>
+                    <span class="n">skip_rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">convert_options</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">ConvertOptions</span><span class="p">(</span><span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">),</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_to_dataframe</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="n">parquet</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_to_dataframe</span><span class="p">(</span><span class="n">table</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dependencies.removed"><a class="viewcode-back" href="../../../api/audb.Dependencies.html#audb.Dependencies.removed">[docs]</a>    <span class="k">def</span> <span class="nf">removed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if file is marked as removed.</span>
@@ -503,17 +532,25 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            path: path to file.</span>
-<span class="sd">                File extension can be ``csv`` or ``pkl``</span>
+<span class="sd">                File extension can be ``csv``, ``pkl``, or ``parquet``</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;csv&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe_to_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">)</span>
+            <span class="n">csv</span><span class="o">.</span><span class="n">write_csv</span><span class="p">(</span>
+                <span class="n">table</span><span class="p">,</span>
+                <span class="n">path</span><span class="p">,</span>
+                <span class="n">write_options</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">WriteOptions</span><span class="p">(</span><span class="n">quoting_style</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
         <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;pkl&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
                 <span class="n">path</span><span class="p">,</span>
                 <span class="n">protocol</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># supported by Python &gt;= 3.4</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;parquet&quot;</span><span class="p">):</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe_to_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">,</span> <span class="n">file_column</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">parquet</span><span class="o">.</span><span class="n">write_table</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dependencies.type"><a class="viewcode-back" href="../../../api/audb.Dependencies.html#audb.Dependencies.type">[docs]</a>    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type of file.</span>
@@ -599,6 +636,7 @@
             <span class="n">values</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_INDEX_DTYPE</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">,</span> <span class="n">df</span><span class="p">])</span>
 
@@ -645,6 +683,35 @@
             <span class="n">value</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>
 
+    <span class="k">def</span> <span class="nf">_dataframe_to_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">file_column</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert pandas dataframe to pyarrow table.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            df: dependency table as pandas dataframe</span>
+<span class="sd">            file_column: if ``False``</span>
+<span class="sd">                the ``&quot;file&quot;`` column</span>
+<span class="sd">                is renamed to ``&quot;&quot;``</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dependency table as pyarrow table</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;file&quot;</span><span class="p">}),</span>
+            <span class="n">preserve_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_column</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">column_names</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span> <span class="k">else</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">table</span>
+
     <span class="k">def</span> <span class="nf">_drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drop files from table.</span>
 
@@ -668,6 +735,33 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;removed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_table_to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert pyarrow table to pandas dataframe.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            table: dependency table as pyarrow table</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dependency table as pandas dataframe</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(</span>
+            <span class="n">deduplicate_objects</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="c1"># Convert to pyarrow dtypes,</span>
+            <span class="c1"># but ensure we use pd.StringDtype(&quot;pyarrow&quot;)</span>
+            <span class="c1"># and not pd.ArrowDtype(pa.string())</span>
+            <span class="c1"># see https://pandas.pydata.org/docs/user_guide/pyarrow.html</span>
+            <span class="n">types_mapper</span><span class="o">=</span><span class="p">{</span>
+                <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">():</span> <span class="n">pd</span><span class="o">.</span><span class="n">StringDtype</span><span class="p">(</span><span class="s2">&quot;pyarrow&quot;</span><span class="p">),</span>
+                <span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">():</span> <span class="n">pd</span><span class="o">.</span><span class="n">ArrowDtype</span><span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
+                <span class="n">pa</span><span class="o">.</span><span class="n">float64</span><span class="p">():</span> <span class="n">pd</span><span class="o">.</span><span class="n">ArrowDtype</span><span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">float64</span><span class="p">()),</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">,</span>  <span class="c1"># we have to provide a callable, not a dict</span>
+        <span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_INDEX_DTYPE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">def</span> <span class="nf">_update_media</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -698,7 +792,7 @@
             <span class="n">values</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_INDEX_DTYPE</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_DTYPES</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
@@ -814,6 +908,88 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">requested_deps</span>
+
+
+<span class="k">def</span> <span class="nf">download_dependencies</span><span class="p">(</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dependencies</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load dependency file from backend.</span>
+
+<span class="sd">    Download dependency file</span>
+<span class="sd">    for requested database</span>
+<span class="sd">    to a temporary folder,</span>
+<span class="sd">    and return an dependency object</span>
+<span class="sd">    loaded from that file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        backend_interface: backend interface</span>
+<span class="sd">        name: database name</span>
+<span class="sd">        version: database version</span>
+<span class="sd">        verbose: if ``True`` a message is shown during download</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dependency object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_root</span><span class="p">:</span>
+        <span class="c1"># Load `db.parquet` file,</span>
+        <span class="c1"># or if non-existent `db.zip`</span>
+        <span class="c1"># from backend</span>
+        <span class="n">remote_deps_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">remote_deps_file</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+            <span class="n">local_deps_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
+            <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span>
+                <span class="n">remote_deps_file</span><span class="p">,</span>
+                <span class="n">local_deps_file</span><span class="p">,</span>
+                <span class="n">version</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">remote_deps_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DB</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
+            <span class="n">local_deps_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">tmp_root</span><span class="p">,</span>
+                <span class="n">define</span><span class="o">.</span><span class="n">LEGACY_DEPENDENCIES_FILE</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+                <span class="n">remote_deps_file</span><span class="p">,</span>
+                <span class="n">tmp_root</span><span class="p">,</span>
+                <span class="n">version</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="c1"># Create deps object from downloaded file</span>
+        <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
+        <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">local_deps_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">deps</span>
+
+
+<span class="k">def</span> <span class="nf">upload_dependencies</span><span class="p">(</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
+    <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
+    <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Upload dependency file to backend.</span>
+
+<span class="sd">    Store a dependency file</span>
+<span class="sd">    in the local database root folder,</span>
+<span class="sd">    and upload it to the backend.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        backend_interface: backend interface</span>
+<span class="sd">        deps: dependency object</span>
+<span class="sd">        db_root: database root folder</span>
+<span class="sd">        name: database name</span>
+<span class="sd">        version: database version</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local_deps_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
+    <span class="n">remote_deps_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
+    <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">local_deps_file</span><span class="p">)</span>
+    <span class="n">backend_interface</span><span class="o">.</span><span class="n">put_file</span><span class="p">(</span><span class="n">local_deps_file</span><span class="p">,</span> <span class="n">remote_deps_file</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
 </pre></div>
 
            </div>
@@ -829,7 +1005,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

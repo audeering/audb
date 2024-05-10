@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.6.5
+                v1.7.0
               </div>
             
           
@@ -182,7 +182,7 @@
 <span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attachments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/load.html#load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load database.</p>
 <p>Loads meta and media files of a database to the local cache and returns
-a <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
+a <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
 <p>By setting
 <code class="docutils literal notranslate"><span class="pre">bit_depth</span></code>,
 <code class="docutils literal notranslate"><span class="pre">channels</span></code>,
@@ -255,7 +255,7 @@ database can be accessed</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>database object</p>
@@ -268,6 +268,10 @@ database can be accessed</p></li>
     <code class="docutils literal notranslate"><span class="pre">format</span></code>,
     or <code class="docutils literal notranslate"><span class="pre">sampling_rate</span></code>
     is requested</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><strong>RuntimeError</strong></a> – if a flavor is requested,
+    but the database contains media files,
+    that don’t contain audio,
+    e.g. text files</p></li>
 </ul>
 </dd>
 </dl>
@@ -311,7 +315,7 @@ database can be accessed</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

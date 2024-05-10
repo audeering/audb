@@ -14,6 +14,14 @@ backend
 -------
 .. autoattribute:: Repository.backend
     
+backend\_registry
+-----------------
+.. autoattribute:: Repository.backend_registry
+    
+create\_backend\_interface\(\)
+------------------------------
+.. automethod:: Repository.create_backend_interface
+    
 host
 ----
 .. autoattribute:: Repository.host
@@ -21,4 +29,8 @@ host
 name
 ----
 .. autoattribute:: Repository.name
+    
+register\(\)
+------------
+.. automethod:: Repository.register
     

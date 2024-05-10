@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.6.5
+                v1.7.0
               </div>
             
           
@@ -504,7 +504,7 @@
     <span class="n">attachments</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
@@ -520,13 +520,13 @@
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">archive</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="s2">&quot;/&quot;</span><span class="p">,</span>
             <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span><span class="p">],</span>
             <span class="n">archive</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+        <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
             <span class="n">archive</span><span class="p">,</span>
             <span class="n">db_root_tmp</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
@@ -557,7 +557,7 @@
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">flavor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Flavor</span><span class="p">],</span>
     <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
@@ -588,7 +588,7 @@
     <span class="n">utils</span><span class="o">.</span><span class="n">mkdir_tree</span><span class="p">(</span><span class="n">media</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="s2">&quot;/&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">],</span>
@@ -596,7 +596,7 @@
         <span class="p">)</span>
         <span class="c1"># extract and move all files that are stored in the archive,</span>
         <span class="c1"># even if only a single file from the archive was requested</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
             <span class="n">archive</span><span class="p">,</span>
             <span class="n">db_root_tmp</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
@@ -612,13 +612,18 @@
                 <span class="n">src_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
                 <span class="n">file</span> <span class="o">=</span> <span class="n">flavor</span><span class="o">.</span><span class="n">destination</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                 <span class="n">dst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-                <span class="n">flavor</span><span class="p">(</span>
-                    <span class="n">src_path</span><span class="p">,</span>
-                    <span class="n">dst_path</span><span class="p">,</span>
-                    <span class="n">src_bit_depth</span><span class="o">=</span><span class="n">bit_depth</span><span class="p">,</span>
-                    <span class="n">src_channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
-                    <span class="n">src_sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
-                <span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">flavor</span><span class="p">(</span>
+                        <span class="n">src_path</span><span class="p">,</span>
+                        <span class="n">dst_path</span><span class="p">,</span>
+                        <span class="n">src_bit_depth</span><span class="o">=</span><span class="n">bit_depth</span><span class="p">,</span>
+                        <span class="n">src_channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
+                        <span class="n">src_sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Media file &#39;</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&#39; does not support requesting a flavor.&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">if</span> <span class="n">src_path</span> <span class="o">!=</span> <span class="n">dst_path</span><span class="p">:</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">src_path</span><span class="p">)</span>
 
@@ -643,7 +648,7 @@
     <span class="n">tables</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
@@ -651,13 +656,13 @@
     <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_root</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="s2">&quot;/&quot;</span><span class="p">,</span>
             <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
             <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">backend</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+        <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
             <span class="n">archive</span><span class="p">,</span>
             <span class="n">db_root_tmp</span><span class="p">,</span>
             <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">table</span><span class="p">),</span>
@@ -693,7 +698,7 @@
 
 <span class="k">def</span> <span class="nf">_load_attachments</span><span class="p">(</span>
     <span class="n">attachments</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -708,7 +713,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        attachments: list of attachment IDs</span>
-<span class="sd">        backend: backend object</span>
+<span class="sd">        backend_interface: backend object</span>
 <span class="sd">        db_root: database root</span>
 <span class="sd">        db: database object</span>
 <span class="sd">        version: database version</span>
@@ -753,14 +758,14 @@
                 <span class="n">verbose</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">missing_attachments</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">backend</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">backend_interface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
             <span class="n">_get_attachments_from_backend</span><span class="p">(</span>
                 <span class="n">db</span><span class="p">,</span>
                 <span class="n">missing_attachments</span><span class="p">,</span>
                 <span class="n">db_root</span><span class="p">,</span>
                 <span class="n">deps</span><span class="p">,</span>
-                <span class="n">backend</span><span class="p">,</span>
+                <span class="n">backend_interface</span><span class="p">,</span>
                 <span class="n">num_workers</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="p">,</span>
             <span class="p">)</span>
@@ -771,7 +776,7 @@
 <span class="k">def</span> <span class="nf">_load_files</span><span class="p">(</span>
     <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">files_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">,</span>
+    <span class="n">backend_interface</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -800,7 +805,7 @@
 <span class="sd">        files_type: ``&#39;media&#39;``,</span>
 <span class="sd">            ``&#39;table&#39;``,</span>
 <span class="sd">            or ``&#39;attachment&#39;``</span>
-<span class="sd">        backend: backend object</span>
+<span class="sd">        backend_interface: backend object</span>
 <span class="sd">        db_root: database root</span>
 <span class="sd">        db: database object</span>
 <span class="sd">        version: database version</span>
@@ -845,8 +850,8 @@
                 <span class="n">verbose</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">missing_files</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">backend</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">backend_interface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">&quot;media&quot;</span><span class="p">:</span>
                 <span class="n">_get_media_from_backend</span><span class="p">(</span>
                     <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -854,7 +859,7 @@
                     <span class="n">db_root</span><span class="p">,</span>
                     <span class="n">flavor</span><span class="p">,</span>
                     <span class="n">deps</span><span class="p">,</span>
-                    <span class="n">backend</span><span class="p">,</span>
+                    <span class="n">backend_interface</span><span class="p">,</span>
                     <span class="n">num_workers</span><span class="p">,</span>
                     <span class="n">verbose</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -864,7 +869,7 @@
                     <span class="n">missing_files</span><span class="p">,</span>
                     <span class="n">db_root</span><span class="p">,</span>
                     <span class="n">deps</span><span class="p">,</span>
-                    <span class="n">backend</span><span class="p">,</span>
+                    <span class="n">backend_interface</span><span class="p">,</span>
                     <span class="n">num_workers</span><span class="p">,</span>
                     <span class="n">verbose</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -1154,6 +1159,10 @@
 <span class="sd">            ``format``,</span>
 <span class="sd">            or ``sampling_rate``</span>
 <span class="sd">            is requested</span>
+<span class="sd">        RuntimeError: if a flavor is requested,</span>
+<span class="sd">            but the database contains media files,</span>
+<span class="sd">            that don&#39;t contain audio,</span>
+<span class="sd">            e.g. text files</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; db = audb.load(</span>
@@ -1196,7 +1205,7 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">FolderLock</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">):</span>
             <span class="c1"># Start with database header without tables</span>
-            <span class="n">db</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="n">load_header_to</span><span class="p">(</span>
+            <span class="n">db</span><span class="p">,</span> <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">load_header_to</span><span class="p">(</span>
                 <span class="n">db_root</span><span class="p">,</span>
                 <span class="n">name</span><span class="p">,</span>
                 <span class="n">version</span><span class="p">,</span>
@@ -1217,7 +1226,7 @@
 
                 <span class="n">cached_versions</span> <span class="o">=</span> <span class="n">_load_attachments</span><span class="p">(</span>
                     <span class="n">requested_attachments</span><span class="p">,</span>
-                    <span class="n">backend</span><span class="p">,</span>
+                    <span class="n">backend_interface</span><span class="p">,</span>
                     <span class="n">db_root</span><span class="p">,</span>
                     <span class="n">db</span><span class="p">,</span>
                     <span class="n">version</span><span class="p">,</span>
@@ -1252,7 +1261,7 @@
                     <span class="n">cached_versions</span> <span class="o">=</span> <span class="n">_load_files</span><span class="p">(</span>
                         <span class="n">_tables</span><span class="p">,</span>
                         <span class="s2">&quot;table&quot;</span><span class="p">,</span>
-                        <span class="n">backend</span><span class="p">,</span>
+                        <span class="n">backend_interface</span><span class="p">,</span>
                         <span class="n">db_root</span><span class="p">,</span>
                         <span class="n">db</span><span class="p">,</span>
                         <span class="n">version</span><span class="p">,</span>
@@ -1287,7 +1296,7 @@
                 <span class="n">cached_versions</span> <span class="o">=</span> <span class="n">_load_files</span><span class="p">(</span>
                     <span class="n">requested_media</span><span class="p">,</span>
                     <span class="s2">&quot;media&quot;</span><span class="p">,</span>
-                    <span class="n">backend</span><span class="p">,</span>
+                    <span class="n">backend_interface</span><span class="p">,</span>
                     <span class="n">db_root</span><span class="p">,</span>
                     <span class="n">db</span><span class="p">,</span>
                     <span class="n">version</span><span class="p">,</span>
@@ -1402,7 +1411,7 @@
 
     <span class="k">with</span> <span class="n">FolderLock</span><span class="p">(</span><span class="n">db_root</span><span class="p">):</span>
         <span class="c1"># Start with database header</span>
-        <span class="n">db</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="n">load_header_to</span><span class="p">(</span>
+        <span class="n">db</span><span class="p">,</span> <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">load_header_to</span><span class="p">(</span>
             <span class="n">db_root</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
@@ -1411,7 +1420,7 @@
         <span class="c1"># Load attachment</span>
         <span class="n">_load_attachments</span><span class="p">(</span>
             <span class="p">[</span><span class="n">attachment</span><span class="p">],</span>
-            <span class="n">backend</span><span class="p">,</span>
+            <span class="n">backend_interface</span><span class="p">,</span>
             <span class="n">db_root</span><span class="p">,</span>
             <span class="n">db</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
@@ -1468,7 +1477,10 @@
     <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">add_audb_meta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">Backend</span><span class="p">]]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
+    <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+    <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]],</span>
+<span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database header from folder or backend.</span>
 
 <span class="sd">    If the database header cannot be found in ``db_root``</span>
@@ -1491,15 +1503,15 @@
 <span class="sd">        database header and backend</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">backend</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">backend_interface</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">local_header</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">local_header</span><span class="p">):</span>
-        <span class="n">backend</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
-        <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+        <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">add_audb_meta</span><span class="p">:</span>
             <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_root</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
             <span class="n">local_header</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
-        <span class="n">backend</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">local_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">local_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">add_audb_meta</span><span class="p">:</span>
             <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;audb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -1515,7 +1527,7 @@
             <span class="p">)</span>
             <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">backend</span>
+    <span class="k">return</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">backend_interface</span>
 
 
 <div class="viewcode-block" id="load_media"><a class="viewcode-back" href="../../../api/audb.load_media.html#audb.load_media">[docs]</a><span class="k">def</span> <span class="nf">load_media</span><span class="p">(</span>
@@ -1635,7 +1647,7 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">FolderLock</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">):</span>
             <span class="c1"># Start with database header without tables</span>
-            <span class="n">db</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="n">load_header_to</span><span class="p">(</span>
+            <span class="n">db</span><span class="p">,</span> <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">load_header_to</span><span class="p">(</span>
                 <span class="n">db_root</span><span class="p">,</span>
                 <span class="n">name</span><span class="p">,</span>
                 <span class="n">version</span><span class="p">,</span>
@@ -1650,7 +1662,7 @@
                 <span class="n">_load_files</span><span class="p">(</span>
                     <span class="n">media</span><span class="p">,</span>
                     <span class="s2">&quot;media&quot;</span><span class="p">,</span>
-                    <span class="n">backend</span><span class="p">,</span>
+                    <span class="n">backend_interface</span><span class="p">,</span>
                     <span class="n">db_root</span><span class="p">,</span>
                     <span class="n">db</span><span class="p">,</span>
                     <span class="n">version</span><span class="p">,</span>
@@ -1754,7 +1766,7 @@
 
     <span class="k">with</span> <span class="n">FolderLock</span><span class="p">(</span><span class="n">db_root</span><span class="p">):</span>
         <span class="c1"># Start with database header without tables</span>
-        <span class="n">db</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="n">load_header_to</span><span class="p">(</span>
+        <span class="n">db</span><span class="p">,</span> <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">load_header_to</span><span class="p">(</span>
             <span class="n">db_root</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
@@ -1771,7 +1783,7 @@
                 <span class="n">_load_files</span><span class="p">(</span>
                     <span class="p">[</span><span class="n">table</span><span class="p">],</span>
                     <span class="s2">&quot;table&quot;</span><span class="p">,</span>
-                    <span class="n">backend</span><span class="p">,</span>
+                    <span class="n">backend_interface</span><span class="p">,</span>
                     <span class="n">db_root</span><span class="p">,</span>
                     <span class="n">db</span><span class="p">,</span>
                     <span class="n">version</span><span class="p">,</span>
@@ -1801,7 +1813,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/04/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
