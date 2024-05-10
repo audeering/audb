@@ -32,6 +32,7 @@
         audeer.mkdir(folder)
 
     audb.config.CACHE_ROOT = "./cache"
+    audb.config.SHARED_CACHE_ROOT = "./cache"
 
 
 .. _publish:
