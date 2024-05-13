@@ -26,7 +26,11 @@ jobs:
             tasks: tests
           - os: ubuntu-latest
             python-version: '3.10'
-            pandas: ['pandas==2.0.3', 'pandas==2.1.4']
+            pandas: 'pandas==2.0.3'
+            tasks: tests
+          - os: ubuntu-latest
+            python-version: '3.10'
+            pandas: 'pandas==2.1.4'
             tasks: tests
 
     steps:
