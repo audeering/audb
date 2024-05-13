@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.7.1 (2024-05-13)
+--------------------------
+
+* Fixed: require ``pandas>=2.0.1``
+  to ensure ``pyarrow`` based data types
+  work under all conditions
+
+
 Version 1.7.0 (2024-05-10)
 --------------------------
 
