@@ -11,8 +11,7 @@ Version 1.7.1 (2024-05-14)
 --------------------------
 
 * Fixed: require ``pandas>=2.0.1``
-  to ensure ``pyarrow`` based data types
-  work under all conditions
+  for ``pyarrow`` based data types
 
 
 Version 1.7.0 (2024-05-10)
