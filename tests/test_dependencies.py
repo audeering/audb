@@ -1,4 +1,5 @@
 import os
+import pickle
 
 import pandas as pd
 import pytest
@@ -259,9 +260,22 @@ def test_load_save(tmpdir, deps, file):
 
 
 @pytest.mark.parametrize(
-    "audb_version", ["1.0.4", "1.1.9", "1.2.6", "1.3.0", "1.4.2", "1.5.2", "1.6.5"]
+    "audb_version, platform",
+    [
+        pytest.param(
+            "1.0.4",
+            None,
+            marks=pytest.mark.xfail(raises=pickle.PickleError),
+        ),
+        ("1.1.9", None),
+        ("1.2.6", None),
+        ("1.3.0", None),
+        ("1.4.2", None),
+        ("1.5.2", None),
+        ("1.6.5", None),
+    ],
 )
-def test_load_save_backward_compatibility(audb_version):
+def test_load_save_backward_compatibility(audb_version, platform):
     """Test backward compatibility with old pickle cache files.
 
     As the dtype of the index has changed,
