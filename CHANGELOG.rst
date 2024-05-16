@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.7.2 (2024-05-16)
+--------------------------
+
+* Fixed: loading of dependency table from cache
+  under Python 3.8,
+  when stored by an older version of ``audb``
+
+
 Version 1.7.1 (2024-05-14)
 --------------------------
 
