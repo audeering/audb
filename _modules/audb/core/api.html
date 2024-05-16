@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.7.1
+                v1.7.2
               </div>
             
           
@@ -424,7 +424,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
             <span class="n">deps</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cached_deps_file</span><span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">):</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
             <span class="c1"># If loading cached file fails, load again from backend</span>
             <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
             <span class="n">deps</span> <span class="o">=</span> <span class="n">download_dependencies</span><span class="p">(</span><span class="n">backend_interface</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
@@ -793,7 +793,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/14 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/16 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
