@@ -261,22 +261,21 @@ def test_load_save(tmpdir, deps, file):
 
 @pytest.mark.parametrize("python_version", ["3.8", "3.9", "3.10", "3.11"])
 @pytest.mark.parametrize(
-    "audb_version, platform",
+    "audb_version",
     [
         pytest.param(
             "1.0.4",
-            None,
             marks=pytest.mark.xfail(raises=pickle.PickleError),
         ),
-        ("1.1.9", None),
-        ("1.2.6", None),
-        ("1.3.0", None),
-        ("1.4.2", None),
-        ("1.5.2", None),
-        ("1.6.5", None),
+        "1.1.9",
+        "1.2.6",
+        "1.3.0",
+        "1.4.2",
+        "1.5.2",
+        "1.6.5",
     ],
 )
-def test_load_save_backward_compatibility(python_version, audb_version, platform):
+def test_load_save_backward_compatibility(python_version, audb_version):
     """Test backward compatibility with old pickle cache files.
 
     As the dtype of the index has changed,
@@ -284,7 +283,6 @@ def test_load_save_backward_compatibility(python_version, audb_version, platform
     when loading old cache files.
 
     """
-    # current_python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
     deps_file = audeer.path(
         CURRENT_DIR,
         "assests",
