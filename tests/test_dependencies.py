@@ -259,6 +259,7 @@ def test_load_save(tmpdir, deps, file):
     assert list(deps2._df.dtypes) == list(audb.core.define.DEPEND_FIELD_DTYPES.values())
 
 
+@pytest.mark.parametrize("python_version", ["3.8", "3.9", "3.10", "3.11"])
 @pytest.mark.parametrize(
     "audb_version, platform",
     [
@@ -275,7 +276,7 @@ def test_load_save(tmpdir, deps, file):
         ("1.6.5", None),
     ],
 )
-def test_load_save_backward_compatibility(audb_version, platform):
+def test_load_save_backward_compatibility(python_version, audb_version, platform):
     """Test backward compatibility with old pickle cache files.
 
     As the dtype of the index has changed,
@@ -283,7 +284,13 @@ def test_load_save_backward_compatibility(audb_version, platform):
     when loading old cache files.
 
     """
-    deps_file = audeer.path(CURRENT_DIR, "assests", f"emodb-audb-{audb_version}.pkl")
+    # current_python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    deps_file = audeer.path(
+        CURRENT_DIR,
+        "assests",
+        "dependency-table",
+        f"db-python-{python_version}-audb-{audb_version}.pkl",
+    )
     deps = audb.Dependencies()
     deps.load(deps_file)
     assert deps._df.index.dtype == audb.core.define.DEPEND_INDEX_DTYPE
