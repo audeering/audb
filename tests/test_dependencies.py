@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import pytest
 
@@ -6,6 +8,7 @@ import audeer
 import audb
 
 
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 ROWS = [
     {
         "file": "db.files.csv",
@@ -255,7 +258,10 @@ def test_load_save(tmpdir, deps, file):
     assert list(deps2._df.dtypes) == list(audb.core.define.DEPEND_FIELD_DTYPES.values())
 
 
-def test_load_save_backward_compatibility(tmpdir, deps):
+@pytest.mark.parametrize(
+    "audb_version", ["1.0.4", "1.1.9", "1.2.6", "1.3.0", "1.4.2", "1.5.2", "1.6.5"]
+)
+def test_load_save_backward_compatibility(audb_version):
     """Test backward compatibility with old pickle cache files.
 
     As the dtype of the index has changed,
@@ -263,14 +269,10 @@ def test_load_save_backward_compatibility(tmpdir, deps):
     when loading old cache files.
 
     """
-    deps_file = audeer.path(tmpdir, "deps.pkl")
-    # Change dtype of index from object to string
-    # to mimic previous behavior
-    deps._df.index = deps._df.index.astype("string")
-    deps.save(deps_file)
-    deps2 = audb.Dependencies()
-    deps2.load(deps_file)
-    assert deps2._df.index.dtype == audb.core.define.DEPEND_INDEX_DTYPE
+    deps_file = audeer.path(CURRENT_DIR, "assests", f"emodb-audb-{audb_version}.pkl")
+    deps = audb.Dependencies()
+    deps.load(deps_file)
+    assert deps._df.index.dtype == audb.core.define.DEPEND_INDEX_DTYPE
 
 
 def test_load_save_errors(deps):
