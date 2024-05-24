@@ -367,6 +367,13 @@ def test_column_locator(files, column, dt, expected_type, expected_result, deps)
     assert actual == expected_result
 
 
+def test_column_locator_throws_invalid_type(deps):
+    """Test column locator: invalid dtype raises."""
+    files = get_entries("file")
+    with pytest.raises(ValueError, match="could not convert"):
+        deps._column_loc("format", files, float)
+
+
 def test_type(deps):
     files = get_entries("file")
     types = get_entries("type")
