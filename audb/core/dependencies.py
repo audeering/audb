@@ -1,3 +1,4 @@
+import collections
 import errno
 import os
 import re
@@ -515,10 +516,27 @@ class Dependencies:
         files: typing.Union[str, typing.Sequence[str]],
         dtype: typing.Callable = None,
     ) -> typing.Union[typing.Any, typing.List[typing.Any]]:
-        r"""Column content for selected files."""
-        value = self._df.at[files, column]
+        r"""Column content for selected files.
+
+        Args:
+        column: one of the names in self._schema
+        files: rows to query, index is a filename
+        dtype: convert data to dtype
+
+        Returns: scalar value or list
+        """
+        # note: pandas series is not a sequence
+        is_sequence = isinstance(files, collections.abc.Sequence)
+        files = [files] if is_sequence and isinstance(files, str) else files
+
         if dtype is not None:
-            value = dtype(value)
+            value = self._df.loc[files][column].astype(dtype).tolist()
+        else:
+            value = self._df.loc[files][column].tolist()
+
+        if len(value) == 1:
+            return value[0]
+
         return value
 
     def _dataframe_to_table(
