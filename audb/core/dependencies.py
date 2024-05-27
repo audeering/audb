@@ -586,9 +586,10 @@ class Dependencies:
             with correct dtypes
 
         """
-        # Check if we have an old cache,
-        # by checking the dtype of index,
-        # which changed to `object` in version 1.7.0
+        # Check the dtype of index,
+        # to decide if we need to update dtypes,
+        # as dtype of index changed to `object`
+        # in version 1.7.0 of audb.
         if df.index.dtype != define.DEPEND_INDEX_DTYPE:
             df.index = df.index.astype(define.DEPEND_INDEX_DTYPE, copy=False)
             columns = define.DEPEND_FIELD_NAMES.values()
