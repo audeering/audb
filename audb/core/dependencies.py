@@ -108,7 +108,7 @@ class Dependencies:
             ``True`` if both dependency tables have the same entries
 
         """
-        return self._df.equals(other._df.astype(self._df.dtypes))
+        return self._df.equals(other._df)
 
     def __getitem__(self, file: str) -> typing.List:
         r"""File information.
