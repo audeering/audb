@@ -594,10 +594,8 @@ class Dependencies:
             df.index = df.index.astype(define.DEPEND_INDEX_DTYPE, copy=False)
             columns = define.DEPEND_FIELD_NAMES.values()
             dtypes = define.DEPEND_FIELD_DTYPES.values()
-            df = df.astype(
-                {name: dtype for name, dtype in zip(columns, dtypes)},
-                copy=False,
-            )
+            mapping = {column: dtype for column, dtype in zip(columns, dtypes)}
+            df = df.astype(mapping, copy=False)
         return df
 
     def _table_to_dataframe(self, table: pa.Table) -> pd.DataFrame:
