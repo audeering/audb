@@ -57,7 +57,7 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
+        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         self._df = self._set_dtypes(self._df)
         # pyarrow schema
         # used for reading and writing files
@@ -306,7 +306,7 @@ class Dependencies:
             FileNotFoundError: if ``path`` does not exists
 
         """
-        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
+        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         path = audeer.path(path)
         extension = audeer.file_extension(path)
         if extension not in ["csv", "pkl", "parquet"]:
@@ -473,7 +473,7 @@ class Dependencies:
         """
         df = pd.DataFrame.from_records(
             values,
-            columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
+            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
         ).set_index("file")
         df = self._set_dtypes(df)
         self._df = pd.concat([self._df, df])
@@ -599,10 +599,7 @@ class Dependencies:
 
         """
         df.index = df.index.astype(define.DEPEND_INDEX_DTYPE, copy=False)
-        columns = define.DEPEND_FIELD_NAMES.values()
-        dtypes = define.DEPEND_FIELD_DTYPES.values()
-        mapping = {column: dtype for column, dtype in zip(columns, dtypes)}
-        df = df.astype(mapping, copy=False)
+        df = df.astype(define.DEPENDENCY_TABLE, copy=False)
         return df
 
     def _table_to_dataframe(self, table: pa.Table) -> pd.DataFrame:
@@ -659,7 +656,7 @@ class Dependencies:
         """
         df = pd.DataFrame.from_records(
             values,
-            columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
+            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
         ).set_index("file")
         df = self._set_dtypes(df)
         self._df.loc[df.index] = df
@@ -676,8 +673,7 @@ class Dependencies:
             version: version string
 
         """
-        field = define.DEPEND_FIELD_NAMES[define.DependField.VERSION]
-        self._df.loc[files, field] = version
+        self._df.loc[files, "version"] = version
 
 
 def error_message_missing_object(

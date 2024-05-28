@@ -71,11 +71,7 @@ def deps():
     # Ensure correct dtype
     df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
     df.index.name = None
-    for name, dtype in zip(
-        audb.core.define.DEPEND_FIELD_NAMES.values(),
-        audb.core.define.DEPEND_FIELD_DTYPES.values(),
-    ):
-        df[name] = df[name].astype(dtype)
+    df = df.astype(audb.core.define.DEPENDENCY_TABLE)
     deps._df = df
     return deps
 
@@ -107,11 +103,7 @@ def test_instantiation():
     ]
     expected_df = pd.DataFrame(columns=expected_columns)
     expected_df.index = expected_df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
-    for name, dtype in zip(
-        audb.core.define.DEPEND_FIELD_NAMES.values(),
-        audb.core.define.DEPEND_FIELD_DTYPES.values(),
-    ):
-        expected_df[name] = expected_df[name].astype(dtype)
+    expected_df = expected_df.astype(audb.core.define.DEPENDENCY_TABLE)
     pd.testing.assert_frame_equal(deps._df, expected_df)
     assert list(deps._df.columns) == expected_columns
     df = deps()
@@ -122,11 +114,7 @@ def test_call(deps):
     expected_df = pd.DataFrame.from_records(ROWS).set_index("file")
     expected_df.index = expected_df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
     expected_df.index.name = None
-    for name, dtype in zip(
-        audb.core.define.DEPEND_FIELD_NAMES.values(),
-        audb.core.define.DEPEND_FIELD_DTYPES.values(),
-    ):
-        expected_df[name] = expected_df[name].astype(dtype)
+    expected_df = expected_df.astype(audb.core.define.DEPENDENCY_TABLE)
     df = deps()
     pd.testing.assert_frame_equal(df, expected_df)
 
@@ -273,7 +261,7 @@ def test_load_save(tmpdir, deps, file):
     deps2 = audb.Dependencies()
     deps2.load(deps_file)
     pd.testing.assert_frame_equal(deps(), deps2())
-    assert list(deps2._df.dtypes) == list(audb.core.define.DEPEND_FIELD_DTYPES.values())
+    assert list(deps2._df.dtypes) == list(audb.core.define.DEPENDENCY_TABLE.values())
 
 
 def test_load_save_backward_compatibility(tmpdir, deps):
