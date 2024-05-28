@@ -38,10 +38,10 @@ def test_loading_multiple_attachments(tmpdir, repository):
         audeer.mkdir(db_root, folder)
     for file in files:
         audeer.touch(db_root, file)
-    db.attachments["a-a"] = audformat.Attachment("a/a/")
-    db.attachments["a-b"] = audformat.Attachment("a/b/")
-    db.attachments["b-a"] = audformat.Attachment("b/a/")
-    db.attachments["c-a"] = audformat.Attachment("c/a/")
+    db.attachments["a-a"] = audformat.Attachment("a/a/", description="Attachment a-a")
+    db.attachments["a-b"] = audformat.Attachment("a/b/", description="Attachment a-b")
+    db.attachments["b-a"] = audformat.Attachment("b/a/", description="Attachment b-a")
+    db.attachments["c-a"] = audformat.Attachment("c/a/", description="Attachment c-a")
     db.save(db_root)
 
     audb.publish(db_root, db_version, repository)
