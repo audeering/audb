@@ -13,55 +13,34 @@ HEADER_FILE = f"{DB}.yaml"
 DEPENDENCIES_FILE = f"{DB}.parquet"
 CACHED_DEPENDENCIES_FILE = f"{DB}.pkl"
 LEGACY_DEPENDENCIES_FILE = f"{DB}.csv"
+DEPENDENCY_TABLE = {
+    # Column name: column dtype
+    "archive": "string[pyarrow]",
+    "bit_depth": "int32[pyarrow]",
+    "channels": "int32[pyarrow]",
+    "checksum": "string[pyarrow]",
+    "duration": "float64[pyarrow]",
+    "format": "string[pyarrow]",
+    "removed": "int32[pyarrow]",
+    "sampling_rate": "int32[pyarrow]",
+    "type": "int32[pyarrow]",
+    "version": "string[pyarrow]",
+}
+r"""Column names and data types of dependency table.
+
+The dependency table is stored in a dataframe
+at ``audb.Dependencies._df``,
+and contains the specified column names
+and data types.
+
+"""
+DEPEND_INDEX_DTYPE = "object"
+
 
 # Cache lock
 CACHED_VERSIONS_TIMEOUT = 10  # Timeout to acquire access to cached versions
 LOCK_FILE = ".lock"
 TIMEOUT_MSG = "Lock could not be acquired. Timeout exceeded."
-
-
-class DependField:
-    r"""Fields stored in dependency table."""
-
-    ARCHIVE = 0
-    BIT_DEPTH = 1
-    CHANNELS = 2
-    CHECKSUM = 3
-    DURATION = 4
-    FORMAT = 5
-    REMOVED = 6
-    SAMPLING_RATE = 7
-    TYPE = 8
-    VERSION = 9
-
-
-DEPEND_FIELD_NAMES = {
-    DependField.ARCHIVE: "archive",
-    DependField.BIT_DEPTH: "bit_depth",
-    DependField.CHANNELS: "channels",
-    DependField.CHECKSUM: "checksum",
-    DependField.DURATION: "duration",
-    DependField.FORMAT: "format",
-    DependField.REMOVED: "removed",
-    DependField.SAMPLING_RATE: "sampling_rate",
-    DependField.TYPE: "type",
-    DependField.VERSION: "version",
-}
-
-DEPEND_FIELD_DTYPES = {
-    DependField.ARCHIVE: "string[pyarrow]",
-    DependField.BIT_DEPTH: "int32[pyarrow]",
-    DependField.CHANNELS: "int32[pyarrow]",
-    DependField.CHECKSUM: "string[pyarrow]",
-    DependField.DURATION: "float64[pyarrow]",
-    DependField.FORMAT: "string[pyarrow]",
-    DependField.REMOVED: "int32[pyarrow]",
-    DependField.SAMPLING_RATE: "int32[pyarrow]",
-    DependField.TYPE: "int32[pyarrow]",
-    DependField.VERSION: "string[pyarrow]",
-}
-
-DEPEND_INDEX_DTYPE = "object"
 
 
 class DependType:

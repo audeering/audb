@@ -99,11 +99,7 @@ if not os.path.exists(data_cache):
         for n in range(num_rows)
     ]
     df = pd.DataFrame.from_records(records)
-    for column, dtype in zip(
-        audb.core.define.DEPEND_FIELD_NAMES.values(),
-        audb.core.define.DEPEND_FIELD_DTYPES.values(),
-    ):
-        df[column] = df[column].astype(dtype)
+    df = df.astype(audb.core.define.DEPENDENCY_TABLE)
     df.set_index("file", inplace=True)
     df.index.name = None
     df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
