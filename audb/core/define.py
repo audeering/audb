@@ -56,26 +56,25 @@ and data types.
 DEPENDENCY_INDEX_DTYPE = "object"
 r"""Data type of the dependency table index."""
 
+DEPENDENCY_TYPE = {
+    "meta": 0,
+    "media": 1,
+    "attachment": 2,
+}
+r"""Types of files stored in a database.
+
+Currently, a database can contain the following files:
+
+* ``"meta"``: tables and misc tables
+* ``"media"``: media files, e.g. audio, video, text
+* ``"attachment"``: files included as attachments
+
+"""
 
 # Cache lock
 CACHED_VERSIONS_TIMEOUT = 10  # Timeout to acquire access to cached versions
 LOCK_FILE = ".lock"
 TIMEOUT_MSG = "Lock could not be acquired. Timeout exceeded."
-
-
-class DependType:
-    r"""Dependency file types."""
-
-    META = 0
-    MEDIA = 1
-    ATTACHMENT = 2
-
-
-DEPEND_TYPE_NAMES = {
-    DependType.META: "meta",
-    DependType.MEDIA: "media",
-    DependType.ATTACHMENT: "attachment",
-}
 
 
 # Flavors
