@@ -147,7 +147,7 @@ deps.load(data_cache)
 file = "file-10.wav"
 n_files = 10000
 _files = deps._df.index[:n_files].tolist()
-dtypes = ["string", "object", "pyarrow"]
+dtypes = ["pyarrow", "string", "object"]
 results = pd.DataFrame(columns=dtypes)
 results.index.name = "method"
 
