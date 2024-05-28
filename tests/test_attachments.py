@@ -10,13 +10,7 @@ import audb
 
 @pytest.fixture(scope="function", autouse=False)
 def same_cache():
-    r"""Set shared cache to cache folder.
-
-    Set shared cache folder
-    to the same folder
-    as the user cache.
-
-    """
+    r"""Set shared cache to same folder as user cache."""
     current_shared_cache = audb.config.SHARED_CACHE_ROOT
     audb.config.SHARED_CACHE_ROOT = audb.config.CACHE_ROOT
 
@@ -37,7 +31,7 @@ def test_loading_attachments_from_cache(tmpdir, repository, same_cache):
 
     """
     # Create version 1.0.0 of database,
-    # publish and load to cache
+    # publish and load
     db_name = "db"
     db_version = "1.0.0"
     db_root = audeer.mkdir(audeer.path(tmpdir, db_name))
@@ -54,7 +48,7 @@ def test_loading_attachments_from_cache(tmpdir, repository, same_cache):
     db = audb.load(db_name, version=db_version, verbose=False)
 
     # Create version 2.0.0 of database,
-    # and publish
+    # and publish and load
     db = audb.load_to(db_root, db_name, version=db_version)
     db_version = "2.0.0"
     db.description = f"Version {db_version} of database."
@@ -62,9 +56,9 @@ def test_loading_attachments_from_cache(tmpdir, repository, same_cache):
 
     audb.publish(db_root, db_version, repository)
 
-    # Try to load attachments
     db = audb.load(db_name, version=db_version, verbose=False)
 
+    # Ensure attachment file is loaded
     assert list(db.attachments) == [filename]
     for attachment in list(db.attachments):
         for file in db.attachments[attachment].files:
