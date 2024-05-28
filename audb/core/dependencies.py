@@ -598,7 +598,7 @@ class Dependencies:
             with correct dtypes
 
         """
-        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE, copy=False)
+        df.index = df.index.astype(define.DEPENDENCY_INDEX_DTYPE, copy=False)
         df = df.astype(define.DEPENDENCY_TABLE, copy=False)
         return df
 
@@ -626,7 +626,7 @@ class Dependencies:
         )
         df.set_index("file", inplace=True)
         df.index.name = None
-        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(define.DEPENDENCY_INDEX_DTYPE)
         return df
 
     def _update_media(

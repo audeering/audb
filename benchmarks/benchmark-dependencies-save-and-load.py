@@ -40,7 +40,7 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32")
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("object")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
     elif dtype == "string":
         # Use `string` to represent strings
         df["archive"] = df["archive"].astype("string")
@@ -53,7 +53,7 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32")
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("string")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
     elif dtype == "pyarrow":
         # Use `pyarrow` to represent all dtypes
         df["archive"] = df["archive"].astype("string[pyarrow]")
@@ -66,7 +66,7 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32[pyarrow]")
         df["type"] = df["type"].astype("int32[pyarrow]")
         df["version"] = df["version"].astype("string[pyarrow]")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
     return df
 
 
@@ -102,7 +102,7 @@ if not os.path.exists(data_cache):
     df = df.astype(audb.core.define.DEPENDENCY_TABLE)
     df.set_index("file", inplace=True)
     df.index.name = None
-    df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+    df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
     df.to_pickle(data_cache)
 else:
     df = pd.read_pickle(data_cache)
@@ -350,7 +350,7 @@ for engine in [None, "c", "pyarrow"]:
         results.at[method, "csv"] = t
         if dtype == "pyarrow":
             dtype = "string[pyarrow]"
-        _df.index = _df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        _df.index = _df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
         assert _df.archive.dtype == dtype
         print(".", end="", flush=True)
 
