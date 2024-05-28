@@ -827,7 +827,7 @@ def test_publish_error_messages(
             )
             path = os.path.join(
                 dbs[version],
-                audb.core.define.DEPENDENCIES_FILE,
+                audb.core.define.DEPENDENCY_FILE,
             )
             deps.save(path)
         audb.publish(
@@ -1159,13 +1159,13 @@ def test_update_database(dbs, persistent_repository):
     previous_version = start_version
     dep_file = os.path.join(
         dbs[version],
-        audb.core.define.DEPENDENCIES_FILE,
+        audb.core.define.DEPENDENCY_FILE,
     )
     os.remove(dep_file)
     error_msg = (
         f"You want to depend on '{previous_version}' "
         f"of {DB_NAME}, "
-        f"but you don't have a '{audb.core.define.DEPENDENCIES_FILE}' "
+        f"but you don't have a '{audb.core.define.DEPENDENCY_FILE}' "
         f"file present "
         f"in {dbs[version]}. "
         f"Did you forgot to call "
@@ -1206,7 +1206,7 @@ def test_update_database(dbs, persistent_repository):
         f"You want to depend on '{audb.latest_version(DB_NAME)}' "
         f"of {DB_NAME}, "
         f"but the dependency file "
-        f"'{audb.core.define.DEPENDENCIES_FILE}' "
+        f"'{audb.core.define.DEPENDENCY_FILE}' "
         f"in {dbs[version]} "
         f"does not match the dependency file "
         f"for the requested version in the repository. "
@@ -1229,7 +1229,7 @@ def test_update_database(dbs, persistent_repository):
     previous_version = None
     error_msg = (
         f"You did not set a dependency to a previous version, "
-        f"but you have a '{audb.core.define.DEPENDENCIES_FILE}' file present "
+        f"but you have a '{audb.core.define.DEPENDENCY_FILE}' file present "
         f"in {dbs[version]}."
     )
     with pytest.raises(RuntimeError, match=re.escape(error_msg)):
