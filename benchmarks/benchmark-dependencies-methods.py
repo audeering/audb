@@ -450,3 +450,6 @@ for dtype in dtypes:
 # ===== Print results =====
 table = tabulate.tabulate(results, headers="keys", tablefmt="github", floatfmt=".3f")
 print(table)
+# ===== Save results =====
+fp_results = audeer.path(cache, 'results_pandas.csv')
+results.to_csv(fp_results)
