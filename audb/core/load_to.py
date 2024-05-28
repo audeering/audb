@@ -462,11 +462,11 @@ def load_to(
 
     # save dependencies
 
-    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCIES_FILE)
+    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCY_FILE)
     deps.save(dep_path_tmp)
     audeer.move_file(
         dep_path_tmp,
-        os.path.join(db_root, define.DEPENDENCIES_FILE),
+        os.path.join(db_root, define.DEPENDENCY_FILE),
     )
 
     # save database and PKL tables

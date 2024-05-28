@@ -707,7 +707,7 @@ def publish(
 
     # load database and dependencies
     deps = Dependencies()
-    for deps_file in [define.DEPENDENCIES_FILE, define.LEGACY_DEPENDENCIES_FILE]:
+    for deps_file in [define.DEPENDENCY_FILE, define.LEGACY_DEPENDENCY_FILE]:
         deps_path = os.path.join(db_root, deps_file)
         if os.path.exists(deps_path):
             deps.load(deps_path)
@@ -728,7 +728,7 @@ def publish(
         raise RuntimeError(
             f"You want to depend on '{previous_version}' "
             f"of {db.name}, "
-            f"but you don't have a '{define.DEPENDENCIES_FILE}' file present "
+            f"but you don't have a '{define.DEPENDENCY_FILE}' file present "
             f"in {db_root}. "
             f"Did you forgot to call "
             f"'audb.load_to({db_root}, {db.name}, "

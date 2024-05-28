@@ -129,8 +129,8 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
     db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        audeer.path(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
-        audeer.path(db_root, audb.core.define.DEPENDENCIES_FILE),
+        audeer.path(previous_db_root, audb.core.define.DEPENDENCY_FILE),
+        audeer.path(db_root, audb.core.define.DEPENDENCY_FILE),
     )
     audb.publish(
         db_root,
@@ -156,8 +156,8 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
     db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        audeer.path(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
-        audeer.path(db_root, audb.core.define.DEPENDENCIES_FILE),
+        audeer.path(previous_db_root, audb.core.define.DEPENDENCY_FILE),
+        audeer.path(db_root, audb.core.define.DEPENDENCY_FILE),
     )
     audb.publish(
         db_root,
@@ -192,8 +192,8 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
     db.save(db_root, storage_format=storage_format)
 
     shutil.copy(
-        os.path.join(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
-        os.path.join(db_root, audb.core.define.DEPENDENCIES_FILE),
+        os.path.join(previous_db_root, audb.core.define.DEPENDENCY_FILE),
+        os.path.join(db_root, audb.core.define.DEPENDENCY_FILE),
     )
     audb.publish(
         db_root,
@@ -220,8 +220,8 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
     db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
     shutil.copy(
-        os.path.join(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
-        os.path.join(db_root, audb.core.define.DEPENDENCIES_FILE),
+        os.path.join(previous_db_root, audb.core.define.DEPENDENCY_FILE),
+        os.path.join(db_root, audb.core.define.DEPENDENCY_FILE),
     )
     audb.publish(
         db_root,

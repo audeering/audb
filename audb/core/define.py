@@ -10,9 +10,27 @@ DB = "db"
 HEADER_FILE = f"{DB}.yaml"
 
 # Dependencies
-DEPENDENCIES_FILE = f"{DB}.parquet"
-CACHED_DEPENDENCIES_FILE = f"{DB}.pkl"
-LEGACY_DEPENDENCIES_FILE = f"{DB}.csv"
+DEPENDENCY_FILE = f"{DB}.parquet"
+r"""Filename and extension of dependency table file."""
+
+CACHED_DEPENDENCY_FILE = f"{DB}.pkl"
+r"""Filename and extension of cached dependency table file.
+
+As loading from a pickle file is still faster
+than loading from a parquet file,
+we are storing the dependency table
+as a pickle file in cache.
+
+"""
+
+LEGACY_DEPENDENCY_FILE = f"{DB}.csv"
+r"""Filename and extension of legacy dependency table file.
+
+In ``audb`` versions smaller than 1.7.0,
+the dependency table was stored in a csv file.
+
+"""
+
 DEPENDENCY_TABLE = {
     # Column name: column dtype
     "archive": "string[pyarrow]",

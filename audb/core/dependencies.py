@@ -798,9 +798,9 @@ def download_dependencies(
         # Load `db.parquet` file,
         # or if non-existent `db.zip`
         # from backend
-        remote_deps_file = backend_interface.join("/", name, define.DEPENDENCIES_FILE)
+        remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
         if backend_interface.exists(remote_deps_file, version):
-            local_deps_file = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
+            local_deps_file = os.path.join(tmp_root, define.DEPENDENCY_FILE)
             backend_interface.get_file(
                 remote_deps_file,
                 local_deps_file,
@@ -811,7 +811,7 @@ def download_dependencies(
             remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
             local_deps_file = os.path.join(
                 tmp_root,
-                define.LEGACY_DEPENDENCIES_FILE,
+                define.LEGACY_DEPENDENCY_FILE,
             )
             backend_interface.get_archive(
                 remote_deps_file,
@@ -846,7 +846,7 @@ def upload_dependencies(
         version: database version
 
     """
-    local_deps_file = os.path.join(db_root, define.DEPENDENCIES_FILE)
-    remote_deps_file = backend_interface.join("/", name, define.DEPENDENCIES_FILE)
+    local_deps_file = os.path.join(db_root, define.DEPENDENCY_FILE)
+    remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
     deps.save(local_deps_file)
     backend_interface.put_file(local_deps_file, remote_deps_file, version)
