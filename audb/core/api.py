@@ -492,10 +492,7 @@ def remove_media(
                     # if archive exists in this version,
                     # remove file from it and re-publish
                     remote_archive = backend_interface.join(
-                        "/",
-                        name,
-                        define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-                        archive + ".zip",
+                        "/", name, "media", archive + ".zip"
                     )
                     if backend_interface.exists(remote_archive, version):
                         files_in_archive = backend_interface.get_archive(

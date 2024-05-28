@@ -395,12 +395,7 @@ def _get_attachments_from_backend(
     def job(path: str):
         archive = deps.archive(path)
         version = deps.version(path)
-        archive = backend_interface.join(
-            "/",
-            db.name,
-            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            archive + ".zip",
-        )
+        archive = backend_interface.join("/", db.name, "attachment", archive + ".zip")
         backend_interface.get_archive(
             archive,
             db_root_tmp,
@@ -464,12 +459,7 @@ def _get_media_from_backend(
     utils.mkdir_tree(media, db_root_tmp)
 
     def job(archive: str, version: str):
-        archive = backend_interface.join(
-            "/",
-            name,
-            define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-            archive + ".zip",
-        )
+        archive = backend_interface.join("/", name, "media", archive + ".zip")
         # extract and move all files that are stored in the archive,
         # even if only a single file from the archive was requested
         files = backend_interface.get_archive(
@@ -559,12 +549,7 @@ def _get_tables_from_backend(
 
         if csv_file in deps.tables:
             table_file = csv_file
-            remote_file = backend_interface.join(
-                "/",
-                db.name,
-                define.DEPEND_TYPE_NAMES[define.DependType.META],
-                f"{table}.zip",
-            )
+            remote_file = backend_interface.join("/", db.name, "meta", f"{table}.zip")
             backend_interface.get_archive(
                 remote_file,
                 db_root_tmp,
@@ -573,12 +558,7 @@ def _get_tables_from_backend(
             )
         else:
             table_file = parquet_file
-            remote_file = backend_interface.join(
-                "/",
-                db.name,
-                define.DEPEND_TYPE_NAMES[define.DependType.META],
-                f"{table}.parquet",
-            )
+            remote_file = backend_interface.join("/", db.name, "meta", f"{table}.parquet")
             backend_interface.get_file(
                 remote_file,
                 os.path.join(db_root_tmp, table_file),

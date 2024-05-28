@@ -147,7 +147,9 @@ class Dependencies:
             list of attachments
 
         """
-        return self._df[self._df["type"] == define.DependType.ATTACHMENT].index.tolist()
+        return self._df[
+            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
+        ].index.tolist()
 
     @property
     def attachment_ids(self) -> typing.List[str]:
@@ -158,7 +160,7 @@ class Dependencies:
 
         """
         return self._df[
-            self._df["type"] == define.DependType.ATTACHMENT
+            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
         ].archive.tolist()
 
     @property
@@ -179,7 +181,9 @@ class Dependencies:
             list of media
 
         """
-        return self._df[self._df["type"] == define.DependType.MEDIA].index.tolist()
+        return self._df[
+            self._df["type"] == define.DEPENDENCY_TYPE["media"]
+        ].index.tolist()
 
     @property
     def removed_media(self) -> typing.List[str]:
@@ -190,7 +194,8 @@ class Dependencies:
 
         """
         return self._df[
-            (self._df["type"] == define.DependType.MEDIA) & (self._df["removed"] == 1)
+            (self._df["type"] == define.DEPENDENCY_TYPE["media"])
+            & (self._df["removed"] == 1)
         ].index.tolist()
 
     @property
@@ -215,7 +220,9 @@ class Dependencies:
             list of tables
 
         """
-        return self._df[self._df["type"] == define.DependType.META].index.tolist()
+        return self._df[
+            self._df["type"] == define.DEPENDENCY_TYPE["meta"]
+        ].index.tolist()
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
@@ -442,7 +449,7 @@ class Dependencies:
             format,  # format
             0,  # removed
             0,  # sampling_rate
-            define.DependType.ATTACHMENT,  # type
+            define.DEPENDENCY_TYPE["attachment"],  # type
             version,  # version
         ]
 
@@ -507,7 +514,7 @@ class Dependencies:
             format,  # format
             0,  # removed
             0,  # sampling_rate
-            define.DependType.META,  # type
+            define.DEPENDENCY_TYPE["meta"],  # type
             version,  # version
         ]
 
