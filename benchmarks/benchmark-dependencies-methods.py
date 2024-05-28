@@ -32,7 +32,7 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32")
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("object")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
         # Set dtypes in library
         audb.core.define.DEPENDENCY_TABLE = {
             "archive": "object",
@@ -58,7 +58,7 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32")
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("string")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
         # Set dtypes in library
         audb.core.define.DEPENDENCY_TABLE = {
             "archive": "string",
@@ -84,7 +84,7 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32[pyarrow]")
         df["type"] = df["type"].astype("int32[pyarrow]")
         df["version"] = df["version"].astype("string[pyarrow]")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
         # Set dtypes in library
         audb.core.define.DEPENDENCY_TABLE = {
             "archive": "string[pyarrow]",
@@ -133,7 +133,7 @@ if not os.path.exists(data_cache):
     df = df.astype(audb.core.define.DEPENDENDENCY_TABLE)
     df.set_index("file", inplace=True)
     df.index.name = None
-    df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+    df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
     df.to_pickle(data_cache)
 
 

@@ -590,8 +590,8 @@ class Dependencies:
         # to decide if we need to update dtypes,
         # as dtype of index changed to `object`
         # in version 1.7.0 of audb.
-        if df.index.dtype != define.DEPEND_INDEX_DTYPE:
-            df.index = df.index.astype(define.DEPEND_INDEX_DTYPE, copy=False)
+        if df.index.dtype != define.DEPENDENCY_INDEX_DTYPE:
+            df.index = df.index.astype(define.DEPENDENCY_INDEX_DTYPE, copy=False)
             df = df.astype(define.DEPENDENCY_TABLE, copy=False)
         return df
 
@@ -619,7 +619,7 @@ class Dependencies:
         )
         df.set_index("file", inplace=True)
         df.index.name = None
-        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(define.DEPENDENCY_INDEX_DTYPE)
         return df
 
     def _update_media(

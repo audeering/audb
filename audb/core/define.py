@@ -34,7 +34,9 @@ and contains the specified column names
 and data types.
 
 """
-DEPEND_INDEX_DTYPE = "object"
+
+DEPENDENCY_INDEX_DTYPE = "object"
+r"""Data type of the dependency table index."""
 
 
 # Cache lock
