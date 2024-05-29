@@ -327,6 +327,7 @@ def test_str(deps):
     # as the end might vary,
     # see https://github.com/audeering/audb/issues/422
     assert str(deps).startswith(expected_str)
+    assert deps._df.to_string().startswith(expected_str)
 
 
 # === Test hidden methods ===
