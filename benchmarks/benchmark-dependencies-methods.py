@@ -147,7 +147,7 @@ deps.load(data_cache)
 file = "file-10.wav"
 n_files = 10000
 _files = deps._df.index[:n_files].tolist()
-dtypes = ["pyarrow", "string", "object"]
+dtypes = ["string", "object", "pyarrow"]
 results = pd.DataFrame(columns=dtypes)
 results.index.name = "method"
 
@@ -247,146 +247,65 @@ for dtype in dtypes:
     t = time.time() - t0
     results.at[method, dtype] = t
 
-
-    method = f"Dependencies.archive({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.archive(_files).tolist()
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
     method = f"Dependencies.archive({n_files} files)"
     t0 = time.time()
-    res = [deps.archive(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    assert res ==  res_v
-
-    method = f"Dependencies.bit_depth({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.bit_depth(_files)
+    [deps.archive(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
     method = f"Dependencies.bit_depth({n_files} files)"
     t0 = time.time()
-    res = [deps.bit_depth(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    assert res ==  res_v
-
-    method = f"Dependencies.channels({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.channels(_files)
+    [deps.bit_depth(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
     method = f"Dependencies.channels({n_files} files)"
     t0 = time.time()
-    res = [deps.channels(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    assert res ==  res_v
-
-    method = f"Dependencies.checksum({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.checksum(_files)
+    [deps.channels(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
     method = f"Dependencies.checksum({n_files} files)"
     t0 = time.time()
-    res = [deps.checksum(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    assert res ==  res_v
-
-    method = f"Dependencies.duration({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.duration(_files)
+    [deps.checksum(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
     method = f"Dependencies.duration({n_files} files)"
     t0 = time.time()
-    res = [deps.duration(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    assert res ==  res_v
-
-    method = f"Dependencies.format({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.format(_files)
+    [deps.duration(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
     method = f"Dependencies.format({n_files} files)"
     t0 = time.time()
-    res = [deps.format(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    assert res ==  res_v
-
-    method = f"Dependencies.removed({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.removed(_files)
+    [deps.format(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
     method = f"Dependencies.removed({n_files} files)"
     t0 = time.time()
-    res = [deps.removed(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    assert res ==  res_v
-
-    method = f"Dependencies.sampling_rate({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.sampling_rate(_files)
+    [deps.removed(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
     method = f"Dependencies.sampling_rate({n_files} files)"
     t0 = time.time()
-    res = [deps.sampling_rate(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    assert res ==  res_v
-
-    method = f"Dependencies.type({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.type(_files)
+    [deps.sampling_rate(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
     method = f"Dependencies.type({n_files} files)"
     t0 = time.time()
-    res = [deps.type(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
-
-    assert res ==  res_v
-
-    method = f"Dependencies.version({n_files} files) / vectorized"
-    t0 = time.time()
-    res_v = deps.version(_files)
+    [deps.type(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
 
     method = f"Dependencies.version({n_files} files)"
     t0 = time.time()
-    res = [deps.version(file) for file in _files]
+    [deps.version(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
-
-    assert res ==  res_v
 
     # -------------------------------------------------------------------------
     method = "Dependencies._add_attachment()"
@@ -450,6 +369,3 @@ for dtype in dtypes:
 # ===== Print results =====
 table = tabulate.tabulate(results, headers="keys", tablefmt="github", floatfmt=".3f")
 print(table)
-# ===== Save results =====
-fp_results = audeer.path(cache, 'results_pandas.csv')
-results.to_csv(fp_results)
