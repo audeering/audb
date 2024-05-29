@@ -519,11 +519,13 @@ class Dependencies:
         r"""Column content for selected files.
 
         Args:
-        column: one of the names in self._schema
-        files: rows to query, index is a filename
-        dtype: convert data to dtype
+            column: one of the names in ``Dependencies._schema``
+            files: rows to query, index is a filename
+            dtype: convert data to dtype
 
-        Returns: scalar value or list
+        Returns:
+            scalar value or list
+
         """
         # note: pandas series is not a sequence
         is_sequence = isinstance(files, collections.abc.Sequence)
