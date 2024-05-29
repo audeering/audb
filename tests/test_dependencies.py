@@ -351,7 +351,7 @@ def test_sampling_rate(deps):
     [
         ("file.wav", "format", None, str, "wav"),
         (["file.wav"], "format", None, str, "wav"),
-        (["file.wav", "db.files.csv"], "format", None, str,  ['wav', 'csv']),
+        (["file.wav", "db.files.csv"], "format", None, str, ['wav', 'csv']),
         (["file.wav", "db.files.csv"], "sampling_rate", float, float, [16000.0, 0.0]),
     ],
 )
