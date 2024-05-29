@@ -1,4 +1,3 @@
-import collections
 import errno
 import os
 import re
@@ -513,32 +512,23 @@ class Dependencies:
     def _column_loc(
         self,
         column: str,
-        files: typing.Union[str, typing.Sequence[str]],
+        file: str,
         dtype: typing.Callable = None,
-    ) -> typing.Union[typing.Any, typing.List[typing.Any]]:
-        r"""Column content for selected files.
+    ) -> typing.Any:
+        r"""Column content for selected file.
 
         Args:
             column: one of the names in ``Dependencies._schema``
-            files: rows to query, index is a filename
+            file: row to query, index is a filename
             dtype: convert data to dtype
 
         Returns:
-            scalar value or list
+            scalar value
 
         """
-        # note: pandas series is not a sequence
-        is_sequence = isinstance(files, collections.abc.Sequence)
-        files = [files] if is_sequence and isinstance(files, str) else files
-
+        value = self._df.at[file, column]
         if dtype is not None:
-            value = self._df.loc[files][column].astype(dtype).tolist()
-        else:
-            value = self._df.loc[files][column].tolist()
-
-        if len(value) == 1:
-            return value[0]
-
+            value = dtype(value)
         return value
 
     def _dataframe_to_table(
