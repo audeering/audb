@@ -358,7 +358,8 @@ def test_sampling_rate(deps):
 def test_column_locator(files, column, dt, expected_type, expected_result, deps):
     r"""Test columns locators.
 
-    Verify that non-scalar input to fhe files argument works
+    Verify that non-scalar input to fhe files argument works.
+
     """
     actual = deps._column_loc(column, files, dt)
     # test return types
