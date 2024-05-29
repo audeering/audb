@@ -1,22 +1,10 @@
-import errno
-import os
-import re
-import tempfile
-import typing
-
-import pandas as pd
-import pyarrow as pa
-import pyarrow.csv as csv
-import pyarrow.parquet as parquet
-import polars as pl
-from pprint import pprint as pr
-
-import audbackend
-import audeer
 import collections
 
+import polars as pl
+import pyarrow as pa
 
 from audb.core import define
+
 
 polars_mappings = pl.datatypes.convert._DataTypeMappings()
 pl2arrow_mappings = polars_mappings.PY_TYPE_TO_ARROW_TYPE
@@ -51,7 +39,7 @@ def pascheme_to_plscheme(schema: pa.lib.Schema) -> collections.OrderedDict:
     r"""Convert pyarrow schema to polars schema.
 
     Args:
-        schema a pyarrow scheme
+        schema: a pyarrow scheme
 
     Returns:
         polars scheme
