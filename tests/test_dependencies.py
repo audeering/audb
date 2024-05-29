@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 import pytest
 
@@ -369,14 +371,17 @@ def test_len(deps):
 
 
 def test_str(deps):
-    expected_str = (
-        "               archive  bit_depth  channels  ... sampling_rate  type version\n"  # noqa: E501
-        "db.files.csv  archive1          0         0  ...             0     0   1.0.0\n"  # noqa: E501
-        "file.wav      archive2         16         2  ...         16000     1   1.0.0\n"  # noqa: E501
-        "\n"
-        "[2 rows x 10 columns]"
+    r"""Test string representation of dependency table."""
+    # Check only parts of the returned string,
+    # as the representation might vary,
+    # see https://github.com/audeering/audb/issues/422
+    expected_str = re.compile(
+        "               archive  bit_depth  channels .+? type version\n"
+        "db.files.csv  archive1          0         0 .+? 0   1.0.0\n"
+        "file.wav      archive2         16         2 .+? 1   1.0.0.*?"
     )
-    assert str(deps) == expected_str
+    assert expected_str.match(str(deps))
+    assert expected_str.match(deps._df.to_string())
 
 
 # === Test hidden methods ===
