@@ -322,10 +322,11 @@ def test_str(deps):
         "               archive  bit_depth  channels  ... sampling_rate  type version\n"  # noqa: E501
         "db.files.csv  archive1          0         0  ...             0     0   1.0.0\n"  # noqa: E501
         "file.wav      archive2         16         2  ...         16000     1   1.0.0\n"  # noqa: E501
-        "\n"
-        "[2 rows x 10 columns]"
     )
-    assert str(deps) == expected_str
+    # Check only the beginning of the returned string,
+    # as the end might vary,
+    # see https://github.com/audeering/audb/issues/422
+    assert str(deps).startswith(expected_str)
 
 
 # === Test hidden methods ===
