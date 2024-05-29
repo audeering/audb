@@ -41,6 +41,11 @@ def _cached_versions(
     # This fixes https://github.com/audeering/audb/issues/101
     if cache_root is None and os.path.exists(default_cache_root(shared=True)):
         df = pd.concat((df, cached(name=name, shared=True)))
+        # Ensure to remove duplicates,
+        # which can occur if cache and shared cache
+        # point to the same folder.
+        # Compare https://github.com/audeering/audb/issues/314
+        df = df[~df.index.duplicated(keep="first")]
 
     cached_versions = []
     for flavor_root, row in df.iterrows():
