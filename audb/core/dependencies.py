@@ -510,34 +510,63 @@ class Dependencies:
             version,  # version
         ]
 
+    # def _column_loc(
+    #     self,
+    #     column: str,
+    #     files: typing.Union[str, typing.Sequence[str]],
+    #     dtype: typing.Callable = None,
+    # ) -> typing.Union[typing.Any, typing.List[typing.Any]]:
+    #     r"""Column content for selected files.
+
+    #     Args:
+    #     column: one of the names in self._schema
+    #     files: rows to query, index is a filename
+    #     dtype: convert data to dtype
+
+    #     Returns: scalar value or list
+    #     """
+    #     # note: pandas series is not a sequence
+    #     is_sequence = isinstance(files, collections.abc.Sequence)
+    #     files = [files] if is_sequence and isinstance(files, str) else files
+
+    #     if dtype is not None:
+    #         value = self._df.loc[files][column].astype(dtype).tolist()
+    #     else:
+    #         value = self._df.loc[files][column].tolist()
+
+    #     if len(value) == 1:
+    #         return value[0]
+
+    #     return value
+
+
+
     def _column_loc(
         self,
         column: str,
         files: typing.Union[str, typing.Sequence[str]],
         dtype: typing.Callable = None,
     ) -> typing.Union[typing.Any, typing.List[typing.Any]]:
-        r"""Column content for selected files.
+        r"""Column content for selected files."""
+        # Single file
+        if isinstance(files, str):
+            value = self._df.at[files, column]
+            if dtype is not None:
+                value = dtype(value)
+            return value
 
-        Args:
-        column: one of the names in self._schema
-        files: rows to query, index is a filename
-        dtype: convert data to dtype
-
-        Returns: scalar value or list
-        """
-        # note: pandas series is not a sequence
-        is_sequence = isinstance(files, collections.abc.Sequence)
-        files = [files] if is_sequence and isinstance(files, str) else files
-
-        if dtype is not None:
-            value = self._df.loc[files][column].astype(dtype).tolist()
+        # Multiple files
         else:
-            value = self._df.loc[files][column].tolist()
+            values = self._df.loc[files, column]
+            if dtype is not None:
+                values = [dtype(value) for value in values]
+            else:
+                values = values.tolist()
+            return values
 
-        if len(value) == 1:
-            return value[0]
 
-        return value
+
+
 
     def _dataframe_to_table(
         self,
