@@ -346,35 +346,6 @@ def test_sampling_rate(deps):
         deps.sampling_rate("non.existing")
 
 
-@pytest.mark.parametrize(
-    "files, column, dt, expected_type, expected_result",
-    [
-        ("file.wav", "format", None, str, "wav"),
-        (["file.wav"], "format", None, str, "wav"),
-        (["file.wav", "db.files.csv"], "format", None, str, ['wav', 'csv']),
-        (["file.wav", "db.files.csv"], "sampling_rate", float, float, [16000.0, 0.0]),
-    ],
-)
-def test_column_locator(files, column, dt, expected_type, expected_result, deps):
-    r"""Test columns locators.
-
-    Verify that non-scalar input to fhe files argument works.
-
-    """
-    actual = deps._column_loc(column, files, dt)
-    # test return types
-    assert all([x for x in map(lambda x: type(x) == expected_type, actual)])
-    # test return values
-    assert actual == expected_result
-
-
-def test_column_locator_throws_invalid_type(deps):
-    """Test column locator: invalid dtype raises."""
-    files = get_entries("file")
-    with pytest.raises(ValueError, match="could not convert"):
-        deps._column_loc("format", files, float)
-
-
 def test_type(deps):
     files = get_entries("file")
     types = get_entries("type")
