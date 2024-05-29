@@ -57,14 +57,8 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        data = {}
-        for name, dtype in zip(
-            define.DEPEND_FIELD_NAMES.values(),
-            define.DEPEND_FIELD_DTYPES.values(),
-        ):
-            data[name] = pd.Series(dtype=dtype)
-        self._df = pd.DataFrame(data)
-        self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
+        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
+        self._df = self._set_dtypes(self._df)
         # pyarrow schema
         # used for reading and writing files
         self._schema = pa.schema(
@@ -328,12 +322,10 @@ class Dependencies:
             )
         if extension == "pkl":
             self._df = pd.read_pickle(path)
-            # Correct dtype of index
+            # Correct dtypes
             # to make backward compatiple
             # with old pickle files in cache
-            # that might use `string` as dtype
-            if self._df.index.dtype != define.DEPEND_INDEX_DTYPE:
-                self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
+            self._df = self._set_dtypes(self._df)
 
         elif extension == "csv":
             table = csv.read_csv(
@@ -483,8 +475,7 @@ class Dependencies:
             values,
             columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
         ).set_index("file")
-        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
-
+        df = self._set_dtypes(df)
         self._df = pd.concat([self._df, df])
 
     def _add_meta(
@@ -583,6 +574,30 @@ class Dependencies:
         """
         self._df.at[file, "removed"] = 1
 
+    @staticmethod
+    def _set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
+        r"""Set dependency table dtypes.
+
+        Args:
+            df: dataframe representing dependency table
+
+        Returns:
+            dataframe representing dependency table
+            with correct dtypes
+
+        """
+        # Check the dtype of index,
+        # to decide if we need to update dtypes,
+        # as dtype of index changed to `object`
+        # in version 1.7.0 of audb.
+        if df.index.dtype != define.DEPEND_INDEX_DTYPE:
+            df.index = df.index.astype(define.DEPEND_INDEX_DTYPE, copy=False)
+            columns = define.DEPEND_FIELD_NAMES.values()
+            dtypes = define.DEPEND_FIELD_DTYPES.values()
+            mapping = {column: dtype for column, dtype in zip(columns, dtypes)}
+            df = df.astype(mapping, copy=False)
+        return df
+
     def _table_to_dataframe(self, table: pa.Table) -> pd.DataFrame:
         r"""Convert pyarrow table to pandas dataframe.
 
@@ -639,12 +654,7 @@ class Dependencies:
             values,
             columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
         ).set_index("file")
-        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
-        for name, dtype in zip(
-            define.DEPEND_FIELD_NAMES.values(),
-            define.DEPEND_FIELD_DTYPES.values(),
-        ):
-            df[name] = df[name].astype(dtype)
+        df = self._set_dtypes(df)
         self._df.loc[df.index] = df
 
     def _update_media_version(
