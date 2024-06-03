@@ -583,8 +583,6 @@ def versions(
             backend_interface = repository.create_backend_interface()
             with backend_interface.backend as backend:
                 if repository.backend == "artifactory":
-                    import artifactory
-
                     # Do not use `backend_interface.versions()` on Artifactory,
                     # as calling `backend_interface.ls()` is slow on Artifactory,
                     # see https://github.com/devopshq/artifactory/issues/423.
@@ -602,8 +600,11 @@ def versions(
                                 header = p.joinpath(f"db-{version}.yaml")
                                 if header.exists():
                                     vs.extend([version])
-                    except artifactory.ArtifactoryException:  # pragma: nocover
-                        # This tackles the case of missing read permissions.
+                    except Exception:  # pragma: nocover
+                        # Might happen,
+                        # if a database is not available on the backend,
+                        # or we don't have read permissions.
+                        #
                         # We cannot test this at the moment
                         # on the public Artifactory server.
                         # Because after trying
