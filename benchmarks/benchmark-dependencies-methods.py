@@ -366,6 +366,11 @@ for dtype in dtypes:
     t = time.time() - t0
     results.at[method, dtype] = t
 
+
+# ===== Save results =====
+fp_results = audeer.path(cache, "results_polars.csv")
+results.to_csv(fp_results)
+
 # ===== Print results =====
 table = tabulate.tabulate(results, headers="keys", tablefmt="github", floatfmt=".3f")
 print(table)
