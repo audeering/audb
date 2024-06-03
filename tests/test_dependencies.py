@@ -338,9 +338,9 @@ def test_load_save_pandas_compatibility(pandas_version):
     if the used ``pandas`` version
     does not match.
 
-    This tests documents,
-    which cases are problematic,
-    and need to be handled inside
+    Test which ``pandas`` versions raise errors
+    when loading deps from pickle files.
+    We have to except those errors inside
     ``audb.dependencies()``.
 
     See Also:
