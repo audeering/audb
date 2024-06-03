@@ -364,6 +364,15 @@ def pandas_version_cache(tmpdir, virtualenv, request):
         virtualenv.run(f"python {script} {pandas_version}")
 
 
+@pytest.fixture(scope="function")
+def pandas_version(virtualenv, request):
+    r"""Fixture to install pandas version."""
+    pandas_version = request.param
+    # Create virtual environment with desired pandas version
+    virtualenv.install_package("audb", installer="pip")
+    virtualenv.install_package(f"pandas=={pandas_version}", installer="pip")
+
+
 no_error = contextlib.nullcontext()
 key_error = pytest.raises(KeyError, match="'_data'")
 module_not_found = pytest.raises(
@@ -389,8 +398,8 @@ skip_3_8 = pytest.mark.skipif(
         pytest.param("2.2.2", "2.1.4", no_error, marks=skip_3_8),
         pytest.param("2.2.2", "2.2.2", no_error, marks=skip_3_8),
     ],
-    # pass value to ``pandas_version_cache()`` fixture
-    indirect=["pandas_version_cache"],
+    # pass values to fixtures
+    indirect=["pandas_version", "pandas_version_cache"],
 )
 def test_load_save_pandas_compatibility(
     pandas_version,
@@ -414,8 +423,10 @@ def test_load_save_pandas_compatibility(
     https://github.com/audeering/audb/issues/418
 
     Args:
+        pandas_version: ``pandas`` version to install for test
         pandas_version_cache: the version of ``pandas``
             used to store the dependency table in cache
+        expectation: expected error
 
     """
     deps_file = audeer.path(
