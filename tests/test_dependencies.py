@@ -1,5 +1,7 @@
+import contextlib
 import os
 import re
+import sys
 
 import pandas as pd
 import pytest
@@ -328,8 +330,73 @@ def test_load_save_backward_compatibility(tmpdir, deps):
     assert deps == deps2
 
 
-@pytest.mark.parametrize("pandas_version", ["2.0.3", "2.1.4", "2.2.2"])
-def test_load_save_pandas_compatibility(pandas_version):
+@pytest.fixture(scope="function")
+def pandas_version_cache(tmpdir, virtualenv, request):
+    r"""Fixture to create pickled dependency tables.
+
+    This fixture creates another virtual environment
+    to install the requested ``pandas`` version,
+    and uses that ``pandas`` version
+    to store the depenpendency table of ``emodb``
+    as a pickle file under
+    ``tests/assests/dependency-table-pandas/emodb-pandas-<pandas_version>.pkl``.
+
+    """
+    pandas_version = request.param
+
+    # Create virtual environment with desired pandas version
+    virtualenv.install_package("audb", installer="pip")
+    virtualenv.install_package(f"pandas=={pandas_version}", installer="pip")
+    # Create pickle file, if not cached
+    outfile = audeer.path(
+        CURRENT_DIR,
+        "assests",
+        "dependency-table-pandas",
+        f"emodb-pandas-{pandas_version}.pkl",
+    )
+    script = audeer.path(
+        CURRENT_DIR,
+        "assests",
+        "dependency-table-pandas",
+        "store_dependency_table.py",
+    )
+    if not os.path.exists(outfile):
+        virtualenv.run(f"python {script} {pandas_version}")
+
+
+no_error = contextlib.nullcontext()
+key_error = pytest.raises(KeyError, match="'_data'")
+module_not_found = pytest.raises(
+    ModuleNotFoundError,
+    match="No module named 'pandas.core.arrays.arrow.dtype'",
+)
+skip_3_8 = pytest.mark.skipif(
+    sys.version_info < (3, 9),
+    reason="Python 3.9 required for pandas 2.2.2",
+)
+
+
+@pytest.mark.parametrize(
+    "pandas_version, pandas_version_cache, expectation",
+    [
+        ("2.0.3", "2.0.3", no_error),
+        ("2.0.3", "2.1.4", key_error),
+        pytest.param("2.0.3", "2.2.2", key_error, marks=skip_3_8),
+        ("2.1.4", "2.0.3", module_not_found),
+        ("2.1.4", "2.1.4", no_error),
+        pytest.param("2.1.4", "2.2.2", no_error, marks=skip_3_8),
+        pytest.param("2.2.2", "2.0.3", module_not_found, marks=skip_3_8),
+        pytest.param("2.2.2", "2.1.4", no_error, marks=skip_3_8),
+        pytest.param("2.2.2", "2.2.2", no_error, marks=skip_3_8),
+    ],
+    # pass value to ``pandas_version_cache()`` fixture
+    indirect=["pandas_version_cache"],
+)
+def test_load_save_pandas_compatibility(
+    pandas_version,
+    pandas_version_cache,
+    expectation,
+):
     """Test pandas backward compatibility of pickle cache files.
 
     Dataframes using pyarrow dtypes,
@@ -347,7 +414,7 @@ def test_load_save_pandas_compatibility(pandas_version):
     https://github.com/audeering/audb/issues/418
 
     Args:
-        pandas_version: the version of ``pandas``
+        pandas_version_cache: the version of ``pandas``
             used to store the dependency table in cache
 
     """
@@ -355,25 +422,10 @@ def test_load_save_pandas_compatibility(pandas_version):
         CURRENT_DIR,
         "assests",
         "dependency-table-pandas",
-        f"emodb-pandas-{pandas_version}.pkl",
+        f"emodb-pandas-{pandas_version_cache}.pkl",
     )
     deps = audb.Dependencies()
-
-    # Dependency table cached with pandas==2.0.3.
-    # Loading with pandas>=2.1.0 leads to a ModuleNotFoundError
-    if pd.__version__ >= "2.1.0" and pandas_version == "2.0.3":
-        error_msg = "No module named 'pandas.core.arrays.arrow.dtype'"
-        with pytest.raises(ModuleNotFoundError, match=error_msg):
-            deps.load(deps_file)
-
-    # Dependency table cached with pandas>=2.1.4.
-    # Loading with pandas==2.0.3 leads to a KeyError
-    elif pd.__version__ == "2.0.3" and pandas_version >= "2.1.4":
-        error_msg = "'_data'"
-        with pytest.raises(KeyError, match=error_msg):
-            deps.load(deps_file)
-
-    else:
+    with expectation:
         deps.load(deps_file)
         assert deps._df.index.dtype == audb.core.define.DEPEND_INDEX_DTYPE
 

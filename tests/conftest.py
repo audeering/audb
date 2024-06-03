@@ -9,6 +9,8 @@ import audeer
 import audb
 
 
+# pytest_plugins = ["pytest_virtualenv"]
+
 if platform.system() == "Darwin":
     # Avoid multi-threading on MacOS runner,
     # as it might fail from time to time
