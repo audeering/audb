@@ -271,7 +271,7 @@ def dependencies(
         try:
             deps = Dependencies()
             deps.load(cached_deps_file)
-        except (AttributeError, EOFError, FileNotFoundError, KeyError, ValueError):
+        except Exception:  # does not catch KeyboardInterupt
             # If loading cached file fails, load again from backend
             backend_interface = utils.lookup_backend(name, version)
             deps = download_dependencies(backend_interface, name, version, verbose)
