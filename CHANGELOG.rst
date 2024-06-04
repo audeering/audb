@@ -7,6 +7,30 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.7.3 (2024-06-04)
+--------------------------
+
+* Fixed: ensure correct data types
+  in dependency table
+  when loaded from cache
+* Fixed: publishing an update of a database
+  when the previous version
+  was stored in cache
+  by an older version of ``audb``
+* Fixed: loading of database attachments
+  when ``audb.config.CACHE_ROOT``
+  and ``audb.config.SHARED_CACHE_ROOT``
+  point to the same folder
+* Fixed: ensure ``audb.versions()``
+  does not fail
+  when database is not available
+  in a repository
+* Fixed: loading of dependency table from cache
+  when the previous version
+  was stored in cache
+  by a different ``pandas`` version
+
+
 Version 1.7.2 (2024-05-16)
 --------------------------
 
