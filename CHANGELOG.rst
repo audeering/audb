@@ -12,6 +12,7 @@ Version 1.7.3 (2024-06-04)
 
 * Fixed: ensure correct data types
   in dependency table
+  when loaded from cache
 * Fixed: publishing an update of a database
   when the previous version
   was stored in cache
@@ -21,13 +22,13 @@ Version 1.7.3 (2024-06-04)
   and ``audb.config.SHARED_CACHE_ROOT``
   point to the same folder
 * Fixed: ensure ``audb.versions()``
-  is not failing
+  does not fail
   when database is not available
   in a repository
 * Fixed: loading of dependency table from cache
   when the previous version
   was stored in cache
-  by another ``pandas`` version
+  by a different ``pandas`` version
 
 
 Version 1.7.2 (2024-05-16)
