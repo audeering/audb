@@ -32,9 +32,9 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32")
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("object")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
         # Set dtypes in library
-        audb.core.define.DEPEND_FIELD_DTYPES = {
+        audb.core.define.DEPENDENCY_TABLE = {
             "archive": "object",
             "bit_depth": "int32",
             "channels": "int32",
@@ -58,9 +58,9 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32")
         df["type"] = df["type"].astype("int32")
         df["version"] = df["version"].astype("string")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
         # Set dtypes in library
-        audb.core.define.DEPEND_FIELD_DTYPES = {
+        audb.core.define.DEPENDENCY_TABLE = {
             "archive": "string",
             "bit_depth": "int32",
             "channels": "int32",
@@ -84,9 +84,9 @@ def astype(df, dtype):
         df["sampling_rate"] = df["sampling_rate"].astype("int32[pyarrow]")
         df["type"] = df["type"].astype("int32[pyarrow]")
         df["version"] = df["version"].astype("string[pyarrow]")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
         # Set dtypes in library
-        audb.core.define.DEPEND_FIELD_DTYPES = {
+        audb.core.define.DEPENDENCY_TABLE = {
             "archive": "string[pyarrow]",
             "bit_depth": "int32[pyarrow]",
             "channels": "int32[pyarrow]",
@@ -130,14 +130,10 @@ if not os.path.exists(data_cache):
         for n in range(num_rows)
     ]
     df = pd.DataFrame.from_records(records)
-    for column, dtype in zip(
-        audb.core.define.DEPEND_FIELD_NAMES.values(),
-        audb.core.define.DEPEND_FIELD_DTYPES.values(),
-    ):
-        df[column] = df[column].astype(dtype)
+    df = df.astype(audb.core.define.DEPENDENDENCY_TABLE)
     df.set_index("file", inplace=True)
     df.index.name = None
-    df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
+    df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
     df.to_pickle(data_cache)
 
 
@@ -163,7 +159,7 @@ for dtype in dtypes:
     else:
         expected_dtype = dtype
     assert deps._df.archive.dtype == expected_dtype
-    assert audb.core.define.DEPEND_FIELD_DTYPES["archive"] == expected_dtype
+    assert audb.core.define.DEPENDENCY_TABLE["archive"] == expected_dtype
 
     method = "Dependencies.__call__()"
     t0 = time.time()

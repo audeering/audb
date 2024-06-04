@@ -185,8 +185,7 @@ def _files_duration(
     files: typing.Sequence[str],
     format: typing.Optional[str],
 ):
-    field = define.DEPEND_FIELD_NAMES[define.DependField.DURATION]
-    durs = deps().loc[files, field]
+    durs = deps().loc[files, "duration"]
     durs = durs[durs > 0]
     durs = pd.to_timedelta(durs, unit="s")
     durs.index.name = "file"
@@ -372,12 +371,7 @@ def _get_attachments_from_backend(
     def job(path: str):
         archive = deps.archive(path)
         version = deps.version(path)
-        archive = backend_interface.join(
-            "/",
-            db.name,
-            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            archive + ".zip",
-        )
+        archive = backend_interface.join("/", db.name, "attachment", archive + ".zip")
         backend_interface.get_archive(
             archive,
             db_root_tmp,
@@ -440,12 +434,7 @@ def _get_media_from_backend(
     utils.mkdir_tree(media, db_root_tmp)
 
     def job(archive: str, version: str):
-        archive = backend_interface.join(
-            "/",
-            name,
-            define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-            archive + ".zip",
-        )
+        archive = backend_interface.join("/", name, "media", archive + ".zip")
         # extract and move all files that are stored in the archive,
         # even if only a single file from the archive was requested
         files = backend_interface.get_archive(
@@ -508,19 +497,14 @@ def _get_tables_from_backend(
     db_root_tmp = database_tmp_root(db_root)
 
     def job(table: str):
-        archive = backend_interface.join(
-            "/",
-            db.name,
-            define.DEPEND_TYPE_NAMES[define.DependType.META],
-            deps.archive(table) + ".zip",
-        )
+        table_id = deps.archive(table)
+        archive = backend_interface.join("/", db.name, "meta", table_id + ".zip")
         backend_interface.get_archive(
             archive,
             db_root_tmp,
             deps.version(table),
             tmp_root=db_root_tmp,
         )
-        table_id = table[3:-4]
         table_path = os.path.join(db_root_tmp, f"db.{table_id}")
         db[table_id].load(table_path)
         db[table_id].save(

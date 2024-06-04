@@ -57,7 +57,7 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
+        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         self._df = self._set_dtypes(self._df)
         # pyarrow schema
         # used for reading and writing files
@@ -147,7 +147,9 @@ class Dependencies:
             list of attachments
 
         """
-        return self._df[self._df["type"] == define.DependType.ATTACHMENT].index.tolist()
+        return self._df[
+            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
+        ].index.tolist()
 
     @property
     def attachment_ids(self) -> typing.List[str]:
@@ -158,7 +160,7 @@ class Dependencies:
 
         """
         return self._df[
-            self._df["type"] == define.DependType.ATTACHMENT
+            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
         ].archive.tolist()
 
     @property
@@ -179,7 +181,9 @@ class Dependencies:
             list of media
 
         """
-        return self._df[self._df["type"] == define.DependType.MEDIA].index.tolist()
+        return self._df[
+            self._df["type"] == define.DEPENDENCY_TYPE["media"]
+        ].index.tolist()
 
     @property
     def removed_media(self) -> typing.List[str]:
@@ -190,7 +194,8 @@ class Dependencies:
 
         """
         return self._df[
-            (self._df["type"] == define.DependType.MEDIA) & (self._df["removed"] == 1)
+            (self._df["type"] == define.DEPENDENCY_TYPE["media"])
+            & (self._df["removed"] == 1)
         ].index.tolist()
 
     @property
@@ -215,7 +220,9 @@ class Dependencies:
             list of tables
 
         """
-        return self._df[self._df["type"] == define.DependType.META].index.tolist()
+        return self._df[
+            self._df["type"] == define.DEPENDENCY_TYPE["meta"]
+        ].index.tolist()
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
@@ -306,7 +313,7 @@ class Dependencies:
             FileNotFoundError: if ``path`` does not exists
 
         """
-        self._df = pd.DataFrame(columns=define.DEPEND_FIELD_NAMES.values())
+        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         path = audeer.path(path)
         extension = audeer.file_extension(path)
         if extension not in ["csv", "pkl", "parquet"]:
@@ -442,7 +449,7 @@ class Dependencies:
             format,  # format
             0,  # removed
             0,  # sampling_rate
-            define.DependType.ATTACHMENT,  # type
+            define.DEPENDENCY_TYPE["attachment"],  # type
             version,  # version
         ]
 
@@ -473,7 +480,7 @@ class Dependencies:
         """
         df = pd.DataFrame.from_records(
             values,
-            columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
+            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
         ).set_index("file")
         df = self._set_dtypes(df)
         self._df = pd.concat([self._df, df])
@@ -505,7 +512,7 @@ class Dependencies:
             format,  # format
             0,  # removed
             0,  # sampling_rate
-            define.DependType.META,  # type
+            define.DEPENDENCY_TYPE["meta"],  # type
             version,  # version
         ]
 
@@ -590,12 +597,9 @@ class Dependencies:
         # to decide if we need to update dtypes,
         # as dtype of index changed to `object`
         # in version 1.7.0 of audb.
-        if df.index.dtype != define.DEPEND_INDEX_DTYPE:
-            df.index = df.index.astype(define.DEPEND_INDEX_DTYPE, copy=False)
-            columns = define.DEPEND_FIELD_NAMES.values()
-            dtypes = define.DEPEND_FIELD_DTYPES.values()
-            mapping = {column: dtype for column, dtype in zip(columns, dtypes)}
-            df = df.astype(mapping, copy=False)
+        if df.index.dtype != define.DEPENDENCY_INDEX_DTYPE:
+            df.index = df.index.astype(define.DEPENDENCY_INDEX_DTYPE, copy=False)
+            df = df.astype(define.DEPENDENCY_TABLE, copy=False)
         return df
 
     def _table_to_dataframe(self, table: pa.Table) -> pd.DataFrame:
@@ -622,7 +626,7 @@ class Dependencies:
         )
         df.set_index("file", inplace=True)
         df.index.name = None
-        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
+        df.index = df.index.astype(define.DEPENDENCY_INDEX_DTYPE)
         return df
 
     def _update_media(
@@ -652,7 +656,7 @@ class Dependencies:
         """
         df = pd.DataFrame.from_records(
             values,
-            columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
+            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
         ).set_index("file")
         df = self._set_dtypes(df)
         self._df.loc[df.index] = df
@@ -669,8 +673,7 @@ class Dependencies:
             version: version string
 
         """
-        field = define.DEPEND_FIELD_NAMES[define.DependField.VERSION]
-        self._df.loc[files, field] = version
+        self._df.loc[files, "version"] = version
 
 
 def error_message_missing_object(
@@ -795,9 +798,9 @@ def download_dependencies(
         # Load `db.parquet` file,
         # or if non-existent `db.zip`
         # from backend
-        remote_deps_file = backend_interface.join("/", name, define.DEPENDENCIES_FILE)
+        remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
         if backend_interface.exists(remote_deps_file, version):
-            local_deps_file = os.path.join(tmp_root, define.DEPENDENCIES_FILE)
+            local_deps_file = os.path.join(tmp_root, define.DEPENDENCY_FILE)
             backend_interface.get_file(
                 remote_deps_file,
                 local_deps_file,
@@ -808,7 +811,7 @@ def download_dependencies(
             remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
             local_deps_file = os.path.join(
                 tmp_root,
-                define.LEGACY_DEPENDENCIES_FILE,
+                define.LEGACY_DEPENDENCY_FILE,
             )
             backend_interface.get_archive(
                 remote_deps_file,
@@ -843,7 +846,7 @@ def upload_dependencies(
         version: database version
 
     """
-    local_deps_file = os.path.join(db_root, define.DEPENDENCIES_FILE)
-    remote_deps_file = backend_interface.join("/", name, define.DEPENDENCIES_FILE)
+    local_deps_file = os.path.join(db_root, define.DEPENDENCY_FILE)
+    remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
     deps.save(local_deps_file)
     backend_interface.put_file(local_deps_file, remote_deps_file, version)

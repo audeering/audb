@@ -195,9 +195,9 @@ def cached(
             # Skip old audb cache (e.g. 1 as flavor)
             files = audeer.list_file_names(version_path, basenames=True)
             if (
-                define.DEPENDENCIES_FILE not in files
-                and define.LEGACY_DEPENDENCIES_FILE not in files
-                and define.CACHED_DEPENDENCIES_FILE not in files
+                define.DEPENDENCY_FILE not in files
+                and define.LEGACY_DEPENDENCY_FILE not in files
+                and define.CACHED_DEPENDENCY_FILE not in files
             ):
                 # Skip all cache entries
                 # that don't contain a dependency file
@@ -265,7 +265,7 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
-    cached_deps_file = os.path.join(db_root, define.CACHED_DEPENDENCIES_FILE)
+    cached_deps_file = os.path.join(db_root, define.CACHED_DEPENDENCY_FILE)
 
     with FolderLock(db_root):
         try:
@@ -492,10 +492,7 @@ def remove_media(
                     # if archive exists in this version,
                     # remove file from it and re-publish
                     remote_archive = backend_interface.join(
-                        "/",
-                        name,
-                        define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-                        archive + ".zip",
+                        "/", name, "media", archive + ".zip"
                     )
                     if backend_interface.exists(remote_archive, version):
                         files_in_archive = backend_interface.get_archive(

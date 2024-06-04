@@ -10,73 +10,71 @@ DB = "db"
 HEADER_FILE = f"{DB}.yaml"
 
 # Dependencies
-DEPENDENCIES_FILE = f"{DB}.parquet"
-CACHED_DEPENDENCIES_FILE = f"{DB}.pkl"
-LEGACY_DEPENDENCIES_FILE = f"{DB}.csv"
+DEPENDENCY_FILE = f"{DB}.parquet"
+r"""Filename and extension of dependency table file."""
+
+CACHED_DEPENDENCY_FILE = f"{DB}.pkl"
+r"""Filename and extension of cached dependency table file.
+
+As loading from a pickle file is still faster
+than loading from a parquet file,
+we are storing the dependency table
+as a pickle file in cache.
+
+"""
+
+LEGACY_DEPENDENCY_FILE = f"{DB}.csv"
+r"""Filename and extension of legacy dependency table file.
+
+In ``audb`` versions smaller than 1.7.0,
+the dependency table was stored in a csv file.
+
+"""
+
+DEPENDENCY_TABLE = {
+    # Column name: column dtype
+    "archive": "string[pyarrow]",
+    "bit_depth": "int32[pyarrow]",
+    "channels": "int32[pyarrow]",
+    "checksum": "string[pyarrow]",
+    "duration": "float64[pyarrow]",
+    "format": "string[pyarrow]",
+    "removed": "int32[pyarrow]",
+    "sampling_rate": "int32[pyarrow]",
+    "type": "int32[pyarrow]",
+    "version": "string[pyarrow]",
+}
+r"""Column names and data types of dependency table.
+
+The dependency table is stored in a dataframe
+at ``audb.Dependencies._df``,
+and contains the specified column names
+and data types.
+
+"""
+
+DEPENDENCY_INDEX_DTYPE = "object"
+r"""Data type of the dependency table index."""
+
+DEPENDENCY_TYPE = {
+    "meta": 0,
+    "media": 1,
+    "attachment": 2,
+}
+r"""Types of files stored in a database.
+
+Currently, a database can contain the following files:
+
+* ``"meta"``: tables and misc tables
+* ``"media"``: media files, e.g. audio, video, text
+* ``"attachment"``: files included as attachments
+
+"""
 
 # Cache lock
 CACHED_VERSIONS_TIMEOUT = 10  # Timeout to acquire access to cached versions
 LOCK_FILE = ".lock"
 TIMEOUT_MSG = "Lock could not be acquired. Timeout exceeded."
-
-
-class DependField:
-    r"""Fields stored in dependency table."""
-
-    ARCHIVE = 0
-    BIT_DEPTH = 1
-    CHANNELS = 2
-    CHECKSUM = 3
-    DURATION = 4
-    FORMAT = 5
-    REMOVED = 6
-    SAMPLING_RATE = 7
-    TYPE = 8
-    VERSION = 9
-
-
-DEPEND_FIELD_NAMES = {
-    DependField.ARCHIVE: "archive",
-    DependField.BIT_DEPTH: "bit_depth",
-    DependField.CHANNELS: "channels",
-    DependField.CHECKSUM: "checksum",
-    DependField.DURATION: "duration",
-    DependField.FORMAT: "format",
-    DependField.REMOVED: "removed",
-    DependField.SAMPLING_RATE: "sampling_rate",
-    DependField.TYPE: "type",
-    DependField.VERSION: "version",
-}
-
-DEPEND_FIELD_DTYPES = {
-    DependField.ARCHIVE: "string[pyarrow]",
-    DependField.BIT_DEPTH: "int32[pyarrow]",
-    DependField.CHANNELS: "int32[pyarrow]",
-    DependField.CHECKSUM: "string[pyarrow]",
-    DependField.DURATION: "float64[pyarrow]",
-    DependField.FORMAT: "string[pyarrow]",
-    DependField.REMOVED: "int32[pyarrow]",
-    DependField.SAMPLING_RATE: "int32[pyarrow]",
-    DependField.TYPE: "int32[pyarrow]",
-    DependField.VERSION: "string[pyarrow]",
-}
-
-DEPEND_INDEX_DTYPE = "object"
-
-
-class DependType:
-    r"""Dependency file types."""
-
-    META = 0
-    MEDIA = 1
-    ATTACHMENT = 2
-
-
-DEPEND_TYPE_NAMES = {
-    DependType.META: "meta",
-    DependType.MEDIA: "media",
-    DependType.ATTACHMENT: "attachment",
-}
 
 
 # Flavors
