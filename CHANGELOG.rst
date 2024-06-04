@@ -10,7 +10,7 @@ and this project adheres to `Semantic Versioning`_.
 Version 1.7.3 (2024-06-04)
 --------------------------
 
-* Changed: ensure correct data types
+* Fixed: ensure correct data types
   in dependency table
 * Fixed: publishing an update of a database
   when the previous version
