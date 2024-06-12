@@ -5,6 +5,7 @@ import random
 import string
 import time
 
+import lance
 import memray
 import numpy as np
 import pandas as pd
@@ -178,7 +179,7 @@ audeer.mkdir(folder)
 dtypes = ["object", "string", "pyarrow"]
 
 # ===== WRITING ===========================================================
-results = pd.DataFrame(columns=["csv", "pickle", "parquet"])
+results = pd.DataFrame(columns=["csv", "pickle", "parquet", "lance"])
 results.index.name = "method"
 
 print()
@@ -305,7 +306,32 @@ t = time.time() - t0
 method = "pa.Table"
 results.at[method, "parquet"] = t
 print(".")
+
+# -------------------------------------------------------------------------
+print("* Write to LANCE file.", end="", flush=True)
+file = audeer.path(folder, "df.lance")
+
+for dtype in dtypes:
+    _df = df.copy()
+    _df = astype(_df, dtype)
+    t0 = time.time()
+    lance.write_dataset(_df, file)
+    t = time.time() - t0
+    audeer.rmdir(file)
+    method = f"pd.DataFrame[{dtype}]"
+    results.at[method, "lance"] = t
+    print(".", end="", flush=True)
+
+t0 = time.time()
+lance.write_dataset(table, file)
+t = time.time() - t0
+audeer.rmdir(file)
+method = "pa.Table"
+results.at[method, "lance"] = t
+print(".")
+
 print()
+
 
 # ===== Print results =====
 print(f"Results for writing {num_rows} lines.")
@@ -316,7 +342,7 @@ print(results)
 
 
 # ===== READING ===========================================================
-results = pd.DataFrame(columns=["csv", "pickle", "parquet"])
+results = pd.DataFrame(columns=["csv", "pickle", "parquet", "lance"])
 results.index.name = "method"
 
 
@@ -549,6 +575,46 @@ with memray.Tracker(audeer.path(result_dir, memray_file)):
     t = time.time() - t0
     results.at[method, "parquet"] = t
 print(".")
+
+# -------------------------------------------------------------------------
+print("* Read LANCE file.", end="", flush=True)
+file = audeer.path(folder, "df.lance")
+
+for dtype in dtypes:
+    _df = df.copy()
+    _df = astype(_df, dtype)
+    _df.index.rename("file", inplace=True)
+    _df = _df.reset_index()
+    lance.write_dataset(_df, file)
+    method = f"----> pd.DataFrame[{dtype}]"
+    memray_file = f"memray-lance-{method_to_filename(method)}.bin"
+    with memray.Tracker(audeer.path(result_dir, memray_file)):
+        t0 = time.time()
+        _df = lance.dataset(file).to_table().to_pandas()
+        t = time.time() - t0
+        audeer.rmdir(file)
+    results.at[method, "lance"] = t
+    print(".", end="", flush=True)
+
+method = "----> pa.Table"
+memray_file = f"memray-lance-{method_to_filename(method)}.bin"
+lance.write_dataset(_df, file)
+with memray.Tracker(audeer.path(result_dir, memray_file)):
+    t0 = time.time()
+    _table = lance.dataset(file).to_table()
+    t = time.time() - t0
+    results.at[method, "lance"] = t
+print(".")
+
+method = "----> lance.LanceDataset"
+memray_file = f"memray-lance-{method_to_filename(method)}.bin"
+with memray.Tracker(audeer.path(result_dir, memray_file)):
+    t0 = time.time()
+    _table = lance.dataset(file)
+    t = time.time() - t0
+    results.at[method, "lance"] = t
+print(".")
+
 print()
 
 # ===== Print results =====
