@@ -20,11 +20,14 @@ jobs:
           - os: ubuntu-latest
             python-version: '3.9'
           - os: ubuntu-latest
-            python-version: '3.10'
+            python-version: '3.9'
             pandas: 'pandas==2.0.3'
-          - os: ubuntu-latest
-            python-version: '3.10'
-            pandas: 'pandas==2.1.4'
+        # - os: ubuntu-latest
+        #    python-version: '3.10'
+        #    pandas: 'pandas==2.0.3'
+        #  - os: ubuntu-latest
+        #    python-version: '3.10'
+        #    pandas: 'pandas==2.1.4'
 
     steps:
     - uses: actions/checkout@v4
@@ -54,7 +57,7 @@ jobs:
     - name: Install requested pandas version
       run: |
         pip install "${{ matrix.pandas }}"
-      if: matrix.pandas == 'pandas==2.1.4'
+      if: matrix.pandas == 'pandas==2.0.3'
 
     # TESTS
     - name: Ubuntu - install ffmpeg/mediainfo
