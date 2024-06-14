@@ -57,7 +57,7 @@ jobs:
     - name: Install requested pandas version
       run: |
         pip install "${{ matrix.pandas }}"
-      if: matrix.pandas == 'pandas==2.0.3'
+      if: matrix.pandas
 
     # TESTS
     - name: Ubuntu - install ffmpeg/mediainfo
