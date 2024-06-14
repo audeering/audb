@@ -13,27 +13,27 @@ jobs:
     strategy:
       matrix:
         include:
-          # Ubuntu
+          # Different platforms
+          - os: ubuntu-latest
+            python-version: '3.10'
+          - os: macOS-latest
+            python-version: '3.10'
+          - os: windows-latest
+            python-version: '3.10'
+          # Other Python versions
           - os: ubuntu-latest
             python-version: '3.8'
           - os: ubuntu-latest
             python-version: '3.9'
           - os: ubuntu-latest
-            python-version: '3.10'
+            python-version: '3.11'
+          # Other pandas versions
           - os: ubuntu-latest
             python-version: '3.10'
             pandas: 'pandas==2.0.3'
           - os: ubuntu-latest
             python-version: '3.10'
             pandas: 'pandas==2.1.4'
-          - os: ubuntu-latest
-            python-version: '3.11'
-          # MacOS
-          - os: macOS-latest
-            python-version: '3.10'
-          # Windows
-          - os: windows-latest
-            python-version: '3.10'
 
     steps:
     - uses: actions/checkout@v4
