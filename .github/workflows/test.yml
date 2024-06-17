@@ -60,9 +60,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Install numpy<2.0.0 for pandas==2.0.3
+      run: |
+        pip install "numpy<2.0.0"
+      if: matrix.pandas == 'pandas==2.0.3'
+
     - name: Install requested pandas version
       run: |
-        pip install "numpy<2.0.0"  # as older pandas versions might fail otherwise
         pip install "${{ matrix.pandas }}"
       if: matrix.pandas
 
