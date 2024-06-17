@@ -62,6 +62,7 @@ jobs:
 
     - name: Install requested pandas version
       run: |
+        pip install "numpy<2.0.0"  # as older pandas versions might fail otherwise
         pip install "${{ matrix.pandas }}"
       if: matrix.pandas
 
