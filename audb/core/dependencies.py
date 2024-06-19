@@ -512,11 +512,21 @@ class Dependencies:
     def _column_loc(
         self,
         column: str,
-        files: typing.Union[str, typing.Sequence[str]],
+        file: str,
         dtype: typing.Callable = None,
-    ) -> typing.Union[typing.Any, typing.List[typing.Any]]:
-        r"""Column content for selected files."""
-        value = self._df.at[files, column]
+    ) -> typing.Any:
+        r"""Column content for selected file.
+
+        Args:
+            column: one of the names in ``Dependencies._schema``
+            file: row to query, index is a filename
+            dtype: convert data to dtype
+
+        Returns:
+            scalar value
+
+        """
+        value = self._df.at[file, column]
         if dtype is not None:
             value = dtype(value)
         return value
