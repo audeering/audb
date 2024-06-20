@@ -261,10 +261,13 @@ def _find_tables(
 ) -> typing.List[str]:
     r"""Find altered, new or removed tables and update 'deps'."""
     table_ids = list(db)
+    # PARQUET is default table,
+    # CSV file is ignored
+    # if it exists as well
     table_files = [
-        f"db.{table}.csv"
-        if os.path.exists(os.path.join(db_root, f"db.{table}.csv"))
-        else f"db.{table}.parquet"
+        f"db.{table}.parquet"
+        if os.path.exists(os.path.join(db_root, f"db.{table}.parquet"))
+        else f"db.{table}.csv"
         for table in table_ids
     ]
 

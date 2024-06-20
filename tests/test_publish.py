@@ -1064,6 +1064,73 @@ def test_publish_error_version(tmpdir, repository):
         audb.publish(db_path, "2.0.0", repository, previous_version="1.0.0?")
 
 
+def test_publish_parquet_tables(tmpdir, repository):
+    r"""Test publishing and loading of parquet tables."""
+    build_dir = audeer.path(tmpdir, "./build")
+    audeer.mkdir(build_dir)
+    data_dir = audeer.mkdir(build_dir, "data")
+    audio_file = audeer.path(data_dir, "file1.wav")
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audio_file, signal, sampling_rate)
+    name = "test-db"
+    db = audformat.Database(name)
+    db.schemes["speaker"] = audformat.Scheme("str")
+    index = audformat.filewise_index(["data/file1.wav"])
+    db["files"] = audformat.Table(index)
+    db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
+    db["files"]["speaker"].set(["adam"])
+    db.save(build_dir, storage_format="parquet")
+    print(f"{audeer.list_file_names(build_dir, basenames=True)=}")
+
+    # Publish database
+    version = "1.0.0"
+    deps = audb.publish(build_dir, version, repository)
+
+    # Check files are published to repository
+    repo = audeer.path(repository.host, repository.name)
+    archive = deps.archive("data/file1.wav")
+    expected_paths = [
+        audeer.path(repo, name, version, "db.parquet"),
+        audeer.path(repo, name, version, "db.yaml"),
+        audeer.path(repo, name, "media", version, f"{archive}.zip"),
+        audeer.path(repo, name, "meta", version, "files.parquet"),
+    ]
+    print(f"{expected_paths=}")
+    print(f"{audeer.list_file_names(repo, recursive=True)=}")
+    assert audeer.list_file_names(repo, recursive=True) == expected_paths
+
+    assert deps.tables == ["db.files.parquet"]
+    file = "data/file1.wav"
+    assert deps.media == [file]
+    assert deps.bit_depth(file) == 16
+    assert deps.channels(file) == signal.shape[0]
+    assert deps.duration(file) == signal.shape[1] / sampling_rate
+    assert deps.format(file) == "wav"
+    assert deps.sampling_rate(file) == sampling_rate
+
+    print(
+        f"{audeer.list_file_names(audeer.path(repository.host, repository.name), recursive=True)=}"
+    )
+    db = audb.load(name, version=version, verbose=False, full_path=False)
+    assert db.files == [file]
+    assert list(db) == ["files"]
+    assert os.path.exists(audeer.path(db.root, file))
+    assert os.path.exists(audeer.path(db.root, "db.files.parquet"))
+
+    # Publish table update
+    db["files"]["object"] = audformat.Column()
+    db["files"]["object"].set(["!!!"])
+    db.save(build_dir, storage_format="parquet")
+    version = "1.1.0"
+    deps = audb.publish(build_dir, version, repository, previous_version="1.0.0")
+
+    assert deps.tables == ["db.files.parquet"]
+    db = audb.load(name, version=version, verbose=False, full_path=False)
+    assert db.files == [file]
+    assert "object" in db["files"].df.columns
+
+
 def test_publish_text_media_files(tmpdir, dbs, repository):
     r"""Test publishing databases containing text files as media files."""
     # Create a database, containing text media file
