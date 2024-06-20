@@ -2,6 +2,8 @@ import os
 import typing
 import warnings
 
+import pyarrow.parquet as parquet
+
 import audbackend
 import audeer
 
@@ -33,6 +35,35 @@ def lookup_backend(
 
     """
     return _lookup(name, version)[1]
+
+
+def md5(file: str) -> str:
+    r"""MD5 checksum of file.
+
+    As PARQUET files are stored non-deterministically.
+    To ensure tracking changes to those files correctly,
+    the checksum can be provided
+    under the key ``b"hash"`` in its metadata,
+    e.g. which is done when creating a PARQUET file
+    with :meth:`audformat.Table.save`.
+
+    If the key is not present in its metadata,
+    or the file is not a PARQUET file
+    :func:`audeer.md5` is used to calculate the checksum.
+
+    Args:
+        file: file path with extension
+
+    Returns:
+        MD5 checksum of file
+
+    """
+    ext = audeer.file_extension(file)
+    if ext == "parquet":
+        metadata = parquet.read_schema(file).metadata
+        if b"hash" in metadata:
+            return metadata[b"hash"].decode()
+    return audeer.md5(file)
 
 
 def mkdir_tree(
