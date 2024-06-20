@@ -1081,7 +1081,7 @@ def test_publish_parquet_tables(tmpdir, repository):
     db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
     db["files"]["speaker"].set(["adam"])
     db.save(build_dir, storage_format="parquet")
-    print(f"{audeer.list_file_names(build_dir, basenames=True)=}")
+    assert not os.path.exists(audeer.path(build_dir, "db.files.csv"))
 
     # Publish database
     version = "1.0.0"
@@ -1096,8 +1096,6 @@ def test_publish_parquet_tables(tmpdir, repository):
         audeer.path(repo, name, "media", version, f"{archive}.zip"),
         audeer.path(repo, name, "meta", version, "files.parquet"),
     ]
-    print(f"{expected_paths=}")
-    print(f"{audeer.list_file_names(repo, recursive=True)=}")
     assert audeer.list_file_names(repo, recursive=True) == expected_paths
 
     assert deps.tables == ["db.files.parquet"]
@@ -1109,14 +1107,12 @@ def test_publish_parquet_tables(tmpdir, repository):
     assert deps.format(file) == "wav"
     assert deps.sampling_rate(file) == sampling_rate
 
-    print(
-        f"{audeer.list_file_names(audeer.path(repository.host, repository.name), recursive=True)=}"
-    )
     db = audb.load(name, version=version, verbose=False, full_path=False)
     assert db.files == [file]
     assert list(db) == ["files"]
     assert os.path.exists(audeer.path(db.root, file))
     assert os.path.exists(audeer.path(db.root, "db.files.parquet"))
+    assert not os.path.exists(audeer.path(db.root, "db.files.csv"))
 
     # Publish table update
     db["files"]["object"] = audformat.Column()

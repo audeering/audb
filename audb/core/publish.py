@@ -500,16 +500,7 @@ def _put_tables(
     verbose: bool,
 ):
     def job(table: str):
-        if os.path.exists(os.path.join(db_root, f"db.{table}.csv")):
-            file = f"db.{table}.csv"
-            archive_file = backend_interface.join(
-                "/",
-                db_name,
-                define.DEPEND_TYPE_NAMES[define.DependType.META],
-                table + ".zip",
-            )
-            backend_interface.put_archive(db_root, archive_file, version, files=file)
-        else:
+        if os.path.exists(os.path.join(db_root, f"db.{table}.parquet")):
             file = os.path.join(db_root, f"db.{table}.parquet")
             remote_file = backend_interface.join(
                 "/",
@@ -518,6 +509,15 @@ def _put_tables(
                 table + ".parquet",
             )
             backend_interface.put_file(file, remote_file, version)
+        else:
+            file = f"db.{table}.csv"
+            archive_file = backend_interface.join(
+                "/",
+                db_name,
+                define.DEPEND_TYPE_NAMES[define.DependType.META],
+                table + ".zip",
+            )
+            backend_interface.put_archive(db_root, archive_file, version, files=file)
 
     audeer.run_tasks(
         job,
