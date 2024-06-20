@@ -25,6 +25,19 @@ ROWS = [
         "version": "1.0.0",
     },
     {
+        "file": "db.speaker.parquet",
+        "archive": "",
+        "bit_depth": 0,
+        "channels": 0,
+        "checksum": "3hf774jkf7hfjjg775678djjd5e7dfh3",
+        "duration": 0.0,
+        "format": "parquet",
+        "removed": 0,
+        "sampling_rate": 0,
+        "type": 0,
+        "version": "1.0.0",
+    },
+    {
         "file": "file.wav",
         "archive": "archive2",
         "bit_depth": 16,
@@ -45,7 +58,7 @@ def get_entries(column):
 
 
 def test_get_entries():
-    assert get_entries("archive") == ["archive1", "archive2"]
+    assert get_entries("archive") == ["archive1", "", "archive2"]
 
 
 @pytest.fixture(
@@ -121,6 +134,7 @@ def test_call(deps):
 def test_contains(deps):
     assert "db.files.csv" in deps
     assert "file.wav" in deps
+    assert "db.speaker.parquet" in deps
     assert "not.csv" not in deps
 
 
@@ -142,13 +156,16 @@ def test_equals(deps):
 
 def test_get_item(deps):
     assert deps["db.files.csv"] == list(ROWS[0].values())[1:]
-    assert deps["file.wav"] == list(ROWS[1].values())[1:]
+    print(deps["db.files.csv"])
+    print(deps().archive)
+    assert deps["db.speaker.parquet"] == list(ROWS[1].values())[1:]
+    assert deps["file.wav"] == list(ROWS[2].values())[1:]
     with pytest.raises(KeyError, match="non.existing"):
         deps["non.existing"]
 
 
 def test_archives(deps):
-    assert deps.archives == get_entries("archive")
+    assert deps.archives == sorted(get_entries("archive"))
 
 
 def test_files(deps):
@@ -164,11 +181,11 @@ def test_removed_media(deps):
 
 
 def test_table_ids(deps):
-    assert deps.table_ids == ["files"]
+    assert deps.table_ids == ["files", "speaker"]
 
 
 def test_tables(deps):
-    assert deps.tables == ["db.files.csv"]
+    assert deps.tables == ["db.files.csv", "db.speaker.parquet"]
 
 
 def test_archive(deps):
@@ -428,10 +445,12 @@ def test_str(deps):
     # as the representation might vary,
     # see https://github.com/audeering/audb/issues/422
     expected_str = re.compile(
-        "               archive  bit_depth  channels .+? type version\n"
-        "db.files.csv  archive1          0         0 .+? 0   1.0.0\n"
-        "file.wav      archive2         16         2 .+? 1   1.0.0.*?"
+        "                     archive  bit_depth  channels .+? type version\n"
+        "db.files.csv        archive1          0         0 .+? 0   1.0.0\n"
+        "db.speaker.parquet                    0         0 .+? 0   1.0.0\n"
+        "file.wav            archive2         16         2 .+? 1   1.0.0.*?"
     )
+    print(str(deps))
     assert expected_str.match(str(deps))
     assert expected_str.match(deps._df.to_string())
 
@@ -445,7 +464,7 @@ def test_str(deps):
 )
 def test_add_attachment(deps, file, version, archive, checksum):
     deps._add_attachment(file, version, archive, checksum)
-    assert len(deps) == 3
+    assert len(deps) == len(ROWS) + 1
     assert deps.version(file) == version
     assert deps.archive(file) == archive
     assert deps.checksum(file) == checksum
@@ -486,7 +505,7 @@ def test_add_attachment(deps, file, version, archive, checksum):
 )
 def test_add_media(deps, values):
     deps._add_media(values)
-    assert len(deps) == 4
+    assert len(deps) == len(ROWS) + 2  # as we added already attachment before
     for (
         file,
         archive,
@@ -520,7 +539,7 @@ def test_add_media(deps, values):
 )
 def test_add_meta(deps, file, version, archive, checksum):
     deps._add_meta(file, version, archive, checksum)
-    assert len(deps) == 3
+    assert len(deps) == len(ROWS) + 1
     assert deps.version(file) == version
     assert deps.archive(file) == archive
     assert deps.checksum(file) == checksum
@@ -529,9 +548,10 @@ def test_add_meta(deps, file, version, archive, checksum):
 @pytest.mark.parametrize(
     "files, expected_length",
     [
-        (["file.wav"], 1),
-        (["db.files.csv"], 1),
-        (["file.wav", "db.files.csv"], 0),
+        (["file.wav"], 2),
+        (["db.files.csv"], 2),
+        (["file.wav", "db.files.csv"], 1),
+        (["file.wav", "db.files.csv", "db.speaker.parquet"], 0),
     ],
 )
 def test_drop(deps, files, expected_length):
@@ -551,7 +571,7 @@ def test_drop(deps, files, expected_length):
 def test_remove(deps, file):
     assert not deps.removed(file)
     deps._remove(file)
-    assert len(deps) == 2
+    assert len(deps) == len(ROWS)
     assert deps.removed(file)
 
 
@@ -595,7 +615,7 @@ def test_remove(deps, file):
 )
 def test_update_media(deps, values):
     deps._update_media(values)
-    assert len(deps) == 2
+    assert len(deps) == len(ROWS)
     for (
         file,
         archive,
@@ -635,6 +655,6 @@ def test_update_media(deps, values):
 )
 def test_update_media_version(deps, files, version):
     deps._update_media_version(files, version)
-    assert len(deps) == 2
+    assert len(deps) == len(ROWS)
     for file in files:
         assert deps.version(file) == version

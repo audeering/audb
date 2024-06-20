@@ -205,7 +205,7 @@ class Dependencies:
             list of table IDs
 
         """
-        return [table[3:-4] for table in self.tables]
+        return [os.path.splitext(table[3:])[0] for table in self.tables]
 
     @property
     def tables(self) -> typing.List[str]:
