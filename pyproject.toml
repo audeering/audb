@@ -25,13 +25,12 @@ classifiers = [
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Topic :: Scientific/Engineering',
 ]
-requires-python = '>=3.8'
+requires-python = '>=3.9'
 dependencies = [
     'audbackend[artifactory] >=2.0.0',
     'audeer >=2.1.0',
@@ -41,7 +40,7 @@ dependencies = [
     'audresample >=0.1.6',
     'filelock',
     'oyaml',
-    'pandas >=2.0.1',
+    'pandas >=2.1.0',
     'pyarrow',
 ]
 # Get version dynamically from git
