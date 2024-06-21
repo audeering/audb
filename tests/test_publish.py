@@ -1162,6 +1162,10 @@ def test_publish_table_storage_format(tmpdir, repository, storage_format):
     assert deps.checksum(table_file) == expected_table_checksum(
         audeer.path(build_dir, table_file)
     )
+    if storage_format == "csv":
+        assert deps.archive(table_file) == table
+    elif storage_format == "parquet":
+        assert deps.archive(table_file) == ""
 
     # Load database to cache
     db = audb.load(name, version=version, verbose=False, full_path=False)
