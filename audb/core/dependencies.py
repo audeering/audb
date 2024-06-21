@@ -482,19 +482,21 @@ class Dependencies:
         self,
         file: str,
         version: str,
-        archive: str,
         checksum: str,
     ):
         r"""Add or update table file.
 
         Args:
             file: relative file path
-            archive: archive name without extension
             checksum: checksum of file
             version: version string
 
         """
         format = audeer.file_extension(file).lower()
+        if format == "parquet":
+            archive = ""
+        else:
+            archive = os.path.splitext(file[3:])[0]
 
         self._df.loc[file] = [
             archive,  # archive

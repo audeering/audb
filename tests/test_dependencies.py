@@ -532,16 +532,17 @@ def test_add_media(deps, values):
 
 
 @pytest.mark.parametrize(
-    "file, version, archive, checksum",
+    "file, version, checksum, expected_archive",
     [
-        ("db.table1.csv", "2.1.0", "table1", "asddfnfpork45rgfl"),
+        ("db.table1.csv", "2.1.0", "asddfnfpork45rgfl", "table1"),
+        ("db.table1.parquet", "2.1.0", "asddfnfpork45rgfl", ""),
     ],
 )
-def test_add_meta(deps, file, version, archive, checksum):
-    deps._add_meta(file, version, archive, checksum)
+def test_add_meta(deps, file, version, checksum, expected_archive):
+    deps._add_meta(file, version, checksum)
     assert len(deps) == len(ROWS) + 1
     assert deps.version(file) == version
-    assert deps.archive(file) == archive
+    assert deps.archive(file) == expected_archive
     assert deps.checksum(file) == checksum
 
 

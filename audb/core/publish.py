@@ -283,7 +283,7 @@ def _find_tables(
     ):
         checksum = utils.md5(os.path.join(db_root, file))
         if file not in deps or checksum != deps.checksum(file):
-            deps._add_meta(file, version, table, checksum)
+            deps._add_meta(file, version, checksum)
             tables.append(table)
 
     return tables
