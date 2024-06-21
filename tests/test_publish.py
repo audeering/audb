@@ -1333,7 +1333,7 @@ def test_publish_table_storage_format_pkl(tmpdir, repository):
 
     When publishing tables,
     stored only in PKL format,
-    they should be converted to CSV automatically.
+    they should be converted to PARQUET automatically.
 
     Args:
         tmpdir: tmpdir fixture
@@ -1374,14 +1374,14 @@ def test_publish_table_storage_format_pkl(tmpdir, repository):
     # Publish database
     version = "1.0.0"
     deps = audb.publish(build_dir, version, repository)
-    assert f"db.{table}.csv" in deps
+    assert f"db.{table}.parquet" in deps
 
     # Check files are published to repository
     repo = audeer.path(repository.host, repository.name)
     dependency_file = "db.parquet"
     header_file = "db.yaml"
     media_file = f"{deps.archive(file)}.zip"
-    meta_file = f"{table}.zip"
+    meta_file = f"{table}.parquet"
     expected_paths = [
         audeer.path(repo, name, version, dependency_file),
         audeer.path(repo, name, version, header_file),
@@ -1652,12 +1652,13 @@ def test_update_database_without_media(tmpdir, persistent_repository):
     )
     for file in db.files:
         assert not os.path.exists(audeer.path(build_root, file))
+    print(f"{audeer.list_file_names(build_root, basenames=True)=}")
 
     # add changes to build folder
     # and call again load_to()
     # to revert them
 
-    os.remove(audeer.path(build_root, "db.emotion.csv"))
+    os.remove(audeer.path(build_root, "db.emotion.parquet"))
     db = audb.load_to(
         build_root,
         DB_NAME,
@@ -1666,7 +1667,7 @@ def test_update_database_without_media(tmpdir, persistent_repository):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    assert os.path.exists(audeer.path(build_root, "db.emotion.csv"))
+    assert os.path.exists(audeer.path(build_root, "db.emotion.parquet"))
 
     # update and save database
 
