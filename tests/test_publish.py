@@ -1066,7 +1066,7 @@ def test_publish_error_version(tmpdir, repository):
 
 
 @pytest.mark.parametrize("storage_format", ["csv", "parquet"])
-def test_publish_table_storage_formats(tmpdir, repository, storage_format):
+def test_publish_table_storage_format(tmpdir, repository, storage_format):
     r"""Test publishing and of tables for different storage formats.
 
     Tables are stored as CSV or PARQUET files.
@@ -1213,6 +1213,175 @@ def test_publish_table_storage_formats(tmpdir, repository, storage_format):
     assert os.path.exists(audeer.path(db.root, table_file))
     assert not os.path.exists(audeer.path(db.root, other_table_file))
     assert "object" in db["files"].df.columns
+
+
+def test_publish_table_storage_format_both(tmpdir, repository):
+    r"""Test publishing of tables stored in CSV and PARQUET.
+
+    When publishing tables,
+    stored in CSV and PARQUET files at the same time,
+    the CSV file should be ignored.
+
+    Args:
+        tmpdir: tmpdir fixture
+        repository: repository fixture,
+            providing a non-persistent repository
+            on a file-system backend
+
+    """
+    build_dir = audeer.path(tmpdir, "./build")
+    audeer.mkdir(build_dir)
+
+    # Define database name, file, and table ID
+    name = "test-db"
+    file = "data/file1.wav"
+    table = "files"
+    table_file = f"db.{table}"
+
+    # Create database with a single audio file and filewise table
+    data_dir = audeer.mkdir(build_dir, os.path.dirname(os.path.normpath(file)))
+    audio_file = audeer.path(data_dir, os.path.basename(os.path.normpath(file)))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audio_file, signal, sampling_rate)
+    db = audformat.Database(name)
+    db.schemes["speaker"] = audformat.Scheme("str")
+    index = audformat.filewise_index([file])
+    db[table] = audformat.Table(index)
+    db[table]["speaker"] = audformat.Column(scheme_id="speaker")
+    db[table]["speaker"].set(["adam"])
+    db.save(build_dir, storage_format="parquet")
+    db[table].save(
+        audeer.path(build_dir, table_file),
+        storage_format="csv",
+        update_other_formats=False,
+    )
+
+    # Check database build_dir looks as expected
+    assert os.path.exists(audeer.path(build_dir, f"{table_file}.csv"))
+    assert os.path.exists(audeer.path(build_dir, f"{table_file}.parquet"))
+    assert os.path.exists(audio_file)
+
+    # Publish database
+    version = "1.0.0"
+    deps = audb.publish(build_dir, version, repository)
+
+    # Check files are published to repository
+    repo = audeer.path(repository.host, repository.name)
+    dependency_file = "db.parquet"
+    header_file = "db.yaml"
+    media_file = f"{deps.archive(file)}.zip"
+    meta_file = f"{table}.parquet"
+    expected_paths = [
+        audeer.path(repo, name, version, dependency_file),
+        audeer.path(repo, name, version, header_file),
+        audeer.path(repo, name, "media", version, media_file),
+        audeer.path(repo, name, "meta", version, meta_file),
+    ]
+    assert audeer.list_file_names(repo, recursive=True) == expected_paths
+
+    # Update only CSV table
+    db = audb.load_to(build_dir, name, version="1.0.0", verbose=False)
+    db[table]["object"] = audformat.Column()
+    db[table]["object"].set(["!!!"])
+    db[table].save(
+        audeer.path(build_dir, table_file),
+        storage_format="csv",
+        update_other_formats=False,
+    )
+    # Remove PKL file to ensure CSV file is not newer
+    os.remove(audeer.path(build_dir, f"{table_file}.pkl"))
+
+    # Check database build_dir looks as expected
+    assert os.path.exists(audeer.path(build_dir, f"{table_file}.csv"))
+    assert os.path.exists(audeer.path(build_dir, f"{table_file}.parquet"))
+    assert not os.path.exists(audeer.path(build_dir, f"{table_file}.pkl"))
+    assert os.path.exists(audio_file)
+
+    # Publishing updated database
+    version = "1.1.0"
+    deps = audb.publish(build_dir, version, repository, previous_version="1.0.0")
+
+    # Check files are published to repository.
+    # Only header and dependency table change,
+    # as the PARQUET table stayed the same
+    expected_paths = [
+        audeer.path(repo, name, "1.0.0", dependency_file),
+        audeer.path(repo, name, "1.0.0", header_file),
+        audeer.path(repo, name, "1.1.0", dependency_file),
+        audeer.path(repo, name, "1.1.0", header_file),
+        audeer.path(repo, name, "media", "1.0.0", media_file),
+        audeer.path(repo, name, "meta", "1.0.0", meta_file),
+    ]
+    assert audeer.list_file_names(repo, recursive=True) == expected_paths
+
+    # Load database to cache
+    db = audb.load(name, version=version, verbose=False, full_path=False)
+    assert not os.path.exists(audeer.path(db.root, f"{table_file}.csv"))
+    assert "object" not in db["files"].df.columns
+
+
+def test_publish_table_storage_format_pkl(tmpdir, repository):
+    r"""Test publishing of tables stored in PKL.
+
+    When publishing tables,
+    stored only in PKL format,
+    they should be converted to CSV automatically.
+
+    Args:
+        tmpdir: tmpdir fixture
+        repository: repository fixture,
+            providing a non-persistent repository
+            on a file-system backend
+
+    """
+    build_dir = audeer.path(tmpdir, "./build")
+    audeer.mkdir(build_dir)
+
+    # Define database name, file, and table ID
+    name = "test-db"
+    file = "data/file1.wav"
+    table = "files"
+    table_file = f"db.{table}"
+
+    # Create database with a single audio file and filewise table
+    data_dir = audeer.mkdir(build_dir, os.path.dirname(os.path.normpath(file)))
+    audio_file = audeer.path(data_dir, os.path.basename(os.path.normpath(file)))
+    signal = np.zeros((2, 1000))
+    sampling_rate = 8000
+    audiofile.write(audio_file, signal, sampling_rate)
+    db = audformat.Database(name)
+    db.schemes["speaker"] = audformat.Scheme("str")
+    index = audformat.filewise_index([file])
+    db[table] = audformat.Table(index)
+    db[table]["speaker"] = audformat.Column(scheme_id="speaker")
+    db[table]["speaker"].set(["adam"])
+    db.save(build_dir, storage_format="pkl")
+
+    # Check database build_dir looks as expected
+    assert os.path.exists(audeer.path(build_dir, f"{table_file}.pkl"))
+    assert not os.path.exists(audeer.path(build_dir, f"{table_file}.csv"))
+    assert not os.path.exists(audeer.path(build_dir, f"{table_file}.parquet"))
+    assert os.path.exists(audio_file)
+
+    # Publish database
+    version = "1.0.0"
+    deps = audb.publish(build_dir, version, repository)
+    assert f"db.{table}.csv" in deps
+
+    # Check files are published to repository
+    repo = audeer.path(repository.host, repository.name)
+    dependency_file = "db.parquet"
+    header_file = "db.yaml"
+    media_file = f"{deps.archive(file)}.zip"
+    meta_file = f"{table}.zip"
+    expected_paths = [
+        audeer.path(repo, name, version, dependency_file),
+        audeer.path(repo, name, version, header_file),
+        audeer.path(repo, name, "media", version, media_file),
+        audeer.path(repo, name, "meta", version, meta_file),
+    ]
+    assert audeer.list_file_names(repo, recursive=True) == expected_paths
 
 
 def test_publish_text_media_files(tmpdir, dbs, repository):
