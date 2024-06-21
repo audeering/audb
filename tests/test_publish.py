@@ -1171,6 +1171,9 @@ def test_publish_table_storage_format(tmpdir, repository, storage_format):
     assert os.path.exists(audeer.path(db.root, table_file))
     assert not os.path.exists(audeer.path(db.root, other_table_file))
 
+    # Clear build dir to force audb.load_to() to load from backend
+    audeer.rmdir(build_dir)
+
     # Update database by adding a column
     db = audb.load_to(build_dir, name, version="1.0.0", verbose=False)
     db[table]["object"] = audformat.Column()
