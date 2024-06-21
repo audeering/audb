@@ -781,14 +781,14 @@ def publish(
 
     # Make sure all tables are stored in CSV or PARQUET format.
     # If only a PKL is found,
-    # the table is stored as CSV instead
+    # the table is stored as PARQUET instead
     for table_id in list(db):
         table = db[table_id]
         table_path = os.path.join(db_root, f"db.{table_id}")
         if not os.path.exists(f"{table_path}.csv") and not os.path.exists(
             f"{table_path}.parquet"
         ):
-            table.save(table_path, storage_format="csv")
+            table.save(table_path, storage_format="parquet")
 
     # check archives
     archives = archives or {}
