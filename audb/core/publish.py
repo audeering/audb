@@ -588,6 +588,22 @@ def publish(
     in addition to write permissions
     on the backend.
 
+    ``audb`` uses MD5 hashes of the database files
+    to check if they have changed.
+    Some file formats are not saved in a deterministic order,
+    e.g. when saving the same values two times,
+    the MD5 sum of the file will change.
+    Make sure, to not save those files again.
+    For files stored in PARQUET format,
+    :func:`audb.publish` will first look for a hash
+    stored in its metadata
+    under the ``b"hash"`` key.
+    For tables,
+    this deterministic hash
+    is automatically stored in the metadata
+    when storing the tables with :mod:`audformat`
+    using ``"parquet"`` as storage format.
+
     .. _audformat: https://audeering.github.io/audformat/data-introduction.html
 
     Args:

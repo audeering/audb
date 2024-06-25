@@ -40,7 +40,7 @@ def lookup_backend(
 def md5(file: str) -> str:
     r"""MD5 checksum of file.
 
-    As PARQUET files are stored non-deterministically.
+    PARQUET files are stored non-deterministically.
     To ensure tracking changes to those files correctly,
     the checksum can be provided
     under the key ``b"hash"`` in its metadata,
