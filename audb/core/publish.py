@@ -593,7 +593,7 @@ def publish(
     Some file formats are not saved in a deterministic order,
     e.g. when saving the same values two times,
     the MD5 sum of the file will change.
-    Make sure, to not save those files again.
+    Make sure, to not save those files repeatedly.
     For files stored in PARQUET format,
     :func:`audb.publish` will first look for a hash
     stored in its metadata
