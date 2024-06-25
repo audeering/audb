@@ -598,11 +598,9 @@ def publish(
     :func:`audb.publish` will first look for a hash
     stored in its metadata
     under the ``b"hash"`` key.
-    For tables,
+    For PARQUET tables,
     this deterministic hash
-    is automatically stored in the metadata
-    when storing the tables with :mod:`audformat`
-    using ``"parquet"`` as storage format.
+    is automatically added by :mod:`audformat`.
 
     .. _audformat: https://audeering.github.io/audformat/data-introduction.html
 
