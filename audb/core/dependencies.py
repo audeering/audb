@@ -596,16 +596,11 @@ class Dependencies:
             with correct dtypes
 
         """
-        # Check the dtype of index,
-        # to decide if we need to update dtypes,
-        # as dtype of index changed to `object`
-        # in version 1.7.0 of audb.
-        if df.index.dtype != define.DEPEND_INDEX_DTYPE:
-            df.index = df.index.astype(define.DEPEND_INDEX_DTYPE, copy=False)
-            columns = define.DEPEND_FIELD_NAMES.values()
-            dtypes = define.DEPEND_FIELD_DTYPES.values()
-            mapping = {column: dtype for column, dtype in zip(columns, dtypes)}
-            df = df.astype(mapping, copy=False)
+        df.index = df.index.astype(define.DEPEND_INDEX_DTYPE, copy=False)
+        columns = define.DEPEND_FIELD_NAMES.values()
+        dtypes = define.DEPEND_FIELD_DTYPES.values()
+        mapping = {column: dtype for column, dtype in zip(columns, dtypes)}
+        df = df.astype(mapping, copy=False)
         return df
 
     def _table_to_dataframe(self, table: pa.Table) -> pd.DataFrame:
