@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.7.4 (2024-06-25)
+--------------------------
+
+* Fixed: ensure correct data types
+  in dependency table
+  when loaded from a version in cache,
+  stored by ``audb<=1.6.3``
+
+
 Version 1.7.3 (2024-06-04)
 --------------------------
 
