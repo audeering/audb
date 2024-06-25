@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.7.3
+                v1.7.4
               </div>
             
           
@@ -665,11 +665,21 @@
     <span class="k">def</span> <span class="nf">_column_loc</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">dtype</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Column content for selected files.&quot;&quot;&quot;</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">files</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Column content for selected file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            column: one of the names in ``Dependencies._schema``</span>
+<span class="sd">            file: row to query, index is a filename</span>
+<span class="sd">            dtype: convert data to dtype</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            scalar value</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">file</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>
@@ -739,16 +749,11 @@
 <span class="sd">            with correct dtypes</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Check the dtype of index,</span>
-        <span class="c1"># to decide if we need to update dtypes,</span>
-        <span class="c1"># as dtype of index changed to `object`</span>
-        <span class="c1"># in version 1.7.0 of audb.</span>
-        <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_INDEX_DTYPE</span><span class="p">:</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_INDEX_DTYPE</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">columns</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-            <span class="n">dtypes</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_DTYPES</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-            <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="n">column</span><span class="p">:</span> <span class="n">dtype</span> <span class="k">for</span> <span class="n">column</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)}</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">DEPEND_INDEX_DTYPE</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_NAMES</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_FIELD_DTYPES</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="n">column</span><span class="p">:</span> <span class="n">dtype</span> <span class="k">for</span> <span class="n">column</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)}</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">def</span> <span class="nf">_table_to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -1015,7 +1020,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/06/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/06/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
