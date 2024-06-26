@@ -607,6 +607,13 @@ def publish(
     this deterministic hash
     is automatically added by :mod:`audformat`.
 
+    Tables stored only as pickle files,
+    are converted to parquet files
+    before publication.
+    If a table is stored as a parquet and csv file,
+    the csv file is ignored,
+    and the parquet file is published.
+
     .. _audformat: https://audeering.github.io/audformat/data-introduction.html
 
     Args:
