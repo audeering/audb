@@ -34,7 +34,7 @@ requires-python = '>=3.9'
 dependencies = [
     'audbackend[artifactory] >=2.0.0',
     'audeer >=2.1.0',
-    'audformat @ git+https://github.com/audeering/audformat',
+    'audformat >=1.2.0',
     'audiofile >=1.0.0',
     'audobject >=0.5.0',
     'audresample >=0.1.6',
