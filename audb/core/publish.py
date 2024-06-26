@@ -588,17 +588,22 @@ def publish(
     in addition to write permissions
     on the backend.
 
-    ``audb`` uses MD5 hashes of the database files
+    ``audb`` uses md5 hashes of the database files
     to check if they have changed.
-    Some file formats are not saved in a deterministic order,
-    e.g. when saving the same values two times,
-    the MD5 sum of the file will change.
-    Make sure, to not save those files repeatedly.
-    For files stored in PARQUET format,
+    Be aware that for certain file formats,
+    like parquet,
+    md5 hashes might differ
+    for files with identical content.
+    Reasons include the library that wrote the file,
+    involved compression codes,
+    or additional metadata written by the library.
+    Tables stored in parquet format
+    are affected by these problems.
+    For files stored in parquet format,
     :func:`audb.publish` will first look for a hash
     stored in its metadata
     under the ``b"hash"`` key.
-    For PARQUET tables,
+    For parquet tables,
     this deterministic hash
     is automatically added by :mod:`audformat`.
 
