@@ -597,8 +597,6 @@ def publish(
     Reasons include the library that wrote the file,
     involved compression codes,
     or additional metadata written by the library.
-    Tables stored in parquet format
-    are affected by these problems.
     For files stored in parquet format,
     :func:`audb.publish` will first look for a hash
     stored in its metadata
