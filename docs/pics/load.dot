@@ -19,8 +19,8 @@ digraph G {
     subgraph cluster_load {
         label="Load with audb"
         download[label="Download"]
-        unpack[label="Unpack"]
-        convert[label="Convert"]
+        unpack[label="(Unpack)"]
+        convert[label="(Convert)"]
     }
 
     subgraph cluster_cache {
