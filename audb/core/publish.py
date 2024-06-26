@@ -588,7 +588,7 @@ def publish(
     in addition to write permissions
     on the backend.
 
-    ``audb`` uses md5 hashes of the database files
+    :mod:`audb` uses md5 hashes of the database files
     to check if they have changed.
     Be aware that for certain file formats,
     like parquet,
