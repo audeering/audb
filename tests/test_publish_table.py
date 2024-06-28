@@ -12,25 +12,41 @@ import audb
 
 
 @pytest.fixture
-def db(tmpdir) -> str:
-    r"""Database fixture.
-
-    Creates a minimal database,
-    containing a media file
-    and a table.
-    The database is not yet stored to disk.
+def build_dir(tmpdir) -> str:
+    r"""Build dir fixture.
 
     Args:
         tmpdir: tmpdir fixture
 
     Returns:
-        database object, and build dir path
+        path to build dir
+
+    """
+    yield audeer.mkdir(tmpdir, "build")
+
+
+@pytest.fixture
+def db(build_dir) -> str:
+    r"""Database fixture.
+
+    Creates a minimal database,
+    containing a media file
+    and a table.
+    The media file is stored in the provided ``build_dir``,
+    but the database is not yet stored to disk,
+    enabling to select the storage format
+    of the tables inside a test function.
+
+    Args:
+        build_dir: build_dir fixture
+
+    Returns:
+        database object
 
     """
     name = "test-db"
     file = "data/file1.wav"
     table = "files"
-    build_dir = audeer.path(tmpdir, "build")
     data_dir = audeer.mkdir(build_dir, os.path.dirname(os.path.normpath(file)))
     audio_file = audeer.path(data_dir, os.path.basename(os.path.normpath(file)))
     signal = np.zeros((2, 1000))
@@ -42,7 +58,6 @@ def db(tmpdir) -> str:
     db[table] = audformat.Table(index)
     db[table]["speaker"] = audformat.Column(scheme_id="speaker")
     db[table]["speaker"].set(["adam"])
-    db.meta["build_dir"] = build_dir
 
     yield db
 
@@ -65,7 +80,7 @@ def expected_table_checksum(path: str) -> str:
 
 
 @pytest.mark.parametrize("storage_format", ["csv", "parquet"])
-def test_publish_table_storage_format(db, repository, storage_format):
+def test_publish_table_storage_format(db, build_dir, repository, storage_format):
     r"""Test publishing and of tables for different storage formats.
 
     Tables are stored as CSV or PARQUET files.
@@ -80,6 +95,7 @@ def test_publish_table_storage_format(db, repository, storage_format):
 
     Args:
         db: db fixture
+        build_dir: build_dir fixture
         repository: repository fixture,
             providing a non-persistent repository
             on a file-system backend
@@ -91,7 +107,6 @@ def test_publish_table_storage_format(db, repository, storage_format):
     elif storage_format == "parquet":
         other_storage_format = "csv"
 
-    build_dir = db.meta["build_dir"]
     table = list(db)[0]
     file = db.files[0]
     audio_file = audeer.path(build_dir, file)
@@ -193,7 +208,7 @@ def test_publish_table_storage_format(db, repository, storage_format):
     assert "object" in db["files"].df.columns
 
 
-def test_publish_table_storage_format_both(db, repository):
+def test_publish_table_storage_format_both(db, build_dir, repository):
     r"""Test publishing of tables stored in CSV and PARQUET.
 
     When publishing tables,
@@ -202,12 +217,12 @@ def test_publish_table_storage_format_both(db, repository):
 
     Args:
         db: db fixture
+        build_dir: build_dir fixture
         repository: repository fixture,
             providing a non-persistent repository
             on a file-system backend
 
     """
-    build_dir = db.meta["build_dir"]
     table = list(db)[0]
     file = db.files[0]
     audio_file = audeer.path(build_dir, file)
@@ -285,7 +300,7 @@ def test_publish_table_storage_format_both(db, repository):
     assert "object" not in db["files"].df.columns
 
 
-def test_publish_table_storage_format_pkl(db, repository):
+def test_publish_table_storage_format_pkl(db, build_dir, repository):
     r"""Test publishing of tables stored in PKL.
 
     When publishing tables,
@@ -294,12 +309,12 @@ def test_publish_table_storage_format_pkl(db, repository):
 
     Args:
         db: db fixture
+        build_dir: build_dir fixture
         repository: repository fixture,
             providing a non-persistent repository
             on a file-system backend
 
     """
-    build_dir = db.meta["build_dir"]
     table = list(db)[0]
     file = db.files[0]
     audio_file = audeer.path(build_dir, file)
@@ -333,15 +348,15 @@ def test_publish_table_storage_format_pkl(db, repository):
     assert audeer.list_file_names(repo, recursive=True) == expected_paths
 
 
-def test_publish_table_parquet_without_hash(db, repository):
+def test_publish_table_parquet_without_hash(db, build_dir, repository):
     r"""Ensure publication of tables without hash metadata work.
 
     Args:
         db: db fixture
+        build_dir: build_dir fixture
         repository: repository fixture
 
     """
-    build_dir = db.meta["build_dir"]
     table_id = list(db)[0]
     table_file = audeer.path(build_dir, f"db.{table_id}.parquet")
 
