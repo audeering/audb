@@ -18,7 +18,7 @@ digraph G {
 
     subgraph cluster_publish {
         label="Publish with audb"
-        pack[label="Pack"]
+        pack[label="(Pack)"]
         upload[label="Upload"]
     }
 
