@@ -86,8 +86,10 @@ def test_publish_table_storage_format(db, repository, storage_format):
         storage_format: storage format of tables
 
     """
-    storage_formats = ["csv", "parquet"]
-    other_storage_format = [sf for sf in storage_formats if sf != storage_format][0]
+    if storage_format == "csv":
+        other_storage_format = "parquet"
+    elif storage_format == "parquet":
+        other_storage_format = "csv"
 
     build_dir = db.meta["build_dir"]
     table = list(db)[0]
