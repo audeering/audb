@@ -261,6 +261,7 @@ def _get_attachments_from_cache(
             num_workers=num_workers,
             progress_bar=verbose,
             task_description="Copy attachments",
+            maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
         )
 
         audeer.rmdir(db_root_tmp)
@@ -341,6 +342,7 @@ def _get_files_from_cache(
                 num_workers=num_workers,
                 progress_bar=verbose,
                 task_description=f"Copy {files_type}",
+                maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
             )
 
             audeer.rmdir(db_root_tmp)
@@ -398,6 +400,7 @@ def _get_attachments_from_backend(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Load attachments",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
     audeer.rmdir(db_root_tmp)
@@ -490,6 +493,7 @@ def _get_media_from_backend(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Load media",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
     audeer.rmdir(db_root_tmp)
@@ -543,6 +547,7 @@ def _get_tables_from_backend(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Load tables",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
     audeer.rmdir(db_root_tmp)
@@ -849,6 +854,7 @@ def _update_path(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Update file path",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
 

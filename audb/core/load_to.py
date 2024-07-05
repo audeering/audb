@@ -60,6 +60,7 @@ def _find_media(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Find media",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
     return media
@@ -97,6 +98,7 @@ def _find_tables(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Find tables",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
     return tables
@@ -146,6 +148,7 @@ def _get_attachments(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Load attachments",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
 
@@ -194,6 +197,7 @@ def _get_media(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Get media",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
 
@@ -242,6 +246,7 @@ def _get_tables(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Get tables",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
 

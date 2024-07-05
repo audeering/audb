@@ -34,6 +34,7 @@ def _check_for_duplicates(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Check tables for duplicates",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
 
@@ -227,6 +228,7 @@ def _find_media(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Find media",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
     # Add updated and new media to dependencies
     # and sort them by paths
@@ -396,6 +398,7 @@ def _put_attachments(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Put attachments",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
 
@@ -472,6 +475,7 @@ def _put_media(
             num_workers=num_workers,
             progress_bar=verbose,
             task_description="Put media",
+            maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
         )
         deps._update_media_version(update_media, version)
 
@@ -501,6 +505,7 @@ def _put_tables(
         num_workers=num_workers,
         progress_bar=verbose,
         task_description="Put tables",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
 
