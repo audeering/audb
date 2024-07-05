@@ -80,7 +80,7 @@ def expected_table_checksum(path: str) -> str:
 
 
 @pytest.mark.parametrize("storage_format", ["csv", "parquet"])
-def test_publish_table_storage_format(db, build_dir, repository, storage_format):
+def TestPublishTableStorageFormat():
     r"""Test publishing and of tables for different storage formats.
 
     Tables are stored as CSV or PARQUET files.
@@ -102,110 +102,309 @@ def test_publish_table_storage_format(db, build_dir, repository, storage_format)
         storage_format: storage format of tables
 
     """
-    if storage_format == "csv":
-        other_storage_format = "parquet"
-    elif storage_format == "parquet":
-        other_storage_format = "csv"
 
-    table = list(db)[0]
-    file = db.files[0]
-    audio_file = audeer.path(build_dir, file)
+    def other_table_file(self, db: audformat.Database, storage_format: str) -> str:
+        r"""Filename of first database table with other storage format.
 
-    table_file = f"db.{table}.{storage_format}"
-    other_table_file = f"db.{table}.{other_storage_format}"
+        csv => parquet
+        parquet => csv
 
-    db.save(build_dir, storage_format=storage_format)
+        Args:
+            db: database
+            storage_format: selected storage format
 
-    # Check database build_dir looks as expected
-    assert os.path.exists(audeer.path(build_dir, table_file))
-    assert not os.path.exists(audeer.path(build_dir, other_table_file))
-    assert os.path.exists(audio_file)
+        Returns:
+            table filename with other storage format
 
-    # Publish database
-    version = "1.0.0"
-    deps = audb.publish(build_dir, version, repository)
+        """
+        table = list(db)[0]
+        if storage_format == "csv":
+            ext = "parquet"
+        elif storage_format == "parquet":
+            ext = "csv"
+        return f"db.{table}.{ext}"
 
-    # Check files are published to repository
-    repo = audeer.path(repository.host, repository.name)
-    dependency_file = "db.parquet"
-    header_file = "db.yaml"
-    media_file = f"{deps.archive(file)}.zip"
-    if storage_format == "csv":
-        meta_file = f"{table}.zip"
-    elif storage_format == "parquet":
-        meta_file = f"{table}.parquet"
-    expected_paths = [
-        audeer.path(repo, db.name, version, dependency_file),
-        audeer.path(repo, db.name, version, header_file),
-        audeer.path(repo, db.name, "media", version, media_file),
-        audeer.path(repo, db.name, "meta", version, meta_file),
-    ]
-    assert audeer.list_file_names(repo, recursive=True) == expected_paths
+    def media_file(self, db: audformat.Database) -> str:
+        r"""Filename of first media file in database.
 
-    # Check entries of dependency table
-    assert deps.tables == [table_file]
-    assert deps.media == [file]
-    assert deps.checksum(table_file) == expected_table_checksum(
-        audeer.path(build_dir, table_file)
-    )
-    if storage_format == "csv":
-        assert deps.archive(table_file) == table
-    elif storage_format == "parquet":
-        assert deps.archive(table_file) == ""
+        Args:
+            db: database
 
-    # Load database to cache
-    db = audb.load(db.name, version=version, verbose=False, full_path=False)
-    assert db.files == [file]
-    assert list(db) == [table]
-    assert os.path.exists(audeer.path(db.root, file))
-    assert os.path.exists(audeer.path(db.root, table_file))
-    assert not os.path.exists(audeer.path(db.root, other_table_file))
+        Returns:
+            filename of media file
 
-    # Clear build dir to force audb.load_to() to load from backend
-    audeer.rmdir(build_dir)
+        """
+        return db.files[0]
 
-    # Update database by adding a column
-    db = audb.load_to(build_dir, db.name, version="1.0.0", verbose=False)
-    db[table]["object"] = audformat.Column()
-    db[table]["object"].set(["!!!"])
-    db.save(build_dir, storage_format=storage_format)
+    def table_file(self, db: audformat.Database, storage_format: str) -> str:
+        r"""Table file name of first table in database.
 
-    # Check database build_dir looks as expected
-    assert os.path.exists(audeer.path(build_dir, table_file))
-    assert not os.path.exists(audeer.path(build_dir, other_table_file))
-    assert os.path.exists(audio_file)
+        Args:
+            db: database
+            storage_format: storage format of databas tables
 
-    # Publish database update
-    version = "1.1.0"
-    deps = audb.publish(build_dir, version, repository, previous_version="1.0.0")
+        Returns:
+            table file name
 
-    # Check files are published to repository
-    expected_paths = [
-        audeer.path(repo, db.name, "1.0.0", dependency_file),
-        audeer.path(repo, db.name, "1.0.0", header_file),
-        audeer.path(repo, db.name, "1.1.0", dependency_file),
-        audeer.path(repo, db.name, "1.1.0", header_file),
-        audeer.path(repo, db.name, "media", "1.0.0", media_file),
-        audeer.path(repo, db.name, "meta", "1.0.0", meta_file),
-        audeer.path(repo, db.name, "meta", "1.1.0", meta_file),
-    ]
-    assert audeer.list_file_names(repo, recursive=True) == expected_paths
+        """
+        table = list(db)[0]
+        return f"db.{table}.{storage_format}"
 
-    # Check entries of dependency table
-    assert deps.tables == [table_file]
-    assert deps.media == [file]
-    assert deps.checksum(table_file) == expected_table_checksum(
-        audeer.path(build_dir, table_file)
-    )
+    def test_database_save(self, build_dir, db, storage_format):
+        r"""Test correct files are stored to build dir.
 
-    # Load database to cache
-    db = audb.load(db.name, version=version, verbose=False, full_path=False)
-    assert db.files == [file]
-    assert list(db) == [table]
-    assert os.path.exists(audeer.path(db.root, file))
-    assert os.path.exists(audeer.path(db.root, table_file))
-    assert not os.path.exists(audeer.path(db.root, other_table_file))
-    assert "object" in db["files"].df.columns
+        Args:
+            build_dir: build dir fixture
+            db: database fixture
+            storage_format: storage format of database tables
+
+        """
+        db.save(build_dir, storage_format=storage_format)
+        assert os.path.exists(
+            audeer.path(build_dir, self.table_file(db, storage_format))
+        )
+        assert not os.path.exists(
+            audeer.path(build_dir, self.other_table_file(db, storage_format))
+        )
+        assert os.path.exists(self.media_file(db))
+
+    def test_database_publish(
+        self,
+        build_dir: str,
+        db: audformat.Database,
+        repository: audb.Repository,
+        storage_format: str,
+    ):
+        r"""Tests files stored in repository and dependency table entries.
+
+        Tables are stored differently in the repository
+        for different storage formats,
+        and their dependency table entry looks different as well.
+
+        Args:
+            build_dir: build dir fixture
+            db: database fixture
+            repository: repository fixture
+            storage_format: database table storage format
+
+        """
+        # Publish database
+        db.save(build_dir, storage_format=storage_format)
+        version = "1.0.0"
+        deps = audb.publish(build_dir, version, repository)
+
+        # Check files are published to repository
+        repo = audeer.path(repository.host, repository.name)
+        file = self.media_file(db)
+        table = list(db)[0]
+        dependency_file = "db.parquet"
+        header_file = "db.yaml"
+        media_file = f"{deps.archive(file)}.zip"
+        if storage_format == "csv":
+            meta_file = f"{table}.zip"
+        elif storage_format == "parquet":
+            meta_file = f"{table}.parquet"
+        expected_paths = [
+            audeer.path(repo, db.name, version, dependency_file),
+            audeer.path(repo, db.name, version, header_file),
+            audeer.path(repo, db.name, "media", version, media_file),
+            audeer.path(repo, db.name, "meta", version, meta_file),
+        ]
+        assert audeer.list_file_names(repo, recursive=True) == expected_paths
+
+        # Check entries of dependency table
+        table_file = self.table_file(db, storage_format)
+        assert deps.tables == [table_file]
+        assert deps.media == [file]
+        assert deps.checksum(table_file) == expected_table_checksum(
+            audeer.path(build_dir, table_file)
+        )
+        if storage_format == "csv":
+            assert deps.archive(table_file) == table
+        elif storage_format == "parquet":
+            assert deps.archive(table_file) == ""
+
+    def test_database_load(
+        self,
+        build_dir: str,
+        db: audformat.Database,
+        repository: audb.Repository,
+    ):
+        r"""Test correct files in cache after loading database.
+
+        Args:
+            build_dir: build dir fixture
+            db: database fixture
+            repository: repository fixture
+
+        """
+        # Publish database
+        db.save(build_dir, storage_format=storage_format)
+        version = "1.0.0"
+        deps = audb.publish(build_dir, version, repository)
+
+        # Load database to cache
+        db = audb.load(db.name, version=version, verbose=False, full_path=False)
+
+        assert os.path.exists(audeer.path(db.root, self.media_file(db)))
+        assert os.path.exists(audeer.path(db.root, self.table_file(db, storage_format)))
+        assert not os.path.exists(
+            audeer.path(db.root, self.other_table_file(db, storage_format))
+        )
+
+    def test_updated_database_save(self, build_dir, db, storage_format):
+        r"""Test correct files are stored to build dir after database update.
+
+        Args:
+            build_dir: build dir fixture
+            db: database fixture
+            storage_format: storage format of database tables
+
+        """
+        # Publish first version
+        db.save(build_dir, storage_format=storage_format)
+        previous_version = "1.0.0"
+        deps = audb.publish(build_dir, previous_version, repository)
+
+        # Clear build dir to force audb.load_to() to load from backend
+        audeer.rmdir(build_dir)
+        # Load previous version of database
+        db = audb.load_to(build_dir, db.name, version=previous_version, verbose=False)
+
+        # Update database by adding a column
+        db[table]["object"] = audformat.Column()
+        db[table]["object"].set(["!!!"])
+        db.save(build_dir, storage_format=storage_format)
+
+        assert os.path.exists(
+            audeer.path(build_dir, self.table_file(db, storage_format))
+        )
+        assert not os.path.exists(
+            audeer.path(build_dir, self.other_table_file(db, storage_format))
+        )
+        assert os.path.exists(self.media_file(db))
+
+    def test_updated_database_publish(
+        self,
+        build_dir: str,
+        db: audformat.Database,
+        repository: audb.Repository,
+        storage_format: str,
+    ):
+        r"""Tests files in repository and dependency table after database update.
+
+        Tables are stored differently in the repository
+        for different storage formats,
+        and their dependency table entry looks different as well.
+
+        Args:
+            build_dir: build dir fixture
+            db: database fixture
+            repository: repository fixture
+            storage_format: database table storage format
+
+        """
+        # Publish first version
+        db.save(build_dir, storage_format=storage_format)
+        previous_version = "1.0.0"
+        deps = audb.publish(build_dir, previous_version, repository)
+
+        # Update database by adding a column
+        db[table]["object"] = audformat.Column()
+        db[table]["object"].set(["!!!"])
+        db.save(build_dir, storage_format=storage_format)
+
+        # Publish second version
+        db.save(build_dir, storage_format=storage_format)
+        version = "1.1.0"
+        deps = audb.publish(
+            build_dir,
+            version,
+            repository,
+            previous_version=previous_version,
+        )
+
+        # Check files are published to repository
+        repo = audeer.path(repository.host, repository.name)
+        file = self.media_file(db)
+        table = list(db)[0]
+        dependency_file = "db.parquet"
+        header_file = "db.yaml"
+        media_file = f"{deps.archive(file)}.zip"
+        if storage_format == "csv":
+            meta_file = f"{table}.zip"
+        elif storage_format == "parquet":
+            meta_file = f"{table}.parquet"
+        expected_paths = [
+            audeer.path(repo, db.name, "1.0.0", dependency_file),
+            audeer.path(repo, db.name, "1.0.0", header_file),
+            audeer.path(repo, db.name, "1.1.0", dependency_file),
+            audeer.path(repo, db.name, "1.1.0", header_file),
+            audeer.path(repo, db.name, "media", "1.0.0", media_file),
+            audeer.path(repo, db.name, "meta", "1.0.0", meta_file),
+            audeer.path(repo, db.name, "meta", "1.1.0", meta_file),
+        ]
+        assert audeer.list_file_names(repo, recursive=True) == expected_paths
+
+        # Check entries of dependency table
+        table_file = self.table_file(db, storage_format)
+        assert deps.tables == [table_file]
+        assert deps.media == [file]
+        assert deps.checksum(table_file) == expected_table_checksum(
+            audeer.path(build_dir, table_file)
+        )
+        if storage_format == "csv":
+            assert deps.archive(table_file) == table
+        elif storage_format == "parquet":
+            assert deps.archive(table_file) == ""
+
+    def test_updated_database_load(
+        self,
+        build_dir: str,
+        db: audformat.Database,
+        repository: audb.Repository,
+    ):
+        r"""Test correct files in cache after loading updated database.
+
+        Args:
+            build_dir: build dir fixture
+            db: database fixture
+            repository: repository fixture
+
+        """
+        # Publish first version
+        db.save(build_dir, storage_format=storage_format)
+        previous_version = "1.0.0"
+        deps = audb.publish(build_dir, previous_version, repository)
+
+        # Update database by adding a column
+        db[table]["object"] = audformat.Column()
+        db[table]["object"].set(["!!!"])
+        db.save(build_dir, storage_format=storage_format)
+
+        # Publish second version
+        db.save(build_dir, storage_format=storage_format)
+        version = "1.1.0"
+        deps = audb.publish(
+            build_dir,
+            version,
+            repository,
+            previous_version=previous_version,
+        )
+        # Publish database
+        db.save(build_dir, storage_format=storage_format)
+        version = "1.0.0"
+        deps = audb.publish(build_dir, version, repository)
+
+        # Load database to cache
+        db = audb.load(db.name, version=version, verbose=False, full_path=False)
+
+        assert os.path.exists(audeer.path(db.root, self.media_file(db)))
+        assert os.path.exists(audeer.path(db.root, self.table_file(db, storage_format)))
+        assert not os.path.exists(
+            audeer.path(db.root, self.other_table_file(db, storage_format))
+        )
+        assert "object" in db["files"].df.columns
 
 
 def test_publish_table_storage_format_both(db, build_dir, repository):
