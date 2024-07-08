@@ -17,6 +17,11 @@ import audeer
 from audb.core import define
 
 
+pl.Config.set_tbl_hide_dataframe_shape(True)
+pl.Config.set_tbl_formatting("NOTHING")
+pl.Config.set_tbl_hide_column_data_types(True)
+
+
 class Dependencies:
     r"""Dependencies of a database.
 
@@ -69,8 +74,9 @@ class Dependencies:
 
         # self._df = pd.DataFrame(data)
 
+        # always an empty frame.
+        # deps can only be loaded or self._df set
         self._df = pl.DataFrame(data)
-
         self.index_col = define.DEPEND_INDEX_COLNAME
         # pl.DataFrame(data)
         # self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
@@ -159,8 +165,7 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        # return file in self._df.index
-        return file in self._df[self.index_col]
+        return file in self._idx
 
     def __eq__(self, other: "Dependencies") -> bool:
         r"""Check if two dependency tables are equal.
@@ -187,17 +192,29 @@ class Dependencies:
         """
         # (self._df[self.index_col] == file).to_list()
         # return .loc[file].tolist()
-        item = pl.Series(self._df.filter(pl.col(self.index_col) == file)).to_list()
+        # item = pl.Series(self._df.filter(pl.col(self.index_col) == file)).to_list()
         # even slower:
         # item = np.array(self._df.filter(pl.col(self.index_col) == file)).tolist()[0]
+        # pandas:
+        # self._df.loc[file].tolist()
+        # ['archive-0', 16, 1, 'f0fa37deab5a6aedc8347c781f5c5f80', 0.6310682188770933, 'wav', 1, 16000, 1, '1.1.0']
+        # ['file-0.wav', 'archive-0', 16, 1, 'f0fa37deab5a6aedc8347c781f5c5f80', 0.6310682188770933, 'wav', 1, 16000, 1, '1.1.0']
+        item = list(self._df.row(self._idx[file]))[1:]
         return item
 
     def __len__(self) -> int:
         r"""Number of all media, table, attachment files."""
-        return len(self._df)
+        return len(self._idx)
 
     def __str__(self) -> str:  # noqa: D105
-        return str(self._df)
+        # return str(self._df)
+        N = 15
+        # pl.Config.set_tbl_hide_dataframe_shape(True)
+        # pl.Config.set_tbl_formatting('NOTHING')
+        # pl.Config.set_tbl_hide_column_data_types(True)
+        mystr = str(self._df.head(N))
+        # pl.Config.restore_defaults()
+        return mystr
 
     @property
     def archives(self) -> typing.List[str]:
@@ -212,17 +229,38 @@ class Dependencies:
 
         self._df["archive"].sort(descending=False).unique(maintain_order=True).to_list()
         self._df["archive"].unique(maintain_order=False).sort(descending=False).to_list()
+        0.144546
         sorted(self._df["archive"].unique().to_list())
 
         Sorting?
 
+        Result:
+        ['archive-0', 'archive-1', 'archive-2', 'archive-3', 'archive-4', 'archive-5', 'archive-6', 'archive-7', 'archive-8', 'archive-9']
         """
-        return (
-            self._df["archive"]
-            .unique(maintain_order=False)
-            .sort(descending=False)
-            .to_list()
-        )
+
+        # 0.014
+        # return (
+        #     self._df["archive"]
+        #     .unique(maintain_order=False)
+        #     .sort(descending=False)
+        #     .to_list()
+        # )
+
+        # 0.014
+        # return (
+        #     self._df.lazy()
+        #     .select(pl.col("archive"))
+        #     .unique()
+        #     .sort(pl.col("archive"))
+        #     .collect()["archive"]
+        #     .to_list()
+        # )
+
+        # 0.014
+        return pl.Series(self._df.select(pl.col("archive"))).unique().sort().to_list()
+
+        # 0.413
+        # return sorted(pl.Series(self._df.select(pl.col("archive"))).unique().to_list())
 
     @property
     def attachments(self) -> typing.List[str]:
@@ -255,7 +293,7 @@ class Dependencies:
             list of files
 
         """
-        return self._df[self.index_col].to_list()
+        return list(self._idx.keys())
 
     @property
     def media(self) -> typing.List[str]:
@@ -293,20 +331,6 @@ class Dependencies:
             list of table IDs
 
         """
-        # [
-        #     "e-17",
-        #     "e-27",
-        #     "e-32",
-        #     "e-37",
-        #     "e-40",
-        #     "e-49",
-        #     "e-50",
-        #     "e-57",
-        #     "e-84",
-        #     "e-85",
-        # ]
-        # need top implement tables first
-        # pandas - funny values?? -results identical
         return [table[3:-4] for table in self.tables]
 
     @property
@@ -332,7 +356,10 @@ class Dependencies:
 
         Example: 'archive-0'
         """
-        return self._df.filter(pl.col("file") == file).item(0, "archive")
+        # return self._df.filter(pl.col("file") == file).item(0, "archive")
+        # pandas implementation
+        # return self._df.archive[file]
+        return self._df.row(self._idx[file], named=True)["archive"]
 
     def bit_depth(self, file: str) -> int:
         r"""Bit depth of media file.
@@ -395,6 +422,12 @@ class Dependencies:
         """
         return self._column_loc("format", file)
 
+    def _update_idx(self):
+        """Update index as polars does not have any."""
+        self._idx = dict(
+            zip(self._df[self.index_col], range(len(self._df[self.index_col])))
+        )
+
     def load(self, path: str):
         r"""Read dependencies from file.
 
@@ -451,9 +484,13 @@ class Dependencies:
             # self._df = self._table_to_dataframe(table)
             # self._df = pl.read_parquet(path)
             # there is no index!
-            self._df = pl.read_parquet(path).rename(
-                {"__index_level_0__": self.index_col}
-            )
+            # self._df = pl.read_parquet(path).rename(
+            #     {"__index_level_0__": self.index_col}
+            # )
+            # new polars version reads index (name file) directly into variable
+            self._df = pl.read_parquet(path)
+            # need to maintain an index
+            self._update_idx()
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
@@ -543,15 +580,13 @@ class Dependencies:
             archive: archive name without extension
             checksum: checksum of file
 
-        NOTE: PANDAS BACK AND FRO COPYING
+        Note that this is considered unstable, see documentation
+        we use  pl.DataFrame.update
 
         """
         format = audeer.file_extension(file).lower()
-
-        # df = self._df.to_pandas().set_index(self.index_col)
-        df = self.pl2pd(self._df)
-
-        df.loc[file] = [
+        entry = [
+            file,
             archive,  # archive
             0,  # bit_depth
             0,  # channels
@@ -564,8 +599,16 @@ class Dependencies:
             version,  # version
         ]
 
-        # self._df = pl.from_pandas(df, include_index=True)
-        self._df = self.pd2pl(df)
+        self._df = self._df.update(
+            pl.from_records([entry], schema=self._df.schema, orient='row'),
+            how="full",
+            left_on=["file"],
+            right_on=["file"],
+        )
+
+        # update index only if a new attachmenbt is coming in
+        if file not  in self._idx:
+            self._idx[file] = len(self._idx)
 
     def _add_media(
         self,
@@ -592,15 +635,10 @@ class Dependencies:
                 where each tuple holds the values of a new media entry
 
         """
-        # pandas
-        # df = pd.DataFrame.from_records(
-        #     values,
-        #     columns=["file"] + list(define.DEPEND_FIELD_NAMES.values()),
-        # ).set_index("file")
-        # df.index = df.index.astype(define.DEPEND_INDEX_DTYPE)
-        # self._df = pd.concat([self._df, df])
+
+
         self._df = pl.concat(
-            [self._df, pl.from_records(values, schema=self.schema_including_file)],
+            [self._df, pl.from_records(values, schema=self._df.schema, orient="row")],
             how="vertical_relaxed",
         )
 
@@ -619,13 +657,11 @@ class Dependencies:
             checksum: checksum of file
             version: version string
 
-        NOTE: casting to pd.DataFrame and back
         """
         format = audeer.file_extension(file).lower()
 
-        df = self.pl2pd(self._df)
-        # df = self._df.to_pandas().set_index(self.index_col)
-        df.loc[file] = [
+        entry = [
+            file,
             archive,  # archive
             0,  # bit_depth
             0,  # channels
@@ -637,41 +673,41 @@ class Dependencies:
             define.DependType.META,  # type
             version,  # version
         ]
-        # self._df = pl.from_pandas(df, include_index=True)
-        self._df = self.pd2pl(df)
+
+        self._df = self._df.update(
+            pl.from_records([entry], schema=self._df.schema, orient='row'),
+            how="full",
+            left_on=["file"],
+            right_on=["file"],
+        )
+
+        # update index only if a new attachmenbt is coming in
+        if file not  in self._idx:
+            self._idx[file] = len(self._idx)
 
     def _column_loc(
         self,
         column: str,
-        files: typing.Union[str, typing.Sequence[str]],
+        file: str,
         dtype: typing.Callable = None,
-    ) -> typing.Union[typing.Any, typing.List[typing.Any]]:
-        r"""Column content for selected files and column.
+    ) -> typing.Any:
+        r"""Column content for selected files and column."""
 
-        This implementation was slightly faster than this one
-        value = (
-            self._df.filter(self._df[self.index_col].is_in(files))[column].item()
-            if len(files) == 1
-            else self._df.filter(self._df[self.index_col].is_in(files))[
-                column
-            ].to_list()
-        )
-
-        """
-        value = (
-            self._df.filter(pl.col(self.index_col).is_in(files))
-            .select(pl.col(column))
-            .to_series()
-            .to_list()
-        )
-
-        if len(value) == 1:
-            return value
-
-        isscalar = not isinstance(value, Iterable)
-        if isscalar and dtype is not None:
+        # cannot get fast as no index
+        # see discussion here:
+        # https://stackoverflow.com/questions/78399629/slicing-using-polars-filter-is-slower-than-pandas-loc
+        # Polars doesn't use indexes,
+        # so random access of one specific element (if not by row number)
+        # will always have to loop over all the data.
+        # One answer suggests to maintain
+        # a dict {'file0.wav': 0, "file1.wav": 1} and then use
+        #  df.row(map[date])
+        # This implementation was slow, even using the lazy api
+        #
+        # value = self._df.lazy().filter(pl.col(self.index_col) == file).collect()[column][0]
+        value = self._df.row(self._idx[file], named=True)[column]
+        if dtype is not None:
             value = dtype(value)
-
         return value
 
     def _dataframe_to_table(
@@ -728,25 +764,13 @@ class Dependencies:
         Args:
             file: relative file path
 
-        QUESTION: when several files to remove: why not vectorize?
         """
-        # pandas:
-        # self._df.at[file, "removed"] = 1
 
-        self._df = pl.concat(
-            [
-                self._df.filter(~self._df[self.index_col].is_in([file])),
-                pl.DataFrame(
-                    {
-                        **self._df.filter(self._df[self.index_col].is_in([file]))[
-                            0
-                        ].to_dicts()[0],
-                        **{"removed": 1},
-                    },
-                    schema=self.schema_including_file,
-                ),
-            ],
-            how="vertical_relaxed",
+        self._df.with_columns(
+            pl.when(pl.col("file") == file)
+            .then(1)
+            .otherwise(pl.col("removed"))
+            .alias("removed")
         )
 
     def _table_to_dataframe(self, table: pa.Table) -> pd.DataFrame:
@@ -801,12 +825,30 @@ class Dependencies:
                 where each tuple holds the new values for a media entry
 
         """
-        df = pl.from_records(values, schema=self.schema_including_file)
-        fl_new = df["file"]
-        self._df = pl.concat(
-            [self._df.filter(~self._df[self.index_col].is_in(fl_new)), df],
-            how="vertical_relaxed",
-        )
+        # Slow implementations
+        # df = pl.from_records(values, schema=self.schema_including_file)
+        # fl_new = df["file"]
+        # self._df = pl.concat(
+        #     [self._df.filter(~self._df[self.index_col].is_in(fl_new)), df],
+        #     how="vertical_relaxed",
+        # )
+
+        # newer concat
+        # self._df = pl.concat(
+        #     [self._df, pl.from_records(values, schema=self._df.schema)],
+        #     how="vertical_relaxed",
+        # )
+
+        # predicate replacement example
+        # self._df.with_columns(
+        #     pl.when(pl.col("file") == file)
+        #     .then(1)
+        #     .otherwise(pl.col("removed")).alias("removed")
+        # )
+        # self._df.with_columns(pl.when(pl.col("file").isin(df_to_replace['file'].list).then(df_to_replace).otherwise(self._df))
+        # df_to_replace = pl.from_records(values, schema=self._df.schema)
+        # df = self._df.clone() #cheap deepcopy/clone
+        self._df = self._df.update(pl.from_records(values, schema=self._df.schema, orient="row"))
 
     def _update_media_version(
         self,
