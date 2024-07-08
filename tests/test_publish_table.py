@@ -145,11 +145,11 @@ def assert_db_saved_to_dir(
     for storage_format in storage_formats:
         for table in tables:
             table_file = f"db.{table}.{storage_format}"
-            assert os.path.exists(root, table_file)
+            assert os.path.exists(os.path.join(root, table_file))
     for storage_format in other_storage_formats:
         for table in tables:
             table_file = f"db.{table}.{storage_format}"
-            assert not os.path.exists(root, table_file)
+            assert not os.path.exists(os.path.join(root, table_file))
     for media_file in list(db.files):
         assert os.path.exists(media_file)
 
@@ -323,7 +323,7 @@ class TestPublishTableStorageFormat:
         # Update database
         db = update_db(db)
         db.save(build_dir, storage_format=storage_format)
-        assert_db_saved_to_dir(db, db.root, [storage_format])
+        assert_db_saved_to_dir(db, db.root, [storage_format, "pkl"])
 
     def test_updated_database_publish(
         self,
@@ -401,10 +401,6 @@ class TestPublishTableStorageFormat:
             repository,
             previous_version=previous_version,
         )
-        # Publish database
-        db.save(build_dir, storage_format=storage_format)
-        version = "1.0.0"
-        audb.publish(build_dir, version, repository)
 
         # Load database to cache
         db = audb.load(db.name, version=version, verbose=False, full_path=False)
@@ -444,11 +440,14 @@ def test_publish_table_storage_format_both(db, build_dir, repository):
 
     # Update only CSV table
     db = audb.load_to(build_dir, db.name, version="1.0.0", verbose=False)
-    db = update_db(db)
-    db.save(build_dir, storage_format="csv", update_other_formats=False)
-
-    # Remove PKL file to ensure CSV file is not newer
+    db_new = update_db(db)
     for table in list(db):
+        db_new[table].save(
+            audeer.path(build_dir, f"db.{table}"),
+            storage_format="csv",
+            update_other_formats=False,
+        )
+        # Remove PKL file to ensure CSV file is not newer
         os.remove(audeer.path(build_dir, f"db.{table}.pkl"))
 
     # Check database build_dir looks as expected
@@ -515,8 +514,8 @@ def test_publish_table_parquet_without_hash(db, build_dir, repository):
         repository: repository fixture
 
     """
-    table = list(db)[0]
-    table_file = audeer.path(build_dir, f"db.{table}.parquet")
+    table_id = list(db)[0]
+    table_file = audeer.path(build_dir, f"db.{table_id}.parquet")
 
     # Store parquet table without metadata entry
     db.save(build_dir, storage_format="parquet")
@@ -533,4 +532,4 @@ def test_publish_table_parquet_without_hash(db, build_dir, repository):
     # Publish database
     version = "1.0.0"
     deps = audb.publish(build_dir, version, repository)
-    assert f"db.{table}.parquet" in deps
+    assert f"db.{table_id}.parquet" in deps
