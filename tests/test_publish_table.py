@@ -200,6 +200,24 @@ def expected_table_checksum(path: str) -> str:
         return audeer.md5(path)
 
 
+def publish_db(build_dir, db, repository, version, storage_format):
+    r"""Publish database.
+
+    Args:
+        build_dir: build dir
+        db: database
+        repository: repository to publish database to
+        version: version of database
+        storage_format: storage format of database tables
+
+    Returns:
+        dependency table of published database
+
+    """
+    db.save(build_dir, storage_format=storage_format)
+    return audb.publish(build_dir, version, repository)
+
+
 def update_db(db: audformat.Database) -> audformat.Database:
     r"""Update database by adding a column to all tables.
 
@@ -267,10 +285,8 @@ class TestPublishTableStorageFormat:
             storage_format: database table storage format
 
         """
-        # Publish database
-        db.save(build_dir, storage_format=storage_format)
         version = "1.0.0"
-        deps = audb.publish(build_dir, version, repository)
+        deps = publish_db(build_dir, db, repository, version, storage_format)
 
         assert_db_published_to_repo(db, deps, repository, version, storage_format)
         assert_dependency_table(db, build_dir, deps, storage_format)
@@ -291,12 +307,9 @@ class TestPublishTableStorageFormat:
             storage_format: storage format of database tables
 
         """
-        # Publish database
-        db.save(build_dir, storage_format=storage_format)
         version = "1.0.0"
-        audb.publish(build_dir, version, repository)
+        publish_db(build_dir, db, repository, version, storage_format)
 
-        # Load database to cache
         db = audb.load(db.name, version=version, verbose=False, full_path=False)
         assert_db_saved_to_dir(db, db.root, [storage_format, "pkl"])
 
@@ -311,14 +324,12 @@ class TestPublishTableStorageFormat:
 
         """
         # Publish first version
-        db.save(build_dir, storage_format=storage_format)
-        previous_version = "1.0.0"
-        audb.publish(build_dir, previous_version, repository)
+        version = "1.0.0"
+        publish_db(build_dir, db, repository, version, storage_format)
 
         # Clear build dir to force audb.load_to() to load from backend
         audeer.rmdir(build_dir)
-        # Load previous version of database
-        db = audb.load_to(build_dir, db.name, version=previous_version, verbose=False)
+        db = audb.load_to(build_dir, db.name, version=version, verbose=False)
 
         # Update database
         db = update_db(db)
@@ -346,23 +357,15 @@ class TestPublishTableStorageFormat:
 
         """
         # Publish first version
-        db.save(build_dir, storage_format=storage_format)
         previous_version = "1.0.0"
-        deps = audb.publish(build_dir, previous_version, repository)
+        publish_db(build_dir, db, repository, previous_version, storage_format)
 
         # Update database
         db = update_db(db)
-        db.save(build_dir, storage_format=storage_format)
 
         # Publish second version
-        db.save(build_dir, storage_format=storage_format)
         version = "1.1.0"
-        deps = audb.publish(
-            build_dir,
-            version,
-            repository,
-            previous_version=previous_version,
-        )
+        deps = publish_db(build_dir, db, repository, version, storage_format)
 
         assert_db_published_to_repo(db, deps, repository, version, storage_format)
         assert_dependency_table(db, build_dir, deps, storage_format)
@@ -384,23 +387,15 @@ class TestPublishTableStorageFormat:
 
         """
         # Publish first version
-        db.save(build_dir, storage_format=storage_format)
         previous_version = "1.0.0"
-        audb.publish(build_dir, previous_version, repository)
+        publish_db(build_dir, db, repository, previous_version, storage_format)
 
         # Update database
         db = update_db(db)
-        db.save(build_dir, storage_format=storage_format)
 
         # Publish second version
-        db.save(build_dir, storage_format=storage_format)
         version = "1.1.0"
-        audb.publish(
-            build_dir,
-            version,
-            repository,
-            previous_version=previous_version,
-        )
+        publish_db(build_dir, db, repository, version, storage_format)
 
         # Load database to cache
         db = audb.load(db.name, version=version, verbose=False, full_path=False)
@@ -453,7 +448,7 @@ def test_publish_table_storage_format_both(db, build_dir, repository):
     # Check database build_dir looks as expected
     assert_db_saved_to_dir(db, db.root, ["csv", "parquet"])
 
-    # Publishing updated database
+    # Publishing database from updated build_dir
     version = "1.1.0"
     deps = audb.publish(build_dir, version, repository, previous_version="1.0.0")
 
