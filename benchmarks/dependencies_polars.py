@@ -850,6 +850,7 @@ class Dependencies:
         self._df = self._df.update(
             pl.from_records(values, schema=self._df.schema, orient="row")
         )
+        # no need to update self._idx as this is updating existing media
 
     def _update_media_version(
         self,
@@ -875,6 +876,7 @@ class Dependencies:
             ],
             how="vertical",
         )
+        # no need to update self._idx as only updating
 
 
 def error_message_missing_object(
