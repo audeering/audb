@@ -600,14 +600,14 @@ class Dependencies:
         ]
 
         self._df = self._df.update(
-            pl.from_records([entry], schema=self._df.schema, orient='row'),
+            pl.from_records([entry], schema=self._df.schema, orient="row"),
             how="full",
             left_on=["file"],
             right_on=["file"],
         )
 
         # update index only if a new attachmenbt is coming in
-        if file not  in self._idx:
+        if file not in self._idx:
             self._idx[file] = len(self._idx)
 
     def _add_media(
@@ -635,7 +635,6 @@ class Dependencies:
                 where each tuple holds the values of a new media entry
 
         """
-
 
         self._df = pl.concat(
             [self._df, pl.from_records(values, schema=self._df.schema, orient="row")],
@@ -675,14 +674,14 @@ class Dependencies:
         ]
 
         self._df = self._df.update(
-            pl.from_records([entry], schema=self._df.schema, orient='row'),
+            pl.from_records([entry], schema=self._df.schema, orient="row"),
             how="full",
             left_on=["file"],
             right_on=["file"],
         )
 
         # update index only if a new attachmenbt is coming in
-        if file not  in self._idx:
+        if file not in self._idx:
             self._idx[file] = len(self._idx)
 
     def _column_loc(
@@ -848,7 +847,9 @@ class Dependencies:
         # self._df.with_columns(pl.when(pl.col("file").isin(df_to_replace['file'].list).then(df_to_replace).otherwise(self._df))
         # df_to_replace = pl.from_records(values, schema=self._df.schema)
         # df = self._df.clone() #cheap deepcopy/clone
-        self._df = self._df.update(pl.from_records(values, schema=self._df.schema, orient="row"))
+        self._df = self._df.update(
+            pl.from_records(values, schema=self._df.schema, orient="row")
+        )
 
     def _update_media_version(
         self,
