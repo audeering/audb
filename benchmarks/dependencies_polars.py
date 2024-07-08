@@ -78,7 +78,6 @@ class Dependencies:
         # deps can only be loaded or self._df set
         self._df = pl.DataFrame(data)
         self.index_col = define.DEPEND_INDEX_COLNAME
-        # pl.DataFrame(data)
         # self._df.index = self._df.index.astype(define.DEPEND_INDEX_DTYPE)
 
         # pyarrow schema
@@ -100,30 +99,9 @@ class Dependencies:
         # )
 
         # self._schema = utils.pascheme_to_plscheme(self._schema)
+        # polars the df has a schema, it can be converted to dict
+        # using dict(self._df.schema)
         self._schema = self._df.schema
-
-    def pl2pd(self, dfpl):
-        """Convert table from polars to pandas.
-
-        Typical usage: self.pl2pd(df)
-
-        Args:
-           dfpl: polars data frame
-
-        Retturns: pandas df
-        """
-        return dfpl.to_pandas().set_index(self.index_col)
-
-    def pd2pl(self, dfpd):
-        r"""Convert pandas df to polars df.
-
-        Tpyical usage: df = self.pd2pl(dfpd)
-
-        Args:
-           dfpd: pandas df
-
-        """
-        return pl.from_pandas(dfpd, include_index=True)
 
     @property
     def schema_including_file(self):
