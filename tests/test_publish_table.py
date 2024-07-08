@@ -151,7 +151,7 @@ def assert_db_saved_to_dir(
             table_file = f"db.{table}.{storage_format}"
             assert not os.path.exists(os.path.join(root, table_file))
     for media_file in list(db.files):
-        assert os.path.exists(media_file)
+        assert os.path.exists(os.path.join(root, media_file))
 
 
 def assert_dependency_table(
