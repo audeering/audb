@@ -368,7 +368,7 @@ for dtype in dtypes:
 
 
 # ===== Save results =====
-fp_results = audeer.path(cache, "results_polars.csv")
+fp_results = audeer.path(cache, "results.csv")
 results.to_csv(fp_results)
 
 # ===== Print results =====
