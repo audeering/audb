@@ -62,6 +62,62 @@ def db(build_dir) -> str:
     yield db
 
 
+def assert_files_published_to_repo(
+    db: audformat.Database,
+    deps: audb.Dependencies,
+    repository: audb.Repository,
+    version: str,
+    storage_format: str,
+):
+    r"""Assert files are published to repository.
+
+    Args:
+        db: database object,
+            used to collect all media files and tables
+        deps: dependency table,
+            used to get name of media file archives
+        repository: repository the database was published to
+        version: version of database,
+            see ``db`` fixture for possible values
+        storage_format: table storage format on repository,
+            ``"csv"`` or ``"parquet"``
+
+    """
+    repo = audeer.path(repository.host, repository.name)
+
+    dependency_file = "db.parquet"
+    header_file = "db.yaml"
+    files = list(db.files)
+    tables = list(db)
+    archives = [f"{deps.archive(file)}.zip" for file in files]
+    if storage_format == "csv":
+        ext = "zip"
+    elif storage_format == "parquet":
+        ext = "parquet"
+    meta_files = [f"{table}.{ext}" for table in tables]
+
+    expected_paths = [
+        audeer.path(repo, db.name, "1.0.0", dependency_file),
+        audeer.path(repo, db.name, "1.0.0", header_file),
+    ]
+    if version == "1.1.0":
+        expected_paths += [
+            audeer.path(repo, db.name, "1.1.0", dependency_file),
+            audeer.path(repo, db.name, "1.1.0", header_file),
+        ]
+    for archive in archives:
+        expected_paths.append(audeer.path(repo, db.name, "media", "1.0.0", archive))
+    for meta_file in meta_files:
+        expected_paths.append(audeer.path(repo, db.name, "meta", "1.0.0", meta_file))
+    if version == "1.1.0":
+        for meta_file in meta_files:
+            expected_paths.append(
+                audeer.path(repo, db.name, "meta", "1.1.0", meta_file)
+            )
+
+    assert audeer.list_file_names(repo, recursive=True) == expected_paths
+
+
 def expected_table_checksum(path: str) -> str:
     r"""Expected checksum of table file.
 
@@ -194,23 +250,7 @@ def TestPublishTableStorageFormat():
         deps = audb.publish(build_dir, version, repository)
 
         # Check files are published to repository
-        repo = audeer.path(repository.host, repository.name)
-        file = self.media_file(db)
-        table = list(db)[0]
-        dependency_file = "db.parquet"
-        header_file = "db.yaml"
-        media_file = f"{deps.archive(file)}.zip"
-        if storage_format == "csv":
-            meta_file = f"{table}.zip"
-        elif storage_format == "parquet":
-            meta_file = f"{table}.parquet"
-        expected_paths = [
-            audeer.path(repo, db.name, version, dependency_file),
-            audeer.path(repo, db.name, version, header_file),
-            audeer.path(repo, db.name, "media", version, media_file),
-            audeer.path(repo, db.name, "meta", version, meta_file),
-        ]
-        assert audeer.list_file_names(repo, recursive=True) == expected_paths
+        assert_files_published_to_repo(db, deps, repository, version, storage_format)
 
         # Check entries of dependency table
         table_file = self.table_file(db, storage_format)
@@ -325,26 +365,7 @@ def TestPublishTableStorageFormat():
         )
 
         # Check files are published to repository
-        repo = audeer.path(repository.host, repository.name)
-        file = self.media_file(db)
-        table = list(db)[0]
-        dependency_file = "db.parquet"
-        header_file = "db.yaml"
-        media_file = f"{deps.archive(file)}.zip"
-        if storage_format == "csv":
-            meta_file = f"{table}.zip"
-        elif storage_format == "parquet":
-            meta_file = f"{table}.parquet"
-        expected_paths = [
-            audeer.path(repo, db.name, "1.0.0", dependency_file),
-            audeer.path(repo, db.name, "1.0.0", header_file),
-            audeer.path(repo, db.name, "1.1.0", dependency_file),
-            audeer.path(repo, db.name, "1.1.0", header_file),
-            audeer.path(repo, db.name, "media", "1.0.0", media_file),
-            audeer.path(repo, db.name, "meta", "1.0.0", meta_file),
-            audeer.path(repo, db.name, "meta", "1.1.0", meta_file),
-        ]
-        assert audeer.list_file_names(repo, recursive=True) == expected_paths
+        assert_files_published_to_repo(db, deps, repository, version, storage_format)
 
         # Check entries of dependency table
         table_file = self.table_file(db, storage_format)
@@ -445,18 +466,7 @@ def test_publish_table_storage_format_both(db, build_dir, repository):
     deps = audb.publish(build_dir, version, repository)
 
     # Check files are published to repository
-    repo = audeer.path(repository.host, repository.name)
-    dependency_file = "db.parquet"
-    header_file = "db.yaml"
-    media_file = f"{deps.archive(file)}.zip"
-    meta_file = f"{table}.parquet"
-    expected_paths = [
-        audeer.path(repo, db.name, version, dependency_file),
-        audeer.path(repo, db.name, version, header_file),
-        audeer.path(repo, db.name, "media", version, media_file),
-        audeer.path(repo, db.name, "meta", version, meta_file),
-    ]
-    assert audeer.list_file_names(repo, recursive=True) == expected_paths
+    assert_files_published_to_repo(db, deps, repository, version, "parquet")
 
     # Update only CSV table
     db = audb.load_to(build_dir, db.name, version="1.0.0", verbose=False)
@@ -533,18 +543,7 @@ def test_publish_table_storage_format_pkl(db, build_dir, repository):
     assert f"db.{table}.parquet" in deps
 
     # Check files are published to repository
-    repo = audeer.path(repository.host, repository.name)
-    dependency_file = "db.parquet"
-    header_file = "db.yaml"
-    media_file = f"{deps.archive(file)}.zip"
-    meta_file = f"{table}.parquet"
-    expected_paths = [
-        audeer.path(repo, db.name, version, dependency_file),
-        audeer.path(repo, db.name, version, header_file),
-        audeer.path(repo, db.name, "media", version, media_file),
-        audeer.path(repo, db.name, "meta", version, meta_file),
-    ]
-    assert audeer.list_file_names(repo, recursive=True) == expected_paths
+    assert_files_published_to_repo(db, deps, repository, version, "parquet")
 
 
 def test_publish_table_parquet_without_hash(db, build_dir, repository):
