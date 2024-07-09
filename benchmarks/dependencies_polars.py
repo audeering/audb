@@ -102,27 +102,6 @@ class Dependencies:
         # using dict(self._df.schema)
         self._schema = self._df.schema
 
-    @property
-    def schema_including_file(self):
-        r"""Create polars scheme including file at the beginning.
-
-        Polars representas scheme as an ordered dict.
-
-        pandas uses a file index.
-
-        Sometimes we want a schema for polars that has file in there
-        Implementation is not very optimised as the ordered dict is
-        simply copied.
-
-        However the amount of data is tiny.
-        """
-        import copy
-
-        schema = copy.deepcopy(self._schema)
-        schema.update({"file": pl.String})
-        schema.move_to_end("file", last=False)
-        return schema
-
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
 
@@ -781,14 +760,8 @@ class Dependencies:
                 where each tuple holds the new values for a media entry
 
         """
-        # Slow implementations
-        # df = pl.from_records(values, schema=self.schema_including_file)
-        # fl_new = df["file"]
-        # self._df = pl.concat(
-        #     [self._df.filter(~self._df[self.index_col].is_in(fl_new)), df],
-        #     how="vertical_relaxed",
-        # )
-
+        # Slow implementations:
+        #
         # newer concat
         # self._df = pl.concat(
         #     [self._df, pl.from_records(values, schema=self._df.schema)],
