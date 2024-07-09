@@ -46,11 +46,9 @@ data_cache = audeer.path(cache, f"df.pkl")
 deps = audb.Dependencies()
 deps.load(data_cache)
 
-# save cache in other formatst
+# save cache in parquet format as the polars load method depends on it
 parquet_cache = audeer.path(cache, f"df.parquet")
 deps.save(parquet_cache)
-csv_cache = audeer.path(cache, f"df.csv")
-deps.save(csv_cache)
 
 file = "file-10.wav"
 n_files = 10000
