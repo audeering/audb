@@ -16,6 +16,11 @@ import audeer
 from audb.core import define
 
 
+pl.Config.set_tbl_hide_dataframe_shape(True)
+pl.Config.set_tbl_formatting("NOTHING")
+pl.Config.set_tbl_hide_column_data_types(True)
+
+
 class Dependencies:
     r"""Dependencies of a database.
 
@@ -177,13 +182,8 @@ class Dependencies:
         return len(self._idx)
 
     def __str__(self) -> str:  # noqa: D105
-        # return str(self._df)
         n = 15  # number of lines identical to pandas
-        pl.Config.set_tbl_hide_dataframe_shape(True)
-        pl.Config.set_tbl_formatting("NOTHING")
-        pl.Config.set_tbl_hide_column_data_types(True)
         str_repr = str(self._df.head(n))
-        pl.Config.restore_defaults()
         return str_repr
 
     @property
@@ -205,7 +205,7 @@ class Dependencies:
         Sorting?
 
         Result:
-        ['archive-0', 'archive-1', 'archive-2', 'archive-3', 'archive-4', 'archive-5', 'archive-6', 'archive-7', 'archive-8', 'archive-9']
+        ['archive-0', 'archive-1', 'archive-2', 'archive-3', ...]
         """
         # 0.014
         # return (
@@ -228,8 +228,10 @@ class Dependencies:
         # 0.014
         return pl.Series(self._df.select(pl.col("archive"))).unique().sort().to_list()
 
-        # 0.413
-        # return sorted(pl.Series(self._df.select(pl.col("archive"))).unique().to_list())
+        # 0.413 - very slow to use list sorting
+        # return sorted(
+        #     pl.Series(self._df.select(pl.col("archive"))).unique().to_list()
+        # )
 
     @property
     def attachments(self) -> typing.List[str]:
@@ -669,8 +671,9 @@ class Dependencies:
         # a dict {'file0.wav': 0, "file1.wav": 1} and then use
         #  df.row(map[date])
         # This implementation was slow, even using the lazy api
-        #
-        # value = self._df.lazy().filter(pl.col(self.index_col) == file).collect()[column][0]
+        # idxcol = self.index_col
+        # value = self._df.lazy().filter(pl.col(idxcol) == file).collect()[column][0]
+
         value = self._df.row(self._idx[file], named=True)[column]
         if dtype is not None:
             value = dtype(value)
@@ -810,9 +813,7 @@ class Dependencies:
         #     .then(1)
         #     .otherwise(pl.col("removed")).alias("removed")
         # )
-        # self._df.with_columns(pl.when(pl.col("file").isin(df_to_replace['file'].list).then(df_to_replace).otherwise(self._df))
-        # df_to_replace = pl.from_records(values, schema=self._df.schema)
-        # df = self._df.clone() #cheap deepcopy/clone
+
         self._df = self._df.update(
             pl.from_records(values, schema=self._df.schema, orient="row")
         )
