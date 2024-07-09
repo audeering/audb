@@ -640,7 +640,6 @@ class Dependencies:
         dtype: typing.Callable = None,
     ) -> typing.Any:
         r"""Column content for selected files and column."""
-
         value = self._df.row(self._idx[file], named=True)[column]
         if dtype is not None:
             value = dtype(value)
