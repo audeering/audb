@@ -1,12 +1,7 @@
-import hashlib
-import os
-import pickle
 import random
-import string
 import time
 
 import pandas as pd
-import polars as pl
 import tabulate
 import utils
 
@@ -42,12 +37,12 @@ def set_dependency_module():
 
 
 # === Dependencies load via pickle before monkey_patching ===
-data_cache = audeer.path(cache, f"df.pkl")
+data_cache = audeer.path(cache, "df.pkl")
 deps = audb.Dependencies()
 deps.load(data_cache)
 
 # save cache in parquet format as the polars load method depends on it
-parquet_cache = audeer.path(cache, f"df.parquet")
+parquet_cache = audeer.path(cache, "df.parquet")
 deps.save(parquet_cache)
 
 file = "file-10.wav"
