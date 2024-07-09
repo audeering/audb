@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 import errno
 import os
 import re
@@ -15,11 +14,6 @@ import audbackend
 import audeer
 
 from audb.core import define
-
-
-pl.Config.set_tbl_hide_dataframe_shape(True)
-pl.Config.set_tbl_formatting("NOTHING")
-pl.Config.set_tbl_hide_column_data_types(True)
 
 
 class Dependencies:
@@ -175,8 +169,6 @@ class Dependencies:
         # item = np.array(self._df.filter(pl.col(self.index_col) == file)).tolist()[0]
         # pandas:
         # self._df.loc[file].tolist()
-        # ['archive-0', 16, 1, 'f0fa37deab5a6aedc8347c781f5c5f80', 0.6310682188770933, 'wav', 1, 16000, 1, '1.1.0']
-        # ['file-0.wav', 'archive-0', 16, 1, 'f0fa37deab5a6aedc8347c781f5c5f80', 0.6310682188770933, 'wav', 1, 16000, 1, '1.1.0']
         item = list(self._df.row(self._idx[file]))[1:]
         return item
 
@@ -186,13 +178,13 @@ class Dependencies:
 
     def __str__(self) -> str:  # noqa: D105
         # return str(self._df)
-        N = 15
-        # pl.Config.set_tbl_hide_dataframe_shape(True)
-        # pl.Config.set_tbl_formatting('NOTHING')
-        # pl.Config.set_tbl_hide_column_data_types(True)
-        mystr = str(self._df.head(N))
-        # pl.Config.restore_defaults()
-        return mystr
+        n = 15  # number of lines identical to pandas
+        pl.Config.set_tbl_hide_dataframe_shape(True)
+        pl.Config.set_tbl_formatting("NOTHING")
+        pl.Config.set_tbl_hide_column_data_types(True)
+        str_repr = str(self._df.head(n))
+        pl.Config.restore_defaults()
+        return str_repr
 
     @property
     def archives(self) -> typing.List[str]:
@@ -215,7 +207,6 @@ class Dependencies:
         Result:
         ['archive-0', 'archive-1', 'archive-2', 'archive-3', 'archive-4', 'archive-5', 'archive-6', 'archive-7', 'archive-8', 'archive-9']
         """
-
         # 0.014
         # return (
         #     self._df["archive"]
@@ -613,7 +604,6 @@ class Dependencies:
                 where each tuple holds the values of a new media entry
 
         """
-
         self._df = pl.concat(
             [self._df, pl.from_records(values, schema=self._df.schema, orient="row")],
             how="vertical_relaxed",
@@ -669,7 +659,6 @@ class Dependencies:
         dtype: typing.Callable = None,
     ) -> typing.Any:
         r"""Column content for selected files and column."""
-
         # cannot get fast as no index
         # see discussion here:
         # https://stackoverflow.com/questions/78399629/slicing-using-polars-filter-is-slower-than-pandas-loc
@@ -742,7 +731,6 @@ class Dependencies:
             file: relative file path
 
         """
-
         self._df.with_columns(
             pl.when(pl.col("file") == file)
             .then(1)
