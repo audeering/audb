@@ -661,18 +661,6 @@ class Dependencies:
         dtype: typing.Callable = None,
     ) -> typing.Any:
         r"""Column content for selected files and column."""
-        # cannot get fast as no index
-        # see discussion here:
-        # https://stackoverflow.com/questions/78399629/slicing-using-polars-filter-is-slower-than-pandas-loc
-        # Polars doesn't use indexes,
-        # so random access of one specific element (if not by row number)
-        # will always have to loop over all the data.
-        # One answer suggests to maintain
-        # a dict {'file0.wav': 0, "file1.wav": 1} and then use
-        #  df.row(map[date])
-        # This implementation was slow, even using the lazy api
-        # idxcol = self.index_col
-        # value = self._df.lazy().filter(pl.col(idxcol) == file).collect()[column][0]
 
         value = self._df.row(self._idx[file], named=True)[column]
         if dtype is not None:
