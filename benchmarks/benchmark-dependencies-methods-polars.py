@@ -24,7 +24,7 @@ dtypes: list = [
 
 
 def set_dependency_module():
-    # audb.core.define.DEPEND_INDEX_DTYPE
+    r"""Monkeypatch dependency modult to use polars module."""
     audb.core.define.DEPEND_INDEX_COLNAME = utils.DEPEND_INDEX_COLNAME
     audb.core.define.DEPEND_FIELD_DTYPES_PANDAS = audb.core.define.DEPEND_FIELD_DTYPES
     audb.core.define.DEPEND_FIELD_DTYPES = utils.DEPEND_FIELD_DTYPES
