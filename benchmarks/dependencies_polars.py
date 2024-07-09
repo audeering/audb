@@ -108,13 +108,13 @@ class Dependencies:
 
         Polars representas scheme as an ordered dict.
 
-        pandas uses a file indes.
+        pandas uses a file index.
 
         Sometimes we want a schema for polars that has file in there
         Implementation is not very optimised as the ordered dict is
         simply copied.
 
-        Howver the amount of data is tiny.
+        However the amount of data is tiny.
         """
         import copy
 
