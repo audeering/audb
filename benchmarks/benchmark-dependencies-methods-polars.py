@@ -50,7 +50,7 @@ n_files = 10000
 results = pd.DataFrame(columns=["polars"])
 results.index.name = "method"
 set_dependency_module()
-dtype = 'polars'
+dtype = "polars"
 
 for dtype in dtypes:
     # load them
@@ -72,7 +72,6 @@ for dtype in dtypes:
     # Access the index one time.
     # Further calls will be faster
     file in deps
-
 
     method = f"Dependencies.__contains__({n_files} files)"
     t0 = time.time()
@@ -205,8 +204,6 @@ for dtype in dtypes:
     [deps.version(file) for file in _files]
     t = time.time() - t0
     results.at[method, dtype] = t
-
-
 
     # -------------------------------------------------------------------------
 
