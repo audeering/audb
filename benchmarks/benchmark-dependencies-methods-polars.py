@@ -52,12 +52,6 @@ deps.save(parquet_cache)
 csv_cache = audeer.path(cache, f"df.csv")
 deps.save(csv_cache)
 
-# def astype(df, dtype):
-#     if dtype == "polars":
-#         breakpoint()
-#         dfp = pl.from_pandas(df)
-
-
 file = "file-10.wav"
 n_files = 10000
 results = pd.DataFrame(columns=["polars"])
