@@ -1330,7 +1330,7 @@ def test_update_database_without_media(tmpdir, persistent_repository):
     # and call again load_to()
     # to revert them
 
-    os.remove(audeer.path(build_root, "db.emotion.csv"))
+    os.remove(audeer.path(build_root, "db.emotion.parquet"))
     db = audb.load_to(
         build_root,
         DB_NAME,
@@ -1339,7 +1339,7 @@ def test_update_database_without_media(tmpdir, persistent_repository):
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
     )
-    assert os.path.exists(audeer.path(build_root, "db.emotion.csv"))
+    assert os.path.exists(audeer.path(build_root, "db.emotion.parquet"))
 
     # update and save database
 

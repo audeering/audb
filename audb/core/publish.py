@@ -11,6 +11,7 @@ import audformat
 import audiofile
 
 from audb.core import define
+from audb.core import utils
 from audb.core.api import dependencies
 from audb.core.dependencies import Dependencies
 from audb.core.dependencies import upload_dependencies
@@ -145,7 +146,7 @@ def _find_attachments(
                 # which raises a FileNotFoundError in this case
                 db.attachments[attachment_id].files
         else:
-            checksum = audeer.md5(audeer.path(db_root, path))
+            checksum = utils.md5(audeer.path(db_root, path))
             if path not in deps or checksum != deps.checksum(path):
                 deps._add_attachment(
                     file=path,
@@ -259,21 +260,30 @@ def _find_tables(
     verbose: bool,
 ) -> typing.List[str]:
     r"""Find altered, new or removed tables and update 'deps'."""
+    table_ids = list(db)
+    # PARQUET is default table,
+    # CSV file is ignored
+    # if it exists as well
+    table_files = [
+        f"db.{table}.parquet"
+        if os.path.exists(os.path.join(db_root, f"db.{table}.parquet"))
+        else f"db.{table}.csv"
+        for table in table_ids
+    ]
+
     # release dependencies to removed tables
+    deps._drop(set(deps.tables) - set(table_files))
 
-    db_tables = [f"db.{table}.csv" for table in list(db)]
-    deps._drop(set(deps.tables) - set(db_tables))
-
+    # new database tables
     tables = []
-    for table in audeer.progress_bar(
-        list(db),
+    for table, file in audeer.progress_bar(
+        zip(table_ids, table_files),
         desc="Find tables",
         disable=not verbose,
     ):
-        file = f"db.{table}.csv"
-        checksum = audeer.md5(os.path.join(db_root, file))
+        checksum = utils.md5(os.path.join(db_root, file))
         if file not in deps or checksum != deps.checksum(file):
-            deps._add_meta(file, version, table, checksum)
+            deps._add_meta(file, version, checksum)
             tables.append(table)
 
     return tables
@@ -490,14 +500,24 @@ def _put_tables(
     verbose: bool,
 ):
     def job(table: str):
-        file = f"db.{table}.csv"
-        archive_file = backend_interface.join(
-            "/",
-            db_name,
-            define.DEPEND_TYPE_NAMES[define.DependType.META],
-            table + ".zip",
-        )
-        backend_interface.put_archive(db_root, archive_file, version, files=file)
+        if os.path.exists(os.path.join(db_root, f"db.{table}.parquet")):
+            file = os.path.join(db_root, f"db.{table}.parquet")
+            remote_file = backend_interface.join(
+                "/",
+                db_name,
+                define.DEPEND_TYPE_NAMES[define.DependType.META],
+                table + ".parquet",
+            )
+            backend_interface.put_file(file, remote_file, version)
+        else:
+            file = f"db.{table}.csv"
+            archive_file = backend_interface.join(
+                "/",
+                db_name,
+                define.DEPEND_TYPE_NAMES[define.DependType.META],
+                table + ".zip",
+            )
+            backend_interface.put_archive(db_root, archive_file, version, files=file)
 
     audeer.run_tasks(
         job,
@@ -567,6 +587,30 @@ def publish(
     but you might need overwrite permissions
     in addition to write permissions
     on the backend.
+
+    :mod:`audb` uses md5 hashes of the database files
+    to check if they have changed.
+    Be aware that for certain file formats,
+    like parquet,
+    md5 hashes might differ
+    for files with identical content.
+    Reasons include the library that wrote the file,
+    involved compression codes,
+    or additional metadata written by the library.
+    For files stored in parquet format,
+    :func:`audb.publish` will first look for a hash
+    stored in its metadata
+    under the ``b"hash"`` key.
+    For parquet tables,
+    this deterministic hash
+    is automatically added by :mod:`audformat`.
+
+    Tables stored only as pickle files,
+    are converted to parquet files
+    before publication.
+    If a table is stored as a parquet and csv file,
+    the csv file is ignored,
+    and the parquet file is published.
 
     .. _audformat: https://audeering.github.io/audformat/data-introduction.html
 
@@ -759,13 +803,16 @@ def publish(
     db_root_files = _get_root_files(db_root)
     _check_for_missing_media(db, db_root, db_root_files, deps)
 
-    # make sure all tables are stored in CSV format
+    # Make sure all tables are stored in CSV or PARQUET format.
+    # If only a PKL is found,
+    # the table is stored as PARQUET instead
     for table_id in list(db):
         table = db[table_id]
         table_path = os.path.join(db_root, f"db.{table_id}")
-        table_ext = audformat.define.TableStorageFormat.CSV
-        if not os.path.exists(table_path + f".{table_ext}"):
-            table.save(table_path, storage_format=table_ext)
+        if not os.path.exists(f"{table_path}.csv") and not os.path.exists(
+            f"{table_path}.parquet"
+        ):
+            table.save(table_path, storage_format="parquet")
 
     # check archives
     archives = archives or {}

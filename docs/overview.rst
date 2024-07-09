@@ -71,7 +71,7 @@ with :func:`audb.publish`
 the following operations are performed:
 
 1. calculate :ref:`database dependencies <database-dependencies>`
-2. pack the files into ZIP archives
+2. pack media and csv files into ZIP archives
 3. upload all files to the backend
 
 .. graphviz:: pics/publish.dot
@@ -87,8 +87,8 @@ the following operations are performed:
 1. find the backends where the database is stored
 2. find the latest version of a database (optional)
 3. calculate :ref:`database dependencies <database-dependencies>`
-4. download archive files from the selected backend
-5. unpack the archive files
+4. download (archive) files from the selected backend
+5. unpack the archive files (optional)
 6. inspect and :ref:`convert <media-conversion-and-flavors>`
    the audio files (optional)
 7. store the data in a :ref:`cache <caching>` folder

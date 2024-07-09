@@ -83,14 +83,25 @@ def _find_tables(
     as those have been deleted
     in a previous step.
 
+    Args:
+        db_header: database header
+        db_root: database root folder
+        deps: database dependencies
+        num_workers: number of workers
+        verbose: if ``True``, show progress bar
+
+    Returns:
+        list of table IDs in ``db_header``,
+        not stored in ``db_root``
+
     """
     tables = []
 
     def job(table: str):
-        file = f"db.{table}.csv"
-        full_file = os.path.join(db_root, file)
-        if not os.path.exists(full_file):
-            tables.append(file)
+        if not os.path.exists(
+            os.path.join(db_root, f"db.{table}.csv")
+        ) and not os.path.exists(os.path.join(db_root, f"db.{table}.parquet")):
+            tables.append(table)
 
     audeer.run_tasks(
         job,
@@ -211,33 +222,66 @@ def _get_tables(
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
+    r"""Load table files from backend.
+
+    Args:
+        tables: table IDs
+        db_root: database root folder
+        db_root_tmp: database root temp folder
+        db_name: database name
+        deps: database dependencies
+        backend_interface: backend interface
+        num_workers: number of workers
+        verbose: if ``True``, show progress bar
+
+    """
+
     def job(table: str):
+        pkl_file = f"db.{table}.pkl"
+        csv_file = f"db.{table}.csv"
+        parquet_file = f"db.{table}.parquet"
+
         # If a pickled version of the table exists,
         # we have to remove it to make sure that
         # later on the new CSV tables are loaded.
         # This can happen if we upgrade an existing
         # database to a different version.
-        path_pkl = (
-            os.path.join(db_root, table)[:-3]
-            + audformat.define.TableStorageFormat.PICKLE
-        )
-        if os.path.exists(path_pkl):
-            os.remove(path_pkl)
-        archive = backend_interface.join(
-            "/",
-            db_name,
-            define.DEPEND_TYPE_NAMES[define.DependType.META],
-            deps.archive(table) + ".zip",
-        )
-        backend_interface.get_archive(
-            archive,
-            db_root_tmp,
-            deps.version(table),
-            tmp_root=db_root_tmp,
-        )
+        if os.path.exists(os.path.join(db_root, pkl_file)):
+            os.remove(os.path.join(db_root, pkl_file))
+
+        # Table file in CSV format is stored in ZIP archive on backend,
+        # table file in PARQUET format is stored as PARQUET file on backend.
+        if csv_file in deps.tables:
+            table_file = csv_file
+            remote_file = backend_interface.join(
+                "/",
+                db_name,
+                define.DEPEND_TYPE_NAMES[define.DependType.META],
+                f"{table}.zip",
+            )
+            backend_interface.get_archive(
+                remote_file,
+                db_root_tmp,
+                deps.version(table_file),
+                tmp_root=db_root_tmp,
+            )
+        else:
+            table_file = parquet_file
+            remote_file = backend_interface.join(
+                "/",
+                db_name,
+                define.DEPEND_TYPE_NAMES[define.DependType.META],
+                f"{table}.parquet",
+            )
+            backend_interface.get_file(
+                remote_file,
+                os.path.join(db_root_tmp, table_file),
+                deps.version(table_file),
+            )
+
         audeer.move_file(
-            os.path.join(db_root_tmp, table),
-            os.path.join(db_root, table),
+            os.path.join(db_root_tmp, table_file),
+            os.path.join(db_root, table_file),
         )
 
     audeer.run_tasks(
@@ -323,7 +367,7 @@ def load_to(
         for file in files:
             full_file = os.path.join(db_root, file)
             if os.path.exists(full_file):
-                checksum = audeer.md5(full_file)
+                checksum = utils.md5(full_file)
                 if checksum != deps.checksum(file):
                     if os.path.isdir(full_file):
                         audeer.rmdir(full_file)

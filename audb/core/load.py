@@ -78,7 +78,24 @@ def _cached_files(
     flavor: typing.Optional[Flavor],
     verbose: bool,
 ) -> (typing.Sequence[typing.Union[str, str]], typing.Sequence[str]):
-    r"""Find cached files."""
+    r"""Find cached files.
+
+    Args:
+        files: media, attachment files, or table IDs
+        deps: database dependencies
+        cached_versions: information on cached versions of the database
+        flavor: requested database flavor
+        verbose: if ``True``, show progress bar
+
+    Returns:
+        ``([(<db_cache_root1>, <cached_file1>), ...)], [<missing_file1>, ...])``,
+        where ``<db_cache_root1>`` is the absolute path
+        to the database root,
+        in which ``<cached_file1>`` is stored.
+        ``<cached_file1>`` and ``<missing_file1>``
+        represent the names of media, attachment files, or table IDs
+
+    """
     cached_files = []
     missing_files = []
 
@@ -88,12 +105,18 @@ def _cached_files(
         disable=not verbose,
     ):
         found = False
-        file_version = audeer.StrictVersion(deps.version(file))
+        if f"db.{file}.csv" in deps.tables:
+            file_path = f"db.{file}.csv"
+        elif f"db.{file}.parquet" in deps.tables:
+            file_path = f"db.{file}.parquet"
+        else:
+            file_path = file
+        file_version = audeer.StrictVersion(deps.version(file_path))
         for cache_version, cache_root, cache_deps in cached_versions:
             if cache_version >= file_version:
-                if file in cache_deps:
-                    if deps.checksum(file) == cache_deps.checksum(file):
-                        path = os.path.join(cache_root, file)
+                if file_path in cache_deps:
+                    if deps.checksum(file_path) == cache_deps.checksum(file_path):
+                        path = os.path.join(cache_root, file_path)
                         if flavor and flavor.format is not None:
                             path = audeer.replace_file_extension(
                                 path,
@@ -320,16 +343,15 @@ def _get_files_from_cache(
             )
             db_root_tmp = database_tmp_root(db_root)
 
-            # Tables are also cached as PKL files
+            # Tables are stored as CSV or PARQUET files,
+            # and are also cached as PKL files
             if files_type == "table":
 
                 def job(cache_root: str, file: str):
-                    file_pkl = audeer.replace_file_extension(
-                        file,
-                        audformat.define.TableStorageFormat.PICKLE,
-                    )
-                    _copy_path(file, cache_root, db_root_tmp, db_root)
-                    _copy_path(file_pkl, cache_root, db_root_tmp, db_root)
+                    for ext in ["csv", "parquet", "pkl"]:
+                        table_file = f"db.{file}.{ext}"
+                        if os.path.exists(os.path.join(cache_root, table_file)):
+                            _copy_path(table_file, cache_root, db_root_tmp, db_root)
 
             else:
 
@@ -508,34 +530,63 @@ def _get_tables_from_backend(
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
-    r"""Load tables from backend."""
+    r"""Load tables from backend.
+
+    Args:
+        db: database
+        tables: table IDs to load from backend
+        db_root: database root
+        deps: database dependencies
+        backend_interface: backend interface
+        num_workers: number of workers
+        verbose: if ``True``, show progress bar
+
+    """
     db_root_tmp = database_tmp_root(db_root)
 
     def job(table: str):
-        archive = backend_interface.join(
-            "/",
-            db.name,
-            define.DEPEND_TYPE_NAMES[define.DependType.META],
-            deps.archive(table) + ".zip",
-        )
-        backend_interface.get_archive(
-            archive,
-            db_root_tmp,
-            deps.version(table),
-            tmp_root=db_root_tmp,
-        )
-        table_id = table[3:-4]
-        table_path = os.path.join(db_root_tmp, f"db.{table_id}")
-        db[table_id].load(table_path)
-        db[table_id].save(
+        csv_file = f"db.{table}.csv"
+        parquet_file = f"db.{table}.parquet"
+
+        if csv_file in deps.tables:
+            table_file = csv_file
+            remote_file = backend_interface.join(
+                "/",
+                db.name,
+                define.DEPEND_TYPE_NAMES[define.DependType.META],
+                f"{table}.zip",
+            )
+            backend_interface.get_archive(
+                remote_file,
+                db_root_tmp,
+                deps.version(table_file),
+                tmp_root=db_root_tmp,
+            )
+        else:
+            table_file = parquet_file
+            remote_file = backend_interface.join(
+                "/",
+                db.name,
+                define.DEPEND_TYPE_NAMES[define.DependType.META],
+                f"{table}.parquet",
+            )
+            backend_interface.get_file(
+                remote_file,
+                os.path.join(db_root_tmp, table_file),
+                deps.version(table_file),
+            )
+
+        # Cache table as PKL file
+        pickle_file = f"db.{table}.pkl"
+        table_path = os.path.join(db_root_tmp, f"db.{table}")
+        db[table].load(table_path)
+        db[table].save(
             table_path,
             storage_format=audformat.define.TableStorageFormat.PICKLE,
         )
-        for storage_format in [
-            audformat.define.TableStorageFormat.PICKLE,
-            audformat.define.TableStorageFormat.CSV,
-        ]:
-            file = f"db.{table_id}.{storage_format}"
+
+        # Move tables from tmp folder to database root
+        for file in [pickle_file, table_file]:
             audeer.move_file(
                 os.path.join(db_root_tmp, file),
                 os.path.join(db_root, file),
@@ -772,22 +823,24 @@ def _missing_files(
         verbose: if ``True`` show progress bar
 
     Returns:
-        list of missing files
+        list of missing files or table IDs
 
     """
     missing_files = []
-
-    if files_type == "table":
-        files = [f"db.{file}.csv" for file in files]
 
     for file in audeer.progress_bar(
         files,
         desc=f"Missing {files_type}",
         disable=not verbose,
     ):
-        path = os.path.join(db_root, file)
-        if not os.path.exists(path):
-            missing_files.append(file)
+        if files_type == "table":
+            if not os.path.exists(
+                os.path.join(db_root, f"db.{file}.csv")
+            ) and not os.path.exists(os.path.join(db_root, f"db.{file}.parquet")):
+                missing_files.append(file)
+        else:
+            if not os.path.exists(os.path.join(db_root, file)):
+                missing_files.append(file)
 
     return missing_files
 

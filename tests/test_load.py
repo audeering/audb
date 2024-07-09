@@ -33,11 +33,16 @@ def assert_database_tmp_folder_is_deleted():
     assert len([d for d in dirs if d.endswith("~")]) == 0
 
 
+@pytest.fixture(scope="module", autouse=False)
+def storage_format():
+    yield "csv"
+
+
 @pytest.fixture(
     scope="module",
     autouse=True,
 )
-def dbs(tmpdir_factory, persistent_repository):
+def dbs(tmpdir_factory, persistent_repository, storage_format):
     r"""Publish different versions of the same database.
 
     Returns:
@@ -96,7 +101,7 @@ def dbs(tmpdir_factory, persistent_repository):
     audeer.touch(db_root, "extra/folder/file1.txt")
     audeer.touch(db_root, "extra/folder/file2.txt")
     audeer.touch(db_root, "extra/folder/sub-folder/file3.txt")
-    db.save(db_root)
+    db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
     archives = db["files"]["speaker"].get().dropna().to_dict()
     audb.publish(
@@ -126,7 +131,7 @@ def dbs(tmpdir_factory, persistent_repository):
     )
     os.remove(audeer.path(db_root, "extra/folder/file2.txt"))
 
-    db.save(db_root)
+    db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
     shutil.copy(
         audeer.path(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
@@ -153,7 +158,7 @@ def dbs(tmpdir_factory, persistent_repository):
         audeer.path(db_root, "extra"),
     )
 
-    db.save(db_root)
+    db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
     shutil.copy(
         audeer.path(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
@@ -180,7 +185,7 @@ def dbs(tmpdir_factory, persistent_repository):
     del db.attachments["file"]
     os.remove(audeer.path(db_root, "extra/file.txt"))
 
-    db.save(db_root)
+    db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
     file = os.path.join(db_root, db.files[0])
     y, sr = audiofile.read(file)
@@ -189,7 +194,7 @@ def dbs(tmpdir_factory, persistent_repository):
     file = db.files[-1]
     db.pick_files(lambda x: x != file)
     os.remove(audeer.path(db_root, file))
-    db.save(db_root)
+    db.save(db_root, storage_format=storage_format)
 
     shutil.copy(
         os.path.join(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
@@ -217,7 +222,7 @@ def dbs(tmpdir_factory, persistent_repository):
         fp.write("text")
 
     db.drop_tables("train")
-    db.save(db_root)
+    db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
     shutil.copy(
         os.path.join(previous_db_root, audb.core.define.DEPENDENCIES_FILE),
@@ -329,7 +334,7 @@ def test_load(dbs, format, version, only_metadata):
         else:
             assert os.path.exists(os.path.join(db_root, file))
 
-    # Assert tables are identical and exist as CSV files
+    # Assert tables are identical and table files exist
     for table in db:
         assert os.path.exists(os.path.join(db_root, f"db.{table}.csv"))
         pd.testing.assert_frame_equal(
@@ -381,7 +386,7 @@ def test_load(dbs, format, version, only_metadata):
         else:
             assert os.path.exists(file)
 
-    # Assert table CSV files exist
+    # Assert table files exist
     for table in db:
         assert os.path.exists(os.path.join(db_root, f"db.{table}.csv"))
 
@@ -686,7 +691,7 @@ def test_load_to(tmpdir, dbs, version, only_metadata):
         else:
             assert os.path.exists(os.path.join(db_root, file))
 
-    # Assert tables are identical and exist as CSV files
+    # Assert tables are identical and exist as files
     for table in db:
         assert os.path.exists(os.path.join(db_root, f"db.{table}.csv"))
         pd.testing.assert_frame_equal(
