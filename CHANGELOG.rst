@@ -7,6 +7,23 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.8.0 (2024-07-09)
+--------------------------
+
+* Added: support for publishing tables as parquet files
+* Changed: depend on ``audeer >=2.1.0``
+* Changed: depend on ``audformat >=1.2.0``
+* Changed: depend on ``pandas >=2.1.0``
+* Fixed: update progress bar at least every second
+  in ``audb.load()``,
+  ``audb.load_attachment()``,
+  ``audb.load_media()``,
+  ``audb.load_tables()``,
+  ``audb.load_to()``,
+  ``audb.publish()``
+* Removed: support for Python 3.8
+
+
 Version 1.7.4 (2024-06-25)
 --------------------------
 
