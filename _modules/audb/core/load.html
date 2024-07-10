@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.7.4
+                v1.8.0
               </div>
             
           
@@ -231,7 +231,24 @@
     <span class="n">flavor</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Flavor</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find cached files.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find cached files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        files: media, attachment files, or table IDs</span>
+<span class="sd">        deps: database dependencies</span>
+<span class="sd">        cached_versions: information on cached versions of the database</span>
+<span class="sd">        flavor: requested database flavor</span>
+<span class="sd">        verbose: if ``True``, show progress bar</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ``([(&lt;db_cache_root1&gt;, &lt;cached_file1&gt;), ...)], [&lt;missing_file1&gt;, ...])``,</span>
+<span class="sd">        where ``&lt;db_cache_root1&gt;`` is the absolute path</span>
+<span class="sd">        to the database root,</span>
+<span class="sd">        in which ``&lt;cached_file1&gt;`` is stored.</span>
+<span class="sd">        ``&lt;cached_file1&gt;`` and ``&lt;missing_file1&gt;``</span>
+<span class="sd">        represent the names of media, attachment files, or table IDs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cached_files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">missing_files</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -241,12 +258,18 @@
         <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">file_version</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">StrictVersion</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv&quot;</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+        <span class="k">elif</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.parquet&quot;</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">file</span>
+        <span class="n">file_version</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">StrictVersion</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">cache_version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">cache_deps</span> <span class="ow">in</span> <span class="n">cached_versions</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">cache_version</span> <span class="o">&gt;=</span> <span class="n">file_version</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">cache_deps</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">==</span> <span class="n">cache_deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-                        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">cache_deps</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="o">==</span> <span class="n">cache_deps</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">flavor</span> <span class="ow">and</span> <span class="n">flavor</span><span class="o">.</span><span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="n">path</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span>
                                 <span class="n">path</span><span class="p">,</span>
@@ -414,6 +437,7 @@
             <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
             <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Copy attachments&quot;</span><span class="p">,</span>
+            <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
@@ -472,16 +496,15 @@
             <span class="p">)</span>
             <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_root</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
-            <span class="c1"># Tables are also cached as PKL files</span>
+            <span class="c1"># Tables are stored as CSV or PARQUET files,</span>
+            <span class="c1"># and are also cached as PKL files</span>
             <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span>
 
                 <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="n">file_pkl</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span>
-                        <span class="n">file</span><span class="p">,</span>
-                        <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>
-                    <span class="p">)</span>
-                    <span class="n">_copy_path</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">)</span>
-                    <span class="n">_copy_path</span><span class="p">(</span><span class="n">file_pkl</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;parquet&quot;</span><span class="p">,</span> <span class="s2">&quot;pkl&quot;</span><span class="p">]:</span>
+                        <span class="n">table_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">table_file</span><span class="p">)):</span>
+                            <span class="n">_copy_path</span><span class="p">(</span><span class="n">table_file</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">)</span>
 
             <span class="k">else</span><span class="p">:</span>
 
@@ -494,6 +517,7 @@
                 <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
                 <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
                 <span class="n">task_description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Copy </span><span class="si">{</span><span class="n">files_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
@@ -551,6 +575,7 @@
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Load attachments&quot;</span><span class="p">,</span>
+        <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
@@ -643,6 +668,7 @@
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Load media&quot;</span><span class="p">,</span>
+        <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
@@ -657,34 +683,63 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load tables from backend.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load tables from backend.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db: database</span>
+<span class="sd">        tables: table IDs to load from backend</span>
+<span class="sd">        db_root: database root</span>
+<span class="sd">        deps: database dependencies</span>
+<span class="sd">        backend_interface: backend interface</span>
+<span class="sd">        num_workers: number of workers</span>
+<span class="sd">        verbose: if ``True``, show progress bar</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_root</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="s2">&quot;/&quot;</span><span class="p">,</span>
-            <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
-            <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
-            <span class="n">archive</span><span class="p">,</span>
-            <span class="n">db_root_tmp</span><span class="p">,</span>
-            <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">table</span><span class="p">),</span>
-            <span class="n">tmp_root</span><span class="o">=</span><span class="n">db_root_tmp</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">table_id</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-        <span class="n">table_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">db</span><span class="p">[</span><span class="n">table_id</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">table_path</span><span class="p">)</span>
-        <span class="n">db</span><span class="p">[</span><span class="n">table_id</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+        <span class="n">csv_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+        <span class="n">parquet_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+
+        <span class="k">if</span> <span class="n">csv_file</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="n">table_file</span> <span class="o">=</span> <span class="n">csv_file</span>
+            <span class="n">remote_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.zip&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
+                <span class="n">remote_file</span><span class="p">,</span>
+                <span class="n">db_root_tmp</span><span class="p">,</span>
+                <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">table_file</span><span class="p">),</span>
+                <span class="n">tmp_root</span><span class="o">=</span><span class="n">db_root_tmp</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">table_file</span> <span class="o">=</span> <span class="n">parquet_file</span>
+            <span class="n">remote_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span>
+                <span class="n">remote_file</span><span class="p">,</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">table_file</span><span class="p">),</span>
+                <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">table_file</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Cache table as PKL file</span>
+        <span class="n">pickle_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.pkl&quot;</span>
+        <span class="n">table_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">db</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">table_path</span><span class="p">)</span>
+        <span class="n">db</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
             <span class="n">table_path</span><span class="p">,</span>
             <span class="n">storage_format</span><span class="o">=</span><span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">storage_format</span> <span class="ow">in</span> <span class="p">[</span>
-            <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>
-            <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">CSV</span><span class="p">,</span>
-        <span class="p">]:</span>
-            <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table_id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">storage_format</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Move tables from tmp folder to database root</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="p">[</span><span class="n">pickle_file</span><span class="p">,</span> <span class="n">table_file</span><span class="p">]:</span>
             <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
@@ -696,6 +751,7 @@
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Load tables&quot;</span><span class="p">,</span>
+        <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
@@ -920,22 +976,24 @@
 <span class="sd">        verbose: if ``True`` show progress bar</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        list of missing files</span>
+<span class="sd">        list of missing files or table IDs</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">missing_files</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv&quot;</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span>
         <span class="n">files</span><span class="p">,</span>
         <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Missing </span><span class="si">{</span><span class="n">files_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-            <span class="n">missing_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+            <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">)):</span>
+                <span class="n">missing_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">)):</span>
+                <span class="n">missing_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">missing_files</span>
 
@@ -1002,6 +1060,7 @@
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Update file path&quot;</span><span class="p">,</span>
+        <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -1818,7 +1877,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/06/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/07/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

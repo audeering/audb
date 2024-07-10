@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.7.4
+                v1.8.0
               </div>
             
           
@@ -221,6 +221,28 @@ It will continue from the current state,
 but you might need overwrite permissions
 in addition to write permissions
 on the backend.</p>
+<p><a class="reference internal" href="audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> uses md5 hashes of the database files
+to check if they have changed.
+Be aware that for certain file formats,
+like parquet,
+md5 hashes might differ
+for files with identical content.
+Reasons include the library that wrote the file,
+involved compression codes,
+or additional metadata written by the library.
+For files stored in parquet format,
+<a class="reference internal" href="#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a> will first look for a hash
+stored in its metadata
+under the <code class="docutils literal notranslate"><span class="pre">b&quot;hash&quot;</span></code> key.
+For parquet tables,
+this deterministic hash
+is automatically added by <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.html#module-audformat" title="(in audformat vv1.2.0)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.</p>
+<p>Tables stored only as pickle files,
+are converted to parquet files
+before publication.
+If a table is stored as a parquet and csv file,
+the csv file is ignored,
+and the parquet file is published.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -277,7 +299,7 @@ processors on the machine multiplied by 5</p></li>
     that are stored under an ID
     using a char not in <code class="docutils literal notranslate"><span class="pre">'[A-Za-z0-9._-]'</span></code></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">version</span></code> or <code class="docutils literal notranslate"><span class="pre">previous_version</span></code>
-    cannot be parsed by <a class="reference external" href="https://audeering.github.io/audeer/api/audeer.StrictVersion.html#audeer.StrictVersion" title="(in audeer vv2.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audeer.StrictVersion</span></code></a></p></li>
+    cannot be parsed by <a class="reference external" href="https://audeering.github.io/audeer/api/audeer.StrictVersion.html#audeer.StrictVersion" title="(in audeer vv2.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audeer.StrictVersion</span></code></a></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">previous_version</span></code> &gt;= <code class="docutils literal notranslate"><span class="pre">version</span></code></p></li>
 </ul>
 </dd>
@@ -309,7 +331,7 @@ processors on the machine multiplied by 5</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/06/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/07/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

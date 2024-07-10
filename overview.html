@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.7.4
+                v1.8.0
               </div>
             
           
@@ -223,10 +223,10 @@ with <a class="reference internal" href="api/audb.publish.html#audb.publish" tit
 the following operations are performed:</p>
 <ol class="arabic simple">
 <li><p>calculate <a class="reference internal" href="dependencies.html#database-dependencies"><span class="std std-ref">database dependencies</span></a></p></li>
-<li><p>pack the files into ZIP archives</p></li>
+<li><p>pack media and csv files into ZIP archives</p></li>
 <li><p>upload all files to the backend</p></li>
 </ol>
-<div class="graphviz"><object data="_images/graphviz-8dea1ba13cbaf3cad29360f1648d646dc82667d8.svg" type="image/svg+xml" class="graphviz">
+<div class="graphviz"><object data="_images/graphviz-ea52394b96b4d166658039c641060616646beaf2.svg" type="image/svg+xml" class="graphviz">
 <p class="warning">digraph G {
 
     rankdir=LR
@@ -246,7 +246,7 @@ the following operations are performed:</p>
 
     subgraph cluster_publish {
         label=&quot;Publish with audb&quot;
-        pack[label=&quot;Pack&quot;]
+        pack[label=&quot;(Pack)&quot;]
         upload[label=&quot;Upload&quot;]
     }
 
@@ -276,13 +276,13 @@ the following operations are performed:</p>
 <li><p>find the backends where the database is stored</p></li>
 <li><p>find the latest version of a database (optional)</p></li>
 <li><p>calculate <a class="reference internal" href="dependencies.html#database-dependencies"><span class="std std-ref">database dependencies</span></a></p></li>
-<li><p>download archive files from the selected backend</p></li>
-<li><p>unpack the archive files</p></li>
+<li><p>download (archive) files from the selected backend</p></li>
+<li><p>unpack the archive files (optional)</p></li>
 <li><p>inspect and <a class="reference internal" href="load.html#media-conversion-and-flavors"><span class="std std-ref">convert</span></a>
 the audio files (optional)</p></li>
 <li><p>store the data in a <a class="reference internal" href="caching.html#caching"><span class="std std-ref">cache</span></a> folder</p></li>
 </ol>
-<div class="graphviz"><object data="_images/graphviz-886b2b7938a5abf0b460aa8871c14888e954a791.svg" type="image/svg+xml" class="graphviz">
+<div class="graphviz"><object data="_images/graphviz-f63a0c9ca71772ae5481e92a5da6c68e00889dec.svg" type="image/svg+xml" class="graphviz">
 <p class="warning">digraph G {
 
     rankdir=LR
@@ -303,8 +303,8 @@ the audio files (optional)</p></li>
     subgraph cluster_load {
         label=&quot;Load with audb&quot;
         download[label=&quot;Download&quot;]
-        unpack[label=&quot;Unpack&quot;]
-        convert[label=&quot;Convert&quot;]
+        unpack[label=&quot;(Unpack)&quot;]
+        convert[label=&quot;(Convert)&quot;]
     }
 
     subgraph cluster_cache {
@@ -349,7 +349,7 @@ the audio files (optional)</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/06/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/07/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

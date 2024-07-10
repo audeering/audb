@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.7.4
+                v1.8.0
               </div>
             
           
@@ -115,6 +115,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-8-0-2024-07-10">Version 1.8.0 (2024-07-10)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-7-4-2024-06-25">Version 1.7.4 (2024-06-25)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-7-3-2024-06-04">Version 1.7.3 (2024-06-04)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-7-2-2024-05-16">Version 1.7.2 (2024-05-16)</a></li>
@@ -206,6 +207,23 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<div class="section" id="version-1-8-0-2024-07-10">
+<h2>Version 1.8.0 (2024-07-10)<a class="headerlink" href="#version-1-8-0-2024-07-10" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: support for publishing tables as parquet files</p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audeer</span> <span class="pre">&gt;=2.1.0</span></code></p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audformat</span> <span class="pre">&gt;=1.2.0</span></code></p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">pandas</span> <span class="pre">&gt;=2.1.0</span></code></p></li>
+<li><p>Fixed: update progress bar at least every second
+in <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">audb.load_attachment()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">audb.load_media()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">audb.load_tables()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">audb.load_to()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code></p></li>
+<li><p>Removed: support for Python 3.8</p></li>
+</ul>
+</div>
 <div class="section" id="version-1-7-4-2024-06-25">
 <h2>Version 1.7.4 (2024-06-25)<a class="headerlink" href="#version-1-7-4-2024-06-25" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
@@ -781,7 +799,7 @@ in documentation</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/06/25 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/07/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
