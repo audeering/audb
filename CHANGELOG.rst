@@ -7,7 +7,7 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
-Version 1.8.0 (2024-07-09)
+Version 1.8.0 (2024-07-10)
 --------------------------
 
 * Added: support for publishing tables as parquet files
