@@ -86,6 +86,8 @@ Handling of the dependency table with `pandas`
 was further compared to handling it with `polars`,
 by reimplementing all methods of `audb.Dependencies` using `polars`.
 
+This benchmark was executed on:
+
 * CPU: 12th Gen Intel Core i7-1255U
 * RAM: 15.66 GB
 * Hard Drive: KBG5AZNT1T02 LA KIOXIA
