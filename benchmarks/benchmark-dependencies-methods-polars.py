@@ -3,7 +3,6 @@ import time
 
 import pandas as pd
 import tabulate
-import utils
 
 import audeer
 
@@ -25,11 +24,35 @@ dtypes: list = [
 
 def set_dependency_module():
     r"""Monkeypatch dependency modult to use polars module."""
-    audb.core.define.DEPEND_INDEX_COLNAME = utils.DEPEND_INDEX_COLNAME
+    import polars as pl
+
+    from audb.core import define
+
+    depend_index_colname = "file"
+    depend_index_dtype = pl.datatypes.Object
+    depend_field_dtypes = dict(
+        zip(
+            define.DEPEND_FIELD_DTYPES.keys(),
+            [
+                pl.datatypes.String,
+                pl.datatypes.Int32,
+                pl.datatypes.Int32,
+                pl.datatypes.String,
+                pl.datatypes.Float64,
+                pl.datatypes.String,
+                pl.datatypes.Int32,
+                pl.datatypes.Int32,
+                pl.datatypes.Int32,
+                pl.datatypes.String,
+            ],
+        )
+    )
+
+    audb.core.define.DEPEND_INDEX_COLNAME = depend_index_colname
     audb.core.define.DEPEND_FIELD_DTYPES_PANDAS = audb.core.define.DEPEND_FIELD_DTYPES
-    audb.core.define.DEPEND_FIELD_DTYPES = utils.DEPEND_FIELD_DTYPES
+    audb.core.define.DEPEND_FIELD_DTYPES = depend_field_dtypes
     audb.core.define.DEPEND_INDEX_DTYPE_PANDAS = audb.core.define.DEPEND_INDEX_DTYPE
-    audb.core.define.DEPEND_INDEX_DTYPE = utils.DEPEND_INDEX_DTYPE
+    audb.core.define.DEPEND_INDEX_DTYPE = depend_index_dtype
 
     import dependencies_polars
 
