@@ -112,11 +112,11 @@ and results.
 
 | method                                          |   pandas |   polars | winner   |   factor |
 |-------------------------------------------------|----------|----------|----------|----------|
-| Dependencies.__call__()                         |    0.000 |    0.000 | polars   |    2.667 |
-| Dependencies.__contains__(10000 files)          |    0.003 |    0.002 | polars   |    2.005 |
-| Dependencies.__get_item__(10000 files)          |    0.648 |    0.013 | polars   |   50.382 |
-| Dependencies.__len__()                          |    0.000 |    0.000 | pandas   |    1.300 |
-| Dependencies.__str__()                          |    0.004 |    0.000 | polars   |   24.677 |
+| Dependencies.\_\_call__()                         |    0.000 |    0.000 | polars   |    2.667 |
+| Dependencies.\_\_contains__(10000 files)          |    0.003 |    0.002 | polars   |    2.005 |
+| Dependencies.\_\_get_item__(10000 files)          |    0.648 |    0.013 | polars   |   50.382 |
+| Dependencies.\_\_len__()                          |    0.000 |    0.000 | pandas   |    1.300 |
+| Dependencies.\_\_str__()                          |    0.004 |    0.000 | polars   |   24.677 |
 | Dependencies._add_attachment()                  |    0.171 |    0.104 | polars   |    1.645 |
 | Dependencies._add_media(10000 files)            |    0.073 |    0.008 | polars   |    9.589 |
 | Dependencies._add_meta()                        |    0.127 |    0.100 | polars   |    1.260 |
