@@ -82,9 +82,9 @@ using `pyarrow` dtypes).
 
 ## audb.Dependencies methods using polars
 
-Pyarrow was further  compared to a reimplenentation  of the dependency
-module  by  monkeypatching using  the  polars  dataframe engine.   All
-methods of `audb.Dependencies` were reimplemented using `polars`.
+Handling of the dependency table with `pandas`
+was further compared to handling it with `polars`,
+by reimplementing all methods of `audb.Dependencies` using `polars`.
 
 * CPU: 12th Gen Intel Core i7-1255U
 * RAM: 15.66 GB
