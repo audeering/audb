@@ -108,7 +108,10 @@ python compare_dependency_methods_polars.py
 ```
 Both steps require that `benchmark-dependencies-methods.py`
 has been run previously in order to create the test data
-and results.
+and results. The comparison in the `pandas` column is
+based on the pyarrow column in the tabulation in the previous
+section.
+
 
 | method                                          |   pandas |   polars | winner   |   factor |
 |-------------------------------------------------|----------|----------|----------|----------|
