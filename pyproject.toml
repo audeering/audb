@@ -4,7 +4,8 @@
 name = 'audb'
 authors = [
     {name = 'Hagen Wierstorf', email = 'hwierstorf@audeering.com'},
-    {name = 'Johannes Wagner', email = 'jwagner@audeering.com'},
+    {name = 'Johannes Wagner'},
+    {name = 'Christian Geng', email = 'cgeng@audeering.com'},
 ]
 description = 'Load and publish databases in audformat'
 readme = 'README.rst'
