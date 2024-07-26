@@ -1721,14 +1721,14 @@ def load_table(
 
         # Load table
         tables = _misc_tables_used_in_scheme(db) + [table]
-        for table in tables:
-            table_file = os.path.join(db_root, f"db.{table}")
+        for _table in tables:
+            table_file = os.path.join(db_root, f"db.{_table}")
             if not (
                 os.path.exists(f"{table_file}.csv")
                 or os.path.exists(f"{table_file}.pkl")
             ):
                 _load_files(
-                    [table],
+                    [_table],
                     "table",
                     backend_interface,
                     db_root,
@@ -1742,6 +1742,6 @@ def load_table(
                     num_workers,
                     verbose,
                 )
-            db[table].load(table_file)
+            db[_table].load(table_file)
 
     return db[table]._df
