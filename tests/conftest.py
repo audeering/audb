@@ -241,3 +241,10 @@ def non_existing_repository():
 def hide_default_repositories():
     r"""Hide default audb repositories during testing."""
     audb.config.REPOSITORIES = []
+
+
+# ===== STORAGE FORMAT =====
+@pytest.fixture(scope="module", autouse=False)
+def storage_format():
+    """Storage format of tables."""
+    yield "csv"
