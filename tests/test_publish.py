@@ -1085,7 +1085,7 @@ def test_publish_text_media_files(tmpdir, dbs, repository, storage_format):
     version = "1.0.0"
     deps = audb.publish(build_dir, version, repository)
 
-    assert deps.tables == ["db.files.csv"]
+    assert deps.tables == [f"db.files.{storage_format}"]
     file = "data/file1.txt"
     assert deps.media == [file]
     assert deps.bit_depth(file) == 0

@@ -77,7 +77,7 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
     return paths
 
 
-def test_load_only_metadata(dbs):
+def test_load_only_metadata(dbs, storage_format):
     db_original = audformat.Database.load(dbs[DB_VERSION])
 
     db = audb.load(
@@ -103,7 +103,7 @@ def test_load_only_metadata(dbs):
 
     # Delete table1
     # to force downloading from backend again
-    os.remove(os.path.join(db.meta["audb"]["root"], "db.table1.csv"))
+    os.remove(os.path.join(db.meta["audb"]["root"], f"db.table1.{storage_format}"))
     os.remove(os.path.join(db.meta["audb"]["root"], "db.table1.pkl"))
     db = audb.load(
         DB_NAME,
