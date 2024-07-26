@@ -1742,7 +1742,6 @@ def load_table(
                     num_workers,
                     verbose,
                 )
-            table = audformat.Table()
-            table.load(table_file)
+            db[table].load(table_file)
 
-    return table._df
+    return db[table]._df

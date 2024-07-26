@@ -601,6 +601,69 @@ def test_load_media(cache, version, media, format):
     assert paths2 == paths
 
 
+@pytest.mark.parametrize("pickle_cache", [True, False])
+@pytest.mark.parametrize("name, version, table", [(DB_NAME, "1.0.0", "emotion")])
+class TestLoadPickle:
+    r"""Test storing tables as pickle files in cache.
+
+    When tables are first downloaded from a backend
+    with ``audb.load()`` or ``audb.load_table()``,
+    they are stored in their original format in the cache,
+    and dependent on the ``pickle_cache`` argument
+    stored as pickle as well.
+
+    """
+
+    def test_load_pickle(self, storage_format, name, version, table, pickle_cache):
+        """Test storing tables with audb.load()."""
+        db = audb.load(
+            name,
+            version=version,
+            tables=table,
+            pickle_cache=pickle_cache,
+            only_metadata=True,
+            verbose=False,
+        )
+        # Original table file exists in cache
+        assert os.path.exists(os.path.join(db.root, f"db.{table}.{storage_format}"))
+        # Pickled table file exists in cache
+        if pickle_cache:
+            assert os.path.exists(os.path.join(db.root, f"db.{table}.pkl"))
+        else:
+            assert not os.path.exists(os.path.join(db.root, f"db.{table}.pkl"))
+
+    def test_load_table_pickle(
+        self, cache, storage_format, name, version, table, pickle_cache
+    ):
+        r"""Test storing tables as pickle files in cache.
+
+        When tables are first downloaded from a backend
+        with ``audb.load()`` or ``audb.load_table()``,
+        they are stored in their original format in the cache,
+        and dependent on the ``pickle_cache`` argument
+        stored as pickle as well.
+
+        """
+        audb.load_table(
+            name,
+            table,
+            version=version,
+            pickle_cache=pickle_cache,
+            verbose=False,
+        )
+        database_cache = audeer.path(cache, name, version)
+        print(audeer.list_file_names(database_cache, recursive=True, basenames=True))
+        # Original table file exists in cache
+        assert os.path.exists(
+            os.path.join(database_cache, f"db.{table}.{storage_format}")
+        )
+        # Pickled table file exists in cache
+        if pickle_cache:
+            assert os.path.exists(audeer.path(database_cache, f"db.{table}.pkl"))
+        else:
+            assert not os.path.exists(audeer.path(database_cache, f"db.{table}.pkl"))
+
+
 @pytest.mark.parametrize(
     "version, table",
     [
