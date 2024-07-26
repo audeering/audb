@@ -606,16 +606,46 @@ def test_load_media(cache, version, media, format):
 class TestLoadPickle:
     r"""Test storing tables as pickle files in cache.
 
-    When tables are first downloaded from a backend
-    with ``audb.load()`` or ``audb.load_table()``,
+    When tables are first downloaded from a backend,
     they are stored in their original format in the cache,
     and dependent on the ``pickle_cache`` argument
     stored as pickle as well.
 
     """
 
+    def assert_table_exist_in_cache(self, db_root, table, storage_format, pickle_cache):
+        """Assert table exists in original format and maybe as pickle.
+
+        Args:
+            db_root: database root folder
+            table: table ID
+            storage_format: storage format of table, ``"csv"`` or ``"parquet"``
+            pickle_cache: if ``True``,
+                table is asserted to exist as pickle file as well,
+                otherwise to not exist
+
+        """
+        original_table = audeer.path(db_root, f"db.{table}.{storage_format}")
+        assert os.path.exists(original_table)
+
+        pickled_table = audeer.path(db_root, f"db.{table}.pkl")
+        if pickle_cache:
+            assert os.path.exists(pickled_table)
+        else:
+            assert not os.path.exists(pickled_table)
+
     def test_load_pickle(self, storage_format, name, version, table, pickle_cache):
-        """Test storing tables with audb.load()."""
+        """Test storing tables with audb.load().
+
+        Args:
+            storage_format: storage_format fixture
+            name: database name
+            version: database version
+            table: table ID
+            pickle_cache: if ``True``,
+                tables are stored as pickle files as well in cache
+
+        """
         db = audb.load(
             name,
             version=version,
@@ -624,24 +654,21 @@ class TestLoadPickle:
             only_metadata=True,
             verbose=False,
         )
-        # Original table file exists in cache
-        assert os.path.exists(os.path.join(db.root, f"db.{table}.{storage_format}"))
-        # Pickled table file exists in cache
-        if pickle_cache:
-            assert os.path.exists(os.path.join(db.root, f"db.{table}.pkl"))
-        else:
-            assert not os.path.exists(os.path.join(db.root, f"db.{table}.pkl"))
+        self.assert_table_exist_in_cache(db.root, table, storage_format, pickle_cache)
 
     def test_load_table_pickle(
         self, cache, storage_format, name, version, table, pickle_cache
     ):
-        r"""Test storing tables as pickle files in cache.
+        r"""Test storing tables with audb.load_table().
 
-        When tables are first downloaded from a backend
-        with ``audb.load()`` or ``audb.load_table()``,
-        they are stored in their original format in the cache,
-        and dependent on the ``pickle_cache`` argument
-        stored as pickle as well.
+        Args:
+            cache: cache fixture
+            storage_format: storage_format fixture
+            name: database name
+            version: database version
+            table: table ID
+            pickle_cache: if ``True``,
+                tables are stored as pickle files as well in cache
 
         """
         audb.load_table(
@@ -651,17 +678,8 @@ class TestLoadPickle:
             pickle_cache=pickle_cache,
             verbose=False,
         )
-        database_cache = audeer.path(cache, name, version)
-        print(audeer.list_file_names(database_cache, recursive=True, basenames=True))
-        # Original table file exists in cache
-        assert os.path.exists(
-            os.path.join(database_cache, f"db.{table}.{storage_format}")
-        )
-        # Pickled table file exists in cache
-        if pickle_cache:
-            assert os.path.exists(audeer.path(database_cache, f"db.{table}.pkl"))
-        else:
-            assert not os.path.exists(audeer.path(database_cache, f"db.{table}.pkl"))
+        db_root = audeer.path(cache, name, version)
+        self.assert_table_exist_in_cache(db_root, table, storage_format, pickle_cache)
 
 
 @pytest.mark.parametrize(
