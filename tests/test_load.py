@@ -33,11 +33,6 @@ def assert_database_tmp_folder_is_deleted():
     assert len([d for d in dirs if d.endswith("~")]) == 0
 
 
-@pytest.fixture(scope="module", autouse=False)
-def storage_format():
-    yield "csv"
-
-
 @pytest.fixture(
     scope="module",
     autouse=True,

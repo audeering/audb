@@ -1064,7 +1064,7 @@ def test_publish_error_version(tmpdir, repository):
         audb.publish(db_path, "2.0.0", repository, previous_version="1.0.0?")
 
 
-def test_publish_text_media_files(tmpdir, dbs, repository):
+def test_publish_text_media_files(tmpdir, dbs, repository, storage_format):
     r"""Test publishing databases containing text files as media files."""
     # Create a database, containing text media file
     build_dir = audeer.path(tmpdir, "./build")
@@ -1079,7 +1079,7 @@ def test_publish_text_media_files(tmpdir, dbs, repository):
     db["files"] = audformat.Table(index)
     db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
     db["files"]["speaker"].set(["adam"])
-    db.save(build_dir)
+    db.save(build_dir, storage_format=storage_format)
 
     # Publish database, containing text media file
     version = "1.0.0"

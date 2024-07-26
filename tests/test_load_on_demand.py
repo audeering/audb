@@ -17,7 +17,7 @@ DB_VERSION = "1.0.0"
     scope="module",
     autouse=True,
 )
-def dbs(tmpdir_factory, persistent_repository):
+def dbs(tmpdir_factory, persistent_repository, storage_format):
     # Collect single database paths
     # and return them in the end
     paths = {}
@@ -64,7 +64,7 @@ def dbs(tmpdir_factory, persistent_repository):
     audeer.touch(db_root, "file.txt")
     audeer.touch(db_root, "folder/file1.txt")
     audeer.touch(db_root, "folder/file2.txt")
-    db.save(db_root)
+    db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
 
     audb.publish(
