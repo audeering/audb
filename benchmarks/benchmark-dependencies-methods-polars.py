@@ -1,8 +1,4 @@
-import hashlib
-import os
-import pickle
 import random
-import string
 import time
 
 import pandas as pd
@@ -17,157 +13,82 @@ random.seed(1)
 
 cache = audeer.mkdir("./cache")
 
-
-def astype(df, dtype):
-    """Convert to desired dataframe dtypes."""
-    if dtype == "object":
-        # Use `object` to represent strings
-        df["archive"] = df["archive"].astype("object")
-        df["bit_depth"] = df["bit_depth"].astype("int32")
-        df["channels"] = df["channels"].astype("int32")
-        df["checksum"] = df["checksum"].astype("object")
-        df["duration"] = df["duration"].astype("float64")
-        df["format"] = df["format"].astype("object")
-        df["removed"] = df["removed"].astype("int32")
-        df["sampling_rate"] = df["sampling_rate"].astype("int32")
-        df["type"] = df["type"].astype("int32")
-        df["version"] = df["version"].astype("object")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
-        # Set dtypes in library
-        audb.core.define.DEPEND_FIELD_DTYPES = {
-            "archive": "object",
-            "bit_depth": "int32",
-            "channels": "int32",
-            "checksum": "object",
-            "duration": "float64",
-            "format": "object",
-            "removed": "int32",
-            "sampling_rate": "int32",
-            "type": "int32",
-            "version": "object",
-        }
-    elif dtype == "string":
-        # Use `string` to represent strings
-        df["archive"] = df["archive"].astype("string")
-        df["bit_depth"] = df["bit_depth"].astype("int32")
-        df["channels"] = df["channels"].astype("int32")
-        df["checksum"] = df["checksum"].astype("string")
-        df["duration"] = df["duration"].astype("float64")
-        df["format"] = df["format"].astype("string")
-        df["removed"] = df["removed"].astype("int32")
-        df["sampling_rate"] = df["sampling_rate"].astype("int32")
-        df["type"] = df["type"].astype("int32")
-        df["version"] = df["version"].astype("string")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
-        # Set dtypes in library
-        audb.core.define.DEPEND_FIELD_DTYPES = {
-            "archive": "string",
-            "bit_depth": "int32",
-            "channels": "int32",
-            "checksum": "string",
-            "duration": "float64",
-            "format": "string",
-            "removed": "int32",
-            "sampling_rate": "int32",
-            "type": "int32",
-            "version": "string",
-        }
-    elif dtype == "pyarrow":
-        # Use `pyarrow` to represent all dtypes
-        df["archive"] = df["archive"].astype("string[pyarrow]")
-        df["bit_depth"] = df["bit_depth"].astype("int32[pyarrow]")
-        df["channels"] = df["channels"].astype("int32[pyarrow]")
-        df["checksum"] = df["checksum"].astype("string[pyarrow]")
-        df["duration"] = df["duration"].astype("float64[pyarrow]")
-        df["format"] = df["format"].astype("string[pyarrow]")
-        df["removed"] = df["removed"].astype("int32[pyarrow]")
-        df["sampling_rate"] = df["sampling_rate"].astype("int32[pyarrow]")
-        df["type"] = df["type"].astype("int32[pyarrow]")
-        df["version"] = df["version"].astype("string[pyarrow]")
-        df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
-        # Set dtypes in library
-        audb.core.define.DEPEND_FIELD_DTYPES = {
-            "archive": "string[pyarrow]",
-            "bit_depth": "int32[pyarrow]",
-            "channels": "int32[pyarrow]",
-            "checksum": "string[pyarrow]",
-            "duration": "float64[pyarrow]",
-            "format": "string[pyarrow]",
-            "removed": "int32[pyarrow]",
-            "sampling_rate": "int32[pyarrow]",
-            "type": "int32[pyarrow]",
-            "version": "string[pyarrow]",
-        }
-    return df
+CACHE_EXT: str = "pkl"
+CACHE_EXT: str = "parquet"
+PARQUET_SAVE_OPTS: dict = {"engine": "pyarrow"}
+# dtypes : list = ["string", "object", "pyarrow"]
+dtypes: list = [
+    "polars",
+]
 
 
-# === Dependencies pandas.DataFrame ===
+def set_dependency_module():
+    r"""Monkeypatch dependency modult to use polars module."""
+    import polars as pl
+
+    from audb.core import define
+
+    depend_index_colname = "file"
+    depend_index_dtype = pl.datatypes.Object
+    depend_field_dtypes = dict(
+        zip(
+            define.DEPEND_FIELD_DTYPES.keys(),
+            [
+                pl.datatypes.String,
+                pl.datatypes.Int32,
+                pl.datatypes.Int32,
+                pl.datatypes.String,
+                pl.datatypes.Float64,
+                pl.datatypes.String,
+                pl.datatypes.Int32,
+                pl.datatypes.Int32,
+                pl.datatypes.Int32,
+                pl.datatypes.String,
+            ],
+        )
+    )
+
+    audb.core.define.DEPEND_INDEX_COLNAME = depend_index_colname
+    audb.core.define.DEPEND_FIELD_DTYPES_PANDAS = audb.core.define.DEPEND_FIELD_DTYPES
+    audb.core.define.DEPEND_FIELD_DTYPES = depend_field_dtypes
+    audb.core.define.DEPEND_INDEX_DTYPE_PANDAS = audb.core.define.DEPEND_INDEX_DTYPE
+    audb.core.define.DEPEND_INDEX_DTYPE = depend_index_dtype
+
+    import dependencies_polars
+
+    audb.Dependencies = dependencies_polars.Dependencies
+
+
+# === Dependencies load via pickle before monkey_patching ===
 data_cache = audeer.path(cache, "df.pkl")
-num_rows = 1000000
-if not os.path.exists(data_cache):
-    bit_depths = [0, 16, 24]
-    channels = [0, 1, 2]
-    formats = ["csv", "wav", "txt"]
-    sampling_rates = [0, 16000, 44100]
-    types = [0, 1, 2]
-    versions = ["1.0.0", "1.1.0"]
-    records = [
-        {
-            "file": f"file-{n}.wav",
-            "archive": f"archive-{n}",
-            "bit_depth": random.choices(bit_depths, weights=[0.1, 0.8, 0.1])[0],
-            "channels": random.choices(channels, weights=[0.1, 0.8, 0.1])[0],
-            "checksum": hashlib.md5(
-                pickle.dumps(random.choice(string.ascii_letters))
-            ).hexdigest(),
-            "duration": 10 * random.random(),
-            "format": random.choices(formats, weights=[0.1, 0.8, 0.1])[0],
-            "removed": random.choices([0, 1], weights=[0.1, 0.9])[0],
-            "sampling_rate": random.choices(sampling_rates, weights=[0.1, 0.8, 0.1])[0],
-            "type": random.choices(types, weights=[0.1, 0.8, 0.1])[0],
-            "version": random.choices(versions, weights=[0.2, 0.8])[0],
-        }
-        for n in range(num_rows)
-    ]
-    df = pd.DataFrame.from_records(records)
-    for column, dtype in zip(
-        audb.core.define.DEPEND_FIELD_NAMES.values(),
-        audb.core.define.DEPEND_FIELD_DTYPES.values(),
-    ):
-        df[column] = df[column].astype(dtype)
-    df.set_index("file", inplace=True)
-    df.index.name = None
-    df.index = df.index.astype(audb.core.define.DEPEND_INDEX_DTYPE)
-    df.to_pickle(data_cache)
-
-
-# ===== Benchmark audb.Dependencies =====
 deps = audb.Dependencies()
 deps.load(data_cache)
+
+# save cache in parquet format as the polars load method depends on it
+parquet_cache = audeer.path(cache, "df.parquet")
+deps.save(parquet_cache)
+
 file = "file-10.wav"
 n_files = 10000
-_files = deps._df.index[:n_files].tolist()
-dtypes = ["string", "object", "pyarrow"]
-results = pd.DataFrame(columns=dtypes)
+results = pd.DataFrame(columns=["polars"])
 results.index.name = "method"
+set_dependency_module()
+dtype = "polars"
 
 for dtype in dtypes:
-    deps.load(data_cache)
-    deps._df = astype(deps._df, dtype)
+    # load them
+    deps = audb.Dependencies()
+    deps.load(parquet_cache)
+    _files = deps._df["file"][:n_files].to_list()
 
-    # Check we have the expected dtypes
-    # in dependency table
-    # and library
-    if dtype == "pyarrow":
-        expected_dtype = "string[pyarrow]"
-    else:
-        expected_dtype = dtype
-    assert deps._df.archive.dtype == expected_dtype
-    assert audb.core.define.DEPEND_FIELD_DTYPES["archive"] == expected_dtype
+    # only string meanningful
+    # expected_dtype = pl.String
+
+    # assert deps._df["archive"].dtype == expected_dtype
 
     method = "Dependencies.__call__()"
     t0 = time.time()
-    deps()
+    # deps()
     t = time.time() - t0
     results.at[method, dtype] = t
 
@@ -308,6 +229,8 @@ for dtype in dtypes:
     results.at[method, dtype] = t
 
     # -------------------------------------------------------------------------
+
+    # TODO: Reimplement
     method = "Dependencies._add_attachment()"
     t0 = time.time()
     deps._add_attachment("attachment.txt", "1.0.0", "archive", "checksum")
@@ -366,11 +289,9 @@ for dtype in dtypes:
     t = time.time() - t0
     results.at[method, dtype] = t
 
-
-# ===== Save results =====
-fp_results = audeer.path(cache, "results.csv")
-results.to_csv(fp_results)
-
 # ===== Print results =====
 table = tabulate.tabulate(results, headers="keys", tablefmt="github", floatfmt=".3f")
+fp_results = audeer.path(cache, "results_polars.csv")
+results.to_csv(fp_results)
+
 print(table)

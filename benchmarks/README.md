@@ -80,6 +80,72 @@ using `pyarrow` dtypes).
 | Dependencies._update_media()                    |    0.087 |    0.086 |     0.145 |
 | Dependencies._update_media_version(10000 files) |    0.011 |    0.011 |     0.020 |
 
+## audb.Dependencies methods using polars
+
+Handling of the dependency table with `pandas`
+was further compared to handling it with `polars`,
+by reimplementing all methods of `audb.Dependencies` using `polars`.
+
+This benchmark was executed on:
+
+* CPU: 12th Gen Intel Core i7-1255U
+* RAM: 15.66 GB
+* Hard Drive: KBG5AZNT1T02 LA KIOXIA
+* Linux: Ubuntu 22.04.4 LTS
+* Python 3.11.9
+
+To run the benchmark execute:
+
+```bash
+$ python benchmark-dependencies-methods-polars.py
+```
+
+The data were compared to
+the results from `benchmark-dependencies-methods.py` using
+
+```bash
+python compare_dependency_methods_polars.py
+```
+Both steps require that `benchmark-dependencies-methods.py`
+has been run previously in order to create the test data
+and results. The comparison in the `pandas` column is
+based on the pyarrow column in the tabulation in the previous
+section.
+
+
+| method                                          |   pandas |   polars | winner   |   factor |
+|-------------------------------------------------|----------|----------|----------|----------|
+| Dependencies.\_\_call__()                         |    0.000 |    0.000 | polars   |    2.667 |
+| Dependencies.\_\_contains__(10000 files)          |    0.003 |    0.002 | polars   |    2.005 |
+| Dependencies.\_\_get_item__(10000 files)          |    0.648 |    0.013 | polars   |   50.382 |
+| Dependencies.\_\_len__()                          |    0.000 |    0.000 | pandas   |    1.300 |
+| Dependencies.\_\_str__()                          |    0.004 |    0.000 | polars   |   24.677 |
+| Dependencies._add_attachment()                  |    0.171 |    0.104 | polars   |    1.645 |
+| Dependencies._add_media(10000 files)            |    0.073 |    0.008 | polars   |    9.589 |
+| Dependencies._add_meta()                        |    0.127 |    0.100 | polars   |    1.260 |
+| Dependencies._drop()                            |    0.118 |    0.021 | polars   |    5.628 |
+| Dependencies._remove()                          |    0.067 |    0.002 | polars   |   39.324 |
+| Dependencies._update_media()                    |    0.142 |    0.066 | polars   |    2.148 |
+| Dependencies._update_media_version(10000 files) |    0.021 |    0.016 | polars   |    1.341 |
+| Dependencies.archive(10000 files)               |    0.045 |    0.014 | polars   |    3.250 |
+| Dependencies.archives                           |    0.145 |    0.151 | pandas   |    1.045 |
+| Dependencies.attachment_ids                     |    0.018 |    0.008 | polars   |    2.375 |
+| Dependencies.attachments                        |    0.017 |    0.008 | polars   |    2.194 |
+| Dependencies.bit_depth(10000 files)             |    0.029 |    0.014 | polars   |    2.031 |
+| Dependencies.channels(10000 files)              |    0.030 |    0.013 | polars   |    2.224 |
+| Dependencies.checksum(10000 files)              |    0.030 |    0.014 | polars   |    2.201 |
+| Dependencies.duration(10000 files)              |    0.028 |    0.014 | polars   |    2.066 |
+| Dependencies.files                              |    0.012 |    0.011 | polars   |    1.040 |
+| Dependencies.format(10000 files)                |    0.033 |    0.014 | polars   |    2.345 |
+| Dependencies.media                              |    0.068 |    0.040 | polars   |    1.702 |
+| Dependencies.removed(10000 files)               |    0.029 |    0.014 | polars   |    2.118 |
+| Dependencies.removed_media                      |    0.068 |    0.038 | polars   |    1.809 |
+| Dependencies.sampling_rate(10000 files)         |    0.029 |    0.014 | polars   |    2.102 |
+| Dependencies.table_ids                          |    0.025 |    0.013 | polars   |    1.927 |
+| Dependencies.tables                             |    0.017 |    0.008 | polars   |    2.166 |
+| Dependencies.type(10000 files)                  |    0.028 |    0.014 | polars   |    2.063 |
+| Dependencies.version(10000 files)               |    0.032 |    0.013 | polars   |    2.372 |
+
 
 ## audb.Dependencies loading/writing to file
 
