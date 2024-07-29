@@ -527,7 +527,7 @@ def _get_tables_from_backend(
     db_root: str,
     deps: Dependencies,
     backend_interface: typing.Type[audbackend.interface.Base],
-    pickle_table: bool,
+    pickle_tables: bool,
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -539,7 +539,7 @@ def _get_tables_from_backend(
         db_root: database root
         deps: database dependencies
         backend_interface: backend interface
-        pickle_table: if ``True``,
+        pickle_tables: if ``True``,
             tables are stored in their original format,
             and as pickle files
             in the cache.
@@ -586,7 +586,7 @@ def _get_tables_from_backend(
         table_files = [table_file]
 
         # Cache table as PKL file
-        if pickle_table:
+        if pickle_tables:
             pickle_file = f"db.{table}.pkl"
             table_path = os.path.join(db_root_tmp, f"db.{table}")
             db[table].load(table_path)
@@ -703,7 +703,7 @@ def _load_files(
     deps: Dependencies,
     flavor: Flavor,
     cache_root: str,
-    pickle_table: bool,
+    pickle_tables: bool,
     num_workers: int,
     verbose: bool,
 ) -> typing.Optional[CachedVersions]:
@@ -734,7 +734,7 @@ def _load_files(
         deps: database dependency object
         flavor: database flavor object
         cache_root: root path of cache
-        pickle_table: if ``True``,
+        pickle_tables: if ``True``,
             tables are stored in their original format,
             and as pickle files
             in the cache.
@@ -796,7 +796,7 @@ def _load_files(
                     db_root,
                     deps,
                     backend_interface,
-                    pickle_table,
+                    pickle_tables,
                     num_workers,
                     verbose,
                 )
@@ -999,7 +999,7 @@ def load(
     media: typing.Union[str, typing.Sequence[str]] = None,
     removed_media: bool = False,
     full_path: bool = True,
-    pickle_table: bool = True,
+    pickle_tables: bool = True,
     cache_root: str = None,
     num_workers: typing.Optional[int] = 1,
     timeout: float = -1,
@@ -1069,7 +1069,7 @@ def load(
             misc tables will be empty
         removed_media: keep rows that reference removed media
         full_path: replace relative with absolute file paths
-        pickle_table: if ``True``,
+        pickle_tables: if ``True``,
             tables are stored in their original format,
             and as pickle files
             in the cache.
@@ -1206,7 +1206,7 @@ def load(
                         deps,
                         flavor,
                         cache_root,
-                        pickle_table,
+                        pickle_tables,
                         num_workers,
                         verbose,
                     )
@@ -1632,7 +1632,7 @@ def load_table(
     table: str,
     *,
     version: str = None,
-    pickle_table: bool = True,
+    pickle_tables: bool = True,
     cache_root: str = None,
     num_workers: typing.Optional[int] = 1,
     verbose: bool = True,
@@ -1651,7 +1651,7 @@ def load_table(
         name: name of database
         table: load table from database
         version: version of database
-        pickle_table: if ``True``,
+        pickle_tables: if ``True``,
             tables are stored in their original format,
             and as pickle files
             in the cache.
@@ -1738,7 +1738,7 @@ def load_table(
                     deps,
                     Flavor(),
                     cache_root,
-                    pickle_table,
+                    pickle_tables,
                     num_workers,
                     verbose,
                 )
