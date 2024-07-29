@@ -312,6 +312,7 @@ def load_to(
     *,
     version: str = None,
     only_metadata: bool = False,
+    pickle_tables: bool = True,
     cache_root: str = None,
     num_workers: typing.Optional[int] = 1,
     verbose: bool = True,
@@ -331,6 +332,12 @@ def load_to(
         name: name of database
         version: version string, latest if ``None``
         only_metadata: load only header and tables of database
+        pickle_tables: if ``True``,
+            tables are stored in their original format,
+            and as pickle files
+            in ``root``.
+            This allows for faster loading,
+            when loading from ``root``
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used.
             Only used to read the dependencies of the requested version
@@ -464,13 +471,20 @@ def load_to(
 
     # save database and PKL tables
 
-    db.save(
-        db_root,
-        storage_format=audformat.define.TableStorageFormat.PICKLE,
-        update_other_formats=False,
-        num_workers=num_workers,
-        verbose=verbose,
-    )
+    if pickle_tables:
+        db.save(
+            db_root,
+            storage_format=audformat.define.TableStorageFormat.PICKLE,
+            update_other_formats=False,
+            num_workers=num_workers,
+            verbose=verbose,
+        )
+    else:
+        db.save(
+            db_root,
+            header_only=True,
+            verbose=verbose,
+        )
 
     # remove the temporal directory
     # to signal all files were correctly loaded

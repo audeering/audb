@@ -313,7 +313,10 @@ class TestPublishTableStorageFormat:
         db = audb.load(db.name, version=version, verbose=False, full_path=False)
         assert_db_saved_to_dir(db, db.root, [storage_format, "pkl"])
 
-    def test_updated_database_save(self, build_dir, db, repository, storage_format):
+    @pytest.mark.parametrize("pickle_tables", [True, False])
+    def test_updated_database_save(
+        self, build_dir, db, repository, storage_format, pickle_tables
+    ):
         r"""Test correct files are stored to build dir after database update.
 
         Args:
@@ -321,6 +324,9 @@ class TestPublishTableStorageFormat:
             db: database fixture
             repository: repository fixture
             storage_format: storage format of database tables
+            pickle_tables: if ``True``,
+                ``audb.load_to()`` should store tables
+                as pickle files as well
 
         """
         # Publish first version
@@ -329,12 +335,22 @@ class TestPublishTableStorageFormat:
 
         # Clear build dir to force audb.load_to() to load from backend
         audeer.rmdir(build_dir)
-        db = audb.load_to(build_dir, db.name, version=version, verbose=False)
+        db = audb.load_to(
+            build_dir,
+            db.name,
+            version=version,
+            pickle_tables=pickle_tables,
+            verbose=False,
+        )
 
         # Update database
         db = update_db(db)
         db.save(build_dir, storage_format=storage_format)
-        assert_db_saved_to_dir(db, db.root, [storage_format, "pkl"])
+        if pickle_tables:
+            expected_formats = [storage_format, "pkl"]
+        else:
+            expected_formats = [storage_format]
+        assert_db_saved_to_dir(db, db.root, expected_formats)
 
     def test_updated_database_publish(
         self,
