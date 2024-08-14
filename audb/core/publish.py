@@ -339,7 +339,7 @@ def _media_values(
         row to be added to the dependency table as tuple
 
     """
-    dependency_type = define.DependType.MEDIA
+    dependency_type = define.DEPENDENCY_TYPE["media"]
     format = audeer.file_extension(file).lower()
     removed = 0
 
@@ -394,10 +394,7 @@ def _put_attachments(
 ):
     def job(attachment_id: str):
         archive_file = backend_interface.join(
-            "/",
-            db.name,
-            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            attachment_id + ".zip",
+            "/", db.name, "attachment", attachment_id + ".zip"
         )
         files = db.attachments[attachment_id].files
         backend_interface.put_archive(db_root, archive_file, version, files=files)
@@ -438,10 +435,7 @@ def _put_media(
                     update_media.append(file)
 
                 archive_file = backend_interface.join(
-                    "/",
-                    db_name,
-                    define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-                    archive + ".zip",
+                    "/", db_name, "media", archive + ".zip"
                 )
 
                 if previous_version is not None:
@@ -503,20 +497,12 @@ def _put_tables(
         if os.path.exists(os.path.join(db_root, f"db.{table}.parquet")):
             file = os.path.join(db_root, f"db.{table}.parquet")
             remote_file = backend_interface.join(
-                "/",
-                db_name,
-                define.DEPEND_TYPE_NAMES[define.DependType.META],
-                table + ".parquet",
+                "/", db_name, "meta", f"{table}.parquet"
             )
             backend_interface.put_file(file, remote_file, version)
         else:
             file = f"db.{table}.csv"
-            archive_file = backend_interface.join(
-                "/",
-                db_name,
-                define.DEPEND_TYPE_NAMES[define.DependType.META],
-                table + ".zip",
-            )
+            archive_file = backend_interface.join("/", db_name, "meta", f"{table}.zip")
             backend_interface.put_archive(db_root, archive_file, version, files=file)
 
     audeer.run_tasks(
@@ -707,7 +693,7 @@ def publish(
 
     # load database and dependencies
     deps = Dependencies()
-    for deps_file in [define.DEPENDENCIES_FILE, define.LEGACY_DEPENDENCIES_FILE]:
+    for deps_file in [define.DEPENDENCY_FILE, define.LEGACY_DEPENDENCY_FILE]:
         deps_path = os.path.join(db_root, deps_file)
         if os.path.exists(deps_path):
             deps.load(deps_path)
@@ -728,7 +714,7 @@ def publish(
         raise RuntimeError(
             f"You want to depend on '{previous_version}' "
             f"of {db.name}, "
-            f"but you don't have a '{define.DEPENDENCIES_FILE}' file present "
+            f"but you don't have a '{define.DEPENDENCY_FILE}' file present "
             f"in {db_root}. "
             f"Did you forgot to call "
             f"'audb.load_to({db_root}, {db.name}, "

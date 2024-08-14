@@ -134,12 +134,7 @@ def _get_attachments(
     def job(path: str):
         archive = deps.archive(path)
         version = deps.version(path)
-        archive = backend_interface.join(
-            "/",
-            db_name,
-            define.DEPEND_TYPE_NAMES[define.DependType.ATTACHMENT],
-            archive + ".zip",
-        )
+        archive = backend_interface.join("/", db_name, "attachment", archive + ".zip")
         backend_interface.get_archive(
             archive,
             db_root_tmp,
@@ -184,12 +179,7 @@ def _get_media(
         archives.add((deps.archive(file), deps.version(file)))
 
     def job(archive: str, version: str):
-        archive = backend_interface.join(
-            "/",
-            db_name,
-            define.DEPEND_TYPE_NAMES[define.DependType.MEDIA],
-            archive + ".zip",
-        )
+        archive = backend_interface.join("/", db_name, "media", archive + ".zip")
         files = backend_interface.get_archive(
             archive,
             db_root_tmp,
@@ -253,12 +243,7 @@ def _get_tables(
         # table file in PARQUET format is stored as PARQUET file on backend.
         if csv_file in deps.tables:
             table_file = csv_file
-            remote_file = backend_interface.join(
-                "/",
-                db_name,
-                define.DEPEND_TYPE_NAMES[define.DependType.META],
-                f"{table}.zip",
-            )
+            remote_file = backend_interface.join("/", db_name, "meta", f"{table}.zip")
             backend_interface.get_archive(
                 remote_file,
                 db_root_tmp,
@@ -268,10 +253,7 @@ def _get_tables(
         else:
             table_file = parquet_file
             remote_file = backend_interface.join(
-                "/",
-                db_name,
-                define.DEPEND_TYPE_NAMES[define.DependType.META],
-                f"{table}.parquet",
+                "/", db_name, "meta", f"{table}.parquet"
             )
             backend_interface.get_file(
                 remote_file,
@@ -462,11 +444,11 @@ def load_to(
 
     # save dependencies
 
-    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCIES_FILE)
+    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCY_FILE)
     deps.save(dep_path_tmp)
     audeer.move_file(
         dep_path_tmp,
-        os.path.join(db_root, define.DEPENDENCIES_FILE),
+        os.path.join(db_root, define.DEPENDENCY_FILE),
     )
 
     # save database and PKL tables
