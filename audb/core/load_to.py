@@ -252,7 +252,9 @@ def _get_tables(
             )
         else:
             table_file = parquet_file
-            remote_file = backend_interface.join("/", db_name, "meta", f"{table}.parquet")
+            remote_file = backend_interface.join(
+                "/", db_name, "meta", f"{table}.parquet"
+            )
             backend_interface.get_file(
                 remote_file,
                 os.path.join(db_root_tmp, table_file),

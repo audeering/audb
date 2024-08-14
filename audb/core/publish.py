@@ -496,7 +496,9 @@ def _put_tables(
     def job(table: str):
         if os.path.exists(os.path.join(db_root, f"db.{table}.parquet")):
             file = os.path.join(db_root, f"db.{table}.parquet")
-            remote_file = backend_interface.join("/", db_name, "meta", f"{table}.parquet")
+            remote_file = backend_interface.join(
+                "/", db_name, "meta", f"{table}.parquet"
+            )
             backend_interface.put_file(file, remote_file, version)
         else:
             file = f"db.{table}.csv"
