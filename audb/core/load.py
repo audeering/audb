@@ -540,6 +540,9 @@ def _get_tables_from_backend(
         deps: database dependencies
         backend_interface: backend interface
         pickle_tables: if ``True``,
+            tables are cached locally
+            in their original format
+            and as pickle files.
             tables are stored in their original format,
             and as pickle files
             in the cache.
@@ -735,9 +738,9 @@ def _load_files(
         flavor: database flavor object
         cache_root: root path of cache
         pickle_tables: if ``True``,
-            tables are stored in their original format,
-            and as pickle files
-            in the cache.
+            tables are cached locally
+            in their original format
+            and as pickle files.
             This allows for faster loading,
             when loading from cache
         num_workers: number of workers to use
@@ -1070,9 +1073,9 @@ def load(
         removed_media: keep rows that reference removed media
         full_path: replace relative with absolute file paths
         pickle_tables: if ``True``,
-            tables are stored in their original format,
-            and as pickle files
-            in the cache.
+            tables are cached locally
+            in their original format
+            and as pickle files.
             This allows for faster loading,
             when loading from cache
         cache_root: cache folder where databases are stored.
@@ -1652,9 +1655,9 @@ def load_table(
         table: load table from database
         version: version of database
         pickle_tables: if ``True``,
-            tables are stored in their original format,
-            and as pickle files
-            in the cache.
+            tables are cached locally
+            in their original format
+            and as pickle files.
             This allows for faster loading,
             when loading from cache
         cache_root: cache folder where databases are stored.

@@ -333,9 +333,9 @@ def load_to(
         version: version string, latest if ``None``
         only_metadata: load only header and tables of database
         pickle_tables: if ``True``,
-            tables are stored in their original format,
-            and as pickle files
-            in ``root``.
+            tables are stored in ``root``
+            in their original format
+            and as pickle files.
             This allows for faster loading,
             when loading from ``root``
         cache_root: cache folder where databases are stored.
