@@ -1635,6 +1635,7 @@ def load_table(
     table: str,
     *,
     version: str = None,
+    map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]] = None,
     pickle_tables: bool = True,
     cache_root: str = None,
     num_workers: typing.Optional[int] = 1,
@@ -1654,6 +1655,15 @@ def load_table(
         name: name of database
         table: load table from database
         version: version of database
+        map: map scheme or scheme fields to column values.
+            For example if your table holds a column ``speaker`` with
+            speaker IDs, which is assigned to a scheme that contains a
+            dict mapping speaker IDs to age and gender entries,
+            ``map={'speaker': ['age', 'gender']}``
+            will replace the column with two new columns that map ID
+            values to age and gender, respectively.
+            To also keep the original column with speaker IDS, you can do
+            ``map={'speaker': ['speaker', 'age', 'gender']}``
         pickle_tables: if ``True``,
             tables are cached locally
             in their original format
@@ -1687,6 +1697,20 @@ def load_table(
         wav/03a01Fa.wav  happiness                0.90
         wav/03a01Nc.wav    neutral                1.00
         wav/03a01Wa.wav      anger                0.95
+
+        >>> df = load_table(
+        ...     "emodb",
+        ...     "files",
+        ...     version="1.4.1",
+        ...     map={"speaker": "age"},
+        ...     verbose=False,
+        ... )
+        >>> df[:3]
+                                         duration transcription  age
+        file
+        wav/03a01Fa.wav    0 days 00:00:01.898250           a01   31
+        wav/03a01Nc.wav    0 days 00:00:01.611250           a01   31
+        wav/03a01Wa.wav 0 days 00:00:01.877812500           a01   31
 
     """
     if version is None:
@@ -1747,4 +1771,9 @@ def load_table(
                 )
             db[_table].load(table_file)
 
-    return db[table]._df
+    if map is None:
+        df = db[table]._df
+    else:
+        df = db[table].get(map=map)
+
+    return df

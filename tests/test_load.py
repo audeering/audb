@@ -1,6 +1,8 @@
 import os
+import random
 import shutil
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -44,6 +46,8 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
         dictionary containing root folder for each version
 
     """
+    random.seed(1)
+
     # Collect single database paths
     # and return them in the end
     paths = {}
@@ -726,6 +730,74 @@ def test_load_table(version, table):
         ]
     files = sorted(list(set(df.index.get_level_values("file"))))
     assert files == expected_files
+
+
+@pytest.mark.parametrize(
+    "version, table, map, expected",
+    [
+        (
+            "1.0.0",
+            "files",
+            None,
+            pd.concat(
+                [
+                    pd.Series(
+                        index=audformat.filewise_index(
+                            [f"audio/00{n + 1}.wav" for n in range(5)]
+                        ),
+                        name="speaker",
+                        data=["adam", "adam", "eve", "eve", None],
+                        dtype=pd.CategoricalDtype(["adam", "eve"]),
+                    ),
+                    pd.Series(
+                        index=audformat.filewise_index(
+                            [f"audio/00{n + 1}.wav" for n in range(5)]
+                        ),
+                        name="misc",
+                        data=[0, 1, 1, 2, np.nan],
+                        dtype=pd.CategoricalDtype([0, 1, 2]),
+                    ),
+                ],
+                axis=1,
+            ),
+        ),
+        (
+            "1.0.0",
+            "files",
+            {"misc": "emotion"},
+            pd.concat(
+                [
+                    pd.Series(
+                        index=audformat.filewise_index(
+                            [f"audio/00{n + 1}.wav" for n in range(5)]
+                        ),
+                        name="speaker",
+                        data=["adam", "adam", "eve", "eve", None],
+                        dtype=pd.CategoricalDtype(["adam", "eve"]),
+                    ),
+                    pd.Series(
+                        index=audformat.filewise_index(
+                            [f"audio/00{n + 1}.wav" for n in range(5)]
+                        ),
+                        name="emotion",
+                        data=["positive", "positive", "positive", "negative", None],
+                        dtype=pd.CategoricalDtype(["positive", "neutral", "negative"]),
+                    ),
+                ],
+                axis=1,
+            ),
+        ),
+    ],
+)
+def test_load_table_map(version, table, map, expected):
+    df = audb.load_table(
+        DB_NAME,
+        table,
+        version=version,
+        map=map,
+        verbose=False,
+    )
+    pd.testing.assert_frame_equal(df, expected)
 
 
 @pytest.mark.parametrize(
