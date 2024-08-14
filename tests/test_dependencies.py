@@ -384,7 +384,7 @@ def test_load_save_pandas_compatibility(pandas_version):
 
     else:
         deps.load(deps_file)
-        assert deps._df.index.dtype == audb.core.define.DEPEND_INDEX_DTYPE
+        assert deps._df.index.dtype == audb.core.define.DEPENDENCY_INDEX_DTYPE
 
 
 def test_load_save_errors(deps):
