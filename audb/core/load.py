@@ -527,6 +527,7 @@ def _get_tables_from_backend(
     db_root: str,
     deps: Dependencies,
     backend_interface: typing.Type[audbackend.interface.Base],
+    pickle_tables: bool,
     num_workers: typing.Optional[int],
     verbose: bool,
 ):
@@ -538,6 +539,15 @@ def _get_tables_from_backend(
         db_root: database root
         deps: database dependencies
         backend_interface: backend interface
+        pickle_tables: if ``True``,
+            tables are cached locally
+            in their original format
+            and as pickle files.
+            tables are stored in their original format,
+            and as pickle files
+            in the cache.
+            This allows for faster loading,
+            when loading from cache
         num_workers: number of workers
         verbose: if ``True``, show progress bar
 
@@ -576,20 +586,24 @@ def _get_tables_from_backend(
                 deps.version(table_file),
             )
 
+        table_files = [table_file]
+
         # Cache table as PKL file
-        pickle_file = f"db.{table}.pkl"
-        table_path = os.path.join(db_root_tmp, f"db.{table}")
-        db[table].load(table_path)
-        db[table].save(
-            table_path,
-            storage_format=audformat.define.TableStorageFormat.PICKLE,
-        )
+        if pickle_tables:
+            pickle_file = f"db.{table}.pkl"
+            table_path = os.path.join(db_root_tmp, f"db.{table}")
+            db[table].load(table_path)
+            db[table].save(
+                table_path,
+                storage_format=audformat.define.TableStorageFormat.PICKLE,
+            )
+            table_files.append(pickle_file)
 
         # Move tables from tmp folder to database root
-        for file in [pickle_file, table_file]:
+        for table_file in table_files:
             audeer.move_file(
-                os.path.join(db_root_tmp, file),
-                os.path.join(db_root, file),
+                os.path.join(db_root_tmp, table_file),
+                os.path.join(db_root, table_file),
             )
 
     audeer.run_tasks(
@@ -692,6 +706,7 @@ def _load_files(
     deps: Dependencies,
     flavor: Flavor,
     cache_root: str,
+    pickle_tables: bool,
     num_workers: int,
     verbose: bool,
 ) -> typing.Optional[CachedVersions]:
@@ -722,6 +737,12 @@ def _load_files(
         deps: database dependency object
         flavor: database flavor object
         cache_root: root path of cache
+        pickle_tables: if ``True``,
+            tables are cached locally
+            in their original format
+            and as pickle files.
+            This allows for faster loading,
+            when loading from cache
         num_workers: number of workers to use
         verbose: if ``True`` show progress bars
             for each step
@@ -778,6 +799,7 @@ def _load_files(
                     db_root,
                     deps,
                     backend_interface,
+                    pickle_tables,
                     num_workers,
                     verbose,
                 )
@@ -980,6 +1002,7 @@ def load(
     media: typing.Union[str, typing.Sequence[str]] = None,
     removed_media: bool = False,
     full_path: bool = True,
+    pickle_tables: bool = True,
     cache_root: str = None,
     num_workers: typing.Optional[int] = 1,
     timeout: float = -1,
@@ -1049,6 +1072,12 @@ def load(
             misc tables will be empty
         removed_media: keep rows that reference removed media
         full_path: replace relative with absolute file paths
+        pickle_tables: if ``True``,
+            tables are cached locally
+            in their original format
+            and as pickle files.
+            This allows for faster loading,
+            when loading from cache
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
         num_workers: number of parallel jobs or 1 for sequential
@@ -1180,6 +1209,7 @@ def load(
                         deps,
                         flavor,
                         cache_root,
+                        pickle_tables,
                         num_workers,
                         verbose,
                     )
@@ -1215,6 +1245,7 @@ def load(
                     deps,
                     flavor,
                     cache_root,
+                    False,
                     num_workers,
                     verbose,
                 )
@@ -1581,6 +1612,7 @@ def load_media(
                     deps,
                     flavor,
                     cache_root,
+                    False,
                     num_workers,
                     verbose,
                 )
@@ -1603,6 +1635,7 @@ def load_table(
     table: str,
     *,
     version: str = None,
+    pickle_tables: bool = True,
     cache_root: str = None,
     num_workers: typing.Optional[int] = 1,
     verbose: bool = True,
@@ -1621,6 +1654,12 @@ def load_table(
         name: name of database
         table: load table from database
         version: version of database
+        pickle_tables: if ``True``,
+            tables are cached locally
+            in their original format
+            and as pickle files.
+            This allows for faster loading,
+            when loading from cache
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
         num_workers: number of parallel jobs or 1 for sequential
@@ -1685,14 +1724,14 @@ def load_table(
 
         # Load table
         tables = _misc_tables_used_in_scheme(db) + [table]
-        for table in tables:
-            table_file = os.path.join(db_root, f"db.{table}")
+        for _table in tables:
+            table_file = os.path.join(db_root, f"db.{_table}")
             if not (
                 os.path.exists(f"{table_file}.csv")
                 or os.path.exists(f"{table_file}.pkl")
             ):
                 _load_files(
-                    [table],
+                    [_table],
                     "table",
                     backend_interface,
                     db_root,
@@ -1702,10 +1741,10 @@ def load_table(
                     deps,
                     Flavor(),
                     cache_root,
+                    pickle_tables,
                     num_workers,
                     verbose,
                 )
-            table = audformat.Table()
-            table.load(table_file)
+            db[_table].load(table_file)
 
-    return table._df
+    return db[table]._df
