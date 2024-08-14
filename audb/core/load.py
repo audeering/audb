@@ -1697,7 +1697,6 @@ def load_table(
         wav/03a01Fa.wav  happiness                0.90
         wav/03a01Nc.wav    neutral                1.00
         wav/03a01Wa.wav      anger                0.95
-
         >>> df = load_table(
         ...     "emodb",
         ...     "files",
