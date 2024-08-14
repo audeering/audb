@@ -1906,39 +1906,109 @@ def stream(
         # Start with database header without tables
         db, backend_interface = load_header_to(db_root, name, version)
 
-        # Load misc tables completely
-        for _table in _misc_tables_used_in_scheme(db):
-            table_file = os.path.join(db_root, f"db.{_table}")
-            if not (
-                os.path.exists(f"{table_file}.csv")
-                or os.path.exists(f"{table_file}.pkl")
-            ):
-                pass
-
-        # Load table
+        # Load table files
         tables = _misc_tables_used_in_scheme(db) + [table]
-        for _table in tables:
-            table_file = os.path.join(db_root, f"db.{_table}")
-            if not (
-                os.path.exists(f"{table_file}.csv")
-                or os.path.exists(f"{table_file}.pkl")
-            ):
-                _load_files(
-                    [_table],
-                    "table",
-                    backend_interface,
-                    db_root,
-                    db,
-                    version,
-                    None,
-                    deps,
-                    Flavor(),
-                    cache_root,
-                    pickle_tables,
-                    num_workers,
-                    verbose,
-                )
-            db[_table].load(table_file)
+        _load_files(
+            tables,
+            "table",
+            backend_interface,
+            db_root,
+            db,
+            version,
+            None,
+            deps,
+            Flavor(),
+            cache_root,
+            False,  # pickle_tables
+            num_workers,
+            verbose,
+        )
 
-    return db[table]._df
->>>>>>> a9d7784 (Add audb.stream())
+        # Load misc tables completely
+        for misc_table in _misc_tables_used_in_scheme(db):
+            table_file = os.path.join(db_root, f"db.{misc_table}")
+            db[misc_table].load(table_file)
+
+    # TODO: create iterator over tabe entries
+
+    return table_iterator
+
+
+class TableIterator:
+    def __init__(
+        self,
+        name: str,
+        table: str,
+        *,
+        version: str = None,
+        batch_size: int = 16,
+        shuffle: bool = False,
+        buffer_size: int = 10_000,
+        only_metadata: bool = False,
+        bit_depth: int = None,
+        channels: typing.Union[int, typing.Sequence[int]] = None,
+        format: str = None,
+        mixdown: bool = False,
+        sampling_rate: int = None,
+        attachments: typing.Union[str, typing.Sequence[str]] = None,
+        full_path: bool = True,
+        cache_root: str = None,
+        num_workers: typing.Optional[int] = 1,
+        timeout: float = -1,
+        verbose: bool = True,
+    ):
+        self.name = name
+        self.table = table
+        self.version = version
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.buffer_size = buffer_size
+        self.only_metadata = only_metadata
+        self.bit_depth = bit_depth
+        self.channels = channels
+        self.format = format
+        self.mixdown = mixdown
+        self.sampling_rate = sampling_rate
+        self.attachments = attachments
+        self.full_path = full_path
+        self.cache_root = cache_root
+        self.num_workers = num_workers
+        self.timeout = timeout
+        self.verbose = verbose
+
+        self._stream = parquet.ParquetFile(file).iter_batches(batch_size=batch_size)
+        self._current = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if shuffle:
+            # TODO: implement
+            pass
+        else:
+            batch = next(iter(self.stream))
+            df = batch.to_pandas()
+            if audformat.is_segmented_index(df.index):
+                media = list(df.index.get_level_values("file"))
+            elif audformat.is_filewise_index(df.index):
+                media = list(df.index)
+            else:
+                media = []
+            if not only_metadata and len(media) > 0:
+                audb.load_media(
+                    self.name,
+                    media,
+                    version=self.version,
+                    bit_depth=self.bit_depth,
+                    channels=self.channels,
+                    format=self.format,
+                    mixdown=self.mixdown,
+                    sampling_rate=self.sampling_rate,
+                    cache_root=self.cache_root,
+                    num_workers=self.num_workers,
+                    timeout=self.timeout,
+                    verbose=self.verbose,
+                )
+
+            return df
