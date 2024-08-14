@@ -1685,18 +1685,20 @@ def load_table(
             that is not part of the database
 
     Examples:
-        >>> df = load_table(
-        ...     "emodb",
-        ...     "emotion",
-        ...     version="1.4.1",
-        ...     verbose=False,
-        ... )
+        >>> df = load_table("emodb", "emotion", version="1.4.1", verbose=False)
         >>> df[:3]
                            emotion  emotion.confidence
         file
         wav/03a01Fa.wav  happiness                0.90
         wav/03a01Nc.wav    neutral                1.00
         wav/03a01Wa.wav      anger                0.95
+        >>> df = load_table("emodb", "files", version="1.4.1", verbose=False)
+        >>> df[:3]
+                                         duration speaker transcription
+        file
+        wav/03a01Fa.wav    0 days 00:00:01.898250       3           a01
+        wav/03a01Nc.wav    0 days 00:00:01.611250       3           a01
+        wav/03a01Wa.wav 0 days 00:00:01.877812500       3           a01
         >>> df = load_table(
         ...     "emodb",
         ...     "files",
