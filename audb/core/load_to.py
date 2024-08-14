@@ -472,6 +472,10 @@ def load_to(
     # save database and PKL tables
 
     if pickle_tables:
+        # Store database header,
+        # and add table as pickle files
+        # (tables are already stored in their original format).
+        # Uses `num_workers` to save tables in parallel.
         db.save(
             db_root,
             storage_format=audformat.define.TableStorageFormat.PICKLE,
@@ -480,6 +484,8 @@ def load_to(
             verbose=verbose,
         )
     else:
+        # Store database header
+        # (tables are already stored)
         db.save(
             db_root,
             header_only=True,
