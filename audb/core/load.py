@@ -4,6 +4,8 @@ import typing
 
 import filelock
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as parquet
 
 import audbackend
 import audeer
@@ -25,7 +27,101 @@ from audb.core.lock import FolderLock
 from audb.core.utils import lookup_backend
 
 
-CachedVersions = typing.Sequence[typing.Tuple[audeer.StrictVersion, str, Dependencies],]
+CachedVersions = typing.Sequence[typing.Tuple[audeer.StrictVersion, str, Dependencies]]
+
+
+class TableIterator:
+    def __init__(
+        self,
+        db: audformat.Database,
+        table: str,
+        *,
+        version: str = None,
+        map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]] = None,
+        batch_size: int = 16,
+        shuffle: bool = False,
+        buffer_size: int = 10_000,
+        only_metadata: bool = False,
+        bit_depth: int = None,
+        channels: typing.Union[int, typing.Sequence[int]] = None,
+        format: str = None,
+        mixdown: bool = False,
+        sampling_rate: int = None,
+        full_path: bool = True,
+        cache_root: str = None,
+        num_workers: typing.Optional[int] = 1,
+        timeout: float = -1,
+        verbose: bool = True,
+    ):
+        self.db = db
+        self.table = table
+        self.version = version
+        self.map = map
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.buffer_size = buffer_size
+        self.only_metadata = only_metadata
+        self.bit_depth = bit_depth
+        self.channels = channels
+        self.format = format
+        self.mixdown = mixdown
+        self.sampling_rate = sampling_rate
+        self.full_path = full_path
+        self.cache_root = cache_root
+        self.num_workers = num_workers
+        self.timeout = timeout
+        self.verbose = verbose
+
+        file = os.path.join(db.root, f"db.{table}.parquet")
+        self._stream = parquet.ParquetFile(file).iter_batches(batch_size=batch_size)
+        self._current = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.shuffle:
+            # TODO: implement
+            pass
+        else:
+            batch = next(iter(self._stream))
+            df = batch.to_pandas(
+                deduplicate_objects=False,
+                types_mapper={
+                    pa.string(): pd.StringDtype(),
+                }.get,  # we have to provide a callable, not a dict
+            )
+            # Adjust dtypes and set index
+            df = self.db[self.table]._pyarrow_convert_dtypes(df, convert_all=False)
+            index_columns = list(self.db[self.table]._levels_and_dtypes.keys())
+            df = self.db[self.table]._set_index(df, index_columns)
+
+            if audformat.is_segmented_index(df.index):
+                media = list(df.index.get_level_values("file"))
+            elif audformat.is_filewise_index(df.index):
+                media = list(df.index)
+            else:
+                media = []
+            if not self.only_metadata and len(media) > 0:
+                load_media(
+                    self.db.name,
+                    media,
+                    version=self.version,
+                    bit_depth=self.bit_depth,
+                    channels=self.channels,
+                    format=self.format,
+                    mixdown=self.mixdown,
+                    sampling_rate=self.sampling_rate,
+                    cache_root=self.cache_root,
+                    num_workers=self.num_workers,
+                    timeout=self.timeout,
+                    verbose=self.verbose,
+                )
+        if self.map is not None:
+            self.db[self.table]._df = df
+            df = self.db[self.table].get(map=map)
+
+        return df
 
 
 def _cached_versions(
@@ -1792,7 +1888,6 @@ def stream(
     format: str = None,
     mixdown: bool = False,
     sampling_rate: int = None,
-    attachments: typing.Union[str, typing.Sequence[str]] = None,
     full_path: bool = True,
     cache_root: str = None,
     num_workers: typing.Optional[int] = 1,
@@ -1841,11 +1936,6 @@ def stream(
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
             ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
-        attachments: load only attachment files
-            for the attachments
-            matching the regular expression
-            or provided in the list.
-            If set to ``[]`` no attachments are loaded
         full_path: replace relative with absolute file paths
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
@@ -1929,86 +2019,25 @@ def stream(
             table_file = os.path.join(db_root, f"db.{misc_table}")
             db[misc_table].load(table_file)
 
-    # TODO: create iterator over tabe entries
+    table_iterator = TableIterator(
+        db,
+        table,
+        version=version,
+        map=None,  # TODO
+        batch_size=batch_size,
+        shuffle=shuffle,
+        buffer_size=buffer_size,
+        only_metadata=only_metadata,
+        bit_depth=bit_depth,
+        channels=channels,
+        format=format,
+        mixdown=mixdown,
+        sampling_rate=sampling_rate,
+        full_path=full_path,
+        cache_root=cache_root,
+        num_workers=num_workers,
+        timeout=timeout,
+        verbose=verbose,
+    )
 
     return table_iterator
-
-
-class TableIterator:
-    def __init__(
-        self,
-        name: str,
-        table: str,
-        *,
-        version: str = None,
-        batch_size: int = 16,
-        shuffle: bool = False,
-        buffer_size: int = 10_000,
-        only_metadata: bool = False,
-        bit_depth: int = None,
-        channels: typing.Union[int, typing.Sequence[int]] = None,
-        format: str = None,
-        mixdown: bool = False,
-        sampling_rate: int = None,
-        attachments: typing.Union[str, typing.Sequence[str]] = None,
-        full_path: bool = True,
-        cache_root: str = None,
-        num_workers: typing.Optional[int] = 1,
-        timeout: float = -1,
-        verbose: bool = True,
-    ):
-        self.name = name
-        self.table = table
-        self.version = version
-        self.batch_size = batch_size
-        self.shuffle = shuffle
-        self.buffer_size = buffer_size
-        self.only_metadata = only_metadata
-        self.bit_depth = bit_depth
-        self.channels = channels
-        self.format = format
-        self.mixdown = mixdown
-        self.sampling_rate = sampling_rate
-        self.attachments = attachments
-        self.full_path = full_path
-        self.cache_root = cache_root
-        self.num_workers = num_workers
-        self.timeout = timeout
-        self.verbose = verbose
-
-        self._stream = parquet.ParquetFile(file).iter_batches(batch_size=batch_size)
-        self._current = 0
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if shuffle:
-            # TODO: implement
-            pass
-        else:
-            batch = next(iter(self.stream))
-            df = batch.to_pandas()
-            if audformat.is_segmented_index(df.index):
-                media = list(df.index.get_level_values("file"))
-            elif audformat.is_filewise_index(df.index):
-                media = list(df.index)
-            else:
-                media = []
-            if not only_metadata and len(media) > 0:
-                audb.load_media(
-                    self.name,
-                    media,
-                    version=self.version,
-                    bit_depth=self.bit_depth,
-                    channels=self.channels,
-                    format=self.format,
-                    mixdown=self.mixdown,
-                    sampling_rate=self.sampling_rate,
-                    cache_root=self.cache_root,
-                    num_workers=self.num_workers,
-                    timeout=self.timeout,
-                    verbose=self.verbose,
-                )
-
-            return df
