@@ -1702,6 +1702,20 @@ def load_table(
         wav/03a01Nc.wav    0 days 00:00:01.611250           a01   31
         wav/03a01Wa.wav 0 days 00:00:01.877812500           a01   31
 
+        >>> df = load_table(
+        ...     "emodb",
+        ...     "files",
+        ...     version="1.4.1",
+        ...     map={"speaker": "age"},
+        ...     verbose=False,
+        ... )
+        >>> df[:3]
+                                         duration transcription  age
+        file
+        wav/03a01Fa.wav    0 days 00:00:01.898250           a01   31
+        wav/03a01Nc.wav    0 days 00:00:01.611250           a01   31
+        wav/03a01Wa.wav 0 days 00:00:01.877812500           a01   31
+
     """
     if version is None:
         version = latest_version(name)
