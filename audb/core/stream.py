@@ -61,13 +61,6 @@ class TableIterator:
         self.timeout = timeout
         self.verbose = verbose
 
-        if os.path.exists(os.path.join(db.root, f"db.{table}.parquet")):
-            self._file = os.path.join(db.root, f"db.{table}.parquet")
-        else:
-            self._file = os.path.join(db.root, f"db.{table}.csv")
-
-        self._current = 0
-
     def __iter__(self):
         return self
 
@@ -117,6 +110,108 @@ class TableIterator:
                 timeout=self.timeout,
                 verbose=self.verbose,
             )
+
+
+class TableIteratorCsv(TableIterator):
+    def __init__(
+        self,
+        db: audformat.Database,
+        table: str,
+        *,
+        version: str,
+        map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]],
+        batch_size: int,
+        shuffle: bool,
+        buffer_size: int,
+        only_metadata: bool,
+        bit_depth: int,
+        channels: typing.Union[int, typing.Sequence[int]],
+        format: str,
+        mixdown: bool,
+        sampling_rate: int,
+        full_path: bool,
+        cache_root: str,
+        num_workers: typing.Optional[int],
+        timeout: float,
+        verbose: bool,
+    ):
+        super().__init__(
+            db,
+            table,
+            version=version,
+            map=map,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            buffer_size=buffer_size,
+            only_metadata=only_metadata,
+            bit_depth=bit_depth,
+            channels=channels,
+            format=format,
+            mixdown=mixdown,
+            sampling_rate=sampling_rate,
+            full_path=full_path,
+            cache_root=cache_root,
+            num_workers=num_workers,
+            timeout=timeout,
+            verbose=verbose,
+        )
+
+        self._file = os.path.join(db.root, f"db.{table}.csv")
+        self._current = 0
+
+        # Prepare settings for csv file reading
+
+        # index
+        columns_and_dtypes = db[table]._levels_and_dtypes
+        # add columns
+        for column_id, column in db[table].columns.items():
+            if column.scheme_id is not None:
+                columns_and_dtypes[column_id] = db.schemes[column.scheme_id].dtype
+            else:
+                columns_and_dtypes[column_id] = audformat.define.DataType.OBJECT
+
+        # Replace data type with converter for dates or timestamps
+        converters = {}
+        dtypes_wo_converters = {}
+        for column, dtype in columns_and_dtypes.items():
+            if dtype == audformat.define.DataType.DATE:
+                converters[column] = lambda x: pd.to_datetime(x)
+            elif dtype == audformat.define.DataType.TIME:
+                converters[column] = lambda x: pd.to_timedelta(x)
+            else:
+                dtypes_wo_converters[column] = (
+                    audformat.core.common.to_pandas_dtype(dtype)
+                )
+
+        self._csv_usecols = list(columns_and_dtypes.keys())
+        self._csv_dtype = dtypes_wo_converters
+        self._csv_index_col = list(db[table]._levels_and_dtypes.keys())
+        self._csv_converters = converters
+
+
+    def _get_batch(self):
+        if self.shuffle:
+            # TODO: implement
+            pass
+        else:
+
+            df = pd.read_csv(
+                self._file,
+                skiprows=lambda x: x in range(self._current) and x > 0,
+                nrows=self.batch_size,
+                usecols=self._csv_usecols,
+                dtype=self._csv_dtype,
+                index_col=self._csv_index_col,
+                converters=self._csv_converters,
+                float_precision="round_trip",
+            )
+
+            self._current += self.batch_size
+
+        if len(df) == 0:
+            raise StopIteration
+
+        return df
 
 
 class TableIteratorParquet(TableIterator):
