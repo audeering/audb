@@ -10,6 +10,7 @@ audb
     :nosignatures:
 
     config
+    DatabaseIterator
     Dependencies
     Flavor
     Repository

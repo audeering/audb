@@ -20,59 +20,11 @@ from audb.core.load import load_media
 from audb.core.lock import FolderLock
 
 
-class DatabaseIterator:
+class DatabaseIterator(audformat.Database):
     r"""Database iterator.
 
-    Baseclass for a database iterator.
-
-    Args:
-        db: database object
-        table: table to iterate
-        version: version string, latest if ``None``
-        map: map scheme or scheme fields to column values.
-            For example if your table holds a column ``speaker`` with
-            speaker IDs, which is assigned to a scheme that contains a
-            dict mapping speaker IDs to age and gender entries,
-            ``map={'speaker': ['age', 'gender']}``
-            will replace the column with two new columns that map ID
-            values to age and gender, respectively.
-            To also keep the original column with speaker IDS, you can do
-            ``map={'speaker': ['speaker', 'age', 'gender']}``
-        batch_size: number of table rows
-            to return in one iteration
-        shuffle: if ``True``,
-            it first reads ``buffer_size`` rows from the table
-            and selects ``batch_size`` randomly from them
-        buffer_size: number of table rows
-            to be loaded
-            when ``shuffle`` is ``True``
-        only_metadata: load only header and tables of database
-        bit_depth: bit depth, one of ``16``, ``24``, ``32``
-        channels: channel selection, see :func:`audresample.remix`.
-            Note that media files with too few channels
-            will be first upsampled by repeating the existing channels.
-            E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,
-            and ``channels=[1]`` returns the second channel
-            of all multi-channel files
-            and all mono files
-        format: file format, one of ``'flac'``, ``'wav'``
-        mixdown: apply mono mix-down
-        sampling_rate: sampling rate in Hz, one of
-            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
-        full_path: replace relative with absolute file paths
-        cache_root: cache folder where databases are stored.
-            If not set :meth:`audb.default_cache_root` is used
-        num_workers: number of parallel jobs or 1 for sequential
-            processing. If ``None`` will be set to the number of
-            processors on the machine multiplied by 5
-        timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``None`` is
-            returned. If timeout < 0 the method will block until the
-            database can be accessed
-        verbose: show debug messages
-
-    Returns:
-        dataframe
+    This class cannot be created directly,
+    but only by calling :func:`audb.stream`.
 
     """
 
@@ -100,24 +52,27 @@ class DatabaseIterator:
     ):
         self._cleanup_database(db, table)
 
-        self.db = db
-        self.table = table
-        self.version = version
-        self.map = map
-        self.batch_size = batch_size
-        self.shuffle = shuffle
-        self.buffer_size = buffer_size
-        self.only_metadata = only_metadata
-        self.bit_depth = bit_depth
-        self.channels = channels
-        self.format = format
-        self.mixdown = mixdown
-        self.sampling_rate = sampling_rate
-        self.full_path = full_path
-        self.cache_root = cache_root
-        self.num_workers = num_workers
-        self.timeout = timeout
-        self.verbose = verbose
+        # Transfer attributes of database object
+        for attr in db.__dict__.keys():
+            setattr(self, attr, getattr(db, attr))
+
+        self._table = table
+        self._version = version
+        self._map = map
+        self._batch_size = batch_size
+        self._shuffle = shuffle
+        self._buffer_size = buffer_size
+        self._only_metadata = only_metadata
+        self._bit_depth = bit_depth
+        self._channels = channels
+        self._format = format
+        self._mixdown = mixdown
+        self._sampling_rate = sampling_rate
+        self._full_path = full_path
+        self._cache_root = cache_root
+        self._num_workers = num_workers
+        self._timeout = timeout
+        self._verbose = verbose
 
         self._buffer = pd.DataFrame()
         self._current = 0
@@ -134,35 +89,26 @@ class DatabaseIterator:
         r"""Iterate database."""
         # Load part of table
         df = self._get_batch()
-        self.db[self.table]._df = df
+        self[self._table]._df = df
 
         # Load corresponding media files
         self._load_media(df)
 
         # Map column values
-        if self.map is not None:
-            df = self.db[self.table].get(map=self.map)
+        if self._map is not None:
+            df = self[self._table].get(map=self._map)
 
         # Adjust full paths and file extensions in table
         _update_path(
-            self.db,
-            self.db.root,
-            self.full_path,
-            self.format,
-            self.num_workers,
-            self.verbose,
+            self,
+            self.root,
+            self._full_path,
+            self._format,
+            self._num_workers,
+            self._verbose,
         )
 
         return df
-
-    def __repr__(self) -> str:
-        r"""String representation.
-
-        Returns:
-            string representing iterable database object
-
-        """
-        return str(self.db)
 
     @staticmethod
     def _cleanup_database(db: audformat.Database, table: str):
@@ -198,14 +144,14 @@ class DatabaseIterator:
             dataframe
 
         """
-        if self.shuffle:
-            if len(self._buffer) < self.batch_size:
+        if self._shuffle:
+            if len(self._buffer) < self._batch_size:
                 self._buffer = self._read_dataframe()
                 # Shuffle data
                 self._buffer = self._buffer.sample(frac=1)
                 self._current += self._samples
 
-            df = self._buffer.iloc[: self.batch_size, :]
+            df = self._buffer.iloc[: self._batch_size, :]
             self._buffer.drop(index=df.index, inplace=True)
 
         else:
@@ -230,20 +176,20 @@ class DatabaseIterator:
             media = list(df.index)
         else:
             media = []
-        if not self.only_metadata and len(media) > 0:
+        if not self._only_metadata and len(media) > 0:
             load_media(
-                self.db.name,
+                self.name,
                 media,
-                version=self.version,
-                bit_depth=self.bit_depth,
-                channels=self.channels,
-                format=self.format,
-                mixdown=self.mixdown,
-                sampling_rate=self.sampling_rate,
-                cache_root=self.cache_root,
-                num_workers=self.num_workers,
-                timeout=self.timeout,
-                verbose=self.verbose,
+                version=self._version,
+                bit_depth=self._bit_depth,
+                channels=self._channels,
+                format=self._format,
+                mixdown=self._mixdown,
+                sampling_rate=self._sampling_rate,
+                cache_root=self._cache_root,
+                num_workers=self._num_workers,
+                timeout=self._timeout,
+                verbose=self._verbose,
             )
 
     def _read_dataframe(self) -> pd.DataFrame:
@@ -405,9 +351,9 @@ class DatabaseIteratorParquet(DatabaseIterator):
             }.get,  # we have to provide a callable, not a dict
         )
         # Adjust dtypes and set index
-        df = self.db[self.table]._pyarrow_convert_dtypes(df, convert_all=False)
-        index_columns = list(self.db[self.table]._levels_and_dtypes.keys())
-        df = self.db[self.table]._set_index(df, index_columns)
+        df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
+        index_columns = list(self[self._table]._levels_and_dtypes.keys())
+        df = self[self._table]._set_index(df, index_columns)
         return df
 
 
