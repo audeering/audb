@@ -35,4 +35,5 @@ audb
     publish
     remove_media
     repository
+    stream
     versions
