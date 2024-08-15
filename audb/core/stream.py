@@ -13,6 +13,7 @@ from audb.core.dependencies import error_message_missing_object
 from audb.core.flavor import Flavor
 from audb.core.load import _load_files
 from audb.core.load import _misc_tables_used_in_table
+from audb.core.load import _update_path
 from audb.core.load import latest_version
 from audb.core.load import load_header_to
 from audb.core.load import load_media
@@ -97,6 +98,8 @@ class TableIterator:
         timeout: float,
         verbose: bool,
     ):
+        self._cleanup_database(db, table)
+
         self.db = db
         self.table = table
         self.version = version
@@ -129,12 +132,64 @@ class TableIterator:
 
     def __next__(self):
         r"""Iterate database."""
+        # Load part of table
         df = self._get_batch()
+        self.db[self.table]._df = df
+
+        # Load corresponding media files
         self._load_media(df)
+
+        # Map column values
         if self.map is not None:
-            self.db[self.table]._df = df
             df = self.db[self.table].get(map=map)
+
+        # Adjust full paths and file extensions in table
+        _update_path(
+            self.db,
+            self.db.root,
+            self.full_path,
+            self.format,
+            self.num_workers,
+            self.verbose,
+        )
+
         return df
+
+    def __repr__(self) -> str:
+        r"""String representation.
+
+        Returns:
+            string representing iterable database object
+
+        """
+        return str(self.db)
+
+    @staticmethod
+    def _cleanup_database(db: audformat.Database, table: str):
+        r"""Remove parts of database, not used by table.
+
+        Args:
+            db: database object
+            table: table ID
+
+        """
+        # Strip non-requested tables from the database
+        db.pick_tables(_misc_tables_used_in_table(db[table]) + [table])
+
+        # Remove unused splits
+        table_split = db[table].split_id or ""
+        for split in list(db.splits):
+            if split != table_split:
+                del db.splits[split]
+
+        # Remove unused schemes
+        table_schemes = []
+        for column_id, column in db[table].columns.items():
+            if column.scheme_id is not None:
+                table_schemes.append(column.scheme_id)
+        for scheme in list(db.schemes):
+            if scheme not in table_schemes:
+                del db.schemes[scheme]
 
     def _get_batch(self) -> pd.DataFrame:
         r"""Read table batch.
