@@ -20,6 +20,61 @@ from audb.core.lock import FolderLock
 
 
 class TableIterator:
+    r"""Database iterator.
+
+    Baseclass for a database iterator.
+
+    Args:
+        db: database object
+        table: table to iterate
+        version: version string, latest if ``None``
+        map: map scheme or scheme fields to column values.
+            For example if your table holds a column ``speaker`` with
+            speaker IDs, which is assigned to a scheme that contains a
+            dict mapping speaker IDs to age and gender entries,
+            ``map={'speaker': ['age', 'gender']}``
+            will replace the column with two new columns that map ID
+            values to age and gender, respectively.
+            To also keep the original column with speaker IDS, you can do
+            ``map={'speaker': ['speaker', 'age', 'gender']}``
+        batch_size: number of table rows
+            to return in one iteration
+        shuffle: if ``True``,
+            it first reads ``buffer_size`` rows from the table
+            and selects ``batch_size`` randomly from them
+        buffer_size: number of table rows
+            to be loaded
+            when ``shuffle`` is ``True``
+        only_metadata: load only header and tables of database
+        bit_depth: bit depth, one of ``16``, ``24``, ``32``
+        channels: channel selection, see :func:`audresample.remix`.
+            Note that media files with too few channels
+            will be first upsampled by repeating the existing channels.
+            E.g. ``channels=[0, 1]`` upsamples all mono files to stereo,
+            and ``channels=[1]`` returns the second channel
+            of all multi-channel files
+            and all mono files
+        format: file format, one of ``'flac'``, ``'wav'``
+        mixdown: apply mono mix-down
+        sampling_rate: sampling rate in Hz, one of
+            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+        full_path: replace relative with absolute file paths
+        cache_root: cache folder where databases are stored.
+            If not set :meth:`audb.default_cache_root` is used
+        num_workers: number of parallel jobs or 1 for sequential
+            processing. If ``None`` will be set to the number of
+            processors on the machine multiplied by 5
+        timeout: maximum wait time if another thread or process is already
+            accessing the database. If timeout is reached, ``None`` is
+            returned. If timeout < 0 the method will block until the
+            database can be accessed
+        verbose: show debug messages
+
+    Returns:
+        dataframe
+
+    """
+
     def __init__(
         self,
         db: audformat.Database,
@@ -63,9 +118,13 @@ class TableIterator:
 
         self._buffer = pd.DataFrame()
         self._current = 0
-        self._current_buffer = 0
+        if shuffle:
+            self._samples = buffer_size
+        else:
+            self._samples = batch_size
 
     def __iter__(self):
+        r"""Iterator generator."""
         return self
 
     def __next__(self):
@@ -78,13 +137,30 @@ class TableIterator:
         return df
 
     def _get_batch(self) -> pd.DataFrame:
-        r"""Load table batch.
+        r"""Read table batch.
 
         Returns:
-            batched dataframe
+            dataframe
 
         """
-        return pd.DataFrame()
+        if self.shuffle:
+            if len(self._buffer) < self.batch_size:
+                self._buffer = self._read_dataframe()
+                # Shuffle data
+                self._buffer = self._buffer.sample(frac=1)
+                self._current += self._samples
+
+            df = self._buffer.iloc[: self.batch_size, :]
+            self._buffer.drop(index=df.index, inplace=True)
+
+        else:
+            df = self._read_dataframe()
+            self._current += self._samples
+
+        if len(df) == 0:
+            raise StopIteration
+
+        return df
 
     def _load_media(self, df: pd.DataFrame):
         r"""Load media file for batch.
@@ -114,6 +190,16 @@ class TableIterator:
                 timeout=self.timeout,
                 verbose=self.verbose,
             )
+
+    def _read_dataframe(self) -> pd.DataFrame:
+        r"""Read dataframe from table.
+
+        Returns:
+            dataframe
+
+        """
+        # Implement this for your table format
+        return pd.DataFrame()
 
 
 class TableIteratorCsv(TableIterator):
@@ -191,41 +277,11 @@ class TableIteratorCsv(TableIterator):
         self._csv_index_col = list(db[table]._levels_and_dtypes.keys())
         self._csv_converters = converters
 
-    def _get_batch(self):
-        if self.shuffle:
-            if len(self._buffer) < self.batch_size:
-                self._buffer = self._read_csv(self._current_buffer, self.buffer_size)
-                # Shuffle data
-                self._buffer = self._buffer.sample(frac=1)
-                self._current_buffer += self.buffer_size
-
-            df = self._buffer.iloc[: self.batch_size, :]
-            self._buffer.drop(index=df.index, inplace=True)
-
-        else:
-            df = self._read_csv(self._current, self.batch_size)
-            self._current += self.batch_size
-
-        if len(df) == 0:
-            raise StopIteration
-
-        return df
-
-    def _read_csv(self, current: int, nrows: int) -> pd.DataFrame:
-        r"""Read from csv file.
-
-        Args:
-            current: current start row
-            nrows: number of rows to read
-
-        Returns:
-            dataframe
-
-        """
+    def _read_dataframe(self) -> pd.DataFrame:
         return pd.read_csv(
             self._file,
-            skiprows=lambda x: x in range(current) and x > 0,
-            nrows=nrows,
+            skiprows=lambda x: x in range(self._current) and x > 0,
+            nrows=self._samples,
             usecols=self._csv_usecols,
             dtype=self._csv_dtype,
             index_col=self._csv_index_col,
@@ -279,25 +335,24 @@ class TableIteratorParquet(TableIterator):
         )
 
         file = os.path.join(db.root, f"db.{table}.parquet")
-        self._stream = parquet.ParquetFile(file).iter_batches(batch_size=batch_size)
-
-    def _get_batch(self):
-        if self.shuffle:
-            # TODO: implement
-            pass
+        if shuffle:
+            samples = buffer_size
         else:
-            batch = next(iter(self._stream))
-            df = batch.to_pandas(
-                deduplicate_objects=False,
-                types_mapper={
-                    pa.string(): pd.StringDtype(),
-                }.get,  # we have to provide a callable, not a dict
-            )
-            # Adjust dtypes and set index
-            df = self.db[self.table]._pyarrow_convert_dtypes(df, convert_all=False)
-            index_columns = list(self.db[self.table]._levels_and_dtypes.keys())
-            df = self.db[self.table]._set_index(df, index_columns)
+            samples = batch_size
+        self._stream = parquet.ParquetFile(file).iter_batches(batch_size=samples)
 
+    def _read_dataframe(self) -> pd.DataFrame:
+        batch = next(iter(self._stream))
+        df = batch.to_pandas(
+            deduplicate_objects=False,
+            types_mapper={
+                pa.string(): pd.StringDtype(),
+            }.get,  # we have to provide a callable, not a dict
+        )
+        # Adjust dtypes and set index
+        df = self.db[self.table]._pyarrow_convert_dtypes(df, convert_all=False)
+        index_columns = list(self.db[self.table]._levels_and_dtypes.keys())
+        df = self.db[self.table]._set_index(df, index_columns)
         return df
 
 
@@ -343,6 +398,15 @@ def stream(
         name: name of database
         table: name of table
         version: version string, latest if ``None``
+        map: map scheme or scheme fields to column values.
+            For example if your table holds a column ``speaker`` with
+            speaker IDs, which is assigned to a scheme that contains a
+            dict mapping speaker IDs to age and gender entries,
+            ``map={'speaker': ['age', 'gender']}``
+            will replace the column with two new columns that map ID
+            values to age and gender, respectively.
+            To also keep the original column with speaker IDS, you can do
+            ``map={'speaker': ['speaker', 'age', 'gender']}``
         batch_size: number of table rows
             to return in one iteration
         shuffle: if ``True``,
