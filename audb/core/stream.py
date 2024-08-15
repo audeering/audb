@@ -511,16 +511,22 @@ def stream(
             e.g. text files
 
     Examples:
-        >>> db = audb.load(
+        >>> db = audb.stream(
         ...     "emodb",
+        ...     "files",
         ...     version="1.4.1",
-        ...     tables=["emotion", "files"],
+        ...     batch_size=4,
         ...     only_metadata=True,
         ...     full_path=False,
         ...     verbose=False,
         ... )
-        >>> list(db.tables)
-        ['emotion', 'files']
+        >>> next(iter(db))
+                                         duration  speaker transcription
+        file
+        wav/03a01Fa.wav    0 days 00:00:01.898250        3           a01
+        wav/03a01Nc.wav    0 days 00:00:01.611250        3           a01
+        wav/03a01Wa.wav 0 days 00:00:01.877812500        3           a01
+        wav/03a02Fc.wav    0 days 00:00:02.006250        3           a02
 
     """
     if version is None:
