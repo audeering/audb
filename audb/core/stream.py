@@ -61,6 +61,10 @@ class TableIterator:
         self.timeout = timeout
         self.verbose = verbose
 
+        self._buffer = pd.DataFrame()
+        self._current = 0
+        self._current_buffer = 0
+
     def __iter__(self):
         return self
 
@@ -157,7 +161,6 @@ class TableIteratorCsv(TableIterator):
         )
 
         self._file = os.path.join(db.root, f"db.{table}.csv")
-        self._current = 0
 
         # Prepare settings for csv file reading
 
@@ -179,8 +182,8 @@ class TableIteratorCsv(TableIterator):
             elif dtype == audformat.define.DataType.TIME:
                 converters[column] = lambda x: pd.to_timedelta(x)
             else:
-                dtypes_wo_converters[column] = (
-                    audformat.core.common.to_pandas_dtype(dtype)
+                dtypes_wo_converters[column] = audformat.core.common.to_pandas_dtype(
+                    dtype
                 )
 
         self._csv_usecols = list(columns_and_dtypes.keys())
@@ -188,30 +191,47 @@ class TableIteratorCsv(TableIterator):
         self._csv_index_col = list(db[table]._levels_and_dtypes.keys())
         self._csv_converters = converters
 
-
     def _get_batch(self):
         if self.shuffle:
-            # TODO: implement
-            pass
+            if len(self._buffer) < self.batch_size:
+                self._buffer = self._read_csv(self._current_buffer, self.buffer_size)
+                # Shuffle data
+                self._buffer = self._buffer.sample(frac=1)
+                self._current_buffer += self.buffer_size
+
+            df = self._buffer.iloc[: self.batch_size, :]
+            self._buffer.drop(index=df.index, inplace=True)
+
         else:
-
-            df = pd.read_csv(
-                self._file,
-                skiprows=lambda x: x in range(self._current) and x > 0,
-                nrows=self.batch_size,
-                usecols=self._csv_usecols,
-                dtype=self._csv_dtype,
-                index_col=self._csv_index_col,
-                converters=self._csv_converters,
-                float_precision="round_trip",
-            )
-
+            df = self._read_csv(self._current, self.batch_size)
             self._current += self.batch_size
 
         if len(df) == 0:
             raise StopIteration
 
         return df
+
+    def _read_csv(self, current: int, nrows: int) -> pd.DataFrame:
+        r"""Read from csv file.
+
+        Args:
+            current: current start row
+            nrows: number of rows to read
+
+        Returns:
+            dataframe
+
+        """
+        return pd.read_csv(
+            self._file,
+            skiprows=lambda x: x in range(current) and x > 0,
+            nrows=nrows,
+            usecols=self._csv_usecols,
+            dtype=self._csv_dtype,
+            index_col=self._csv_index_col,
+            converters=self._csv_converters,
+            float_precision="round_trip",
+        )
 
 
 class TableIteratorParquet(TableIterator):
