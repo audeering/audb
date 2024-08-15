@@ -499,7 +499,7 @@ def stream(
         database object
 
     Raises:
-        ValueError: if attachment, table or media is requested
+        ValueError: if table is requested
             that is not part of the database
         ValueError: if a non-supported ``bit_depth``,
             ``format``,
