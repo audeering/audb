@@ -61,14 +61,112 @@ class TableIterator:
         self.timeout = timeout
         self.verbose = verbose
 
-        file = os.path.join(db.root, f"db.{table}.parquet")
-        self._stream = parquet.ParquetFile(file).iter_batches(batch_size=batch_size)
+        if os.path.exists(os.path.join(db.root, f"db.{table}.parquet")):
+            self._file = os.path.join(db.root, f"db.{table}.parquet")
+        else:
+            self._file = os.path.join(db.root, f"db.{table}.csv")
+
         self._current = 0
 
     def __iter__(self):
         return self
 
     def __next__(self):
+        r"""Iterate database."""
+        df = self._get_batch()
+        self._load_media(df)
+        if self.map is not None:
+            self.db[self.table]._df = df
+            df = self.db[self.table].get(map=map)
+        return df
+
+    def _get_batch(self) -> pd.DataFrame:
+        r"""Load table batch.
+
+        Returns:
+            batched dataframe
+
+        """
+        return pd.DataFrame()
+
+    def _load_media(self, df: pd.DataFrame):
+        r"""Load media file for batch.
+
+        Args:
+            df: dataframe of batch
+
+        """
+        if audformat.is_segmented_index(df.index):
+            media = list(df.index.get_level_values("file"))
+        elif audformat.is_filewise_index(df.index):
+            media = list(df.index)
+        else:
+            media = []
+        if not self.only_metadata and len(media) > 0:
+            load_media(
+                self.db.name,
+                media,
+                version=self.version,
+                bit_depth=self.bit_depth,
+                channels=self.channels,
+                format=self.format,
+                mixdown=self.mixdown,
+                sampling_rate=self.sampling_rate,
+                cache_root=self.cache_root,
+                num_workers=self.num_workers,
+                timeout=self.timeout,
+                verbose=self.verbose,
+            )
+
+
+class TableIteratorParquet(TableIterator):
+    def __init__(
+        self,
+        db: audformat.Database,
+        table: str,
+        *,
+        version: str,
+        map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]],
+        batch_size: int,
+        shuffle: bool,
+        buffer_size: int,
+        only_metadata: bool,
+        bit_depth: int,
+        channels: typing.Union[int, typing.Sequence[int]],
+        format: str,
+        mixdown: bool,
+        sampling_rate: int,
+        full_path: bool,
+        cache_root: str,
+        num_workers: typing.Optional[int],
+        timeout: float,
+        verbose: bool,
+    ):
+        super().__init__(
+            db,
+            table,
+            version=version,
+            map=map,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            buffer_size=buffer_size,
+            only_metadata=only_metadata,
+            bit_depth=bit_depth,
+            channels=channels,
+            format=format,
+            mixdown=mixdown,
+            sampling_rate=sampling_rate,
+            full_path=full_path,
+            cache_root=cache_root,
+            num_workers=num_workers,
+            timeout=timeout,
+            verbose=verbose,
+        )
+
+        file = os.path.join(db.root, f"db.{table}.parquet")
+        self._stream = parquet.ParquetFile(file).iter_batches(batch_size=batch_size)
+
+    def _get_batch(self):
         if self.shuffle:
             # TODO: implement
             pass
@@ -84,31 +182,6 @@ class TableIterator:
             df = self.db[self.table]._pyarrow_convert_dtypes(df, convert_all=False)
             index_columns = list(self.db[self.table]._levels_and_dtypes.keys())
             df = self.db[self.table]._set_index(df, index_columns)
-
-            if audformat.is_segmented_index(df.index):
-                media = list(df.index.get_level_values("file"))
-            elif audformat.is_filewise_index(df.index):
-                media = list(df.index)
-            else:
-                media = []
-            if not self.only_metadata and len(media) > 0:
-                load_media(
-                    self.db.name,
-                    media,
-                    version=self.version,
-                    bit_depth=self.bit_depth,
-                    channels=self.channels,
-                    format=self.format,
-                    mixdown=self.mixdown,
-                    sampling_rate=self.sampling_rate,
-                    cache_root=self.cache_root,
-                    num_workers=self.num_workers,
-                    timeout=self.timeout,
-                    verbose=self.verbose,
-                )
-        if self.map is not None:
-            self.db[self.table]._df = df
-            df = self.db[self.table].get(map=map)
 
         return df
 
@@ -261,7 +334,12 @@ def stream(
             table_file = os.path.join(db_root, f"db.{misc_table}")
             db[misc_table].load(table_file)
 
-    table_iterator = TableIterator(
+    if os.path.exists(os.path.join(db_root, f"db.{table}.parquet")):
+        table_iterator_object = TableIteratorParquet
+    else:
+        table_iterator_object = TableIteratorCsv
+
+    table_iterator = table_iterator_object(
         db,
         table,
         version=version,
