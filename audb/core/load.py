@@ -810,7 +810,15 @@ def _load_files(
 def _misc_tables_used_in_scheme(
     db: audformat.Database,
 ) -> typing.List[str]:
-    r"""List of misc tables that are used inside a scheme."""
+    r"""List of misc tables that are used inside a scheme.
+
+    Args:
+        db: database object
+
+    Returns:
+        unique list of misc tables used in schemes
+
+    """
     misc_tables_used_in_scheme = []
     for scheme in db.schemes.values():
         if scheme.uses_table:
@@ -1747,14 +1755,23 @@ def load_table(
             version,
         )
 
+        # Find misc tables used in schemes of the requested table
+        scheme_misc_tables = []
+        for column_id, column in db[table].columns.items():
+            if column.scheme_id is not None:
+                scheme = db.schemes[column.scheme_id]
+                if scheme.uses_table:
+                    scheme_misc_tables.append(scheme.labels)
+        scheme_misc_tables = audeer.unique(scheme_misc_tables)
+
         # Load table
-        tables = _misc_tables_used_in_scheme(db) + [table]
+        tables = scheme_misc_tables + [table]
         for _table in tables:
             table_file = os.path.join(db_root, f"db.{_table}")
-            if not (
-                os.path.exists(f"{table_file}.csv")
-                or os.path.exists(f"{table_file}.pkl")
-            ):
+            # `_load_files()` downloads a table
+            # from the backend,
+            # if it cannot find its corresponding csv or parquet file
+            if not os.path.exists(f"{table_file}.pkl"):
                 _load_files(
                     [_table],
                     "table",
