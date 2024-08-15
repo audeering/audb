@@ -523,7 +523,7 @@ def stream(
         ...     full_path=False,
         ...     verbose=False,
         ... )
-        >>> next(iter(db))
+        >>> next(db)
                                          duration  speaker transcription
         file
         wav/14a05Fb.wav 0 days 00:00:03.128687500       14           a05
