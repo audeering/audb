@@ -16,10 +16,10 @@ from audb.core.load import load
 from audb.core.load import load_attachment
 from audb.core.load import load_media
 from audb.core.load import load_table
-from audb.core.load import stream
 from audb.core.load_to import load_to
 from audb.core.publish import publish
 from audb.core.repository import Repository
+from audb.core.stream import stream
 
 
 __all__ = []
