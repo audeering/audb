@@ -26,7 +26,89 @@ class DatabaseIterator(audformat.Database):
     This class cannot be created directly,
     but only by calling :func:`audb.stream`.
 
-    """
+    Examples:
+        Create :class:`audb.DatabaseIterator` object.
+
+        >>> db = audb.stream(
+        ...     "emodb",
+        ...     "files",
+        ...     version="1.4.1",
+        ...     batch_size=4,
+        ...     only_metadata=True,
+        ...     full_path=False,
+        ...     verbose=False,
+        ... )
+
+        The :class:`audb.DatabaseIterator` object
+        is restricted to the requested table,
+        and all related schemes
+        and misc tables
+        used as labels in a related scheme.
+
+        >>> db
+        name: emodb
+        ...
+        schemes:
+          age: {description: Age of speaker, dtype: int, minimum: 0}
+          duration: {dtype: time}
+          gender:
+            description: Gender of speaker
+            dtype: str
+            labels: [female, male]
+          language: {description: Language of speaker, dtype: str}
+          speaker: {description: The actors could produce each sentence as often as they liked
+              and were asked to remember a real situation from their past when they had felt
+              this emotion., dtype: int, labels: speaker}
+          transcription:
+            description: Sentence produced by actor.
+            dtype: str
+            labels: {a01: Der Lappen liegt auf dem Eisschrank., a02: Das will sie am Mittwoch
+                abgeben., a04: Heute abend könnte ich es ihm sagen., a05: Das schwarze Stück
+                Papier befindet sich da oben neben dem Holzstück., a07: In sieben Stunden
+                wird es soweit sein., b01: 'Was sind denn das für Tüten, die da unter dem
+                Tisch stehen.', b02: Sie haben es gerade hochgetragen und jetzt gehen sie
+                wieder runter., b03: An den Wochenenden bin ich jetzt immer nach Hause gefahren
+                und habe Agnes besucht., b09: Ich will das eben wegbringen und dann mit Karl
+                was trinken gehen., b10: 'Die wird auf dem Platz sein, wo wir sie immer hinlegen.'}
+        tables:
+          files:
+            type: filewise
+            columns:
+              duration: {scheme_id: duration}
+              speaker: {scheme_id: speaker}
+              transcription: {scheme_id: transcription}
+        misc_tables:
+          speaker:
+            levels: {speaker: int}
+            columns:
+              age: {scheme_id: age}
+              gender: {scheme_id: gender}
+              language: {scheme_id: language}
+        pdf: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&rep=rep1&type=pdf
+
+        Request the first batch of data.
+
+        >>> next(db)
+                                         duration  speaker transcription
+        file
+        wav/03a01Fa.wav    0 days 00:00:01.898250        3           a01
+        wav/03a01Nc.wav    0 days 00:00:01.611250        3           a01
+        wav/03a01Wa.wav 0 days 00:00:01.877812500        3           a01
+        wav/03a02Fc.wav    0 days 00:00:02.006250        3           a02
+
+        During the iteration,
+        the :class:`audb.DatabaseIterator` object
+        provides access to the current batch of data.
+
+        >>> db["files"].get(map={"speaker": "age"})
+                                         duration transcription  age
+        file
+        wav/03a01Fa.wav    0 days 00:00:01.898250           a01   31
+        wav/03a01Nc.wav    0 days 00:00:01.611250           a01   31
+        wav/03a01Wa.wav 0 days 00:00:01.877812500           a01   31
+        wav/03a02Fc.wav    0 days 00:00:02.006250           a02   31
+
+    """  # noqa: E501
 
     def __init__(
         self,
@@ -119,20 +201,25 @@ class DatabaseIterator(audformat.Database):
             table: table ID
 
         """
+        tables = _misc_tables_used_in_table(db[table]) + [table]
+
         # Strip non-requested tables from the database
-        db.pick_tables(_misc_tables_used_in_table(db[table]) + [table])
+        db.pick_tables(tables)
 
         # Remove unused splits
-        table_split = db[table].split_id or ""
+        table_splits = [
+            db[table].split_id for table in tables if db[table].split_id is not None
+        ]
         for split in list(db.splits):
-            if split != table_split:
+            if split not in table_splits:
                 del db.splits[split]
 
         # Remove unused schemes
         table_schemes = []
-        for column_id, column in db[table].columns.items():
-            if column.scheme_id is not None:
-                table_schemes.append(column.scheme_id)
+        for table in tables:
+            for column_id, column in db[table].columns.items():
+                if column.scheme_id is not None:
+                    table_schemes.append(column.scheme_id)
         for scheme in list(db.schemes):
             if scheme not in table_schemes:
                 del db.schemes[scheme]
