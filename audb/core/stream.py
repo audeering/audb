@@ -20,7 +20,7 @@ from audb.core.load import load_media
 from audb.core.lock import FolderLock
 
 
-class TableIterator:
+class DatabaseIterator:
     r"""Database iterator.
 
     Baseclass for a database iterator.
@@ -257,7 +257,7 @@ class TableIterator:
         return pd.DataFrame()
 
 
-class TableIteratorCsv(TableIterator):
+class DatabaseIteratorCsv(DatabaseIterator):
     def __init__(
         self,
         db: audformat.Database,
@@ -345,7 +345,7 @@ class TableIteratorCsv(TableIterator):
         )
 
 
-class TableIteratorParquet(TableIterator):
+class DatabaseIteratorParquet(DatabaseIterator):
     def __init__(
         self,
         db: audformat.Database,
@@ -431,7 +431,7 @@ def stream(
     num_workers: typing.Optional[int] = 1,
     timeout: float = -1,
     verbose: bool = True,
-) -> typing.Optional[audformat.Database]:
+) -> DatabaseIterator:
     r"""Stream table and media files of a database.
 
     Loads only the first ``batch_size`` rows
@@ -511,11 +511,14 @@ def stream(
             e.g. text files
 
     Examples:
+        >>> import numpy as np
+        >>> np.random.seed(1)
         >>> db = audb.stream(
         ...     "emodb",
         ...     "files",
         ...     version="1.4.1",
         ...     batch_size=4,
+        ...     shuffle=True,
         ...     only_metadata=True,
         ...     full_path=False,
         ...     verbose=False,
@@ -523,10 +526,10 @@ def stream(
         >>> next(iter(db))
                                          duration  speaker transcription
         file
-        wav/03a01Fa.wav    0 days 00:00:01.898250        3           a01
-        wav/03a01Nc.wav    0 days 00:00:01.611250        3           a01
-        wav/03a01Wa.wav 0 days 00:00:01.877812500        3           a01
-        wav/03a02Fc.wav    0 days 00:00:02.006250        3           a02
+        wav/14a05Fb.wav 0 days 00:00:03.128687500       14           a05
+        wav/15a05Eb.wav 0 days 00:00:03.993562500       15           a05
+        wav/12a05Nd.wav    0 days 00:00:03.185875       12           a05
+        wav/13a07Na.wav 0 days 00:00:01.911687500       13           a07
 
     """
     if version is None:
@@ -575,11 +578,11 @@ def stream(
             db[misc_table].load(table_file)
 
     if os.path.exists(os.path.join(db_root, f"db.{table}.parquet")):
-        table_iterator_object = TableIteratorParquet
+        database_iterator_object = DatabaseIteratorParquet
     else:
-        table_iterator_object = TableIteratorCsv
+        database_iterator_object = DatabaseIteratorCsv
 
-    table_iterator = table_iterator_object(
+    database_iterator = database_iterator_object(
         db,
         table,
         version=version,
@@ -600,4 +603,4 @@ def stream(
         verbose=verbose,
     )
 
-    return table_iterator
+    return database_iterator
