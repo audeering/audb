@@ -141,7 +141,7 @@ class DatabaseIterator:
 
         # Map column values
         if self.map is not None:
-            df = self.db[self.table].get(map=map)
+            df = self.db[self.table].get(map=self.map)
 
         # Adjust full paths and file extensions in table
         _update_path(
