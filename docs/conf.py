@@ -74,7 +74,6 @@ apipages_hidden_methods = [
     "__contains__",
     "__eq__",
     "__getitem__",
-    "__iter__",
     "__len__",
     "__next__",
 ]

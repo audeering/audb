@@ -165,10 +165,6 @@ class DatabaseIterator(audformat.Database):
         else:
             self._samples = batch_size
 
-    def __iter__(self) -> DatabaseIterator:
-        r"""Iterator generator."""
-        return self
-
     def __next__(self) -> pd.DataFrame:
         r"""Iterate database."""
         # Load part of table
