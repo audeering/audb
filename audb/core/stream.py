@@ -570,7 +570,14 @@ def stream(
     if version is None:
         version = latest_version(name)
 
-    db_root = database_cache_root(name, version, cache_root)
+    flavor = Flavor(
+        bit_depth=bit_depth,
+        channels=channels,
+        format=format,
+        mixdown=mixdown,
+        sampling_rate=sampling_rate,
+    )
+    db_root = database_cache_root(name, version, cache_root, flavor)
 
     deps = dependencies(
         name,
@@ -585,7 +592,13 @@ def stream(
 
     with FolderLock(db_root):
         # Start with database header without tables
-        db, backend_interface = load_header_to(db_root, name, version)
+        db, backend_interface = load_header_to(
+            db_root,
+            name,
+            version,
+            flavor=flavor,
+            add_audb_meta=True,
+        )
 
         # Misc tables required by schemes of requested table
         misc_tables = _misc_tables_used_in_table(db[table])
