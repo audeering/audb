@@ -203,28 +203,38 @@ class DatabaseIterator(audformat.Database):
             table: table ID
 
         """
-        tables = _misc_tables_used_in_table(db[table]) + [table]
+        tables = [table]
+        misc_tables = _misc_tables_used_in_table(db[table])
 
-        # Strip non-requested tables from the database
-        db.pick_tables(tables)
-
-        # Remove unused splits
-        table_splits = [
-            db[table].split_id for table in tables if db[table].split_id is not None
-        ]
-        for split in list(db.splits):
-            if split not in table_splits:
-                del db.splits[split]
+        # Remove non-requested table
+        db.drop_tables([table for table in list(db.tables) if table not in tables])
 
         # Remove unused schemes
-        table_schemes = []
-        for table in tables:
+        used_schemes = []
+        for table in misc_tables + tables:
             for column_id, column in db[table].columns.items():
                 if column.scheme_id is not None:
-                    table_schemes.append(column.scheme_id)
+                    used_schemes.append(column.scheme_id)
         for scheme in list(db.schemes):
-            if scheme not in table_schemes:
+            if scheme not in used_schemes:
                 del db.schemes[scheme]
+
+        # Remove misc tables not required by the schemes of table
+        db.drop_tables(
+            [
+                misc_table
+                for misc_table in list(db.misc_tables)
+                if misc_table not in misc_tables + tables
+            ]
+        )
+
+        # Remove unused splits
+        used_splits = [
+            db[table].split_id for table in list(db) if db[table].split_id is not None
+        ]
+        for split in list(db.splits):
+            if split not in used_splits:
+                del db.splits[split]
 
     def _get_batch(self) -> pd.DataFrame:
         r"""Read table batch.
@@ -297,7 +307,7 @@ class DatabaseIterator(audformat.Database):
 
         """
         # Implement this for your table format
-        return pd.DataFrame()
+        return pd.DataFrame()  # pragma: nocover
 
 
 class DatabaseIteratorCsv(DatabaseIterator):
@@ -349,7 +359,7 @@ class DatabaseIteratorCsv(DatabaseIterator):
         # Prepare settings for csv file reading
 
         # index
-        columns_and_dtypes = db[table]._levels_and_dtypes
+        columns_and_dtypes = db[table]._levels_and_dtypes.copy()
         # add columns
         for column_id, column in db[table].columns.items():
             if column.scheme_id is not None:
@@ -376,16 +386,23 @@ class DatabaseIteratorCsv(DatabaseIterator):
         self._csv_converters = converters
 
     def _read_dataframe(self) -> pd.DataFrame:
-        return pd.read_csv(
+        df = pd.read_csv(
             self._file,
             skiprows=lambda x: x in range(self._current + 1) and x > 0,
             nrows=self._samples,
             usecols=self._csv_usecols,
             dtype=self._csv_dtype,
-            index_col=self._csv_index_col,
             converters=self._csv_converters,
             float_precision="round_trip",
         )
+        # Ensure categorical dtypes are preserved
+        # when reading from CSV files.
+        # This is most likely broken in the csv code of audformat,
+        # which used `pandas.read_csv()`
+        df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
+        df = self[self._table]._set_index(df, self._csv_index_col)
+
+        return df
 
 
 class DatabaseIteratorParquet(DatabaseIterator):

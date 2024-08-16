@@ -53,27 +53,38 @@ class TestStreaming:
     """Seed for random operations."""
 
     @classmethod
-    @pytest.fixture(scope="class", autouse=True)
-    def setup(cls, tmpdir_factory, persistent_repository):
+    @pytest.fixture(scope="class", autouse=True, params=["parquet", "csv"])
+    def setup(cls, request, tmpdir_factory, persistent_repository):
         r"""Publish a database.
 
         This creates a database,
         consisting of 5 audio files,
         2 misc tables (1 used as scheme labels),
-        and 1 table.
+        and 2 tables (1 fileswise, 1 segmented).
+
+        The database is published to a new repository
+        for each ``storage_format``,
+        and all tests are run for a given ``storage_format``.
+
+        Args:
+            request: request fixture to access params
+            tmpdir_factory: tmpdir_factory fixture
+            persistent_repository: persistent_repository fixture
 
         """
+        storage_format = request.param
+
         db_root = tmpdir_factory.mktemp("build")
 
         db = audformat.Database(cls.name)
 
         # Misc table for scheme labels
-        db.schemes["age"] = audformat.Scheme("int")
+        db.schemes["year-of-birth"] = audformat.Scheme("date")
         db["speaker"] = audformat.MiscTable(
             pd.Index([0, 1, 2, 3, 4], name="speaker", dtype="Int64")
         )
-        db["speaker"]["age"] = audformat.Column(scheme_id="age")
-        db["speaker"]["age"].set([10, 20, 30, 40, 50])
+        db["speaker"]["year-of-birth"] = audformat.Column(scheme_id="year-of-birth")
+        db["speaker"]["year-of-birth"].set([1910, 1920, 1930, 1940, 1950])
         db.schemes["speaker"] = audformat.Scheme("int", labels="speaker")
 
         # Misc table
@@ -86,7 +97,7 @@ class TestStreaming:
         db["acronym"]["speaker"] = audformat.Column(scheme_id="speaker")
         db["acronym"]["speaker"].set([0])
 
-        # Table
+        # Filewise table
         db.schemes["quality"] = audformat.Scheme("int", labels=[1, 2, 3])
         index = audformat.filewise_index([f"file{n}.wav" for n in range(5)])
         create_audio_files(db_root, index)
@@ -96,11 +107,26 @@ class TestStreaming:
         db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
         db["files"]["speaker"].set([0, 1, 2, 3, 4])
 
-        db.save(db_root)
+        # Segmented table
+        index = audformat.segmented_index(
+            files=["file0.wav", "file0.wav", "file1.wav", "file2.wav"],
+            starts=[0, 0.5, 0.1, 0.1],
+            ends=[0.4, 0.9, 0.8, 0.9],
+        )
+        db["segments"] = audformat.Table(index)
+        db["segments"]["noise"] = audformat.Column()
+        db["segments"]["noise"].set(["low", "low", "low", "high"])
+
+        db.save(db_root, storage_format=storage_format)
+
+        # Ensure we start with an empty repository
+        # for each storage format
+        audeer.rmdir(persistent_repository.host)
+        audeer.mkdir(persistent_repository.host, persistent_repository.name)
 
         audb.publish(db_root, cls.version, persistent_repository)
 
-    @pytest.mark.parametrize("table", ["files", "speaker", "acronym"])
+    @pytest.mark.parametrize("table", ["files", "segments", "speaker", "acronym"])
     @pytest.mark.parametrize("batch_size", [0, 1, 2, 10])
     def test_batch_size(self, table: str, batch_size: int):
         r"""Test table batching.
@@ -141,7 +167,7 @@ class TestStreaming:
         if batch_size > len(expected_df):
             assert len(batches) == 1
 
-    @pytest.mark.parametrize("table", ["files", "speaker", "acronym"])
+    @pytest.mark.parametrize("table", ["files", "acronym"])
     @pytest.mark.parametrize("batch_size", [0, 1, 2, 10])
     @pytest.mark.parametrize("buffer_size", [0, 1, 2, 10])
     def test_buffer_size(self, table: str, batch_size: int, buffer_size: int):
@@ -193,9 +219,13 @@ class TestStreaming:
     @pytest.mark.parametrize(
         "table, expected_tables, expected_schemes",
         [
-            ("speaker", ["speaker"], ["age"]),
-            ("acronym", ["acronym", "speaker"], ["age", "full-name", "speaker"]),
-            ("files", ["files", "speaker"], ["age", "quality", "speaker"]),
+            ("speaker", ["speaker"], ["year-of-birth"]),
+            (
+                "acronym",
+                ["acronym", "speaker"],
+                ["year-of-birth", "full-name", "speaker"],
+            ),
+            ("files", ["files", "speaker"], ["year-of-birth", "quality", "speaker"]),
         ],
     )
     def test_db_cleanup(
@@ -242,7 +272,6 @@ class TestStreaming:
         db = audb.stream(
             self.name,
             "files",
-            version=self.version,
             only_metadata=True,
             full_path=full_path,
             verbose=False,
@@ -255,10 +284,48 @@ class TestStreaming:
             assert path == "file0.wav"
 
     @pytest.mark.parametrize(
+        "table, map",
+        [
+            ("acronym", {"speaker": "year-of-birth"}),
+            ("acronym", {"speaker": ["year-of-birth", "speaker"]}),
+            ("acronym", {"speaker": ["speaker", "year-of-birth"]}),
+            ("files", {"speaker": "year-of-birth"}),
+        ],
+    )
+    def test_map(self, table: str, map: typing.Dict):
+        r"""Test mapping of scheme labels.
+
+        Args:
+            table: table to stream
+            map: mapping of column with scheme labels
+
+        """
+        db = audb.stream(
+            self.name,
+            table,
+            version=self.version,
+            map=map,
+            batch_size=16,
+            only_metadata=True,
+            verbose=False,
+        )
+        df = next(db)
+        expected_df = audb.load_table(
+            self.name,
+            table,
+            version=self.version,
+            map=map,
+            verbose=False,
+        )
+        pd.testing.assert_frame_equal(df, expected_df)
+
+    @pytest.mark.parametrize(
         "only_metadata, table, expected_number_of_media_files",
         [
             (True, "files", 5),
             (False, "files", 5),
+            (True, "segments", 3),
+            (False, "segments", 3),
             (True, "acronym", 0),
             (False, "acronym", 0),
             (True, "speaker", 0),
@@ -294,7 +361,7 @@ class TestStreaming:
                 assert os.path.exists(file)
 
     @pytest.mark.parametrize("shuffle", [False, True])
-    @pytest.mark.parametrize("table", ["files", "speaker", "acronym"])
+    @pytest.mark.parametrize("table", ["files", "segments", "speaker", "acronym"])
     def test_shuffle(self, shuffle: bool, table: str):
         r"""Test table batch shuffling.
 
@@ -327,3 +394,22 @@ class TestStreaming:
         if shuffle:
             expected_df = expected_df.sample(frac=1)
         pd.testing.assert_frame_equal(df, expected_df)
+
+    @pytest.mark.parametrize(
+        "table, error, error_msg",
+        [
+            (
+                "non-existent",
+                ValueError,
+                "Could not find the table 'non-existent' in db v1.0.0",
+            ),
+        ],
+    )
+    def test_errors(self, table: str, error, error_msg: str):
+        with pytest.raises(error, match=error_msg):
+            audb.stream(
+                self.name,
+                table,
+                version=self.version,
+                verbose=False,
+            )
