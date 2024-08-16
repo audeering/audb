@@ -234,14 +234,22 @@ class DatabaseIterator(audformat.Database):
 
         """
         if self._shuffle:
+            buffer_read_length = self._batch_size
+            df1 = pd.DataFrame()
             if len(self._buffer) < self._batch_size:
+                if len(self._buffer) > 0:
+                    # Empty current buffer,
+                    # before refilling
+                    df1 = self._buffer
+                    buffer_read_length = self._batch_size - len(self._buffer)
                 self._buffer = self._read_dataframe()
                 # Shuffle data
                 self._buffer = self._buffer.sample(frac=1)
                 self._current += self._samples
 
-            df = self._buffer.iloc[: self._batch_size, :]
-            self._buffer.drop(index=df.index, inplace=True)
+            df2 = self._buffer.iloc[:buffer_read_length, :]
+            self._buffer.drop(index=df2.index, inplace=True)
+            df = pd.concat([df1, df2])
 
         else:
             df = self._read_dataframe()
@@ -370,7 +378,7 @@ class DatabaseIteratorCsv(DatabaseIterator):
     def _read_dataframe(self) -> pd.DataFrame:
         return pd.read_csv(
             self._file,
-            skiprows=lambda x: x in range(self._current) and x > 0,
+            skiprows=lambda x: x in range(self._current + 1) and x > 0,
             nrows=self._samples,
             usecols=self._csv_usecols,
             dtype=self._csv_dtype,
