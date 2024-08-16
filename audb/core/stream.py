@@ -86,7 +86,7 @@ class DatabaseIterator(audformat.Database):
               age: {scheme_id: age}
               gender: {scheme_id: gender}
               language: {scheme_id: language}
-        pdf: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&rep=rep1&type=pdf
+        ...
 
         Request the first batch of data.
 
@@ -440,17 +440,23 @@ class DatabaseIteratorParquet(DatabaseIterator):
         self._stream = parquet.ParquetFile(file).iter_batches(batch_size=samples)
 
     def _read_dataframe(self) -> pd.DataFrame:
-        batch = next(iter(self._stream))
-        df = batch.to_pandas(
-            deduplicate_objects=False,
-            types_mapper={
-                pa.string(): pd.StringDtype(),
-            }.get,  # we have to provide a callable, not a dict
-        )
-        # Adjust dtypes and set index
-        df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
-        index_columns = list(self[self._table]._levels_and_dtypes.keys())
-        df = self[self._table]._set_index(df, index_columns)
+        try:
+            batch = next(iter(self._stream))
+            df = batch.to_pandas(
+                deduplicate_objects=False,
+                types_mapper={
+                    pa.string(): pd.StringDtype(),
+                }.get,  # we have to provide a callable, not a dict
+            )
+            # Adjust dtypes and set index
+            df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
+            index_columns = list(self[self._table]._levels_and_dtypes.keys())
+            df = self[self._table]._set_index(df, index_columns)
+        except StopIteration:
+            # Ensure return an empty dataframe,
+            # at the last iteration,
+            # when no remaining data is left
+            df = pd.DataFrame()
         return df
 
 
