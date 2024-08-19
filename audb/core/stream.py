@@ -354,8 +354,7 @@ class DatabaseIteratorCsv(DatabaseIterator):
             verbose=verbose,
         )
 
-        self._file = os.path.join(db.root, f"db.{table}.csv")
-
+        # self._file = os.path.join(db.root, f"db.{table}.csv")
         # Prepare settings for csv file reading
 
         # index
@@ -385,39 +384,45 @@ class DatabaseIteratorCsv(DatabaseIterator):
         self._csv_index_col = list(db[table]._levels_and_dtypes.keys())
         self._csv_converters = converters
 
-    def _read_dataframe(self) -> pd.DataFrame:
-        # Debug: read whole file
-        df = pd.read_csv(
-            self._file,
-            # skiprows=0,
-            # nrows=self._samples,
-            usecols=self._csv_usecols,
-            dtype=self._csv_dtype,
-            converters=self._csv_converters,
-            float_precision="round_trip",
-        )
-        print("Reading whole CSV")
-        print(f"{df=}")
+        file = os.path.join(db.root, f"db.{table}.csv")
+        if shuffle:
+            samples = buffer_size
+        else:
+            samples = batch_size
+        if samples == 0:
+            self._stream = []
+        else:
+            self._stream = pd.read_csv(
+                file,
+                chunksize=samples,
+                usecols=self._csv_usecols,
+                dtype=self._csv_dtype,
+                converters=self._csv_converters,
+                float_precision="round_trip",
+            )
 
-        df = pd.read_csv(
-            self._file,
-            skiprows=lambda x: x in range(self._current + 1) and x > 0,
-            nrows=self._samples,
-            usecols=self._csv_usecols,
-            dtype=self._csv_dtype,
-            converters=self._csv_converters,
-            float_precision="round_trip",
-        )
-        print("Reading CSV batch")
-        print(f"{self._current=}")
-        print(f"{self._samples=}")
-        print(f"{df=}")
-        # Ensure categorical dtypes are preserved
-        # when reading from CSV files.
-        # This is most likely broken in the csv code of audformat,
-        # which used `pandas.read_csv()`
-        df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
-        df = self[self._table]._set_index(df, self._csv_index_col)
+    def _read_dataframe(self) -> pd.DataFrame:
+        try:
+            df = next(iter(self._stream))
+            # Adjust dtypes and set index
+            df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
+            index_columns = list(self[self._table]._levels_and_dtypes.keys())
+            df = self[self._table]._set_index(df, index_columns)
+        except StopIteration:
+            # Ensure return an empty dataframe,
+            # at the last iteration,
+            # when no remaining data is left
+            df = pd.DataFrame()
+        # print("Reading CSV batch")
+        # print(f"{self._current=}")
+        # print(f"{self._samples=}")
+        # print(f"{df=}")
+        # # Ensure categorical dtypes are preserved
+        # # when reading from CSV files.
+        # # This is most likely broken in the csv code of audformat,
+        # # which used `pandas.read_csv()`
+        # df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
+        # df = self[self._table]._set_index(df, self._csv_index_col)
 
         return df
 
