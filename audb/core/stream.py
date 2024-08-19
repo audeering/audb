@@ -501,7 +501,7 @@ def stream(
     map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]] = None,
     batch_size: int = 16,
     shuffle: bool = False,
-    buffer_size: int = 10_000,
+    buffer_size: int = 100_000,
     only_metadata: bool = False,
     bit_depth: int = None,
     channels: typing.Union[int, typing.Sequence[int]] = None,
