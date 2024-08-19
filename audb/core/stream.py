@@ -503,7 +503,7 @@ def stream(
     Loads only the first ``batch_size`` rows
     of a table into memory,
     and downloads only the related media files,
-    if any.
+    if any media files are requested.
 
     By setting
     ``bit_depth``,
