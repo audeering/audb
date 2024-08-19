@@ -395,6 +395,10 @@ class DatabaseIteratorCsv(DatabaseIterator):
             converters=self._csv_converters,
             float_precision="round_trip",
         )
+        print("Reading CSV batch")
+        print(f"{df=}")
+        print(f"{self._current=}")
+        print(f"{self._samples=}")
         # Ensure categorical dtypes are preserved
         # when reading from CSV files.
         # This is most likely broken in the csv code of audformat,
