@@ -386,6 +386,19 @@ class DatabaseIteratorCsv(DatabaseIterator):
         self._csv_converters = converters
 
     def _read_dataframe(self) -> pd.DataFrame:
+        # Debug: read whole file
+        df = pd.read_csv(
+            self._file,
+            # skiprows=0,
+            # nrows=self._samples,
+            usecols=self._csv_usecols,
+            dtype=self._csv_dtype,
+            converters=self._csv_converters,
+            float_precision="round_trip",
+        )
+        print("Reading whole CSV")
+        print(f"{df=}")
+
         df = pd.read_csv(
             self._file,
             skiprows=lambda x: x in range(self._current + 1) and x > 0,
@@ -396,9 +409,9 @@ class DatabaseIteratorCsv(DatabaseIterator):
             float_precision="round_trip",
         )
         print("Reading CSV batch")
-        print(f"{df=}")
         print(f"{self._current=}")
         print(f"{self._samples=}")
+        print(f"{df=}")
         # Ensure categorical dtypes are preserved
         # when reading from CSV files.
         # This is most likely broken in the csv code of audformat,
