@@ -1755,7 +1755,7 @@ def load_table(
             version,
         )
 
-        # Find misc tables used in schemes of the requested table
+        # Find only those misc tables used in schemes of the requested table
         scheme_misc_tables = []
         for column_id, column in db[table].columns.items():
             if column.scheme_id is not None:
