@@ -158,12 +158,12 @@ class DatabaseIterator(audformat.Database):
         self._timeout = timeout
         self._verbose = verbose
 
-        self._buffer = pd.DataFrame()
-        self._current = 0
         if shuffle:
             self._samples = buffer_size
         else:
             self._samples = batch_size
+        self._buffer = pd.DataFrame()
+        self._stream = self._initialize_stream()
 
     def __iter__(self) -> DatabaseIterator:
         r"""Iterator generator."""
@@ -255,7 +255,6 @@ class DatabaseIterator(audformat.Database):
                 self._buffer = self._read_dataframe()
                 # Shuffle data
                 self._buffer = self._buffer.sample(frac=1)
-                self._current += self._samples
 
             df2 = self._buffer.iloc[:buffer_read_length, :]
             self._buffer.drop(index=df2.index, inplace=True)
@@ -263,12 +262,25 @@ class DatabaseIterator(audformat.Database):
 
         else:
             df = self._read_dataframe()
-            self._current += self._samples
 
         if len(df) == 0:
             raise StopIteration
 
         return df
+
+    def _initialize_stream(self) -> typing.Iterable:
+        r"""Create table iterator object.
+
+        This method needs to be implemented
+        for the table file types
+        in the classes,
+        that inherit from :class:`audb.DatabaseIterator`.
+
+        Returns:
+            table iterator
+
+        """
+        return None  # pragma: nocover
 
     def _load_media(self, df: pd.DataFrame):
         r"""Load media file for batch.
@@ -299,6 +311,34 @@ class DatabaseIterator(audformat.Database):
                 verbose=self._verbose,
             )
 
+    def _postprocess_batch(self, batch: typing.Any) -> pd.DataFrame:
+        r"""Post-process batch data to desired dataframe.
+
+        Args:
+            batch: input data
+
+        Returns:
+            dataframe
+
+        """
+        return batch  # pragma: nocover
+
+    def _postprocess_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        r"""Post-process dataframe to have correct index and data types.
+
+        Args:
+            df: dataframe
+
+        Returns:
+            dataframe
+
+        """
+        # Adjust dtypes and set index
+        df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
+        index_columns = list(self[self._table]._levels_and_dtypes.keys())
+        df = self[self._table]._set_index(df, index_columns)
+        return df
+
     def _read_dataframe(self) -> pd.DataFrame:
         r"""Read dataframe from table.
 
@@ -306,8 +346,16 @@ class DatabaseIterator(audformat.Database):
             dataframe
 
         """
-        # Implement this for your table format
-        return pd.DataFrame()  # pragma: nocover
+        try:
+            df = self._postprocess_dataframe(
+                self._postprocess_batch(next(iter(self._stream)))
+            )
+        except StopIteration:
+            # Ensure return an empty dataframe,
+            # at the last iteration,
+            # when no remaining data is left
+            df = pd.DataFrame()
+        return df
 
 
 class DatabaseIteratorCsv(DatabaseIterator):
@@ -354,15 +402,15 @@ class DatabaseIteratorCsv(DatabaseIterator):
             verbose=verbose,
         )
 
-        # self._file = os.path.join(db.root, f"db.{table}.csv")
+    def _initialize_stream(self):
         # Prepare settings for csv file reading
 
         # index
-        columns_and_dtypes = db[table]._levels_and_dtypes.copy()
+        columns_and_dtypes = self[self._table]._levels_and_dtypes.copy()
         # add columns
-        for column_id, column in db[table].columns.items():
+        for column_id, column in self[self._table].columns.items():
             if column.scheme_id is not None:
-                columns_and_dtypes[column_id] = db.schemes[column.scheme_id].dtype
+                columns_and_dtypes[column_id] = self.schemes[column.scheme_id].dtype
             else:
                 columns_and_dtypes[column_id] = audformat.define.DataType.OBJECT
 
@@ -379,52 +427,19 @@ class DatabaseIteratorCsv(DatabaseIterator):
                     dtype
                 )
 
-        self._csv_usecols = list(columns_and_dtypes.keys())
-        self._csv_dtype = dtypes_wo_converters
-        self._csv_index_col = list(db[table]._levels_and_dtypes.keys())
-        self._csv_converters = converters
-
-        file = os.path.join(db.root, f"db.{table}.csv")
-        if shuffle:
-            samples = buffer_size
+        if self._samples == 0:
+            # `pandas.read_csv()` does not support a `chunksize=0`
+            return []
         else:
-            samples = batch_size
-        if samples == 0:
-            self._stream = []
-        else:
-            self._stream = pd.read_csv(
+            file = os.path.join(self.root, f"db.{self._table}.csv")
+            return pd.read_csv(
                 file,
-                chunksize=samples,
-                usecols=self._csv_usecols,
-                dtype=self._csv_dtype,
-                converters=self._csv_converters,
+                chunksize=self._samples,
+                usecols=list(columns_and_dtypes.keys()),
+                dtype=dtypes_wo_converters,
+                converters=converters,
                 float_precision="round_trip",
             )
-
-    def _read_dataframe(self) -> pd.DataFrame:
-        try:
-            df = next(iter(self._stream))
-            # Adjust dtypes and set index
-            df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
-            index_columns = list(self[self._table]._levels_and_dtypes.keys())
-            df = self[self._table]._set_index(df, index_columns)
-        except StopIteration:
-            # Ensure return an empty dataframe,
-            # at the last iteration,
-            # when no remaining data is left
-            df = pd.DataFrame()
-        # print("Reading CSV batch")
-        # print(f"{self._current=}")
-        # print(f"{self._samples=}")
-        # print(f"{df=}")
-        # # Ensure categorical dtypes are preserved
-        # # when reading from CSV files.
-        # # This is most likely broken in the csv code of audformat,
-        # # which used `pandas.read_csv()`
-        # df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
-        # df = self[self._table]._set_index(df, self._csv_index_col)
-
-        return df
 
 
 class DatabaseIteratorParquet(DatabaseIterator):
@@ -471,31 +486,17 @@ class DatabaseIteratorParquet(DatabaseIterator):
             verbose=verbose,
         )
 
-        file = os.path.join(db.root, f"db.{table}.parquet")
-        if shuffle:
-            samples = buffer_size
-        else:
-            samples = batch_size
-        self._stream = parquet.ParquetFile(file).iter_batches(batch_size=samples)
+    def _initialize_stream(self) -> pa.RecordBatch:
+        file = os.path.join(self.root, f"db.{self._table}.parquet")
+        return parquet.ParquetFile(file).iter_batches(batch_size=self._samples)
 
-    def _read_dataframe(self) -> pd.DataFrame:
-        try:
-            batch = next(iter(self._stream))
-            df = batch.to_pandas(
-                deduplicate_objects=False,
-                types_mapper={
-                    pa.string(): pd.StringDtype(),
-                }.get,  # we have to provide a callable, not a dict
-            )
-            # Adjust dtypes and set index
-            df = self[self._table]._pyarrow_convert_dtypes(df, convert_all=False)
-            index_columns = list(self[self._table]._levels_and_dtypes.keys())
-            df = self[self._table]._set_index(df, index_columns)
-        except StopIteration:
-            # Ensure return an empty dataframe,
-            # at the last iteration,
-            # when no remaining data is left
-            df = pd.DataFrame()
+    def _postprocess_batch(self, batch: pa.RecordBatch) -> pd.DataFrame:
+        df = batch.to_pandas(
+            deduplicate_objects=False,
+            types_mapper={
+                pa.string(): pd.StringDtype(),
+            }.get,  # we have to provide a callable, not a dict
+        )
         return df
 
 
