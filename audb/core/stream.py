@@ -64,14 +64,7 @@ class DatabaseIterator(audformat.Database):
           transcription:
             description: Sentence produced by actor.
             dtype: str
-            labels: {a01: Der Lappen liegt auf dem Eisschrank., a02: Das will sie am Mittwoch
-                abgeben., a04: Heute abend könnte ich es ihm sagen., a05: Das schwarze Stück
-                Papier befindet sich da oben neben dem Holzstück., a07: In sieben Stunden
-                wird es soweit sein., b01: 'Was sind denn das für Tüten, die da unter dem
-                Tisch stehen.', b02: Sie haben es gerade hochgetragen und jetzt gehen sie
-                wieder runter., b03: An den Wochenenden bin ich jetzt immer nach Hause gefahren
-                und habe Agnes besucht., b09: Ich will das eben wegbringen und dann mit Karl
-                was trinken gehen., b10: 'Die wird auf dem Platz sein, wo wir sie immer hinlegen.'}
+            labels: ...
         tables:
           files:
             type: filewise
