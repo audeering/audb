@@ -46,6 +46,7 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
         dictionary containing root folder for each version
 
     """
+    # Fix seed for audformat.testing
     random.seed(1)
 
     # Collect single database paths
