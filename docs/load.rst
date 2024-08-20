@@ -336,7 +336,7 @@ Streaming
 which helps to load large datasets.
 It will only load ``batch_size`` number of rows
 from a selected table into memory,
-and downloads only matching media files
+and download only matching media files
 in each iteration.
 The table and media files
 are still stored in the cache.
