@@ -126,6 +126,12 @@ class TestStreaming:
 
         audb.publish(db_root, cls.version, persistent_repository)
 
+        yield
+
+        # Clean up persistent repository at end
+        audeer.rmdir(persistent_repository.host)
+        audeer.mkdir(persistent_repository.host, persistent_repository.name)
+
     @pytest.mark.parametrize("table", ["files", "segments", "speaker", "acronym"])
     @pytest.mark.parametrize("batch_size", [0, 1, 2, 10])
     def test_batch_size(self, table: str, batch_size: int):
