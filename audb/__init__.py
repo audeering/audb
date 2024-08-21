@@ -19,6 +19,8 @@ from audb.core.load import load_table
 from audb.core.load_to import load_to
 from audb.core.publish import publish
 from audb.core.repository import Repository
+from audb.core.stream import DatabaseIterator
+from audb.core.stream import stream
 
 
 __all__ = []

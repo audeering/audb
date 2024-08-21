@@ -25,7 +25,7 @@ from audb.core.lock import FolderLock
 from audb.core.utils import lookup_backend
 
 
-CachedVersions = typing.Sequence[typing.Tuple[audeer.StrictVersion, str, Dependencies],]
+CachedVersions = typing.Sequence[typing.Tuple[audeer.StrictVersion, str, Dependencies]]
 
 
 def _cached_versions(
@@ -805,7 +805,28 @@ def _misc_tables_used_in_scheme(
         if scheme.uses_table:
             misc_tables_used_in_scheme.append(scheme.labels)
 
-    return list(set(misc_tables_used_in_scheme))
+    return audeer.unique(misc_tables_used_in_scheme)
+
+
+def _misc_tables_used_in_table(
+    table: audformat.Table,
+) -> typing.List[str]:
+    r"""List of misc tables that are used inside schemes of a table.
+
+    Args:
+        table: table object
+
+    Returns:
+        unique list of misc tables used in schemes of the table
+
+    """
+    misc_tables_used_in_table = []
+    for column_id, column in table.columns.items():
+        if column.scheme_id is not None:
+            scheme = table.db.schemes[column.scheme_id]
+            if scheme.uses_table:
+                misc_tables_used_in_table.append(scheme.labels)
+    return audeer.unique(misc_tables_used_in_table)
 
 
 def _missing_files(
