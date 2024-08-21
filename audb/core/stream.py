@@ -617,6 +617,10 @@ def stream(
     if version is None:
         version = latest_version(name)
 
+    # Extract kwargs
+    # to pass on to the DatabaseIterator constructor
+    kwargs =  dict((k, v) for (k, v) in locals().items() if k not in ["name", "table"])
+
     flavor = Flavor(
         bit_depth=bit_depth,
         channels=channels,
@@ -673,29 +677,6 @@ def stream(
             db[misc_table].load(table_file)
 
     if os.path.exists(os.path.join(db_root, f"db.{table}.parquet")):
-        database_iterator_object = DatabaseIteratorParquet
+        return DatabaseIteratorParquet(db, table, **kwargs)
     else:
-        database_iterator_object = DatabaseIteratorCsv
-
-    database_iterator = database_iterator_object(
-        db,
-        table,
-        version=version,
-        map=map,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        buffer_size=buffer_size,
-        only_metadata=only_metadata,
-        bit_depth=bit_depth,
-        channels=channels,
-        format=format,
-        mixdown=mixdown,
-        sampling_rate=sampling_rate,
-        full_path=full_path,
-        cache_root=cache_root,
-        num_workers=num_workers,
-        timeout=timeout,
-        verbose=verbose,
-    )
-
-    return database_iterator
+        return DatabaseIteratorCsv(db, table, **kwargs)
