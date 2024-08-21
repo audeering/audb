@@ -419,3 +419,34 @@ class TestStreaming:
                 version=self.version,
                 verbose=False,
             )
+
+
+def test_database_iterator_error():
+    db = audformat.Database("db")
+    db["some"] = audformat.Table()
+    table = "some"
+    error_msg = (
+        "Can't instantiate abstract class DatabaseIterator "
+        "with abstract method _initialize_stream"
+    )
+    with pytest.raises(TypeError, match=error_msg):
+        audb.DatabaseIterator(
+            db,
+            table,
+            version=None,
+            map=None,
+            batch_size=16,
+            shuffle=False,
+            buffer_size=100_000,
+            only_metadata=False,
+            bit_depth=None,
+            channels=None,
+            format=None,
+            mixdown=False,
+            sampling_rate=None,
+            full_path=False,
+            cache_root=None,
+            num_workers=1,
+            timeout=-1,
+            verbose=False,
+        )

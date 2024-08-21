@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 import os
 import typing
 
@@ -22,7 +23,7 @@ from audb.core.load import load_media
 from audb.core.lock import FolderLock
 
 
-class DatabaseIterator(audformat.Database):
+class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
     r"""Database iterator.
 
     This class cannot be created directly,
@@ -187,6 +188,21 @@ class DatabaseIterator(audformat.Database):
 
         return df
 
+    @abc.abstractmethod
+    def _initialize_stream(self) -> typing.Iterable:
+        r"""Create table iterator object.
+
+        This method needs to be implemented
+        for the table file types
+        in the classes,
+        that inherit from :class:`audb.DatabaseIterator`.
+
+        Returns:
+            table iterator
+
+        """
+        return  # pragma: nocover
+
     @staticmethod
     def _cleanup_database(db: audformat.Database, table: str):
         r"""Remove parts of database, not used by table.
@@ -260,20 +276,6 @@ class DatabaseIterator(audformat.Database):
             raise StopIteration
 
         return df
-
-    def _initialize_stream(self) -> typing.Iterable:
-        r"""Create table iterator object.
-
-        This method needs to be implemented
-        for the table file types
-        in the classes,
-        that inherit from :class:`audb.DatabaseIterator`.
-
-        Returns:
-            table iterator
-
-        """
-        return None  # pragma: nocover
 
     def _load_media(self, df: pd.DataFrame):
         r"""Load media file for batch.
