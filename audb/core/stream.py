@@ -352,49 +352,6 @@ class DatabaseIterator(audformat.Database):
 
 
 class DatabaseIteratorCsv(DatabaseIterator):
-    def __init__(
-        self,
-        db: audformat.Database,
-        table: str,
-        *,
-        version: str,
-        map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]],
-        batch_size: int,
-        shuffle: bool,
-        buffer_size: int,
-        only_metadata: bool,
-        bit_depth: int,
-        channels: typing.Union[int, typing.Sequence[int]],
-        format: str,
-        mixdown: bool,
-        sampling_rate: int,
-        full_path: bool,
-        cache_root: str,
-        num_workers: typing.Optional[int],
-        timeout: float,
-        verbose: bool,
-    ):
-        super().__init__(
-            db,
-            table,
-            version=version,
-            map=map,
-            batch_size=batch_size,
-            shuffle=shuffle,
-            buffer_size=buffer_size,
-            only_metadata=only_metadata,
-            bit_depth=bit_depth,
-            channels=channels,
-            format=format,
-            mixdown=mixdown,
-            sampling_rate=sampling_rate,
-            full_path=full_path,
-            cache_root=cache_root,
-            num_workers=num_workers,
-            timeout=timeout,
-            verbose=verbose,
-        )
-
     def _initialize_stream(self):
         # Prepare settings for csv file reading
 
@@ -436,49 +393,6 @@ class DatabaseIteratorCsv(DatabaseIterator):
 
 
 class DatabaseIteratorParquet(DatabaseIterator):
-    def __init__(
-        self,
-        db: audformat.Database,
-        table: str,
-        *,
-        version: str,
-        map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]],
-        batch_size: int,
-        shuffle: bool,
-        buffer_size: int,
-        only_metadata: bool,
-        bit_depth: int,
-        channels: typing.Union[int, typing.Sequence[int]],
-        format: str,
-        mixdown: bool,
-        sampling_rate: int,
-        full_path: bool,
-        cache_root: str,
-        num_workers: typing.Optional[int],
-        timeout: float,
-        verbose: bool,
-    ):
-        super().__init__(
-            db,
-            table,
-            version=version,
-            map=map,
-            batch_size=batch_size,
-            shuffle=shuffle,
-            buffer_size=buffer_size,
-            only_metadata=only_metadata,
-            bit_depth=bit_depth,
-            channels=channels,
-            format=format,
-            mixdown=mixdown,
-            sampling_rate=sampling_rate,
-            full_path=full_path,
-            cache_root=cache_root,
-            num_workers=num_workers,
-            timeout=timeout,
-            verbose=verbose,
-        )
-
     def _initialize_stream(self) -> pa.RecordBatch:
         file = os.path.join(self.root, f"db.{self._table}.parquet")
         return parquet.ParquetFile(file).iter_batches(batch_size=self._samples)
@@ -619,7 +533,7 @@ def stream(
 
     # Extract kwargs
     # to pass on to the DatabaseIterator constructor
-    kwargs =  dict((k, v) for (k, v) in locals().items() if k not in ["name", "table"])
+    kwargs = dict((k, v) for (k, v) in locals().items() if k not in ["name", "table"])
 
     flavor = Flavor(
         bit_depth=bit_depth,
