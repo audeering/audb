@@ -327,6 +327,78 @@ from the tables.
     db["emotion"].get()
 
 
+.. _streaming:
+
+Streaming
+---------
+
+:func:`audb.stream` provides a pseudo-streaming mode,
+which helps to load large datasets.
+It will only load ``batch_size`` number of rows
+from a selected table into memory,
+and download only matching media files
+in each iteration.
+The table and media files
+are still stored in the cache.
+
+.. Prefetch data with only_metadata=True
+.. jupyter-execute::
+    :hide-code:
+
+    db = audb.stream(
+        "emodb",
+        "emotion",
+        version="1.4.1",
+        batch_size=4,
+        only_metadata=True,
+        full_path=False,
+        verbose=False,
+    )
+
+.. code-block:: python
+
+     db = audb.stream(
+        "emodb",
+        "emotion",
+        version="1.4.1",
+        batch_size=4,
+        full_path=False,
+        verbose=False,
+    )
+
+It returns an :class:`audb.DatabaseIterator` object,
+which behaves as :class:`audformat.Database`,
+but provides the ability
+to iterate over the database:
+
+.. jupyter-execute::
+
+    next(db)
+
+With ``shuffle=True``,
+a user can request
+that the data is returned in a random order.
+:func:`audb.stream` will then load ``buffer_size`` of rows
+into an buffer and selected randomly from those.
+
+.. jupyter-execute::
+
+    import numpy as np
+    np.random.seed(1)
+    db = audb.stream(
+        "emodb",
+        "emotion",
+        version="1.4.1",
+        batch_size=4,
+        shuffle=True,
+        buffer_size=100_000,
+        only_metadata=True,
+        full_path=False,
+        verbose=False,
+    )
+    next(db)
+
+
 .. _corresponding audformat documentation: https://audeering.github.io/audformat/accessing-data.html
 .. _combine tables: https://audeering.github.io/audformat/combine-tables.html
 .. _map labels: https://audeering.github.io/audformat/map-scheme.html

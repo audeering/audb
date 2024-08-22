@@ -1,0 +1,6 @@
+﻿stream\(\)
+==========
+
+.. currentmodule:: audb
+
+.. autofunction:: audb.stream

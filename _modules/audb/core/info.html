@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.8.0
+                v1.9.0
               </div>
             
           
@@ -259,7 +259,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">filtered_dependencies</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">media</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_TYPE</span><span class="p">[</span><span class="s2">&quot;media&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="channels"><a class="viewcode-back" href="../../../api/audb.info.channels.html#audb.info.channels">[docs]</a><span class="k">def</span> <span class="nf">channels</span><span class="p">(</span>
@@ -295,7 +295,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">filtered_dependencies</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">media</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_TYPE</span><span class="p">[</span><span class="s2">&quot;media&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="description"><a class="viewcode-back" href="../../../api/audb.info.description.html#audb.info.description">[docs]</a><span class="k">def</span> <span class="nf">description</span><span class="p">(</span>
@@ -366,7 +366,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">filtered_dependencies</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">media</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span>
-        <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_TYPE</span><span class="p">[</span><span class="s2">&quot;media&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
         <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">,</span>
     <span class="p">)</span></div>
 
@@ -430,7 +430,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">filtered_dependencies</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">media</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_TYPE</span><span class="p">[</span><span class="s2">&quot;media&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">format</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="header"><a class="viewcode-back" href="../../../api/audb.info.header.html#audb.info.header">[docs]</a><span class="k">def</span> <span class="nf">header</span><span class="p">(</span>
@@ -759,7 +759,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">filtered_dependencies</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">media</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">]</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_TYPE</span><span class="p">[</span><span class="s2">&quot;media&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="schemes"><a class="viewcode-back" href="../../../api/audb.info.schemes.html#audb.info.schemes">[docs]</a><span class="k">def</span> <span class="nf">schemes</span><span class="p">(</span>
@@ -937,7 +937,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/07/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/08/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

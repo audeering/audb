@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.8.0
+                v1.9.0
               </div>
             
           
@@ -110,6 +110,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">audb</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="audb.config.html">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.DatabaseIterator.html">DatabaseIterator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.Dependencies.html">Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.Flavor.html">Flavor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.Repository.html">Repository</a></li>
@@ -128,6 +129,7 @@
 <li class="toctree-l2"><a class="reference internal" href="audb.publish.html">publish()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.remove_media.html">remove_media()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.repository.html">repository()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.stream.html">stream()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb.versions.html">versions()</a></li>
 </ul>
 </li>
@@ -186,13 +188,16 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="audb.config.html#audb.config" title="audb.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a></p></td>
 <td><p>Get/set configuration values for the <a class="reference internal" href="#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> module.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.Dependencies.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dependencies</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.DatabaseIterator.html#audb.DatabaseIterator" title="audb.DatabaseIterator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatabaseIterator</span></code></a></p></td>
+<td><p>Database iterator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.Dependencies.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dependencies</span></code></a></p></td>
 <td><p>Dependencies of a database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audb.Flavor.html#audb.Flavor" title="audb.Flavor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Flavor</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.Flavor.html#audb.Flavor" title="audb.Flavor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Flavor</span></code></a></p></td>
 <td><p>Database flavor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.Repository.html#audb.Repository" title="audb.Repository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Repository</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.Repository.html#audb.Repository" title="audb.Repository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Repository</span></code></a></p></td>
 <td><p>Repository object.</p></td>
 </tr>
 </tbody>
@@ -249,7 +254,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="audb.repository.html#audb.repository" title="audb.repository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">repository</span></code></a></p></td>
 <td><p>Return repository that stores the requested database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audb.versions.html#audb.versions" title="audb.versions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">versions</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audb.stream.html#audb.stream" title="audb.stream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stream</span></code></a></p></td>
+<td><p>Stream table and media files of a database.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audb.versions.html#audb.versions" title="audb.versions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">versions</span></code></a></p></td>
 <td><p>Available versions of database.</p></td>
 </tr>
 </tbody>
@@ -279,7 +287,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/07/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/08/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

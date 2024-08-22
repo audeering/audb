@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.8.0
+                v1.9.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#media-conversion-and-flavors">Media conversion and flavors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metadata-and-header-only">Metadata and header only</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#loading-on-demand">Loading on demand</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#streaming">Streaming</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dependencies.html">Database dependencies</a></li>
@@ -188,7 +189,7 @@ even if a new version of the database is published.</p>
 </div>
 <p><a class="reference internal" href="api/audb.load.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> will download the data,
 store them in a cache folder,
-and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
+and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
 The most important content of that object
 are the database tables.</p>
 <div class="jupyter_cell jupyter_container docutils container">
@@ -862,6 +863,171 @@ from the tables.</p>
 </div></div></div>
 </div>
 </div>
+<div class="section" id="streaming">
+<span id="id2"></span><h2>Streaming<a class="headerlink" href="#streaming" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference internal" href="api/audb.stream.html#audb.stream" title="audb.stream"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.stream()</span></code></a> provides a pseudo-streaming mode,
+which helps to load large datasets.
+It will only load <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> number of rows
+from a selected table into memory,
+and download only matching media files
+in each iteration.
+The table and media files
+are still stored in the cache.</p>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;emotion&quot;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>It returns an <a class="reference internal" href="api/audb.DatabaseIterator.html#audb.DatabaseIterator" title="audb.DatabaseIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.DatabaseIterator</span></code></a> object,
+which behaves as <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a>,
+but provides the ability
+to iterate over the database:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">next</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>emotion</th>
+      <th>emotion.confidence</th>
+    </tr>
+    <tr>
+      <th>file</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>wav/03a01Fa.wav</th>
+      <td>happiness</td>
+      <td>0.90</td>
+    </tr>
+    <tr>
+      <th>wav/03a01Nc.wav</th>
+      <td>neutral</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>wav/03a01Wa.wav</th>
+      <td>anger</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <th>wav/03a02Fc.wav</th>
+      <td>happiness</td>
+      <td>0.85</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">shuffle=True</span></code>,
+a user can request
+that the data is returned in a random order.
+<a class="reference internal" href="api/audb.stream.html#audb.stream" title="audb.stream"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.stream()</span></code></a> will then load <code class="docutils literal notranslate"><span class="pre">buffer_size</span></code> of rows
+into an buffer and selected randomly from those.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;emotion&quot;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">buffer_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span>
+    <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">next</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>emotion</th>
+      <th>emotion.confidence</th>
+    </tr>
+    <tr>
+      <th>file</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>wav/14a05Fb.wav</th>
+      <td>happiness</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>wav/15a05Eb.wav</th>
+      <td>disgust</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>wav/12a05Nd.wav</th>
+      <td>neutral</td>
+      <td>0.9</td>
+    </tr>
+    <tr>
+      <th>wav/13a07Na.wav</th>
+      <td>neutral</td>
+      <td>0.9</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</div>
 </div>
 
 
@@ -887,7 +1053,7 @@ from the tables.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/07/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/08/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

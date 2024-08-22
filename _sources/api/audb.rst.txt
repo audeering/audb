@@ -10,6 +10,7 @@ audb
     :nosignatures:
 
     config
+    DatabaseIterator
     Dependencies
     Flavor
     Repository
@@ -35,4 +36,5 @@ audb
     publish
     remove_media
     repository
+    stream
     versions

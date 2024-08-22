@@ -1,0 +1,1359 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>DatabaseIterator &mdash; Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/thebelab.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dependencies" href="audb.Dependencies.html" />
+    <link rel="prev" title="config" href="audb.config.html" />
+    
+      
+    
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../index.html">
+          
+            <img src="../_static/images/audeering.png" class="logo" alt="audEERING"/>
+          
+          
+            <span> audb</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publish.html">Publish a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load.html">Load a database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Database dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../caching.html">Caching</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="audb.html">audb</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="audb.config.html">config</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DatabaseIterator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#contains">__contains__()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#eq">__eq__()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#getitem">__getitem__()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iter">__iter__()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#next">__next__()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#attachments">attachments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#author">author</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#description">description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#drop-files">drop_files()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#drop-tables">drop_tables()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dump">dump()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#expires">expires</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#files">files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#files-duration">files_duration()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-dict">from_dict()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get">get()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#is-portable">is_portable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#languages">languages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#license">license</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#license-url">license_url</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#load">load()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#load-header-from-yaml">load_header_from_yaml()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#map-files">map_files()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#media">media</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#meta">meta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#misc-tables">misc_tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#name">name</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#organization">organization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pick-files">pick_files()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pick-tables">pick_tables()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#raters">raters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#root">root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#save">save()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schemes">schemes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#segments">segments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#source">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#splits">splits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tables">tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#to-dict">to_dict()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#update">update()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage">usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="audb.Dependencies.html">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.Flavor.html">Flavor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.Repository.html">Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.available.html">available()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.cached.html">cached()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.default_cache_root.html">default_cache_root()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.dependencies.html">dependencies()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.exists.html">exists()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.flavor_path.html">flavor_path()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.latest_version.html">latest_version()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load.html">load()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load_attachment.html">load_attachment()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load_media.html">load_media()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load_table.html">load_table()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.load_to.html">load_to()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.publish.html">publish()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.remove_media.html">remove_media()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.repository.html">repository()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.stream.html">stream()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb.versions.html">versions()</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="audb.info.html">audb.info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">audb</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="audb.html">audb</a> &raquo;</li>
+      <li>DatabaseIterator</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/audeering/audb/" class="fa fa-github"> GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="databaseiterator">
+<h1>DatabaseIterator<a class="headerlink" href="#databaseiterator" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="audb.DatabaseIterator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">DatabaseIterator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixdown</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/stream.html#DatabaseIterator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.DatabaseIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Database iterator.</p>
+<p>This class cannot be created directly,
+but only by calling <a class="reference internal" href="audb.stream.html#audb.stream" title="audb.stream"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.stream()</span></code></a>.</p>
+<p class="rubric">Examples</p>
+<p>Create <a class="reference internal" href="#audb.DatabaseIterator" title="audb.DatabaseIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.DatabaseIterator</span></code></a> object.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;files&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="#audb.DatabaseIterator" title="audb.DatabaseIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.DatabaseIterator</span></code></a> object
+is restricted to the requested table,
+and all related schemes
+and misc tables
+used as labels in a related scheme.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span>
+<span class="go">name: emodb</span>
+<span class="go">...</span>
+<span class="go">schemes:</span>
+<span class="go">  age: {description: Age of speaker, dtype: int, minimum: 0}</span>
+<span class="go">  duration: {dtype: time}</span>
+<span class="go">  gender:</span>
+<span class="go">    description: Gender of speaker</span>
+<span class="go">    dtype: str</span>
+<span class="go">    labels: [female, male]</span>
+<span class="go">  language: {description: Language of speaker, dtype: str}</span>
+<span class="go">  speaker: {description: The actors could produce each sentence as often as they liked</span>
+<span class="go">      and were asked to remember a real situation from their past when they had felt</span>
+<span class="go">      this emotion., dtype: int, labels: speaker}</span>
+<span class="go">  transcription:</span>
+<span class="go">    description: Sentence produced by actor.</span>
+<span class="go">    dtype: str</span>
+<span class="go">    labels: ...</span>
+<span class="go">tables:</span>
+<span class="go">  files:</span>
+<span class="go">    type: filewise</span>
+<span class="go">    columns:</span>
+<span class="go">      duration: {scheme_id: duration}</span>
+<span class="go">      speaker: {scheme_id: speaker}</span>
+<span class="go">      transcription: {scheme_id: transcription}</span>
+<span class="go">misc_tables:</span>
+<span class="go">  speaker:</span>
+<span class="go">    levels: {speaker: int}</span>
+<span class="go">    columns:</span>
+<span class="go">      age: {scheme_id: age}</span>
+<span class="go">      gender: {scheme_id: gender}</span>
+<span class="go">      language: {scheme_id: language}</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>Request the first batch of data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">                                 duration  speaker transcription</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav    0 days 00:00:01.898250        3           a01</span>
+<span class="go">wav/03a01Nc.wav    0 days 00:00:01.611250        3           a01</span>
+<span class="go">wav/03a01Wa.wav 0 days 00:00:01.877812500        3           a01</span>
+<span class="go">wav/03a02Fc.wav    0 days 00:00:02.006250        3           a02</span>
+</pre></div>
+</div>
+<p>During the iteration,
+the <a class="reference internal" href="#audb.DatabaseIterator" title="audb.DatabaseIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.DatabaseIterator</span></code></a> object
+provides access to the current batch of data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">map</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="s2">&quot;age&quot;</span><span class="p">})</span>
+<span class="go">                                 duration transcription  age</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav    0 days 00:00:01.898250           a01   31</span>
+<span class="go">wav/03a01Nc.wav    0 days 00:00:01.611250           a01   31</span>
+<span class="go">wav/03a01Wa.wav 0 days 00:00:01.877812500           a01   31</span>
+<span class="go">wav/03a02Fc.wav    0 days 00:00:02.006250           a02   31</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="section" id="contains">
+<h2>__contains__()<a class="headerlink" href="#contains" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.__contains__">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if (miscellaneous) table exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>table_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – table identifier</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="eq">
+<h2>__eq__()<a class="headerlink" href="#eq" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.__eq__">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Comparison if database equals another database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getitem">
+<h2>__getitem__()<a class="headerlink" href="#getitem" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.__getitem__">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get (miscellaneous) table from database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>table_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – table identifier</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>BadKeyError</strong> – if table does not exist</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.MiscTable.html#audformat.MiscTable" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MiscTable</span></code></a>, <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Table.html#audformat.Table" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="iter">
+<h2>__iter__()<a class="headerlink" href="#iter" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.__iter__">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/stream.html#DatabaseIterator.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.DatabaseIterator.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterator generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#audb.DatabaseIterator" title="audb.core.stream.DatabaseIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatabaseIterator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="next">
+<h2>__next__()<a class="headerlink" href="#next" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.__next__">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">__next__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/stream.html#DatabaseIterator.__next__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.DatabaseIterator.__next__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="attachments">
+<h2>attachments<a class="headerlink" href="#attachments" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.attachments">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">attachments</span></span><a class="headerlink" href="#audb.DatabaseIterator.attachments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of attachments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><strong>RuntimeError</strong></a> – if the path of a newly assigned attachment
+    overlaps with the path of an existing attachment</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="author">
+<h2>author<a class="headerlink" href="#author" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.author">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">author</span></span><a class="headerlink" href="#audb.DatabaseIterator.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>Author(s) of database</p>
+</dd></dl>
+
+</div>
+<div class="section" id="description">
+<h2>description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.description">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#audb.DatabaseIterator.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description</p>
+</dd></dl>
+
+</div>
+<div class="section" id="drop-files">
+<h2>drop_files()<a class="headerlink" href="#drop-files" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.drop_files">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">drop_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.drop_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop files from tables.</p>
+<p>Iterate through all tables and remove rows with a reference to
+listed or matching files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]]) – list of files or condition function</p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of parallel jobs.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> will be set to the number of processors
+on the machine multiplied by 5</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show progress bar</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="drop-tables">
+<h2>drop_tables()<a class="headerlink" href="#drop-tables" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.drop_tables">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">drop_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.drop_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop (miscellaneous) tables by ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>table_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – table IDs to drop</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://audeering.github.io/audformat/api/audformat.errors.BadIdError.html#audformat.errors.BadIdError" title="(in audformat vv1.3.0)"><strong>audformat.errors.BadIdError</strong></a> – if a table with provided ID
+    does not exist in the database</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><strong>RuntimeError</strong></a> – if a misc table
+    that is used in a scheme
+    would be removed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="dump">
+<h2>dump()<a class="headerlink" href="#dump" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.dump">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize object to YAML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream</strong> – file-like object. If <code class="docutils literal notranslate"><span class="pre">None</span></code> serializes to string</p></li>
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – indent</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>YAML string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="expires">
+<h2>expires<a class="headerlink" href="#expires" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.expires">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">expires</span></span><a class="headerlink" href="#audb.DatabaseIterator.expires" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expiry date</p>
+</dd></dl>
+
+</div>
+<div class="section" id="files">
+<h2>files<a class="headerlink" href="#files" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.files">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#audb.DatabaseIterator.files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Files referenced in the database.</p>
+<p>Includes files from filewise and segmented tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>files</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="files-duration">
+<h2>files_duration()<a class="headerlink" href="#files-duration" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.files_duration">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">files_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.files_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Duration of files in the database.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">db.files_duration(db.files).sum()</span></code>
+to get the total duration of all files in a database.
+Or <code class="docutils literal notranslate"><span class="pre">db.files_duration(db[table_id].files).sum()</span></code>
+to get the total duration of all files assigned to a table.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Durations are cached,
+i.e. changing the files on disk after calling
+this function can lead to wrong results.
+The cache is cleared when the
+database is reloaded from disk.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – file names</p></li>
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – root directory under which the files are stored.
+Provide if file names are relative and
+database was not saved or loaded from disk.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database.root" title="(in audformat vv1.3.0)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audformat.Database.root</span></code></a> is used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>mapping from file to duration</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">root</span></code> is not set
+    when using relative file names
+    with a database that was not saved
+    or loaded from disk</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="from-dict">
+<h2>from_dict()<a class="headerlink" href="#from-dict" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.from_dict">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize object from dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – dictionary of class variables to assign</p></li>
+<li><p><strong>ignore_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – variables listed here will be ignored</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="get">
+<h2>get()<a class="headerlink" href="#get" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.get">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_schemes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_column_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mismatch'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get labels by scheme.</p>
+<p>Return all labels
+from columns assigned to a
+<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Scheme.html#audformat.Scheme" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Scheme</span></code></a>
+with name <code class="docutils literal notranslate"><span class="pre">scheme</span></code>.
+The request can be limited to specific <code class="docutils literal notranslate"><span class="pre">tables</span></code>
+and/or <code class="docutils literal notranslate"><span class="pre">splits</span></code>.
+By providing <code class="docutils literal notranslate"><span class="pre">additional_schemes</span></code>
+the result can be enriched
+with labels from other schemes
+(searched in all tables).
+If <code class="docutils literal notranslate"><span class="pre">strict</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>,
+a scheme is defined more broadly
+and does not only match
+schemes of the database,
+but also columns with the same name
+or labels of a scheme
+with the requested name as key.
+If at least one returned label belongs to a segmented table,
+the returned data frame has a segmented index.
+An <code class="docutils literal notranslate"><span class="pre">aggregate_function</span></code> can be provided
+that specifies how values are combined
+if more than one value is found
+for the same file or segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scheme</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – scheme ID for which labels should be returned.
+The search can be restricted to specific tables and splits
+by the <code class="docutils literal notranslate"><span class="pre">tables</span></code> and <code class="docutils literal notranslate"><span class="pre">splits</span></code> arguments.
+Or extended to columns with that same name
+or the name of a label in the scheme
+using the <cite>strict</cite> argument</p></li>
+<li><p><strong>additional_schemes</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]) – scheme ID or sequence of scheme IDs
+for which additional labels should be returned.
+The search is not affected
+by the <code class="docutils literal notranslate"><span class="pre">tables</span></code> and <code class="docutils literal notranslate"><span class="pre">splits</span></code> arguments</p></li>
+<li><p><strong>tables</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – limit search for <code class="docutils literal notranslate"><span class="pre">scheme</span></code> to selected tables</p></li>
+<li><p><strong>splits</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – limit search for <code class="docutils literal notranslate"><span class="pre">scheme</span></code> to selected splits</p></li>
+<li><p><strong>strict</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">False</span></code>
+the search is extended to columns
+that match the name of the scheme
+or the name of a label in the scheme</p></li>
+<li><p><strong>map</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>
+and a requested scheme
+has labels with mappings,
+those will be returned</p></li>
+<li><p><strong>original_column_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>
+keep the original column names
+(possibly results in multiple columns).
+For mapped schemes,
+the column name before mapping is returned,
+e.g. when requesting <code class="docutils literal notranslate"><span class="pre">'gender'</span></code>
+it might return a column named <code class="docutils literal notranslate"><span class="pre">'speaker'</span></code></p></li>
+<li><p><strong>aggregate_function</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]) – callable to aggregate overlapping values.
+The function gets a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>
+with overlapping values
+as input.
+E.g. set to
+<code class="docutils literal notranslate"><span class="pre">lambda</span> <span class="pre">y:</span> <span class="pre">y.mean()</span></code>
+to average the values
+or to
+<code class="docutils literal notranslate"><span class="pre">tuple</span></code>
+to return them as a tuple</p></li>
+<li><p><strong>aggregate_strategy</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">aggregate_function</span></code> is not <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+<code class="docutils literal notranslate"><span class="pre">aggregate_strategy</span></code> decides
+when <code class="docutils literal notranslate"><span class="pre">aggregate_function</span></code> is applied.
+<code class="docutils literal notranslate"><span class="pre">'overlap'</span></code>: apply to all samples
+that have an overlapping index;
+<code class="docutils literal notranslate"><span class="pre">'mismatch'</span></code>: apply to all samples
+that have an overlapping index
+and a different value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>data frame with values</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if different labels are found
+    for a requested scheme under the same index entry</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">original_column_names</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>
+    and two columns in the returned data frame
+    have the same name
+    and cannot be joined
+    due to overlapping data
+    or different data type</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.12)"><strong>TypeError</strong></a> – if labels of different data type are found
+    for a requested scheme</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Return all labels that match a requested scheme.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">audb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                   emotion</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  happiness</span>
+<span class="go">wav/03a01Nc.wav    neutral</span>
+<span class="go">wav/03a01Wa.wav      anger</span>
+<span class="go">wav/03a02Fc.wav  happiness</span>
+<span class="go">wav/03a02Nc.wav    neutral</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;transcription&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                                        transcription</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  Der Lappen liegt auf dem Eisschrank.</span>
+<span class="go">wav/03a01Nc.wav  Der Lappen liegt auf dem Eisschrank.</span>
+<span class="go">wav/03a01Wa.wav  Der Lappen liegt auf dem Eisschrank.</span>
+<span class="go">wav/03a02Fc.wav     Das will sie am Mittwoch abgeben.</span>
+<span class="go">wav/03a02Nc.wav     Das will sie am Mittwoch abgeben.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;transcription&quot;</span><span class="p">],</span> <span class="nb">map</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                   emotion transcription</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  happiness           a01</span>
+<span class="go">wav/03a01Nc.wav    neutral           a01</span>
+<span class="go">wav/03a01Wa.wav      anger           a01</span>
+<span class="go">wav/03a02Fc.wav  happiness           a02</span>
+<span class="go">wav/03a02Nc.wav    neutral           a02</span>
+</pre></div>
+</div>
+<p>Non-existent schemes are ignored.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;non-existing&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">       emotion non-existing</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  happiness          NaN</span>
+<span class="go">wav/03a01Nc.wav    neutral          NaN</span>
+<span class="go">wav/03a01Wa.wav      anger          NaN</span>
+<span class="go">wav/03a02Fc.wav  happiness          NaN</span>
+<span class="go">wav/03a02Nc.wav    neutral          NaN</span>
+</pre></div>
+</div>
+<p>Limit to a particular table or split.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="n">tables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;emotion.categories.train.gold_standard&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                   emotion</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  happiness</span>
+<span class="go">wav/03a01Nc.wav    neutral</span>
+<span class="go">wav/03a01Wa.wav      anger</span>
+<span class="go">wav/03a02Fc.wav  happiness</span>
+<span class="go">wav/03a02Nc.wav    neutral</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                   emotion</span>
+<span class="go">file</span>
+<span class="go">wav/12a01Fb.wav  happiness</span>
+<span class="go">wav/12a01Lb.wav    boredom</span>
+<span class="go">wav/12a01Nb.wav    neutral</span>
+<span class="go">wav/12a01Wc.wav      anger</span>
+<span class="go">wav/12a02Ac.wav       fear</span>
+</pre></div>
+</div>
+<p>Return requested scheme name independent of column ID.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span>
+<span class="go">emotion:</span>
+<span class="go">  {scheme_id: emotion, rater_id: gold}</span>
+<span class="go">emotion.confidence:</span>
+<span class="go">  {scheme_id: confidence, rater_id: gold}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;confidence&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                 confidence</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav        0.90</span>
+<span class="go">wav/03a01Nc.wav        1.00</span>
+<span class="go">wav/03a01Wa.wav        0.95</span>
+<span class="go">wav/03a02Fc.wav        0.85</span>
+<span class="go">wav/03a02Nc.wav        1.00</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">strict</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>
+only values that have an attached scheme are returned.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion.confidence&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                 emotion.confidence</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav                0.90</span>
+<span class="go">wav/03a01Nc.wav                1.00</span>
+<span class="go">wav/03a01Wa.wav                0.95</span>
+<span class="go">wav/03a02Fc.wav                0.85</span>
+<span class="go">wav/03a02Nc.wav                1.00</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion.confidence&quot;</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">Empty DataFrame</span>
+<span class="go">Columns: [emotion.confidence]</span>
+<span class="go">Index: []</span>
+</pre></div>
+</div>
+<p>If more then one value exists
+for the requested scheme
+and index entry,
+an error is raised
+and <code class="docutils literal notranslate"><span class="pre">aggregate_function</span></code> can be used
+to combine the values.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add a shuffled version of emotion ratings as `random` column</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">][</span><span class="s2">&quot;random&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">scheme_id</span><span class="o">=</span><span class="s2">&quot;emotion&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">][</span><span class="s2">&quot;random&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">][</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="gr">ValueError</span>: <span class="n">Found overlapping data in column &#39;emotion&#39;:</span>
+<span class="x">                      left    right</span>
+<span class="x">file</span>
+<span class="x">wav/03a01Nc.wav    neutral  disgust</span>
+<span class="x">wav/03a01Wa.wav      anger  neutral</span>
+<span class="x">wav/03a02Fc.wav  happiness  neutral</span>
+<span class="x">wav/03a02Ta.wav    sadness  boredom</span>
+<span class="x">wav/03a02Wb.wav      anger  sadness</span>
+<span class="x">wav/03a04Ad.wav       fear  neutral</span>
+<span class="x">wav/03a04Fd.wav  happiness    anger</span>
+<span class="x">wav/03a04Nc.wav    neutral  sadness</span>
+<span class="x">wav/03a04Wc.wav      anger  boredom</span>
+<span class="x">wav/03a05Aa.wav       fear  sadness</span>
+<span class="x">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="n">aggregate_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                   emotion</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  happiness</span>
+<span class="go">wav/03a01Nc.wav    neutral</span>
+<span class="go">wav/03a01Wa.wav      anger</span>
+<span class="go">wav/03a02Fc.wav  happiness</span>
+<span class="go">wav/03a02Nc.wav    neutral</span>
+</pre></div>
+</div>
+<p>Alternatively,
+use <code class="docutils literal notranslate"><span class="pre">original_column_names</span></code> to return column IDs.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="n">original_column_names</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                   emotion     random</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  happiness  happiness</span>
+<span class="go">wav/03a01Nc.wav    neutral    disgust</span>
+<span class="go">wav/03a01Wa.wav      anger    neutral</span>
+<span class="go">wav/03a02Fc.wav  happiness    neutral</span>
+<span class="go">wav/03a02Nc.wav    neutral    neutral</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="is-portable">
+<h2>is_portable<a class="headerlink" href="#is-portable" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.is_portable">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">is_portable</span></span><a class="headerlink" href="#audb.DatabaseIterator.is_portable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if database can be moved to another location.</p>
+<p>To be portable,
+media must not be referenced with an absolute path,
+and not contain <code class="docutils literal notranslate"><span class="pre">\</span></code>,
+<code class="docutils literal notranslate"><span class="pre">.</span></code>,
+or <code class="docutils literal notranslate"><span class="pre">..</span></code>.
+If a database is portable
+it can be moved to another folder
+or updated by another database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the database is portable</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="languages">
+<h2>languages<a class="headerlink" href="#languages" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.languages">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">languages</span></span><a class="headerlink" href="#audb.DatabaseIterator.languages" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of included languages</p>
+</dd></dl>
+
+</div>
+<div class="section" id="license">
+<h2>license<a class="headerlink" href="#license" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.license">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">license</span></span><a class="headerlink" href="#audb.DatabaseIterator.license" title="Permalink to this definition">¶</a></dt>
+<dd><p>License of database</p>
+</dd></dl>
+
+</div>
+<div class="section" id="license-url">
+<h2>license_url<a class="headerlink" href="#license-url" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.license_url">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">license_url</span></span><a class="headerlink" href="#audb.DatabaseIterator.license_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>URL of database license</p>
+</dd></dl>
+
+</div>
+<div class="section" id="load">
+<h2>load()<a class="headerlink" href="#load" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.load">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'db'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load database from disk.</p>
+<p>Expects a header <code class="docutils literal notranslate"><span class="pre">&lt;root&gt;/&lt;name&gt;.yaml</span></code>
+and for every table a file <code class="docutils literal notranslate"><span class="pre">&lt;root&gt;/&lt;name&gt;.&lt;table-id&gt;.[csv|parquet|pkl]</span></code>
+Media files should be located under <code class="docutils literal notranslate"><span class="pre">root</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – root directory</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – base name of header and table files</p></li>
+<li><p><strong>load_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">False</span></code>,
+<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Table.html#audformat.Table" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Table</span></code></a>
+data is only loaded on demand,
+e.g. when
+<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Table.html#audformat.Table.get" title="(in audformat vv1.3.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audformat.Table.get()</span></code></a>
+is called for the first time.
+Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to load all
+<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Table.html#audformat.Table" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Table</span></code></a>
+data immediately</p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of parallel jobs.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> will be set to the number of processors
+on the machine multiplied by 5</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show progress bar</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>database object</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.12)"><strong>FileNotFoundError</strong></a> – if the database header file cannot be found
+    under <code class="docutils literal notranslate"><span class="pre">root</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><strong>RuntimeError</strong></a> – if a CSV or PARQUET table file is newer
+    than the corresponding PKL file</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="load-header-from-yaml">
+<h2>load_header_from_yaml()<a class="headerlink" href="#load-header-from-yaml" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.load_header_from_yaml">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">load_header_from_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.load_header_from_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load database header from YAML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – YAML header definition</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>database object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="map-files">
+<h2>map_files()<a class="headerlink" href="#map-files" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.map_files">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">map_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.map_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply function to file names in all tables.</p>
+<p>If speed is crucial,
+see <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.map_file_path.html#audformat.utils.map_file_path" title="(in audformat vv1.3.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.map_file_path()</span></code></a>
+for further hints how to optimize your code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – map function</p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of parallel jobs.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> will be set to the number of processors
+on the machine multiplied by 5</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show progress bar</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="media">
+<h2>media<a class="headerlink" href="#media" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.media">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#audb.DatabaseIterator.media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of media information</p>
+</dd></dl>
+
+</div>
+<div class="section" id="meta">
+<h2>meta<a class="headerlink" href="#meta" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.meta">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#audb.DatabaseIterator.meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary with meta fields</p>
+</dd></dl>
+
+</div>
+<div class="section" id="misc-tables">
+<h2>misc_tables<a class="headerlink" href="#misc-tables" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.misc_tables">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">misc_tables</span></span><a class="headerlink" href="#audb.DatabaseIterator.misc_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of miscellaneous tables</p>
+</dd></dl>
+
+</div>
+<div class="section" id="name">
+<h2>name<a class="headerlink" href="#name" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.name">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#audb.DatabaseIterator.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of database</p>
+</dd></dl>
+
+</div>
+<div class="section" id="organization">
+<h2>organization<a class="headerlink" href="#organization" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.organization">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">organization</span></span><a class="headerlink" href="#audb.DatabaseIterator.organization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Organization that created the database</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pick-files">
+<h2>pick_files()<a class="headerlink" href="#pick-files" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.pick_files">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">pick_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.pick_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pick files from tables.</p>
+<p>Iterate through all tables and keep only rows with a reference
+to listed files or matching files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]]) – list of files or condition function</p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of parallel jobs.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> will be set to the number of processors
+on the machine multiplied by 5</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show progress bar</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="pick-tables">
+<h2>pick_tables()<a class="headerlink" href="#pick-tables" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.pick_tables">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">pick_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.pick_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pick (miscellaneous) tables by ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>table_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – table IDs to pick</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://audeering.github.io/audformat/api/audformat.errors.BadIdError.html#audformat.errors.BadIdError" title="(in audformat vv1.3.0)"><strong>audformat.errors.BadIdError</strong></a> – if a table with provided ID
+    does not exist in the database</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><strong>RuntimeError</strong></a> – if a misc table
+    that is used in a scheme
+    would be removed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="raters">
+<h2>raters<a class="headerlink" href="#raters" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.raters">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">raters</span></span><a class="headerlink" href="#audb.DatabaseIterator.raters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of raters</p>
+</dd></dl>
+
+</div>
+<div class="section" id="root">
+<h2>root<a class="headerlink" href="#root" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.root">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">root</span></span><a class="headerlink" href="#audb.DatabaseIterator.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Database root directory.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if database has not been stored yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>root directory</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="save">
+<h2>save()<a class="headerlink" href="#save" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.save">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'db'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'parquet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_other_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save database to disk.</p>
+<p>Creates a header <code class="docutils literal notranslate"><span class="pre">&lt;root&gt;/&lt;name&gt;.yaml</span></code>
+and for every table a file <code class="docutils literal notranslate"><span class="pre">&lt;root&gt;/&lt;name&gt;.&lt;table-id&gt;.[csv,parquet,pkl]</span></code>.</p>
+<p>Existing files will be overwritten.
+If <code class="docutils literal notranslate"><span class="pre">update_other_formats</span></code> is provided,
+it will overwrite all existing files in others formats as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – root directory (possibly created)</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – base name of files</p></li>
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – indent size</p></li>
+<li><p><strong>storage_format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – storage format of tables.
+See <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.define.TableStorageFormat.html#audformat.define.TableStorageFormat" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.define.TableStorageFormat</span></code></a>
+for available formats</p></li>
+<li><p><strong>update_other_formats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> it will not only save
+to the given <code class="docutils literal notranslate"><span class="pre">storage_format</span></code>,
+but update all files stored in other storage formats as well</p></li>
+<li><p><strong>header_only</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – store header only</p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – number of parallel jobs.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> will be set to the number of processors
+on the machine multiplied by 5</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show progress bar</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="schemes">
+<h2>schemes<a class="headerlink" href="#schemes" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.schemes">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">schemes</span></span><a class="headerlink" href="#audb.DatabaseIterator.schemes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of schemes</p>
+</dd></dl>
+
+</div>
+<div class="section" id="segments">
+<h2>segments<a class="headerlink" href="#segments" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.segments">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">segments</span></span><a class="headerlink" href="#audb.DatabaseIterator.segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Segments referenced in the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>segments</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="source">
+<h2>source<a class="headerlink" href="#source" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.source">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#audb.DatabaseIterator.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Database source</p>
+</dd></dl>
+
+</div>
+<div class="section" id="splits">
+<h2>splits<a class="headerlink" href="#splits" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.splits">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">splits</span></span><a class="headerlink" href="#audb.DatabaseIterator.splits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of splits</p>
+</dd></dl>
+
+</div>
+<div class="section" id="tables">
+<h2>tables<a class="headerlink" href="#tables" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.tables">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">tables</span></span><a class="headerlink" href="#audb.DatabaseIterator.tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of audformat tables</p>
+</dd></dl>
+
+</div>
+<div class="section" id="to-dict">
+<h2>to_dict()<a class="headerlink" href="#to-dict" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.to_dict">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize object to dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary with attributes</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="update">
+<h2>update()<a class="headerlink" href="#update" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.update">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">others</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_attachments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_media</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audb.DatabaseIterator.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update database with other database(s).</p>
+<p>In order to <a class="reference external" href="https://audeering.github.io/audformat/update-database.html#update-a-database" title="(in audformat vv1.3.0)"><span class="xref std std-ref">update a database</span></a>,
+<em>license</em> and <em>usage</em> have to match.
+Labels and values of <em>schemes</em>
+with the same ID are combined.
+<em>Media</em>, <em>raters</em>, <em>schemes</em>, <em>splits</em>,
+and <em>attachments</em>
+that are not part of
+the database yet are added.
+Other fields will be updated by
+applying the following rules:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 74%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>field</strong></p></td>
+<td><p><strong>result</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>author</p></td>
+<td><p>‘db.author, other.author’</p></td>
+</tr>
+<tr class="row-odd"><td><p>description</p></td>
+<td><p>db.description</p></td>
+</tr>
+<tr class="row-even"><td><p>expires</p></td>
+<td><p>min(db.expires, other.expires)</p></td>
+</tr>
+<tr class="row-odd"><td><p>languages</p></td>
+<td><p>db.languages + other.languages</p></td>
+</tr>
+<tr class="row-even"><td><p>license_url</p></td>
+<td><p>db.license_url</p></td>
+</tr>
+<tr class="row-odd"><td><p>meta</p></td>
+<td><p>db.meta + other.meta</p></td>
+</tr>
+<tr class="row-even"><td><p>name</p></td>
+<td><p>db.name</p></td>
+</tr>
+<tr class="row-odd"><td><p>organization</p></td>
+<td><p>‘db.organization, other.organization’</p></td>
+</tr>
+<tr class="row-even"><td><p>source</p></td>
+<td><p>‘db.source, other.source’</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>others</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a>]]) – database object(s)</p></li>
+<li><p><strong>copy_attachments</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> it copies the attachment files
+associated with <code class="docutils literal notranslate"><span class="pre">others</span></code> to the current database root folder</p></li>
+<li><p><strong>copy_media</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> it copies the media files
+associated with <code class="docutils literal notranslate"><span class="pre">others</span></code> to the current database root folder</p></li>
+<li><p><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – overwrite table values where indices overlap</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the updated database</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if database has different license or usage</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if different media, rater, scheme, split, or attachment
+    with same ID is found</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if schemes cannot be combined,
+    e.g. labels have different dtype</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if tables cannot be combined
+    (e.g. values in same position overlap or
+    level and dtypes of table indices do not match)</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><strong>RuntimeError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">copy_media</span></code>
+    or <code class="docutils literal notranslate"><span class="pre">copy_attachments</span></code>
+    is <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+    but one of the involved databases was not saved
+    (contains files but no root folder)</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><strong>RuntimeError</strong></a> – if any involved database is not portable</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="usage">
+<h2>usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audb.DatabaseIterator.usage">
+<span class="sig-prename descclassname"><span class="pre">DatabaseIterator.</span></span><span class="sig-name descname"><span class="pre">usage</span></span><a class="headerlink" href="#audb.DatabaseIterator.usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Usage permission.</p>
+<p>Possible return values are given by
+<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.define.Usage.html#audformat.define.Usage" title="(in audformat vv1.3.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.define.Usage</span></code></a>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="audb.Dependencies.html" class="btn btn-neutral float-right" title="Dependencies" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="audb.config.html" class="btn btn-neutral float-left" title="config" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/08/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2020-2024 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

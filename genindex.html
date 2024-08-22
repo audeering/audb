@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.8.0
+                v1.9.0
               </div>
             
           
@@ -161,6 +161,7 @@
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
@@ -184,11 +185,17 @@
         <li><a href="api/audb.Flavor.html#audb.Flavor.__call__">(audb.Flavor method)</a>
 </li>
       </ul></li>
-      <li><a href="api/audb.Dependencies.html#audb.Dependencies.__contains__">__contains__() (audb.Dependencies method)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.__contains__">__contains__() (audb.DatabaseIterator method)</a>
+
+      <ul>
+        <li><a href="api/audb.Dependencies.html#audb.Dependencies.__contains__">(audb.Dependencies method)</a>
 </li>
+      </ul></li>
       <li><a href="api/audb.config.html#audb.config.__eq__">__eq__() (audb.config method)</a>
 
       <ul>
+        <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.__eq__">(audb.DatabaseIterator method)</a>
+</li>
         <li><a href="api/audb.Dependencies.html#audb.Dependencies.__eq__">(audb.Dependencies method)</a>
 </li>
         <li><a href="api/audb.Flavor.html#audb.Flavor.__eq__">(audb.Flavor method)</a>
@@ -198,9 +205,17 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/audb.Dependencies.html#audb.Dependencies.__getitem__">__getitem__() (audb.Dependencies method)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.__getitem__">__getitem__() (audb.DatabaseIterator method)</a>
+
+      <ul>
+        <li><a href="api/audb.Dependencies.html#audb.Dependencies.__getitem__">(audb.Dependencies method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.__iter__">__iter__() (audb.DatabaseIterator method)</a>
 </li>
       <li><a href="api/audb.Dependencies.html#audb.Dependencies.__len__">__len__() (audb.Dependencies method)</a>
+</li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.__next__">__next__() (audb.DatabaseIterator method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -216,8 +231,12 @@
 </li>
       <li><a href="api/audb.Dependencies.html#audb.Dependencies.attachment_ids">attachment_ids (audb.Dependencies attribute)</a>
 </li>
-      <li><a href="api/audb.Dependencies.html#audb.Dependencies.attachments">attachments (audb.Dependencies attribute)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.attachments">attachments (audb.DatabaseIterator attribute)</a>
+
+      <ul>
+        <li><a href="api/audb.Dependencies.html#audb.Dependencies.attachments">(audb.Dependencies attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/audb.info.attachments.html#audb.info.attachments">attachments() (in module audb.info)</a>
 </li>
   </ul></td>
@@ -236,6 +255,8 @@
         <li><a href="api/audb.info.html#module-audb.info">module</a>
 </li>
       </ul></li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.author">author (audb.DatabaseIterator attribute)</a>
+</li>
       <li><a href="api/audb.info.author.html#audb.info.author">author() (in module audb.info)</a>
 </li>
       <li><a href="api/audb.available.html#audb.available">available() (in module audb)</a>
@@ -292,17 +313,27 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator">DatabaseIterator (class in audb)</a>
+</li>
       <li><a href="api/audb.default_cache_root.html#audb.default_cache_root">default_cache_root() (in module audb)</a>
 </li>
       <li><a href="api/audb.Dependencies.html#audb.Dependencies">Dependencies (class in audb)</a>
 </li>
       <li><a href="api/audb.dependencies.html#audb.dependencies">dependencies() (in module audb)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.description">description (audb.DatabaseIterator attribute)</a>
+</li>
       <li><a href="api/audb.info.description.html#audb.info.description">description() (in module audb.info)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/audb.Flavor.html#audb.Flavor.destination">destination() (audb.Flavor method)</a>
+</li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.drop_files">drop_files() (audb.DatabaseIterator method)</a>
+</li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.drop_tables">drop_tables() (audb.DatabaseIterator method)</a>
+</li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.dump">dump() (audb.DatabaseIterator method)</a>
 </li>
       <li><a href="api/audb.Dependencies.html#audb.Dependencies.duration">duration() (audb.Dependencies method)</a>
 
@@ -319,32 +350,54 @@
       <li><a href="api/audb.exists.html#audb.exists">exists() (in module audb)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.expires">expires (audb.DatabaseIterator attribute)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/audb.Dependencies.html#audb.Dependencies.files">files (audb.Dependencies attribute)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.files">files (audb.DatabaseIterator attribute)</a>
+
+      <ul>
+        <li><a href="api/audb.Dependencies.html#audb.Dependencies.files">(audb.Dependencies attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/audb.info.files.html#audb.info.files">files() (in module audb.info)</a>
+</li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.files_duration">files_duration() (audb.DatabaseIterator method)</a>
 </li>
       <li><a href="api/audb.Flavor.html#audb.Flavor">Flavor (class in audb)</a>
 </li>
       <li><a href="api/audb.flavor_path.html#audb.flavor_path">flavor_path() (in module audb)</a>
 </li>
-      <li><a href="api/audb.Flavor.html#audb.Flavor.format">format (audb.Flavor attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.Flavor.html#audb.Flavor.format">format (audb.Flavor attribute)</a>
+</li>
       <li><a href="api/audb.Dependencies.html#audb.Dependencies.format">format() (audb.Dependencies method)</a>
 </li>
       <li><a href="api/audb.info.formats.html#audb.info.formats">formats() (in module audb.info)</a>
 </li>
-      <li><a href="api/audb.Flavor.html#audb.Flavor.from_dict">from_dict() (audb.Flavor static method)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.from_dict">from_dict() (audb.DatabaseIterator method)</a>
+
+      <ul>
+        <li><a href="api/audb.Flavor.html#audb.Flavor.from_dict">(audb.Flavor static method)</a>
 </li>
+      </ul></li>
       <li><a href="api/audb.Flavor.html#audb.Flavor.from_yaml">from_yaml() (audb.Flavor static method)</a>
 </li>
       <li><a href="api/audb.Flavor.html#audb.Flavor.from_yaml_s">from_yaml_s() (audb.Flavor static method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.get">get() (audb.DatabaseIterator method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -372,29 +425,41 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/audb.Flavor.html#audb.Flavor.is_loaded_from_dict">is_loaded_from_dict (audb.Flavor attribute)</a>
 </li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.is_portable">is_portable (audb.DatabaseIterator attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.languages">languages (audb.DatabaseIterator attribute)</a>
+</li>
       <li><a href="api/audb.info.languages.html#audb.info.languages">languages() (in module audb.info)</a>
 </li>
       <li><a href="api/audb.latest_version.html#audb.latest_version">latest_version() (in module audb)</a>
 </li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.license">license (audb.DatabaseIterator attribute)</a>
+</li>
       <li><a href="api/audb.info.license.html#audb.info.license">license() (in module audb.info)</a>
+</li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.license_url">license_url (audb.DatabaseIterator attribute)</a>
 </li>
       <li><a href="api/audb.info.license_url.html#audb.info.license_url">license_url() (in module audb.info)</a>
 </li>
-      <li><a href="api/audb.Dependencies.html#audb.Dependencies.load">load() (audb.Dependencies method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.load">load() (audb.DatabaseIterator static method)</a>
 
       <ul>
+        <li><a href="api/audb.Dependencies.html#audb.Dependencies.load">(audb.Dependencies method)</a>
+</li>
         <li><a href="api/audb.load.html#audb.load">(in module audb)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/audb.load_attachment.html#audb.load_attachment">load_attachment() (in module audb)</a>
+</li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.load_header_from_yaml">load_header_from_yaml() (audb.DatabaseIterator static method)</a>
 </li>
       <li><a href="api/audb.load_media.html#audb.load_media">load_media() (in module audb)</a>
 </li>
@@ -408,16 +473,26 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/audb.Dependencies.html#audb.Dependencies.media">media (audb.Dependencies attribute)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.map_files">map_files() (audb.DatabaseIterator method)</a>
 </li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.media">media (audb.DatabaseIterator attribute)</a>
+
+      <ul>
+        <li><a href="api/audb.Dependencies.html#audb.Dependencies.media">(audb.Dependencies attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api/audb.info.media.html#audb.info.media">media() (in module audb.info)</a>
+</li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.meta">meta (audb.DatabaseIterator attribute)</a>
 </li>
       <li><a href="api/audb.info.meta.html#audb.info.meta">meta() (in module audb.info)</a>
 </li>
-      <li><a href="api/audb.info.misc_tables.html#audb.info.misc_tables">misc_tables() (in module audb.info)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.misc_tables">misc_tables (audb.DatabaseIterator attribute)</a>
+</li>
+      <li><a href="api/audb.info.misc_tables.html#audb.info.misc_tables">misc_tables() (in module audb.info)</a>
+</li>
       <li><a href="api/audb.Flavor.html#audb.Flavor.mixdown">mixdown (audb.Flavor attribute)</a>
 </li>
       <li>
@@ -435,13 +510,21 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/audb.Repository.html#audb.Repository.name">name (audb.Repository attribute)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.name">name (audb.DatabaseIterator attribute)</a>
+
+      <ul>
+        <li><a href="api/audb.Repository.html#audb.Repository.name">(audb.Repository attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.organization">organization (audb.DatabaseIterator attribute)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/audb.info.organization.html#audb.info.organization">organization() (in module audb.info)</a>
 </li>
@@ -453,8 +536,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/audb.Flavor.html#audb.Flavor.path">path() (audb.Flavor method)</a>
 </li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.pick_files">pick_files() (audb.DatabaseIterator method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.pick_tables">pick_tables() (audb.DatabaseIterator method)</a>
+</li>
       <li><a href="api/audb.publish.html#audb.publish">publish() (in module audb)</a>
 </li>
   </ul></td>
@@ -463,6 +550,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.raters">raters (audb.DatabaseIterator attribute)</a>
+</li>
       <li><a href="api/audb.info.raters.html#audb.info.raters">raters() (in module audb.info)</a>
 </li>
       <li><a href="api/audb.Repository.html#audb.Repository.register">register() (audb.Repository class method)</a>
@@ -483,6 +572,8 @@
 </li>
       <li><a href="api/audb.Flavor.html#audb.Flavor.resolvers">resolvers (audb.Flavor attribute)</a>
 </li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.root">root (audb.DatabaseIterator attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -495,19 +586,33 @@
 </li>
       <li><a href="api/audb.info.sampling_rates.html#audb.info.sampling_rates">sampling_rates() (in module audb.info)</a>
 </li>
-      <li><a href="api/audb.Dependencies.html#audb.Dependencies.save">save() (audb.Dependencies method)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.save">save() (audb.DatabaseIterator method)</a>
+
+      <ul>
+        <li><a href="api/audb.Dependencies.html#audb.Dependencies.save">(audb.Dependencies method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.schemes">schemes (audb.DatabaseIterator attribute)</a>
+</li>
+      <li><a href="api/audb.info.schemes.html#audb.info.schemes">schemes() (in module audb.info)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/audb.info.schemes.html#audb.info.schemes">schemes() (in module audb.info)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.segments">segments (audb.DatabaseIterator attribute)</a>
 </li>
       <li><a href="api/audb.config.html#audb.config.SHARED_CACHE_ROOT">SHARED_CACHE_ROOT (audb.config attribute)</a>
 </li>
       <li><a href="api/audb.Flavor.html#audb.Flavor.short_id">short_id (audb.Flavor attribute)</a>
 </li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.source">source (audb.DatabaseIterator attribute)</a>
+</li>
       <li><a href="api/audb.info.source.html#audb.info.source">source() (in module audb.info)</a>
 </li>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.splits">splits (audb.DatabaseIterator attribute)</a>
+</li>
       <li><a href="api/audb.info.splits.html#audb.info.splits">splits() (in module audb.info)</a>
+</li>
+      <li><a href="api/audb.stream.html#audb.stream">stream() (in module audb)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -517,14 +622,22 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/audb.Dependencies.html#audb.Dependencies.table_ids">table_ids (audb.Dependencies attribute)</a>
 </li>
-      <li><a href="api/audb.Dependencies.html#audb.Dependencies.tables">tables (audb.Dependencies attribute)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.tables">tables (audb.DatabaseIterator attribute)</a>
+
+      <ul>
+        <li><a href="api/audb.Dependencies.html#audb.Dependencies.tables">(audb.Dependencies attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/audb.info.tables.html#audb.info.tables">tables() (in module audb.info)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/audb.Flavor.html#audb.Flavor.to_dict">to_dict() (audb.Flavor method)</a>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.to_dict">to_dict() (audb.DatabaseIterator method)</a>
+
+      <ul>
+        <li><a href="api/audb.Flavor.html#audb.Flavor.to_dict">(audb.Flavor method)</a>
 </li>
+      </ul></li>
       <li><a href="api/audb.Flavor.html#audb.Flavor.to_yaml">to_yaml() (audb.Flavor method)</a>
 </li>
       <li><a href="api/audb.Flavor.html#audb.Flavor.to_yaml_s">to_yaml_s() (audb.Flavor method)</a>
@@ -537,6 +650,12 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.update">update() (audb.DatabaseIterator method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/audb.DatabaseIterator.html#audb.DatabaseIterator.usage">usage (audb.DatabaseIterator attribute)</a>
+</li>
       <li><a href="api/audb.info.usage.html#audb.info.usage">usage() (in module audb.info)</a>
 </li>
   </ul></td>
@@ -569,7 +688,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/07/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/08/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

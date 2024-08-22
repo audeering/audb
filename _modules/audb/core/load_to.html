@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.8.0
+                v1.9.0
               </div>
             
           
@@ -287,12 +287,7 @@
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">archive</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="s2">&quot;/&quot;</span><span class="p">,</span>
-            <span class="n">db_name</span><span class="p">,</span>
-            <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">ATTACHMENT</span><span class="p">],</span>
-            <span class="n">archive</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db_name</span><span class="p">,</span> <span class="s2">&quot;attachment&quot;</span><span class="p">,</span> <span class="n">archive</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
         <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
             <span class="n">archive</span><span class="p">,</span>
             <span class="n">db_root_tmp</span><span class="p">,</span>
@@ -337,12 +332,7 @@
         <span class="n">archives</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">),</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">file</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="s2">&quot;/&quot;</span><span class="p">,</span>
-            <span class="n">db_name</span><span class="p">,</span>
-            <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">MEDIA</span><span class="p">],</span>
-            <span class="n">archive</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db_name</span><span class="p">,</span> <span class="s2">&quot;media&quot;</span><span class="p">,</span> <span class="n">archive</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
         <span class="n">files</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
             <span class="n">archive</span><span class="p">,</span>
             <span class="n">db_root_tmp</span><span class="p">,</span>
@@ -406,12 +396,7 @@
         <span class="c1"># table file in PARQUET format is stored as PARQUET file on backend.</span>
         <span class="k">if</span> <span class="n">csv_file</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
             <span class="n">table_file</span> <span class="o">=</span> <span class="n">csv_file</span>
-            <span class="n">remote_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="s2">&quot;/&quot;</span><span class="p">,</span>
-                <span class="n">db_name</span><span class="p">,</span>
-                <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.zip&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">remote_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db_name</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.zip&quot;</span><span class="p">)</span>
             <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
                 <span class="n">remote_file</span><span class="p">,</span>
                 <span class="n">db_root_tmp</span><span class="p">,</span>
@@ -421,10 +406,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">table_file</span> <span class="o">=</span> <span class="n">parquet_file</span>
             <span class="n">remote_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="s2">&quot;/&quot;</span><span class="p">,</span>
-                <span class="n">db_name</span><span class="p">,</span>
-                <span class="n">define</span><span class="o">.</span><span class="n">DEPEND_TYPE_NAMES</span><span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">DependType</span><span class="o">.</span><span class="n">META</span><span class="p">],</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db_name</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
             <span class="p">)</span>
             <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span>
                 <span class="n">remote_file</span><span class="p">,</span>
@@ -465,6 +447,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">only_metadata</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">pickle_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -484,6 +467,12 @@
 <span class="sd">        name: name of database</span>
 <span class="sd">        version: version string, latest if ``None``</span>
 <span class="sd">        only_metadata: load only header and tables of database</span>
+<span class="sd">        pickle_tables: if ``True``,</span>
+<span class="sd">            tables are stored in ``root``</span>
+<span class="sd">            in their original format</span>
+<span class="sd">            and as pickle files.</span>
+<span class="sd">            This allows for faster loading,</span>
+<span class="sd">            when loading from ``root``</span>
 <span class="sd">        cache_root: cache folder where databases are stored.</span>
 <span class="sd">            If not set :meth:`audb.default_cache_root` is used.</span>
 <span class="sd">            Only used to read the dependencies of the requested version</span>
@@ -608,22 +597,35 @@
 
     <span class="c1"># save dependencies</span>
 
-    <span class="n">dep_path_tmp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">)</span>
+    <span class="n">dep_path_tmp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_FILE</span><span class="p">)</span>
     <span class="n">deps</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dep_path_tmp</span><span class="p">)</span>
     <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
         <span class="n">dep_path_tmp</span><span class="p">,</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCIES_FILE</span><span class="p">),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_FILE</span><span class="p">),</span>
     <span class="p">)</span>
 
     <span class="c1"># save database and PKL tables</span>
 
-    <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-        <span class="n">db_root</span><span class="p">,</span>
-        <span class="n">storage_format</span><span class="o">=</span><span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>
-        <span class="n">update_other_formats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
-        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">pickle_tables</span><span class="p">:</span>
+        <span class="c1"># Store database header,</span>
+        <span class="c1"># and add table as pickle files</span>
+        <span class="c1"># (tables are already stored in their original format).</span>
+        <span class="c1"># Uses `num_workers` to save tables in parallel.</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+            <span class="n">db_root</span><span class="p">,</span>
+            <span class="n">storage_format</span><span class="o">=</span><span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">TableStorageFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>
+            <span class="n">update_other_formats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Store database header</span>
+        <span class="c1"># (tables are already stored)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+            <span class="n">db_root</span><span class="p">,</span>
+            <span class="n">header_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># remove the temporal directory</span>
     <span class="c1"># to signal all files were correctly loaded</span>
@@ -652,7 +654,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/07/10 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/08/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

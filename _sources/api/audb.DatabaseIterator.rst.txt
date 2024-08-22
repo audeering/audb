@@ -1,0 +1,172 @@
+﻿DatabaseIterator
+================
+
+.. currentmodule:: audb
+
+.. autoclass:: DatabaseIterator
+
+
+\_\_contains\_\_\(\)
+--------------------
+.. automethod:: DatabaseIterator.__contains__
+    
+\_\_eq\_\_\(\)
+--------------
+.. automethod:: DatabaseIterator.__eq__
+    
+\_\_getitem\_\_\(\)
+-------------------
+.. automethod:: DatabaseIterator.__getitem__
+    
+\_\_iter\_\_\(\)
+----------------
+.. automethod:: DatabaseIterator.__iter__
+    
+\_\_next\_\_\(\)
+----------------
+.. automethod:: DatabaseIterator.__next__
+    
+attachments
+-----------
+.. autoattribute:: DatabaseIterator.attachments
+    
+author
+------
+.. autoattribute:: DatabaseIterator.author
+    
+description
+-----------
+.. autoattribute:: DatabaseIterator.description
+    
+drop\_files\(\)
+---------------
+.. automethod:: DatabaseIterator.drop_files
+    
+drop\_tables\(\)
+----------------
+.. automethod:: DatabaseIterator.drop_tables
+    
+dump\(\)
+--------
+.. automethod:: DatabaseIterator.dump
+    
+expires
+-------
+.. autoattribute:: DatabaseIterator.expires
+    
+files
+-----
+.. autoattribute:: DatabaseIterator.files
+    
+files\_duration\(\)
+-------------------
+.. automethod:: DatabaseIterator.files_duration
+    
+from\_dict\(\)
+--------------
+.. automethod:: DatabaseIterator.from_dict
+    
+get\(\)
+-------
+.. automethod:: DatabaseIterator.get
+    
+is\_portable
+------------
+.. autoattribute:: DatabaseIterator.is_portable
+    
+languages
+---------
+.. autoattribute:: DatabaseIterator.languages
+    
+license
+-------
+.. autoattribute:: DatabaseIterator.license
+    
+license\_url
+------------
+.. autoattribute:: DatabaseIterator.license_url
+    
+load\(\)
+--------
+.. automethod:: DatabaseIterator.load
+    
+load\_header\_from\_yaml\(\)
+----------------------------
+.. automethod:: DatabaseIterator.load_header_from_yaml
+    
+map\_files\(\)
+--------------
+.. automethod:: DatabaseIterator.map_files
+    
+media
+-----
+.. autoattribute:: DatabaseIterator.media
+    
+meta
+----
+.. autoattribute:: DatabaseIterator.meta
+    
+misc\_tables
+------------
+.. autoattribute:: DatabaseIterator.misc_tables
+    
+name
+----
+.. autoattribute:: DatabaseIterator.name
+    
+organization
+------------
+.. autoattribute:: DatabaseIterator.organization
+    
+pick\_files\(\)
+---------------
+.. automethod:: DatabaseIterator.pick_files
+    
+pick\_tables\(\)
+----------------
+.. automethod:: DatabaseIterator.pick_tables
+    
+raters
+------
+.. autoattribute:: DatabaseIterator.raters
+    
+root
+----
+.. autoattribute:: DatabaseIterator.root
+    
+save\(\)
+--------
+.. automethod:: DatabaseIterator.save
+    
+schemes
+-------
+.. autoattribute:: DatabaseIterator.schemes
+    
+segments
+--------
+.. autoattribute:: DatabaseIterator.segments
+    
+source
+------
+.. autoattribute:: DatabaseIterator.source
+    
+splits
+------
+.. autoattribute:: DatabaseIterator.splits
+    
+tables
+------
+.. autoattribute:: DatabaseIterator.tables
+    
+to\_dict\(\)
+------------
+.. automethod:: DatabaseIterator.to_dict
+    
+update\(\)
+----------
+.. automethod:: DatabaseIterator.update
+    
+usage
+-----
+.. autoattribute:: DatabaseIterator.usage
+    
