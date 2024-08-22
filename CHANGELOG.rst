@@ -7,6 +7,30 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.9.0 (2024-08-22)
+--------------------------
+
+* Added: pseudo-streaming support with ``audb.stream()``,
+  which returns the new ``audb.DatabaseIterator`` object.
+  In each iteration
+  it will load a few rows from a requested table
+  and downloads corresponding media files
+* Added: ``map`` argument to ``audb.load_table()``,
+  which behaves identical to the ``map`` argument
+  of ``audformat.Database.get()``
+* Added: ``pickle_tables`` argument
+  to ``audb.load()``,
+  ``audb.load_to()``
+  and ``audb.load_table()``
+  with default value of ``True``.
+  It can be used to disable
+  storing tables as pickle files
+  in cache/root folder
+* Fixed: ``audb.load_table()`` now only loads additional misc tables,
+  that are used as scheme labels inside the requested table,
+  and not in the whole database
+
+
 Version 1.8.0 (2024-07-10)
 --------------------------
 
