@@ -9,6 +9,10 @@ import audeer
 import audb
 
 
+PUBLIC_HOST = "s3.dualstack.eu-north-1.amazonaws.com"
+PUBLIC_BACKEND = "minio"
+
+
 if platform.system() == "Darwin":
     # Avoid multi-threading on MacOS runner,
     # as it might fail from time to time
@@ -185,25 +189,21 @@ def persistent_repository(tmpdir_factory):
 
 @pytest.fixture(scope="module", autouse=False)
 def private_and_public_repository():
-    r"""Private and public repository on Artifactory.
+    r"""Private and public repository.
 
     Configure the following repositories:
-    * data-private: repo on public Artifactory without access
-    * data-public: repo on public Artifactory with anonymous access
-    * data-public2: repo on public Artifactory with anonymous access
+    * audb-private: repo without access
+    * audb-public: repo with anonymous access
 
     Note, that the order of the repos is important.
     audb will visit the repos in the given order
     until it finds the requested database.
 
     """
-    host = "https://audeering.jfrog.io/artifactory"
-    backend = "artifactory"
     current_repositories = audb.config.REPOSITORIES
     audb.config.REPOSITORIES = [
-        audb.Repository("data-private", host, backend),
-        audb.Repository("data-public", host, backend),
-        audb.Repository("data-public2", host, backend),
+        audb.Repository("audb-private", PUBLIC_HOST, PUBLIC_BACKEND),
+        audb.Repository("audb-public", PUBLIC_HOST, PUBLIC_BACKEND),
     ]
 
     yield repository
@@ -213,23 +213,21 @@ def private_and_public_repository():
 
 @pytest.fixture(scope="module", autouse=False)
 def non_existing_repository():
-    r"""Non-existing repository on Artifactory.
+    r"""Non-existing repository.
 
     Configure the following repositories:
     * non-existing: non-exsiting repo on public Artifactory
-    * data-public: repo on public Artifactory with anonymous access
+    * audb-public: repo on public Artifactory with anonymous access
 
     Note, that the order of the repos is important.
     audb will visit the repos in the given order
     until it finds the requested database.
 
     """
-    host = "https://audeering.jfrog.io/artifactory"
-    backend = "artifactory"
     current_repositories = audb.config.REPOSITORIES
     audb.config.REPOSITORIES = [
-        audb.Repository("non-existing", host, backend),
-        audb.Repository("data-public", host, backend),
+        audb.Repository("non-existing", PUBLIC_HOST, PUBLIC_BACKEND),
+        audb.Repository("audb-public", PUBLIC_HOST, PUBLIC_BACKEND),
     ]
 
     yield repository

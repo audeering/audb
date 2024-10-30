@@ -27,10 +27,15 @@ class Repository:
 
     """
 
-    backend_registry = {
+    backends = {
         "file-system": audbackend.backend.FileSystem,
-        "artifactory": audbackend.backend.Artifactory,
+        "minio": audbackend.backend.Minio,
     }
+
+    if hasattr(audbackend.backend, "Artifactory"):
+        backends["artifactory"] = audbackend.backend.Artifactory
+
+    backend_registry = backends
     r"""Backend registry.
 
     Holds mapping between registered backend names,
@@ -117,7 +122,7 @@ class Repository:
         """
         backend_class = self.backend_registry[self.backend]
         backend = backend_class(self.host, self.name)
-        if self.backend == "artifactory":
+        if self.backend in ["artifactory", "minio"]:
             interface = audbackend.interface.Maven(backend)
         else:
             interface = audbackend.interface.Versioned(backend)

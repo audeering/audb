@@ -39,7 +39,7 @@ def cache(tmpdir_factory):
 
 @pytest.fixture(autouse=True)
 def public_repository(doctest_namespace):
-    r"""Provide access to the public Artifactory repository.
+    r"""Provide access to the public repository.
 
     Some tests in the docstrings need access to the emodb database.
     As all the unit tests defined under ``tests/*``
@@ -54,9 +54,9 @@ def public_repository(doctest_namespace):
     """
     audb.config.REPOSITORIES = [
         audb.Repository(
-            name="data-public",
-            host="https://audeering.jfrog.io/artifactory",
-            backend="artifactory",
+            name="audb-public",
+            host="s3.dualstack.eu-north-1.amazonaws.com",
+            backend="minio",
         ),
     ]
     doctest_namespace["audb"] = audb
