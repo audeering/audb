@@ -120,7 +120,7 @@ class Repository:
         """
         backend_class = self.backend_registry[self.backend]
         backend = backend_class(self.host, self.name)
-        if self.backend in ["artifactory", "minio"]:
+        if self.backend == "artifactory":
             interface = audbackend.interface.Maven(backend)
         else:
             interface = audbackend.interface.Versioned(backend)
