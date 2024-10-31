@@ -122,16 +122,16 @@ def test_header(db):
 
 def test_bit_depths():
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
-    assert audb.info.bit_depths(DB_NAME) == set(
-        [deps.bit_depth(file) for file in deps.media if deps.bit_depth(file)]
-    )
+    assert audb.info.bit_depths(DB_NAME) == {
+        deps.bit_depth(file) for file in deps.media if deps.bit_depth(file)
+    }
 
 
 def test_channels():
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
-    assert audb.info.channels(DB_NAME) == set(
-        [deps.channels(file) for file in deps.media if deps.channels(file)]
-    )
+    assert audb.info.channels(DB_NAME) == {
+        deps.channels(file) for file in deps.media if deps.channels(file)
+    }
 
 
 def test_description(db):
@@ -178,7 +178,7 @@ def test_duration(tables, media):
 
 def test_formats():
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
-    assert audb.info.formats(DB_NAME) == set([deps.format(file) for file in deps.media])
+    assert audb.info.formats(DB_NAME) == {deps.format(file) for file in deps.media}
 
 
 def test_languages(db):
@@ -215,9 +215,9 @@ def test_raters(db):
 
 def test_sampling_rates():
     deps = audb.dependencies(DB_NAME, version=DB_VERSION)
-    assert audb.info.sampling_rates(DB_NAME) == set(
-        [deps.sampling_rate(file) for file in deps.media if deps.sampling_rate(file)]
-    )
+    assert audb.info.sampling_rates(DB_NAME) == {
+        deps.sampling_rate(file) for file in deps.media if deps.sampling_rate(file)
+    }
 
 
 def test_schemes(db):

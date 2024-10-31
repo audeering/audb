@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
 import types
-import typing
 
 import filelock
 
@@ -11,7 +13,7 @@ import audb.core.define as define
 class FolderLock:
     def __init__(
         self,
-        folders: typing.Union[str, typing.Sequence[str]],
+        folders: str | Sequence[str],
         *,
         timeout: float = -1,
     ):
@@ -48,9 +50,9 @@ class FolderLock:
 
     def __exit__(
         self,
-        exc_type: typing.Optional[typing.Type[BaseException]],
-        exc_value: typing.Optional[BaseException],
-        traceback: typing.Optional[types.TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: types.TracebackType | None,
     ) -> None:
         """Release the lock(s)."""
         for lock in self.locks:

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import abc
+from collections.abc import Iterable
+from collections.abc import Sequence
 import os
-import typing
 
 import pandas as pd
 import pyarrow as pa
@@ -112,19 +113,19 @@ class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
         table: str,
         *,
         version: str,
-        map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]],
+        map: dict[str, str | Sequence[str]],
         batch_size: int,
         shuffle: bool,
         buffer_size: int,
         only_metadata: bool,
         bit_depth: int,
-        channels: typing.Union[int, typing.Sequence[int]],
+        channels: int | Sequence[int],
         format: str,
         mixdown: bool,
         sampling_rate: int,
         full_path: bool,
         cache_root: str,
-        num_workers: typing.Optional[int],
+        num_workers: int | None,
         timeout: float,
         verbose: bool,
     ):
@@ -189,7 +190,7 @@ class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
         return df
 
     @abc.abstractmethod
-    def _initialize_stream(self) -> typing.Iterable:
+    def _initialize_stream(self) -> Iterable:
         r"""Create table iterator object.
 
         This method needs to be implemented
@@ -306,7 +307,7 @@ class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
                 verbose=self._verbose,
             )
 
-    def _postprocess_batch(self, batch: typing.Any) -> pd.DataFrame:
+    def _postprocess_batch(self, batch: object) -> pd.DataFrame:
         r"""Post-process batch data to desired dataframe.
 
         Args:
@@ -414,19 +415,19 @@ def stream(
     table: str,
     *,
     version: str = None,
-    map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]] = None,
+    map: dict[str, str | Sequence[str]] = None,
     batch_size: int = 16,
     shuffle: bool = False,
     buffer_size: int = 100_000,
     only_metadata: bool = False,
     bit_depth: int = None,
-    channels: typing.Union[int, typing.Sequence[int]] = None,
+    channels: int | Sequence[int] = None,
     format: str = None,
     mixdown: bool = False,
     sampling_rate: int = None,
     full_path: bool = True,
     cache_root: str = None,
-    num_workers: typing.Optional[int] = 1,
+    num_workers: int | None = 1,
     timeout: float = -1,
     verbose: bool = True,
 ) -> DatabaseIterator:
@@ -535,7 +536,7 @@ def stream(
 
     # Extract kwargs
     # to pass on to the DatabaseIterator constructor
-    kwargs = dict((k, v) for (k, v) in locals().items() if k not in ["name", "table"])
+    kwargs = {k: v for (k, v) in locals().items() if k not in ["name", "table"]}
 
     flavor = Flavor(
         bit_depth=bit_depth,

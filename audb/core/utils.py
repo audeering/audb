@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 import os
-import typing
 import warnings
 
 import pyarrow.parquet as parquet
@@ -15,7 +15,7 @@ from audb.core.repository import Repository
 def lookup_backend(
     name: str,
     version: str,
-) -> typing.Type[audbackend.interface.Base]:
+) -> type[audbackend.interface.Base]:
     r"""Return backend of requested database.
 
     If the database is stored in several repositories,
@@ -67,7 +67,7 @@ def md5(file: str) -> str:
 
 
 def mkdir_tree(
-    files: typing.Sequence[str],
+    files: Sequence[str],
     root: str,
 ):
     r"""Helper function to create folder tree."""
@@ -81,7 +81,7 @@ def mkdir_tree(
 def _lookup(
     name: str,
     version: str,
-) -> typing.Tuple[Repository, typing.Type[audbackend.interface.Base]]:
+) -> tuple[Repository, type[audbackend.interface.Base]]:
     r"""Helper function to look up database in all repositories.
 
     Returns repository, version and backend object.
