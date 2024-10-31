@@ -17,7 +17,8 @@ class Repository:
     Args:
         name: repository name
         host: repository host
-        backend: repository backend
+        backend: repository backend,
+            for storage on S3 use the `"minio"` backend
 
     Examples:
         >>> Repository("data-local", "/data", "file-system")
@@ -74,6 +75,18 @@ class Repository:
     def create_backend_interface(self) -> type[audbackend.interface.Base]:
         r"""Create backend interface to access repository.
 
+        It wraps an :class:`audbackend.interface.Versioned` interface
+        around it.
+        The files will then be stored
+        with the following structure on the backend
+        (shown by the example of version 1.0.0 of the emodb dataset)::
+
+            emodb/1.0.0/db.yaml            <-- header
+            emodb/1.0.0/db.zip             <-- dependency table
+            emodb/attachment/1.0.0/...     <-- attachments
+            emodb/media/1.0.0/...          <-- media files
+            emodb/meta/1.0.0/...           <-- tables
+
         When :attr:`Repository.backend` equals ``artifactory``,
         it wraps an :class:`audbackend.interface.Maven` interface
         around it.
@@ -86,19 +99,6 @@ class Repository:
             emodb/attachment/.../1.0.0/... <-- attachments
             emodb/media/.../1.0.0/...      <-- media files
             emodb/meta/.../1.0.0/...       <-- tables
-
-        Otherwise,
-        it wraps an :class:`audbackend.interface.Versioned` interface
-        around it.
-        The files will then be stored
-        with the following structure on the backend
-        (shown by the example of version 1.0.0 of the emodb dataset)::
-
-            emodb/1.0.0/db.yaml            <-- header
-            emodb/1.0.0/db.zip             <-- dependency table
-            emodb/attachment/1.0.0/...     <-- attachments
-            emodb/media/1.0.0/...          <-- media files
-            emodb/meta/1.0.0/...           <-- tables
 
         The returned backend instance
         has not yet established a connection to the backend.
