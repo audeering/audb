@@ -148,7 +148,7 @@ in the file ``db.parquet``.
 Note,
 that the structure of the folders
 used for versioning
-depends on the backend,
+:meth:`depends on the backend <audb.Repository.create_backend_interface>`,
 and differs slightly
 for an Artifactory backend.
 

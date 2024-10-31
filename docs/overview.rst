@@ -31,6 +31,7 @@ to communicate with the underlying backend.
 At the moment,
 it supports to store the data
 in a folder on a local file system,
+in a bucket on MinIO_ or S3_ storage,
 or inside a `Generic repository`_
 on an `Artifactory server`_.
 
@@ -96,6 +97,8 @@ the following operations are performed:
 .. graphviz:: pics/load.dot
 
 
-.. _Generic repository: https://jfrog.com/help/r/jfrog-artifactory-documentation/repository-management
 .. _Artifactory server: https://jfrog.com/artifactory/
+.. _Generic repository: https://jfrog.com/help/r/jfrog-artifactory-documentation/repository-management
 .. _implements the required functions: https://github.com/audeering/audbackend/blob/edd23462799ae9052a43cdd045698f78e19dbcaf/audbackend/core/backend.py#L559-L659
+.. _MinIO: https://min.io
+.. _S3: https://aws.amazon.com/s3/

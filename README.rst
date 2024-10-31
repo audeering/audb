@@ -13,7 +13,9 @@ and versioned for reproducibility.
 as it stores all databases in a `common format`_
 and manages different versions of a database.
 Databases are stored in repositories
-on local file systems
+on local file systems,
+MinIO_,
+S3_,
 or Artifactory_ servers.
 
 You can request resampling or remixing of audio content
@@ -42,11 +44,13 @@ If you want to cite **audb**, you can refer to our paper_:
     }
 
 
-.. _common format: https://audeering.github.io/audformat/
 .. _Artifactory: https://jfrog.com/artifactory/
+.. _common format: https://audeering.github.io/audformat/
 .. _installation: https://audeering.github.io/audb/install.html
-.. _quickstart: https://audeering.github.io/audb/quickstart.html
+.. _MinIO: https://min.io
 .. _paper: https://arxiv.org/abs/2303.00645
+.. _quickstart: https://audeering.github.io/audb/quickstart.html
+.. _S3: https://aws.amazon.com/s3/
 
 
 .. badges images and links:
