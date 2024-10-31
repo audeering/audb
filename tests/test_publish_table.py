@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 import os
-import typing
 
 import numpy as np
 import pyarrow.parquet as parquet
@@ -125,7 +125,7 @@ def assert_db_published_to_repo(
 def assert_db_saved_to_dir(
     db: audformat.Database,
     root: str,
-    storage_formats: typing.Sequence[str],
+    storage_formats: Sequence[str],
 ):
     r"""Assert all database files are stored to the build dir.
 

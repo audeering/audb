@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import collections
+from collections.abc import Mapping
 import os
 import re
 import shutil
 import tempfile
-import typing
 
 import audbackend
 import audeer
@@ -42,7 +44,7 @@ def _check_for_duplicates(
 def _check_for_missing_media(
     db: audformat.Database,
     db_root: str,
-    db_root_files: typing.Set[str],
+    db_root_files: set[str],
     deps: Dependencies,
 ):
     r"""Check for media that is not in root and not in dependencies."""
@@ -77,7 +79,7 @@ def _find_attachments(
     version: str,
     deps: Dependencies,
     verbose: bool,
-) -> typing.List[str]:
+) -> list[str]:
     r"""Find altered, new or removed attachments and update 'deps'."""
     # drop removed attachments from dependency table
     removed_attachments = [
@@ -162,13 +164,13 @@ def _find_attachments(
 def _find_media(
     db: audformat.Database,
     db_root: str,
-    db_root_files: typing.Set[str],
+    db_root_files: set[str],
     version: str,
     deps: Dependencies,
-    archives: typing.Mapping[str, str],
+    archives: Mapping[str, str],
     num_workers: int,
     verbose: bool,
-) -> typing.Set[str]:
+) -> set[str]:
     r"""Find archives with new, altered or removed media and update 'deps'."""
     media_archives = set()
     db_media = set(db.files)
@@ -258,7 +260,7 @@ def _find_tables(
     version: str,
     deps: Dependencies,
     verbose: bool,
-) -> typing.List[str]:
+) -> list[str]:
     r"""Find altered, new or removed tables and update 'deps'."""
     table_ids = list(db)
     # PARQUET is default table,
@@ -291,7 +293,7 @@ def _find_tables(
 
 def _get_root_files(
     db_root: str,
-) -> typing.Set[str]:
+) -> set[str]:
     r"""Return list of files in root directory."""
     db_root_files = audeer.list_file_names(
         db_root,
@@ -311,7 +313,7 @@ def _media_values(
     version: str,
     archive: str,
     checksum: str,
-) -> typing.Tuple[str, str, int, int, str, float, str, int, float, int, str]:
+) -> tuple[str, str, int, int, str, float, str, int, float, int, str]:
     r"""Return values of a media entry in dependencies.
 
     The dependency table expects the following columns:
@@ -384,12 +386,12 @@ def _media_values(
 
 
 def _put_attachments(
-    attachments: typing.List[str],
+    attachments: list[str],
     db_root: str,
     db: audformat.Database,
     version: str,
-    backend_interface: typing.Type[audbackend.interface.Base],
-    num_workers: typing.Optional[int],
+    backend_interface: type[audbackend.interface.Base],
+    num_workers: int | None,
     verbose: bool,
 ):
     def job(attachment_id: str):
@@ -410,14 +412,14 @@ def _put_attachments(
 
 
 def _put_media(
-    media_archives: typing.Set[str],
+    media_archives: set[str],
     db_root: str,
     db_name: str,
     version: str,
-    previous_version: typing.Optional[str],
+    previous_version: str | None,
     deps: Dependencies,
-    backend_interface: typing.Type[audbackend.interface.Base],
-    num_workers: typing.Optional[int],
+    backend_interface: type[audbackend.interface.Base],
+    num_workers: int | None,
     verbose: bool,
 ):
     r"""Upload archives with new, altered or removed media files."""
@@ -485,12 +487,12 @@ def _put_media(
 
 
 def _put_tables(
-    tables: typing.List[str],
+    tables: list[str],
     db_root: str,
     db_name: str,
     version: str,
-    backend_interface: typing.Type[audbackend.interface.Base],
-    num_workers: typing.Optional[int],
+    backend_interface: type[audbackend.interface.Base],
+    num_workers: int | None,
     verbose: bool,
 ):
     def job(table: str):
@@ -520,10 +522,10 @@ def publish(
     version: str,
     repository: Repository,
     *,
-    archives: typing.Mapping[str, str] = None,
-    previous_version: typing.Optional[str] = "latest",
+    archives: Mapping[str, str] = None,
+    previous_version: str | None = "latest",
     cache_root: str = None,
-    num_workers: typing.Optional[int] = 1,
+    num_workers: int | None = 1,
     verbose: bool = True,
 ) -> Dependencies:
     r"""Publish database.

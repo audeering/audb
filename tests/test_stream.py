@@ -1,5 +1,4 @@
 import os
-import typing
 
 import numpy as np
 import pandas as pd
@@ -237,8 +236,8 @@ class TestStreaming:
     def test_db_cleanup(
         self,
         table: str,
-        expected_tables: typing.List,
-        expected_schemes: typing.List,
+        expected_tables: list,
+        expected_schemes: list,
     ):
         r"""Test removal of non-selected tables and schemes.
 
@@ -298,7 +297,7 @@ class TestStreaming:
             ("files", {"speaker": "year-of-birth"}),
         ],
     )
-    def test_map(self, table: str, map: typing.Dict):
+    def test_map(self, table: str, map: dict):
         r"""Test mapping of scheme labels.
 
         Args:

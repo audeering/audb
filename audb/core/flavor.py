@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
 import os
 import shutil
-import typing
 
 import numpy as np
 
@@ -53,7 +55,7 @@ class Flavor(audobject.Object):
         self,
         *,
         bit_depth: int = None,
-        channels: typing.Union[int, typing.Sequence[int]] = None,
+        channels: int | Sequence[int] = None,
         format: str = None,
         mixdown: bool = False,
         sampling_rate: int = None,
@@ -150,9 +152,9 @@ class Flavor(audobject.Object):
     def _check_convert(
         self,
         file: str,
-        bit_depth: typing.Optional[int],
-        channels: typing.Optional[int],
-        sampling_rate: typing.Optional[int],
+        bit_depth: int | None,
+        channels: int | None,
+        sampling_rate: int | None,
     ) -> bool:
         r"""Check if file needs to be converted to flavor."""
         format = audeer.file_extension(file).lower()

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
 import os
-import typing
 
 import audbackend
 import audeer
@@ -17,7 +19,7 @@ from audb.core.load import load_header_to
 def _find_attachments(
     db_root: str,
     deps: Dependencies,
-) -> typing.List[str]:
+) -> list[str]:
     r"""Find missing attachments."""
     attachments = []
 
@@ -33,9 +35,9 @@ def _find_media(
     db: audformat.Database,
     db_root: str,
     deps: Dependencies,
-    num_workers: typing.Optional[int],
+    num_workers: int | None,
     verbose: bool,
-) -> typing.List[str]:
+) -> list[str]:
     r"""Find missing media.
 
     Collects all media files present in ``db.files``,
@@ -70,9 +72,9 @@ def _find_tables(
     db_header: audformat.Database,
     db_root: str,
     deps: Dependencies,
-    num_workers: typing.Optional[int],
+    num_workers: int | None,
     verbose: bool,
-) -> typing.List[str]:
+) -> list[str]:
     r"""Find missing tables.
 
     Collects all tables and misc tables
@@ -116,13 +118,13 @@ def _find_tables(
 
 
 def _get_attachments(
-    paths: typing.Sequence[str],
+    paths: Sequence[str],
     db_root: str,
     db_root_tmp: str,
     db_name: str,
     deps: Dependencies,
-    backend_interface: typing.Type[audbackend.interface.Base],
-    num_workers: typing.Optional[int],
+    backend_interface: type[audbackend.interface.Base],
+    num_workers: int | None,
     verbose: bool,
 ):
     r"""Load attachments from backend."""
@@ -159,13 +161,13 @@ def _get_attachments(
 
 
 def _get_media(
-    media: typing.List[str],
+    media: list[str],
     db_root: str,
     db_root_tmp: str,
     db_name: str,
     deps: Dependencies,
-    backend_interface: typing.Type[audbackend.interface.Base],
-    num_workers: typing.Optional[int],
+    backend_interface: type[audbackend.interface.Base],
+    num_workers: int | None,
     verbose: bool,
 ):
     # create folder tree to avoid race condition
@@ -203,13 +205,13 @@ def _get_media(
 
 
 def _get_tables(
-    tables: typing.List[str],
+    tables: list[str],
     db_root: str,
     db_root_tmp: str,
     db_name: str,
     deps: Dependencies,
-    backend_interface: typing.Type[audbackend.interface.Base],
-    num_workers: typing.Optional[int],
+    backend_interface: type[audbackend.interface.Base],
+    num_workers: int | None,
     verbose: bool,
 ):
     r"""Load table files from backend.
@@ -296,7 +298,7 @@ def load_to(
     only_metadata: bool = False,
     pickle_tables: bool = True,
     cache_root: str = None,
-    num_workers: typing.Optional[int] = 1,
+    num_workers: int | None = 1,
     verbose: bool = True,
 ) -> audformat.Database:
     r"""Load database to directory.

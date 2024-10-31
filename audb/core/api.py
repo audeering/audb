@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
 import os
 import tempfile
-import typing
 
 import pandas as pd
 
@@ -286,7 +288,7 @@ def exists(
     *,
     version: str = None,
     bit_depth: int = None,
-    channels: typing.Union[int, typing.Sequence[int]] = None,
+    channels: int | Sequence[int] = None,
     format: str = None,
     mixdown: bool = False,
     sampling_rate: int = None,
@@ -367,7 +369,7 @@ def flavor_path(
     version: str,
     *,
     bit_depth: int = None,
-    channels: typing.Union[int, typing.Sequence[int]] = None,
+    channels: int | Sequence[int] = None,
     format: str = None,
     mixdown: bool = False,
     sampling_rate: int = None,
@@ -453,7 +455,7 @@ def latest_version(
 
 def remove_media(
     name: str,
-    files: typing.Union[str, typing.Sequence[str]],
+    files: str | Sequence[str],
     *,
     verbose: bool = False,
 ):
@@ -560,7 +562,7 @@ def repository(
 
 def versions(
     name: str,
-) -> typing.List[str]:
+) -> list[str]:
     r"""Available versions of database.
 
     Args:

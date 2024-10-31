@@ -411,7 +411,7 @@ def test_publish(tmpdir, dbs, persistent_repository, version):
     number_of_media_files_in_custom_archives = len(set(archives.keys()))
     number_of_custom_archives = len(set(archives.values()))
     number_of_media_files = len(deps.media)
-    number_of_media_archives = len(set([deps.archive(file) for file in deps.media]))
+    number_of_media_archives = len({deps.archive(file) for file in deps.media})
     assert (number_of_media_files_in_custom_archives - number_of_custom_archives) == (
         number_of_media_files - number_of_media_archives
     )

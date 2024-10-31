@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
 import os
 import shutil
-import typing
 
 import filelock
 import pandas as pd
@@ -25,14 +27,14 @@ from audb.core.lock import FolderLock
 from audb.core.utils import lookup_backend
 
 
-CachedVersions = typing.Sequence[typing.Tuple[audeer.StrictVersion, str, Dependencies]]
+CachedVersions = Sequence[tuple[audeer.StrictVersion, str, Dependencies]]
 
 
 def _cached_versions(
     name: str,
     version: str,
     flavor: Flavor,
-    cache_root: typing.Optional[str],
+    cache_root: str | None,
 ) -> CachedVersions:
     r"""Find other cached versions of same flavor."""
     df = cached(cache_root=cache_root, name=name)
@@ -72,12 +74,12 @@ def _cached_versions(
 
 
 def _cached_files(
-    files: typing.Sequence[str],
+    files: Sequence[str],
     deps: Dependencies,
     cached_versions: CachedVersions,
-    flavor: typing.Optional[Flavor],
+    flavor: Flavor | None,
     verbose: bool,
-) -> (typing.Sequence[typing.Union[str, str]], typing.Sequence[str]):
+) -> tuple[list[str], list[str]]:
     r"""Find cached files.
 
     Args:
@@ -205,8 +207,8 @@ def _database_is_complete(
 def _files_duration(
     db: audformat.Database,
     deps: Dependencies,
-    files: typing.Sequence[str],
-    format: typing.Optional[str],
+    files: Sequence[str],
+    format: str | None,
 ):
     durs = deps().loc[files, "duration"]
     durs = durs[durs > 0]
@@ -225,7 +227,7 @@ def _files_duration(
 
 
 def _get_attachments_from_cache(
-    attachments: typing.Sequence[str],
+    attachments: Sequence[str],
     db_root: str,
     db: audformat.Database,
     deps: Dependencies,
@@ -233,7 +235,7 @@ def _get_attachments_from_cache(
     flavor: Flavor,
     num_workers: int,
     verbose: bool,
-) -> typing.Sequence[str]:
+) -> list[str]:
     r"""Copy files from cache.
 
     This function copies all files
@@ -292,7 +294,7 @@ def _get_attachments_from_cache(
 
 
 def _get_files_from_cache(
-    files: typing.Sequence[str],
+    files: Sequence[str],
     files_type: str,
     db_root: str,
     deps: Dependencies,
@@ -300,7 +302,7 @@ def _get_files_from_cache(
     flavor: Flavor,
     num_workers: int,
     verbose: bool,
-) -> typing.Sequence[str]:
+) -> Sequence[str]:
     r"""Copy files from cache.
 
     This function copies requested media files
@@ -376,11 +378,11 @@ def _get_files_from_cache(
 
 def _get_attachments_from_backend(
     db: audformat.Database,
-    attachments: typing.Sequence[str],
+    attachments: Sequence[str],
     db_root: str,
     deps: Dependencies,
-    backend_interface: typing.Type[audbackend.interface.Base],
-    num_workers: typing.Optional[int],
+    backend_interface: type[audbackend.interface.Base],
+    num_workers: int | None,
     verbose: bool,
 ):
     r"""Load attachments from backend."""
@@ -424,12 +426,12 @@ def _get_attachments_from_backend(
 
 def _get_media_from_backend(
     name: str,
-    media: typing.Sequence[str],
+    media: Sequence[str],
     db_root: str,
-    flavor: typing.Optional[Flavor],
+    flavor: Flavor | None,
     deps: Dependencies,
-    backend_interface: typing.Type[audbackend.interface.Base],
-    num_workers: typing.Optional[int],
+    backend_interface: type[audbackend.interface.Base],
+    num_workers: int | None,
     verbose: bool,
 ):
     r"""Load media from backend."""
@@ -512,12 +514,12 @@ def _get_media_from_backend(
 
 def _get_tables_from_backend(
     db: audformat.Database,
-    tables: typing.Sequence[str],
+    tables: Sequence[str],
     db_root: str,
     deps: Dependencies,
-    backend_interface: typing.Type[audbackend.interface.Base],
+    backend_interface: type[audbackend.interface.Base],
     pickle_tables: bool,
-    num_workers: typing.Optional[int],
+    num_workers: int | None,
     verbose: bool,
 ):
     r"""Load tables from backend.
@@ -600,18 +602,18 @@ def _get_tables_from_backend(
 
 
 def _load_attachments(
-    attachments: typing.Sequence[str],
-    backend_interface: typing.Type[audbackend.interface.Base],
+    attachments: Sequence[str],
+    backend_interface: type[audbackend.interface.Base],
     db_root: str,
     db: audformat.Database,
     version: str,
-    cached_versions: typing.Optional[CachedVersions],
+    cached_versions: CachedVersions | None,
     deps: Dependencies,
     flavor: Flavor,
     cache_root: str,
     num_workers: int,
     verbose: bool,
-) -> typing.Optional[CachedVersions]:
+) -> CachedVersions | None:
     r"""Load attachments to cache.
 
     Args:
@@ -677,20 +679,20 @@ def _load_attachments(
 
 
 def _load_files(
-    files: typing.Sequence[str],
+    files: Sequence[str],
     files_type: str,
-    backend_interface: typing.Type[audbackend.interface.Base],
+    backend_interface: type[audbackend.interface.Base],
     db_root: str,
     db: audformat.Database,
     version: str,
-    cached_versions: typing.Optional[CachedVersions],
+    cached_versions: CachedVersions | None,
     deps: Dependencies,
     flavor: Flavor,
     cache_root: str,
     pickle_tables: bool,
     num_workers: int,
     verbose: bool,
-) -> typing.Optional[CachedVersions]:
+) -> CachedVersions | None:
     r"""Load files to cache.
 
     Loads media files,
@@ -790,7 +792,7 @@ def _load_files(
 
 def _misc_tables_used_in_scheme(
     db: audformat.Database,
-) -> typing.List[str]:
+) -> list[str]:
     r"""List of misc tables that are used inside a scheme.
 
     Args:
@@ -810,7 +812,7 @@ def _misc_tables_used_in_scheme(
 
 def _misc_tables_used_in_table(
     table: audformat.Table,
-) -> typing.List[str]:
+) -> list[str]:
     r"""List of misc tables that are used inside schemes of a table.
 
     Args:
@@ -830,12 +832,12 @@ def _misc_tables_used_in_table(
 
 
 def _missing_files(
-    files: typing.Sequence[str],
+    files: Sequence[str],
     files_type: str,
     db_root: str,
     flavor: Flavor,
     verbose: bool,
-) -> typing.Sequence[str]:
+) -> list[str]:
     r"""List missing files.
 
     Checks for media files,
@@ -896,7 +898,7 @@ def _update_path(
     db: audformat.Database,
     root: str,
     full_path: bool,
-    format: typing.Optional[str],
+    format: str | None,
     num_workers: int,
     verbose: bool,
 ):
@@ -946,8 +948,8 @@ def _update_path(
 def filtered_dependencies(
     name: str,
     version: str,
-    media: typing.Union[str, typing.Sequence[str]],
-    tables: typing.Union[str, typing.Sequence[str]],
+    media: str | Sequence[str],
+    tables: str | Sequence[str],
     cache_root: str = None,
 ) -> pd.DataFrame:
     r"""Filter media by tables.
@@ -1003,21 +1005,21 @@ def load(
     version: str = None,
     only_metadata: bool = False,
     bit_depth: int = None,
-    channels: typing.Union[int, typing.Sequence[int]] = None,
+    channels: int | Sequence[int] = None,
     format: str = None,
     mixdown: bool = False,
     sampling_rate: int = None,
-    attachments: typing.Union[str, typing.Sequence[str]] = None,
-    tables: typing.Union[str, typing.Sequence[str]] = None,
-    media: typing.Union[str, typing.Sequence[str]] = None,
+    attachments: str | Sequence[str] = None,
+    tables: str | Sequence[str] = None,
+    media: str | Sequence[str] = None,
     removed_media: bool = False,
     full_path: bool = True,
     pickle_tables: bool = True,
     cache_root: str = None,
-    num_workers: typing.Optional[int] = 1,
+    num_workers: int | None = 1,
     timeout: float = -1,
     verbose: bool = True,
-) -> typing.Optional[audformat.Database]:
+) -> audformat.Database | None:
     r"""Load database.
 
     Loads meta and media files of a database to the local cache and returns
@@ -1307,7 +1309,7 @@ def load_attachment(
     version: str = None,
     cache_root: str = None,
     verbose: bool = True,
-) -> typing.List[str]:
+) -> list[str]:
     r"""Load attachment(s) of database.
 
     Args:
@@ -1429,10 +1431,7 @@ def load_header_to(
     flavor: Flavor = None,
     add_audb_meta: bool = False,
     overwrite: bool = False,
-) -> typing.Tuple[
-    audformat.Database,
-    typing.Optional[typing.Type[audbackend.interface.Base]],
-]:
+) -> tuple[audformat.Database, type[audbackend.interface.Base] | None]:
     r"""Load database header from folder or backend.
 
     If the database header cannot be found in ``db_root``
@@ -1484,19 +1483,19 @@ def load_header_to(
 
 def load_media(
     name: str,
-    media: typing.Union[str, typing.Sequence[str]],
+    media: str | Sequence[str],
     *,
     version: str = None,
     bit_depth: int = None,
-    channels: typing.Union[int, typing.Sequence[int]] = None,
+    channels: int | Sequence[int] = None,
     format: str = None,
     mixdown: bool = False,
     sampling_rate: int = None,
     cache_root: str = None,
-    num_workers: typing.Optional[int] = 1,
+    num_workers: int | None = 1,
     timeout: float = -1,
     verbose: bool = True,
-) -> typing.Optional[typing.List]:
+) -> list | None:
     r"""Load media file(s).
 
     If you are interested in media files
@@ -1645,10 +1644,10 @@ def load_table(
     table: str,
     *,
     version: str = None,
-    map: typing.Dict[str, typing.Union[str, typing.Sequence[str]]] = None,
+    map: dict[str, str | Sequence[str]] = None,
     pickle_tables: bool = True,
     cache_root: str = None,
-    num_workers: typing.Optional[int] = 1,
+    num_workers: int | None = 1,
     verbose: bool = True,
 ) -> pd.DataFrame:
     r"""Load a database table.

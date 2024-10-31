@@ -1,4 +1,4 @@
-import typing
+from collections.abc import Sequence
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ def attachments(
     *,
     version: str = None,
     cache_root: str = None,
-) -> typing.Dict[str, audformat.Attachment]:
+) -> dict[str, audformat.Attachment]:
     """Attachment(s) of database.
 
     Args:
@@ -77,10 +77,10 @@ def bit_depths(
     name: str,
     *,
     version: str = None,
-    tables: typing.Sequence = None,
-    media: typing.Sequence = None,
+    tables: Sequence = None,
+    media: Sequence = None,
     cache_root: str = None,
-) -> typing.Set[int]:
+) -> set[int]:
     """Media bit depth.
 
     Args:
@@ -113,10 +113,10 @@ def channels(
     name: str,
     *,
     version: str = None,
-    tables: typing.Sequence = None,
-    media: typing.Sequence = None,
+    tables: Sequence = None,
+    media: Sequence = None,
     cache_root: str = None,
-) -> typing.Set[int]:
+) -> set[int]:
     """Media channels.
 
     Args:
@@ -181,8 +181,8 @@ def duration(
     name: str,
     *,
     version: str = None,
-    tables: typing.Sequence = None,
-    media: typing.Sequence = None,
+    tables: Sequence = None,
+    media: Sequence = None,
     cache_root: str = None,
 ) -> pd.Timedelta:
     """Total media duration.
@@ -223,7 +223,7 @@ def files(
     *,
     version: str = None,
     cache_root: str = None,
-) -> typing.List[str]:
+) -> list[str]:
     """Media files included in the database.
 
     Args:
@@ -248,10 +248,10 @@ def formats(
     name: str,
     *,
     version: str = None,
-    tables: typing.Sequence = None,
-    media: typing.Sequence = None,
+    tables: Sequence = None,
+    media: Sequence = None,
     cache_root: str = None,
-) -> typing.Set[str]:
+) -> set[str]:
     """Media formats.
 
     Args:
@@ -327,7 +327,7 @@ def languages(
     *,
     version: str = None,
     cache_root: str = None,
-) -> typing.List[str]:
+) -> list[str]:
     """Languages of database.
 
     Args:
@@ -420,7 +420,7 @@ def media(
     *,
     version: str = None,
     cache_root: str = None,
-) -> typing.Dict[str, audformat.Media]:
+) -> dict[str, audformat.Media]:
     """Audio and video media of database.
 
     Args:
@@ -452,7 +452,7 @@ def meta(
     *,
     version: str = None,
     cache_root: str = None,
-) -> typing.Dict:
+) -> dict:
     """Meta information of database.
 
     Args:
@@ -484,7 +484,7 @@ def misc_tables(
     *,
     version: str = None,
     cache_root: str = None,
-) -> typing.Dict[str, audformat.MiscTable]:
+) -> dict[str, audformat.MiscTable]:
     """Miscellaneous tables of database.
 
     Args:
@@ -546,7 +546,7 @@ def raters(
     *,
     version: str = None,
     cache_root: str = None,
-) -> typing.Dict[str, audformat.Rater]:
+) -> dict[str, audformat.Rater]:
     """Raters contributed to database.
 
     Args:
@@ -577,10 +577,10 @@ def sampling_rates(
     name: str,
     *,
     version: str = None,
-    tables: typing.Sequence = None,
-    media: typing.Sequence = None,
+    tables: Sequence = None,
+    media: Sequence = None,
     cache_root: str = None,
-) -> typing.Set[int]:
+) -> set[int]:
     """Media sampling rates.
 
     Args:
@@ -615,7 +615,7 @@ def schemes(
     version: str = None,
     load_tables: bool = True,
     cache_root: str = None,
-) -> typing.Dict[str, audformat.Scheme]:
+) -> dict[str, audformat.Scheme]:
     """Schemes of database.
 
     Args:
@@ -680,7 +680,7 @@ def splits(
     *,
     version: str = None,
     cache_root: str = None,
-) -> typing.Dict[str, audformat.Split]:
+) -> dict[str, audformat.Split]:
     """Splits of database.
 
     Args:
@@ -714,7 +714,7 @@ def tables(
     *,
     version: str = None,
     cache_root: str = None,
-) -> typing.Dict[str, audformat.Table]:
+) -> dict[str, audformat.Table]:
     """Tables of database.
 
     Args:

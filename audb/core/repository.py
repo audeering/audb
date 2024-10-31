@@ -1,5 +1,3 @@
-import typing
-
 import audbackend
 
 
@@ -72,7 +70,7 @@ class Repository:
             f")"
         )
 
-    def create_backend_interface(self) -> typing.Type[audbackend.interface.Base]:
+    def create_backend_interface(self) -> type[audbackend.interface.Base]:
         r"""Create backend interface to access repository.
 
         When :attr:`Repository.backend` equals ``artifactory``,
@@ -127,7 +125,7 @@ class Repository:
     def register(
         cls,
         backend_name: str,
-        backend_class: typing.Type[audbackend.backend.Base],
+        backend_class: type[audbackend.backend.Base],
     ):
         r"""Register backend class.
 

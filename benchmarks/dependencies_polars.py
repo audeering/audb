@@ -1,8 +1,11 @@
+from __future__ import annotations
+
+from collections.abc import Callable
+from collections.abc import Sequence
 import errno
 import os
 import re
 import tempfile
-import typing
 
 import pandas as pd
 import polars as pl
@@ -135,7 +138,7 @@ class Dependencies:
         """
         return self._df.equals(other._df)
 
-    def __getitem__(self, file: str) -> typing.List:
+    def __getitem__(self, file: str) -> list:
         r"""File information.
 
         Args:
@@ -166,7 +169,7 @@ class Dependencies:
         return str_repr
 
     @property
-    def archives(self) -> typing.List[str]:
+    def archives(self) -> list[str]:
         r"""All media, table, attachment archives.
 
         Return:
@@ -213,7 +216,7 @@ class Dependencies:
         # )
 
     @property
-    def attachments(self) -> typing.List[str]:
+    def attachments(self) -> list[str]:
         r"""Attachment paths (can be a file or a folder).
 
         Returns:
@@ -224,7 +227,7 @@ class Dependencies:
         return self._df.filter(pl.col("type") == deptype)[self.index_col].to_list()
 
     @property
-    def attachment_ids(self) -> typing.List[str]:
+    def attachment_ids(self) -> list[str]:
         r"""Attachment IDs.
 
         Returns:
@@ -236,7 +239,7 @@ class Dependencies:
         ].to_list()
 
     @property
-    def files(self) -> typing.List[str]:
+    def files(self) -> list[str]:
         r"""All media, table, attachments.
 
         Returns:
@@ -246,7 +249,7 @@ class Dependencies:
         return list(self._idx.keys())
 
     @property
-    def media(self) -> typing.List[str]:
+    def media(self) -> list[str]:
         r"""Media files.
 
         Returns:
@@ -258,7 +261,7 @@ class Dependencies:
         ].to_list()
 
     @property
-    def removed_media(self) -> typing.List[str]:
+    def removed_media(self) -> list[str]:
         r"""Removed media files.
 
         Returns:
@@ -270,7 +273,7 @@ class Dependencies:
         )[self.index_col].to_list()
 
     @property
-    def table_ids(self) -> typing.List[str]:
+    def table_ids(self) -> list[str]:
         r"""Table IDs.
 
         Like :meth:`audb.Dependencies.tables`,
@@ -284,7 +287,7 @@ class Dependencies:
         return [table[3:-4] for table in self.tables]
 
     @property
-    def tables(self) -> typing.List[str]:
+    def tables(self) -> list[str]:
         r"""Tables files.
 
         Returns:
@@ -562,8 +565,8 @@ class Dependencies:
 
     def _add_media(
         self,
-        values: typing.Sequence[
-            typing.Tuple[
+        values: Sequence[
+            tuple[
                 str,  # file
                 str,  # archive
                 int,  # bit_depth
@@ -637,8 +640,8 @@ class Dependencies:
         self,
         column: str,
         file: str,
-        dtype: typing.Callable = None,
-    ) -> typing.Any:
+        dtype: Callable = None,
+    ) -> object:
         r"""Column content for selected files and column."""
         value = self._df.row(self._idx[file], named=True)[column]
         if dtype is not None:
@@ -674,7 +677,7 @@ class Dependencies:
             table = table.rename_columns(columns)
         return table
 
-    def _drop(self, files: typing.Sequence[str]):
+    def _drop(self, files: Sequence[str]):
         r"""Drop files from table.
 
         Args:
@@ -736,8 +739,8 @@ class Dependencies:
 
     def _update_media(
         self,
-        values: typing.Sequence[
-            typing.Tuple[
+        values: Sequence[
+            tuple[
                 str,  # file
                 str,  # archive
                 int,  # bit_depth
@@ -781,7 +784,7 @@ class Dependencies:
 
     def _update_media_version(
         self,
-        files: typing.Sequence[str],
+        files: Sequence[str],
         version: str,
     ):
         r"""Update version of media files.
@@ -808,7 +811,7 @@ class Dependencies:
 
 def error_message_missing_object(
     object_type: str,
-    missing_object_id: typing.Union[str, typing.Sequence],
+    missing_object_id: str | Sequence,
     database_name: str = None,
     database_version: str = None,
 ) -> str:
@@ -843,12 +846,12 @@ def error_message_missing_object(
 
 
 def filter_deps(
-    requested_deps: typing.Optional[typing.Union[str, typing.Sequence[str]]],
-    available_deps: typing.Sequence[str],
+    requested_deps: str | Sequence[str] | None,
+    available_deps: Sequence[str],
     deps_type: str,
     database_name: str = None,
     database_version: str = None,
-) -> typing.Sequence[str]:
+) -> Sequence[str]:
     r"""Filter dependency files by requested files.
 
     Args:
@@ -901,7 +904,7 @@ def filter_deps(
 
 
 def download_dependencies(
-    backend_interface: typing.Type[audbackend.interface.Base],
+    backend_interface: type[audbackend.interface.Base],
     name: str,
     version: str,
     verbose: bool,
@@ -956,7 +959,7 @@ def download_dependencies(
 
 
 def upload_dependencies(
-    backend_interface: typing.Type[audbackend.interface.Base],
+    backend_interface: type[audbackend.interface.Base],
     deps: Dependencies,
     db_root: str,
     name: str,
