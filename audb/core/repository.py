@@ -25,10 +25,15 @@ class Repository:
 
     """
 
-    backend_registry = {
+    backends = {
         "file-system": audbackend.backend.FileSystem,
-        "artifactory": audbackend.backend.Artifactory,
+        "minio": audbackend.backend.Minio,
     }
+
+    if hasattr(audbackend.backend, "Artifactory"):
+        backends["artifactory"] = audbackend.backend.Artifactory
+
+    backend_registry = backends
     r"""Backend registry.
 
     Holds mapping between registered backend names,
@@ -74,8 +79,7 @@ class Repository:
         r"""Create backend interface to access repository.
 
         When :attr:`Repository.backend` equals ``artifactory``,
-        it creates an instance of :class:`audbackend.backend.Artifactory`
-        and wraps an :class:`audbackend.interface.Maven` interface
+        it wraps an :class:`audbackend.interface.Maven` interface
         around it.
         The files will then be stored
         with the following structure on the Artifactory backend
@@ -87,12 +91,11 @@ class Repository:
             emodb/media/.../1.0.0/...      <-- media files
             emodb/meta/.../1.0.0/...       <-- tables
 
-        When :attr:`Repository.backend` equals ``file-system``,
-        it creates an instance of :class:`audbackend.backend.FileSystem`
-        and wraps an :class:`audbackend.interface.Versioned` interface
+        Otherwise,
+        it wraps an :class:`audbackend.interface.Versioned` interface
         around it.
         The files will then be stored
-        with the following structure on the Artifactory backend
+        with the following structure on the backend
         (shown by the example of version 1.0.0 of the emodb dataset)::
 
             emodb/1.0.0/db.yaml            <-- header
