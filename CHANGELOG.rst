@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.10.0 (2024-11-04)
+---------------------------
+
+* Added: support for repositories
+  on S3 and MinIO servers,
+  using the ``minio`` backend
+  of ``audbackend``
+* Changed: depend on ``audbackend>=2.1.0``
+
+
 Version 1.9.0 (2024-08-22)
 --------------------------
 
