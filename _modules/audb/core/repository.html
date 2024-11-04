@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.9.0
+                v1.10.0
               </div>
             
           
@@ -151,9 +151,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audb.core.repository</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">typing</span>
-
-<span class="kn">import</span> <span class="nn">audbackend</span>
+<span></span><span class="kn">import</span> <span class="nn">audbackend</span>
 
 
 <div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository">[docs]</a><span class="k">class</span> <span class="nc">Repository</span><span class="p">:</span>
@@ -172,7 +170,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        name: repository name</span>
 <span class="sd">        host: repository host</span>
-<span class="sd">        backend: repository backend</span>
+<span class="sd">        backend: repository backend,</span>
+<span class="sd">            for storage on S3 use the `&quot;minio&quot;` backend</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; Repository(&quot;data-local&quot;, &quot;/data&quot;, &quot;file-system&quot;)</span>
@@ -181,8 +180,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">backend_registry</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;file-system&quot;</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">,</span>
         <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Artifactory</span><span class="p">,</span>
+        <span class="s2">&quot;file-system&quot;</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">,</span>
+        <span class="s2">&quot;minio&quot;</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Minio</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Backend registry.</span>
 
@@ -225,12 +225,23 @@
             <span class="sa">f</span><span class="s2">&quot;)&quot;</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Repository.create_backend_interface"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository.create_backend_interface">[docs]</a>    <span class="k">def</span> <span class="nf">create_backend_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
+<div class="viewcode-block" id="Repository.create_backend_interface"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository.create_backend_interface">[docs]</a>    <span class="k">def</span> <span class="nf">create_backend_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create backend interface to access repository.</span>
 
+<span class="sd">        It wraps an :class:`audbackend.interface.Versioned` interface</span>
+<span class="sd">        around it.</span>
+<span class="sd">        The files will then be stored</span>
+<span class="sd">        with the following structure on the backend</span>
+<span class="sd">        (shown by the example of version 1.0.0 of the emodb dataset)::</span>
+
+<span class="sd">            emodb/1.0.0/db.yaml            &lt;-- header</span>
+<span class="sd">            emodb/1.0.0/db.zip             &lt;-- dependency table</span>
+<span class="sd">            emodb/attachment/1.0.0/...     &lt;-- attachments</span>
+<span class="sd">            emodb/media/1.0.0/...          &lt;-- media files</span>
+<span class="sd">            emodb/meta/1.0.0/...           &lt;-- tables</span>
+
 <span class="sd">        When :attr:`Repository.backend` equals ``artifactory``,</span>
-<span class="sd">        it creates an instance of :class:`audbackend.backend.Artifactory`</span>
-<span class="sd">        and wraps an :class:`audbackend.interface.Maven` interface</span>
+<span class="sd">        it wraps an :class:`audbackend.interface.Maven` interface</span>
 <span class="sd">        around it.</span>
 <span class="sd">        The files will then be stored</span>
 <span class="sd">        with the following structure on the Artifactory backend</span>
@@ -241,20 +252,6 @@
 <span class="sd">            emodb/attachment/.../1.0.0/... &lt;-- attachments</span>
 <span class="sd">            emodb/media/.../1.0.0/...      &lt;-- media files</span>
 <span class="sd">            emodb/meta/.../1.0.0/...       &lt;-- tables</span>
-
-<span class="sd">        When :attr:`Repository.backend` equals ``file-system``,</span>
-<span class="sd">        it creates an instance of :class:`audbackend.backend.FileSystem`</span>
-<span class="sd">        and wraps an :class:`audbackend.interface.Versioned` interface</span>
-<span class="sd">        around it.</span>
-<span class="sd">        The files will then be stored</span>
-<span class="sd">        with the following structure on the Artifactory backend</span>
-<span class="sd">        (shown by the example of version 1.0.0 of the emodb dataset)::</span>
-
-<span class="sd">            emodb/1.0.0/db.yaml            &lt;-- header</span>
-<span class="sd">            emodb/1.0.0/db.zip             &lt;-- dependency table</span>
-<span class="sd">            emodb/attachment/1.0.0/...     &lt;-- attachments</span>
-<span class="sd">            emodb/media/1.0.0/...          &lt;-- media files</span>
-<span class="sd">            emodb/meta/1.0.0/...           &lt;-- tables</span>
 
 <span class="sd">        The returned backend instance</span>
 <span class="sd">        has not yet established a connection to the backend.</span>
@@ -280,7 +277,7 @@
     <span class="k">def</span> <span class="nf">register</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">backend_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">backend_class</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
+        <span class="n">backend_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register backend class.</span>
 
@@ -317,7 +314,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/08/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
