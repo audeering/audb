@@ -17,8 +17,7 @@ class Repository:
     Args:
         name: repository name
         host: repository host
-        backend: repository backend,
-            for storage on S3 use the `"minio"` backend
+        backend: repository backend
 
     Examples:
         >>> Repository("data-local", "/data", "file-system")
@@ -30,6 +29,7 @@ class Repository:
         "artifactory": audbackend.backend.Artifactory,
         "file-system": audbackend.backend.FileSystem,
         "minio": audbackend.backend.Minio,
+        "s3": audbackend.backend.Minio,
     }
     r"""Backend registry.
 
