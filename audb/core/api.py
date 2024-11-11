@@ -77,10 +77,9 @@ def available(
                             # we do not include the dataset
                             pass
 
-                elif repository.backend in ["minio", "s3"]:
-                    # We can be much faster
-                    # by avoiding using ls(),
-                    # which would recursively lists all files
+                elif repository.backend in ["minio", "s3"]:  # pragma: nocover
+                    # Avoid `ls(recursive=True)` for S3 and MinIO
+                    # as this is slow for large databases
                     for obj in backend._client.list_objects(repository.name):
                         name = obj.object_name
                         header_file = f"/{name}/{define.HEADER_FILE}"
