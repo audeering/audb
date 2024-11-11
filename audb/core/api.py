@@ -81,7 +81,7 @@ def available(
                     # We can be much faster
                     # by avoiding using ls(),
                     # which would recursively lists all files
-                    for obj in backend.list_objects(repository.name):
+                    for obj in backend._client.list_objects(repository.name):
                         name = obj.object_name
                         header_file = f"/{name}/{define.HEADER_FILE}"
                         for _, version in backend_interface.ls(header_file):
