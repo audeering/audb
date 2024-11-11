@@ -91,7 +91,7 @@ def available(
                                 "attachment",
                                 "media",
                                 "meta",
-                            ] and backend.exist(header_file):
+                            ] and backend.exists(header_file):
                                 add_database(name, version, repository)
 
                 else:
