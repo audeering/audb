@@ -84,8 +84,15 @@ def available(
                     for obj in backend._client.list_objects(repository.name):
                         name = obj.object_name
                         header_file = f"/{name}/{define.HEADER_FILE}"
-                        for _, version in backend_interface.ls(header_file):
-                            add_database(name, version, repository)
+                        for _obj in backend._client.list_objects(repository.name, name):
+                            version = _obj.object_name.split("/")[1]
+                            header_file = f"/{name}/{version}/{define.HEADER_FILE}"
+                            if version not in [
+                                "attachment",
+                                "media",
+                                "meta",
+                            ] and backend.exist(header_file):
+                                add_database(name, version, repository)
 
                 else:
                     for path, version in backend_interface.ls("/"):
