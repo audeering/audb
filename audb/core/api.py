@@ -77,7 +77,7 @@ def available(
                             # we do not include the dataset
                             pass
 
-                elif repository.backend in ["minio", "s3"]:  # pragma: nocover
+                elif repository.backend in ["minio", "s3"]:
                     # Avoid `ls(recursive=True)` for S3 and MinIO
                     # as this is slow for large databases
                     for obj in backend._client.list_objects(repository.name):
