@@ -46,6 +46,19 @@ def available(
 
     """  # noqa: E501
     databases = []
+
+    def add_database(name: str, version: str, repository: Repository):
+        """Add database to list of databases."""
+        databases.append(
+            [
+                name,
+                repository.backend,
+                repository.host,
+                repository.name,
+                version,
+            ]
+        )
+
     for repository in config.REPOSITORIES:
         try:
             backend_interface = repository.create_backend_interface()
@@ -58,32 +71,28 @@ def available(
                         name = p.name
                         try:
                             for version in [str(x).split("/")[-1] for x in p / "db"]:
-                                databases.append(
-                                    [
-                                        name,
-                                        repository.backend,
-                                        repository.host,
-                                        repository.name,
-                                        version,
-                                    ]
-                                )
+                                add_database(name, version, repository)
                         except FileNotFoundError:
                             # If the `db` folder does not exist,
                             # we do not include the dataset
                             pass
+
+                elif repository.backend in ["minio", "s3"]:
+                    # We can be much faster
+                    # by avoiding using ls(),
+                    # which would recursively lists all files
+                    for obj in backend.list_objects(repository.name):
+                        name = obj.object_name
+                        header_file = f"/{name}/{define.HEADER_FILE}"
+                        for _, version in backend_interface.ls(header_file):
+                            add_database(name, version, repository)
+
                 else:
                     for path, version in backend_interface.ls("/"):
                         if path.endswith(define.HEADER_FILE):
                             name = path.split("/")[1]
-                            databases.append(
-                                [
-                                    name,
-                                    repository.backend,
-                                    repository.host,
-                                    repository.name,
-                                    version,
-                                ]
-                            )
+                            add_database(name, version, repository)
+
         except audbackend.BackendError:
             continue
 
