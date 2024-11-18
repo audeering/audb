@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.10.1
+                v1.10.2
               </div>
             
           
@@ -234,9 +234,11 @@
                     <span class="c1"># Avoid `ls(recursive=True)` for S3 and MinIO</span>
                     <span class="c1"># as this is slow for large databases</span>
                     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-                        <span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">object_name</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">object_name</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># remove &quot;/&quot; at end</span>
                         <span class="n">header_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
-                        <span class="k">for</span> <span class="n">_obj</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                        <span class="k">for</span> <span class="n">_obj</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span>
+                            <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/&quot;</span>
+                        <span class="p">):</span>
                             <span class="n">version</span> <span class="o">=</span> <span class="n">_obj</span><span class="o">.</span><span class="n">object_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
                             <span class="n">header_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
                             <span class="k">if</span> <span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
