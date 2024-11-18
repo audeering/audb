@@ -140,6 +140,7 @@ The following properties can be changed.
       - 8000
       - 16000
       - 22500
+      - 24000
       - 44100
       - 48000
 
