@@ -332,7 +332,7 @@ def exists(
         format: file format, one of ``'flac'``, ``'wav'``
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
-            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+            ``8000``, ``16000``, ``22500``, ``24000``, ``44100``, ``48000``
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
 
@@ -416,7 +416,7 @@ def flavor_path(
         format: file format, one of ``'flac'``, ``'wav'``
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
-            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+            ``8000``, ``16000``, ``22500``, ``24000``, ``44100``, ``48000``
 
     Returns:
         flavor path relative to cache folder
