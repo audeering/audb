@@ -25,16 +25,16 @@ class Repository:
 
     """
 
-    backends = {
+    _backends = {
         "file-system": audbackend.backend.FileSystem,
         "minio": audbackend.backend.Minio,
         "s3": audbackend.backend.Minio,
     }
 
     if hasattr(audbackend.backend, "Artifactory"):
-        backends["artifactory"] = audbackend.backend.Artifactory
+        _backends["artifactory"] = audbackend.backend.Artifactory
 
-    backend_registry = backends
+    backend_registry = _backends
     r"""Backend registry.
 
     Holds mapping between registered backend names,
