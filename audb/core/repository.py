@@ -39,6 +39,8 @@ class Repository:
 
     Holds mapping between registered backend names,
     and their corresponding backend classes.
+    The ``"artifactory"`` backend is currently not available
+    under Python 3.12.
 
     """
 
