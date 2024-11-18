@@ -2,7 +2,7 @@ cache_root: ~/audb
 shared_cache_root: /data/audb
 repositories:
   - name: audb-public
-    backend: minio
+    backend: s3
     host: s3.dualstack.eu-north-1.amazonaws.com
   - name: data-local
     backend: file-system

@@ -10,7 +10,7 @@ import audb
 
 
 PUBLIC_HOST = "s3.dualstack.eu-north-1.amazonaws.com"
-PUBLIC_BACKEND = "minio"
+PUBLIC_BACKEND = "s3"
 
 
 if platform.system() == "Darwin":

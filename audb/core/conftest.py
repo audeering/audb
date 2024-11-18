@@ -53,7 +53,7 @@ def public_repository():
         audb.Repository(
             name="audb-public",
             host="s3.dualstack.eu-north-1.amazonaws.com",
-            backend="minio",
+            backend="s3",
         ),
     ]
 

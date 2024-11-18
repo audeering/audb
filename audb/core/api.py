@@ -41,8 +41,8 @@ def available(
         >>> df.loc[["air", "emodb"]]
               backend                                   host   repository version
         name
-        air     minio  s3.dualstack.eu-north-1.amazonaws.com  audb-public   1.4.2
-        emodb   minio  s3.dualstack.eu-north-1.amazonaws.com  audb-public   1.4.1
+        air        s3  s3.dualstack.eu-north-1.amazonaws.com  audb-public   1.4.2
+        emodb      s3  s3.dualstack.eu-north-1.amazonaws.com  audb-public   1.4.1
 
     """  # noqa: E501
     databases = []
@@ -569,7 +569,7 @@ def repository(
 
     Examples:
         >>> audb.repository("emodb", "1.4.1")
-        Repository('audb-public', 's3.dualstack.eu-north-1.amazonaws.com', 'minio')
+        Repository('audb-public', 's3.dualstack.eu-north-1.amazonaws.com', 's3')
 
     """  # noqa: E501
     if not versions(name):
