@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.10.2 (2024-11-18)
+---------------------------
+
+* Fixed: remove extra ``"/"`` at end of dataset names
+  in ``audb.available()`` for S3 and Minio backends
+
+
 Version 1.10.1 (2024-11-18)
 ---------------------------
 
