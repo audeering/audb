@@ -226,7 +226,7 @@ def test_mixdown(db_root, mixdown):
 
 @pytest.mark.parametrize(
     "sampling_rate",
-    [None, 16000],
+    [None, 16000, 24000],
 )
 def test_sampling_rate(db_root, sampling_rate):
     db = audb.load(

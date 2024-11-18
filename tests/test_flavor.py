@@ -31,7 +31,7 @@ import audb
             None,
             audb.core.define.Format.WAV,
             True,
-            16000,
+            24000,
         ),
         pytest.param(
             0,
