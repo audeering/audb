@@ -1458,7 +1458,6 @@ def load_header_to(
     local_header = os.path.join(db_root, define.HEADER_FILE)
     if overwrite or not os.path.exists(local_header):
         backend_interface = lookup_backend(name, version)
-        print(f"jetzt backend interface in load_header_to: {backend_interface}")
         remote_header = backend_interface.join("/", name, define.HEADER_FILE)
         if add_audb_meta:
             db_root_tmp = database_tmp_root(db_root)
