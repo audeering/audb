@@ -25,16 +25,22 @@ class Repository:
 
     """
 
-    backend_registry = {
-        "artifactory": audbackend.backend.Artifactory,
+    backends = {
         "file-system": audbackend.backend.FileSystem,
         "minio": audbackend.backend.Minio,
         "s3": audbackend.backend.Minio,
     }
+
+    if hasattr(audbackend.backend, "Artifactory"):
+        backends["artifactory"] = audbackend.backend.Artifactory
+
+    backend_registry = backends
     r"""Backend registry.
 
     Holds mapping between registered backend names,
     and their corresponding backend classes.
+    The ``"artifactory"`` backend is currently not available
+    under Python >=3.12.
 
     """
 
