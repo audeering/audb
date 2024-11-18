@@ -11,7 +11,7 @@ Version 1.10.1 (2024-11-18)
 ---------------------------
 
 * Added: ``"s3"`` as a registered backend name
-* Changed: depend on ``audbackend=>2.2.0``
+* Changed: depend on ``audbackend>=2.2.0``
 * Changed: make Artifactory backend optional,
   to allow importing ``audb`` in Python>=3.12
 * Fixed:  speedup ``audb.available()`` for S3 and Minio backends
