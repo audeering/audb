@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
             
           
@@ -199,6 +199,19 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="n">databases</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add database to list of databases.&quot;&quot;&quot;</span>
+        <span class="n">databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+                <span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+                <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">version</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
     <span class="k">for</span> <span class="n">repository</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
@@ -211,32 +224,34 @@
                         <span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;db&quot;</span><span class="p">]:</span>
-                                <span class="n">databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                                    <span class="p">[</span>
-                                        <span class="n">name</span><span class="p">,</span>
-                                        <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
-                                        <span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
-                                        <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                                        <span class="n">version</span><span class="p">,</span>
-                                    <span class="p">]</span>
-                                <span class="p">)</span>
+                                <span class="n">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
                         <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
                             <span class="c1"># If the `db` folder does not exist,</span>
                             <span class="c1"># we do not include the dataset</span>
                             <span class="k">pass</span>
+
+                <span class="k">elif</span> <span class="n">repository</span><span class="o">.</span><span class="n">backend</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;minio&quot;</span><span class="p">,</span> <span class="s2">&quot;s3&quot;</span><span class="p">]:</span>
+                    <span class="c1"># Avoid `ls(recursive=True)` for S3 and MinIO</span>
+                    <span class="c1"># as this is slow for large databases</span>
+                    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">object_name</span>
+                        <span class="n">header_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">for</span> <span class="n">_obj</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                            <span class="n">version</span> <span class="o">=</span> <span class="n">_obj</span><span class="o">.</span><span class="n">object_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="n">header_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="k">if</span> <span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+                                <span class="s2">&quot;attachment&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;media&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;meta&quot;</span><span class="p">,</span>
+                            <span class="p">]</span> <span class="ow">and</span> <span class="n">backend</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">header_file</span><span class="p">):</span>
+                                <span class="n">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
+
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">):</span>
                             <span class="n">name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-                            <span class="n">databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                                <span class="p">[</span>
-                                    <span class="n">name</span><span class="p">,</span>
-                                    <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
-                                    <span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
-                                    <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                                    <span class="n">version</span><span class="p">,</span>
-                                <span class="p">]</span>
-                            <span class="p">)</span>
+                            <span class="n">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
+
         <span class="k">except</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">BackendError</span><span class="p">:</span>
             <span class="k">continue</span>
 
@@ -793,7 +808,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

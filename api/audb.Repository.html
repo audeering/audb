@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v1.10.0
+                v1.10.1
               </div>
             
           
@@ -206,8 +206,7 @@ to access the repository.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository name</p></li>
 <li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository host</p></li>
-<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository backend,
-for storage on S3 use the <cite>“minio”</cite> backend</p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository backend</p></li>
 </ul>
 </dd>
 </dl>
@@ -251,10 +250,12 @@ for storage on S3 use the <cite>“minio”</cite> backend</p></li>
 <h2>backend_registry<a class="headerlink" href="#backend-registry" title="Permalink to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Repository.backend_registry">
-<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">backend_registry</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'artifactory':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.artifactory.Artifactory'&gt;,</span> <span class="pre">'file-system':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.filesystem.FileSystem'&gt;,</span> <span class="pre">'minio':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.minio.Minio'&gt;}</span></em><a class="headerlink" href="#audb.Repository.backend_registry" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">backend_registry</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'artifactory':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.artifactory.Artifactory'&gt;,</span> <span class="pre">'file-system':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.filesystem.FileSystem'&gt;,</span> <span class="pre">'minio':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.minio.Minio'&gt;,</span> <span class="pre">'s3':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.minio.Minio'&gt;}</span></em><a class="headerlink" href="#audb.Repository.backend_registry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Backend registry.</p>
 <p>Holds mapping between registered backend names,
-and their corresponding backend classes.</p>
+and their corresponding backend classes.
+The <code class="docutils literal notranslate"><span class="pre">&quot;artifactory&quot;</span></code> backend is currently not available
+under Python &gt;=3.12.</p>
 </dd></dl>
 
 </div>
@@ -264,7 +265,7 @@ and their corresponding backend classes.</p>
 <dt class="sig sig-object py" id="audb.Repository.create_backend_interface">
 <span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">create_backend_interface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository.create_backend_interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository.create_backend_interface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create backend interface to access repository.</p>
-<p>It wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Versioned.html#audbackend.interface.Versioned" title="(in audbackend v2.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Versioned</span></code></a> interface
+<p>It wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Versioned.html#audbackend.interface.Versioned" title="(in audbackend v2.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Versioned</span></code></a> interface
 around it.
 The files will then be stored
 with the following structure on the backend
@@ -277,7 +278,7 @@ with the following structure on the backend
 </pre></div>
 </div>
 <p>When <a class="reference internal" href="#audb.Repository.backend" title="audb.Repository.backend"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Repository.backend</span></code></a> equals <code class="docutils literal notranslate"><span class="pre">artifactory</span></code>,
-it wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Maven.html#audbackend.interface.Maven" title="(in audbackend v2.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Maven</span></code></a> interface
+it wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Maven.html#audbackend.interface.Maven" title="(in audbackend v2.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Maven</span></code></a> interface
 around it.
 The files will then be stored
 with the following structure on the Artifactory backend
@@ -298,7 +299,7 @@ The backend is stored as the inside the <code class="docutils literal notranslat
 of the returned backend interface.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v2.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v2.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>interface to repository</p>
@@ -340,7 +341,7 @@ to an actual backend class.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the backend,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;file-system&quot;</span></code></p></li>
-<li><p><strong>backend_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v2.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]) – class of the backend,
+<li><p><strong>backend_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v2.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]) – class of the backend,
 that should be associated with <code class="docutils literal notranslate"><span class="pre">backend_name</span></code>,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbackend.backend.Filesystem&quot;</span></code></p></li>
 </ul>
@@ -379,7 +380,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
