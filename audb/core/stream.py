@@ -30,6 +30,9 @@ class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
     This class cannot be created directly,
     but only by calling :func:`audb.stream`.
 
+    ..
+        >>> import audb
+
     Examples:
         Create :class:`audb.DatabaseIterator` object.
 

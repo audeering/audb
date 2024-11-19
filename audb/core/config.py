@@ -76,11 +76,14 @@ class config:
     The :ref:`caching <caching>` related configuration values
     can be overwritten by environment variables.
 
+    ..
+        >>> import audb
+
     Examples:
-        >>> config.CACHE_ROOT
+        >>> audb.config.CACHE_ROOT
         '~/audb'
-        >>> config.CACHE_ROOT = "~/caches/audb"
-        >>> config.CACHE_ROOT
+        >>> audb.config.CACHE_ROOT = "~/caches/audb"
+        >>> audb.config.CACHE_ROOT
         '~/caches/audb'
 
     """

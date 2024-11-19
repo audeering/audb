@@ -1,12 +1,6 @@
-.. Import audb
-.. jupyter-execute::
-    :hide-code:
-    :hide-output:
-
-    import audb
-
-
 .. _configuration:
+
+.. skip: start
 
 Configuration
 -------------
@@ -24,19 +18,16 @@ they can be accessed
 or changed
 using :class:`audb.config`.
 
-.. jupyter-execute::
+>>> audb.config.CACHE_ROOT
+'~/audb'
 
-    audb.config.CACHE_ROOT
+>>> audb.config.SHARED_CACHE_ROOT
+'/data/audb'
 
-.. jupyter-execute::
+>>> audb.config.REPOSITORIES
+[Repository('data-public', 'https://audeering.jfrog.io/artifactory', 'artifactory'),
+ Repository('data-local', '~/audb-host', 'file-system')]
 
-    audb.config.SHARED_CACHE_ROOT
+>>> audb.config.CACHE_ROOT = "/user/cache"
 
-.. jupyter-execute::
-
-    audb.config.REPOSITORIES
-
-.. jupyter-execute::
-
-    audb.config.CACHE_ROOT = "/user/cache"
-    audb.config.CACHE_ROOT
+.. skip: end

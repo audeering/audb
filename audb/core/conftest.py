@@ -1,8 +1,23 @@
+from doctest import ELLIPSIS
+from doctest import NORMALIZE_WHITESPACE
 import os
 
 import pytest
+import sybil
+from sybil.parsers.rest import DocTestParser
 
 import audb
+
+
+# Collect doctests
+pytest_collect_file = sybil.Sybil(
+    parsers=[DocTestParser(optionflags=ELLIPSIS + NORMALIZE_WHITESPACE)],
+    patterns=["*.py"],
+    fixtures=[
+        "cache",
+        "public_repository",
+    ],
+).pytest()
 
 
 @pytest.fixture(scope="package", autouse=True)
@@ -38,20 +53,8 @@ def cache(tmpdir_factory):
 
 
 @pytest.fixture(autouse=True)
-def public_repository(doctest_namespace):
-    r"""Provide access to the public Artifactory repository.
-
-    Some tests in the docstrings need access to the emodb database.
-    As all the unit tests defined under ``tests/*``
-    should not be able to see the public repository
-    as the number of available databases would then not be deterministic.
-    We provide this access here
-    with the help of the ``doctest_namespace`` fixture.
-
-    The ``conftest.py`` file has to be in the same folder
-    as the code file where the docstring is defined.
-
-    """
+def public_repository():
+    r"""Provide access to the public Artifactory repository."""
     audb.config.REPOSITORIES = [
         audb.Repository(
             name="data-public",
@@ -59,9 +62,8 @@ def public_repository(doctest_namespace):
             backend="artifactory",
         ),
     ]
-    doctest_namespace["audb"] = audb
 
-    yield
+    yield audb
 
     # Remove public repo
     audb.config.REPOSITORIES.pop()

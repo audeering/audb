@@ -36,6 +36,9 @@ def available(
         table with database name as index,
         and backend, host, repository, version as columns
 
+    ..
+        >>> import audb
+
     Examples:
         >>> df = audb.available(only_latest=True)
         >>> df.loc[["air", "emodb"]]
@@ -162,7 +165,7 @@ def cached(
         ...     full_path=False,
         ...     verbose=False,
         ... )
-        >>> df = cached()
+        >>> df = audb.cached()
         >>> print(df.iloc[0].to_string())
         name                emodb
         flavor_id        d3b62a9b
@@ -271,7 +274,7 @@ def dependencies(
         dependency object
 
     Examples:
-        >>> deps = dependencies("emodb", version="1.4.1")
+        >>> deps = audb.dependencies("emodb", version="1.4.1")
         >>> deps.version("db.emotion.csv")
         '1.1.0'
 
@@ -428,7 +431,7 @@ def flavor_path(
             is requested
 
     Examples:
-        >>> flavor_path("emodb", version="1.4.1").split(os.path.sep)
+        >>> audb.flavor_path("emodb", version="1.4.1").split(os.path.sep)
         ['emodb', '1.4.1', 'd3b62a9b']
 
     """
@@ -458,7 +461,7 @@ def latest_version(
         RuntimeError: if no version exists for the requested database
 
     Examples:
-        >>> latest_version("emodb")
+        >>> audb.latest_version("emodb")
         '1.4.1'
 
     """
@@ -589,7 +592,7 @@ def versions(
         list of versions
 
     Examples:
-        >>> versions("emodb")
+        >>> audb.versions("emodb")
         ['1.1.0', '1.1.1', '1.2.0', '1.3.0', '1.4.0', '1.4.1']
 
     """

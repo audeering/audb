@@ -28,8 +28,11 @@ def attachments(
     Returns:
         attachments of database
 
+    ..
+        >>> import audb
+
     Examples:
-        >>> list(attachments("emodb", version="1.4.1"))
+        >>> list(audb.info.attachments("emodb", version="1.4.1"))
         ['bibtex']
 
     """
@@ -60,7 +63,7 @@ def author(
         author(s) of database
 
     Examples:
-        >>> author("emodb", version="1.4.1")
+        >>> audb.info.author("emodb", version="1.4.1")
         'Felix Burkhardt, Astrid Paeschke, Miriam Rolfes, Walter Sendlmeier, Benjamin Weiss'
 
     """  # noqa: E501
@@ -101,7 +104,7 @@ def bit_depths(
             that is not part of the database
 
     Examples:
-        >>> bit_depths("emodb", version="1.4.1")
+        >>> audb.info.bit_depths("emodb", version="1.4.1")
         {16}
 
     """
@@ -137,7 +140,7 @@ def channels(
             that is not part of the database
 
     Examples:
-        >>> channels("emodb", version="1.4.1")
+        >>> audb.info.channels("emodb", version="1.4.1")
         {1}
 
     """
@@ -163,7 +166,7 @@ def description(
         description of database
 
     Examples:
-        >>> desc = description("emodb", version="1.4.1")
+        >>> desc = audb.info.description("emodb", version="1.4.1")
         >>> desc.split(".")[0]  # show first sentence
         'Berlin Database of Emotional Speech'
 
@@ -205,9 +208,9 @@ def duration(
             that is not part of the database
 
     Examples:
-        >>> duration("emodb", version="1.4.1")
+        >>> audb.info.duration("emodb", version="1.4.1")
         Timedelta('0 days 00:24:47.092187500')
-        >>> duration("emodb", version="1.4.1", media=["wav/03a01Fa.wav"])
+        >>> audb.info.duration("emodb", version="1.4.1", media=["wav/03a01Fa.wav"])
         Timedelta('0 days 00:00:01.898250')
 
     """
@@ -236,7 +239,7 @@ def files(
         media files
 
     Examples:
-        >>> files("emodb", version="1.4.1")[:2]
+        >>> audb.info.files("emodb", version="1.4.1")[:2]
         ['wav/03a01Fa.wav', 'wav/03a01Nc.wav']
 
     """
@@ -272,7 +275,7 @@ def formats(
             that is not part of the database
 
     Examples:
-        >>> formats("emodb", version="1.4.1")
+        >>> audb.info.formats("emodb", version="1.4.1")
         {'wav'}
 
     """
@@ -302,7 +305,7 @@ def header(
         database object without table data
 
     Examples:
-        >>> db = header("emodb", version="1.4.1")
+        >>> db = audb.info.header("emodb", version="1.4.1")
         >>> db.name
         'emodb'
 
@@ -340,7 +343,7 @@ def languages(
         languages of database
 
     Examples:
-        >>> languages("emodb", version="1.4.1")
+        >>> audb.info.languages("emodb", version="1.4.1")
         ['deu']
 
     """
@@ -371,7 +374,7 @@ def license(
         license of database
 
     Examples:
-        >>> license("emodb", version="1.4.1")
+        >>> audb.info.license("emodb", version="1.4.1")
         'CC0-1.0'
 
     """
@@ -402,7 +405,7 @@ def license_url(
         license URL of database
 
     Examples:
-        >>> license_url("emodb", version="1.4.1")
+        >>> audb.info.license_url("emodb", version="1.4.1")
         'https://creativecommons.org/publicdomain/zero/1.0/'
 
     """
@@ -433,7 +436,7 @@ def media(
         media of database
 
     Examples:
-        >>> media("emodb", version="1.4.1")
+        >>> audb.info.media("emodb", version="1.4.1")
         microphone:
             {type: other, format: wav, channels: 1, sampling_rate: 16000}
 
@@ -465,7 +468,7 @@ def meta(
         meta information of database
 
     Examples:
-        >>> meta("emodb", version="1.4.1")
+        >>> audb.info.meta("emodb", version="1.4.1")
         pdf:
           http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.130.8506&rep=rep1&type=pdf
 
@@ -497,7 +500,7 @@ def misc_tables(
         miscellaneous tables of database
 
     Examples:
-        >>> list(misc_tables("emodb", version="1.4.1"))
+        >>> list(audb.info.misc_tables("emodb", version="1.4.1"))
         ['speaker']
 
     """  # noqa: E501
@@ -528,7 +531,7 @@ def organization(
         organization responsible for database
 
     Examples:
-        >>> organization("emodb", version="1.4.1")
+        >>> audb.info.organization("emodb", version="1.4.1")
         'audEERING'
 
     """
@@ -559,7 +562,7 @@ def raters(
         raters of database
 
     Examples:
-        >>> raters("emodb", version="1.4.1")
+        >>> audb.info.raters("emodb", version="1.4.1")
         gold:
             {type: human}
 
@@ -601,7 +604,7 @@ def sampling_rates(
             that is not part of the database
 
     Examples:
-        >>> sampling_rates("emodb", version="1.4.1")
+        >>> audb.info.sampling_rates("emodb", version="1.4.1")
         {16000}
 
     """
@@ -631,7 +634,7 @@ def schemes(
         schemes of database
 
     Examples:
-        >>> list(schemes("emodb", version="1.4.1"))
+        >>> list(audb.info.schemes("emodb", version="1.4.1"))
         ['age', 'confidence', 'duration', 'emotion', 'gender', 'language', 'speaker', 'transcription']
 
     """  # noqa: E501
@@ -662,7 +665,7 @@ def source(
         source of database
 
     Examples:
-        >>> source("emodb", version="1.4.1")
+        >>> audb.info.source("emodb", version="1.4.1")
         'http://emodb.bilderbar.info/download/download.zip'
 
     """
@@ -693,7 +696,7 @@ def splits(
         splits of database
 
     Examples:
-        >>> splits("emodb", version="1.4.1")
+        >>> audb.info.splits("emodb", version="1.4.1")
         test:
           {description: Unofficial speaker-independent test split, type: test}
         train:
@@ -727,7 +730,7 @@ def tables(
         tables of database
 
     Examples:
-        >>> list(tables("emodb", version="1.4.1"))
+        >>> list(audb.info.tables("emodb", version="1.4.1"))
         ['emotion', 'emotion.categories.test.gold_standard', 'emotion.categories.train.gold_standard', 'files']
 
     """  # noqa: E501
@@ -758,7 +761,7 @@ def usage(
         usage of database
 
     Examples:
-        >>> usage("emodb", version="1.4.1")
+        >>> audb.info.usage("emodb", version="1.4.1")
         'unrestricted'
 
     """
