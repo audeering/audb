@@ -1,6 +1,6 @@
-.. _configuration:
-
 .. skip: start
+
+.. _configuration:
 
 Configuration
 -------------

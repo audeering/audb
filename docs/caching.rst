@@ -1,6 +1,6 @@
-.. _caching:
-
 .. skip: start
+
+.. _caching:
 
 Caching
 =======
