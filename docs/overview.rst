@@ -1,6 +1,3 @@
-..
-    >>> import audb
-
 Overview
 ========
 

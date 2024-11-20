@@ -28,9 +28,6 @@ def attachments(
     Returns:
         attachments of database
 
-    ..
-        >>> import audb
-
     Examples:
         >>> list(audb.info.attachments("emodb", version="1.4.1"))
         ['bibtex']

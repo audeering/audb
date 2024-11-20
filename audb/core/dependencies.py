@@ -33,9 +33,6 @@ class Dependencies:
     The dependencies of a database can be requested with
     :func:`audb.dependencies`.
 
-    ..
-        >>> import audb
-
     Examples:
         >>> deps = audb.Dependencies()
         >>> deps()

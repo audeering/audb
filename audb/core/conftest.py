@@ -9,15 +9,9 @@ from sybil.parsers.rest import DocTestParser
 import audb
 
 
-# Collect doctests
-pytest_collect_file = sybil.Sybil(
-    parsers=[DocTestParser(optionflags=ELLIPSIS + NORMALIZE_WHITESPACE)],
-    patterns=["*.py"],
-    fixtures=[
-        "cache",
-        "public_repository",
-    ],
-).pytest()
+def imports(namespace):
+    """Provide Python modules to namespace."""
+    namespace["audb"] = audb
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -67,3 +61,15 @@ def public_repository():
 
     # Remove public repo
     audb.config.REPOSITORIES.pop()
+
+
+# Collect doctests
+pytest_collect_file = sybil.Sybil(
+    parsers=[DocTestParser(optionflags=ELLIPSIS + NORMALIZE_WHITESPACE)],
+    patterns=["*.py"],
+    fixtures=[
+        "cache",
+        "public_repository",
+    ],
+    setup=imports,
+).pytest()

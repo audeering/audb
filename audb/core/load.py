@@ -1116,9 +1116,6 @@ def load(
             that don't contain audio,
             e.g. text files
 
-    ..
-        >>> import audb
-
     Examples:
         >>> db = audb.load(
         ...     "emodb",

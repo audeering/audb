@@ -36,9 +36,6 @@ def available(
         table with database name as index,
         and backend, host, repository, version as columns
 
-    ..
-        >>> import audb
-
     Examples:
         >>> df = audb.available(only_latest=True)
         >>> df.loc[["air", "emodb"]]

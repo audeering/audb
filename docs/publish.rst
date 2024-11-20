@@ -1,6 +1,3 @@
-..
-    >>> import audb
-
 .. _publish:
 
 Publish a database

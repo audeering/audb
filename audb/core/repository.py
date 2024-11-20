@@ -146,9 +146,6 @@ class Repository:
                 that should be associated with ``backend_name``,
                 e.g. ``"audbackend.backend.Filesystem"``
 
-        ..
-            >>> import audb
-
         Examples:
             >>> import audbackend
             >>> audb.Repository.register("file-system", audbackend.backend.FileSystem)
