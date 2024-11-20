@@ -20,7 +20,7 @@ pytest_collect_file = sybil.Sybil(
 ).pytest()
 
 
-@pytest.fixture(scope="package", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def cache(tmpdir_factory):
     r"""Provide a reusable cache for docstring tests.
 

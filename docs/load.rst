@@ -199,7 +199,6 @@ You can list all available flavors and their locations in the cache with:
          name version  complete format sampling_rate
 0       emodb   1.4.1     False   flac         44100
 1       emodb   1.4.1     False   None          None
-2  vadtoolkit   1.1.0     False   None          None
 
 The entry ``"complete"`` tells you if a database flavor is completely cached,
 or if some table or media files are still missing.

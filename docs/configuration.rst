@@ -1,4 +1,5 @@
-.. skip: start
+..
+    >>> import audb
 
 .. _configuration:
 
@@ -29,5 +30,5 @@ using :class:`audb.config`.
  Repository('data-local', '~/audb-host', 'file-system')]
 
 >>> audb.config.CACHE_ROOT = "/user/cache"
-
-.. skip: end
+>>> audb.config.CACHE_ROOT
+'/user/cache'

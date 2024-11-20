@@ -1,4 +1,5 @@
-.. skip: start
+..
+    >>> import audb
 
 .. _caching:
 
@@ -60,6 +61,8 @@ There are four ways to change the default locations:
 
 1. By setting the argument ``cache_root`` during a function call, e.g.
 
+.. skip: next
+
 >>> db = audb.load("emodb", ..., cache_root="/cache/root/audb")
 
 2. System-wide by setting the following system variables
@@ -87,7 +90,5 @@ Note,
 1. overwrites all other methods,
 2. overwrites 3. and 4.,
 and so on.
-
-.. skip: end
 
 .. _adjust the rights: https://superuser.com/a/264406
