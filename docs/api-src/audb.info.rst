@@ -1,7 +1,6 @@
 .. Pre-load data without being verbose
 ..
    >>> import audb
-   >>> db = audb.load("emodb", version="1.4.1", only_metadata=True, verbose=False)
 
 
 audb.info

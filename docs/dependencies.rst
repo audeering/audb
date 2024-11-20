@@ -1,10 +1,3 @@
-.. Specify pandas format output in cells
-.. invisible-code-block: python
-
-    import pandas as pd
-
-    # pd.set_option("display.max_columns", 7)
-
 ..
     >>> import audb
 
@@ -88,6 +81,7 @@ of the first ten files in the *emotion* table
 of the emodb database.
 
 >>> import numpy as np
+>>> import pandas as pd
 >>> df = audb.load_table("emodb", "emotion", version="1.4.1", verbose=False)
 >>> files = df.index[:10]
 >>> duration_in_sec = np.sum([deps.duration(f) for f in files])

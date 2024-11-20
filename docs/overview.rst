@@ -1,3 +1,6 @@
+..
+    >>> import audb
+
 Overview
 ========
 
@@ -45,10 +48,6 @@ For example,
 to store all your data
 on your local disk under :file:`/data/data-local`
 you would use the following repository.
-
-.. invisible-code-block: python
-
-    import audb
 
 .. code-block:: python
 
