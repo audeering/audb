@@ -63,7 +63,7 @@ def public_repository():
         ),
     ]
 
-    yield audb
+    yield
 
     # Remove public repo
     audb.config.REPOSITORIES.pop()
