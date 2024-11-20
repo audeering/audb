@@ -1,8 +1,3 @@
-.. Pre-load data without being verbose
-..
-   >>> import audb
-
-
 audb.info
 ==========
 
