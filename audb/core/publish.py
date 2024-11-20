@@ -161,70 +161,157 @@ def _find_attachments(
     return list(attachment_ids)
 
 
+# def _find_media(
+#     db: audformat.Database,
+#     db_root: str,
+#     db_root_files: set[str],
+#     version: str,
+#     deps: Dependencies,
+#     archives: Mapping[str, str],
+#     num_workers: int,
+#     verbose: bool,
+# ) -> set[str]:
+#     r"""Find archives with new, altered or removed media and update 'deps'."""
+#     media_archives = set()
+#     db_media = set(db.files)
+#
+#     # release dependencies to removed media
+#     # and select according archives for upload
+#     removed_files = set(deps.media) - db_media
+#     for file in removed_files:
+#         media_archives.add(deps.archive(file))
+#     deps._drop(removed_files)
+#
+#     # limit to relevant media
+#     db_media_in_root = db_media.intersection(db_root_files)
+#
+#     # update version of altered media and insert new ones
+#
+#     def job(file):
+#         path = os.path.join(db_root, file)
+#         if file not in deps:
+#             # assert lowercase file extensions
+#             ext = audeer.file_extension(file)
+#             if ext.lower() != ext:
+#                 raise RuntimeError(
+#                     "The file extension of a media file must be lowercase, "
+#                     f"but '{file}' includes at least one uppercase letter."
+#                 )
+#             checksum = audeer.md5(path)
+#             if file in archives:
+#                 archive = archives[file]
+#             else:
+#                 archive = audeer.uid(from_string=file.replace("\\", "/"))
+#             values = _media_values(
+#                 db_root,
+#                 file,
+#                 version,
+#                 archive,
+#                 checksum,
+#             )
+#             add_media.append(values)
+#         elif not deps.removed(file):
+#             checksum = audeer.md5(path)
+#             if checksum != deps.checksum(file):
+#                 archive = deps.archive(file)
+#                 values = _media_values(
+#                     db_root,
+#                     file,
+#                     version,
+#                     archive,
+#                     checksum,
+#                 )
+#                 update_media.append(values)
+#
+#     add_media = []
+#     update_media = []
+#     audeer.run_tasks(
+#         job,
+#         params=[([file], {}) for file in db_media_in_root],
+#         num_workers=num_workers,
+#         progress_bar=verbose,
+#         task_description="Find media",
+#         maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
+#     )
+#     # Add updated and new media to dependencies
+#     # and sort them by paths
+#     # as they can be returned in random order
+#     # by the discovery job.
+#     # Sorting enforces determinism in the
+#     # generation of the dependencies table
+#     if update_media:
+#         update_media = sorted(update_media, key=lambda x: x[0])
+#         deps._update_media(update_media)
+#     if add_media:
+#         add_media = sorted(add_media, key=lambda x: x[0])
+#         deps._add_media(add_media)
+#
+#     # select archives with new or altered files for upload
+#     for file in deps.media:
+#         if not deps.removed(file) and deps.version(file) == version:
+#             media_archives.add(deps.archive(file))
+#
+#     return media_archives
+
+
+# Constants
+FILE_EXTENSION_ERROR_MSG = (
+    "The file extension of a media file must be lowercase, "
+    "but '{file}' includes at least one uppercase letter."
+)
+
+
 def _find_media(
     db: audformat.Database,
     db_root: str,
     db_root_files: set[str],
     version: str,
-    deps: Dependencies,
+    deps: "Dependencies",
     archives: Mapping[str, str],
     num_workers: int,
     verbose: bool,
 ) -> set[str]:
-    r"""Find archives with new, altered or removed media and update 'deps'."""
+    """Find archives with new, altered or removed media and update 'deps'."""
     media_archives = set()
     db_media = set(db.files)
 
-    # release dependencies to removed media
-    # and select according archives for upload
+    # Release dependencies to removed media
+    # and select corresponding archives for upload
     removed_files = set(deps.media) - db_media
     for file in removed_files:
         media_archives.add(deps.archive(file))
     deps._drop(removed_files)
 
-    # limit to relevant media
+    # Limit to relevant media
     db_media_in_root = db_media.intersection(db_root_files)
 
-    # update version of altered media and insert new ones
-
-    def job(file):
-        path = os.path.join(db_root, file)
-        if file not in deps:
-            # assert lowercase file extensions
-            ext = audeer.file_extension(file)
-            if ext.lower() != ext:
-                raise RuntimeError(
-                    "The file extension of a media file must be lowercase, "
-                    f"but '{file}' includes at least one uppercase letter."
-                )
-            checksum = audeer.md5(path)
-            if file in archives:
-                archive = archives[file]
-            else:
-                archive = audeer.uid(from_string=file.replace("\\", "/"))
-            values = _media_values(
-                db_root,
-                file,
-                version,
-                archive,
-                checksum,
-            )
-            add_media.append(values)
-        elif not deps.removed(file):
-            checksum = audeer.md5(path)
-            if checksum != deps.checksum(file):
-                archive = deps.archive(file)
-                values = _media_values(
-                    db_root,
-                    file,
-                    version,
-                    archive,
-                    checksum,
-                )
-                update_media.append(values)
-
+    # Prepare lists to store media updates
     add_media = []
     update_media = []
+
+    def process_new_file(file: str) -> None:
+        ext = audeer.file_extension(file)
+        if ext.lower() != ext:
+            raise RuntimeError(FILE_EXTENSION_ERROR_MSG.format(file=file))
+        checksum = audeer.md5(os.path.join(db_root, file))
+        archive = archives.get(file) or audeer.uid(from_string=file.replace("\\", "/"))
+        values = _media_values(db_root, file, version, archive, checksum)
+        add_media.append(values)
+
+    def process_existing_file(file: str) -> None:
+        path = os.path.join(db_root, file)
+        checksum = audeer.md5(path)
+        if checksum != deps.checksum(file):
+            archive = deps.archive(file)
+            values = _media_values(db_root, file, version, archive, checksum)
+            update_media.append(values)
+
+    def job(file: str) -> None:
+        if file not in deps:
+            process_new_file(file)
+        elif not deps.removed(file):
+            process_existing_file(file)
+
     audeer.run_tasks(
         job,
         params=[([file], {}) for file in db_media_in_root],
@@ -233,20 +320,14 @@ def _find_media(
         task_description="Find media",
         maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
-    # Add updated and new media to dependencies
-    # and sort them by paths
-    # as they can be returned in random order
-    # by the discovery job.
-    # Sorting enforces determinism in the
-    # generation of the dependencies table
-    if update_media:
-        update_media = sorted(update_media, key=lambda x: x[0])
-        deps._update_media(update_media)
-    if add_media:
-        add_media = sorted(add_media, key=lambda x: x[0])
-        deps._add_media(add_media)
 
-    # select archives with new or altered files for upload
+    # Add updated and new media to dependencies with sorting for consistency
+    if update_media:
+        deps._update_media(sorted(update_media, key=lambda x: x[0]))
+    if add_media:
+        deps._add_media(sorted(add_media, key=lambda x: x[0]))
+
+    # Select archives with new or altered files for upload
     for file in deps.media:
         if not deps.removed(file) and deps.version(file) == version:
             media_archives.add(deps.archive(file))
