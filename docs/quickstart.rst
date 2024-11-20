@@ -6,22 +6,23 @@ Quickstart
 The most common task is to load a database
 with :func:`audb.load`.
 
-Let's first see which databases are available
-on our `public Artifactory server`_.
+You can browse `available datasets`_
+or check them in your Python console:
 
 >>> import audb
->>> df = audb.available(only_latest=True)
->>> df.loc["emodb"]
-backend                                  artifactory
-host          https://audeering.jfrog.io/artifactory
-repository                               data-public
-version                                        1.4.1
-Name: emodb, dtype: object
+>>> audb.available(only_latest=True)
+                         backend  ... version
+name                              ...
+...
+emodb                artifactory  ...   1.4.1
+...
 
 Let's load version 1.4.1 of the emodb_ database.
 
 .. Load with only_metadata=True in the background
 .. invisible-code-block: python
+
+    import audformat as _audformat
 
     db = audb.load(
         "emodb",
@@ -30,10 +31,16 @@ Let's load version 1.4.1 of the emodb_ database.
         full_path=False,
         verbose=False,
     )
+    # Add flavor path, to mimic `full_path=True`
+    for table in list(db.tables):
+        db[table]._df.index = _audformat.utils.expand_file_path(
+            db[table]._df.index,
+            f'...{audb.flavor_path("emodb", "1.4.1")}',
+        )
 
 .. skip: next
 
->>> db = audb.load("emodb", version="1.4.1", full_path=False, verbose=False)
+>>> db = audb.load("emodb", version="1.4.1", verbose=False)
 
 This downloads the database header,
 all the media files,
@@ -95,12 +102,12 @@ as a :class:`pandas.DataFrame`.
 
 >>> df = db["emotion"].get()  # get table
 >>> df[:3]  # show first three entries
-                   emotion  emotion.confidence
+                                           emotion  emotion.confidence
 file
-wav/03a01Fa.wav  happiness                0.90
-wav/03a01Nc.wav    neutral                1.00
-wav/03a01Wa.wav      anger                0.95
+...emodb/1.4.1/d3b62a9b/wav/03a01Fa.wav  happiness                0.90
+...emodb/1.4.1/d3b62a9b/wav/03a01Nc.wav    neutral                1.00
+...emodb/1.4.1/d3b62a9b/wav/03a01Wa.wav      anger                0.95
 
 
 .. _emodb: https://github.com/audeering/emodb
-.. _public Artifactory server: https://audeering.jfrog.io/artifactory
+.. _available datasets: https://audeering.github.io/datasets/datasets.html
