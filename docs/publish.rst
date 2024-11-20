@@ -101,7 +101,7 @@ in which archives they are stored,
 and information about audio metadata.
 
 >>> deps()
-											 archive  bit_depth  ...  type version
+                                             archive  bit_depth  ...  type version
 db.age.parquet                                                0  ...     0   1.0.0
 audio/001.wav   436c65ec-1e42-f9de-2708-ecafe07e827e         16  ...     1   1.0.0
 audio/002.wav   fda7e4d6-f2b2-4cff-cab5-906ef5d57607         16  ...     1   1.0.0
