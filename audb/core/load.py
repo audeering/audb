@@ -1057,7 +1057,7 @@ def load(
         format: file format, one of ``'flac'``, ``'wav'``
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
-            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+            ``8000``, ``16000``, ``22500``, ``24000``, ``44100``, ``48000``
         attachments: load only attachment files
             for the attachments
             matching the regular expression
@@ -1521,7 +1521,7 @@ def load_media(
         format: file format, one of ``'flac'``, ``'wav'``
         mixdown: apply mono mix-down
         sampling_rate: sampling rate in Hz, one of
-            ``8000``, ``16000``, ``22500``, ``44100``, ``48000``
+            ``8000``, ``16000``, ``22500``, ``24000``, ``44100``, ``48000``
         cache_root: cache folder where databases are stored.
             If not set :meth:`audb.default_cache_root` is used
         num_workers: number of parallel jobs or 1 for sequential
