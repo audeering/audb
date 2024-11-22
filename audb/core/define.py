@@ -91,7 +91,7 @@ class Format:
 
 FORMATS = [Format.WAV, Format.FLAC]
 BIT_DEPTHS = [16, 24, 32]
-SAMPLING_RATES = [8000, 16000, 22500, 24000, 44100, 48000]
+SAMPLING_RATES = [8000, 16000, 22050, 24000, 44100, 48000]
 
 # Progress bar
 MAXIMUM_REFRESH_TIME = 1  # force progress bar to update every second

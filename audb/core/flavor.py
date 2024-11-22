@@ -41,7 +41,7 @@ class Flavor(audobject.Object):
         format: file format, one of ``'flac'``, ``'wav'``
         mixdown: apply mono mix-down on selection
         sampling_rate: sampling rate in Hz, one of
-            ``8000``, ``16000``, ``22500``, ``24000``, ``44100``, ``48000``
+            ``8000``, ``16000``, ``22050``, ``24000``, ``44100``, ``48000``
 
     Raises:
         ValueError: if a non-supported ``bit_depth``,
