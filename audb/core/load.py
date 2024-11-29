@@ -742,6 +742,9 @@ def _load_files(
         flavor,
         verbose,
     )
+    print(f"{flavor=}")
+    print(f"{files[:3]=}")
+    print(f"{missing_files[:3]=}")
     if missing_files:
         if cached_versions is None:
             cached_versions = _cached_versions(
@@ -861,6 +864,12 @@ def _missing_files(
 
     """
     missing_files = []
+
+    # Adjust expected file extensions,
+    # if a specific file format is requested.
+    # See https://github.com/audeering/audb/issues/324
+    if files_type == "media" and flavor.format is not None:
+        files = audformat.utils.replace_file_extension(files, flavor.format)
 
     for file in audeer.progress_bar(
         files,
