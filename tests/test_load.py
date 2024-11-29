@@ -409,7 +409,7 @@ def test_load_from_cache(dbs):
     db = audb.load(
         DB_NAME,
         version="1.0.0",
-        format="flac",
+        format=format,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
@@ -430,11 +430,26 @@ def test_load_from_cache(dbs):
     for file in db.files:
         assert os.path.exists(os.path.join(db_root, file))
 
+    # Ensure no media files are marked as missing files,
+    # when requested in format different from original
+    # (https://github.com/audeering/audb/issues/324)
+    original_files = audformat.utils.replace_file_extension(db.files, "wav")
+    assert (
+        audb.core.load._missing_files(
+            original_files,
+            "media",
+            db_root,
+            audb.Flavor(format=format),
+            False,
+        )
+        == []
+    )
+
     version = "2.0.0"
     db = audb.load(
         DB_NAME,
         version="2.0.0",
-        format="flac",
+        format=format,
         full_path=False,
         num_workers=pytest.NUM_WORKERS,
         verbose=False,
