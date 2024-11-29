@@ -742,9 +742,6 @@ def _load_files(
         flavor,
         verbose,
     )
-    print(f"{flavor=}")
-    print(f"{files[:3]=}")
-    print(f"{missing_files[:3]=}")
     if missing_files:
         if cached_versions is None:
             cached_versions = _cached_versions(
@@ -865,25 +862,37 @@ def _missing_files(
     """
     missing_files = []
 
-    # Adjust expected file extensions,
-    # if a specific file format is requested.
-    # See https://github.com/audeering/audb/issues/324
-    if files_type == "media" and flavor.format is not None:
-        files = audformat.utils.replace_file_extension(files, flavor.format)
+    if files_type == "table":
+
+        def file_cached(file):
+            return os.path.exists(
+                os.path.join(db_root, f"db.{file}.csv")
+            ) or os.path.exists(os.path.join(db_root, f"db.{file}.parquet"))
+
+    elif files_type == "media" and flavor.format is not None:
+
+        def file_cached(file):
+            # Adjust expected file extensions,
+            # if a specific file format is requested.
+            # See https://github.com/audeering/audb/issues/324
+            return os.path.exists(
+                os.path.join(
+                    db_root, audeer.replace_file_extension(file, flavor.format)
+                )
+            )
+
+    else:
+
+        def file_cached(file):
+            return os.path.exists(os.path.join(db_root, file))
 
     for file in audeer.progress_bar(
         files,
         desc=f"Missing {files_type}",
         disable=not verbose,
     ):
-        if files_type == "table":
-            if not os.path.exists(
-                os.path.join(db_root, f"db.{file}.csv")
-            ) and not os.path.exists(os.path.join(db_root, f"db.{file}.parquet")):
-                missing_files.append(file)
-        else:
-            if not os.path.exists(os.path.join(db_root, file)):
-                missing_files.append(file)
+        if not file_cached(file):
+            missing_files.append(file)
 
     return missing_files
 
