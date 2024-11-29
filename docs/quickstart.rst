@@ -3,21 +3,10 @@
 Quickstart
 ==========
 
-The most common task is to load a database
-with :func:`audb.load`.
-
-You can browse `available datasets`_
-or check them in your Python console:
-
->>> import audb
->>> audb.available(only_latest=True)
-                      backend  ... version
-name                           ...
-...
-emodb                      s3  ...   1.4.1
-...
-
-Let's load version 1.4.1 of the emodb_ database.
+Browse `available datasets`_ and select one.
+We load emodb_,
+which is returned
+as an :class:`audformat.Database`.
 
 .. Load with only_metadata=True in the background
 .. invisible-code-block: python
@@ -36,73 +25,48 @@ Let's load version 1.4.1 of the emodb_ database.
 
 .. skip: next
 
->>> db = audb.load("emodb", version="1.4.1", verbose=False)
+>>> db = audb.load("emodb", version="1.4.1")
 
-This downloads the database header,
-all the media files,
-and tables with annotations
-to a caching folder on your machine.
-The database is then returned
-as an :class:`audformat.Database` object.
+Inspect label schemes,
+and request emotion labels for the test split.
 
-Each database comes with a description,
-which is a good starting point
-to learn what the database is all about.
-
->>> db.description[:78]
-'Berlin Database of Emotional Speech. A German database of emotional utterances'
-
-The annotations of a database are stored in
-tables represented by :class:`audformat.Table`.
-
->>> db.tables
-emotion:
-  type: filewise
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-emotion.categories.test.gold_standard:
-  type: filewise
-  split_id: test
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-emotion.categories.train.gold_standard:
-  type: filewise
-  split_id: train
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-files:
-  type: filewise
-  columns:
-    duration: {scheme_id: duration}
-    speaker: {scheme_id: speaker}
-    transcription: {scheme_id: transcription}
-
-Each table contains columns (:class:`audformat.Column`)
-that have corresponding schemes (:class:`audformat.Scheme`)
-describing its content.
-For example,
-to get an idea about the emotion annotations
-stored in the ``emotion`` column,
-we can inspect the corresponding scheme.
-
->>> db.schemes["emotion"]
-description: Six basic emotions and neutral.
-dtype: str
-labels: [anger, boredom, disgust, fear, happiness, sadness, neutral]
-
-Finally, we get the actual annotations
-as a :class:`pandas.DataFrame`.
-
->>> df = db["emotion"].get()  # get table
->>> df[:3]  # show first three entries
-                                           emotion  emotion.confidence
+>>> list(db.schemes)
+['age',
+ 'confidence',
+ 'duration',
+ 'emotion',
+ 'gender',
+ 'language',
+ 'speaker',
+ 'transcription']
+>>> db.get("emotion", splits="test")  # returns dataframe
+                       emotion
 file
-...emodb/1.4.1/d3b62a9b/wav/03a01Fa.wav  happiness                0.90
-...emodb/1.4.1/d3b62a9b/wav/03a01Nc.wav    neutral                1.00
-...emodb/1.4.1/d3b62a9b/wav/03a01Wa.wav      anger                0.95
+.../wav/12a01Fb.wav  happiness
+.../wav/12a01Lb.wav    boredom
+.../wav/12a01Nb.wav    neutral
+.../wav/12a01Wc.wav      anger
+.../wav/12a02Ac.wav       fear
+...                        ...
+
+Or inspect tables,
+and request labels from a table.
+
+>>> list(db)
+['emotion',
+ 'emotion.categories.test.gold_standard',
+ 'emotion.categories.train.gold_standard',
+ 'files',
+ 'speaker']
+>>> db["emotion.categories.test.gold_standard"].get()  # returns dataframe
+                       emotion  emotion.confidence
+file
+.../wav/12a01Fb.wav  happiness                0.95
+.../wav/12a01Lb.wav    boredom                0.90
+.../wav/12a01Nb.wav    neutral                0.95
+.../wav/12a01Wc.wav      anger                0.95
+.../wav/12a02Ac.wav       fear                0.90
+...                        ...                 ...
 
 
 .. _emodb: https://github.com/audeering/emodb
