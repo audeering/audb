@@ -77,10 +77,10 @@ class config:
     can be overwritten by environment variables.
 
     Examples:
-        >>> config.CACHE_ROOT
+        >>> audb.config.CACHE_ROOT
         '~/audb'
-        >>> config.CACHE_ROOT = "~/caches/audb"
-        >>> config.CACHE_ROOT
+        >>> audb.config.CACHE_ROOT = "~/caches/audb"
+        >>> audb.config.CACHE_ROOT
         '~/caches/audb'
 
     """

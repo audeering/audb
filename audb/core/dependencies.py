@@ -34,7 +34,7 @@ class Dependencies:
     :func:`audb.dependencies`.
 
     Examples:
-        >>> deps = Dependencies()
+        >>> deps = audb.Dependencies()
         >>> deps()
         Empty DataFrame
         Columns: [archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version]
