@@ -75,11 +75,14 @@ def load_config():
     # Global config
     config = load_configuration_file(global_config_file)
     # User config
+    print(f"{audeer.path(USER_CONFIG_FILE)=}")
     if os.path.exists(audeer.path(USER_CONFIG_FILE)):
         user_config_file = audeer.path(USER_CONFIG_FILE)
     else:
         user_config_file = audeer.path(DEPRECATED_USER_CONFIG_FILE)
+    print(f"{audeer.path(DEPRECATED_USER_CONFIG_FILE)=}")
     user_config = load_configuration_file(user_config_file)
+    print(f"{user_config=}")
     config.update(user_config)
     return config
 

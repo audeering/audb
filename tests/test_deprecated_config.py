@@ -30,6 +30,7 @@ def config_files(tmpdir, request):
     home = audeer.mkdir(tmpdir)
     current_home = os.environ.get("HOME", None)
     os.environ["HOME"] = home
+    print(f"{home=}")
     if request.param in ["both", "default"]:
         audeer.mkdir(home, ".config")
         with open(audeer.path(home, ".config", "audb.yaml"), "w") as fp:
