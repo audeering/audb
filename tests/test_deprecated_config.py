@@ -1,4 +1,5 @@
 import os
+import platform
 
 import pytest
 
@@ -31,6 +32,9 @@ def config_files(tmpdir, request):
     current_home = os.environ.get("HOME", None)
     os.environ["HOME"] = home
     print(f"{home=}")
+    if platform.system() == "Windows":
+        print(f"{os.environ.get('HOMEDRIVE')=}")
+        print(f"{os.environ.get('HOMEPATH')=}")
     if request.param in ["both", "default"]:
         audeer.mkdir(home, ".config")
         with open(audeer.path(home, ".config", "audb.yaml"), "w") as fp:
