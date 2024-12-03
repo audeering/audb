@@ -3,7 +3,8 @@ import os
 
 # Configuration files
 CONFIG_FILE = os.path.join("etc", "audb.yaml")
-USER_CONFIG_FILE = "~/.audb.yaml"
+USER_CONFIG_FILE = "~/.config/audb.yaml"
+DEPRECATED_USER_CONFIG_FILE = "~/.audb.yaml"
 
 # Database
 DB = "db"

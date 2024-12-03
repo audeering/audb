@@ -5,8 +5,13 @@ import oyaml as yaml
 import audeer
 
 from audb.core.define import CONFIG_FILE
+from audb.core.define import DEPRECATED_USER_CONFIG_FILE
 from audb.core.define import USER_CONFIG_FILE
 from audb.core.repository import Repository
+
+
+CWD = audeer.script_dir()
+global_config_file = os.path.join(CWD, CONFIG_FILE)
 
 
 def load_configuration_file(config_file: str):
@@ -58,13 +63,25 @@ def load_configuration_file(config_file: str):
     return config
 
 
-# Read in configuration from global and user file
-root = os.path.dirname(os.path.realpath(__file__))
-global_config_file = os.path.join(root, CONFIG_FILE)
-user_config_file = audeer.path(USER_CONFIG_FILE)
-global_config = load_configuration_file(global_config_file)
-user_config = load_configuration_file(user_config_file)
-global_config.update(user_config)
+def load_config():
+    """Read configuration from configuration files.
+
+    It first reads the global config file,
+    that is part of the ``audb`` Python package,
+    and then updates its results
+    by the user configuration file.
+
+    """
+    # Global config
+    config = load_configuration_file(global_config_file)
+    # User config
+    if os.path.exists(audeer.path(USER_CONFIG_FILE)):
+        user_config_file = audeer.path(USER_CONFIG_FILE)
+    else:
+        user_config_file = audeer.path(DEPRECATED_USER_CONFIG_FILE)
+    user_config = load_configuration_file(user_config_file)
+    config.update(user_config)
+    return config
 
 
 class config:
@@ -87,12 +104,13 @@ class config:
 
     """
 
-    CACHE_ROOT = global_config["cache_root"]
+    _config = load_config()
+
+    CACHE_ROOT = _config["cache_root"]
     r"""Default user cache folder."""
 
     REPOSITORIES = [
-        Repository(r["name"], r["host"], r["backend"])
-        for r in global_config["repositories"]
+        Repository(r["name"], r["host"], r["backend"]) for r in _config["repositories"]
     ]
     r"""Repositories, will be iterated in given order.
 
@@ -106,5 +124,5 @@ class config:
 
     """
 
-    SHARED_CACHE_ROOT = global_config["shared_cache_root"]
+    SHARED_CACHE_ROOT = _config["shared_cache_root"]
     r"""Shared cache folder."""
