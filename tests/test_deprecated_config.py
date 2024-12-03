@@ -51,6 +51,7 @@ def config_files(tmpdir, request):
         homedrive, homepath = os.path.splitdrive(home)
         os.environ["HOMEDRIVE"] = homedrive
         os.environ["HOMEPATH"] = homepath
+        print(f"{audeer.path('~')=}")
     else:
         current_home = os.environ.get("HOME", None)
         os.environ["HOME"] = home
