@@ -8,6 +8,22 @@ import audeer
 import audb
 
 
+def set_or_delete_env_variable(key, value):
+    """Set or delete environment variable.
+
+    Args:
+        key: name of environment variable
+        value: value of environment variable.
+            If ``None``,
+            ``key`` is deleted
+
+    """
+    if value is None:
+        del os.environ[key]
+    else:
+        os.environ[key] = value
+
+
 @pytest.fixture()
 def config_files(tmpdir, request):
     """Provide user config files.
@@ -29,8 +45,15 @@ def config_files(tmpdir, request):
 
     """
     home = audeer.mkdir(tmpdir)
-    current_home = os.environ.get("HOME", None)
-    os.environ["HOME"] = home
+    if platform.system() == "Windows":
+        current_homedrive = os.environ.get("HOMEDRIVE", None)
+        current_homepath = os.environ.get("HOMEPATH", None)
+        homedrive, homepath = os.path.splitdrive(home)
+        os.environ["HOMEDRIVE"] = homedrive
+        os.environ["HOMEPATH"] = homepath
+    else:
+        current_home = os.environ.get("HOME", None)
+        os.environ["HOME"] = home
     print(f"{home=}")
     if platform.system() == "Windows":
         print(f"{os.environ.get('HOMEDRIVE')=}")
@@ -45,10 +68,11 @@ def config_files(tmpdir, request):
 
     yield
 
-    if current_home is None:
-        del os.environ["HOME"]
+    if platform.system() == "Windows":
+        set_or_delete_env_variable("HOMEDRIVE", current_homedrive)
+        set_or_delete_env_variable("HOMEPATH", current_homepath)
     else:
-        os.environ["HOME"] = current_home
+        set_or_delete_env_variable("HOME", current_home)
 
 
 @pytest.mark.parametrize(
