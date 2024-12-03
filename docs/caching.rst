@@ -81,7 +81,7 @@ There are four ways to change the default locations:
 
 4. System wide by
    using the :ref:`configuration file <configuration>`
-   :file:`~/.audb.yaml`
+   :file:`~/.config/audb.yaml`
 
 Note,
 1. overwrites all other methods,

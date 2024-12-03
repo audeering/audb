@@ -3,7 +3,7 @@
 Configuration
 -------------
 
-:mod:`audb` can be configured with a :file:`~/.audb.yaml` file.
+:mod:`audb` can be configured with a :file:`~/.config/audb.yaml` file.
 The configuration file is read during import
 and will overwrite the default settings.
 The default settings are:
