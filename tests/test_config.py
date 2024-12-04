@@ -1,4 +1,5 @@
 import pytest
+import yaml
 
 import audeer
 
@@ -92,3 +93,10 @@ def test_empty_config_file(tmp_path):
     empty_config.write_text("")
     config = audb.core.config.load_configuration_file(empty_config)
     assert config == {}
+
+
+def test_invalid_config_file(tmp_path):
+    invalid_config = tmp_path / "invalid.yaml"
+    invalid_config.write_text("{invalid: yaml: content}")
+    with pytest.raises(yaml.YAMLError):
+        audb.core.config.load_configuration_file(invalid_config)
