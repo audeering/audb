@@ -1,5 +1,12 @@
 .. _caching:
 
+.. As the test outputs are mainly paths,
+.. we skip the tests under Windows
+..
+   >>> import platform
+
+.. skip: start if(platform.system() == "Windows")
+
 Caching
 =======
 
@@ -44,7 +51,7 @@ accessible to you only.
 By default it points to
 
 >>> audb.default_cache_root(shared=False)
-'/home/.../audb'
+'.../audb'
 
 When you request a database with :meth:`audb.load`,
 :mod:`audb` first looks for it in the shared cache folder
@@ -88,5 +95,6 @@ Note,
 2. overwrites 3. and 4.,
 and so on.
 
+.. skip: end
 
 .. _adjust the rights: https://superuser.com/a/264406
