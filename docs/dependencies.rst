@@ -51,7 +51,7 @@ in the database dependency table.
 ..
     >>> import pandas as pd
 
-.. skip: start if(pd.version == "2.1.4", reason="formats output differently")
+.. skip: start if(pd.__version__ == "2.1.4", reason="formats output differently")
 
 >>> deps = audb.dependencies("emodb", version="1.4.1")
 >>> df = deps()
