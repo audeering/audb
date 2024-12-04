@@ -68,6 +68,22 @@ file
 .../wav/12a02Ac.wav       fear                0.90
 ...                        ...                 ...
 
+Load a media file,
+selected from the index of the dataframe
+or from the files index ``db.files``.
+
+>>> import audiofile
+>>> signal, sampling_rate = audiofile.read(db.files[0], always_2d=True)
+
+Listen to the signal.
+
+.. skip: start
+
+>>> import sounddevice
+>>> sounddevice.play(signal.T, sampling_rate)
+
+.. skip: end
+
 
 .. _emodb: https://github.com/audeering/emodb
 .. _available datasets: https://audeering.github.io/datasets/datasets.html
