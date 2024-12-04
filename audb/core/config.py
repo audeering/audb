@@ -26,11 +26,13 @@ def load_configuration_file(config_file: str):
             ``backend``, or ``name`` key
 
     """
-    if os.path.exists(config_file):
-        with open(config_file) as cf:
-            config = yaml.load(cf, Loader=yaml.BaseLoader)
-    else:
-        config = {}
+    if not os.path.exists(config_file):
+        return {}
+
+    with open(config_file) as cf:
+        config = yaml.load(cf, Loader=yaml.BaseLoader)
+        if config is None:
+            return {}
 
     # Check that we have provided a valid repositories configuration
     if "repositories" in config:
