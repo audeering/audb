@@ -1,4 +1,5 @@
 import os
+import pathlib
 import platform
 
 import pytest
@@ -52,6 +53,7 @@ def config_files(tmpdir, request):
         os.environ["HOMEDRIVE"] = homedrive
         os.environ["HOMEPATH"] = homepath
         print(f"{audeer.path('~')=}")
+        print(f"{pathlib.Path.home()=}")
     else:
         current_home = os.environ.get("HOME", None)
         os.environ["HOME"] = home
