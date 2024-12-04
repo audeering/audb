@@ -14,6 +14,36 @@ from audb.core.conftest import imports
 from audb.core.conftest import public_repository  # noqa: F401
 
 
+class DefaultConfiguration:
+    """Context manager to provide default configuration values."""
+
+    def __init__(self):
+        self.config = audb.core.config.load_configuration_file(
+            audb.core.config.global_config_file
+        )
+        self._saved_state = {}
+
+    def __enter__(self):
+        """Save current state."""
+        self._saved_state = {
+            "cache_root": audb.config.CACHE_ROOT,
+            "shared_cache_root": audb.config.SHARED_CACHE_ROOT,
+            "repositories": audb.config.REPOSITORIES,
+        }
+        # Set default values
+        audb.config.CACHE_ROOT = self.config["cache_root"]
+        audb.config.SHARED_CACHE_ROOT = self.config["shared_cache_root"]
+        audb.config.REPOSITORIES = [
+            audb.Repository(repo["name"], repo["host"], repo["backend"])
+            for repo in self.config["repositories"]
+        ]
+
+    def __exit__(self, *args):
+        """Restore previous state."""
+        for key, value in self._saved_state.items():
+            setattr(audb.config, key, value)
+
+
 @pytest.fixture(scope="module")
 def run_in_tmpdir(tmpdir_factory):
     """Move to a persistent tmpdir for execution of a whole file."""
@@ -28,29 +58,9 @@ def run_in_tmpdir(tmpdir_factory):
 
 @pytest.fixture(scope="module")
 def default_configuration():
-    """Set config values to default values from global config file."""
-    # Read global config file
-    global_config = audb.core.config.load_configuration_file(
-        audb.core.config.global_config_file
-    )
-    # Store current user settings
-    current_cache_root = audb.config.CACHE_ROOT
-    current_shared_cache_root = audb.config.SHARED_CACHE_ROOT
-    current_repositories = audb.config.REPOSITORIES
-    # Enforce default values
-    audb.config.CACHE_ROOT = global_config["cache_root"]
-    audb.config.SHARED_CACHE_ROOT = global_config["shared_cache_root"]
-    audb.config.REPOSITORIES = [
-        audb.Repository(r["name"], r["host"], r["backend"])
-        for r in global_config["repositories"]
-    ]
-
-    yield audb
-
-    # Restore user settings
-    audb.config.CACHE_ROOT = current_cache_root
-    audb.config.SHARED_CACHE_ROOT = current_shared_cache_root
-    audb.config.REPOSITORIES = current_repositories
+    """Set config values to default values."""
+    with DefaultConfiguration():
+        yield
 
 
 # Collect doctests
