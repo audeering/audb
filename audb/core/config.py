@@ -14,7 +14,7 @@ CWD = audeer.script_dir()
 global_config_file = os.path.join(CWD, CONFIG_FILE)
 
 
-def load_configuration_file(config_file: str):
+def load_configuration_file(config_file: str) -> dict:
     r"""Read configuration from YAML file.
 
     Args:
@@ -63,7 +63,7 @@ def load_configuration_file(config_file: str):
     return config
 
 
-def load_config():
+def load_config() -> dict:
     """Read configuration from configuration files.
 
     It first reads the global config file,
