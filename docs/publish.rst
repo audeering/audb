@@ -118,7 +118,7 @@ We can compare this with the files stored in the repository.
             indent = " " * 2 * (level)
             print(f"{indent}{os.path.basename(root)}/")
             subindent = " " * 2 * (level + 1)
-            for f in files:
+            for f in sorted(files):
                 print(f"{subindent}{f}")
 
 >>> list_files(repository.host)
@@ -133,8 +133,8 @@ data/
           age.parquet
       media/
         1.0.0/
-          e26ef45d-bdc1-6153-bdc4-852d83806e4a.zip
           436c65ec-1e42-f9de-2708-ecafe07e827e.zip
+          e26ef45d-bdc1-6153-bdc4-852d83806e4a.zip
           fda7e4d6-f2b2-4cff-cab5-906ef5d57607.zip
 
 As you can see all media files are stored
@@ -261,8 +261,8 @@ data/
         1.1.0/
           ef4d1e81-6488-95cf-a165-604d1e47d575.zip
         1.0.0/
-          e26ef45d-bdc1-6153-bdc4-852d83806e4a.zip
           436c65ec-1e42-f9de-2708-ecafe07e827e.zip
+          e26ef45d-bdc1-6153-bdc4-852d83806e4a.zip
           fda7e4d6-f2b2-4cff-cab5-906ef5d57607.zip
 
 And check which databases are available.
