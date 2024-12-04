@@ -1,27 +1,9 @@
-import os
-
 import pytest
 import yaml
 
 import audeer
 
 import audb
-
-
-def set_or_delete_env_variable(key, value):
-    """Set or delete environment variable.
-
-    Args:
-        key: name of environment variable
-        value: value of environment variable.
-            If ``None``,
-            ``key`` is deleted
-
-    """
-    if value is None:
-        del os.environ[key]
-    else:
-        os.environ[key] = value
 
 
 @pytest.fixture()
