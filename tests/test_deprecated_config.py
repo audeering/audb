@@ -1,6 +1,4 @@
 import os
-import pathlib
-import platform
 
 import pytest
 
@@ -46,22 +44,10 @@ def config_files(tmpdir, request):
 
     """
     home = audeer.mkdir(tmpdir)
-    if platform.system() == "Windows":
-        current_homedrive = os.environ.get("HOMEDRIVE", None)
-        current_homepath = os.environ.get("HOMEPATH", None)
-        homedrive, homepath = os.path.splitdrive(home)
-        os.environ["HOMEDRIVE"] = homedrive
-        os.environ["HOMEPATH"] = homepath
-        print(f"{audeer.path('~')=}")
-        print(f"{pathlib.Path.home()=}")
-        print(f"{str(pathlib.Path.home())=}")
-    else:
-        current_home = os.environ.get("HOME", None)
-        os.environ["HOME"] = home
-    print(f"{home=}")
-    if platform.system() == "Windows":
-        print(f"{os.environ.get('HOMEDRIVE')=}")
-        print(f"{os.environ.get('HOMEPATH')=}")
+    current_user_config_file = audb.core.define.USER_CONFIG_FILE
+    current_deprecated_user_config_file = audb.core.define.DEPRECATED_USER_CONFIG_FILE
+    audb.core.config.USER_CONFIG_FILE = audeer.path(home, ".config", "audb.yaml")
+    audb.core.config.DEPRECATED_USER_CONFIG_FILE = audeer.path(home, ".audb.yaml")
     if request.param in ["both", "default"]:
         audeer.mkdir(home, ".config")
         with open(audeer.path(home, ".config", "audb.yaml"), "w") as fp:
@@ -72,11 +58,8 @@ def config_files(tmpdir, request):
 
     yield
 
-    if platform.system() == "Windows":
-        set_or_delete_env_variable("HOMEDRIVE", current_homedrive)
-        set_or_delete_env_variable("HOMEPATH", current_homepath)
-    else:
-        set_or_delete_env_variable("HOME", current_home)
+    audb.core.config.USER_CONFIG_FILE = current_user_config_file
+    audb.core.config.DEPRECATED_USER_CONFIG_FILE = current_deprecated_user_config_file
 
 
 @pytest.mark.parametrize(
