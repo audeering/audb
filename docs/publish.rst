@@ -113,7 +113,7 @@ We can compare this with the files stored in the repository.
     import os
 
     def list_files(path):
-        for root, dirs, files in os.walk(path):
+        for root, _, files in sorted(os.walk(path)):
             level = root.replace(path, "").count(os.sep)
             indent = " " * 2 * (level)
             print(f"{indent}{os.path.basename(root)}/")
@@ -128,14 +128,14 @@ data/
       1.0.0/
         db.parquet
         db.yaml
-      meta/
-        1.0.0/
-          age.parquet
       media/
         1.0.0/
           436c65ec-1e42-f9de-2708-ecafe07e827e.zip
           e26ef45d-bdc1-6153-bdc4-852d83806e4a.zip
           fda7e4d6-f2b2-4cff-cab5-906ef5d57607.zip
+      meta/
+        1.0.0/
+          age.parquet
 
 As you can see all media files are stored
 inside the ``media/`` folder,
@@ -246,24 +246,24 @@ We can again inspect the repository.
 data/
   data-local/
     age-test/
-      1.1.0/
-        db.parquet
-        db.yaml
       1.0.0/
         db.parquet
         db.yaml
-      meta/
-        1.1.0/
-          age.parquet
-        1.0.0/
-          age.parquet
+      1.1.0/
+        db.parquet
+        db.yaml
       media/
-        1.1.0/
-          ef4d1e81-6488-95cf-a165-604d1e47d575.zip
         1.0.0/
           436c65ec-1e42-f9de-2708-ecafe07e827e.zip
           e26ef45d-bdc1-6153-bdc4-852d83806e4a.zip
           fda7e4d6-f2b2-4cff-cab5-906ef5d57607.zip
+        1.1.0/
+          ef4d1e81-6488-95cf-a165-604d1e47d575.zip
+      meta/
+        1.0.0/
+          age.parquet
+        1.1.0/
+          age.parquet
 
 And check which databases are available.
 
