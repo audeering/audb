@@ -84,3 +84,11 @@ def test_config_file(tmpdir):
             },
         ]
     }
+
+
+def test_empty_config_file(tmp_path):
+    """Test loading an empty config file."""
+    empty_config = tmp_path / "empty.yaml"
+    empty_config.write_text("")
+    config = audb.core.config.load_configuration_file(empty_config)
+    assert config == {}
