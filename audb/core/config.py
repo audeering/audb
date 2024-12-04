@@ -66,10 +66,8 @@ def load_configuration_file(config_file: str) -> dict:
 def load_config() -> dict:
     """Read configuration from configuration files.
 
-    It first reads the global config file,
-    that is part of the ``audb`` Python package,
-    and then updates its results
-    by the user configuration file.
+    User config values take precedence over global config values
+    when the same setting exists in both files.
 
     """
     # Global config
