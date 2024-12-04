@@ -38,8 +38,8 @@ def config_files(tmpdir, request):
             for storing user config files
         request: request fixture
             for selecting which user config file to create.
-            ``"default"`` will create a file at ``~/.config/audb.yaml``,
-            ``"deprecated"`` will create a file at ``~/.audb.yaml``,
+            ``"default"`` will create a file at ``tmpdir/.config/audb.yaml``,
+            ``"deprecated"`` will create a file at ``tmpdir/.audb.yaml``,
             ``"both"`` will create both files
 
     """
