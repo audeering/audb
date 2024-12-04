@@ -96,6 +96,7 @@ def test_empty_config_file(tmp_path):
 
 
 def test_invalid_config_file(tmp_path):
+    """Test loading a broken config file."""
     invalid_config = tmp_path / "invalid.yaml"
     invalid_config.write_text("{invalid: yaml: content}")
     with pytest.raises(yaml.YAMLError):
