@@ -27,9 +27,9 @@ def set_or_delete_env_variable(key, value):
 def config_files(tmpdir, request):
     """Provide user config files.
 
-    The config file at ``~/.config/audb.yaml``
+    The config file at ``.config/audb.yaml``
     sets ``cache_root`` to ``~/user1``.
-    The config file at ``~/.audb.yam``
+    The config file at ``.audb.yam``
     sets ``cache_root`` to ``~/user2``.
 
     Args:
