@@ -45,6 +45,13 @@ class DefaultConfiguration:
 
 
 @pytest.fixture(scope="module")
+def default_configuration():
+    """Set config values to default values."""
+    with DefaultConfiguration():
+        yield
+
+
+@pytest.fixture(scope="module")
 def run_in_tmpdir(tmpdir_factory):
     """Move to a persistent tmpdir for execution of a whole file."""
     tmpdir = tmpdir_factory.mktemp("tmp")
@@ -54,13 +61,6 @@ def run_in_tmpdir(tmpdir_factory):
     yield
 
     os.chdir(current_dir)
-
-
-@pytest.fixture(scope="module")
-def default_configuration():
-    """Set config values to default values."""
-    with DefaultConfiguration():
-        yield
 
 
 # Collect doctests
