@@ -1,6 +1,7 @@
 import glob
 import os
 import platform
+import sys
 
 import pytest
 
@@ -208,12 +209,15 @@ def private_and_public_repository():
     public_artifactory_host = "https://audeering.jfrog.io/artifactory"
     public_s3_host = "s3.dualstack.eu-north-1.amazonaws.com"
     audb.config.REPOSITORIES = [
-        audb.Repository("data-private", public_artifactory_host, "artifactory"),
         audb.Repository("audb-private", public_s3_host, "s3"),
-        audb.Repository("data-public", public_artifactory_host, "artifactory"),
         audb.Repository("audb-public", public_s3_host, "s3"),
-        audb.Repository("data-public2", public_artifactory_host, "artifactory"),
     ]
+    if sys.version_info < (3, 12):
+        audb.config.REPOSITORIES += [
+            audb.Repository("data-private", public_artifactory_host, "artifactory"),
+            audb.Repository("data-public", public_artifactory_host, "artifactory"),
+            audb.Repository("data-public2", public_artifactory_host, "artifactory"),
+        ]
 
     yield repository
 
