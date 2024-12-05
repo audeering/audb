@@ -11,10 +11,10 @@ or check them in your Python console:
 
 >>> import audb
 >>> audb.available(only_latest=True)
-                         backend  ... version
-name                              ...
+                      backend  ... version
+name                           ...
 ...
-emodb                artifactory  ...   1.4.1
+emodb                      s3  ...   1.4.1
 ...
 
 Let's load version 1.4.1 of the emodb_ database.
