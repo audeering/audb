@@ -75,7 +75,7 @@ or from the files index ``db.files``.
 .. skip: start
 
 >>> import audiofile
->>> signal, sampling_rate = audiofile.read(db.files[0], always_2d=True)
+>>> signal, sampling_rate = audiofile.read(db.files[0])
 
 Listen to the signal.
 
