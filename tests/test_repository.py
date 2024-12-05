@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 
 import audbackend
@@ -70,12 +72,16 @@ def test_repository_repr(backend, host, repo, expected):
             audbackend.backend.FileSystem,
             audbackend.interface.Versioned,
         ),
-        (
+        pytest.param(
             "artifactory",
             "host",
             "repo",
             audbackend.backend.Artifactory,
             audbackend.interface.Maven,
+            marks=pytest.mark.skipif(
+                sys.version_info >= (3, 12),
+                reason="No artifactory backend support in Python>=3.12",
+            ),
         ),
     ],
 )
