@@ -32,7 +32,7 @@ class Repository:
     }
 
     if hasattr(audbackend.backend, "Artifactory"):
-        _backends["artifactory"] = audbackend.backend.Artifactory
+        _backends["artifactory"] = audbackend.backend.Artifactory  # pragma: no cover
 
     backend_registry = _backends
     r"""Backend registry.
@@ -121,7 +121,7 @@ class Repository:
         backend_class = self.backend_registry[self.backend]
         backend = backend_class(self.host, self.name)
         if self.backend == "artifactory":
-            interface = audbackend.interface.Maven(backend)
+            interface = audbackend.interface.Maven(backend)  # pragma: no cover
         else:
             interface = audbackend.interface.Versioned(backend)
         return interface
