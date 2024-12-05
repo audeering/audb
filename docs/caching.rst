@@ -65,6 +65,9 @@ There are four ways to change the default locations:
 
 1. By setting the argument ``cache_root`` during a function call, e.g.
 
+.. skip: end
+.. skip: next
+
 >>> db = audb.load("emodb", ..., cache_root="/cache/root/audb")
 
 2. System-wide by setting the following system variables
@@ -75,6 +78,8 @@ There are four ways to change the default locations:
     export AUDB_SHARED_CACHE_ROOT=/new/shared/cache/audb
 
 3. Program-wide by overwriting the default values in :class:`audb.config`
+
+.. skip: start if(platform.system() == "Windows")
 
 >>> audb.config.SHARED_CACHE_ROOT = "/new/shared/cache/audb"
 >>> audb.default_cache_root(shared=True)
