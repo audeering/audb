@@ -25,6 +25,8 @@ jobs:
             python-version: '3.9'
           - os: ubuntu-latest
             python-version: '3.11'
+          - os: ubuntu-latest
+            python-version: '3.12'
           # Other pandas versions
           - os: ubuntu-latest
             python-version: '3.10'
