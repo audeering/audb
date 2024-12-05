@@ -1,9 +1,9 @@
 cache_root: ~/audb
 shared_cache_root: /data/audb
 repositories:
-  - name: data-public
-    backend: artifactory
-    host: https://audeering.jfrog.io/artifactory
+  - name: audb-public
+    backend: s3
+    host: s3.dualstack.eu-north-1.amazonaws.com
   - name: data-local
     backend: file-system
     host: ~/audb-host

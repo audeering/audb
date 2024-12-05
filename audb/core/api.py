@@ -39,10 +39,10 @@ def available(
     Examples:
         >>> df = audb.available(only_latest=True)
         >>> df.loc[["air", "emodb"]]
-                   backend                                    host   repository version
+              backend                                   host   repository version
         name
-        air    artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.2
-        emodb  artifactory  https://audeering.jfrog.io/artifactory  data-public   1.4.1
+        air        s3  s3.dualstack.eu-north-1.amazonaws.com  audb-public   1.4.2
+        emodb      s3  s3.dualstack.eu-north-1.amazonaws.com  audb-public   1.4.1
 
     """  # noqa: E501
     databases = []
@@ -63,7 +63,7 @@ def available(
         try:
             backend_interface = repository.create_backend_interface()
             with backend_interface.backend as backend:
-                if repository.backend == "artifactory":
+                if repository.backend == "artifactory":  # pragma: nocover
                     # avoid backend_interface.ls('/')
                     # which is very slow on Artifactory
                     # see https://github.com/audeering/audbackend/issues/132
@@ -569,7 +569,7 @@ def repository(
 
     Examples:
         >>> audb.repository("emodb", "1.4.1")
-        Repository('data-public', 'https://audeering.jfrog.io/artifactory', 'artifactory')
+        Repository('audb-public', 's3.dualstack.eu-north-1.amazonaws.com', 's3')
 
     """  # noqa: E501
     if not versions(name):
@@ -598,7 +598,7 @@ def versions(
         try:
             backend_interface = repository.create_backend_interface()
             with backend_interface.backend as backend:
-                if repository.backend == "artifactory":
+                if repository.backend == "artifactory":  # pragma: nocover
                     # Do not use `backend_interface.versions()` on Artifactory,
                     # as calling `backend_interface.ls()` is slow on Artifactory,
                     # see https://github.com/devopshq/artifactory/issues/423.
@@ -616,7 +616,7 @@ def versions(
                                 header = p.joinpath(f"db-{version}.yaml")
                                 if header.exists():
                                     vs.extend([version])
-                    except Exception:  # pragma: nocover
+                    except Exception:
                         # Might happen,
                         # if a database is not available on the backend,
                         # or we don't have read permissions.
