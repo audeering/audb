@@ -22,8 +22,6 @@ Let's load version 1.4.1 of the emodb_ database.
 .. Load with only_metadata=True in the background
 .. invisible-code-block: python
 
-    import audformat as _audformat
-
     db = audb.load(
         "emodb",
         version="1.4.1",
