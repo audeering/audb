@@ -48,6 +48,11 @@ If your database contains only WAV or FLAC files,
 we store the duration in seconds of every file
 in the database dependency table.
 
+..
+    >>> import pandas as pd
+
+.. skip: start if(pd.__version__ == "2.1.4", reason="formats output differently")
+
 >>> deps = audb.dependencies("emodb", version="1.4.1")
 >>> df = deps()
 >>> df.duration[:10]
@@ -62,6 +67,8 @@ wav/03a02Ta.wav    1.735688
 wav/03a02Wb.wav    2.123625
 wav/03a02Wc.wav    1.498063
 Name: duration, dtype: double[pyarrow]
+
+.. skip: end
 
 For those databases
 you can get their overall duration with:

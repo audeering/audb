@@ -1,5 +1,12 @@
 .. _caching:
 
+.. As the test outputs are mainly paths,
+.. we skip the tests under Windows
+..
+   >>> import platform
+
+.. skip: start if(platform.system() == "Windows")
+
 Caching
 =======
 
@@ -44,7 +51,7 @@ accessible to you only.
 By default it points to
 
 >>> audb.default_cache_root(shared=False)
-'/home/.../audb'
+'.../audb'
 
 When you request a database with :meth:`audb.load`,
 :mod:`audb` first looks for it in the shared cache folder
@@ -58,6 +65,7 @@ There are four ways to change the default locations:
 
 1. By setting the argument ``cache_root`` during a function call, e.g.
 
+.. skip: end
 .. skip: next
 
 >>> db = audb.load("emodb", ..., cache_root="/cache/root/audb")
@@ -70,6 +78,8 @@ There are four ways to change the default locations:
     export AUDB_SHARED_CACHE_ROOT=/new/shared/cache/audb
 
 3. Program-wide by overwriting the default values in :class:`audb.config`
+
+.. skip: start if(platform.system() == "Windows")
 
 >>> audb.config.SHARED_CACHE_ROOT = "/new/shared/cache/audb"
 >>> audb.default_cache_root(shared=True)
@@ -88,5 +98,6 @@ Note,
 2. overwrites 3. and 4.,
 and so on.
 
+.. skip: end
 
 .. _adjust the rights: https://superuser.com/a/264406

@@ -22,8 +22,6 @@ Let's load version 1.4.1 of the emodb_ database.
 .. Load with only_metadata=True in the background
 .. invisible-code-block: python
 
-    import audformat as _audformat
-
     db = audb.load(
         "emodb",
         version="1.4.1",
@@ -32,11 +30,9 @@ Let's load version 1.4.1 of the emodb_ database.
         verbose=False,
     )
     # Add flavor path, to mimic `full_path=True`
+    flavor_path = audb.flavor_path("emodb", "1.4.1").replace("\\", "/")
     for table in list(db.tables):
-        db[table]._df.index = _audformat.utils.expand_file_path(
-            db[table]._df.index,
-            f'...{audb.flavor_path("emodb", "1.4.1")}',
-        )
+        db[table]._df.index = f"...{flavor_path}/" + db[table]._df.index
 
 .. skip: next
 
