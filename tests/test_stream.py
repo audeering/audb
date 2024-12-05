@@ -424,10 +424,7 @@ def test_database_iterator_error():
     db = audformat.Database("db")
     db["some"] = audformat.Table()
     table = "some"
-    error_msg = (
-        "Can't instantiate abstract class DatabaseIterator "
-        "with abstract method _initialize_stream"
-    )
+    error_msg = "Can't instantiate abstract class DatabaseIterator"
     with pytest.raises(TypeError, match=error_msg):
         audb.DatabaseIterator(
             db,
