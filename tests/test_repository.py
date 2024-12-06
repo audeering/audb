@@ -129,7 +129,7 @@ def test_repository_create_backend_interface(
             "artifactory",
             "host",
             "repo",
-            "The 'artifactory' backend is not support in Python>=3.12",
+            "The 'artifactory' backend is not supported in Python>=3.12",
             ValueError,
             marks=pytest.mark.skipif(
                 sys.version_info < (3, 12),
