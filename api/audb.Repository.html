@@ -30,8 +30,6 @@
   <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/thebelab.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="available()" href="audb.available.html" />
@@ -70,7 +68,7 @@
             
             
               <div class="version">
-                v1.10.2
+                v1.11.0
               </div>
             
           
@@ -265,7 +263,7 @@ under Python &gt;=3.12.</p>
 <dt class="sig sig-object py" id="audb.Repository.create_backend_interface">
 <span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">create_backend_interface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository.create_backend_interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository.create_backend_interface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create backend interface to access repository.</p>
-<p>It wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Versioned.html#audbackend.interface.Versioned" title="(in audbackend v2.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Versioned</span></code></a> interface
+<p>It wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Versioned.html#audbackend.interface.Versioned" title="(in audbackend v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Versioned</span></code></a> interface
 around it.
 The files will then be stored
 with the following structure on the backend
@@ -278,7 +276,7 @@ with the following structure on the backend
 </pre></div>
 </div>
 <p>When <a class="reference internal" href="#audb.Repository.backend" title="audb.Repository.backend"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Repository.backend</span></code></a> equals <code class="docutils literal notranslate"><span class="pre">artifactory</span></code>,
-it wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Maven.html#audbackend.interface.Maven" title="(in audbackend v2.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Maven</span></code></a> interface
+it wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Maven.html#audbackend.interface.Maven" title="(in audbackend v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Maven</span></code></a> interface
 around it.
 The files will then be stored
 with the following structure on the Artifactory backend
@@ -299,10 +297,16 @@ The backend is stored as the inside the <code class="docutils literal notranslat
 of the returned backend interface.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v2.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>interface to repository</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – if an artifactory backend is requested in Python&gt;=3.12</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – if a non-supported backend is requested</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -341,7 +345,7 @@ to an actual backend class.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>backend_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the backend,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;file-system&quot;</span></code></p></li>
-<li><p><strong>backend_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v2.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]) – class of the backend,
+<li><p><strong>backend_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]) – class of the backend,
 that should be associated with <code class="docutils literal notranslate"><span class="pre">backend_name</span></code>,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbackend.backend.Filesystem&quot;</span></code></p></li>
 </ul>
@@ -349,7 +353,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">audbackend</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Repository</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;file-system&quot;</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;file-system&quot;</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -380,7 +384,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -420,9 +424,6 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-        <script src="../_static/thebelab-helper.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   

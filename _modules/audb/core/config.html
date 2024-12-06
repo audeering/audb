@@ -30,8 +30,6 @@
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/thebelab.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     
@@ -68,7 +66,7 @@
             
             
               <div class="version">
-                v1.10.2
+                v1.11.0
               </div>
             
           
@@ -158,11 +156,16 @@
 <span class="kn">import</span> <span class="nn">audeer</span>
 
 <span class="kn">from</span> <span class="nn">audb.core.define</span> <span class="kn">import</span> <span class="n">CONFIG_FILE</span>
+<span class="kn">from</span> <span class="nn">audb.core.define</span> <span class="kn">import</span> <span class="n">DEPRECATED_USER_CONFIG_FILE</span>
 <span class="kn">from</span> <span class="nn">audb.core.define</span> <span class="kn">import</span> <span class="n">USER_CONFIG_FILE</span>
 <span class="kn">from</span> <span class="nn">audb.core.repository</span> <span class="kn">import</span> <span class="n">Repository</span>
 
 
-<span class="k">def</span> <span class="nf">load_configuration_file</span><span class="p">(</span><span class="n">config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="n">CWD</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">script_dir</span><span class="p">()</span>
+<span class="n">global_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CWD</span><span class="p">,</span> <span class="n">CONFIG_FILE</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">load_configuration_file</span><span class="p">(</span><span class="n">config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read configuration from YAML file.</span>
 
 <span class="sd">    Args:</span>
@@ -179,11 +182,13 @@
 <span class="sd">            ``backend``, or ``name`` key</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
-            <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">BaseLoader</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">BaseLoader</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
 
     <span class="c1"># Check that we have provided a valid repositories configuration</span>
     <span class="k">if</span> <span class="s2">&quot;repositories&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
@@ -209,13 +214,23 @@
     <span class="k">return</span> <span class="n">config</span>
 
 
-<span class="c1"># Read in configuration from global and user file</span>
-<span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-<span class="n">global_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">CONFIG_FILE</span><span class="p">)</span>
-<span class="n">user_config_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">USER_CONFIG_FILE</span><span class="p">)</span>
-<span class="n">global_config</span> <span class="o">=</span> <span class="n">load_configuration_file</span><span class="p">(</span><span class="n">global_config_file</span><span class="p">)</span>
-<span class="n">user_config</span> <span class="o">=</span> <span class="n">load_configuration_file</span><span class="p">(</span><span class="n">user_config_file</span><span class="p">)</span>
-<span class="n">global_config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user_config</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">load_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read configuration from configuration files.</span>
+
+<span class="sd">    User config values take precedence over global config values</span>
+<span class="sd">    when the same setting exists in both files.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Global config</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">load_configuration_file</span><span class="p">(</span><span class="n">global_config_file</span><span class="p">)</span>
+    <span class="c1"># User config</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">USER_CONFIG_FILE</span><span class="p">)):</span>
+        <span class="n">user_config_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">USER_CONFIG_FILE</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">user_config_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">DEPRECATED_USER_CONFIG_FILE</span><span class="p">)</span>
+    <span class="n">user_config</span> <span class="o">=</span> <span class="n">load_configuration_file</span><span class="p">(</span><span class="n">user_config_file</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user_config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span>
 
 
 <div class="viewcode-block" id="config"><a class="viewcode-back" href="../../../api/audb.config.html#audb.config">[docs]</a><span class="k">class</span> <span class="nc">config</span><span class="p">:</span>
@@ -223,27 +238,28 @@
 
 <span class="sd">    The configuration values are read in during module import</span>
 <span class="sd">    from the :ref:`configuration file &lt;configuration&gt;`</span>
-<span class="sd">    :file:`~/.audb.yaml`.</span>
+<span class="sd">    :file:`~/.config/audb.yaml`.</span>
 <span class="sd">    You can change the configuration values after import,</span>
 <span class="sd">    by setting the attributes directly.</span>
 <span class="sd">    The :ref:`caching &lt;caching&gt;` related configuration values</span>
 <span class="sd">    can be overwritten by environment variables.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; config.CACHE_ROOT</span>
+<span class="sd">        &gt;&gt;&gt; audb.config.CACHE_ROOT</span>
 <span class="sd">        &#39;~/audb&#39;</span>
-<span class="sd">        &gt;&gt;&gt; config.CACHE_ROOT = &quot;~/caches/audb&quot;</span>
-<span class="sd">        &gt;&gt;&gt; config.CACHE_ROOT</span>
+<span class="sd">        &gt;&gt;&gt; audb.config.CACHE_ROOT = &quot;~/caches/audb&quot;</span>
+<span class="sd">        &gt;&gt;&gt; audb.config.CACHE_ROOT</span>
 <span class="sd">        &#39;~/caches/audb&#39;</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s2">&quot;cache_root&quot;</span><span class="p">]</span>
+    <span class="n">_config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+
+    <span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="n">_config</span><span class="p">[</span><span class="s2">&quot;cache_root&quot;</span><span class="p">]</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default user cache folder.&quot;&quot;&quot;</span>
 
     <span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">Repository</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;backend&quot;</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">global_config</span><span class="p">[</span><span class="s2">&quot;repositories&quot;</span><span class="p">]</span>
+        <span class="n">Repository</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;backend&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_config</span><span class="p">[</span><span class="s2">&quot;repositories&quot;</span><span class="p">]</span>
     <span class="p">]</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repositories, will be iterated in given order.</span>
 
@@ -257,7 +273,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">SHARED_CACHE_ROOT</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s2">&quot;shared_cache_root&quot;</span><span class="p">]</span>
+    <span class="n">SHARED_CACHE_ROOT</span> <span class="o">=</span> <span class="n">_config</span><span class="p">[</span><span class="s2">&quot;shared_cache_root&quot;</span><span class="p">]</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shared cache folder.&quot;&quot;&quot;</span></div>
 </pre></div>
 
@@ -274,7 +290,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -314,9 +330,6 @@
         <script src="../../../_static/sphinx_highlight.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>
-        <script src="../../../_static/thebelab-helper.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   

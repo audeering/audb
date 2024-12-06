@@ -30,8 +30,6 @@
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Configuration" href="configuration.html" />
@@ -70,7 +68,7 @@
             
             
               <div class="version">
-                v1.10.2
+                v1.11.0
               </div>
             
           
@@ -155,15 +153,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
-<div class="section" id="database-dependencies">
+  <div class="section" id="database-dependencies">
 <span id="id1"></span><h1>Database dependencies<a class="headerlink" href="#database-dependencies" title="Permalink to this heading">¶</a></h1>
 <p>Media and table files of databases are stored
 in archive files.
@@ -177,119 +167,26 @@ in a dependency table in a file <code class="file docutils literal notranslate">
 for every version of a database.</p>
 <p>You request a <a class="reference internal" href="api/audb.Dependencies.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> object with
 <a class="reference internal" href="api/audb.dependencies.html#audb.dependencies" title="audb.dependencies"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.dependencies()</span></code></a>.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-</div>
 </div>
 <p>You can see all entries by calling the returned object.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span>
-<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                                              archive  bit_depth  ...  type version</span>
+<span class="go">db.emotion.csv                                emotion          0  ...     0   1.1.0</span>
+<span class="go">db.files.csv                                    files          0  ...     0   1.1.0</span>
+<span class="go">wav/03a01Fa.wav  c1f5cc6f-6d00-348a-ba3b-4adaa2436aad         16  ...     1   1.1.0</span>
+<span class="go">wav/03a01Nc.wav  d40b53dd-8f0d-d5d3-42e7-8ad7ea6a05a6         16  ...     1   1.1.0</span>
+<span class="go">wav/03a01Wa.wav  9b62bc9b-a68e-7e38-6ed1-f4a16ac18511         16  ...     1   1.1.0</span>
+
+<span class="go">[5 rows x 10 columns]</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>archive</th>
-      <th>bit_depth</th>
-      <th>channels</th>
-      <th>...</th>
-      <th>sampling_rate</th>
-      <th>type</th>
-      <th>version</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>db.emotion.csv</th>
-      <td>emotion</td>
-      <td>0</td>
-      <td>0</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1.1.0</td>
-    </tr>
-    <tr>
-      <th>db.files.csv</th>
-      <td>files</td>
-      <td>0</td>
-      <td>0</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1.1.0</td>
-    </tr>
-    <tr>
-      <th>wav/03a01Fa.wav</th>
-      <td>c1f5cc6f-6d00-348a-ba3b-4adaa2436aad</td>
-      <td>16</td>
-      <td>1</td>
-      <td>...</td>
-      <td>16000</td>
-      <td>1</td>
-      <td>1.1.0</td>
-    </tr>
-    <tr>
-      <th>wav/03a01Nc.wav</th>
-      <td>d40b53dd-8f0d-d5d3-42e7-8ad7ea6a05a6</td>
-      <td>16</td>
-      <td>1</td>
-      <td>...</td>
-      <td>16000</td>
-      <td>1</td>
-      <td>1.1.0</td>
-    </tr>
-    <tr>
-      <th>wav/03a01Wa.wav</th>
-      <td>9b62bc9b-a68e-7e38-6ed1-f4a16ac18511</td>
-      <td>16</td>
-      <td>1</td>
-      <td>...</td>
-      <td>16000</td>
-      <td>1</td>
-      <td>1.1.0</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 10 columns</p>
-</div></div></div>
 </div>
 <p>You can also use it to request certain aspects, e.g.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">&quot;wav/03a01Fa.wav&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">&quot;wav/03a01Fa.wav&quot;</span><span class="p">)</span>
+<span class="go">1.89825</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>1.89825
-</pre></div>
-</div>
-</div>
 </div>
 <p>See <a class="reference internal" href="api/audb.Dependencies.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> for all available methods.</p>
 <div class="section" id="duration-of-a-database">
@@ -297,43 +194,27 @@ for every version of a database.</p>
 <p>If your database contains only WAV or FLAC files,
 we store the duration in seconds of every file
 in the database dependency table.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span>
-<span class="n">df</span><span class="o">.</span><span class="n">duration</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">deps</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">duration</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">db.emotion.csv          0.0</span>
+<span class="go">db.files.csv            0.0</span>
+<span class="go">wav/03a01Fa.wav     1.89825</span>
+<span class="go">wav/03a01Nc.wav     1.61125</span>
+<span class="go">wav/03a01Wa.wav    1.877813</span>
+<span class="go">wav/03a02Fc.wav     2.00625</span>
+<span class="go">wav/03a02Nc.wav    1.439812</span>
+<span class="go">wav/03a02Ta.wav    1.735688</span>
+<span class="go">wav/03a02Wb.wav    2.123625</span>
+<span class="go">wav/03a02Wc.wav    1.498063</span>
+<span class="go">Name: duration, dtype: double[pyarrow]</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>db.emotion.csv          0.0
-db.files.csv            0.0
-wav/03a01Fa.wav     1.89825
-wav/03a01Nc.wav     1.61125
-wav/03a01Wa.wav    1.877813
-wav/03a02Fc.wav     2.00625
-wav/03a02Nc.wav    1.439812
-wav/03a02Ta.wav    1.735688
-wav/03a02Wb.wav    2.123625
-wav/03a02Wc.wav    1.498063
-Name: duration, dtype: double[pyarrow]
-</pre></div>
-</div>
-</div>
 </div>
 <p>For those databases
 you can get their overall duration with:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<span class="go">Timedelta(&#39;0 days 00:24:47.092187500&#39;)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Timedelta(&#39;0 days 00:24:47.092187500&#39;)
-</pre></div>
-</div>
-</div>
 </div>
 <p>The duration of parts of a database
 can be calculated
@@ -342,22 +223,14 @@ and filter for the selected media files.
 The following calculates the duration
 of the first ten files in the <em>emotion</em> table
 of the emodb database.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">files</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
-<span class="n">duration_in_sec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">])</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">duration_in_sec</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">files</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">duration_in_sec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">duration_in_sec</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+<span class="go">Timedelta(&#39;0 days 00:00:17.392437500&#39;)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Timedelta(&#39;0 days 00:00:17.392437500&#39;)
-</pre></div>
-</div>
-</div>
 </div>
 <p>If your table is a segmented table,
 and you would like to get the duration
@@ -366,13 +239,16 @@ that contain a label
 you can use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv1.3.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
 which calculates the duration
 from the <code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> entries.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s2">&quot;database-with-segmented-tables&quot;</span><span class="p">,</span> <span class="s2">&quot;segmented-table&quot;</span><span class="p">)</span>
-<span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">audformat</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s2">&quot;vadtoolkit&quot;</span><span class="p">,</span> <span class="s2">&quot;segments&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.1.0&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+<span class="go">Timedelta(&#39;0 days 00:37:17.037467&#39;)</span>
 </pre></div>
 </div>
 <p>Or you can count the duration of all segments within your database.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;database-with-segmented-tables&quot;</span><span class="p">,</span> <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;vadtoolkit&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.1.0&quot;</span><span class="p">,</span> <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span>
+<span class="go">Timedelta(&#39;0 days 00:37:17.037467&#39;)</span>
 </pre></div>
 </div>
 <p>If your database contains files
@@ -382,8 +258,8 @@ like MP4 files,
 you have to download the database first
 and use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv1.3.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
 to calculate the duration on the fly.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;database-with-videos&quot;</span><span class="p">)</span>
-<span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;database-with-videos&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -412,7 +288,7 @@ to calculate the duration on the fly.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -452,9 +328,6 @@ to calculate the duration on the fly.</p>
         <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
-        <script src="_static/thebelab-helper.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   

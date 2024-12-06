@@ -1,17 +1,9 @@
-.. Import audb
-.. jupyter-execute::
-    :hide-code:
-    :hide-output:
-
-    import audb
-
-
 .. _configuration:
 
 Configuration
 -------------
 
-:mod:`audb` can be configured with a :file:`~/.audb.yaml` file.
+:mod:`audb` can be configured with a :file:`~/.config/audb.yaml` file.
 The configuration file is read during import
 and will overwrite the default settings.
 The default settings are:
@@ -24,19 +16,15 @@ they can be accessed
 or changed
 using :class:`audb.config`.
 
-.. jupyter-execute::
+>>> audb.config.CACHE_ROOT
+'~/audb'
 
-    audb.config.CACHE_ROOT
+>>> audb.config.SHARED_CACHE_ROOT
+'/data/audb'
 
-.. jupyter-execute::
+>>> audb.config.REPOSITORIES
+[Repository('audb-public', 's3.dualstack.eu-north-1.amazonaws.com', 's3')]
 
-    audb.config.SHARED_CACHE_ROOT
-
-.. jupyter-execute::
-
-    audb.config.REPOSITORIES
-
-.. jupyter-execute::
-
-    audb.config.CACHE_ROOT = "/user/cache"
-    audb.config.CACHE_ROOT
+>>> audb.config.CACHE_ROOT = "/user/cache"
+>>> audb.config.CACHE_ROOT
+'/user/cache'

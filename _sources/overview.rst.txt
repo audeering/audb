@@ -46,12 +46,7 @@ to store all your data
 on your local disk under :file:`/data/data-local`
 you would use the following repository.
 
-.. jupyter-execute::
-    :hide-code:
-
-    import audb
-
-.. jupyter-execute::
+.. code-block:: python
 
     repository = audb.Repository(
         name="data-local",

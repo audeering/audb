@@ -30,8 +30,6 @@
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Database dependencies" href="dependencies.html" />
@@ -70,7 +68,7 @@
             
             
               <div class="version">
-                v1.10.2
+                v1.11.0
               </div>
             
           
@@ -158,15 +156,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
-<div class="section" id="load-a-database">
+  <div class="section" id="load-a-database">
 <span id="load"></span><h1>Load a database<a class="headerlink" href="#load-a-database" title="Permalink to this heading">¶</a></h1>
 <p>To load a database you only need its name.
 However,
@@ -176,15 +166,7 @@ as <a class="reference internal" href="api/audb.load.html#audb.load" title="audb
 for the latest available version,
 but it will ensure your code returns the same data,
 even if a new version of the database is published.</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="api/audb.load.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> will download the data,
@@ -192,183 +174,68 @@ store them in a cache folder,
 and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
 The most important content of that object
 are the database tables.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
+<span class="go">emotion:</span>
+<span class="go">  type: filewise</span>
+<span class="go">  columns:</span>
+<span class="go">    emotion: {scheme_id: emotion, rater_id: gold}</span>
+<span class="go">    emotion.confidence: {scheme_id: confidence, rater_id: gold}</span>
+<span class="go">emotion.categories.test.gold_standard:</span>
+<span class="go">  type: filewise</span>
+<span class="go">  split_id: test</span>
+<span class="go">  columns:</span>
+<span class="go">    emotion: {scheme_id: emotion, rater_id: gold}</span>
+<span class="go">    emotion.confidence: {scheme_id: confidence, rater_id: gold}</span>
+<span class="go">emotion.categories.train.gold_standard:</span>
+<span class="go">  type: filewise</span>
+<span class="go">  split_id: train</span>
+<span class="go">  columns:</span>
+<span class="go">    emotion: {scheme_id: emotion, rater_id: gold}</span>
+<span class="go">    emotion.confidence: {scheme_id: confidence, rater_id: gold}</span>
+<span class="go">files:</span>
+<span class="go">  type: filewise</span>
+<span class="go">  columns:</span>
+<span class="go">    duration: {scheme_id: duration}</span>
+<span class="go">    speaker: {scheme_id: speaker}</span>
+<span class="go">    transcription: {scheme_id: transcription}</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>emotion:
-  type: filewise
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-emotion.categories.test.gold_standard:
-  type: filewise
-  split_id: test
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-emotion.categories.train.gold_standard:
-  type: filewise
-  split_id: train
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-files:
-  type: filewise
-  columns:
-    duration: {scheme_id: duration}
-    speaker: {scheme_id: speaker}
-    transcription: {scheme_id: transcription}
-</pre></div>
-</div>
-</div>
 </div>
 <p>They contain the annotations of the database,
 and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="go">                   emotion  emotion.confidence</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  happiness                0.90</span>
+<span class="go">wav/03a01Nc.wav    neutral                1.00</span>
+<span class="go">wav/03a01Wa.wav      anger                0.95</span>
+<span class="go">wav/03a02Fc.wav  happiness                0.85</span>
+<span class="go">wav/03a02Nc.wav    neutral                1.00</span>
+<span class="go">...                    ...                 ...</span>
+<span class="go">wav/16b10Lb.wav    boredom                1.00</span>
+<span class="go">wav/16b10Tb.wav    sadness                0.90</span>
+<span class="go">wav/16b10Td.wav    sadness                0.95</span>
+<span class="go">wav/16b10Wa.wav      anger                1.00</span>
+<span class="go">wav/16b10Wb.wav      anger                1.00</span>
+
+<span class="go">[535 rows x 2 columns]</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>emotion</th>
-      <th>emotion.confidence</th>
-    </tr>
-    <tr>
-      <th>file</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a01Fa.wav</th>
-      <td>happiness</td>
-      <td>0.90</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a01Nc.wav</th>
-      <td>neutral</td>
-      <td>1.00</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a01Wa.wav</th>
-      <td>anger</td>
-      <td>0.95</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b10Td.wav</th>
-      <td>sadness</td>
-      <td>0.95</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b10Wa.wav</th>
-      <td>anger</td>
-      <td>1.00</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b10Wb.wav</th>
-      <td>anger</td>
-      <td>1.00</td>
-    </tr>
-  </tbody>
-</table>
-<p>535 rows × 2 columns</p>
-</div></div></div>
 </div>
 <p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">][</span><span class="s2">&quot;duration&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">][</span><span class="s2">&quot;duration&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav      0 days 00:00:01.898250</span>
+<span class="go">wav/03a01Nc.wav      0 days 00:00:01.611250</span>
+<span class="go">wav/03a01Wa.wav   0 days 00:00:01.877812500</span>
+<span class="go">wav/03a02Fc.wav      0 days 00:00:02.006250</span>
+<span class="go">wav/03a02Nc.wav   0 days 00:00:01.439812500</span>
+<span class="go">                            ...</span>
+<span class="go">wav/16b10Lb.wav   0 days 00:00:03.442687500</span>
+<span class="go">wav/16b10Tb.wav      0 days 00:00:03.500625</span>
+<span class="go">wav/16b10Td.wav   0 days 00:00:03.934187500</span>
+<span class="go">wav/16b10Wa.wav      0 days 00:00:02.414125</span>
+<span class="go">wav/16b10Wb.wav   0 days 00:00:02.522499999</span>
+<span class="go">Name: duration, Length: 535, dtype: timedelta64[ns]</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th></th>
-    </tr>
-    <tr>
-      <th>file</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a01Fa.wav</th>
-      <td>0 days 00:00:01.898250</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a01Nc.wav</th>
-      <td>0 days 00:00:01.611250</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a01Wa.wav</th>
-      <td>0 days 00:00:01.877812500</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b10Td.wav</th>
-      <td>0 days 00:00:03.934187500</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b10Wa.wav</th>
-      <td>0 days 00:00:02.414125</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/16b10Wb.wav</th>
-      <td>0 days 00:00:02.522499999</td>
-    </tr>
-  </tbody>
-</table>
-<p>535 rows × 1 columns</p>
-</div></div></div>
 </div>
 <p>As you can see the index of the returned object
 holds the path to the corresponding media files.</p>
@@ -407,7 +274,8 @@ The following properties can be changed.</p>
 <span class="nt">sampling_rate</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16000</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22500</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22050</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">24000</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">44100</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">48000</span>
 </pre></div>
@@ -416,10 +284,6 @@ The following properties can be changed.</p>
 to FLAC with a sampling rate of 44100 Hz.
 For each flavor a sub-folder will be created
 inside the <a class="reference internal" href="caching.html#caching"><span class="std std-ref">cache</span></a>.</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
@@ -431,76 +295,21 @@ inside the <a class="reference internal" href="caching.html#caching"><span class
 </div>
 <p>The flavor information of a database is stored
 inside the <code class="docutils literal notranslate"><span class="pre">db.meta[&quot;audb&quot;]</span></code> dictionary.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;audb&quot;</span><span class="p">][</span><span class="s2">&quot;flavor&quot;</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;audb&quot;</span><span class="p">][</span><span class="s2">&quot;flavor&quot;</span><span class="p">]</span>
+<span class="go">{&#39;bit_depth&#39;: None,</span>
+<span class="go"> &#39;channels&#39;: None,</span>
+<span class="go"> &#39;format&#39;: &#39;flac&#39;,</span>
+<span class="go"> &#39;mixdown&#39;: False,</span>
+<span class="go"> &#39;sampling_rate&#39;: 44100}</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;bit_depth&#39;: None,
- &#39;channels&#39;: None,
- &#39;format&#39;: &#39;flac&#39;,
- &#39;mixdown&#39;: False,
- &#39;sampling_rate&#39;: 44100}
-</pre></div>
-</div>
-</div>
 </div>
 <p>You can list all available flavors and their locations in the cache with:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">cached</span><span class="p">()</span>
-<span class="n">df</span><span class="p">[[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="s2">&quot;complete&quot;</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="s2">&quot;sampling_rate&quot;</span><span class="p">]]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">cached</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="s2">&quot;complete&quot;</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="s2">&quot;sampling_rate&quot;</span><span class="p">]]</span>
+<span class="go">         name version  complete format sampling_rate</span>
+<span class="go">0       emodb   1.4.1     False   flac         44100</span>
+<span class="go">1       emodb   1.4.1     False   None          None</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>name</th>
-      <th>version</th>
-      <th>complete</th>
-      <th>format</th>
-      <th>sampling_rate</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/9c872f39</th>
-      <td>emodb</td>
-      <td>1.4.1</td>
-      <td>False</td>
-      <td>flac</td>
-      <td>44100</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b</th>
-      <td>emodb</td>
-      <td>1.4.1</td>
-      <td>False</td>
-      <td>None</td>
-      <td>None</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
 </div>
 <p>The entry <code class="docutils literal notranslate"><span class="pre">&quot;complete&quot;</span></code> tells you if a database flavor is completely cached,
 or if some table or media files are still missing.</p>
@@ -512,19 +321,8 @@ or if some table or media files are still missing.</p>
 of a database.
 In that case media files are not loaded,
 but all the tables and the header.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
-    <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-</div>
 </div>
 <p>For databases with many annotations,
 this can still take some time.
@@ -534,58 +332,36 @@ Or if you are only interested
 in parts of the header,
 have a look at the <a class="reference internal" href="api/audb.info.html#module-audb.info" title="audb.info"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb.info</span></code></a> module.
 It can list all table definitions.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span>
-    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<span class="go">emotion:</span>
+<span class="go">  type: filewise</span>
+<span class="go">  columns:</span>
+<span class="go">    emotion: {scheme_id: emotion, rater_id: gold}</span>
+<span class="go">    emotion.confidence: {scheme_id: confidence, rater_id: gold}</span>
+<span class="go">emotion.categories.test.gold_standard:</span>
+<span class="go">  type: filewise</span>
+<span class="go">  split_id: test</span>
+<span class="go">  columns:</span>
+<span class="go">    emotion: {scheme_id: emotion, rater_id: gold}</span>
+<span class="go">    emotion.confidence: {scheme_id: confidence, rater_id: gold}</span>
+<span class="go">emotion.categories.train.gold_standard:</span>
+<span class="go">  type: filewise</span>
+<span class="go">  split_id: train</span>
+<span class="go">  columns:</span>
+<span class="go">    emotion: {scheme_id: emotion, rater_id: gold}</span>
+<span class="go">    emotion.confidence: {scheme_id: confidence, rater_id: gold}</span>
+<span class="go">files:</span>
+<span class="go">  type: filewise</span>
+<span class="go">  columns:</span>
+<span class="go">    duration: {scheme_id: duration}</span>
+<span class="go">    speaker: {scheme_id: speaker}</span>
+<span class="go">    transcription: {scheme_id: transcription}</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>emotion:
-  type: filewise
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-emotion.categories.test.gold_standard:
-  type: filewise
-  split_id: test
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-emotion.categories.train.gold_standard:
-  type: filewise
-  split_id: train
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-files:
-  type: filewise
-  columns:
-    duration: {scheme_id: duration}
-    speaker: {scheme_id: speaker}
-    transcription: {scheme_id: transcription}
-</pre></div>
-</div>
-</div>
 </div>
 <p>Or get the total duration of all media files.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span>
-    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<span class="go">Timedelta(&#39;0 days 00:24:47.092187500&#39;)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Timedelta(&#39;0 days 00:24:47.092187500&#39;)
-</pre></div>
-</div>
-</div>
 </div>
 <p>See <a class="reference internal" href="api/audb.info.html#module-audb.info" title="audb.info"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb.info</span></code></a> for a list of all available options.</p>
 </div>
@@ -603,9 +379,7 @@ but only the table(s) and media of the <em>test</em> set.</p>
 we can do the following.
 First, we download the table with information
 about the speakers (here <code class="docutils literal notranslate"><span class="pre">db[&quot;files&quot;]</span></code>):</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
     <span class="n">tables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">],</span>
@@ -613,20 +387,16 @@ about the speakers (here <code class="docutils literal notranslate"><span class=
     <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">db</span><span class="o">.</span><span class="n">tables</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>files:
-  type: filewise
-  columns:
-    duration: {scheme_id: duration}
-    speaker: {scheme_id: speaker}
-    transcription: {scheme_id: transcription}
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
+<span class="go">files:</span>
+<span class="go">  type: filewise</span>
+<span class="go">  columns:</span>
+<span class="go">    duration: {scheme_id: duration}</span>
+<span class="go">    speaker: {scheme_id: speaker}</span>
+<span class="go">    transcription: {scheme_id: transcription}</span>
 </pre></div>
-</div>
-</div>
 </div>
 <p>Note,
 that we set <code class="docutils literal notranslate"><span class="pre">only_metadata=True</span></code>
@@ -635,146 +405,52 @@ By setting <code class="docutils literal notranslate"><span class="pre">full_pat
 we further ensure that the paths
 in the table index are relative
 and therefore match the paths on the backend.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">speaker</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">][</span><span class="s2">&quot;speaker&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="n">speaker</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">speaker</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">][</span><span class="s2">&quot;speaker&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">speaker</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav     3</span>
+<span class="go">wav/03a01Nc.wav     3</span>
+<span class="go">wav/03a01Wa.wav     3</span>
+<span class="go">wav/03a02Fc.wav     3</span>
+<span class="go">wav/03a02Nc.wav     3</span>
+<span class="go">                   ..</span>
+<span class="go">wav/16b10Lb.wav    16</span>
+<span class="go">wav/16b10Tb.wav    16</span>
+<span class="go">wav/16b10Td.wav    16</span>
+<span class="go">wav/16b10Wa.wav    16</span>
+<span class="go">wav/16b10Wb.wav    16</span>
+<span class="go">Name: speaker, Length: 535, dtype: category</span>
+<span class="go">Categories (10, int64): [3, 8, 9, 10, ..., 13, 14, 15, 16]</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th></th>
-    </tr>
-    <tr>
-      <th>file</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>wav/03a01Fa.wav</th>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>wav/03a01Nc.wav</th>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>wav/03a01Wa.wav</th>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>wav/16b10Td.wav</th>
-      <td>16</td>
-    </tr>
-    <tr>
-      <th>wav/16b10Wa.wav</th>
-      <td>16</td>
-    </tr>
-    <tr>
-      <th>wav/16b10Wb.wav</th>
-      <td>16</td>
-    </tr>
-  </tbody>
-</table>
-<p>535 rows × 1 columns</p>
-</div></div></div>
 </div>
 <p>Now, we use the column with speaker IDs
 to get a list of media files
 that belong to speaker 3.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">media</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">speaker</span> <span class="o">==</span> <span class="mi">3</span><span class="p">]</span>
-<span class="n">media</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">media</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">speaker</span> <span class="o">==</span> <span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">media</span>
+<span class="go">Index([&#39;wav/03a01Fa.wav&#39;, &#39;wav/03a01Nc.wav&#39;, &#39;wav/03a01Wa.wav&#39;,</span>
+<span class="go">       &#39;wav/03a02Fc.wav&#39;, &#39;wav/03a02Nc.wav&#39;, &#39;wav/03a02Ta.wav&#39;,</span>
+<span class="go">       &#39;wav/03a02Wb.wav&#39;, &#39;wav/03a02Wc.wav&#39;, &#39;wav/03a04Ad.wav&#39;,</span>
+<span class="go">       &#39;wav/03a04Fd.wav&#39;, &#39;wav/03a04Lc.wav&#39;, &#39;wav/03a04Nc.wav&#39;,</span>
+<span class="go">       &#39;wav/03a04Ta.wav&#39;, &#39;wav/03a04Wc.wav&#39;, &#39;wav/03a05Aa.wav&#39;,</span>
+<span class="go">       &#39;wav/03a05Fc.wav&#39;, &#39;wav/03a05Nd.wav&#39;, &#39;wav/03a05Tc.wav&#39;,</span>
+<span class="go">       &#39;wav/03a05Wa.wav&#39;, &#39;wav/03a05Wb.wav&#39;, &#39;wav/03a07Fa.wav&#39;,</span>
+<span class="go">       &#39;wav/03a07Fb.wav&#39;, &#39;wav/03a07La.wav&#39;, &#39;wav/03a07Nc.wav&#39;,</span>
+<span class="go">       &#39;wav/03a07Wc.wav&#39;, &#39;wav/03b01Fa.wav&#39;, &#39;wav/03b01Lb.wav&#39;,</span>
+<span class="go">       &#39;wav/03b01Nb.wav&#39;, &#39;wav/03b01Td.wav&#39;, &#39;wav/03b01Wa.wav&#39;,</span>
+<span class="go">       &#39;wav/03b01Wc.wav&#39;, &#39;wav/03b02Aa.wav&#39;, &#39;wav/03b02La.wav&#39;,</span>
+<span class="go">       &#39;wav/03b02Na.wav&#39;, &#39;wav/03b02Tb.wav&#39;, &#39;wav/03b02Wb.wav&#39;,</span>
+<span class="go">       &#39;wav/03b03Nb.wav&#39;, &#39;wav/03b03Tc.wav&#39;, &#39;wav/03b03Wc.wav&#39;,</span>
+<span class="go">       &#39;wav/03b09La.wav&#39;, &#39;wav/03b09Nc.wav&#39;, &#39;wav/03b09Tc.wav&#39;,</span>
+<span class="go">       &#39;wav/03b09Wa.wav&#39;, &#39;wav/03b10Ab.wav&#39;, &#39;wav/03b10Ec.wav&#39;,</span>
+<span class="go">       &#39;wav/03b10Na.wav&#39;, &#39;wav/03b10Nc.wav&#39;, &#39;wav/03b10Wb.wav&#39;,</span>
+<span class="go">       &#39;wav/03b10Wc.wav&#39;],</span>
+<span class="go">      dtype=&#39;string&#39;, name=&#39;file&#39;)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>file</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>wav/03a01Fa.wav</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>wav/03a01Nc.wav</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>wav/03a01Wa.wav</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>46</th>
-      <td>wav/03b10Nc.wav</td>
-    </tr>
-    <tr>
-      <th>47</th>
-      <td>wav/03b10Wb.wav</td>
-    </tr>
-    <tr>
-      <th>48</th>
-      <td>wav/03b10Wc.wav</td>
-    </tr>
-  </tbody>
-</table>
-<p>49 rows × 1 columns</p>
-</div></div></div>
 </div>
 <p>Finally, we load the database again
 and use the list to request
 only the data of this speaker.</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
     <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
@@ -787,80 +463,15 @@ only the data of this speaker.</p>
 <p>This will also remove
 entries of other speakers
 from the tables.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">                   emotion  emotion.confidence</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  happiness                0.90</span>
+<span class="go">wav/03a01Nc.wav    neutral                1.00</span>
+<span class="go">wav/03a01Wa.wav      anger                0.95</span>
+<span class="go">wav/03a02Fc.wav  happiness                0.85</span>
+<span class="go">wav/03a02Nc.wav    neutral                1.00</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>emotion</th>
-      <th>emotion.confidence</th>
-    </tr>
-    <tr>
-      <th>file</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>wav/03a01Fa.wav</th>
-      <td>happiness</td>
-      <td>0.90</td>
-    </tr>
-    <tr>
-      <th>wav/03a01Nc.wav</th>
-      <td>neutral</td>
-      <td>1.00</td>
-    </tr>
-    <tr>
-      <th>wav/03a01Wa.wav</th>
-      <td>anger</td>
-      <td>0.95</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>wav/03b10Nc.wav</th>
-      <td>neutral</td>
-      <td>0.80</td>
-    </tr>
-    <tr>
-      <th>wav/03b10Wb.wav</th>
-      <td>anger</td>
-      <td>0.95</td>
-    </tr>
-    <tr>
-      <th>wav/03b10Wc.wav</th>
-      <td>anger</td>
-      <td>1.00</td>
-    </tr>
-  </tbody>
-</table>
-<p>49 rows × 2 columns</p>
-</div></div></div>
 </div>
 </div>
 <div class="section" id="streaming">
@@ -873,10 +484,6 @@ and download only matching media files
 in each iteration.
 The table and media files
 are still stored in the cache.</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
     <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
     <span class="s2">&quot;emotion&quot;</span><span class="p">,</span>
@@ -891,73 +498,21 @@ are still stored in the cache.</p>
 which behaves as <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a>,
 but provides the ability
 to iterate over the database:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">next</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">                   emotion  emotion.confidence</span>
+<span class="go">file</span>
+<span class="go">wav/03a01Fa.wav  happiness                0.90</span>
+<span class="go">wav/03a01Nc.wav    neutral                1.00</span>
+<span class="go">wav/03a01Wa.wav      anger                0.95</span>
+<span class="go">wav/03a02Fc.wav  happiness                0.85</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>emotion</th>
-      <th>emotion.confidence</th>
-    </tr>
-    <tr>
-      <th>file</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>wav/03a01Fa.wav</th>
-      <td>happiness</td>
-      <td>0.90</td>
-    </tr>
-    <tr>
-      <th>wav/03a01Nc.wav</th>
-      <td>neutral</td>
-      <td>1.00</td>
-    </tr>
-    <tr>
-      <th>wav/03a01Wa.wav</th>
-      <td>anger</td>
-      <td>0.95</td>
-    </tr>
-    <tr>
-      <th>wav/03a02Fc.wav</th>
-      <td>happiness</td>
-      <td>0.85</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
 </div>
 <p>With <code class="docutils literal notranslate"><span class="pre">shuffle=True</span></code>,
 a user can request
 that the data is returned in a random order.
 <a class="reference internal" href="api/audb.stream.html#audb.stream" title="audb.stream"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.stream()</span></code></a> will then load <code class="docutils literal notranslate"><span class="pre">buffer_size</span></code> of rows
 into an buffer and selected randomly from those.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
     <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
@@ -970,62 +525,16 @@ into an buffer and selected randomly from those.</p>
     <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">next</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>emotion</th>
-      <th>emotion.confidence</th>
-    </tr>
-    <tr>
-      <th>file</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>wav/14a05Fb.wav</th>
-      <td>happiness</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>wav/15a05Eb.wav</th>
-      <td>disgust</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>wav/12a05Nd.wav</th>
-      <td>neutral</td>
-      <td>0.9</td>
-    </tr>
-    <tr>
-      <th>wav/13a07Na.wav</th>
-      <td>neutral</td>
-      <td>0.9</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">                   emotion  emotion.confidence</span>
+<span class="go">file</span>
+<span class="go">wav/14a05Fb.wav  happiness                 1.0</span>
+<span class="go">wav/15a05Eb.wav    disgust                 1.0</span>
+<span class="go">wav/12a05Nd.wav    neutral                 0.9</span>
+<span class="go">wav/13a07Na.wav    neutral                 0.9</span>
+</pre></div>
 </div>
 </div>
 </div>
@@ -1053,7 +562,7 @@ into an buffer and selected randomly from those.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1093,9 +602,6 @@ into an buffer and selected randomly from those.</p>
         <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
-        <script src="_static/thebelab-helper.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   

@@ -30,8 +30,6 @@
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Publish a database" href="publish.html" />
@@ -70,7 +68,7 @@
             
             
               <div class="version">
-                v1.10.2
+                v1.11.0
               </div>
             
           
@@ -179,7 +177,7 @@ or <a class="reference internal" href="load.html#load"><span class="std std-ref"
 <div class="section" id="backends">
 <h2>Backends<a class="headerlink" href="#backends" title="Permalink to this heading">¶</a></h2>
 <p><a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> abstracts the database storage
-by using the <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.html#module-audbackend" title="(in audbackend v2.2.0)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audbackend</span></code></a> package
+by using the <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.html#module-audbackend" title="(in audbackend v2.2.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audbackend</span></code></a> package
 to communicate with the underlying backend.
 At the moment,
 it supports to store the data
@@ -196,22 +194,12 @@ For example,
 to store all your data
 on your local disk under <code class="file docutils literal notranslate"><span class="pre">/data/data-local</span></code>
 you would use the following repository.</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">repository</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">repository</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;data-local&quot;</span><span class="p">,</span>
     <span class="n">host</span><span class="o">=</span><span class="s2">&quot;/data&quot;</span><span class="p">,</span>
     <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;file-system&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-</div>
 </div>
 <p>The default repositories are configured in <a class="reference internal" href="api/audb.config.html#audb.config.REPOSITORIES" title="audb.config.REPOSITORIES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code></a>
 and can be managed best
@@ -350,7 +338,7 @@ the audio files (optional)</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -390,9 +378,6 @@ the audio files (optional)</p></li>
         <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
-        <script src="_static/thebelab-helper.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   

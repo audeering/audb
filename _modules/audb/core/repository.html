@@ -30,8 +30,6 @@
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/thebelab.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     
@@ -68,7 +66,7 @@
             
             
               <div class="version">
-                v1.10.2
+                v1.11.0
               </div>
             
           
@@ -151,7 +149,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audb.core.repository</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">audbackend</span>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">audbackend</span>
 
 
 <div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository">[docs]</a><span class="k">class</span> <span class="nc">Repository</span><span class="p">:</span>
@@ -185,7 +185,7 @@
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s2">&quot;Artifactory&quot;</span><span class="p">):</span>
-        <span class="n">_backends</span><span class="p">[</span><span class="s2">&quot;artifactory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Artifactory</span>
+        <span class="n">_backends</span><span class="p">[</span><span class="s2">&quot;artifactory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Artifactory</span>  <span class="c1"># pragma: no cover</span>
 
     <span class="n">backend_registry</span> <span class="o">=</span> <span class="n">_backends</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Backend registry.</span>
@@ -270,11 +270,21 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            interface to repository</span>
 
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if an artifactory backend is requested in Python&gt;=3.12</span>
+<span class="sd">            ValueError: if a non-supported backend is requested</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
+                <span class="s2">&quot;The &#39;artifactory&#39; backend is not supported in Python&gt;=3.12&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39; is not a registered backend&quot;</span><span class="p">)</span>
         <span class="n">backend_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">]</span>
         <span class="n">backend</span> <span class="o">=</span> <span class="n">backend_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
-            <span class="n">interface</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Maven</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
+            <span class="n">interface</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Maven</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">interface</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Versioned</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">interface</span></div>
@@ -301,7 +311,7 @@
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; import audbackend</span>
-<span class="sd">            &gt;&gt;&gt; Repository.register(&quot;file-system&quot;, audbackend.backend.FileSystem)</span>
+<span class="sd">            &gt;&gt;&gt; audb.Repository.register(&quot;file-system&quot;, audbackend.backend.FileSystem)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">[</span><span class="n">backend_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">backend_class</span></div></div>
@@ -320,7 +330,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -360,9 +370,6 @@
         <script src="../../../_static/sphinx_highlight.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>
-        <script src="../../../_static/thebelab-helper.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   

@@ -1,95 +1,89 @@
-.. Specify repository to overwrite local config files
-.. jupyter-execute::
-    :hide-code:
-    :hide-output:
-
-    import audb
-
-    audb.config.REPOSITORIES = [
-        audb.Repository(
-            name="data-public",
-            host="https://audeering.jfrog.io/artifactory",
-            backend="artifactory",
-        )
-    ]
-
 .. _quickstart:
 
 Quickstart
 ==========
 
-The most common task is to load a database
-with :func:`audb.load`.
-
-Let's first see which databases are available
-on our `public Artifactory server`_.
-
-
-.. jupyter-execute::
-
-    import audb
-
-    audb.available(only_latest=True)
-
-Let's load version 1.4.1 of the emodb_ database.
+Browse `available datasets`_ and select one.
+We load emodb_,
+which is returned
+as an :class:`audformat.Database`.
 
 .. Load with only_metadata=True in the background
-.. jupyter-execute::
-    :hide-code:
+.. invisible-code-block: python
 
     db = audb.load(
         "emodb",
         version="1.4.1",
         only_metadata=True,
+        full_path=False,
         verbose=False,
     )
+    # Add flavor path, to mimic `full_path=True`
+    flavor_path = audb.flavor_path("emodb", "1.4.1").replace("\\", "/")
+    for table in list(db.tables):
+        db[table]._df.index = f"...{flavor_path}/" + db[table]._df.index
 
-.. code-block:: python
+.. skip: next
 
-    db = audb.load("emodb", version="1.4.1", verbose=False)
+>>> db = audb.load("emodb", version="1.4.1")
 
-This downloads the database header,
-all the media files,
-and tables with annotations
-to a caching folder on your machine.
-The database is then returned
-as an :class:`audformat.Database` object.
+Inspect label schemes,
+and request emotion labels for the test split.
 
-Each database comes with a description,
-which is a good starting point
-to learn what the database is all about.
+>>> list(db.schemes)
+['age',
+ 'confidence',
+ 'duration',
+ 'emotion',
+ 'gender',
+ 'language',
+ 'speaker',
+ 'transcription']
+>>> db.get("emotion", splits="test")  # returns dataframe
+                       emotion
+file
+.../wav/12a01Fb.wav  happiness
+.../wav/12a01Lb.wav    boredom
+.../wav/12a01Nb.wav    neutral
+.../wav/12a01Wc.wav      anger
+.../wav/12a02Ac.wav       fear
+...                        ...
 
-.. jupyter-execute::
+Or inspect tables,
+and request labels from a table.
 
-    db.description
+>>> list(db)
+['emotion',
+ 'emotion.categories.test.gold_standard',
+ 'emotion.categories.train.gold_standard',
+ 'files',
+ 'speaker']
+>>> db["emotion.categories.test.gold_standard"].get()  # returns dataframe
+                       emotion  emotion.confidence
+file
+.../wav/12a01Fb.wav  happiness                0.95
+.../wav/12a01Lb.wav    boredom                0.90
+.../wav/12a01Nb.wav    neutral                0.95
+.../wav/12a01Wc.wav      anger                0.95
+.../wav/12a02Ac.wav       fear                0.90
+...                        ...                 ...
 
-The annotations of a database are stored in
-tables represented by :class:`audformat.Table`.
+Load a media file,
+selected from the index of the dataframe
+or from the files index ``db.files``.
 
-.. jupyter-execute::
+.. skip: start
 
-    db.tables
+>>> import audiofile
+>>> signal, sampling_rate = audiofile.read(db.files[0])
 
-Each table contains columns (:class:`audformat.Column`)
-that have corresponding schemes (:class:`audformat.Scheme`)
-describing its content.
-For example,
-to get an idea about the emotion annotations
-stored in the ``emotion`` column,
-we can inspect the corresponding scheme.
+Listen to the signal.
 
-.. jupyter-execute::
+>>> import sounddevice
+>>> sounddevice.play(signal.T, sampling_rate)
 
-    db.schemes["emotion"]
-
-Finally, we get the actual annotations
-as a :class:`pandas.DataFrame`.
-
-.. jupyter-execute::
-
-    df = db["emotion"].get()  # get table
-    df[:3]  # show first three entries
+.. skip: end
 
 
 .. _emodb: https://github.com/audeering/emodb
-.. _public Artifactory server: https://audeering.jfrog.io/artifactory
+.. _available datasets: https://audeering.github.io/datasets/datasets.html

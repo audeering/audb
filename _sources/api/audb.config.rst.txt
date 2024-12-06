@@ -6,9 +6,6 @@
 .. autoclass:: config
 
 
-\_\_eq\_\_\(\)
---------------
-.. automethod:: config.__eq__
     
 CACHE\_ROOT
 -----------

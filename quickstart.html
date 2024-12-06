@@ -30,8 +30,6 @@
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Overview" href="overview.html" />
@@ -70,7 +68,7 @@
             
             
               <div class="version">
-                v1.10.2
+                v1.11.0
               </div>
             
           
@@ -152,252 +150,67 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
-<div class="section" id="quickstart">
+  <div class="section" id="quickstart">
 <span id="id1"></span><h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading">¶</a></h1>
-<p>The most common task is to load a database
-with <a class="reference internal" href="api/audb.load.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
-<p>Let’s first see which databases are available
-on our <a class="reference external" href="https://audeering.jfrog.io/artifactory">public Artifactory server</a>.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audb</span>
-
-<span class="n">audb</span><span class="o">.</span><span class="n">available</span><span class="p">(</span><span class="n">only_latest</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<p>Browse <a class="reference external" href="https://audeering.github.io/datasets/datasets.html">available datasets</a> and select one.
+We load <a class="reference external" href="https://github.com/audeering/emodb">emodb</a>,
+which is returned
+as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>backend</th>
-      <th>host</th>
-      <th>repository</th>
-      <th>version</th>
-    </tr>
-    <tr>
-      <th>name</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>air</th>
-      <td>artifactory</td>
-      <td>https://audeering.jfrog.io/artifactory</td>
-      <td>data-public</td>
-      <td>1.4.2</td>
-    </tr>
-    <tr>
-      <th>cough-speech-sneeze</th>
-      <td>artifactory</td>
-      <td>https://audeering.jfrog.io/artifactory</td>
-      <td>data-public</td>
-      <td>2.0.1</td>
-    </tr>
-    <tr>
-      <th>crema-d</th>
-      <td>artifactory</td>
-      <td>https://audeering.jfrog.io/artifactory</td>
-      <td>data-public</td>
-      <td>1.3.0</td>
-    </tr>
-    <tr>
-      <th>emodb</th>
-      <td>artifactory</td>
-      <td>https://audeering.jfrog.io/artifactory</td>
-      <td>data-public</td>
-      <td>1.4.1</td>
-    </tr>
-    <tr>
-      <th>micirp</th>
-      <td>artifactory</td>
-      <td>https://audeering.jfrog.io/artifactory</td>
-      <td>data-public</td>
-      <td>1.0.0</td>
-    </tr>
-    <tr>
-      <th>musan</th>
-      <td>artifactory</td>
-      <td>https://audeering.jfrog.io/artifactory</td>
-      <td>data-public</td>
-      <td>1.0.0</td>
-    </tr>
-    <tr>
-      <th>vadtoolkit</th>
-      <td>artifactory</td>
-      <td>https://audeering.jfrog.io/artifactory</td>
-      <td>data-public</td>
-      <td>1.1.0</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<p>Let’s load version 1.4.1 of the <a class="reference external" href="https://github.com/audeering/emodb">emodb</a> database.</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<p>Inspect label schemes,
+and request emotion labels for the test split.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">schemes</span><span class="p">)</span>
+<span class="go">[&#39;age&#39;,</span>
+<span class="go"> &#39;confidence&#39;,</span>
+<span class="go"> &#39;duration&#39;,</span>
+<span class="go"> &#39;emotion&#39;,</span>
+<span class="go"> &#39;gender&#39;,</span>
+<span class="go"> &#39;language&#39;,</span>
+<span class="go"> &#39;speaker&#39;,</span>
+<span class="go"> &#39;transcription&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="n">splits</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>  <span class="c1"># returns dataframe</span>
+<span class="go">                       emotion</span>
+<span class="go">file</span>
+<span class="go">.../wav/12a01Fb.wav  happiness</span>
+<span class="go">.../wav/12a01Lb.wav    boredom</span>
+<span class="go">.../wav/12a01Nb.wav    neutral</span>
+<span class="go">.../wav/12a01Wc.wav      anger</span>
+<span class="go">.../wav/12a02Ac.wav       fear</span>
+<span class="go">...                        ...</span>
 </pre></div>
 </div>
-<p>This downloads the database header,
-all the media files,
-and tables with annotations
-to a caching folder on your machine.
-The database is then returned
-as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.</p>
-<p>Each database comes with a description,
-which is a good starting point
-to learn what the database is all about.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">description</span>
+<p>Or inspect tables,
+and request labels from a table.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<span class="go">[&#39;emotion&#39;,</span>
+<span class="go"> &#39;emotion.categories.test.gold_standard&#39;,</span>
+<span class="go"> &#39;emotion.categories.train.gold_standard&#39;,</span>
+<span class="go"> &#39;files&#39;,</span>
+<span class="go"> &#39;speaker&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion.categories.test.gold_standard&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>  <span class="c1"># returns dataframe</span>
+<span class="go">                       emotion  emotion.confidence</span>
+<span class="go">file</span>
+<span class="go">.../wav/12a01Fb.wav  happiness                0.95</span>
+<span class="go">.../wav/12a01Lb.wav    boredom                0.90</span>
+<span class="go">.../wav/12a01Nb.wav    neutral                0.95</span>
+<span class="go">.../wav/12a01Wc.wav      anger                0.95</span>
+<span class="go">.../wav/12a02Ac.wav       fear                0.90</span>
+<span class="go">...                        ...                 ...</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;Berlin Database of Emotional Speech. A German database of emotional utterances spoken by actors recorded as a part of the DFG funded research project SE462/3-1 in 1997 and 1999. Recordings took place in the anechoic chamber of the Technical University Berlin, department of Technical Acoustics. It contains about 500 utterances from ten different actors expressing basic six emotions and neutral.&#39;
+<p>Load a media file,
+selected from the index of the dataframe
+or from the files index <code class="docutils literal notranslate"><span class="pre">db.files</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">audiofile</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-</div>
-</div>
-<p>The annotations of a database are stored in
-tables represented by <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Table.html#audformat.Table" title="(in audformat vv1.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Table</span></code></a>.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
+<p>Listen to the signal.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sounddevice</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sounddevice</span><span class="o">.</span><span class="n">play</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>emotion:
-  type: filewise
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-emotion.categories.test.gold_standard:
-  type: filewise
-  split_id: test
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-emotion.categories.train.gold_standard:
-  type: filewise
-  split_id: train
-  columns:
-    emotion: {scheme_id: emotion, rater_id: gold}
-    emotion.confidence: {scheme_id: confidence, rater_id: gold}
-files:
-  type: filewise
-  columns:
-    duration: {scheme_id: duration}
-    speaker: {scheme_id: speaker}
-    transcription: {scheme_id: transcription}
-</pre></div>
-</div>
-</div>
-</div>
-<p>Each table contains columns (<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Column.html#audformat.Column" title="(in audformat vv1.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Column</span></code></a>)
-that have corresponding schemes (<a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Scheme.html#audformat.Scheme" title="(in audformat vv1.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Scheme</span></code></a>)
-describing its content.
-For example,
-to get an idea about the emotion annotations
-stored in the <code class="docutils literal notranslate"><span class="pre">emotion</span></code> column,
-we can inspect the corresponding scheme.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">schemes</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>description: Six basic emotions and neutral.
-dtype: str
-labels: [anger, boredom, disgust, fear, happiness, sadness, neutral]
-</pre></div>
-</div>
-</div>
-</div>
-<p>Finally, we get the actual annotations
-as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>  <span class="c1"># get table</span>
-<span class="n">df</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># show first three entries</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>emotion</th>
-      <th>emotion.confidence</th>
-    </tr>
-    <tr>
-      <th>file</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a01Fa.wav</th>
-      <td>happiness</td>
-      <td>0.90</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a01Nc.wav</th>
-      <td>neutral</td>
-      <td>1.00</td>
-    </tr>
-    <tr>
-      <th>/home/runner/audb/emodb/1.4.1/d3b62a9b/wav/03a01Wa.wav</th>
-      <td>anger</td>
-      <td>0.95</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
 </div>
 </div>
 
@@ -424,7 +237,7 @@ as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/s
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/18 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -464,9 +277,6 @@ as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/s
         <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
-        <script src="_static/thebelab-helper.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   
