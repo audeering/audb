@@ -4,6 +4,3 @@ repositories:
   - name: audb-public
     backend: s3
     host: s3.dualstack.eu-north-1.amazonaws.com
-  - name: data-local
-    backend: file-system
-    host: ~/audb-host
