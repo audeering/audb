@@ -23,7 +23,7 @@ using :class:`audb.config`.
 '/data/audb'
 
 >>> audb.config.REPOSITORIES
-[Repository('audb-public', 's3.dualstack.eu-north-1.amazonaws.com', 's3'), Repository('data-local', '~/audb-host', 'file-system')]
+[Repository('audb-public', 's3.dualstack.eu-north-1.amazonaws.com', 's3')]
 
 >>> audb.config.CACHE_ROOT = "/user/cache"
 >>> audb.config.CACHE_ROOT
