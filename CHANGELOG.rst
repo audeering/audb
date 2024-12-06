@@ -32,9 +32,8 @@ Version 1.11.0 (2024-12-06)
   of the documentation
 * Changed: depend on ``audbackend>=2.2.1``
 * Changed: depend on ``audeer>=2.2.0``
-* Deprecated: a sampling rate of 22500 Hz
-  as possible flavor
-* Removed: file system repository from default configuration
+* Deprecated: a sampling rate of 22500 Hz as flavor
+* Removed: file-system repository from default configuration
 * Fixed: handle an empty configuration file
 
 
