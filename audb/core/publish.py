@@ -653,6 +653,8 @@ def publish(
         ValueError: if ``version`` or ``previous_version``
             cannot be parsed by :class:`audeer.StrictVersion`
         ValueError: if ``previous_version`` >= ``version``
+        ValueError: if ``repository`` has artifactory as backend in Python>=3.12
+        ValueError: if ``repository`` has a non-supported backend
 
     """
     # Enforce error if version cannot be converted to audeer.StrictVersion

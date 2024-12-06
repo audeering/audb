@@ -113,3 +113,38 @@ def test_repository_create_backend_interface(
     assert isinstance(backend_interface, expected_interface)
     assert isinstance(backend_interface.backend, expected_backend)
     assert not backend_interface.backend.opened
+
+
+@pytest.mark.parametrize(
+    "backend, host, repo, expected_error_msg, expected_error",
+    [
+        (
+            "custom",
+            "host",
+            "repo",
+            "'custom' is not a registered backend",
+            ValueError,
+        ),
+        pytest.param(
+            "artifactory",
+            "host",
+            "repo",
+            "The 'artifactory' backend is not supported in Python>=3.12",
+            ValueError,
+            marks=pytest.mark.skipif(
+                sys.version_info < (3, 12),
+                reason="Should only fail for Python>=3.12",
+            ),
+        ),
+    ],
+)
+def test_repository_create_backend_interface_errors(
+    backend,
+    host,
+    repo,
+    expected_error_msg,
+    expected_error,
+):
+    repository = audb.Repository(repo, host, backend)
+    with pytest.raises(expected_error, match=expected_error_msg):
+        repository.create_backend_interface()
