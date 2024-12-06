@@ -1,3 +1,5 @@
+import sys
+
 import audbackend
 
 
@@ -117,7 +119,15 @@ class Repository:
         Returns:
             interface to repository
 
+        Raises:
+            ValueError: if an artifactory backend is requested in Python>=3.12
+            ValueError: if a non-supported backend is requested
+
         """
+        if sys.version_info >= (3, 12) and self.backend == "artifactory":
+            raise ValueError("The 'artifactory' backend is not support in Python>=3.12")
+        if self.backend not in self.backend_registry:
+            raise ValueError(f"'{self.backend}' is not a registered backend")
         backend_class = self.backend_registry[self.backend]
         backend = backend_class(self.host, self.name)
         if self.backend == "artifactory":
