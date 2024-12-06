@@ -16,7 +16,7 @@ Version 1.11.0 (2024-12-06)
   (without Artifactory backend)
 * Added: support for Python 3.12
   (without Artifactory backend)
-* Changed: switched default repository
+* Changed: switch default repository
   to ``audb-public``,
   hosted on S3
 * Changed: ``audb.Repository.create_backend_interface()``
@@ -24,11 +24,10 @@ Version 1.11.0 (2024-12-06)
   now raise a ``ValueError``
   for a repository with non-registered backends,
   or an Artifactory backend under Python>=3.12
-* Changed: all functions
-  with read-only access to repositories
-  now skip non-registered backends
+* Changed: skip non-registered backends
   without raising an error
-* Changed: simplified quickstart section
+  in all functions with read-only access to repositories
+* Changed: simplify quickstart section
   of the documentation
 * Changed: depend on ``audbackend>=2.2.1``
 * Changed: depend on ``audeer>=2.2.0``
