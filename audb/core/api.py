@@ -101,7 +101,7 @@ def available(
                             name = path.split("/")[1]
                             add_database(name, version, repository)
 
-        except audbackend.BackendError:
+        except (audbackend.BackendError, ValueError):
             continue
 
     df = pd.DataFrame.from_records(
@@ -635,7 +635,7 @@ def versions(
                             suppress_backend_errors=True,
                         )
                     )
-        except audbackend.BackendError:
+        except (audbackend.BackendError, ValueError):
             # If the backend cannot be accessed,
             # e.g. host or repository do not exist,
             # we skip it
