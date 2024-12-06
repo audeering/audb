@@ -7,6 +7,37 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.11.0 (2024-12-06)
+---------------------------
+
+* Added: a sampling rate of 24000 Hz as flavor
+* Added: a sampling rate of 22050 Hz as flavor
+* Added: support for Python 3.13
+  (without Artifactory backend)
+* Added: support for Python 3.12
+  (without Artifactory backend)
+* Changed: switched default repository
+  to ``audb-public``,
+  hosted on S3
+* Changed: ``audb.Repository.create_backend_interface()``
+  and ``audb.publish()``
+  now raise a ``ValueError``
+  for an repository with non-registered backend,
+  or an Artifactory backend under Python>=3.12
+* Changed: all functions
+  with read-only access to repositories
+  now skip non-registered backends
+  without raising an error
+* Changed: simplified quickstart section
+  of the documentation
+* Changed: depend on ``audbackend>=2.2.1``
+* Changed: depend on ``audeer>=2.2.0``
+* Deprecated: a sampling rate of 22500 Hz
+  as possible flavor
+* Removed: file system repository from default configuration
+* Fixed: handle an empty configuration file
+
+
 Version 1.10.2 (2024-11-18)
 ---------------------------
 
