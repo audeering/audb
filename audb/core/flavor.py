@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 import os
 import shutil
+import warnings
 
 import numpy as np
 
@@ -81,7 +82,14 @@ class Flavor(audobject.Object):
 
         if sampling_rate is not None:
             sampling_rate = int(sampling_rate)
-            if sampling_rate not in define.SAMPLING_RATES:
+            if sampling_rate == 22500:
+                message = (
+                    "A sampling rate of 22500 Hz is deprecated "
+                    "and will be removed with version 1.13.0 of audb. "
+                    "Use 22050 Hz instead."
+                )
+                warnings.warn(message, category=UserWarning, stacklevel=2)
+            elif sampling_rate not in define.SAMPLING_RATES:
                 raise ValueError(
                     f"Sampling_rate has to be one of "
                     f"{define.SAMPLING_RATES}, not {sampling_rate}."
