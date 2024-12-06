@@ -1,4 +1,5 @@
 import os
+import sys
 
 import audeer
 import audformat
@@ -22,14 +23,25 @@ def test_available(repository):
     # Non existing repo
     name = "non-existing-repo"
     audb.config.REPOSITORIES = [
-        audb.Repository(
-            name=name,
-            host=repository.host,
-            backend=repository.backend,
-        )
+        audb.Repository(name, repository.host, repository.backend)
     ]
     df = audb.available()
     assert len(df) == 0
+
+    # Non existing backend
+    audb.config.REPOSITORIES = [
+        audb.Repository(repository.name, repository.host, "custom")
+    ]
+    df = audb.available()
+    assert len(df) == 0
+
+    # artifactory backend and Python>=3.12
+    if sys.version_info >= (3, 12):
+        audb.config.REPOSITORIES = [
+            audb.Repository(repository.name, repository.host, "artifactory")
+        ]
+        df = audb.available()
+        assert len(df) == 0
 
 
 def test_available_broken_dataset(private_and_public_repository):

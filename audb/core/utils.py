@@ -91,7 +91,7 @@ def _lookup(
         try:
             backend_interface = repository.create_backend_interface()
             backend_interface.backend.open()
-        except audbackend.BackendError:
+        except (audbackend.BackendError, ValueError):
             continue
 
         header = backend_interface.join("/", name, "db.yaml")
