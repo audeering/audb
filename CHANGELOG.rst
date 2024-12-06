@@ -22,7 +22,7 @@ Version 1.11.0 (2024-12-06)
 * Changed: ``audb.Repository.create_backend_interface()``
   and ``audb.publish()``
   now raise a ``ValueError``
-  for an repository with non-registered backend,
+  for a repository with non-registered backends,
   or an Artifactory backend under Python>=3.12
 * Changed: all functions
   with read-only access to repositories
