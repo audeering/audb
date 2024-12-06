@@ -73,6 +73,13 @@ def test_init(bit_depth, channels, format, mixdown, sampling_rate):
     assert flavor.id == flavor_2.id
 
 
+def test_deprecated_sampling_rate():
+    """Test a sampling rate of 22500 Hz raises user warning."""
+    message = "removed with version 1.13.0"
+    with pytest.warns(UserWarning, match=message):
+        audb.Flavor(sampling_rate=22500)
+
+
 @pytest.mark.parametrize(
     "format",
     [
