@@ -143,7 +143,7 @@ The following properties can be changed.
     sampling_rate:
       - 8000
       - 16000
-      - 22500
+      - 22050
       - 24000
       - 44100
       - 48000
