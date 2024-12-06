@@ -860,23 +860,21 @@ def _missing_files(
         list of missing files or table IDs
 
     """
-    missing_files = []
 
-    for file in audeer.progress_bar(
-        files,
-        desc=f"Missing {files_type}",
-        disable=not verbose,
-    ):
+    def is_cached(file):
         if files_type == "table":
-            if not os.path.exists(
-                os.path.join(db_root, f"db.{file}.csv")
-            ) and not os.path.exists(os.path.join(db_root, f"db.{file}.parquet")):
-                missing_files.append(file)
+            path1 = os.path.join(db_root, f"db.{file}.csv")
+            path2 = os.path.join(db_root, f"db.{file}.parquet")
+            return os.path.exists(path1) or os.path.exists(path2)
+        elif files_type == "media" and flavor.format is not None:
+            # https://github.com/audeering/audb/issues/324
+            cached_file = audeer.replace_file_extension(file, flavor.format)
+            return os.path.exists(os.path.join(db_root, cached_file))
         else:
-            if not os.path.exists(os.path.join(db_root, file)):
-                missing_files.append(file)
+            return os.path.exists(os.path.join(db_root, file))
 
-    return missing_files
+    pbar = audeer.progress_bar(files, desc=f"Missing {files_type}", disable=not verbose)
+    return [file for file in pbar if not is_cached(file)]
 
 
 def _remove_media(
