@@ -57,6 +57,27 @@ def test_available_broken_dataset(private_and_public_repository):
     assert "broken-dataset" not in df
 
 
+def test_available_repositories(tmpdir):
+    """Test repositories argument of available()."""
+    repositories = []
+    for n in range(2):
+        host = audeer.mkdir(tmpdir, f"host{n}")
+        repo = f"repo{n}"
+        repositories.append(audb.Repository(repo, host, "file-system"))
+        # Fake dataset by adding db.yaml file
+        audeer.touch(audeer.mkdir(host, repo, f"name{n}", "1.0.0"), "db.yaml")
+    df = audb.available(repositories=repositories)
+    assert len(df) == 2
+    for n, repository in enumerate(repositories):
+        # Test for string and list arguments
+        for repo_test in [repository, [repository]]:
+            df = audb.available(repositories=repo_test)
+            assert len(df) == 1
+            assert df.host.iloc[0] == repository.host
+            assert df.repository.iloc[0] == repository.name
+            assert df.index[0] == f"name{n}"
+
+
 def test_versions(tmpdir, repository):
     """Test versions() for non existing repositories.
 
