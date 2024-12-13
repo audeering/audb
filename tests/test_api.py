@@ -1,4 +1,4 @@
-import os
+import pytest
 
 import audeer
 import audformat
@@ -6,55 +6,144 @@ import audformat
 import audb
 
 
-def test_available(repository):
-    # Broken database in repo
-    name = "non-existing-database"
-    path = os.path.join(
-        repository.host,
-        repository.name,
-        name,
+class TestAvailable:
+    r"""Test collecting available datasets."""
+
+    @classmethod
+    @pytest.fixture(scope="class", autouse=True)
+    def setup(cls, tmpdir_factory):
+        r"""Prepare repositories and datasets.
+
+        Create two repositories
+        with different hosts, repositories and datasets:
+
+        * ``<tmpdir>/host0/repo0/name0/1.0.0/db.yaml``
+        * ``<tmpdir>/host1/repo1/name1/1.0.0/db.yaml``
+
+        The repositories are then set in ``audb.config.REPOSITORIES``.
+
+        Args:
+            tmpdir_factory: tmpdir_factory fixture
+
+        """
+        current_repositories = audb.config.REPOSITORIES
+        # First repository
+        host0 = str(tmpdir_factory.mktemp("host0"))
+        audeer.touch(audeer.mkdir(host0, "repo0", "name0", "1.0.0"), "db.yaml")
+        # Second repository
+        host1 = str(tmpdir_factory.mktemp("host1"))
+        audeer.touch(audeer.mkdir(host1, "repo1", "name1", "1.0.0"), "db.yaml")
+        audb.config.REPOSITORIES = [
+            audb.Repository("repo0", host0, "file-system"),
+            audb.Repository("repo1", host1, "file-system"),
+        ]
+        yield
+        audb.config.REPOSITORIES = current_repositories
+
+    @pytest.fixture(scope="function", autouse=False)
+    def repository_with_broken_database(self):
+        """Create repository with empty folder.
+
+        Adds an empty folder ``"no-database"``
+        to the first repository.
+
+        """
+        repository = audb.config.REPOSITORIES[0]
+        empty_folder = audeer.mkdir(repository.host, repository.name, "no-database")
+        yield
+        audeer.rmdir(empty_folder)
+
+    @pytest.fixture(scope="function", autouse=False)
+    def non_existing_repository(self):
+        """Add non-existing repository to config."""
+        repository = audb.config.REPOSITORIES[0]
+        audb.config.REPOSITORIES.append(
+            audb.Repository("non-existing", repository.host, "file-system")
+        )
+        yield
+        audb.config.REPOSITORIES = audb.config.REPOSITORIES[:-1]
+
+    @pytest.fixture(scope="function", autouse=False)
+    def non_existing_artifactory_host(self):
+        """Add non-existing host on Artifactory backend.
+
+        This should also not fail under Python 3.12,
+        which no longher supports Artifactory.
+
+        """
+        audb.config.REPOSITORIES.append(
+            audb.Repository("repo", "https:artifactory.url.com", "artifactory")
+        )
+        yield
+        audb.config.REPOSITORIES = audb.config.REPOSITORIES[:-1]
+
+    @pytest.fixture(scope="function", autouse=False)
+    def additional_version(self):
+        """Publish a second version of first database."""
+        repository = audb.config.REPOSITORIES[0]
+        version2 = audeer.path(repository.host, "repo0", "name0", "2.0.0")
+        audeer.touch(audeer.mkdir(version2), "db.yaml")
+        yield
+        audeer.rmdir(version2)
+
+    def test_default(self):
+        """Test available databases with default arguments."""
+        df = audb.available()
+        assert len(df) == 2
+        assert "name0" in df.index
+        assert "name1" in df.index
+
+    def test_broken_database(self, repository_with_broken_database):
+        """Test having a database only given as a folder."""
+        df = audb.available()
+        assert len(df) == 2
+        assert "name0" in df.index
+        assert "name1" in df.index
+        assert "no-database" not in df.index
+
+    def test_non_existing_repository(self, non_existing_repository):
+        """Test having a non-existing repository in config."""
+        df = audb.available()
+        assert len(df) == 2
+        assert "name0" in df.index
+        assert "name1" in df.index
+
+    def test_non_existing_artifactory_host(self, non_existing_artifactory_host):
+        """Test having a non-existing host on an Artifactory backend."""
+        df = audb.available()
+        assert len(df) == 2
+        assert "name0" in df.index
+        assert "name1" in df.index
+
+    @pytest.mark.parametrize(
+        "only_latest, expected_databases, expected_versions",
+        [
+            (True, ["name0", "name1"], ["2.0.0", "1.0.0"]),
+            (False, ["name0", "name0", "name1"], ["1.0.0", "2.0.0", "1.0.0"]),
+        ],
     )
-    path = audeer.mkdir(path)
-    df = audb.available()
-    os.rmdir(path)
-    assert len(df) == 0
+    def test_latest_version(
+        self,
+        additional_version,
+        only_latest,
+        expected_databases,
+        expected_versions,
+    ):
+        """Test only_latest argument.
 
-    # Non existing repo
-    name = "non-existing-repo"
-    audb.config.REPOSITORIES = [
-        audb.Repository(name, repository.host, repository.backend)
-    ]
-    df = audb.available()
-    assert len(df) == 0
+        Args:
+            additional_version: additional_version fixture
+            only_latest: only_latest argument of audb.available()
+            expected_databases: expected database names
+                in index of dataframe
+            expected_versions: expected database version
+                in version column of dataframe
 
-    # Non existing backend
-    audb.config.REPOSITORIES = [
-        audb.Repository(repository.name, repository.host, "custom")
-    ]
-    df = audb.available()
-    assert len(df) == 0
-
-    # artifactory backend with non-existing host,
-    # and non-support under Python>=3.12
-    audb.config.REPOSITORIES = [
-        audb.Repository("repo", "https:artifactory.url.com", "artifactory")
-    ]
-    df = audb.available()
-    assert len(df) == 0
-
-
-def test_available_broken_dataset(private_and_public_repository):
-    """Test for listing datasets, including a broken one.
-
-    This uses the public repositories,
-    from which ``data-public2``
-    includes ``broken-dataset``,
-    which has a missing ``db`` folder.
-
-    """
-    df = audb.available(only_latest=True)
-    assert len(df) > 0
-    assert "broken-dataset" not in df
+        """
+        df = audb.available(only_latest=only_latest)
+        assert len(df) == len(expected_databases)
+        assert list(df.index) == expected_databases
+        assert list(df["version"]) == expected_versions
 
 
 def test_versions(tmpdir, repository):

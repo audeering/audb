@@ -248,12 +248,6 @@ def non_existing_repository():
     audb.config.REPOSITORIES = current_repositories
 
 
-@pytest.fixture(scope="package", autouse=True)
-def hide_default_repositories():
-    r"""Hide default audb repositories during testing."""
-    audb.config.REPOSITORIES = []
-
-
 # ===== STORAGE FORMAT =====
 @pytest.fixture(scope="module", autouse=False)
 def storage_format():
