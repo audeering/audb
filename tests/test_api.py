@@ -14,13 +14,13 @@ class TestAvailable:
     def setup(cls, tmpdir_factory):
         r"""Prepare repositories and datasets.
 
-        Creates two repositories
+        Create two repositories
         with different hosts, repositories and datasets:
 
         * ``<tmpdir>/host0/repo0/name0/1.0.0/db.yaml``
         * ``<tmpdir>/host1/repo1/name1/1.0.0/db.yaml``
 
-        Those two repositories are then set as default for ``audb``.
+        The repositories are then set in ``audb.config.REPOSITORIES``.
 
         Args:
             tmpdir_factory: tmpdir_factory fixture
@@ -44,7 +44,8 @@ class TestAvailable:
     def repository_with_broken_database(self):
         """Create repository with empty folder.
 
-        Adds an empty folder to the first repository.
+        Adds an empty folder ``"no-database"``
+        to the first repository.
 
         """
         repository = audb.config.REPOSITORIES[0]
@@ -86,7 +87,7 @@ class TestAvailable:
         audeer.rmdir(version2)
 
     def test_default(self):
-        """Test available datasets with default arguments."""
+        """Test available databases with default arguments."""
         df = audb.available()
         assert len(df) == 2
         assert "name0" in df.index
@@ -101,7 +102,7 @@ class TestAvailable:
         assert "no-database" not in df.index
 
     def test_non_existing_repository(self, non_existing_repository):
-        """Test having a non-existing repoisitory in config."""
+        """Test having a non-existing repository in config."""
         df = audb.available()
         assert len(df) == 2
         assert "name0" in df.index
@@ -125,7 +126,7 @@ class TestAvailable:
         self,
         additional_version,
         only_latest,
-        expected_datasets,
+        expected_databases,
         expected_versions,
     ):
         """Test only_latest argument.
@@ -133,15 +134,15 @@ class TestAvailable:
         Args:
             additional_version: additional_version fixture
             only_latest: only_latest argument of audb.available()
-            expected_datasets: expected dataset names
+            expected_databases: expected database names
                 in index of dataframe
-            expected_versions: expected dataset version
+            expected_versions: expected database version
                 in version column of dataframe
 
         """
         df = audb.available(only_latest=only_latest)
-        assert len(df) == len(expected_datasets)
-        assert list(df.index) == expected_datasets
+        assert len(df) == len(expected_databases)
+        assert list(df.index) == expected_databases
         assert list(df["version"]) == expected_versions
 
 
