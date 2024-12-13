@@ -114,19 +114,35 @@ class TestAvailable:
         assert "name0" in df.index
         assert "name1" in df.index
 
-    def test_latest_version(self, additional_version):
-        """Test only_latest argument."""
-        df = audb.available()
-        assert len(df) == 3
-        assert "name0" in df.index
-        assert "name1" in df.index
-        assert len(df.loc["name0"]) == 2
-        df = audb.available(only_latest=True)
-        assert len(df) == 2
-        assert "name0" in df.index
-        assert "name1" in df.index
-        assert df.loc["name0", "version"] == "2.0.0"
-        assert df.loc["name1", "version"] == "1.0.0"
+    @pytest.mark.parametrize(
+        "only_latest, expected_datasets, expected_versions",
+        [
+            (True, ["name0", "name1"], ["2.0.0", "1.0.0"]),
+            (False, ["name0", "name0", "name1"], ["1.0.0", "2.0.0", "1.0.0"]),
+        ],
+    )
+    def test_latest_version(
+        self,
+        additional_version,
+        only_latest,
+        expected_datasets,
+        expected_versions,
+    ):
+        """Test only_latest argument.
+
+        Args:
+            additional_version: additional_version fixture
+            only_latest: only_latest argument of audb.available()
+            expected_datasets: expected dataset names
+                in index of dataframe
+            expected_versions: expected dataset version
+                in version column of dataframe
+
+        """
+        df = audb.available(only_latest=only_latest)
+        assert len(df) == len(expected_datasets)
+        assert list(df.index) == expected_datasets
+        assert list(df["version"]) == expected_versions
 
 
 def test_versions(tmpdir, repository):
