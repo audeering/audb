@@ -116,7 +116,7 @@ class TestAvailable:
         assert "name1" in df.index
 
     @pytest.mark.parametrize(
-        "only_latest, expected_datasets, expected_versions",
+        "only_latest, expected_databases, expected_versions",
         [
             (True, ["name0", "name1"], ["2.0.0", "1.0.0"]),
             (False, ["name0", "name0", "name1"], ["1.0.0", "2.0.0", "1.0.0"]),
