@@ -93,6 +93,36 @@ class TestAvailable:
         assert "name0" in df.index
         assert "name1" in df.index
 
+    def test_repositories_all(self):
+        """Test repositories argument with all repositories."""
+        df = audb.available(repositories=self.repositories)
+        assert len(df) == 2
+
+    @pytest.mark.parametrize("repository_index", [0, 1])
+    @pytest.mark.parametrize("as_list", [False, True])
+    def test_repositories_single(self, repository_index, as_list):
+        """Test repositories argument with single repositories.
+
+        Args:
+            repository_index: select single repository
+                by the given index
+                from ``audb.config.REPOSITORIES``
+            as_list: if ``True``,
+                single repository is given as list
+                to ``repositories`` argument
+
+        """
+        repository = audb.config.REPOSITORIES[repository_index]
+        if as_list:
+            repositories = [repository]
+        else:
+            repositories = repository
+        df = audb.available(repositories=repositories)
+        assert len(df) == 1
+        assert df.host.iloc[0] == repository.host
+        assert df.repository.iloc[0] == repository.name
+        assert df.index[0] == f"name{repository_index}"
+
     def test_broken_database(self, repository_with_broken_database):
         """Test having a database only given as a folder."""
         df = audb.available()
