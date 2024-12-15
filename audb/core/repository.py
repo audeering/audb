@@ -71,7 +71,7 @@ class Repository:
         """
         return str(self) == str(other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Hash of repository.
 
         Returns:
