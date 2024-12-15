@@ -44,14 +44,56 @@ def test_repository_eq(repository1, repository2, expected):
 
 
 @pytest.mark.parametrize(
-    "repository",
-    [audb.Repository("repo", "host", "file-system")],
+    "repo1, repo2, should_have_same_hash",
+    [
+        # Same repositories should have same hash
+        (
+            audb.Repository("repo", "host", "file-system"),
+            audb.Repository("repo", "host", "file-system"),
+            True,
+        ),
+        # Different attributes should have different hashes
+        (
+            audb.Repository("repo1", "host", "file-system"),
+            audb.Repository("repo2", "host", "file-system"),
+            False,
+        ),
+        (
+            audb.Repository("repo", "host1", "file-system"),
+            audb.Repository("repo", "host2", "file-system"),
+            False,
+        ),
+        (
+            audb.Repository("repo", "host", "file-system"),
+            audb.Repository("repo", "host", "s3"),
+            False,
+        ),
+    ],
 )
-def test_repository_hash(repository):
-    """Test Repository object is hashable."""
-    assert isinstance(hash(repository), int)
-    # set needs `__hash__` to exist to work
-    assert set([repository]) == set([str(repository)])
+def test_repository_hash(repo1, repo2, should_have_same_hash):
+    """Test Repository object hash behavior.
+
+    Tests that:
+    - Repository objects are hashable
+    - Equal repositories have same hash
+    - Different repositories have different hashes
+    """
+    # Verify objects are hashable
+    assert isinstance(hash(repo1), int)
+    assert isinstance(hash(repo2), int)
+
+    # Test hash equality matches object equality
+    if should_have_same_hash:
+        assert hash(repo1) == hash(repo2)
+        assert repo1 == repo2
+    else:
+        assert hash(repo1) != hash(repo2)
+        assert repo1 != repo2
+
+    # Verify can be used in sets
+    test_set = {repo1, repo2}
+    expected_len = 1 if should_have_same_hash else 2
+    assert len(test_set) == expected_len
 
 
 @pytest.mark.parametrize(
