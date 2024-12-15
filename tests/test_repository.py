@@ -44,6 +44,17 @@ def test_repository_eq(repository1, repository2, expected):
 
 
 @pytest.mark.parametrize(
+    "repository",
+    [audb.Repository("repo", "host", "file-system")],
+)
+def test_repository_hash(repository):
+    """Test Repository object is hashable."""
+    assert isinstance(hash(repository), int)
+    # set needs `__hash__` to exist to work
+    assert set([repository]) == set([str(repository)])
+
+
+@pytest.mark.parametrize(
     "backend, host, repo, expected",
     [
         (

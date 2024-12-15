@@ -71,6 +71,15 @@ class Repository:
         """
         return str(self) == str(other)
 
+    def __hash__(self):
+        """Hash of repository.
+
+        Returns:
+            hash of repository
+
+        """
+        return hash(str(self))
+
     def __repr__(self):  # noqa: D105
         return (
             f"Repository("
