@@ -141,9 +141,8 @@ class TestAvailable:
     @pytest.mark.parametrize("repositories", [[], ()])
     def test_repositories_empty(self, repositories):
         """Tests empty repositories argument."""
-        expected_error_msg = "'repositories' argument must not be empty when provided"
-        with pytest.raises(ValueError, match=expected_error_msg):
-            audb.available(repositories=repositories)
+        df = audb.available(repositories=repositories)
+        assert len(df) == 0
 
     def test_broken_database(self, repository_with_broken_database):
         """Test having a database only given as a folder."""
