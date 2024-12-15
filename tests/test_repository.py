@@ -77,6 +77,14 @@ def test_repository_hash(repo1, repo2, should_have_same_hash):
     - Repository objects are hashable
     - Equal repositories have same hash
     - Different repositories have different hashes
+
+    Args:
+        repo1: repository object
+        repo2: repository object
+        should_have_same_hash: if ``True``,
+            expects ``repo1`` and ``repo2``
+            to be the same object
+
     """
     # Verify objects are hashable
     assert isinstance(hash(repo1), int)
