@@ -98,6 +98,18 @@ class TestAvailable:
         df = audb.available(repositories=audb.config.REPOSITORIES)
         assert len(df) == 2
 
+        # Verify repositories
+        expected_repos = set(audb.config.REPOSITORIES)
+        assert set(df.repository.unique()) == expected_repos
+
+        # Verify database names are present
+        assert "name0" in df.index
+        assert "name1" in df.index
+
+        # Verify hosts
+        assert df.loc["name0", "host"] == "host0"
+        assert df.loc["name1", "host"] == "host1"
+
     @pytest.mark.parametrize("repository_index", [0, 1])
     @pytest.mark.parametrize("as_list", [False, True])
     def test_repositories_single(self, repository_index, as_list):
