@@ -95,7 +95,7 @@ class TestAvailable:
 
     def test_repositories_all(self):
         """Test repositories argument with all repositories."""
-        df = audb.available(repositories=self.repositories)
+        df = audb.available(repositories=audb.config.REPOSITORIES)
         assert len(df) == 2
 
     @pytest.mark.parametrize("repository_index", [0, 1])
