@@ -38,6 +38,9 @@ def available(
         table with database name as index,
         and backend, host, repository, version as columns
 
+    Raises:
+        ValueError: if ``repositories`` is an empty when provided
+
     Examples:
         >>> df = audb.available(only_latest=True)
         >>> df.loc[["air", "emodb"]]
@@ -63,6 +66,8 @@ def available(
 
     if repositories is not None:
         repositories = audeer.to_list(repositories)
+        if not repositories:
+            raise ValueError("'repositories' argument must not be empty when provided")
     else:
         repositories = config.REPOSITORIES
 

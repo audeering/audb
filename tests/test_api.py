@@ -138,6 +138,13 @@ class TestAvailable:
         # Verify host
         assert df.host.iloc[0] == repository.host
 
+    @pytest.mark.parametrize("repositories", [[], ()])
+    def test_repositories_empty(self, repositories):
+        """Tests empty repositories argument."""
+        expected_error_msg = "'repositories' argument must not be empty when provided"
+        with pytest.raises(ValueError, match=expected_error_msg):
+            audb.available(repositories=repositories)
+
     def test_broken_database(self, repository_with_broken_database):
         """Test having a database only given as a folder."""
         df = audb.available()
