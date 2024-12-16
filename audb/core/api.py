@@ -32,7 +32,9 @@ def available(
 
     Args:
         only_latest: include only latest version of database
-        repositories: search only in the given repositories
+        repositories: search only in the given repositories.
+            If ``None``,
+            :attr:`audb.config.REPOSITORIES` is used
 
     Returns:
         table with database name as index,
