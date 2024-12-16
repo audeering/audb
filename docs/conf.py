@@ -94,12 +94,12 @@ html_title = title
 
 
 # Cache databases to avoid progress bar in code examples ------------------
+_config = audb.core.config.load_configuration_file(
+    audb.core.config.global_config_file,
+)
 audb.config.REPOSITORIES = [
-    audb.Repository(
-        name="data-public",
-        host="https://audeering.jfrog.io/artifactory",
-        backend="artifactory",
-    )
+    audb.Repository(repo["name"], repo["host"], repo["backend"])
+    for repo in _config["repositories"]
 ]
 database_name = "emodb"
 database_version = "1.4.1"
