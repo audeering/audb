@@ -26,11 +26,15 @@ from audb.core.repository import Repository
 def available(
     *,
     only_latest: bool = False,
+    repositories: Repository | Sequence[Repository] = None,
 ) -> pd.DataFrame:
     r"""List all databases that are available to the user.
 
     Args:
         only_latest: include only latest version of database
+        repositories: search only in the given repositories.
+            If ``None``,
+            :attr:`audb.config.REPOSITORIES` is used
 
     Returns:
         table with database name as index,
@@ -59,7 +63,12 @@ def available(
             ]
         )
 
-    for repository in config.REPOSITORIES:
+    if repositories is not None:
+        repositories = audeer.to_list(repositories)
+    else:
+        repositories = config.REPOSITORIES
+
+    for repository in repositories:
         try:
             backend_interface = repository.create_backend_interface()
             with backend_interface.backend as backend:
