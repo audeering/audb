@@ -115,10 +115,10 @@ class config:
     A repository is defined by the object :class:`audb.Repository`,
     containing the following attributes:
 
-    * :attr:`audb.Repository.name`: repository name, e.g. ``'data-local'``
-    * :attr:`audb.Repository.backend`: backend name, e.g. ``'artifactory'``
+    * :attr:`audb.Repository.name`: repository name, e.g. ``"audb-public"``
+    * :attr:`audb.Repository.backend`: backend name, e.g. ``"s3"``
     * :attr:`audb.Repository.host`: host name,
-      e.g. ``'https://artifactory.audeering.com/artifactory'``
+      e.g. ``"s3.dualstack.eu-north-1.amazonaws.com"``
 
     """
 
