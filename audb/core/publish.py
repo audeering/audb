@@ -299,8 +299,7 @@ def _find_media(
         add_media.append(values)
 
     def process_existing_file(file: str) -> None:
-        path = os.path.join(db_root, file)
-        checksum = audeer.md5(path)
+        checksum = audeer.md5(os.path.join(db_root, file))
         if checksum != deps.checksum(file):
             archive = deps.archive(file)
             values = _media_values(db_root, file, version, archive, checksum)
