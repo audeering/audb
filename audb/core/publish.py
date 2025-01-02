@@ -166,21 +166,51 @@ def _find_media(
     db_root: str,
     db_root_files: set[str],
     version: str,
-    deps: "Dependencies",
+    deps: Dependencies,
     archives: Mapping[str, str],
     num_workers: int,
     verbose: bool,
 ) -> set[str]:
-    """Find archives with new, altered or removed media and update 'deps'."""
+    """Find archives with new, altered or removed media and update 'deps'.
+
+    The function alters the dependency table entries of ``deps`` in place
+    by adding new entries for new media files,
+    removing entries for removed media files,
+    and updating entries for altered media files.
+    It further collects all media archives,
+    that need to be uploaded
+    after they are created or changed.
+
+    Args:
+        db: database
+        db_root: path to root of database
+        db_root_files: (media) files in root of database
+        version: version of database
+        deps: database dependency table
+        archives: mapping of media files to archives
+        num_workers: number of workers
+        verbose: if ``True`` show progress bar
+
+    Returns:
+        media archives to be updated
+
+    Raises:
+        RuntimeError: if a newly added media file
+            has any uppercase letter in its file extension
+
+    """
+    # Media archives to update
     media_archives = set()
+
+    # Media files in database
     db_media = set(db.files)
 
-    # Release dependencies to removed media
-    # and select corresponding archives for upload
-    removed_files = set(deps.media) - db_media
-    for file in removed_files:
+    removed_media = set(deps.media) - db_media
+    # Select media archives to update for removed media
+    for file in removed_media:
         media_archives.add(deps.archive(file))
-    deps._drop(removed_files)
+    # Release dependency on removed media
+    deps._drop(removed_media)
 
     # Limit to relevant media
     db_media_in_root = db_media.intersection(db_root_files)
@@ -189,7 +219,8 @@ def _find_media(
     add_media = []
     update_media = []
 
-    def process_new_file(file: str) -> None:
+    def process_new_media(file: str):
+        """Collect dependency values for new media files in 'add_media'."""
         ext = audeer.file_extension(file)
         if ext.lower() != ext:
             raise RuntimeError(
@@ -201,7 +232,8 @@ def _find_media(
         values = _media_values(db_root, file, version, archive, checksum)
         add_media.append(values)
 
-    def process_existing_file(file: str) -> None:
+    def process_existing_media(file: str):
+        """Collect dependency values for updated media file in 'update_media'."""
         checksum = audeer.md5(os.path.join(db_root, file))
         if checksum != deps.checksum(file):
             archive = deps.archive(file)
@@ -210,9 +242,9 @@ def _find_media(
 
     def job(file: str) -> None:
         if file not in deps:
-            process_new_file(file)
+            process_new_media(file)
         elif not deps.removed(file):
-            process_existing_file(file)
+            process_existing_media(file)
 
     audeer.run_tasks(
         job,
@@ -229,7 +261,7 @@ def _find_media(
     if add_media:
         deps._add_media(sorted(add_media, key=lambda x: x[0]))
 
-    # Select archives with new or altered files for upload
+    # Update media archives for new or altered media files
     for file in deps.media:
         if not deps.removed(file) and deps.version(file) == version:
             media_archives.add(deps.archive(file))
