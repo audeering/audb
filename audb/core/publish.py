@@ -453,6 +453,9 @@ def _put_media(
         num_workers: number of parallel workers for processing
         verbose: whether to display progress information
 
+    Raises:
+        RuntimeError: if downloading missing media files fails
+
     """
     if not media_archives:
         return
@@ -489,16 +492,30 @@ def _put_media(
 
             if missing_files:
                 with tempfile.TemporaryDirectory() as tmp_root:
-                    backend_interface.get_archive(
-                        archive_file,
-                        tmp_root,
-                        deps.version(missing_files[0]),
-                    )
-                    for missing_file in missing_files:
-                        src_path = os.path.join(tmp_root, missing_file)
-                        dst_path = os.path.join(db_root, missing_file)
-                        audeer.mkdir(os.path.dirname(dst_path))
-                        shutil.copy(src_path, dst_path)
+                    try:
+                        backend_interface.get_archive(
+                            archive_file,
+                            tmp_root,
+                            deps.version(missing_files[0]),
+                        )
+                        for missing_file in missing_files:
+                            src_path = os.path.join(tmp_root, missing_file)
+                            dst_path = os.path.join(db_root, missing_file)
+                            audeer.mkdir(os.path.dirname(dst_path))
+                            shutil.copy(src_path, dst_path)
+                    except Exception as e:  # pragma: no cover
+                        # Clean up any partially copied files
+                        for file in missing_files:
+                            dst_path = os.path.join(db_root, file)
+                            if os.path.exists(dst_path):
+                                try:
+                                    os.remove(dst_path)
+                                except OSError:
+                                    pass  # Best effort cleanup
+                        raise RuntimeError(
+                            "Failed to download missing media files "
+                            f"for archive {archive_file}: {e}"
+                        )
 
         backend_interface.put_archive(
             db_root,
