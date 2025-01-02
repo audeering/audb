@@ -161,13 +161,6 @@ def _find_attachments(
     return list(attachment_ids)
 
 
-# Constants
-FILE_EXTENSION_ERROR_MSG = (
-    "The file extension of a media file must be lowercase, "
-    "but '{file}' includes at least one uppercase letter."
-)
-
-
 def _find_media(
     db: audformat.Database,
     db_root: str,
@@ -199,7 +192,10 @@ def _find_media(
     def process_new_file(file: str) -> None:
         ext = audeer.file_extension(file)
         if ext.lower() != ext:
-            raise RuntimeError(FILE_EXTENSION_ERROR_MSG.format(file=file))
+            raise RuntimeError(
+                "The file extension of a media file must be lowercase, "
+                f"but '{file}' includes at least one uppercase letter."
+            )
         checksum = audeer.md5(os.path.join(db_root, file))
         archive = archives.get(file) or audeer.uid(from_string=file.replace("\\", "/"))
         values = _media_values(db_root, file, version, archive, checksum)
