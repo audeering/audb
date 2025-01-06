@@ -171,60 +171,83 @@ def _find_media(
     num_workers: int,
     verbose: bool,
 ) -> set[str]:
-    r"""Find archives with new, altered or removed media and update 'deps'."""
+    """Find archives with new, altered or removed media and update 'deps'.
+
+    The function alters the dependency table entries of ``deps`` in place
+    by
+
+    * adding entries for new media files
+    * removing entries for removed media files
+    * updating entries for altered media files
+
+    It further collects all media archives,
+    that are affected by those media files.
+
+    Args:
+        db: database
+        db_root: path to root of database
+        db_root_files: all files in root of database
+        version: version of database
+        deps: database dependency table
+        archives: mapping of media files to archives
+        num_workers: number of workers
+        verbose: if ``True`` show progress bar
+
+    Returns:
+        media archives to be updated
+
+    Raises:
+        RuntimeError: if a newly added media file
+            has any uppercase letter in its file extension
+
+    """
+    # Media archives to update
     media_archives = set()
+
+    # Media files in database
     db_media = set(db.files)
 
-    # release dependencies to removed media
-    # and select according archives for upload
-    removed_files = set(deps.media) - db_media
-    for file in removed_files:
+    removed_media = set(deps.media) - db_media
+    # Select media archives to update for removed media
+    for file in removed_media:
         media_archives.add(deps.archive(file))
-    deps._drop(removed_files)
+    # Remove rows in dependency table matching removed media
+    deps._drop(removed_media)
 
-    # limit to relevant media
+    # Limit to relevant media
     db_media_in_root = db_media.intersection(db_root_files)
 
-    # update version of altered media and insert new ones
-
-    def job(file):
-        path = os.path.join(db_root, file)
-        if file not in deps:
-            # assert lowercase file extensions
-            ext = audeer.file_extension(file)
-            if ext.lower() != ext:
-                raise RuntimeError(
-                    "The file extension of a media file must be lowercase, "
-                    f"but '{file}' includes at least one uppercase letter."
-                )
-            checksum = audeer.md5(path)
-            if file in archives:
-                archive = archives[file]
-            else:
-                archive = audeer.uid(from_string=file.replace("\\", "/"))
-            values = _media_values(
-                db_root,
-                file,
-                version,
-                archive,
-                checksum,
-            )
-            add_media.append(values)
-        elif not deps.removed(file):
-            checksum = audeer.md5(path)
-            if checksum != deps.checksum(file):
-                archive = deps.archive(file)
-                values = _media_values(
-                    db_root,
-                    file,
-                    version,
-                    archive,
-                    checksum,
-                )
-                update_media.append(values)
-
+    # Prepare lists to store media updates
     add_media = []
     update_media = []
+
+    def process_new_media(file: str):
+        """Collect dependency values for new media files in 'add_media'."""
+        ext = audeer.file_extension(file)
+        if ext.lower() != ext:
+            raise RuntimeError(
+                "The file extension of a media file must be lowercase, "
+                f"but '{file}' includes at least one uppercase letter."
+            )
+        checksum = audeer.md5(os.path.join(db_root, file))
+        archive = archives.get(file) or audeer.uid(from_string=file.replace("\\", "/"))
+        values = _media_values(db_root, file, version, archive, checksum)
+        add_media.append(values)
+
+    def process_existing_media(file: str):
+        """Collect dependency values for updated media file in 'update_media'."""
+        checksum = audeer.md5(os.path.join(db_root, file))
+        if checksum != deps.checksum(file):
+            archive = deps.archive(file)
+            values = _media_values(db_root, file, version, archive, checksum)
+            update_media.append(values)
+
+    def job(file: str) -> None:
+        if file not in deps:
+            process_new_media(file)
+        elif not deps.removed(file):
+            process_existing_media(file)
+
     audeer.run_tasks(
         job,
         params=[([file], {}) for file in db_media_in_root],
@@ -233,20 +256,14 @@ def _find_media(
         task_description="Find media",
         maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
-    # Add updated and new media to dependencies
-    # and sort them by paths
-    # as they can be returned in random order
-    # by the discovery job.
-    # Sorting enforces determinism in the
-    # generation of the dependencies table
-    if update_media:
-        update_media = sorted(update_media, key=lambda x: x[0])
-        deps._update_media(update_media)
-    if add_media:
-        add_media = sorted(add_media, key=lambda x: x[0])
-        deps._add_media(add_media)
 
-    # select archives with new or altered files for upload
+    # Add updated and new media to dependencies with sorting for consistency
+    if update_media:
+        deps._update_media(sorted(update_media, key=lambda x: x[0]))
+    if add_media:
+        deps._add_media(sorted(add_media, key=lambda x: x[0]))
+
+    # Update media archives for new or altered media files
     for file in deps.media:
         if not deps.removed(file) and deps.version(file) == version:
             media_archives.add(deps.archive(file))
@@ -422,68 +439,113 @@ def _put_media(
     num_workers: int | None,
     verbose: bool,
 ):
-    r"""Upload archives with new, altered or removed media files."""
-    if media_archives:
-        # create a mapping from archives to media files
-        map_archive_to_files = collections.defaultdict(list)
-        for file in deps.media:
-            if not deps.removed(file):
-                map_archive_to_files[deps.archive(file)].append(file)
+    r"""Upload archives with new, altered, or removed media files.
 
-        def job(archive):
-            if archive in map_archive_to_files:
-                files = map_archive_to_files[archive]
-                for file in files:
-                    update_media.append(file)
+    It uploads all media files
+    and adjusts the version in ``deps`` in place.
 
-                archive_file = backend_interface.join(
-                    "/", db_name, "media", archive + ".zip"
-                )
+    Args:
+        media_archives: media archives to upload
+        db_root: root directory of database
+        db_name: name of database
+        version: version of database
+        previous_version: previous version of database, if any.
+        deps: dependency table of database
+        backend_interface: backend interface for file operations
+        num_workers: number of parallel workers for processing
+        verbose: whether to display progress information
 
-                if previous_version is not None:
-                    # if only some files of the archive were altered
-                    # it may happen that the others do not exist
-                    # in the root folder,
-                    # so we have to download the archive
-                    # and copy the missing files first
-                    missing_files = []
-                    for file in files:
-                        path = os.path.join(db_root, file)
-                        if not os.path.exists(path):
-                            missing_files.append(file)
-                    if missing_files:
-                        with tempfile.TemporaryDirectory() as tmp_root:
-                            backend_interface.get_archive(
-                                archive_file,
-                                tmp_root,
-                                deps.version(missing_files[0]),
-                            )
-                            for missing_file in missing_files:
-                                src_path = os.path.join(tmp_root, missing_file)
-                                dst_path = os.path.join(db_root, missing_file)
-                                audeer.mkdir(os.path.dirname(dst_path))
-                                shutil.copy(
-                                    src_path,
-                                    dst_path,
-                                )
+    Raises:
+        RuntimeError: if downloading missing media files fails
 
-                backend_interface.put_archive(
-                    db_root,
-                    archive_file,
-                    version,
-                    files=files,
-                )
+    """
+    if not media_archives:
+        return
 
-        update_media = []
-        audeer.run_tasks(
-            job,
-            params=[([archive], {}) for archive in media_archives],
-            num_workers=num_workers,
-            progress_bar=verbose,
-            task_description="Put media",
-            maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
+    # Create a mapping from archives to media files
+    #
+    # `defaultdict(list)` eliminates the need for dictionary initialization check
+    map_archive_to_files = collections.defaultdict(list)
+    for media_file in [f for f in deps.media if not deps.removed(f)]:
+        archive = deps.archive(media_file)
+        map_archive_to_files[archive].append(media_file)
+
+    # Collect media files from uploaded archives
+    uploaded_media = []
+
+    def upload_archive(archive: str):
+        """Upload archive to backend."""
+        # Media files stored in requested archive
+        files = map_archive_to_files[archive]
+        uploaded_media.extend(files)
+
+        archive_file = backend_interface.join("/", db_name, "media", f"{archive}.zip")
+
+        if previous_version:
+            # An archive might include several media files.
+            # If a previous version of a database exists,
+            # not all media files of the requested archive
+            # might be present in `db_root`,
+            # e.g. if `only_metadata=True` was used
+            # when downloading the previous version with `audb.load_to()`
+            # and a media file is removed
+            # by deleting it in all tables,
+            # we need to download all other media files
+            # also included in the archive
+            # that stores the removed media file.
+            # In this case,
+            # we download the archive to a temporary folder,
+            # and copy the missing files from there
+            missing_files = [
+                file
+                for file in files
+                if not os.path.exists(os.path.join(db_root, file))
+            ]
+
+            if missing_files:
+                with tempfile.TemporaryDirectory() as tmp_root:
+                    try:
+                        backend_interface.get_archive(
+                            archive_file,
+                            tmp_root,
+                            deps.version(missing_files[0]),
+                        )
+                        for missing_file in missing_files:
+                            src_path = os.path.join(tmp_root, missing_file)
+                            dst_path = os.path.join(db_root, missing_file)
+                            audeer.mkdir(os.path.dirname(dst_path))
+                            shutil.copy(src_path, dst_path)
+                    except Exception as e:  # pragma: no cover
+                        # Clean up any partially copied files
+                        for file in missing_files:
+                            dst_path = os.path.join(db_root, file)
+                            if os.path.exists(dst_path):
+                                try:
+                                    os.remove(dst_path)
+                                except OSError:
+                                    pass  # Best effort cleanup
+                        raise RuntimeError(
+                            "Failed to download missing media files "
+                            f"for archive {archive_file}: {e}"
+                        )
+
+        backend_interface.put_archive(
+            db_root,
+            archive_file,
+            version,
+            files=files,
         )
-        deps._update_media_version(update_media, version)
+
+    audeer.run_tasks(
+        upload_archive,
+        params=[([archive], {}) for archive in media_archives],
+        num_workers=num_workers,
+        progress_bar=verbose,
+        task_description="Put media",
+        maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
+    )
+    # Adjust the version in the dependency table for all uploaded media files
+    deps._update_media_version(uploaded_media, version)
 
 
 def _put_tables(
