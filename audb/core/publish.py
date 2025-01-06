@@ -480,9 +480,17 @@ def _put_media(
         archive_file = backend_interface.join("/", db_name, "media", f"{archive}.zip")
 
         if previous_version:
+            # An archive might include several media files.
             # If a previous version of a database exists,
-            # not all media files might be present,
-            # that are grouped into the requested archive.
+            # not all media files of the requested archive
+            # might be present in `db_root`,
+            # e.g. if `only_metadata=True` was used
+            # when downloading the previous version with `audb.load_to()`
+            # and a media file is removed
+            # by deleting it in all tables,
+            # we need to download all other media files
+            # also included in the archive
+            # that stores the removed media file.
             # In this case,
             # we download the archive to a temporary folder,
             # and copy the missing files from there
