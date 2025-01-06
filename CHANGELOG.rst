@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.11.1 (2025-01-06)
+---------------------------
+
+* Added: ``repositories`` argument to ``audb.available()``
+  to limit it to selected repositories
+* Changed: ensure ``audb.Repository`` is hashable
+* Fixed: default value for ``audb.config.REPOSITORIES``
+  in documentation
+
+
 Version 1.11.0 (2024-12-06)
 ---------------------------
 
