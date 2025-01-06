@@ -186,7 +186,7 @@ def _find_media(
     Args:
         db: database
         db_root: path to root of database
-        db_root_files: (media) files in root of database
+        db_root_files: all files in root of database
         version: version of database
         deps: database dependency table
         archives: mapping of media files to archives
