@@ -174,12 +174,14 @@ def _find_media(
     """Find archives with new, altered or removed media and update 'deps'.
 
     The function alters the dependency table entries of ``deps`` in place
-    by adding new entries for new media files,
-    removing entries for removed media files,
-    and updating entries for altered media files.
+    by
+
+    * adding entries for new media files
+    * removing entries for removed media files
+    * updating entries for altered media files
+
     It further collects all media archives,
-    that need to be uploaded
-    after they are created or changed.
+    that are affected by those media files.
 
     Args:
         db: database
