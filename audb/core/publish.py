@@ -211,7 +211,7 @@ def _find_media(
     # Select media archives to update for removed media
     for file in removed_media:
         media_archives.add(deps.archive(file))
-    # Release dependency on removed media
+    # Remove rows in dependency table matching removed media
     deps._drop(removed_media)
 
     # Limit to relevant media
