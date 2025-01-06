@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.0
+                v1.11.1
               </div>
             
           
@@ -149,12 +149,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audb.core.repository</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="kn">import</span> <span class="nn">audbackend</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audbackend</span>
 
 
-<div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository">[docs]</a><span class="k">class</span> <span class="nc">Repository</span><span class="p">:</span>
+<div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Repository</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository object.</span>
 
 <span class="sd">    It stores all information</span>
@@ -197,7 +197,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">host</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -210,7 +210,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository backend name.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Repository.__eq__"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="Repository.__eq__"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository.__eq__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare two repository instances.</span>
 
 <span class="sd">        Args:</span>
@@ -222,7 +222,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hash of repository.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            hash of repository</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Repository(&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
@@ -231,7 +240,7 @@
             <span class="sa">f</span><span class="s2">&quot;)&quot;</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Repository.create_backend_interface"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository.create_backend_interface">[docs]</a>    <span class="k">def</span> <span class="nf">create_backend_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
+<div class="viewcode-block" id="Repository.create_backend_interface"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository.create_backend_interface">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_backend_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create backend interface to access repository.</span>
 
 <span class="sd">        It wraps an :class:`audbackend.interface.Versioned` interface</span>
@@ -290,7 +299,7 @@
         <span class="k">return</span> <span class="n">interface</span></div>
 
 <div class="viewcode-block" id="Repository.register"><a class="viewcode-back" href="../../../api/audb.Repository.html#audb.Repository.register">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">backend_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">backend_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
@@ -330,7 +339,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/01/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -338,7 +347,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2024 audEERING GmbH
+      &copy; 2020-2025 audEERING GmbH
     </p>
   </div> 
 

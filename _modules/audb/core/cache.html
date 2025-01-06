@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.0
+                v1.11.1
               </div>
             
           
@@ -149,15 +149,15 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audb.core.cache</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">audeer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audeer</span>
 
-<span class="kn">from</span> <span class="nn">audb.core.config</span> <span class="kn">import</span> <span class="n">config</span>
-<span class="kn">from</span> <span class="nn">audb.core.flavor</span> <span class="kn">import</span> <span class="n">Flavor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.flavor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flavor</span>
 
 
-<span class="k">def</span> <span class="nf">database_cache_root</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">database_cache_root</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -194,7 +194,7 @@
     <span class="k">return</span> <span class="n">db_root</span>
 
 
-<span class="k">def</span> <span class="nf">database_tmp_root</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">database_tmp_root</span><span class="p">(</span>
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create and return temporary database cache folder.</span>
@@ -213,7 +213,7 @@
     <span class="k">return</span> <span class="n">tmp_root</span>
 
 
-<div class="viewcode-block" id="default_cache_root"><a class="viewcode-back" href="../../../api/audb.default_cache_root.html#audb.default_cache_root">[docs]</a><span class="k">def</span> <span class="nf">default_cache_root</span><span class="p">(</span>
+<div class="viewcode-block" id="default_cache_root"><a class="viewcode-back" href="../../../api/audb.default_cache_root.html#audb.default_cache_root">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">default_cache_root</span><span class="p">(</span>
     <span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default cache folder.</span>
@@ -258,7 +258,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/01/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -266,7 +266,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2024 audEERING GmbH
+      &copy; 2020-2025 audEERING GmbH
     </p>
   </div> 
 

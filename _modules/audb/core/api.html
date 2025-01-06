@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.0
+                v1.11.1
               </div>
             
           
@@ -149,39 +149,43 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audb.core.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">import</span> <span class="nn">audbackend</span>
-<span class="kn">import</span> <span class="nn">audeer</span>
-<span class="kn">import</span> <span class="nn">audformat</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audbackend</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audeer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audformat</span>
 
-<span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">define</span>
-<span class="kn">from</span> <span class="nn">audb.core</span> <span class="kn">import</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">audb.core.cache</span> <span class="kn">import</span> <span class="n">database_cache_root</span>
-<span class="kn">from</span> <span class="nn">audb.core.cache</span> <span class="kn">import</span> <span class="n">default_cache_root</span>
-<span class="kn">from</span> <span class="nn">audb.core.config</span> <span class="kn">import</span> <span class="n">config</span>
-<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">Dependencies</span>
-<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">download_dependencies</span>
-<span class="kn">from</span> <span class="nn">audb.core.dependencies</span> <span class="kn">import</span> <span class="n">upload_dependencies</span>
-<span class="kn">from</span> <span class="nn">audb.core.flavor</span> <span class="kn">import</span> <span class="n">Flavor</span>
-<span class="kn">from</span> <span class="nn">audb.core.lock</span> <span class="kn">import</span> <span class="n">FolderLock</span>
-<span class="kn">from</span> <span class="nn">audb.core.repository</span> <span class="kn">import</span> <span class="n">Repository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">define</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">database_cache_root</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_cache_root</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dependencies</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">download_dependencies</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">upload_dependencies</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.flavor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flavor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.lock</span><span class="w"> </span><span class="kn">import</span> <span class="n">FolderLock</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">Repository</span>
 
 
-<div class="viewcode-block" id="available"><a class="viewcode-back" href="../../../api/audb.available.html#audb.available">[docs]</a><span class="k">def</span> <span class="nf">available</span><span class="p">(</span>
+<div class="viewcode-block" id="available"><a class="viewcode-back" href="../../../api/audb.available.html#audb.available">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">only_latest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">repositories</span><span class="p">:</span> <span class="n">Repository</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Repository</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;List all databases that are available to the user.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        only_latest: include only latest version of database</span>
+<span class="sd">        repositories: search only in the given repositories.</span>
+<span class="sd">            If ``None``,</span>
+<span class="sd">            :attr:`audb.config.REPOSITORIES` is used</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        table with database name as index,</span>
@@ -198,7 +202,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="n">databases</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add database to list of databases.&quot;&quot;&quot;</span>
         <span class="n">databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">[</span>
@@ -210,7 +214,12 @@
             <span class="p">]</span>
         <span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">repository</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">repositories</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">repositories</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">repositories</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">repositories</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span>
+
+    <span class="k">for</span> <span class="n">repository</span> <span class="ow">in</span> <span class="n">repositories</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
             <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span> <span class="k">as</span> <span class="n">backend</span><span class="p">:</span>
@@ -275,7 +284,7 @@
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cached"><a class="viewcode-back" href="../../../api/audb.cached.html#audb.cached">[docs]</a><span class="k">def</span> <span class="nf">cached</span><span class="p">(</span>
+<div class="viewcode-block" id="cached"><a class="viewcode-back" href="../../../api/audb.cached.html#audb.cached">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">cached</span><span class="p">(</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -402,7 +411,7 @@
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="dependencies"><a class="viewcode-back" href="../../../api/audb.dependencies.html#audb.dependencies">[docs]</a><span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span>
+<div class="viewcode-block" id="dependencies"><a class="viewcode-back" href="../../../api/audb.dependencies.html#audb.dependencies">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">dependencies</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -451,7 +460,7 @@
     <span class="k">return</span> <span class="n">deps</span></div>
 
 
-<div class="viewcode-block" id="exists"><a class="viewcode-back" href="../../../api/audb.exists.html#audb.exists">[docs]</a><span class="k">def</span> <span class="nf">exists</span><span class="p">(</span>
+<div class="viewcode-block" id="exists"><a class="viewcode-back" href="../../../api/audb.exists.html#audb.exists">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -532,7 +541,7 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="flavor_path"><a class="viewcode-back" href="../../../api/audb.flavor_path.html#audb.flavor_path">[docs]</a><span class="k">def</span> <span class="nf">flavor_path</span><span class="p">(</span>
+<div class="viewcode-block" id="flavor_path"><a class="viewcode-back" href="../../../api/audb.flavor_path.html#audb.flavor_path">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">flavor_path</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -594,7 +603,7 @@
     <span class="k">return</span> <span class="n">flavor</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="latest_version"><a class="viewcode-back" href="../../../api/audb.latest_version.html#audb.latest_version">[docs]</a><span class="k">def</span> <span class="nf">latest_version</span><span class="p">(</span>
+<div class="viewcode-block" id="latest_version"><a class="viewcode-back" href="../../../api/audb.latest_version.html#audb.latest_version">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">latest_version</span><span class="p">(</span>
     <span class="n">name</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Latest version of database.</span>
@@ -621,7 +630,7 @@
     <span class="k">return</span> <span class="n">vs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="remove_media"><a class="viewcode-back" href="../../../api/audb.remove_media.html#audb.remove_media">[docs]</a><span class="k">def</span> <span class="nf">remove_media</span><span class="p">(</span>
+<div class="viewcode-block" id="remove_media"><a class="viewcode-back" href="../../../api/audb.remove_media.html#audb.remove_media">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">remove_media</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">files</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
@@ -697,7 +706,7 @@
                 <span class="n">upload_dependencies</span><span class="p">(</span><span class="n">backend_interface</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="repository"><a class="viewcode-back" href="../../../api/audb.repository.html#audb.repository">[docs]</a><span class="k">def</span> <span class="nf">repository</span><span class="p">(</span>
+<div class="viewcode-block" id="repository"><a class="viewcode-back" href="../../../api/audb.repository.html#audb.repository">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">repository</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Repository</span><span class="p">:</span>
@@ -728,7 +737,7 @@
     <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">_lookup</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="versions"><a class="viewcode-back" href="../../../api/audb.versions.html#audb.versions">[docs]</a><span class="k">def</span> <span class="nf">versions</span><span class="p">(</span>
+<div class="viewcode-block" id="versions"><a class="viewcode-back" href="../../../api/audb.versions.html#audb.versions">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">versions</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Available versions of database.</span>
@@ -808,7 +817,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/01/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -816,7 +825,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2024 audEERING GmbH
+      &copy; 2020-2025 audEERING GmbH
     </p>
   </div> 
 
