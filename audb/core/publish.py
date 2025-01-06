@@ -463,10 +463,12 @@ def _put_media(
         return
 
     # Create a mapping from archives to media files
+    #
+    # `defaultdict(list)` eliminates the need for dictionary initialization check
     map_archive_to_files = collections.defaultdict(list)
-    for file in deps.media:
-        if not deps.removed(file):
-            map_archive_to_files[deps.archive(file)].append(file)
+    for media_file in [f for f in deps.media if not deps.removed(f)]:
+        archive = deps.archive(media_file)
+        map_archive_to_files[archive].append(media_file)
 
     # Collect media files from uploaded archives
     uploaded_media = []
