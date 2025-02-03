@@ -147,7 +147,7 @@ def test_repository_repr(backend, host, repo, expected):
             audbackend.interface.Maven,
             marks=pytest.mark.skipif(
                 sys.version_info >= (3, 13),
-                reason="No artifactory backend support in Python>=3.12",
+                reason="No artifactory backend support in Python>=3.13",
             ),
         ),
     ],
