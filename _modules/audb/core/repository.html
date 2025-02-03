@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.1
+                v1.11.2
               </div>
             
           
@@ -193,7 +193,7 @@
 <span class="sd">    Holds mapping between registered backend names,</span>
 <span class="sd">    and their corresponding backend classes.</span>
 <span class="sd">    The ``&quot;artifactory&quot;`` backend is currently not available</span>
-<span class="sd">    under Python &gt;=3.12.</span>
+<span class="sd">    under Python &gt;=3.13.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -280,13 +280,13 @@
 <span class="sd">            interface to repository</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if an artifactory backend is requested in Python&gt;=3.12</span>
+<span class="sd">            ValueError: if an artifactory backend is requested in Python&gt;=3.13</span>
 <span class="sd">            ValueError: if a non-supported backend is requested</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
-                <span class="s2">&quot;The &#39;artifactory&#39; backend is not supported in Python&gt;=3.12&quot;</span>
+                <span class="s2">&quot;The &#39;artifactory&#39; backend is not supported in Python&gt;=3.13&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39; is not a registered backend&quot;</span><span class="p">)</span>
@@ -339,7 +339,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/01/06 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/02/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
