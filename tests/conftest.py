@@ -212,7 +212,7 @@ def private_and_public_repository():
         audb.Repository("audb-private", public_s3_host, "s3"),
         audb.Repository("audb-public", public_s3_host, "s3"),
     ]
-    if sys.version_info < (3, 12):
+    if sys.version_info < (3, 13):
         audb.config.REPOSITORIES += [
             audb.Repository("data-private", public_artifactory_host, "artifactory"),
             audb.Repository("data-public", public_artifactory_host, "artifactory"),

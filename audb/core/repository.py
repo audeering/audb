@@ -129,13 +129,13 @@ class Repository:
             interface to repository
 
         Raises:
-            ValueError: if an artifactory backend is requested in Python>=3.12
+            ValueError: if an artifactory backend is requested in Python>=3.13
             ValueError: if a non-supported backend is requested
 
         """
-        if sys.version_info >= (3, 12) and self.backend == "artifactory":
+        if sys.version_info >= (3, 13) and self.backend == "artifactory":
             raise ValueError(  # pragma: no cover
-                "The 'artifactory' backend is not supported in Python>=3.12"
+                "The 'artifactory' backend is not supported in Python>=3.13"
             )
         if self.backend not in self.backend_registry:
             raise ValueError(f"'{self.backend}' is not a registered backend")
