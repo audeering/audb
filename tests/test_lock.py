@@ -154,12 +154,14 @@ def test_lock_warning_and_failure(tmpdir):
     lock_error = filelock.Timeout
     lock_error_msg = f"The file lock '{lock_file}' could not be acquired."
     warning_msg = (
-        "Lock could not be acquired immediately. "
-        "It might be that another user is loading the same database, "
-        f"or that the lock file '{lock_file}' is a leftover file from a failed job "
-        "and needs to be manually deleted. "
-        f"You can check who created it when by running: 'ls -lh {lock_file}' in bash. "
-        "Still trying for 0.1 more seconds..."
+        f"Lock could not be acquired immediately.\n"
+        "Another user might loading the same database,\n"
+        f"or the lock file '{lock_file}' is left from a failed job "
+        "and needs to be deleted manually.\n"
+        "You can check who created it when by running: "
+        f"'ls -lh {lock_file}' in bash.\n"
+        f"Still trying for 0.1 "
+        "more seconds...\n"
     )
     with pytest.warns(UserWarning, match=re.escape(warning_msg)):
         with pytest.raises(lock_error, match=re.escape(lock_error_msg)):

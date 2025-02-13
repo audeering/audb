@@ -72,13 +72,12 @@ class FolderLock:
                     acquired = True
                 except filelock.Timeout:
                     warnings.warn(
-                        f"Lock could not be acquired immediately. "
-                        "It might be that another user is loading the same database, "
-                        f"or that the lock file '{lock_file}' "
-                        "is a leftover file from a failed job "
-                        "and needs to be manually deleted. "
+                        f"Lock could not be acquired immediately.\n"
+                        "Another user might loading the same database,\n"
+                        f"or the lock file '{lock_file}' is left from a failed job "
+                        "and needs to be deleted manually.\n"
                         "You can check who created it when by running: "
-                        f"'ls -lh {lock_file}' in bash. "
+                        f"'ls -lh {lock_file}' in bash.\n"
                         f"Still trying for {self.timeout - self.warning_timeout:.1f} "
                         "more seconds...\n"
                     )
