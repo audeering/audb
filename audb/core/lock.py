@@ -41,8 +41,6 @@ class FolderLock:
 
         """
         folders = audeer.to_list(folders)
-        if timeout < warning_timeout:
-            warning_timeout = timeout
 
         # In the past we used ``-1`` as default value for timeout
         # to wait infinitely until the lock is acquired.
