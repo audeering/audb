@@ -34,9 +34,7 @@ class FolderLock:
                 an exception is raised
             warning_timeout: time in seconds
                 after which a warning is shown to the user
-                that the lock could not get acquired immediately.
-                If ``timeout < warning_timeout``,
-                it is automatically set to ``timeout``
+                that the lock could not yet get acquired
 
         Raises:
             :class:`filelock.Timeout`: if a timeout is reached
