@@ -1,3 +1,4 @@
+import re
 import threading
 import time
 
@@ -160,7 +161,7 @@ def test_lock_warning_and_failure(tmpdir):
         f"You can check who created it when by running: 'ls -lh {lock_file}' in bash. "
         "Still trying for 0.1 more seconds..."
     )
-    with pytest.warns(UserWarning, match=warning_msg):
-        with pytest.raises(lock_error, match=lock_error_msg):
+    with pytest.warns(UserWarning, match=re.escape(warning_msg)):
+        with pytest.raises(lock_error, match=re.escape(lock_error_msg)):
             with FolderLock(tmpdir, warning_timeout=0.1, timeout=0.2):
                 pass
