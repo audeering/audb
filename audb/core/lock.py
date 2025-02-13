@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 import types
+import warnings
 
 import filelock
 
@@ -15,7 +16,8 @@ class FolderLock:
         self,
         folders: str | Sequence[str],
         *,
-        timeout: float = -1,
+        timeout: float = define.TIMEOUT,
+        warning_timeout: float = 2,
     ):
         r"""Lock one or more folders.
 
@@ -25,27 +27,66 @@ class FolderLock:
 
         Args:
             folders: path to one or more folders that should be locked
-            timeout: maximum wait time if another thread or process
+            timeout: maximum wait time in seconds
+                if another thread or process
                 is already accessing one or more locks.
                 If timeout is reached,
-                an exception is raised.
-                If timeout < 0 the method will block
-                until the resource can be accessed
+                an exception is raised
+            warning_timeout: time in seconds
+                after which a warning is shown to the user
+                that the lock could not get acquired immediately.
+                If ``timeout < warning_timeout``,
+                it is automatically set to ``timeout``
 
         Raises:
             :class:`filelock.Timeout`: if a timeout is reached
 
         """
         folders = audeer.to_list(folders)
-        files = [audeer.path(folder, define.LOCK_FILE) for folder in folders]
+        if timeout < warning_timeout:
+            warning_timeout = timeout
 
-        self.locks = [filelock.SoftFileLock(file) for file in files]
+        # In the past we used ``-1`` as default value for timeout
+        # to wait infinitely until the lock is acquired.
+        if timeout < 0:
+            warnings.warn(
+                "'timeout' values <0 are no longer supported. "
+                f"Changing your provided value of {timeout} to {define.TIMEOUT}"
+            )
+            timeout = define.TIMEOUT
+
+        self.lock_files = [audeer.path(folder, define.LOCK_FILE) for folder in folders]
+        self.locks = [filelock.SoftFileLock(file) for file in self.lock_files]
         self.timeout = timeout
+        self.warning_timeout = warning_timeout
 
     def __enter__(self) -> "FolderLock":
         r"""Acquire the lock(s)."""
-        for lock in self.locks:
-            lock.acquire(self.timeout)
+        for lock, lock_file in zip(self.locks, self.lock_files):
+            remaining_time = self.timeout
+            acquired = False
+            # First try to acquire lock in warning_timeout time
+            if self.warning_timeout < self.timeout:
+                try:
+                    lock.acquire(timeout=self.warning_timeout)
+                    acquired = True
+                except filelock.Timeout:
+                    warnings.warn(
+                        f"Lock could not be acquired immediately. "
+                        "It might be that another user is loading the same database, "
+                        f"or that the lock file '{lock_file}' "
+                        "is a leftover file from a failed job "
+                        "and needs to be manually deleted. "
+                        "You can check who created it when by running: "
+                        f"'ls -lh {lock_file}' in bash. "
+                        f"Still trying for {self.timeout - self.warning_timeout:.1f} "
+                        "more seconds...\n"
+                    )
+                    remaining_time = self.timeout - self.warning_timeout
+
+            if not acquired:
+                lock.acquire(timeout=remaining_time)
+
         return self
 
     def __exit__(

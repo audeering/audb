@@ -2,6 +2,7 @@ import threading
 import time
 
 import filelock
+import pytest
 
 import audeer
 
@@ -143,3 +144,23 @@ def test_lock(tmpdir):
         num_workers=3,
     )
     assert result == [1, 0, 1]
+
+
+def test_lock_warning_and_failure(tmpdir):
+    """Test user warning and lock failure messages."""
+    # Create lock file to force failing acquiring of lock
+    lock_file = audeer.touch(tmpdir, ".lock")
+    lock_error = filelock.Timeout
+    lock_error_msg = f"The file lock '{lock_file}' could not be acquired."
+    warning_msg = (
+        "Lock could not be acquired immediately. "
+        "It might be that another user is loading the same database, "
+        f"or that the lock file '{lock_file}' is a leftover file from a failed job "
+        "and needs to be manually deleted. "
+        f"You can check who created it when by running: 'ls -lh {lock_file}' in bash. "
+        "Still trying for 0.1 more seconds..."
+    )
+    with pytest.warns(UserWarning, match=warning_msg):
+        with pytest.raises(lock_error, match=lock_error_msg):
+            with FolderLock(tmpdir, warning_timeout=0.1, timeout=0.2):
+                pass

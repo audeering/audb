@@ -443,6 +443,5 @@ def test_database_iterator_error():
             full_path=False,
             cache_root=None,
             num_workers=1,
-            timeout=-1,
             verbose=False,
         )

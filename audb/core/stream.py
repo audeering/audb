@@ -11,6 +11,7 @@ import pyarrow.parquet as parquet
 
 import audformat
 
+from audb.core import define
 from audb.core.api import dependencies
 from audb.core.cache import database_cache_root
 from audb.core.dependencies import error_message_missing_object
@@ -428,7 +429,7 @@ def stream(
     full_path: bool = True,
     cache_root: str = None,
     num_workers: int | None = 1,
-    timeout: float = -1,
+    timeout: float = define.TIMEOUT,
     verbose: bool = True,
 ) -> DatabaseIterator:
     r"""Stream table and media files of a database.
@@ -488,10 +489,11 @@ def stream(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``None`` is
-            returned. If timeout < 0 the method will block until the
-            database can be accessed
+        timeout: maximum wait time in seconds
+            if another thread or process is already
+            accessing the database.
+            If timeout is reached,
+            ``None`` is returned
         verbose: show debug messages
 
     Returns:

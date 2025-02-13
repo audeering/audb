@@ -1015,7 +1015,7 @@ def load(
     pickle_tables: bool = True,
     cache_root: str = None,
     num_workers: int | None = 1,
-    timeout: float = -1,
+    timeout: float = define.TIMEOUT,
     verbose: bool = True,
 ) -> audformat.Database | None:
     r"""Load database.
@@ -1093,10 +1093,11 @@ def load(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``None`` is
-            returned. If timeout < 0 the method will block until the
-            database can be accessed
+        timeout: maximum wait time in seconds
+            if another thread or process is already
+            accessing the database.
+            If timeout is reached,
+            ``None`` is returned
         verbose: show debug messages
 
     Returns:
@@ -1491,7 +1492,7 @@ def load_media(
     sampling_rate: int = None,
     cache_root: str = None,
     num_workers: int | None = 1,
-    timeout: float = -1,
+    timeout: float = define.TIMEOUT,
     verbose: bool = True,
 ) -> list | None:
     r"""Load media file(s).
@@ -1525,10 +1526,11 @@ def load_media(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        timeout: maximum wait time if another thread or process is already
-            accessing the database. If timeout is reached, ``None`` is
-            returned. If timeout < 0 the method will block until the
-            database can be accessed
+        timeout: maximum wait time in seconds
+            if another thread or process is already
+            accessing the database.
+            If timeout is reached,
+            ``None`` is returned
         verbose: show debug messages
 
     Returns:
