@@ -14,8 +14,8 @@ Version 1.11.3 (2025-02-20)
   from infinity to 24h
 * Changed: show a user warning
   if a lock for a cache folder cannot be acquired within 2s.
-  The warning message suggests how the user can check
-  if the existing lock file needs to be manually deleted
+  The warning message suggests how to check
+  whether the existing lock file needs to be deleted manually
 
 
 Version 1.11.2 (2025-02-03)
