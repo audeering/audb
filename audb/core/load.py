@@ -1093,11 +1093,9 @@ def load(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        timeout: maximum wait time in seconds
-            if another thread or process is already
-            accessing the database.
-            If timeout is reached,
-            ``None`` is returned
+        timeout: maximum time in seconds
+            before giving up acquiring a lock to the database cache folder.
+            ``None`` is returned in this case
         verbose: show debug messages
 
     Returns:
@@ -1526,11 +1524,9 @@ def load_media(
         num_workers: number of parallel jobs or 1 for sequential
             processing. If ``None`` will be set to the number of
             processors on the machine multiplied by 5
-        timeout: maximum wait time in seconds
-            if another thread or process is already
-            accessing the database.
-            If timeout is reached,
-            ``None`` is returned
+        timeout: maximum time in seconds
+            before giving up acquiring a lock to the database cache folder.
+            ``None`` is returned in this case
         verbose: show debug messages
 
     Returns:
