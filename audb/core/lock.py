@@ -27,9 +27,8 @@ class FolderLock:
 
         Args:
             folders: path to one or more folders that should be locked
-            timeout: maximum wait time in seconds
-                if another thread or process
-                is already accessing one or more locks.
+            timeout: maximum time in seconds
+                before giving up acquiring a lock to the database cache folder.
                 If timeout is reached,
                 an exception is raised
             warning_timeout: time in seconds
