@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.2
+                v1.11.3
               </div>
             
           
@@ -1166,7 +1166,7 @@
     <span class="n">pickle_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database.</span>
@@ -1244,10 +1244,9 @@
 <span class="sd">        num_workers: number of parallel jobs or 1 for sequential</span>
 <span class="sd">            processing. If ``None`` will be set to the number of</span>
 <span class="sd">            processors on the machine multiplied by 5</span>
-<span class="sd">        timeout: maximum wait time if another thread or process is already</span>
-<span class="sd">            accessing the database. If timeout is reached, ``None`` is</span>
-<span class="sd">            returned. If timeout &lt; 0 the method will block until the</span>
-<span class="sd">            database can be accessed</span>
+<span class="sd">        timeout: maximum time in seconds</span>
+<span class="sd">            before giving up acquiring a lock to the database cache folder.</span>
+<span class="sd">            ``None`` is returned in this case</span>
 <span class="sd">        verbose: show debug messages</span>
 
 <span class="sd">    Returns:</span>
@@ -1642,7 +1641,7 @@
     <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media file(s).</span>
@@ -1676,10 +1675,9 @@
 <span class="sd">        num_workers: number of parallel jobs or 1 for sequential</span>
 <span class="sd">            processing. If ``None`` will be set to the number of</span>
 <span class="sd">            processors on the machine multiplied by 5</span>
-<span class="sd">        timeout: maximum wait time if another thread or process is already</span>
-<span class="sd">            accessing the database. If timeout is reached, ``None`` is</span>
-<span class="sd">            returned. If timeout &lt; 0 the method will block until the</span>
-<span class="sd">            database can be accessed</span>
+<span class="sd">        timeout: maximum time in seconds</span>
+<span class="sd">            before giving up acquiring a lock to the database cache folder.</span>
+<span class="sd">            ``None`` is returned in this case</span>
 <span class="sd">        verbose: show debug messages</span>
 
 <span class="sd">    Returns:</span>
@@ -1960,7 +1958,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/02/03 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/02/20 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
