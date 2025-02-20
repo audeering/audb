@@ -7,6 +7,17 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.11.3 (2025-02-20)
+---------------------------
+
+* Changed: reduce the timeout for acquiring a lock for a cache folder
+  from infinity to 24h
+* Changed: show a user warning
+  if a lock for a cache folder cannot be acquired within 2s.
+  The warning message suggests how to check
+  whether the existing lock file needs to be deleted manually
+
+
 Version 1.11.2 (2025-02-03)
 ---------------------------
 
