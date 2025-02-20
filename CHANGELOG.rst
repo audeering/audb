@@ -13,7 +13,7 @@ Version 1.11.3 (2025-02-20)
 * Changed: reduce the timeout for acquiring a lock for a cache folder
   from infinity to 24h
 * Changed: show a user warning
-  if a lock for a cache folder cannot be acquired in 2s.
+  if a lock for a cache folder cannot be acquired within 2s.
   The warning message suggests how the user can check
   if the existing lock file needs to be manually deleted
 
