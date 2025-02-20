@@ -277,7 +277,6 @@ def load_db(timeout):
 @pytest.mark.parametrize(
     "num_workers, timeout, expected",
     [
-        (2, -1, 2),
         (2, 9999, 2),
         (2, 0, 1),
     ],
@@ -328,6 +327,39 @@ def test_lock_load(
 def test_lock_load_crash(set_repositories):
     with pytest.raises(audbackend.BackendError):
         load_db(-1)
+
+
+@pytest.mark.parametrize(
+    "set_repositories",
+    ["slow-file-system"],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "num_workers, timeout, expected",
+    [
+        (2, -1, 2),
+    ],
+)
+def test_lock_load_deprecated_timeout(
+    set_repositories,
+    num_workers,
+    timeout,
+    expected,
+):
+    """Test timeout <0 argument."""
+    params = [([timeout], {})] * num_workers
+    msg = (
+        "'timeout' values <0 are no longer supported. "
+        f"Changing your provided value of {timeout} to {audb.core.define.TIMEOUT}"
+    )
+    with pytest.warns(UserWarning, match=msg):
+        result = audeer.run_tasks(
+            load_db,
+            params,
+            num_workers=num_workers,
+        )
+    result = [x for x in result if x is not None]
+    assert len(result) == expected
 
 
 @pytest.mark.parametrize(
@@ -501,7 +533,6 @@ def load_media(timeout):
 @pytest.mark.parametrize(
     "num_workers, timeout, expected",
     [
-        (2, -1, 2),
         (2, 9999, 2),
         (2, 0, 1),
     ],
