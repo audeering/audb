@@ -182,6 +182,12 @@ def _database_check_complete(
         return complete
 
     if check():
+        # Create .complete file to mark database as complete
+        complete_file = os.path.join(db_root, define.COMPLETE_FILE)
+        open(complete_file, "w").close()
+
+        # Keep updating the header file for backwards compatibility
+        # with older versions of audb
         db_root_tmp = database_tmp_root(db_root)
         db.meta["audb"]["complete"] = True
         db_original = audformat.Database.load(db_root, load_data=False)
@@ -197,6 +203,14 @@ def _database_check_complete(
 def _database_is_complete(
     db: audformat.Database,
 ) -> bool:
+    # First check for .complete file
+    if "audb" in db.meta and "root" in db.meta["audb"]:
+        db_root = db.meta["audb"]["root"]
+        complete_file = os.path.join(db_root, define.COMPLETE_FILE)
+        if os.path.exists(complete_file):
+            return True
+
+    # Fall back to checking header for backwards compatibility
     complete = False
     if "audb" in db.meta:
         if "complete" in db.meta["audb"]:

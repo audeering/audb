@@ -35,7 +35,7 @@ def load_configuration_file(config_file: str) -> dict:
         return {}
 
     with open(config_file) as cf:
-        config = yaml.load(cf, Loader=yaml.BaseLoader)
+        config = yaml.load(cf, Loader=yaml.SafeLoader)
         if config is None:
             return {}
 
