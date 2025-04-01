@@ -57,11 +57,6 @@ jobs:
         sudo apt-get install --no-install-recommends --yes libsndfile1
       if: matrix.os == 'ubuntu-latest'
 
-    - name: Install numpy<2.0.0 for pandas==2.0.3
-      run: |
-        uv add "numpy<2.0.0"
-      if: matrix.pandas == 'pandas==2.0.3'
-
     - name: Install requested pandas version
       run: |
         uv add "${{ matrix.pandas }}"
