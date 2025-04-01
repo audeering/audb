@@ -67,6 +67,11 @@ jobs:
         uv add "${{ matrix.pandas }}"
       if: matrix.pandas
 
+    - name: List installed Python packages
+      run: |
+        uv sync
+        uv pip list
+
     # TESTS
     - name: Ubuntu - install ffmpeg/mediainfo
       run: |
@@ -83,9 +88,7 @@ jobs:
       if: matrix.os == 'windows-latest'
 
     - name: Test with pytest
-      run: |
-        uv pip list
-        uv run pytest
+      run: uv run pytest
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
