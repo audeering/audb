@@ -62,10 +62,11 @@ jobs:
         uv add "${{ matrix.pandas }}"
       if: matrix.pandas
 
+    - name: Sync Python environment
+      run: uv sync
+
     - name: List installed Python packages
-      run: |
-        uv sync
-        uv pip list
+      run: uv pip list
 
     # TESTS
     - name: Ubuntu - install ffmpeg/mediainfo
