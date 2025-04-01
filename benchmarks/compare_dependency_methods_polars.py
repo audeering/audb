@@ -1,3 +1,10 @@
+# /// script
+# dependencies = [
+#   "pandas",
+#   "tabulate",
+# ]
+# ///
+
 import pandas as pd
 import tabulate
 
