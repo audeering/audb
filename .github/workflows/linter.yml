@@ -23,7 +23,7 @@ jobs:
       uses: astral-sh/setup-uv@v5
 
     - name: Install pre-commit hooks
-      run: uv run pre-commit install --install-hooks
+      run: uvx pre-commit install --install-hooks
 
     - name: Code style check via pre-commit
-      run: uv run pre-commit run --all-files
+      run: uvx pre-commit run --all-files
