@@ -11,3 +11,4 @@ coverage.xml
 docs/api/
 benchmarks/cache/
 benchmarks/results/
+uv.lock

@@ -1,3 +1,13 @@
+# /// script
+# dependencies = [
+#   "audb",
+#   "tabulate",
+# ]
+#
+# [tool.uv.sources]
+# audb = { path = "../", editable = true }
+# ///
+
 import hashlib
 import os
 import pickle

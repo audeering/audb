@@ -55,6 +55,23 @@ repository = 'https://github.com/audeering/audb/'
 documentation = 'https://audeering.github.io/audb/'
 
 
+# ===== Dependency groups =================================================
+[dependency-groups]
+dev = [
+    'audiofile >=1.1.0',
+    'docutils',
+    'pytest',
+    'pytest-cov',
+    'sphinx >=3.5.4',
+    'sphinx-apipages >=0.1.2',
+    'sphinx-audeering-theme >=1.2.1',
+    'sphinx-autodoc-typehints',
+    'sphinx-copybutton',
+    'sybil',
+    'toml',
+]   
+
+
 # ===== BUILD-SYSTEM ======================================================
 #
 # Requirements for building the Python package
