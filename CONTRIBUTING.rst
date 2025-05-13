@@ -46,9 +46,8 @@ are defined in :file:`pyproject.toml`.
 The checks are executed in the CI using `pre-commit`_.
 You can enable those checks locally by executing::
 
-    pip install pre-commit  # consider system wide installation
-    pre-commit install
-    pre-commit run --all-files
+    uvx pre-commit install
+    uvx pre-commit run --all-files
 
 Afterwards ruff_ and codespell_ are executed
 every time you create a commit.
@@ -56,15 +55,14 @@ every time you create a commit.
 You can also install ruff_ and codespell_
 and call it directly::
 
-    pip install ruff codespell  # consider system wide installation
-    ruff check --fix .  # lint all Python files, and fix any fixable errors
-    ruff format .  # format code of all Python files
-    codespell
+    uvx ruff check --fix .  # lint all Python files, and fix any fixable errors
+    uvx ruff format .  # format code of all Python files
+    uvx codespell
 
 It can be restricted to specific folders::
 
-    ruff check audfoo/ tests/
-    codespell audfoo/ tests/
+    uvx ruff check audfoo/ tests/
+    uvx codespell audfoo/ tests/
 
 
 .. _codespell: https://github.com/codespell-project/codespell/
