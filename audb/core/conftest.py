@@ -35,8 +35,11 @@ def cache(tmpdir_factory):
     # Assign values for test
     os.environ["AUDB_CACHE_ROOT"] = str(cache)
     os.environ["AUDB_SHARED_CACHE_ROOT"] = str(cache)
-    audb.config.CACHE_ROOT = "~/audb"
-    audb.config.SHARED_CACHE_ROOT = "/data/audb"
+    default_config = audb.core.config.load_configuration_file(
+        audb.core.config.global_config_file
+    )
+    audb.config.CACHE_ROOT = default_config["cache_root"]
+    audb.config.SHARED_CACHE_ROOT = default_config["shared_cache_root"]
 
     yield
 
