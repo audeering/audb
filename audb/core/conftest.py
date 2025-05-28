@@ -7,6 +7,8 @@ import sybil
 from sybil.parsers.rest import DocTestParser
 
 import audb
+from audb.core.config import global_config_file
+from audb.core.config import load_configuration_file
 
 
 def imports(namespace):
@@ -22,8 +24,10 @@ def cache(tmpdir_factory):
     it makes sense to cache it
     across all docstring tests.
 
-    We use a environment variable,
-    and set ``audb.config.CACHE_ROOT`` to its default value.
+    We use a environment variables,
+    and set ``audb.config.CACHE_ROOT``
+    and ``audb.config.SHARED_CACHE_ROOT``
+    to its default values.
 
     """
     cache = tmpdir_factory.mktemp("cache")
@@ -35,9 +39,7 @@ def cache(tmpdir_factory):
     # Assign values for test
     os.environ["AUDB_CACHE_ROOT"] = str(cache)
     os.environ["AUDB_SHARED_CACHE_ROOT"] = str(cache)
-    default_config = audb.core.config.load_configuration_file(
-        audb.core.config.global_config_file
-    )
+    default_config = load_configuration_file(global_config_file)
     audb.config.CACHE_ROOT = default_config["cache_root"]
     audb.config.SHARED_CACHE_ROOT = default_config["shared_cache_root"]
 
