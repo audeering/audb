@@ -20,9 +20,9 @@ Development Installation
 Instead of pip-installing the latest release from PyPI_,
 you should get the newest development version from Github_::
 
-   git clone https://github.com/audeering/audb/
-   cd audb
-   uv sync
+    git clone https://github.com/audeering/audb/
+    cd audb
+    uv sync
 
 
 This way,
@@ -77,14 +77,19 @@ Building the Documentation
 If you make changes to the documentation,
 you can re-create the HTML pages using Sphinx_::
 
-   uv run python -m sphinx docs/ build/html -b html
+    uv run python -m sphinx docs/ build/html -b html
 
 The generated files will be available
 in the directory :file:`build/html/`.
 
+Note,
+that you need ``graphviz`` for building the documentation::
+
+    sudo apt install graphviz
+
 It is also possible to automatically check if all links are still valid::
 
-   uv run python -m sphinx docs/ build/html -b linkcheck
+    uv run python -m sphinx docs/ build/html -b linkcheck
 
 .. _Sphinx: http://sphinx-doc.org
 
@@ -94,7 +99,7 @@ Running the Tests
 
 You can run tests with pytest_::
 
-   uv run pytest
+    uv run pytest
 
 .. _pytest: https://pytest.org
 
