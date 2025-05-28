@@ -7,6 +7,8 @@ import sybil
 from sybil.parsers.rest import DocTestParser
 
 import audb
+from audb.core.config import global_config_file
+from audb.core.config import load_configuration_file
 
 
 def imports(namespace):
@@ -22,28 +24,38 @@ def cache(tmpdir_factory):
     it makes sense to cache it
     across all docstring tests.
 
+    We use a environment variables,
+    and set ``audb.config.CACHE_ROOT``
+    and ``audb.config.SHARED_CACHE_ROOT``
+    to its default values.
+
     """
     cache = tmpdir_factory.mktemp("cache")
-    # We use the environment variable here
-    # to ensure audb.config.CACHE_ROOT
-    # does still return the default config value
-    # in the doctest
+    # Store original values
     env_cache = os.environ.get("AUDB_CACHE_ROOT", None)
     env_shared_cache = os.environ.get("AUDB_SHARED_CACHE_ROOT", None)
+    config_cache = audb.config.CACHE_ROOT
+    config_shared_cache = audb.config.SHARED_CACHE_ROOT
+    # Assign values for test
     os.environ["AUDB_CACHE_ROOT"] = str(cache)
     os.environ["AUDB_SHARED_CACHE_ROOT"] = str(cache)
+    default_config = load_configuration_file(global_config_file)
+    audb.config.CACHE_ROOT = default_config["cache_root"]
+    audb.config.SHARED_CACHE_ROOT = default_config["shared_cache_root"]
 
     yield
 
+    # Reassign original values
     if env_cache is None:
         del os.environ["AUDB_CACHE_ROOT"]
     else:  # pragma: nocover
         os.environ["AUDB_CACHE_ROOT"] = env_cache
-
     if env_shared_cache is None:
         del os.environ["AUDB_SHARED_CACHE_ROOT"]
     else:  # pragma: nocover
         os.environ["AUDB_SHARED_CACHE_ROOT"] = env_shared_cache
+    audb.config.CACHE_ROOT = config_cache
+    audb.config.SHARED_CACHE_ROOT = config_shared_cache
 
 
 @pytest.fixture(autouse=True)
