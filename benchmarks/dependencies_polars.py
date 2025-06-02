@@ -1,3 +1,14 @@
+# /// script
+# dependencies = [
+#   "audb",
+#   "polars",
+#   "tabulate",
+# ]
+#
+# [tool.uv.sources]
+# audb = { path = "../", editable = true }
+# ///
+
 from __future__ import annotations
 
 from collections.abc import Callable

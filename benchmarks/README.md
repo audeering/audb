@@ -13,14 +13,6 @@ on the following machine:
 * Linux: Ubuntu 22.04
 * Python: 3.10
 
-Before running any benchmark,
-make sure to install missing requirements with:
-
-```bash
-$ cd benchmarks/
-$ pip install -r requirements.txt
-```
-
 
 ## audb.Dependencies methods
 
@@ -34,7 +26,7 @@ the dependency table internally.
 To run the benchmark execute:
 
 ```bash
-$ python benchmark-dependencies-methods.py
+$ uv run --python 3.10 benchmark-dependencies-methods.py
 ```
 
 Execution times in seconds
@@ -97,14 +89,14 @@ This benchmark was executed on:
 To run the benchmark execute:
 
 ```bash
-$ python benchmark-dependencies-methods-polars.py
+$ uv run --python 3.11 benchmark-dependencies-methods-polars.py
 ```
 
 The data were compared to
 the results from `benchmark-dependencies-methods.py` using
 
 ```bash
-python compare_dependency_methods_polars.py
+$ uv run --python 3.11 compare_dependency_methods_polars.py
 ```
 Both steps require that `benchmark-dependencies-methods.py`
 has been run previously in order to create the test data
@@ -161,7 +153,7 @@ and `pyarrow.Table`).
 To run the benchmark execute:
 
 ```bash
-$ python benchmark-dependencies-save-and-load.py
+$ uv run --python 3.10 benchmark-dependencies-save-and-load.py
 ```
 
 **Writing**
