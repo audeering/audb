@@ -758,26 +758,21 @@ def publish(
         previous_version = all_versions[-1] if len(all_versions) > 0 else None
     # Check repository consistency when previous_version is specified
     if previous_version is not None:
-        try:
-            previous_repository = utils._lookup(db.name, previous_version)[0]
-            if previous_repository.name != repository.name:
-                raise RuntimeError(
-                    f"Cannot publish version '{version}' to repository "
-                    f"'{repository.name}' based on previous version "
-                    f"'{previous_version}'. The previous version is stored "
-                    f"in repository '{previous_repository.name}'. "
-                    f"Publishing to a different repository would split "
-                    f"the database across multiple repositories, which "
-                    f"can create data privacy risks and is not supported. "
-                    f"Use previous_version=None to start a new database "
-                    f"in '{repository.name}' or publish to the same "
-                    f"repository '{previous_repository.name}'."
-                )
-        except RuntimeError as e:
-            # If lookup fails because previous version doesn't exist,
-            # re-raise the original error
-            if "Cannot find version" in str(e):
-                raise
+        previous_repository = utils._lookup(db.name, previous_version)[0]
+        if previous_repository != repository:
+            print("repos different")
+            raise RuntimeError(
+                f"Cannot publish version '{version}' to repository "
+                f"'{repository.name}' based on previous version "
+                f"'{previous_version}'. The previous version is stored "
+                f"in repository '{previous_repository.name}'. "
+                f"Publishing to a different repository would split "
+                f"the database across multiple repositories, which "
+                f"can create data privacy risks and is not supported. "
+                f"Use previous_version=None to start a new database "
+                f"in '{repository.name}' or publish to the same "
+                f"repository '{previous_repository.name}'."
+            )
 
     # load database and dependencies
     deps = Dependencies()

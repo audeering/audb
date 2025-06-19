@@ -1117,7 +1117,18 @@ def test_publish_error_cross_repository(tmpdir):
             audb.publish(db_path_v2, "2.0.0", repo2, previous_version="1.0.0")
 
         # Publishing to repo2 with previous_version=None should work
+        os.remove(audeer.path(db_path, "db.parquet"))
         audb.publish(db_path, "2.0.0", repo2, previous_version=None)
+
+        # Assert that the new version appears in repo2
+        assert os.path.exists(
+            audeer.path(repo2.host, repo2.name, "test_cross_repo", "2.0.0")
+        )
+
+        # Assert that the new version does NOT appear in repo1
+        assert not os.path.exists(
+            audeer.path(repo1.host, repo1.name, "test_cross_repo", "2.0.0")
+        )
 
     finally:
         # Restore original repositories
