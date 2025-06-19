@@ -15,6 +15,7 @@ import audiofile
 from audb.core import define
 from audb.core import utils
 from audb.core.api import dependencies
+from audb.core.api import versions as api_versions
 from audb.core.dependencies import Dependencies
 from audb.core.dependencies import upload_dependencies
 from audb.core.repository import Repository
@@ -752,10 +753,35 @@ def publish(
             "A version " f"'{version}' " "already exists for database " f"'{db.name}'."
         )
     if previous_version == "latest":
-        if len(versions) > 0:
-            previous_version = versions[-1]
+        # Find latest version across all repositories (like audb.latest_version)
+        all_versions = api_versions(db.name)
+        if len(all_versions) > 0:
+            previous_version = all_versions[-1]
         else:
             previous_version = None
+
+    # Check repository consistency when previous_version is specified
+    if previous_version is not None:
+        try:
+            previous_repository = utils._lookup(db.name, previous_version)[0]
+            if previous_repository.name != repository.name:
+                raise RuntimeError(
+                    f"Cannot publish version '{version}' to repository "
+                    f"'{repository.name}' based on previous version "
+                    f"'{previous_version}'. The previous version is stored "
+                    f"in repository '{previous_repository.name}'. "
+                    f"Publishing to a different repository would split "
+                    f"the database across multiple repositories, which "
+                    f"can create data privacy risks and is not supported. "
+                    f"Use previous_version=None to start a new database "
+                    f"in '{repository.name}' or publish to the same "
+                    f"repository '{previous_repository.name}'."
+                )
+        except RuntimeError as e:
+            # If lookup fails because previous version doesn't exist,
+            # re-raise the original error
+            if "Cannot find version" in str(e):
+                raise
 
     # load database and dependencies
     deps = Dependencies()
