@@ -382,6 +382,13 @@ def test_load_save_pandas_compatibility(pandas_version):
         with pytest.raises(KeyError, match=error_msg):
             deps.load(deps_file)
 
+    # Dependency table cached with pandas>=2.1.4,<2.3.
+    # Loading with pandas>=2.3.0 leads to AttributeError
+    elif pd.__version__ >= "2.3.0" and pandas_version >= "2.1.4":
+        error_msg = "'StringDtype' object has no attribute '_na_value'"
+        with pytest.raises(AttributeError, match=error_msg):
+            deps.load(deps_file)
+
     else:
         deps.load(deps_file)
         assert deps._df.index.dtype == audb.core.define.DEPENDENCY_INDEX_DTYPE
