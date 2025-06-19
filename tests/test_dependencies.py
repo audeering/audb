@@ -349,8 +349,8 @@ def test_load_save_pandas_compatibility(pandas_version):
 
     Test which ``pandas`` versions raise errors
     when loading deps from pickle files.
-    We have to except those errors inside
-    ``audb.dependencies()``.
+    In ``audb.dependencies()`` we catch all exceptions,
+    and delete and re-create the dependency table.
 
     See Also:
     https://github.com/audeering/audb/issues/418
