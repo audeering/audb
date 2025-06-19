@@ -1082,11 +1082,12 @@ def test_publish_error_cross_repository(tmpdir):
     try:
         # Create simple database
         db_path = audeer.mkdir(tmpdir, "db")
+        name = "test_cross_repo"
         audio_file = audeer.path(db_path, "f1.wav")
         signal = np.zeros((2, 1000))
         sampling_rate = 8000
         audiofile.write(audio_file, signal, sampling_rate)
-        db = audformat.Database("test_cross_repo")
+        db = audformat.Database(name)
         index = audformat.filewise_index(os.path.basename(audio_file))
         db["table"] = audformat.Table(index)
         db["table"]["column"] = audformat.Column()
@@ -1099,7 +1100,7 @@ def test_publish_error_cross_repository(tmpdir):
         # Load the previous version to set up dependencies for next version
         # (this is the normal workflow)
         db_path_v2 = audeer.mkdir(tmpdir, "db_v2")
-        audb.load_to(db_path_v2, "test_cross_repo", version="1.0.0", verbose=False)
+        audb.load_to(db_path_v2, name, version="1.0.0", verbose=False)
 
         # Try to publish version 2.0.0 to repo2 with previous_version="latest"
         # This should fail because latest version is in repo1
@@ -1121,14 +1122,10 @@ def test_publish_error_cross_repository(tmpdir):
         audb.publish(db_path, "2.0.0", repo2, previous_version=None)
 
         # Assert that the new version appears in repo2
-        assert os.path.exists(
-            audeer.path(repo2.host, repo2.name, "test_cross_repo", "2.0.0")
-        )
+        assert os.path.exists(audeer.path(repo2.host, repo2.name, name, "2.0.0"))
 
         # Assert that the new version does NOT appear in repo1
-        assert not os.path.exists(
-            audeer.path(repo1.host, repo1.name, "test_cross_repo", "2.0.0")
-        )
+        assert not os.path.exists(audeer.path(repo1.host, repo1.name, name, "2.0.0"))
 
     finally:
         # Restore original repositories
