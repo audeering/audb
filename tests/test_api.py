@@ -48,6 +48,7 @@ class TestAvailable:
         to the first repository.
 
         """
+        print(f"{audb.config.REPOSITORIES=}")
         repository = audb.config.REPOSITORIES[0]
         empty_folder = audeer.mkdir(repository.host, repository.name, "no-database")
         yield
