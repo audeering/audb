@@ -755,11 +755,7 @@ def publish(
     if previous_version == "latest":
         # Find latest version across all repositories (like audb.latest_version)
         all_versions = api_versions(db.name)
-        if len(all_versions) > 0:
-            previous_version = all_versions[-1]
-        else:
-            previous_version = None
-
+        previous_version = all_versions[-1] if len(all_versions) > 0 else None
     # Check repository consistency when previous_version is specified
     if previous_version is not None:
         try:
