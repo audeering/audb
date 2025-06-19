@@ -762,16 +762,18 @@ def publish(
         if previous_repository != repository:
             print("repos different")
             raise RuntimeError(
-                f"Cannot publish version '{version}' to repository "
-                f"'{repository.name}' based on previous version "
-                f"'{previous_version}'. The previous version is stored "
-                f"in repository '{previous_repository.name}'. "
-                f"Publishing to a different repository would split "
-                f"the database across multiple repositories, which "
-                f"can create data privacy risks and is not supported. "
-                f"Use previous_version=None to start a new database "
-                f"in '{repository.name}' or publish to the same "
-                f"repository '{previous_repository.name}'."
+                f"Cannot publish version '{version}' "
+                f"to repository '{repository.name}' "
+                f"based on previous version '{previous_version}'. "
+                "The previous version is stored in repository "
+                f"'{previous_repository.name}'. "
+                "Publishing to a different repository would split the database "
+                "across multiple repositories, "
+                "which can create data privacy risks "
+                "and is not supported. "
+                "Use previous_version=None "
+                f"to start a new database in '{repository.name}' "
+                f"or publish to the same repository '{previous_repository.name}'."
             )
 
     # load database and dependencies
