@@ -301,6 +301,15 @@ def dependencies(
             deps.load(cached_deps_file)
         except Exception:  # does not catch KeyboardInterupt
             # If loading cached file fails, load again from backend
+            #
+            # This can fail as we use PyArrow data types,
+            # which when loading from pickle
+            # are not compatible between certain pandas versions.
+            # We had originally some tests for it,
+            # but as the actual failure is not that important,
+            # we removed them in
+            # See https://github.com/audeering/audb/pull/507
+            #
             backend_interface = utils.lookup_backend(name, version)
             deps = download_dependencies(backend_interface, name, version, verbose)
             # Store as pickle in cache

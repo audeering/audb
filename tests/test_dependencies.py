@@ -337,63 +337,6 @@ def test_load_save_backward_compatibility(tmpdir, deps):
     assert deps == deps2
 
 
-@pytest.mark.parametrize("pandas_version", ["2.0.3", "2.1.4", "2.2.2"])
-def test_load_save_pandas_compatibility(pandas_version):
-    """Test pandas backward compatibility of pickle cache files.
-
-    Dataframes using pyarrow dtypes,
-    and stored as pickle files
-    might fail to load
-    if the used ``pandas`` version
-    does not match.
-
-    Test which ``pandas`` versions raise errors
-    when loading deps from pickle files.
-    In ``audb.dependencies()`` we catch all exceptions,
-    and delete and re-create the dependency table.
-
-    See Also:
-    https://github.com/audeering/audb/issues/418
-
-    Args:
-        pandas_version: the version of ``pandas``
-            used to store the dependency table in cache
-
-    """
-    deps_file = audeer.path(
-        CURRENT_DIR,
-        "assests",
-        "dependency-table-pandas",
-        f"emodb-pandas-{pandas_version}.pkl",
-    )
-    deps = audb.Dependencies()
-
-    # Dependency table cached with pandas==2.0.3.
-    # Loading with pandas>=2.1.0 leads to a ModuleNotFoundError
-    if pd.__version__ >= "2.1.0" and pandas_version == "2.0.3":
-        error_msg = "No module named 'pandas.core.arrays.arrow.dtype'"
-        with pytest.raises(ModuleNotFoundError, match=error_msg):
-            deps.load(deps_file)
-
-    # Dependency table cached with pandas>=2.1.4.
-    # Loading with pandas==2.0.3 leads to a KeyError
-    elif pd.__version__ == "2.0.3" and pandas_version >= "2.1.4":
-        error_msg = "'_data'"
-        with pytest.raises(KeyError, match=error_msg):
-            deps.load(deps_file)
-
-    # Dependency table cached with pandas>=2.1.4,<2.3.
-    # Loading with pandas>=2.3.0 leads to AttributeError
-    elif pd.__version__ >= "2.3.0" and pandas_version >= "2.1.4":
-        error_msg = "'StringDtype' object has no attribute '_na_value'"
-        with pytest.raises(AttributeError, match=error_msg):
-            deps.load(deps_file)
-
-    else:
-        deps.load(deps_file)
-        assert deps._df.index.dtype == audb.core.define.DEPENDENCY_INDEX_DTYPE
-
-
 def test_load_save_errors(deps):
     """Test possible errors when loading/saving."""
     # Wrong file extension
