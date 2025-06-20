@@ -60,7 +60,7 @@ documentation = 'https://audeering.github.io/audb/'
 dev = [
     'audiofile >=1.1.0',
     'docutils',
-    'pytest',
+    'pytest <8.4.0',
     'pytest-cov',
     'sphinx >=3.5.4',
     'sphinx-apipages >=0.1.2',
