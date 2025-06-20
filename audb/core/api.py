@@ -302,9 +302,10 @@ def dependencies(
         except Exception:  # does not catch KeyboardInterupt
             # If loading cached file fails, load again from backend
             #
-            # This can fail as we use PyArrow data types,
+            # Loading a cache file can fail
+            # as we use PyArrow data types,
             # which when loading from pickle
-            # are not compatible between certain pandas versions.
+            # are not compatible between all pandas versions.
             # We had originally some tests for it,
             # but as the actual failure is not that important,
             # we removed them in
