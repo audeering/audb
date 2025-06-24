@@ -760,7 +760,6 @@ def publish(
     if previous_version is not None:
         previous_repository = utils._lookup(db.name, previous_version)[0]
         if previous_repository != repository:
-            print("repos different")
             raise RuntimeError(
                 f"Cannot publish version '{version}' "
                 f"to repository '{repository.name}' "
