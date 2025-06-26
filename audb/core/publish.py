@@ -15,6 +15,7 @@ import audiofile
 from audb.core import define
 from audb.core import utils
 from audb.core.api import dependencies
+from audb.core.api import versions as api_versions
 from audb.core.dependencies import Dependencies
 from audb.core.dependencies import upload_dependencies
 from audb.core.repository import Repository
@@ -752,10 +753,27 @@ def publish(
             "A version " f"'{version}' " "already exists for database " f"'{db.name}'."
         )
     if previous_version == "latest":
-        if len(versions) > 0:
-            previous_version = versions[-1]
-        else:
-            previous_version = None
+        # Find latest version across all repositories (like audb.latest_version)
+        all_versions = api_versions(db.name)
+        previous_version = all_versions[-1] if len(all_versions) > 0 else None
+    # Check repository consistency when previous_version is specified
+    if previous_version is not None:
+        previous_repository = utils._lookup(db.name, previous_version)[0]
+        if previous_repository != repository:
+            raise RuntimeError(
+                f"Cannot publish version '{version}' "
+                f"to repository '{repository.name}' "
+                f"based on previous version '{previous_version}'. "
+                "The previous version is stored in repository "
+                f"'{previous_repository.name}'. "
+                "Publishing to a different repository would split the database "
+                "across multiple repositories, "
+                "which can create data privacy risks "
+                "and is not supported. "
+                "Use previous_version=None "
+                f"to start a new database in '{repository.name}' "
+                f"or publish to the same repository '{previous_repository.name}'."
+            )
 
     # load database and dependencies
     deps = Dependencies()

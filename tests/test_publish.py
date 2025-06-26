@@ -994,6 +994,74 @@ def test_publish_error_changed_deps_file_type(tmpdir, repository):
     audeer.rmdir(db_path)
 
 
+def test_publish_error_cross_repository(tmpdir):
+    """Test that publishing to different repository fails with appropriate error."""
+    # Create two separate repositories
+    host = audeer.mkdir(tmpdir, "host")
+    repo1 = audb.Repository("repo1", host, "file-system")
+    repo2 = audb.Repository("repo2", host, "file-system")
+
+    # Create directory structure for repositories
+    audeer.mkdir(host, "repo1")
+    audeer.mkdir(host, "repo2")
+
+    # Save original config and set both repositories
+    original_repos = audb.config.REPOSITORIES
+    audb.config.REPOSITORIES = [repo1, repo2]
+
+    try:
+        # Create simple database
+        db_path = audeer.mkdir(tmpdir, "db")
+        name = "test_cross_repo"
+        audio_file = audeer.path(db_path, "f1.wav")
+        signal = np.zeros((2, 1000))
+        sampling_rate = 8000
+        audiofile.write(audio_file, signal, sampling_rate)
+        db = audformat.Database(name)
+        index = audformat.filewise_index(os.path.basename(audio_file))
+        db["table"] = audformat.Table(index)
+        db["table"]["column"] = audformat.Column()
+        db["table"]["column"].set(["label"])
+        db.save(db_path)
+
+        # Publish version 1.0.0 to repo1
+        audb.publish(db_path, "1.0.0", repo1, previous_version=None)
+
+        # Load the previous version to set up dependencies for next version
+        # (this is the normal workflow)
+        db_path_v2 = audeer.mkdir(tmpdir, "db_v2")
+        audb.load_to(db_path_v2, name, version="1.0.0", verbose=False)
+
+        # Try to publish version 2.0.0 to repo2 with previous_version="latest"
+        # This should fail because latest version is in repo1
+        error_msg = (
+            "Cannot publish version '2.0.0' to repository 'repo2' "
+            "based on previous version '1.0.0'. The previous version is stored "
+            "in repository 'repo1'. Publishing to a different repository would "
+            "split the database across multiple repositories"
+        )
+        with pytest.raises(RuntimeError, match=re.escape(error_msg)):
+            audb.publish(db_path_v2, "2.0.0", repo2, previous_version="latest")
+
+        # Try to publish version 2.0.0 to repo2 with explicit previous_version
+        with pytest.raises(RuntimeError, match=re.escape(error_msg)):
+            audb.publish(db_path_v2, "2.0.0", repo2, previous_version="1.0.0")
+
+        # Publishing to repo2 with previous_version=None should work
+        os.remove(audeer.path(db_path, "db.parquet"))
+        audb.publish(db_path, "2.0.0", repo2, previous_version=None)
+
+        # Assert that the new version appears in repo2
+        assert os.path.exists(audeer.path(repo2.host, repo2.name, name, "2.0.0"))
+
+        # Assert that the new version does NOT appear in repo1
+        assert not os.path.exists(audeer.path(repo1.host, repo1.name, name, "2.0.0"))
+
+    finally:
+        # Restore original repositories
+        audb.config.REPOSITORIES = original_repos
+
+
 def test_publish_error_repository_does_not_exist(tmpdir, repository):
     db = audformat.Database("test")
     db.save(tmpdir)
