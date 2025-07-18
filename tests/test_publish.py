@@ -1167,7 +1167,7 @@ def test_publish_text_media_files(tmpdir, dbs, repository, storage_format):
     assert list(db) == ["files"]
     assert os.path.exists(audeer.path(db.root, file))
 
-    # Test requestng a flavor
+    # Test requesting a flavor
     db = audb.load(name, version=version, channels=[0], verbose=False)
     assert db.files == [file]
     assert os.path.exists(audeer.path(db.root, file))
