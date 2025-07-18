@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterable
+from collections.abc import Iterator
 from collections.abc import Sequence
 import os
 
@@ -397,13 +398,12 @@ class DatabaseIteratorCsv(DatabaseIterator):
 
 
 class DatabaseIteratorParquet(DatabaseIterator):
-    def _initialize_stream(self) -> pa.RecordBatch:
+    def _initialize_stream(self) -> Iterator[pa.RecordBatch]:
         if self._samples == 0:
             # pyarrow >=21.0.0 does not support batch_size=0
-            return pa.RecordBatch.from_arrays([])
-        else:
-            file = os.path.join(self.root, f"db.{self._table}.parquet")
-            return parquet.ParquetFile(file).iter_batches(batch_size=self._samples)
+            return []
+        file = os.path.join(self.root, f"db.{self._table}.parquet")
+        return parquet.ParquetFile(file).iter_batches(batch_size=self._samples)
 
     def _postprocess_batch(self, batch: pa.RecordBatch) -> pd.DataFrame:
         df = batch.to_pandas(
