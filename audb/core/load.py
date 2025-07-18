@@ -470,15 +470,15 @@ def _get_media_from_backend(
             version,
             tmp_root=db_root_tmp,
         )
+        # media files that can be changed to a requested flavor
+        flavor_files = deps._df[deps._df.sampling_rate != 0].index
         for file in files:
             if os.name == "nt":  # pragma: no cover
                 file = file.replace(os.sep, "/")
-            if flavor is not None:
-                # Skip non-media files
-                if (sampling_rate := deps.sampling_rate(file)) == 0:
-                    continue
+            if flavor is not None and file in flavor_files:
                 bit_depth = deps.bit_depth(file)
                 channels = deps.channels(file)
+                sampling_rate = deps.sampling_rate(file)
                 src_path = os.path.join(db_root_tmp, file)
                 file = flavor.destination(file)
                 dst_path = os.path.join(db_root_tmp, file)
