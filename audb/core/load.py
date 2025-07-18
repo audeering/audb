@@ -482,18 +482,13 @@ def _get_media_from_backend(
                 src_path = os.path.join(db_root_tmp, file)
                 file = flavor.destination(file)
                 dst_path = os.path.join(db_root_tmp, file)
-                try:
-                    flavor(
-                        src_path,
-                        dst_path,
-                        src_bit_depth=bit_depth,
-                        src_channels=channels,
-                        src_sampling_rate=sampling_rate,
-                    )
-                except RuntimeError:
-                    raise RuntimeError(
-                        f"Media file '{file}' does not support requesting a flavor."
-                    )
+                flavor(
+                    src_path,
+                    dst_path,
+                    src_bit_depth=bit_depth,
+                    src_channels=channels,
+                    src_sampling_rate=sampling_rate,
+                )
                 if src_path != dst_path:
                     os.remove(src_path)
 
