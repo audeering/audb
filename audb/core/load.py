@@ -470,28 +470,25 @@ def _get_media_from_backend(
             version,
             tmp_root=db_root_tmp,
         )
+        # media files that can be changed to a requested flavor
+        flavor_files = deps._df[deps._df.sampling_rate != 0].index
         for file in files:
             if os.name == "nt":  # pragma: no cover
                 file = file.replace(os.sep, "/")
-            if flavor is not None:
+            if flavor is not None and file in flavor_files:
                 bit_depth = deps.bit_depth(file)
                 channels = deps.channels(file)
                 sampling_rate = deps.sampling_rate(file)
                 src_path = os.path.join(db_root_tmp, file)
                 file = flavor.destination(file)
                 dst_path = os.path.join(db_root_tmp, file)
-                try:
-                    flavor(
-                        src_path,
-                        dst_path,
-                        src_bit_depth=bit_depth,
-                        src_channels=channels,
-                        src_sampling_rate=sampling_rate,
-                    )
-                except RuntimeError:
-                    raise RuntimeError(
-                        f"Media file '{file}' does not support requesting a flavor."
-                    )
+                flavor(
+                    src_path,
+                    dst_path,
+                    src_bit_depth=bit_depth,
+                    src_channels=channels,
+                    src_sampling_rate=sampling_rate,
+                )
                 if src_path != dst_path:
                     os.remove(src_path)
 
