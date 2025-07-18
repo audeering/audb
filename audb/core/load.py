@@ -474,9 +474,11 @@ def _get_media_from_backend(
             if os.name == "nt":  # pragma: no cover
                 file = file.replace(os.sep, "/")
             if flavor is not None:
+                # Skip non-media files
+                if (sampling_rate := deps.sampling_rate(file)) == 0:
+                    continue
                 bit_depth = deps.bit_depth(file)
                 channels = deps.channels(file)
-                sampling_rate = deps.sampling_rate(file)
                 src_path = os.path.join(db_root_tmp, file)
                 file = flavor.destination(file)
                 dst_path = os.path.join(db_root_tmp, file)
