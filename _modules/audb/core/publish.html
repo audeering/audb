@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.3
+                v1.11.4
               </div>
             
           
@@ -166,6 +166,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">define</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">dependencies</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">versions</span> <span class="k">as</span> <span class="n">api_versions</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dependencies</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">upload_dependencies</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">Repository</span>
@@ -903,10 +904,27 @@
             <span class="s2">&quot;A version &quot;</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&#39; &quot;</span> <span class="s2">&quot;already exists for database &quot;</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">previous_version</span> <span class="o">==</span> <span class="s2">&quot;latest&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">versions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">previous_version</span> <span class="o">=</span> <span class="n">versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">previous_version</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Find latest version across all repositories (like audb.latest_version)</span>
+        <span class="n">all_versions</span> <span class="o">=</span> <span class="n">api_versions</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">previous_version</span> <span class="o">=</span> <span class="n">all_versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_versions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="c1"># Check repository consistency when previous_version is specified</span>
+    <span class="k">if</span> <span class="n">previous_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">previous_repository</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">_lookup</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">previous_version</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">previous_repository</span> <span class="o">!=</span> <span class="n">repository</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot publish version &#39;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;to repository &#39;</span><span class="si">{</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;based on previous version &#39;</span><span class="si">{</span><span class="n">previous_version</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                <span class="s2">&quot;The previous version is stored in repository &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">previous_repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                <span class="s2">&quot;Publishing to a different repository would split the database &quot;</span>
+                <span class="s2">&quot;across multiple repositories, &quot;</span>
+                <span class="s2">&quot;which can create data privacy risks &quot;</span>
+                <span class="s2">&quot;and is not supported. &quot;</span>
+                <span class="s2">&quot;Use previous_version=None &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;to start a new database in &#39;</span><span class="si">{</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;or publish to the same repository &#39;</span><span class="si">{</span><span class="n">previous_repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="p">)</span>
 
     <span class="c1"># load database and dependencies</span>
     <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
@@ -1079,7 +1097,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/02/20 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

@@ -5,10 +5,13 @@ To install :mod:`audb` run:
 
 .. code-block:: bash
 
-    $ # Create and activate Python virtual environment, e.g.
-    $ # virtualenv --python=python3 ${HOME}/.envs/audb
-    $ # source ${HOME}/.envs/audb/bin/activate
     $ pip install audb
+
+To interactively test it run:
+
+.. code-block:: bash
+
+    $ uvx --with audb ipython
 
 :mod:`audb` uses :mod:`audiofile` to access media files,
 which supports WAV, FLAC, OGG out of the box.

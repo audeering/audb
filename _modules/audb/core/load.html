@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.3
+                v1.11.4
               </div>
             
           
@@ -621,28 +621,25 @@
             <span class="n">version</span><span class="p">,</span>
             <span class="n">tmp_root</span><span class="o">=</span><span class="n">db_root_tmp</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># media files that can be changed to a requested flavor</span>
+        <span class="n">flavor_files</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="n">deps</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="n">file</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">flavor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">flavor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">flavor_files</span><span class="p">:</span>
                 <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                 <span class="n">channels</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">channels</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                 <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                 <span class="n">src_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
                 <span class="n">file</span> <span class="o">=</span> <span class="n">flavor</span><span class="o">.</span><span class="n">destination</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                 <span class="n">dst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">flavor</span><span class="p">(</span>
-                        <span class="n">src_path</span><span class="p">,</span>
-                        <span class="n">dst_path</span><span class="p">,</span>
-                        <span class="n">src_bit_depth</span><span class="o">=</span><span class="n">bit_depth</span><span class="p">,</span>
-                        <span class="n">src_channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
-                        <span class="n">src_sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
-                    <span class="p">)</span>
-                <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Media file &#39;</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&#39; does not support requesting a flavor.&quot;</span>
-                    <span class="p">)</span>
+                <span class="n">flavor</span><span class="p">(</span>
+                    <span class="n">src_path</span><span class="p">,</span>
+                    <span class="n">dst_path</span><span class="p">,</span>
+                    <span class="n">src_bit_depth</span><span class="o">=</span><span class="n">bit_depth</span><span class="p">,</span>
+                    <span class="n">src_channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
+                    <span class="n">src_sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span>
+                <span class="p">)</span>
                 <span class="k">if</span> <span class="n">src_path</span> <span class="o">!=</span> <span class="n">dst_path</span><span class="p">:</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">src_path</span><span class="p">)</span>
 
@@ -1958,7 +1955,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/02/20 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
