@@ -10,10 +10,9 @@ and this project adheres to `Semantic Versioning`_.
 Version 1.11.4 (2025-07-22)
 ---------------------------
 
-* Changed: a new version of a database
+* Changed: restrict publishing of a new version of a database
   with dependencies to a previous version
-  can only be published
-  in the same repository
+  to the same repository
   as the previous version
 * Changed: skip non-media files
   when requesting a flavor,
