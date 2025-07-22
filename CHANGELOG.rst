@@ -7,6 +7,20 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.11.4 (2025-07-22)
+---------------------------
+
+* Changed: a new version of a database
+  with dependencies to a previous version
+  can only be published
+  in the same repository
+  as the previous version
+* Changed: skip non-media files
+  when requesting a flavor,
+  e.g. don't raise an error for a JSON file
+* Fixed: ``audb.stream()`` for ``pyarrow>=21.0.0``
+
+
 Version 1.11.3 (2025-02-20)
 ---------------------------
 
