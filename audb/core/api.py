@@ -46,7 +46,7 @@ def available(
               backend                                   host   repository version
         name
         air        s3  s3.dualstack.eu-north-1.amazonaws.com  audb-public   1.4.2
-        emodb      s3  s3.dualstack.eu-north-1.amazonaws.com  audb-public   1.4.1
+        emodb      s3  s3.dualstack.eu-north-1.amazonaws.com  audb-public   2.0.0
 
     """  # noqa: E501
     databases = []
@@ -478,7 +478,7 @@ def latest_version(
 
     Examples:
         >>> audb.latest_version("emodb")
-        '1.4.1'
+        '2.0.0'
 
     """
     vs = versions(name)
@@ -609,7 +609,7 @@ def versions(
 
     Examples:
         >>> audb.versions("emodb")
-        ['1.1.0', '1.1.1', '1.2.0', '1.3.0', '1.4.0', '1.4.1']
+        ['1.1.0', '1.1.1', '1.2.0', '1.3.0', '1.4.0', '1.4.1', '2.0.0']
 
     """
     vs = []
