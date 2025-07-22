@@ -14,7 +14,7 @@ Version 1.11.4 (2025-07-22)
   with dependencies to a previous version
   to the same repository
   as the previous version
-* Changed: skip non-media files
+* Changed: skip media files without audio
   when requesting a flavor,
   e.g. don't raise an error for a JSON file
 * Fixed: ``audb.stream()`` for ``pyarrow>=21.0.0``
