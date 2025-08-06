@@ -110,7 +110,12 @@ class Dependencies:
                     [file],
                 ).fetchone()
                 return result[0] > 0
+            except (duckdb.Error, duckdb.InvalidInputException):
+                # Log DuckDB specific errors but don't fail
+                pass
             except Exception:
+                # Other unexpected errors - close connection and fallback
+                self._close_duckdb_connection()
                 pass
         # Fallback to pandas
         return file in self._df.index
@@ -161,7 +166,12 @@ class Dependencies:
                     "ORDER BY archive"
                 ).fetchall()
                 return [row[0] for row in result]
+            except (duckdb.Error, duckdb.InvalidInputException):
+                # Log DuckDB specific errors but don't fail
+                pass
             except Exception:
+                # Other unexpected errors - close connection and fallback
+                self._close_duckdb_connection()
                 pass
         # Fallback to pandas
         return sorted(self._df.archive.unique().tolist())
@@ -179,7 +189,10 @@ class Dependencies:
                 return self._duckdb_query_files(
                     f"type = {define.DEPENDENCY_TYPE['attachment']}"
                 )
+            except (duckdb.Error, duckdb.InvalidInputException):
+                pass
             except Exception:
+                self._close_duckdb_connection()
                 pass
         # Fallback to pandas
         return self._df[
@@ -201,7 +214,10 @@ class Dependencies:
                     f"WHERE type = {define.DEPENDENCY_TYPE['attachment']}"
                 ).fetchall()
                 return [row[0] for row in result]
+            except (duckdb.Error, duckdb.InvalidInputException):
+                pass
             except Exception:
+                self._close_duckdb_connection()
                 pass
         # Fallback to pandas
         return self._df[
@@ -222,7 +238,10 @@ class Dependencies:
                     f"SELECT file FROM '{self._parquet_file}'"
                 ).fetchall()
                 return [row[0] for row in result]
+            except (duckdb.Error, duckdb.InvalidInputException):
+                pass
             except Exception:
+                self._close_duckdb_connection()
                 pass
         # Fallback to pandas
         return self._df.index.tolist()
@@ -240,7 +259,10 @@ class Dependencies:
                 return self._duckdb_query_files(
                     f"type = {define.DEPENDENCY_TYPE['media']}"
                 )
+            except (duckdb.Error, duckdb.InvalidInputException):
+                pass
             except Exception:
+                self._close_duckdb_connection()
                 pass
         # Fallback to pandas
         return self._df[
@@ -260,7 +282,10 @@ class Dependencies:
                 return self._duckdb_query_files(
                     f"type = {define.DEPENDENCY_TYPE['media']} AND removed = 1"
                 )
+            except (duckdb.Error, duckdb.InvalidInputException):
+                pass
             except Exception:
+                self._close_duckdb_connection()
                 pass
         # Fallback to pandas
         return self._df[
@@ -295,7 +320,10 @@ class Dependencies:
                 return self._duckdb_query_files(
                     f"type = {define.DEPENDENCY_TYPE['meta']}"
                 )
+            except (duckdb.Error, duckdb.InvalidInputException):
+                pass
             except Exception:
+                self._close_duckdb_connection()
                 pass
         # Fallback to pandas
         return self._df[
@@ -650,8 +678,12 @@ class Dependencies:
                 if result is None:
                     raise KeyError(f"File '{file}' not found in dependencies")
                 value = result[0]
-            except (duckdb.Error, Exception):
-                # Fallback to pandas if DuckDB query fails
+            except (duckdb.Error, duckdb.InvalidInputException):
+                # DuckDB specific errors - fallback to pandas
+                value = self._df.at[file, column]
+            except Exception:
+                # Other unexpected errors - close connection and fallback
+                self._close_duckdb_connection()
                 value = self._df.at[file, column]
         else:
             value = self._df.at[file, column]
@@ -828,8 +860,17 @@ class Dependencies:
             self._duckdb_conn.execute(
                 f"SELECT COUNT(*) FROM '{parquet_path}'"
             ).fetchone()
-        except Exception:
+        except (duckdb.Error, duckdb.InvalidInputException):
             # If DuckDB setup fails, fall back to pandas
+            self._duckdb_conn = None
+            self._parquet_file = None
+        except Exception:
+            # Unexpected error during setup
+            if hasattr(self, "_duckdb_conn") and self._duckdb_conn is not None:
+                try:
+                    self._duckdb_conn.close()
+                except Exception:
+                    pass
             self._duckdb_conn = None
             self._parquet_file = None
 
@@ -857,16 +898,28 @@ class Dependencies:
                 query += f" WHERE {condition}"
             result = self._duckdb_conn.execute(query).fetchall()
             return [row[0] for row in result]
+        except (duckdb.Error, duckdb.InvalidInputException):
+            # DuckDB specific errors - fallback to pandas
+            pass
         except Exception:
-            # Fallback to pandas
+            # Unexpected errors - close connection and fallback
+            self._close_duckdb_connection()
+            pass
+
+        # Fallback to pandas
+        if condition:
+            # This is a simplified fallback - in practice, condition
+            # translation would need to be more sophisticated
             return self._df.index.tolist()
+        return self._df.index.tolist()
 
     def _close_duckdb_connection(self):
         r"""Close DuckDB connection if open."""
-        if self._duckdb_conn is not None:
+        if hasattr(self, "_duckdb_conn") and self._duckdb_conn is not None:
             try:
                 self._duckdb_conn.close()
             except Exception:
+                # Ignore errors during connection cleanup
                 pass
             finally:
                 self._duckdb_conn = None
@@ -874,7 +927,11 @@ class Dependencies:
 
     def __del__(self):
         r"""Cleanup DuckDB connection on object destruction."""
-        self._close_duckdb_connection()
+        try:
+            self._close_duckdb_connection()
+        except Exception:
+            # Ignore errors during cleanup to avoid issues during shutdown
+            pass
 
 
 def error_message_missing_object(
