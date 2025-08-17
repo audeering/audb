@@ -984,3 +984,39 @@ def test_repository(persistent_repository, name, version, error, error_msg):
     else:
         repository = audb.repository(name, version)
         assert repository == persistent_repository
+
+
+def test_database_complete_file(tmpdir, persistent_repository):
+    """Test database completeness mechanism with .complete file.
+
+    This test checks if:
+    1. A .complete file is created when loading a complete database
+    2. The _database_is_complete function returns True when the .complete file exists
+    3. The completeness check still works via the header for backward compatibility
+    """
+    # Load a database fully to create the .complete file
+    db = audb.load(DB_NAME, version="1.0.0", cache_root=tmpdir)
+
+    # Get the database root folder path
+    db_root = audb.core.cache.database_cache_root(DB_NAME, "1.0.0", cache_root=tmpdir)
+
+    # Check if .complete file exists
+    complete_file = os.path.join(db_root, audb.core.define.COMPLETE_FILE)
+    assert os.path.exists(complete_file), "The .complete file was not created"
+
+    # Check if the complete flag is also set in the header (for backward compatibility)
+    from audb.core.load import _database_is_complete
+
+    assert _database_is_complete(db), "Database is not marked as complete"
+
+    # Remove .complete file but keep the header flag to test backward compatibility
+    os.remove(complete_file)
+    assert not os.path.exists(complete_file), "The .complete file could not be removed"
+    assert _database_is_complete(
+        db
+    ), "Backward compatibility with header flag not working"
+
+    # Load the database again - this should recreate the .complete file
+    # as the database detects it's complete from the header flag
+    db = audb.load(DB_NAME, version="1.0.0", cache_root=tmpdir)
+    assert os.path.exists(complete_file), "The .complete file was not recreated"
