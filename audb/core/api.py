@@ -592,7 +592,7 @@ def repository(
 
     """  # noqa: E501
     if not versions(name):
-        raise RuntimeError(f"Cannot find database " f"'{name}'.")
+        raise RuntimeError(f"Cannot find database '{name}'.")
     return utils._lookup(name, version)[0]
 
 

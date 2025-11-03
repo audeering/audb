@@ -848,9 +848,9 @@ def error_message_missing_object(
         object_name = object_type
 
     if isinstance(missing_object_id, str):
-        msg = f"Could not find a {object_name} " f"matching '{missing_object_id}'"
+        msg = f"Could not find a {object_name} matching '{missing_object_id}'"
     else:
-        msg = f"Could not find the {object_name} " f"'{missing_object_id[0]}'"
+        msg = f"Could not find the {object_name} '{missing_object_id[0]}'"
     if database_name is not None and database_version is not None:
         msg += f" in {database_name} v{database_version}"
     return msg
