@@ -65,8 +65,7 @@ class Flavor(audobject.Object):
             bit_depth = int(bit_depth)
             if bit_depth not in define.BIT_DEPTHS:
                 raise ValueError(
-                    f"Bit depth has to be one of "
-                    f"{define.BIT_DEPTHS}, not {bit_depth}."
+                    f"Bit depth has to be one of {define.BIT_DEPTHS}, not {bit_depth}."
                 )
 
         if channels is not None:
@@ -74,11 +73,10 @@ class Flavor(audobject.Object):
             if len(channels) < 2:
                 mixdown = False
 
-        if format is not None:
-            if format not in define.FORMATS:
-                raise ValueError(
-                    f"Format has to be one of " f"{define.FORMATS}, not '{format}'."
-                )
+        if format is not None and format not in define.FORMATS:
+            raise ValueError(
+                f"Format has to be one of {define.FORMATS}, not '{format}'."
+            )
 
         if sampling_rate is not None:
             sampling_rate = int(sampling_rate)
@@ -125,7 +123,7 @@ class Flavor(audobject.Object):
         if self.format is not None:
             format = audeer.file_extension(file).lower()
             if format != self.format:
-                file = f"{file[:-len(format)]}{self.format}"
+                file = f"{file[: -len(format)]}{self.format}"
         return file
 
     def path(

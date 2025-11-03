@@ -376,8 +376,7 @@ def _media_values(
         # If sox or mediafile are not installed
         # we get a FileNotFoundError error
         raise RuntimeError(
-            f"sox and mediainfo have to be installed "
-            f"to publish '{format}' media files."
+            f"sox and mediainfo have to be installed to publish '{format}' media files."
         )
     except RuntimeError:
         # Skip audio/video metadata for media files,
@@ -750,7 +749,7 @@ def publish(
 
     if version in versions:
         raise RuntimeError(
-            "A version " f"'{version}' " "already exists for database " f"'{db.name}'."
+            f"A version '{version}' already exists for database '{db.name}'."
         )
     if previous_version == "latest":
         # Find latest version across all repositories (like audb.latest_version)

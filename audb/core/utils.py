@@ -100,9 +100,7 @@ def _lookup(
         else:
             backend_interface.backend.close()
 
-    raise RuntimeError(
-        f"Cannot find version " f"'{version}' " f"for database " f"'{name}'."
-    )
+    raise RuntimeError(f"Cannot find version '{version}' for database '{name}'.")
 
 
 def timeout_warning():
