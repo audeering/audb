@@ -73,11 +73,10 @@ class Flavor(audobject.Object):
             if len(channels) < 2:
                 mixdown = False
 
-        if format is not None:
-            if format not in define.FORMATS:
-                raise ValueError(
-                    f"Format has to be one of {define.FORMATS}, not '{format}'."
-                )
+        if format is not None and format not in define.FORMATS:
+            raise ValueError(
+                f"Format has to be one of {define.FORMATS}, not '{format}'."
+            )
 
         if sampling_rate is not None:
             sampling_rate = int(sampling_rate)
