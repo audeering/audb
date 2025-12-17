@@ -744,8 +744,8 @@ def test_publish_changed_db(
             None,
             RuntimeError,
             (
-                "The following 5 files are referenced in tables "
-                "that cannot be found on disk "
+                "The following 5 files are referenced in tables, "
+                "but cannot be found on disk "
                 "and are not yet part of the database: "
                 "['audio/002.wav', 'audio/003.wav', "
                 "'audio/004.wav', 'audio/005.wav', "
@@ -757,8 +757,8 @@ def test_publish_changed_db(
             None,
             RuntimeError,
             (
-                "The following 25 files are referenced in tables "
-                "that cannot be found on disk "
+                "The following 25 files are referenced in tables, "
+                "but cannot be found on disk "
                 "and are not yet part of the database: "
                 "['audio/002.wav', 'audio/003.wav', "
                 "'audio/004.wav', 'audio/005.wav', "
@@ -774,8 +774,8 @@ def test_publish_changed_db(
             "1.0.0",
             RuntimeError,
             (
-                "The following 21 files are referenced in tables "
-                "that cannot be found on disk "
+                "The following 21 files are referenced in tables, "
+                "but cannot be found on disk "
                 "and are not yet part of the database: "
                 f"['{LONG_PATH}', "
                 "'file0.wav', 'file1.wav', 'file10.wav', 'file11.wav', "

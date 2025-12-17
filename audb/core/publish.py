@@ -61,8 +61,8 @@ def _check_for_missing_media(
         error_msg = (
             f"The following "
             f"{len(missing_files)} "
-            f"files are referenced in tables "
-            f"that cannot be found on disk "
+            f"files are referenced in tables, "
+            f"but cannot be found on disk "
             f"and are not yet part of the database: "
             f"{missing_files[:number_of_presented_files]}"
         )
