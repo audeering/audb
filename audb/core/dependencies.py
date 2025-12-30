@@ -104,19 +104,11 @@ class Dependencies:
 
         """
         if self._duckdb_conn is not None and self._parquet_file is not None:
-            try:
-                result = self._duckdb_conn.execute(
-                    f"SELECT COUNT(*) FROM '{self._parquet_file}' WHERE file = ?",
-                    [file],
-                ).fetchone()
-                return result[0] > 0
-            except (duckdb.Error, duckdb.InvalidInputException):
-                # Log DuckDB specific errors but don't fail
-                pass
-            except Exception:
-                # Other unexpected errors - close connection and fallback
-                self._close_duckdb_connection()
-                pass
+            result = self._duckdb_conn.execute(
+                f"SELECT COUNT(*) FROM '{self._parquet_file}' WHERE file = ?",
+                [file],
+            ).fetchone()
+            return result[0] > 0
         # Fallback to pandas
         return file in self._df.index
 
@@ -160,19 +152,10 @@ class Dependencies:
 
         """
         if self._duckdb_conn is not None and self._parquet_file is not None:
-            try:
-                result = self._duckdb_conn.execute(
-                    f"SELECT DISTINCT archive FROM '{self._parquet_file}' "
-                    "ORDER BY archive"
-                ).fetchall()
-                return [row[0] for row in result]
-            except (duckdb.Error, duckdb.InvalidInputException):
-                # Log DuckDB specific errors but don't fail
-                pass
-            except Exception:
-                # Other unexpected errors - close connection and fallback
-                self._close_duckdb_connection()
-                pass
+            result = self._duckdb_conn.execute(
+                f"SELECT DISTINCT archive FROM '{self._parquet_file}' ORDER BY archive"
+            ).fetchall()
+            return [row[0] for row in result]
         # Fallback to pandas
         return sorted(self._df.archive.unique().tolist())
 
@@ -185,15 +168,9 @@ class Dependencies:
 
         """
         if self._duckdb_conn is not None and self._parquet_file is not None:
-            try:
-                return self._duckdb_query_files(
-                    f"type = {define.DEPENDENCY_TYPE['attachment']}"
-                )
-            except (duckdb.Error, duckdb.InvalidInputException):
-                pass
-            except Exception:
-                self._close_duckdb_connection()
-                pass
+            return self._duckdb_query_files(
+                f"type = {define.DEPENDENCY_TYPE['attachment']}"
+            )
         # Fallback to pandas
         return self._df[
             self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
@@ -208,17 +185,11 @@ class Dependencies:
 
         """
         if self._duckdb_conn is not None and self._parquet_file is not None:
-            try:
-                result = self._duckdb_conn.execute(
-                    f"SELECT archive FROM '{self._parquet_file}' "
-                    f"WHERE type = {define.DEPENDENCY_TYPE['attachment']}"
-                ).fetchall()
-                return [row[0] for row in result]
-            except (duckdb.Error, duckdb.InvalidInputException):
-                pass
-            except Exception:
-                self._close_duckdb_connection()
-                pass
+            result = self._duckdb_conn.execute(
+                f"SELECT archive FROM '{self._parquet_file}' "
+                f"WHERE type = {define.DEPENDENCY_TYPE['attachment']}"
+            ).fetchall()
+            return [row[0] for row in result]
         # Fallback to pandas
         return self._df[
             self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
@@ -233,16 +204,10 @@ class Dependencies:
 
         """
         if self._duckdb_conn is not None and self._parquet_file is not None:
-            try:
-                result = self._duckdb_conn.execute(
-                    f"SELECT file FROM '{self._parquet_file}'"
-                ).fetchall()
-                return [row[0] for row in result]
-            except (duckdb.Error, duckdb.InvalidInputException):
-                pass
-            except Exception:
-                self._close_duckdb_connection()
-                pass
+            result = self._duckdb_conn.execute(
+                f"SELECT file FROM '{self._parquet_file}'"
+            ).fetchall()
+            return [row[0] for row in result]
         # Fallback to pandas
         return self._df.index.tolist()
 
@@ -255,15 +220,7 @@ class Dependencies:
 
         """
         if self._duckdb_conn is not None and self._parquet_file is not None:
-            try:
-                return self._duckdb_query_files(
-                    f"type = {define.DEPENDENCY_TYPE['media']}"
-                )
-            except (duckdb.Error, duckdb.InvalidInputException):
-                pass
-            except Exception:
-                self._close_duckdb_connection()
-                pass
+            return self._duckdb_query_files(f"type = {define.DEPENDENCY_TYPE['media']}")
         # Fallback to pandas
         return self._df[
             self._df["type"] == define.DEPENDENCY_TYPE["media"]
@@ -278,15 +235,9 @@ class Dependencies:
 
         """
         if self._duckdb_conn is not None and self._parquet_file is not None:
-            try:
-                return self._duckdb_query_files(
-                    f"type = {define.DEPENDENCY_TYPE['media']} AND removed = 1"
-                )
-            except (duckdb.Error, duckdb.InvalidInputException):
-                pass
-            except Exception:
-                self._close_duckdb_connection()
-                pass
+            return self._duckdb_query_files(
+                f"type = {define.DEPENDENCY_TYPE['media']} AND removed = 1"
+            )
         # Fallback to pandas
         return self._df[
             (self._df["type"] == define.DEPENDENCY_TYPE["media"])
@@ -316,15 +267,7 @@ class Dependencies:
 
         """
         if self._duckdb_conn is not None and self._parquet_file is not None:
-            try:
-                return self._duckdb_query_files(
-                    f"type = {define.DEPENDENCY_TYPE['meta']}"
-                )
-            except (duckdb.Error, duckdb.InvalidInputException):
-                pass
-            except Exception:
-                self._close_duckdb_connection()
-                pass
+            return self._duckdb_query_files(f"type = {define.DEPENDENCY_TYPE['meta']}")
         # Fallback to pandas
         return self._df[
             self._df["type"] == define.DEPENDENCY_TYPE["meta"]
