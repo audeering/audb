@@ -446,8 +446,12 @@ def load_to(
 
     # save dependencies
 
-    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCY_FILE)
-    deps.save(dep_path_tmp)
+    if deps.path is not None and os.path.basename(deps.path) == define.DEPENDENCY_FILE:
+        dep_path_tmp = deps.path
+    else:
+        # Convert old dependency formats
+        dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCY_FILE)
+        deps.save(dep_path_tmp)
     audeer.move_file(
         dep_path_tmp,
         os.path.join(db_root, define.DEPENDENCY_FILE),

@@ -293,12 +293,12 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
-    cached_deps_file = os.path.join(db_root, define.CACHED_DEPENDENCY_FILE)
+    deps_file = os.path.join(db_root, define.DEPENDENCY_FILE)
 
     with FolderLock(db_root):
         try:
             deps = Dependencies()
-            deps.load(cached_deps_file)
+            deps.load(deps_file)
         except Exception:  # does not catch KeyboardInterupt
             # If loading cached file fails, load again from backend
             #
@@ -312,9 +312,12 @@ def dependencies(
             # See https://github.com/audeering/audb/pull/507
             #
             backend_interface = utils.lookup_backend(name, version)
-            deps = download_dependencies(backend_interface, name, version, verbose)
-            # Store as pickle in cache
-            deps.save(cached_deps_file)
+            deps = download_dependencies(
+                db_root, backend_interface, name, version, verbose
+            )
+            # Store as parquet in cache
+            if not os.path.exists(deps_file):
+                deps.save(deps_file)
 
     return deps
 
@@ -513,9 +516,12 @@ def remove_media(
 
     for version in versions(name):
         backend_interface = utils.lookup_backend(name, version)
-        deps = download_dependencies(backend_interface, name, version, verbose)
 
         with tempfile.TemporaryDirectory() as db_root:
+            deps = download_dependencies(
+                db_root, backend_interface, name, version, verbose
+            )
+
             # Track if we need to upload the dependency table again
             upload = False
 
