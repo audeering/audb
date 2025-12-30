@@ -89,7 +89,7 @@ deps.load(deps_file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
-method = "Dependencies.__call__()"
+method = r"Dependencies.\_\_call\_\_()"
 t0 = time.time()
 deps()
 t = time.time() - t0
@@ -99,25 +99,25 @@ results.at[method, "result"] = t
 # Further calls will be faster
 file in deps
 
-method = f"Dependencies.__contains__({n_files} files)"
+method = rf"Dependencies.\_\_contains\_\_({n_files} files)"
 t0 = time.time()
 [file in deps for file in _files]
 t = time.time() - t0
 results.at[method, "result"] = t
 
-method = f"Dependencies.__get_item__({n_files} files)"
+method = rf"Dependencies.\_\_get_item\_\_({n_files} files)"
 t0 = time.time()
 [deps[file] for file in _files]
 t = time.time() - t0
 results.at[method, "result"] = t
 
-method = "Dependencies.__len__()"
+method = r"Dependencies.\_\_len\_\_()"
 t0 = time.time()
 len(deps)
 t = time.time() - t0
 results.at[method, "result"] = t
 
-method = "Dependencies.__str__()"
+method = r"Dependencies.\_\_str\_\_()"
 t0 = time.time()
 str(deps)
 t = time.time() - t0
