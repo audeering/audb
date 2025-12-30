@@ -27,92 +27,11 @@ random.seed(1)
 
 cache = audeer.mkdir("./cache")
 
-
-def astype(df, dtype):
-    """Convert to desired dataframe dtypes."""
-    if dtype == "object":
-        # Use `object` to represent strings
-        df["archive"] = df["archive"].astype("object")
-        df["bit_depth"] = df["bit_depth"].astype("int32")
-        df["channels"] = df["channels"].astype("int32")
-        df["checksum"] = df["checksum"].astype("object")
-        df["duration"] = df["duration"].astype("float64")
-        df["format"] = df["format"].astype("object")
-        df["removed"] = df["removed"].astype("int32")
-        df["sampling_rate"] = df["sampling_rate"].astype("int32")
-        df["type"] = df["type"].astype("int32")
-        df["version"] = df["version"].astype("object")
-        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
-        # Set dtypes in library
-        audb.core.define.DEPENDENCY_TABLE = {
-            "archive": "object",
-            "bit_depth": "int32",
-            "channels": "int32",
-            "checksum": "object",
-            "duration": "float64",
-            "format": "object",
-            "removed": "int32",
-            "sampling_rate": "int32",
-            "type": "int32",
-            "version": "object",
-        }
-    elif dtype == "string":
-        # Use `string` to represent strings
-        df["archive"] = df["archive"].astype("string")
-        df["bit_depth"] = df["bit_depth"].astype("int32")
-        df["channels"] = df["channels"].astype("int32")
-        df["checksum"] = df["checksum"].astype("string")
-        df["duration"] = df["duration"].astype("float64")
-        df["format"] = df["format"].astype("string")
-        df["removed"] = df["removed"].astype("int32")
-        df["sampling_rate"] = df["sampling_rate"].astype("int32")
-        df["type"] = df["type"].astype("int32")
-        df["version"] = df["version"].astype("string")
-        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
-        # Set dtypes in library
-        audb.core.define.DEPENDENCY_TABLE = {
-            "archive": "string",
-            "bit_depth": "int32",
-            "channels": "int32",
-            "checksum": "string",
-            "duration": "float64",
-            "format": "string",
-            "removed": "int32",
-            "sampling_rate": "int32",
-            "type": "int32",
-            "version": "string",
-        }
-    elif dtype == "pyarrow":
-        # Use `pyarrow` to represent all dtypes
-        df["archive"] = df["archive"].astype("string[pyarrow]")
-        df["bit_depth"] = df["bit_depth"].astype("int32[pyarrow]")
-        df["channels"] = df["channels"].astype("int32[pyarrow]")
-        df["checksum"] = df["checksum"].astype("string[pyarrow]")
-        df["duration"] = df["duration"].astype("float64[pyarrow]")
-        df["format"] = df["format"].astype("string[pyarrow]")
-        df["removed"] = df["removed"].astype("int32[pyarrow]")
-        df["sampling_rate"] = df["sampling_rate"].astype("int32[pyarrow]")
-        df["type"] = df["type"].astype("int32[pyarrow]")
-        df["version"] = df["version"].astype("string[pyarrow]")
-        df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
-        # Set dtypes in library
-        audb.core.define.DEPENDENCY_TABLE = {
-            "archive": "string[pyarrow]",
-            "bit_depth": "int32[pyarrow]",
-            "channels": "int32[pyarrow]",
-            "checksum": "string[pyarrow]",
-            "duration": "float64[pyarrow]",
-            "format": "string[pyarrow]",
-            "removed": "int32[pyarrow]",
-            "sampling_rate": "int32[pyarrow]",
-            "type": "int32[pyarrow]",
-            "version": "string[pyarrow]",
-        }
-    return df
+print(f"audb v{audb.__version__}")
 
 
-# === Dependencies pandas.DataFrame ===
-data_cache = audeer.path(cache, "df.pkl")
+# === Create legacy CSV dependency table ===
+data_cache = audeer.path(cache, "df.csv")
 num_rows = 1000000
 if not os.path.exists(data_cache):
     bit_depths = [0, 16, 24]
@@ -140,237 +59,247 @@ if not os.path.exists(data_cache):
         for n in range(num_rows)
     ]
     df = pd.DataFrame.from_records(records)
-    df = df.astype(audb.core.define.DEPENDENDENCY_TABLE)
+    df = df.astype(audb.core.define.DEPENDENCY_TABLE)
     df.set_index("file", inplace=True)
     df.index.name = None
     df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
-    df.to_pickle(data_cache)
+    df.to_csv(data_cache)
 
-
-# ===== Benchmark audb.Dependencies =====
+# Prepare deps object
 deps = audb.Dependencies()
 deps.load(data_cache)
-file = "file-10.wav"
+deps_file = audeer.path(cache, audb.core.define.DEPENDENCY_FILE)
 n_files = 10000
-_files = deps._df.index[:n_files].tolist()
-dtypes = ["string", "object", "pyarrow"]
-results = pd.DataFrame(columns=dtypes)
+_files = deps.files[:n_files]
+results = pd.DataFrame(columns=["result"])
 results.index.name = "method"
 
-for dtype in dtypes:
-    deps.load(data_cache)
-    deps._df = astype(deps._df, dtype)
+# ===== Benchmark audb.Dependencies =====
+method = "Dependencies.save()"
+t0 = time.time()
+deps.save(deps_file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    # Check we have the expected dtypes
-    # in dependency table
-    # and library
-    if dtype == "pyarrow":
-        expected_dtype = "string[pyarrow]"
-    else:
-        expected_dtype = dtype
-    assert deps._df.archive.dtype == expected_dtype
-    assert audb.core.define.DEPENDENCY_TABLE["archive"] == expected_dtype
+method = "Dependencies.load()"
+deps = audb.Dependencies()
+t0 = time.time()
+deps.load(deps_file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.__call__()"
-    t0 = time.time()
-    deps()
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = r"Dependencies.\_\_call\_\_()"
+t0 = time.time()
+deps()
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    # Access the index one time.
-    # Further calls will be faster
-    file in deps
+# Access the index one time.
+# Further calls will be faster
+"file-10.wav" in deps
 
-    method = f"Dependencies.__contains__({n_files} files)"
-    t0 = time.time()
-    [file in deps for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = rf"Dependencies.\_\_contains\_\_({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = file in deps
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.__get_item__({n_files} files)"
-    t0 = time.time()
-    [deps[file] for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = rf"Dependencies.\_\_get_item\_\_({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps[file]
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.__len__()"
-    t0 = time.time()
-    len(deps)
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = r"Dependencies.\_\_len\_\_()"
+t0 = time.time()
+len(deps)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.__str__()"
-    t0 = time.time()
-    str(deps)
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = r"Dependencies.\_\_str\_\_()"
+t0 = time.time()
+str(deps)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.archives"
-    t0 = time.time()
-    deps.archives
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies.archives"
+t0 = time.time()
+deps.archives
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.attachments"
-    t0 = time.time()
-    deps.attachments
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies.attachments"
+t0 = time.time()
+deps.attachments
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.attachment_ids"
-    t0 = time.time()
-    deps.attachment_ids
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies.attachment_ids"
+t0 = time.time()
+deps.attachment_ids
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.files"
-    t0 = time.time()
-    deps.files
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies.files"
+t0 = time.time()
+deps.files
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.media"
-    t0 = time.time()
-    deps.media
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies.media"
+t0 = time.time()
+deps.media
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.removed_media"
-    t0 = time.time()
-    deps.removed_media
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies.removed_media"
+t0 = time.time()
+deps.removed_media
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.table_ids"
-    t0 = time.time()
-    deps.table_ids
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies.table_ids"
+t0 = time.time()
+deps.table_ids
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies.tables"
-    t0 = time.time()
-    deps.tables
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies.tables"
+t0 = time.time()
+deps.tables
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.archive({n_files} files)"
-    t0 = time.time()
-    [deps.archive(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.archive({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.archive(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.bit_depth({n_files} files)"
-    t0 = time.time()
-    [deps.bit_depth(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.bit_depth({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.bit_depth(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.channels({n_files} files)"
-    t0 = time.time()
-    [deps.channels(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.channels({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.channels(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.checksum({n_files} files)"
-    t0 = time.time()
-    [deps.checksum(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.checksum({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.checksum(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.duration({n_files} files)"
-    t0 = time.time()
-    [deps.duration(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.duration({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.duration(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.format({n_files} files)"
-    t0 = time.time()
-    [deps.format(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.format({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.format(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.removed({n_files} files)"
-    t0 = time.time()
-    [deps.removed(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.removed({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.removed(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.sampling_rate({n_files} files)"
-    t0 = time.time()
-    [deps.sampling_rate(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.sampling_rate({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.sampling_rate(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.type({n_files} files)"
-    t0 = time.time()
-    [deps.type(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.type({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.type(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies.version({n_files} files)"
-    t0 = time.time()
-    [deps.version(file) for file in _files]
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies.version({n_files} files)"
+t0 = time.time()
+for file in _files:
+    _ = deps.version(file)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    # -------------------------------------------------------------------------
-    method = "Dependencies._add_attachment()"
-    t0 = time.time()
-    deps._add_attachment("attachment.txt", "1.0.0", "archive", "checksum")
-    t = time.time() - t0
-    results.at[method, dtype] = t
+# -------------------------------------------------------------------------
+method = "Dependencies._add_attachment()"
+t0 = time.time()
+deps._add_attachment("attachment.txt", "1.0.0", "archive", "checksum")
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies._add_media({n_files} files)"
-    values = [
-        (
-            f"file-new-{n}.wav",  # file
-            f"archive-new-{n}",  # archive
-            16,  # bit_depth
-            1,  # channels
-            f"checksum-{n}",  # checksum
-            0.4,  # duration
-            "wav",  # format
-            0,  # removed
-            16000,  # sampling_rate
-            1,  # type
-            "1.0.0",  # version
-        )
-        for n in range(n_files)
-    ]
-    t0 = time.time()
-    deps._add_media(values)
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies._add_media({n_files} files)"
+values = [
+    (
+        f"file-new-{n}.wav",  # file
+        f"archive-new-{n}",  # archive
+        16,  # bit_depth
+        1,  # channels
+        f"checksum-{n}",  # checksum
+        0.4,  # duration
+        "wav",  # format
+        0,  # removed
+        16000,  # sampling_rate
+        1,  # type
+        "1.0.0",  # version
+    )
+    for n in range(n_files)
+]
+t0 = time.time()
+deps._add_media(values)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies._add_meta()"
-    t0 = time.time()
-    deps._add_meta("db.new-table.csv", "1.0.0", "archive", "checksum")
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies._add_meta()"
+t0 = time.time()
+deps._add_meta("db.new-table.csv", "1.0.0", "checksum")
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies._drop()"
-    t0 = time.time()
-    deps._drop(["file-90000.wav"])
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies._drop()"
+t0 = time.time()
+deps._drop(["file-90000.wav"])
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies._remove()"
-    t0 = time.time()
-    deps._remove(file)
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies._remove()"
+t0 = time.time()
+deps._remove("file-10.wav")
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = "Dependencies._update_media()"
-    t0 = time.time()
-    deps._update_media(values)
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = "Dependencies._update_media()"
+t0 = time.time()
+deps._update_media(values)
+t = time.time() - t0
+results.at[method, "result"] = t
 
-    method = f"Dependencies._update_media_version({n_files} files)"
-    t0 = time.time()
-    deps._update_media_version([f"file-{n}.wav" for n in range(n_files)], "version")
-    t = time.time() - t0
-    results.at[method, dtype] = t
+method = f"Dependencies._update_media_version({n_files} files)"
+t0 = time.time()
+deps._update_media_version([f"file-{n}.wav" for n in range(n_files)], "version")
+t = time.time() - t0
+results.at[method, "result"] = t
 
 
 # ===== Save results =====
