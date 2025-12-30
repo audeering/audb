@@ -5,6 +5,7 @@ from collections.abc import Sequence
 import errno
 import os
 import re
+import sqlite3
 import tempfile
 
 import pandas as pd
@@ -306,21 +307,21 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv``
-                or ``parquet``
+                File extension can be ``csv``,
+                ``parquet``, or ``sqlite``
 
         Raises:
             ValueError: if file extension is not one of
-                ``csv``, ``parquet``
+                ``csv``, ``parquet``, ``sqlite``
             FileNotFoundError: if ``path`` does not exists
 
         """
         self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         path = audeer.path(path)
         extension = audeer.file_extension(path)
-        if extension not in ["csv", "parquet"]:
+        if extension not in ["csv", "parquet", "sqlite"]:
             raise ValueError(
-                f"File extension of 'path' has to be 'csv' or 'parquet' "
+                f"File extension of 'path' has to be 'csv', 'parquet', or 'sqlite' "
                 f"not '{extension}'"
             )
         if not os.path.exists(path):
@@ -343,6 +344,22 @@ class Dependencies:
         elif extension == "parquet":
             table = parquet.read_table(path)
             self._df = self._table_to_dataframe(table)
+
+        elif extension == "sqlite":
+            conn = sqlite3.connect(path)
+            try:
+                # Read directly into pandas with correct index
+                self._df = pd.read_sql_query(
+                    "SELECT * FROM dependencies",
+                    conn,
+                    index_col="file",
+                )
+                # Remove index name to match expected format
+                self._df.index.name = None
+                # Set correct dtypes
+                self._df = self._set_dtypes(self._df)
+            finally:
+                conn.close()
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
@@ -373,7 +390,7 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv`` or ``parquet``
+                File extension can be ``csv``, ``parquet``, or ``sqlite``
 
         """
         path = audeer.path(path)
@@ -387,6 +404,49 @@ class Dependencies:
         elif path.endswith("parquet"):
             table = self._dataframe_to_table(self._df, file_column=True)
             parquet.write_table(table, path)
+        elif path.endswith("sqlite"):
+            # Remove existing database file if it exists
+            if os.path.exists(path):
+                os.remove(path)
+
+            conn = sqlite3.connect(path)
+            try:
+                # Create table with proper schema
+                conn.execute("""
+                    CREATE TABLE dependencies (
+                        file TEXT PRIMARY KEY,
+                        archive TEXT,
+                        bit_depth INTEGER,
+                        channels INTEGER,
+                        checksum TEXT,
+                        duration REAL,
+                        format TEXT,
+                        removed INTEGER,
+                        sampling_rate INTEGER,
+                        type INTEGER,
+                        version TEXT
+                    )
+                """)
+
+                # Create indexes for frequently queried columns
+                conn.execute("CREATE INDEX idx_type ON dependencies(type)")
+                conn.execute("CREATE INDEX idx_removed ON dependencies(removed)")
+                conn.execute("CREATE INDEX idx_archive ON dependencies(archive)")
+
+                # Write dataframe to SQLite
+                # Reset index to include 'file' as a column
+                df_to_save = self._df.reset_index()
+                df_to_save.columns = ["file"] + list(self._df.columns)
+                df_to_save.to_sql(
+                    "dependencies",
+                    conn,
+                    if_exists="append",
+                    index=False,
+                )
+
+                conn.commit()
+            finally:
+                conn.close()
 
     def type(self, file: str) -> int:
         r"""Type of file.
@@ -792,9 +852,8 @@ def download_dependencies(
 
     """
     with tempfile.TemporaryDirectory() as tmp_root:
-        # Load `db.parquet` file,
-        # or if non-existent `db.zip`
-        # from backend
+        # Try to load in order: db.sqlite, db.parquet, db.zip (legacy CSV)
+        # First, try SQLite (current format)
         remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
         if backend_interface.exists(remote_deps_file, version):
             local_deps_file = os.path.join(tmp_root, define.DEPENDENCY_FILE)
@@ -805,17 +864,31 @@ def download_dependencies(
                 verbose=verbose,
             )
         else:
-            remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
-            local_deps_file = os.path.join(
-                tmp_root,
-                define.LEGACY_DEPENDENCY_FILE,
+            # Try parquet (previous format)
+            remote_deps_file = backend_interface.join(
+                "/", name, define.PARQUET_DEPENDENCY_FILE
             )
-            backend_interface.get_archive(
-                remote_deps_file,
-                tmp_root,
-                version,
-                verbose=verbose,
-            )
+            if backend_interface.exists(remote_deps_file, version):
+                local_deps_file = os.path.join(tmp_root, define.PARQUET_DEPENDENCY_FILE)
+                backend_interface.get_file(
+                    remote_deps_file,
+                    local_deps_file,
+                    version,
+                    verbose=verbose,
+                )
+            else:
+                # Fall back to legacy CSV format
+                remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
+                local_deps_file = os.path.join(
+                    tmp_root,
+                    define.LEGACY_DEPENDENCY_FILE,
+                )
+                backend_interface.get_archive(
+                    remote_deps_file,
+                    tmp_root,
+                    version,
+                    verbose=verbose,
+                )
         # Create deps object from downloaded file
         deps = Dependencies()
         deps.load(local_deps_file)

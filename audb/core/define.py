@@ -11,8 +11,16 @@ DB = "db"
 HEADER_FILE = f"{DB}.yaml"
 
 # Dependencies
-DEPENDENCY_FILE = f"{DB}.parquet"
+DEPENDENCY_FILE = f"{DB}.sqlite"
 r"""Filename and extension of dependency table file."""
+
+PARQUET_DEPENDENCY_FILE = f"{DB}.parquet"
+r"""Filename and extension of parquet dependency table file.
+
+In ``audb`` versions between 1.7.0 and the SQLite migration,
+the dependency table was stored in a parquet file.
+
+"""
 
 LEGACY_DEPENDENCY_FILE = f"{DB}.csv"
 r"""Filename and extension of legacy dependency table file.

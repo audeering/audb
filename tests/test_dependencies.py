@@ -250,7 +250,7 @@ def test_removed(deps):
         deps.removed("non.existing")
 
 
-@pytest.mark.parametrize("file", ["deps.csv", "deps.parquet"])
+@pytest.mark.parametrize("file", ["deps.csv", "deps.parquet", "deps.sqlite"])
 def test_load_save(tmpdir, deps, file):
     """Test consistency of dependency table after save/load cycle.
 
