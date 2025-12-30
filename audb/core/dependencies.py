@@ -19,6 +19,14 @@ import audeer
 from audb.core import define
 
 
+# SQLITE query variables
+DEPENDENCIES = (
+    "(file, archive, bit_depth, channels, checksum, duration, format, "
+    "removed, sampling_rate, type, version)"
+)
+VALUES = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+
 class Dependencies:
     r"""Dependencies of a database.
 
@@ -192,7 +200,7 @@ class Dependencies:
             self._conn.close()
 
     def __getstate__(self):
-        """Prepare object for pickling by converting SQLite data to serializable format."""
+        """Make object serializable."""
         # Get all data as a DataFrame
         df = self()
         # Return the DataFrame and schema for reconstruction
@@ -202,7 +210,7 @@ class Dependencies:
         }
 
     def __setstate__(self, state):
-        """Restore object from pickled state."""
+        """Restore object from serialized state."""
         # Recreate the SQLite connection
         self._conn = sqlite3.connect(":memory:", check_same_thread=False)
         self._db_path = None
@@ -258,11 +266,7 @@ class Dependencies:
             for i, row in enumerate(data):
                 file = index[i]
                 self._conn.execute(
-                    """
-                    INSERT INTO dependencies
-                    (file, archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
+                    f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
                     (
                         file,
                         row["archive"],
@@ -662,11 +666,7 @@ class Dependencies:
         format = audeer.file_extension(file).lower()
 
         self._conn.execute(
-            """
-            INSERT OR REPLACE INTO dependencies
-            (file, archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+            f"INSERT OR REPLACE INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
             (
                 file,
                 archive,
@@ -709,11 +709,7 @@ class Dependencies:
 
         """
         self._conn.executemany(
-            """
-            INSERT INTO dependencies
-            (file, archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+            f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
             values,
         )
         self._conn.commit()
@@ -739,11 +735,7 @@ class Dependencies:
             archive = os.path.splitext(file[3:])[0]
 
         self._conn.execute(
-            """
-            INSERT OR REPLACE INTO dependencies
-            (file, archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+            f"INSERT OR REPLACE INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
             (
                 file,
                 archive,

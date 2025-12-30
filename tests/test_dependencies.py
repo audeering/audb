@@ -51,6 +51,11 @@ ROWS = [
         "version": "1.0.0",
     },
 ]
+DEPENDENCIES = (
+    "(file, archive, bit_depth, channels, checksum, duration, format, "
+    "removed, sampling_rate, type, version)"
+)
+VALUES = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 
 def get_entries(column):
@@ -69,11 +74,7 @@ def deps():
     # Insert test data directly into SQLite
     for row in ROWS:
         deps._conn.execute(
-            """
-            INSERT INTO dependencies
-            (file, archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+            f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
             (
                 row["file"],
                 row["archive"],
@@ -158,11 +159,7 @@ def test_equals(deps):
     _deps = audb.Dependencies()
     for row in ROWS:
         _deps._conn.execute(
-            """
-            INSERT INTO dependencies
-            (file, archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+            f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
             (
                 row["file"],
                 row["archive"],
