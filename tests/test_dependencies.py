@@ -66,13 +66,29 @@ def test_get_entries():
 )
 def deps():
     deps = audb.Dependencies()
-    df = pd.DataFrame.from_records(ROWS)
-    df.set_index("file", inplace=True)
-    # Ensure correct dtype
-    df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
-    df.index.name = None
-    df = df.astype(audb.core.define.DEPENDENCY_TABLE)
-    deps._df = df
+    # Insert test data directly into SQLite
+    for row in ROWS:
+        deps._conn.execute(
+            """
+            INSERT INTO dependencies
+            (file, archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                row["file"],
+                row["archive"],
+                row["bit_depth"],
+                row["channels"],
+                row["checksum"],
+                row["duration"],
+                row["format"],
+                row["removed"],
+                row["sampling_rate"],
+                row["type"],
+                row["version"],
+            ),
+        )
+    deps._conn.commit()
     return deps
 
 
@@ -80,10 +96,10 @@ def test_instantiation():
     r"""Test instantiation of audb.Dependencies.
 
     During instantiation of ``audb.Dependencies``
-    an empty dataframe is created under ``self._df``,
+    an empty SQLite database is created under ``self._conn``,
     that stores the dependency table.
     This test ensures,
-    that the dataframe
+    that the database
     contains the correct column names and data types,
     and the correct name and data type of its index.
 
@@ -106,9 +122,8 @@ def test_instantiation():
         audb.core.define.DEPENDENCY_INDEX_DTYPE
     )
     expected_df = expected_df.astype(audb.core.define.DEPENDENCY_TABLE)
-    pd.testing.assert_frame_equal(deps._df, expected_df)
-    assert list(deps._df.columns) == expected_columns
     df = deps()
+    pd.testing.assert_frame_equal(df, expected_df)
     assert list(df.columns) == expected_columns
 
 
@@ -139,10 +154,36 @@ def test_equals(deps):
     assert deps != audb.Dependencies()
     # example table vs. example table
     assert deps == deps
-    _deps._df = deps._df.copy()
+    # Copy data to new Dependencies object
+    _deps = audb.Dependencies()
+    for row in ROWS:
+        _deps._conn.execute(
+            """
+            INSERT INTO dependencies
+            (file, archive, bit_depth, channels, checksum, duration, format, removed, sampling_rate, type, version)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                row["file"],
+                row["archive"],
+                row["bit_depth"],
+                row["channels"],
+                row["checksum"],
+                row["duration"],
+                row["format"],
+                row["removed"],
+                row["sampling_rate"],
+                row["type"],
+                row["version"],
+            ),
+        )
+    _deps._conn.commit()
     assert deps == _deps
     # example table vs. different table
-    _deps._df.loc["db.files.csv", "channels"] = 4
+    _deps._conn.execute(
+        "UPDATE dependencies SET channels = 4 WHERE file = 'db.files.csv'"
+    )
+    _deps._conn.commit()
     assert deps != _deps
 
 
@@ -265,7 +306,7 @@ def test_load_save(tmpdir, deps, file):
     deps2 = audb.Dependencies()
     deps2.load(deps_file)
     pd.testing.assert_frame_equal(deps(), deps2())
-    assert list(deps2._df.dtypes) == list(audb.core.define.DEPENDENCY_TABLE.values())
+    assert list(deps2().dtypes) == list(audb.core.define.DEPENDENCY_TABLE.values())
 
 
 def test_load_save_errors(deps):
@@ -325,7 +366,8 @@ def test_str(deps):
     )
     print(str(deps))
     assert expected_str.match(str(deps))
-    assert expected_str.match(deps._df.to_string())
+    # str(deps) now calls __str__ which calls __call__ which returns a DataFrame
+    assert expected_str.match(deps().to_string())
 
 
 # === Test hidden methods ===
