@@ -5,7 +5,6 @@ from collections.abc import Sequence
 import errno
 import os
 import re
-import tempfile
 
 import duckdb
 import pandas as pd
@@ -945,6 +944,7 @@ def filter_deps(
 
 
 def download_dependencies(
+    db_root: str,
     backend_interface: type[audbackend.interface.Base],
     name: str,
     version: str,
@@ -953,12 +953,12 @@ def download_dependencies(
     r"""Load dependency file from backend.
 
     Download dependency file
-    for requested database
-    to a temporary folder,
+    for requested database,
     and return an dependency object
     loaded from that file.
 
     Args:
+        db_root: folder to store the dependency file
         backend_interface: backend interface
         name: database name
         version: database version
@@ -968,34 +968,33 @@ def download_dependencies(
         dependency object
 
     """
-    with tempfile.TemporaryDirectory() as tmp_root:
-        # Load `db.parquet` file,
-        # or if non-existent `db.zip`
-        # from backend
-        remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
-        if backend_interface.exists(remote_deps_file, version):
-            local_deps_file = os.path.join(tmp_root, define.DEPENDENCY_FILE)
-            backend_interface.get_file(
-                remote_deps_file,
-                local_deps_file,
-                version,
-                verbose=verbose,
-            )
-        else:
-            remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
-            local_deps_file = os.path.join(
-                tmp_root,
-                define.LEGACY_DEPENDENCY_FILE,
-            )
-            backend_interface.get_archive(
-                remote_deps_file,
-                tmp_root,
-                version,
-                verbose=verbose,
-            )
-        # Create deps object from downloaded file
-        deps = Dependencies()
-        deps.load(local_deps_file)
+    # Load `db.parquet` file,
+    # or if non-existent `db.zip`
+    # from backend
+    remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
+    if backend_interface.exists(remote_deps_file, version):
+        local_deps_file = os.path.join(db_root, define.DEPENDENCY_FILE)
+        backend_interface.get_file(
+            remote_deps_file,
+            local_deps_file,
+            version,
+            verbose=verbose,
+        )
+    else:
+        remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
+        local_deps_file = os.path.join(
+            db_root,
+            define.LEGACY_DEPENDENCY_FILE,
+        )
+        backend_interface.get_archive(
+            remote_deps_file,
+            db_root,
+            version,
+            verbose=verbose,
+        )
+    # Create deps object from downloaded file
+    deps = Dependencies()
+    deps.load(local_deps_file)
     return deps
 
 
