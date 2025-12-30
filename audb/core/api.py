@@ -225,7 +225,6 @@ def cached(
             if (
                 define.DEPENDENCY_FILE not in files
                 and define.LEGACY_DEPENDENCY_FILE not in files
-                and define.CACHED_DEPENDENCY_FILE not in files
             ):
                 # Skip all cache entries
                 # that don't contain a dependency file
@@ -293,28 +292,19 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
-    cached_deps_file = os.path.join(db_root, define.CACHED_DEPENDENCY_FILE)
+    deps_file = os.path.join(db_root, define.DEPENDENCY_FILE)
 
     with FolderLock(db_root):
         try:
             deps = Dependencies()
-            deps.load(cached_deps_file)
+            deps.load(deps_file)
         except Exception:  # does not catch KeyboardInterupt
             # If loading cached file fails, load again from backend
             #
-            # Loading a cache file can fail
-            # as we use PyArrow data types,
-            # which when loading from pickle
-            # are not compatible between all pandas versions.
-            # We had originally some tests for it,
-            # but as the actual failure is not that important,
-            # we removed them in
-            # See https://github.com/audeering/audb/pull/507
-            #
             backend_interface = utils.lookup_backend(name, version)
             deps = download_dependencies(backend_interface, name, version, verbose)
-            # Store as pickle in cache
-            deps.save(cached_deps_file)
+            # Store in cache
+            deps.save(deps_file)
 
     return deps
 
