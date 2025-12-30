@@ -293,12 +293,12 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
-    cached_deps_file = os.path.join(db_root, define.CACHED_DEPENDENCY_FILE)
+    deps_file = os.path.join(db_root, define.DEPENDENCY_FILE)
 
     with FolderLock(db_root):
         try:
             deps = Dependencies()
-            deps.load(cached_deps_file)
+            deps.load(deps_file)
         except Exception:  # does not catch KeyboardInterupt
             # If loading cached file fails, load again from backend
             #
@@ -315,8 +315,9 @@ def dependencies(
             deps = download_dependencies(
                 db_root, backend_interface, name, version, verbose
             )
-            # Store as pickle in cache
-            deps.save(cached_deps_file)
+            # Store as parquet in cache
+            if not os.path.exists(deps_file):
+                deps.save(deps_file)
 
     return deps
 
