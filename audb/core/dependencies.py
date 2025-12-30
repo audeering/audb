@@ -307,21 +307,20 @@ class Dependencies:
         Args:
             path: path to file.
                 File extension can be ``csv``
-                ``pkl``,
                 or ``parquet``
 
         Raises:
             ValueError: if file extension is not one of
-                ``csv``, ``pkl``, ``parquet``
+                ``csv``, ``parquet``
             FileNotFoundError: if ``path`` does not exists
 
         """
         self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         path = audeer.path(path)
         extension = audeer.file_extension(path)
-        if extension not in ["csv", "pkl", "parquet"]:
+        if extension not in ["csv", "parquet"]:
             raise ValueError(
-                f"File extension of 'path' has to be 'csv', 'pkl', or 'parquet' "
+                f"File extension of 'path' has to be 'csv' or 'parquet' "
                 f"not '{extension}'"
             )
         if not os.path.exists(path):
@@ -330,14 +329,7 @@ class Dependencies:
                 os.strerror(errno.ENOENT),
                 path,
             )
-        if extension == "pkl":
-            self._df = pd.read_pickle(path)
-            # Correct dtypes
-            # to make backward compatiple
-            # with old pickle files in cache
-            self._df = self._set_dtypes(self._df)
-
-        elif extension == "csv":
+        if extension == "csv":
             table = csv.read_csv(
                 path,
                 read_options=csv.ReadOptions(
@@ -381,7 +373,7 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv``, ``pkl``, or ``parquet``
+                File extension can be ``csv`` or ``parquet``
 
         """
         path = audeer.path(path)
@@ -391,11 +383,6 @@ class Dependencies:
                 table,
                 path,
                 write_options=csv.WriteOptions(quoting_style="none"),
-            )
-        elif path.endswith("pkl"):
-            self._df.to_pickle(
-                path,
-                protocol=4,  # supported by Python >= 3.4
             )
         elif path.endswith("parquet"):
             table = self._dataframe_to_table(self._df, file_column=True)

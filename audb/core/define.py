@@ -14,16 +14,6 @@ HEADER_FILE = f"{DB}.yaml"
 DEPENDENCY_FILE = f"{DB}.parquet"
 r"""Filename and extension of dependency table file."""
 
-CACHED_DEPENDENCY_FILE = f"{DB}.pkl"
-r"""Filename and extension of cached dependency table file.
-
-As loading from a pickle file is still faster
-than loading from a parquet file,
-we are storing the dependency table
-as a pickle file in cache.
-
-"""
-
 LEGACY_DEPENDENCY_FILE = f"{DB}.csv"
 r"""Filename and extension of legacy dependency table file.
 

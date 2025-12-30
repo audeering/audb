@@ -250,7 +250,7 @@ def test_removed(deps):
         deps.removed("non.existing")
 
 
-@pytest.mark.parametrize("file", ["deps.csv", "deps.pkl", "deps.parquet"])
+@pytest.mark.parametrize("file", ["deps.csv", "deps.parquet"])
 def test_load_save(tmpdir, deps, file):
     """Test consistency of dependency table after save/load cycle.
 
@@ -266,75 +266,6 @@ def test_load_save(tmpdir, deps, file):
     deps2.load(deps_file)
     pd.testing.assert_frame_equal(deps(), deps2())
     assert list(deps2._df.dtypes) == list(audb.core.define.DEPENDENCY_TABLE.values())
-
-
-def test_load_save_backward_compatibility(tmpdir, deps):
-    """Test backward compatibility with old pickle cache files.
-
-    As the dtype of the index has changed,
-    we need to make sure this is corrected
-    when loading old cache files.
-
-    Old behaviour (audb<1.7):
-
-    archive          string[python]
-    bit_depth                 int32
-    channels                  int32
-    checksum         string[python]
-    duration                float64
-    format           string[python]
-    removed                   int32
-    sampling_rate             int32
-    type                      int32
-    version          string[python]
-
-    New behaviour (audb>=1.7):
-
-    archive          string[pyarrow]
-    bit_depth         int32[pyarrow]
-    channels          int32[pyarrow]
-    checksum         string[pyarrow]
-    duration         double[pyarrow]
-    format           string[pyarrow]
-    removed           int32[pyarrow]
-    sampling_rate     int32[pyarrow]
-    type              int32[pyarrow]
-    version          string[pyarrow]
-
-    """
-    deps_file = audeer.path(tmpdir, "deps.pkl")
-
-    deps_old = audb.Dependencies()
-    deps_old._df = deps._df.copy()
-
-    # Change dtype of index from object to string
-    # to mimic previous behavior
-    deps_old._df.index = deps_old._df.index.astype("string")
-    # Change dtype of columns
-    # to mimic previous behavior
-    deps_old._df = deps_old._df.astype(
-        {
-            "archive": "string",
-            "bit_depth": "int32",
-            "channels": "int32",
-            "checksum": "string",
-            "duration": "float64",
-            "format": "string",
-            "removed": "int32",
-            "sampling_rate": "int32",
-            "type": "int32",
-            "version": "string",
-        }
-    )
-    deps_old.save(deps_file)
-
-    # Check that we get the correct dtypes,
-    # when loading from cache
-    deps2 = audb.Dependencies()
-    deps2.load(deps_file)
-    assert deps2._df.index.dtype == audb.core.define.DEPENDENCY_INDEX_DTYPE
-    pd.testing.assert_frame_equal(deps._df, deps2._df)
-    assert deps == deps2
 
 
 def test_load_save_errors(deps):
