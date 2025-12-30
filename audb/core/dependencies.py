@@ -884,34 +884,11 @@ class Dependencies:
             list of file paths
 
         """
-        if self._duckdb_conn is None or self._parquet_file is None:
-            # Fallback to pandas
-            if condition:
-                # This is a simplified fallback - in practice, condition
-                # translation would need to be more sophisticated
-                return self._df.index.tolist()
-            return self._df.index.tolist()
-
-        try:
-            query = f"SELECT file FROM '{self._parquet_file}'"
-            if condition:
-                query += f" WHERE {condition}"
-            result = self._duckdb_conn.execute(query).fetchall()
-            return [row[0] for row in result]
-        except (duckdb.Error, duckdb.InvalidInputException):
-            # DuckDB specific errors - fallback to pandas
-            pass
-        except Exception:
-            # Unexpected errors - close connection and fallback
-            self._close_duckdb_connection()
-            pass
-
-        # Fallback to pandas
+        query = f"SELECT file FROM '{self._parquet_file}'"
         if condition:
-            # This is a simplified fallback - in practice, condition
-            # translation would need to be more sophisticated
-            return self._df.index.tolist()
-        return self._df.index.tolist()
+            query += f" WHERE {condition}"
+        result = self._duckdb_conn.execute(query).fetchall()
+        return [row[0] for row in result]
 
     def _close_duckdb_connection(self):
         r"""Close DuckDB connection if open."""
@@ -927,11 +904,7 @@ class Dependencies:
 
     def __del__(self):
         r"""Cleanup DuckDB connection on object destruction."""
-        try:
-            self._close_duckdb_connection()
-        except Exception:
-            # Ignore errors during cleanup to avoid issues during shutdown
-            pass
+        self._close_duckdb_connection()
 
 
 def error_message_missing_object(
