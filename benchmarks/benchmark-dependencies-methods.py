@@ -69,7 +69,6 @@ if not os.path.exists(data_cache):
 deps = audb.Dependencies()
 deps.load(data_cache)
 deps_file = audeer.path(cache, audb.core.define.DEPENDENCY_FILE)
-file = "file-10.wav"
 n_files = 10000
 _files = deps.files[:n_files]
 results = pd.DataFrame(columns=["result"])
@@ -97,17 +96,19 @@ results.at[method, "result"] = t
 
 # Access the index one time.
 # Further calls will be faster
-file in deps
+"file-10.wav" in deps
 
 method = rf"Dependencies.\_\_contains\_\_({n_files} files)"
 t0 = time.time()
-[file in deps for file in _files]
+for file in _files:
+    _ = file in deps
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = rf"Dependencies.\_\_get_item\_\_({n_files} files)"
 t0 = time.time()
-[deps[file] for file in _files]
+for file in _files:
+    _ = deps[file]
 t = time.time() - t0
 results.at[method, "result"] = t
 
@@ -173,61 +174,71 @@ results.at[method, "result"] = t
 
 method = f"Dependencies.archive({n_files} files)"
 t0 = time.time()
-[deps.archive(file) for file in _files]
+for file in _files:
+    _ = deps.archive(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = f"Dependencies.bit_depth({n_files} files)"
 t0 = time.time()
-[deps.bit_depth(file) for file in _files]
+for file in _files:
+    _ = deps.bit_depth(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = f"Dependencies.channels({n_files} files)"
 t0 = time.time()
-[deps.channels(file) for file in _files]
+for file in _files:
+    _ = deps.channels(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = f"Dependencies.checksum({n_files} files)"
 t0 = time.time()
-[deps.checksum(file) for file in _files]
+for file in _files:
+    _ = deps.checksum(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = f"Dependencies.duration({n_files} files)"
 t0 = time.time()
-[deps.duration(file) for file in _files]
+for file in _files:
+    _ = deps.duration(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = f"Dependencies.format({n_files} files)"
 t0 = time.time()
-[deps.format(file) for file in _files]
+for file in _files:
+    _ = deps.format(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = f"Dependencies.removed({n_files} files)"
 t0 = time.time()
-[deps.removed(file) for file in _files]
+for file in _files:
+    _ = deps.removed(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = f"Dependencies.sampling_rate({n_files} files)"
 t0 = time.time()
-[deps.sampling_rate(file) for file in _files]
+for file in _files:
+    _ = deps.sampling_rate(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = f"Dependencies.type({n_files} files)"
 t0 = time.time()
-[deps.type(file) for file in _files]
+for file in _files:
+    _ = deps.type(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
 method = f"Dependencies.version({n_files} files)"
 t0 = time.time()
-[deps.version(file) for file in _files]
+for file in _files:
+    _ = deps.version(file)
 t = time.time() - t0
 results.at[method, "result"] = t
 
@@ -274,7 +285,7 @@ results.at[method, "result"] = t
 
 method = "Dependencies._remove()"
 t0 = time.time()
-deps._remove(file)
+deps._remove("file-10.wav")
 t = time.time() - t0
 results.at[method, "result"] = t
 
