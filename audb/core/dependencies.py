@@ -60,8 +60,11 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
-        self._df = self._set_dtypes(self._df)
+        self.path = None
+        """Path to dependency file."""
+
+        self._df = self._init_df()
+
         # pyarrow schema
         # used for reading and writing files
         self._schema = pa.schema(
@@ -81,7 +84,6 @@ class Dependencies:
         )
         # duckdb connection for fast queries
         self._duckdb_conn = None
-        self._parquet_file = None
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -102,9 +104,9 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             result = self._duckdb_conn.execute(
-                f"SELECT COUNT(*) FROM '{self._parquet_file}' WHERE file = ?",
+                f"SELECT COUNT(*) FROM '{self.path}' WHERE file = ?",
                 [file],
             ).fetchone()
             return result[0] > 0
@@ -150,9 +152,9 @@ class Dependencies:
             list of archives
 
         """
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             result = self._duckdb_conn.execute(
-                f"SELECT DISTINCT archive FROM '{self._parquet_file}' ORDER BY archive"
+                f"SELECT DISTINCT archive FROM '{self.path}' ORDER BY archive"
             ).fetchall()
             return [row[0] for row in result]
         # Fallback to pandas
@@ -166,7 +168,7 @@ class Dependencies:
             list of attachments
 
         """
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             return self._duckdb_query_files(
                 f"type = {define.DEPENDENCY_TYPE['attachment']}"
             )
@@ -183,9 +185,9 @@ class Dependencies:
             list of attachment IDs
 
         """
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             result = self._duckdb_conn.execute(
-                f"SELECT archive FROM '{self._parquet_file}' "
+                f"SELECT archive FROM '{self.path}' "
                 f"WHERE type = {define.DEPENDENCY_TYPE['attachment']}"
             ).fetchall()
             return [row[0] for row in result]
@@ -202,9 +204,9 @@ class Dependencies:
             list of files
 
         """
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             result = self._duckdb_conn.execute(
-                f"SELECT file FROM '{self._parquet_file}'"
+                f"SELECT file FROM '{self.path}'"
             ).fetchall()
             return [row[0] for row in result]
         # Fallback to pandas
@@ -218,7 +220,7 @@ class Dependencies:
             list of media
 
         """
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             return self._duckdb_query_files(f"type = {define.DEPENDENCY_TYPE['media']}")
         # Fallback to pandas
         return self._df[
@@ -233,7 +235,7 @@ class Dependencies:
             list of media
 
         """
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             return self._duckdb_query_files(
                 f"type = {define.DEPENDENCY_TYPE['media']} AND removed = 1"
             )
@@ -265,7 +267,7 @@ class Dependencies:
             list of tables
 
         """
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             return self._duckdb_query_files(f"type = {define.DEPENDENCY_TYPE['meta']}")
         # Fallback to pandas
         return self._df[
@@ -282,10 +284,10 @@ class Dependencies:
             archive name
 
         """
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             try:
                 result = self._duckdb_conn.execute(
-                    f"SELECT archive FROM '{self._parquet_file}' WHERE file = ?", [file]
+                    f"SELECT archive FROM '{self.path}' WHERE file = ?", [file]
                 ).fetchone()
                 if result is None:
                     raise KeyError(f"File '{file}' not found in dependencies")
@@ -372,12 +374,9 @@ class Dependencies:
             FileNotFoundError: if ``path`` does not exists
 
         """
-        # Close existing DuckDB connection
-        self._close_duckdb_connection()
-
-        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         path = audeer.path(path)
         extension = audeer.file_extension(path)
+
         if extension not in ["csv", "pkl", "parquet"]:
             raise ValueError(
                 f"File extension of 'path' has to be 'csv', 'pkl', or 'parquet' "
@@ -389,6 +388,12 @@ class Dependencies:
                 os.strerror(errno.ENOENT),
                 path,
             )
+
+        self.path = path
+
+        # Close existing DuckDB connection
+        self._close_duckdb_connection()
+
         if extension == "pkl":
             self._df = pd.read_pickle(path)
             # Correct dtypes
@@ -411,7 +416,7 @@ class Dependencies:
             table = parquet.read_table(path)
             self._df = self._table_to_dataframe(table)
             # Set up DuckDB connection for fast queries
-            self._setup_duckdb_connection(path)
+            self._setup_duckdb_connection()
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
@@ -462,7 +467,7 @@ class Dependencies:
             table = self._dataframe_to_table(self._df, file_column=True)
             parquet.write_table(table, path)
             # Set up DuckDB connection for the newly saved file
-            self._setup_duckdb_connection(path)
+            # self._setup_duckdb_connection()
 
     def type(self, file: str) -> int:
         r"""Type of file.
@@ -611,10 +616,10 @@ class Dependencies:
 
         """
         # Use DuckDB for fast lookup if parquet file is available
-        if self._duckdb_conn is not None and self._parquet_file is not None:
+        if self._duckdb_conn is not None:
             try:
                 result = self._duckdb_conn.execute(
-                    f"SELECT {column} FROM '{self._parquet_file}' WHERE file = ?",
+                    f"SELECT {column} FROM '{self.path}' WHERE file = ?",
                     [file],
                 ).fetchone()
                 if result is None:
@@ -680,6 +685,16 @@ class Dependencies:
         # which is claimed to be faster,
         # isn't.
         self._df = self._df[~self._df.index.isin(files)]
+
+    def _init_df(self) -> pd.DataFrame:
+        r"""Initialize empty dataframe.
+
+        Returns:
+            empty dependency table dataframe
+
+        """
+        df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
+        return self._set_dtypes(df)
 
     def _remove(self, file: str):
         r"""Mark file as removed.
@@ -788,33 +803,9 @@ class Dependencies:
 
         self._df.loc[files, "version"] = version
 
-    def _setup_duckdb_connection(self, parquet_path: str):
-        r"""Set up DuckDB connection for fast queries.
-
-        Args:
-            parquet_path: path to parquet file
-
-        """
-        try:
-            self._duckdb_conn = duckdb.connect()
-            self._parquet_file = parquet_path
-            # Test the connection with a simple query
-            self._duckdb_conn.execute(
-                f"SELECT COUNT(*) FROM '{parquet_path}'"
-            ).fetchone()
-        except (duckdb.Error, duckdb.InvalidInputException):
-            # If DuckDB setup fails, fall back to pandas
-            self._duckdb_conn = None
-            self._parquet_file = None
-        except Exception:
-            # Unexpected error during setup
-            if hasattr(self, "_duckdb_conn") and self._duckdb_conn is not None:
-                try:
-                    self._duckdb_conn.close()
-                except Exception:
-                    pass
-            self._duckdb_conn = None
-            self._parquet_file = None
+    def _setup_duckdb_connection(self):
+        r"""Set up DuckDB connection for fast queries."""
+        self._duckdb_conn = duckdb.connect()
 
     def _duckdb_query_files(self, condition: str = None) -> list[str]:
         r"""Query files using DuckDB for better performance.
@@ -826,7 +817,7 @@ class Dependencies:
             list of file paths
 
         """
-        query = f"SELECT file FROM '{self._parquet_file}'"
+        query = f"SELECT file FROM '{self.path}'"
         if condition:
             query += f" WHERE {condition}"
         result = self._duckdb_conn.execute(query).fetchall()
@@ -842,7 +833,6 @@ class Dependencies:
                 pass
             finally:
                 self._duckdb_conn = None
-                self._parquet_file = None
 
     def __del__(self):
         r"""Cleanup DuckDB connection on object destruction."""
