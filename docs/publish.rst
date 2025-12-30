@@ -228,10 +228,10 @@ and will only publish those.
 
 >>> deps()
                                              archive  bit_depth  ...  type version
-db.age.parquet                                                0  ...     0   1.1.0
 audio/001.wav   436c65ec-1e42-f9de-2708-ecafe07e827e         16  ...     1   1.0.0
 audio/002.wav   fda7e4d6-f2b2-4cff-cab5-906ef5d57607         16  ...     1   1.0.0
 audio/003.wav   e26ef45d-bdc1-6153-bdc4-852d83806e4a         16  ...     1   1.0.0
+db.age.parquet                                                0  ...     0   1.1.0
 audio/004.wav   ef4d1e81-6488-95cf-a165-604d1e47d575         16  ...     1   1.1.0
 <BLANKLINE>
 [5 rows x 10 columns]
