@@ -450,21 +450,15 @@ class Dependencies:
 
         elif extension == "csv":
             # Read from CSV file
-            # The CSV writer creates a duplicate header (known issue), so skip the first data row
-            # and use the column names from the header
+            # Provide explicit column names and skip the header row
             table = csv.read_csv(
                 path,
                 read_options=csv.ReadOptions(
-                    skip_rows=1,  # Skip the duplicate header row
-                    autogenerate_column_names=False,
+                    column_names=self._schema.names,
+                    skip_rows=1,
                 ),
+                convert_options=csv.ConvertOptions(column_types=self._schema),
             )
-            # Rename the empty column to "file"
-            columns = table.column_names
-            columns = ["file" if c == "" else c for c in columns]
-            table = table.rename_columns(columns)
-            # Ensure correct schema types
-            table = table.cast(self._schema)
 
         elif extension == "parquet":
             # Read from Parquet file
@@ -528,7 +522,8 @@ class Dependencies:
                 os.remove(path)
 
             # Create a new Lance file
-            with LanceFileWriter(path) as writer:
+            # Provide schema to handle empty tables
+            with LanceFileWriter(path, schema=self._schema) as writer:
                 writer.write_batch(self._table)
 
     def type(self, file: str) -> int:
@@ -769,6 +764,8 @@ class Dependencies:
             preserve_index=False,
             schema=self._schema,
         )
+        # Combine chunks to avoid multi-chunk columns that cause CSV writing issues
+        table = table.combine_chunks()
         if not file_column:
             columns = table.column_names
             columns = ["" if c == "file" else c for c in columns]
