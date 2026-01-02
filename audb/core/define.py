@@ -11,16 +11,13 @@ DB = "db"
 HEADER_FILE = f"{DB}.yaml"
 
 # Dependencies
-DEPENDENCY_FILE = f"{DB}.parquet"
+DEPENDENCY_FILE = f"{DB}.lance"
 r"""Filename and extension of dependency table file."""
 
-CACHED_DEPENDENCY_FILE = f"{DB}.pkl"
-r"""Filename and extension of cached dependency table file.
+PARQUET_DEPENDENCY_FILE = f"{DB}.parquet"
+r"""Filename and extension of parquet dependency table file.
 
-As loading from a pickle file is still faster
-than loading from a parquet file,
-we are storing the dependency table
-as a pickle file in cache.
+Used as a backward compatible format for loading older databases.
 
 """
 

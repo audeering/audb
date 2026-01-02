@@ -84,8 +84,8 @@ def _find_attachments(
     r"""Find altered, new or removed attachments and update 'deps'."""
     # drop removed attachments from dependency table
     removed_attachments = [
-        deps._df.index[deps._df.archive == attachment_id][0]
-        for attachment_id in deps.attachment_ids
+        attachment
+        for attachment, attachment_id in zip(deps.attachments, deps.attachment_ids)
         if attachment_id not in db.attachments
     ]
     deps._drop(removed_attachments)

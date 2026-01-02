@@ -44,6 +44,7 @@ dependencies = [
     'oyaml',
     'pandas >=2.1.0',
     'pyarrow',
+    'pylance',
 ]
 # Get version dynamically from git
 # (needs setuptools_scm tools config below)
