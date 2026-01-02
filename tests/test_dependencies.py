@@ -51,13 +51,6 @@ ROWS = [
         "version": "1.0.0",
     },
 ]
-DEPENDENCIES = (
-    "(file, archive, bit_depth, channels, checksum, duration, format, "
-    "removed, sampling_rate, type, version)"
-)
-VALUES = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
-
 def get_entries(column):
     return [row[column] for row in ROWS]
 
@@ -71,25 +64,25 @@ def test_get_entries():
 )
 def deps():
     deps = audb.Dependencies()
-    # Insert test data directly into SQLite
-    for row in ROWS:
-        deps._conn.execute(
-            f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
-            (
-                row["file"],
-                row["archive"],
-                row["bit_depth"],
-                row["channels"],
-                row["checksum"],
-                row["duration"],
-                row["format"],
-                row["removed"],
-                row["sampling_rate"],
-                row["type"],
-                row["version"],
-            ),
+    # Insert test data directly using _add_media for all types
+    # to preserve the exact test data including archive values
+    media_and_meta_rows = [
+        (
+            row["file"],
+            row["archive"],
+            row["bit_depth"],
+            row["channels"],
+            row["checksum"],
+            row["duration"],
+            row["format"],
+            row["removed"],
+            row["sampling_rate"],
+            row["type"],
+            row["version"],
         )
-    deps._conn.commit()
+        for row in ROWS
+    ]
+    deps._add_media(media_and_meta_rows)
     return deps
 
 
@@ -97,10 +90,10 @@ def test_instantiation():
     r"""Test instantiation of audb.Dependencies.
 
     During instantiation of ``audb.Dependencies``
-    an empty SQLite database is created under ``self._conn``,
+    an empty PyArrow table is created under ``self._table``,
     that stores the dependency table.
     This test ensures,
-    that the database
+    that the table
     contains the correct column names and data types,
     and the correct name and data type of its index.
 
@@ -157,30 +150,43 @@ def test_equals(deps):
     assert deps == deps
     # Copy data to new Dependencies object
     _deps = audb.Dependencies()
-    for row in ROWS:
-        _deps._conn.execute(
-            f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
-            (
-                row["file"],
-                row["archive"],
-                row["bit_depth"],
-                row["channels"],
-                row["checksum"],
-                row["duration"],
-                row["format"],
-                row["removed"],
-                row["sampling_rate"],
-                row["type"],
-                row["version"],
-            ),
+    media_and_meta_rows = [
+        (
+            row["file"],
+            row["archive"],
+            row["bit_depth"],
+            row["channels"],
+            row["checksum"],
+            row["duration"],
+            row["format"],
+            row["removed"],
+            row["sampling_rate"],
+            row["type"],
+            row["version"],
         )
-    _deps._conn.commit()
+        for row in ROWS
+    ]
+    _deps._add_media(media_and_meta_rows)
     assert deps == _deps
     # example table vs. different table
-    _deps._conn.execute(
-        "UPDATE dependencies SET channels = 4 WHERE file = 'db.files.csv'"
+    # Modify one row to make it different
+    _deps._update_media(
+        [
+            (
+                "file.wav",
+                "archive2",
+                16,
+                4,  # changed from 2 to 4
+                "917338b854ad9c72f76bc9a68818dcd8",
+                1.23,
+                "wav",
+                0,
+                16000,
+                1,
+                "1.0.0",
+            )
+        ]
     )
-    _deps._conn.commit()
     assert deps != _deps
 
 
@@ -288,7 +294,7 @@ def test_removed(deps):
         deps.removed("non.existing")
 
 
-@pytest.mark.parametrize("file", ["deps.csv", "deps.parquet", "deps.sqlite"])
+@pytest.mark.parametrize("file", ["deps.csv", "deps.parquet", "deps.lance"])
 def test_load_save(tmpdir, deps, file):
     """Test consistency of dependency table after save/load cycle.
 
