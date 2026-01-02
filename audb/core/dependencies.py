@@ -9,7 +9,9 @@ import tempfile
 
 import pandas as pd
 import pyarrow as pa
+import pyarrow.compute as pc
 import pyarrow.csv as csv
+import pyarrow.ipc as ipc
 import pyarrow.parquet as parquet
 
 import audbackend
@@ -60,8 +62,6 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
-        self._df = self._set_dtypes(self._df)
         # pyarrow schema
         # used for reading and writing files
         self._schema = pa.schema(
@@ -79,6 +79,59 @@ class Dependencies:
                 ("version", pa.string()),
             ]
         )
+        # Internal Arrow table (immutable)
+        self._table = pa.table(
+            {
+                "file": pa.array([], type=pa.string()),
+                "archive": pa.array([], type=pa.string()),
+                "bit_depth": pa.array([], type=pa.int32()),
+                "channels": pa.array([], type=pa.int32()),
+                "checksum": pa.array([], type=pa.string()),
+                "duration": pa.array([], type=pa.float64()),
+                "format": pa.array([], type=pa.string()),
+                "removed": pa.array([], type=pa.int32()),
+                "sampling_rate": pa.array([], type=pa.int32()),
+                "type": pa.array([], type=pa.int32()),
+                "version": pa.array([], type=pa.string()),
+            },
+            schema=self._schema,
+        )
+        # File path to row index mapping for O(1) lookups
+        self._file_index: dict[str, int] = {}
+        # Cached DataFrame for __call__()
+        self._df_cache: pd.DataFrame | None = None
+        # Track if table was modified to invalidate cache
+        self._table_modified: bool = True
+
+    @property
+    def _df(self) -> pd.DataFrame:
+        r"""Backward compatibility property for accessing the DataFrame.
+
+        Returns the cached DataFrame representation of the Arrow table.
+        This property is provided for backward compatibility with code
+        that directly accesses ``_df``.
+
+        Returns:
+            DataFrame with dependencies
+
+        """
+        return self.__call__()
+
+    @_df.setter
+    def _df(self, df: pd.DataFrame):
+        r"""Backward compatibility setter for the DataFrame.
+
+        Converts the DataFrame to an Arrow table and updates internal state.
+        This setter is provided for backward compatibility with code
+        that directly sets ``_df`` (e.g., test fixtures).
+
+        Args:
+            df: DataFrame to set
+
+        """
+        self._table = self._dataframe_to_table(df, file_column=True)
+        self._rebuild_index()
+        self._invalidate_df_cache()
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -87,7 +140,10 @@ class Dependencies:
             table with dependencies
 
         """
-        return self._df
+        if self._df_cache is None or self._table_modified:
+            self._df_cache = self._table_to_dataframe(self._table)
+            self._table_modified = False
+        return self._df_cache
 
     def __contains__(self, file: str) -> bool:
         r"""Check if file is part of dependencies.
@@ -99,7 +155,7 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        return file in self._df.index
+        return file in self._file_index
 
     def __eq__(self, other: "Dependencies") -> bool:
         r"""Check if two dependency tables are equal.
@@ -111,7 +167,9 @@ class Dependencies:
             ``True`` if both dependency tables have the same entries
 
         """
-        return self._df.equals(other._df)
+        # Compare using DataFrames for compatibility with code
+        # that modifies _df directly
+        return self.__call__().equals(other.__call__())
 
     def __getitem__(self, file: str) -> list:
         r"""File information.
@@ -123,14 +181,22 @@ class Dependencies:
             list with meta information
 
         """
-        return self._df.loc[file].tolist()
+        if file not in self._file_index:
+            raise KeyError(file)
+        row_idx = self._file_index[file]
+        # Direct column access is much faster than take() for single rows,
+        # especially with chunked arrays from parquet/arrow files
+        return [
+            self._table.column(i)[row_idx].as_py()
+            for i in range(1, self._table.num_columns)
+        ]
 
     def __len__(self) -> int:
         r"""Number of all media, table, attachment files."""
-        return len(self._df)
+        return len(self._table)
 
     def __str__(self) -> str:  # noqa: D105
-        return str(self._df)
+        return str(self.__call__())
 
     @property
     def archives(self) -> list[str]:
@@ -140,7 +206,8 @@ class Dependencies:
             list of archives
 
         """
-        return sorted(self._df.archive.unique().tolist())
+        unique_archives = pc.unique(self._table.column("archive"))
+        return sorted(unique_archives.to_pylist())
 
     @property
     def attachments(self) -> list[str]:
@@ -150,9 +217,10 @@ class Dependencies:
             list of attachments
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
-        ].index.tolist()
+        type_col = self._table.column("type")
+        mask = pc.equal(type_col, define.DEPENDENCY_TYPE["attachment"])
+        filtered_table = self._table.filter(mask)
+        return filtered_table.column("file").to_pylist()
 
     @property
     def attachment_ids(self) -> list[str]:
@@ -162,9 +230,10 @@ class Dependencies:
             list of attachment IDs
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
-        ].archive.tolist()
+        type_col = self._table.column("type")
+        mask = pc.equal(type_col, define.DEPENDENCY_TYPE["attachment"])
+        filtered_table = self._table.filter(mask)
+        return filtered_table.column("archive").to_pylist()
 
     @property
     def files(self) -> list[str]:
@@ -174,7 +243,7 @@ class Dependencies:
             list of files
 
         """
-        return self._df.index.tolist()
+        return self._table.column("file").to_pylist()
 
     @property
     def media(self) -> list[str]:
@@ -184,9 +253,10 @@ class Dependencies:
             list of media
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["media"]
-        ].index.tolist()
+        type_col = self._table.column("type")
+        mask = pc.equal(type_col, define.DEPENDENCY_TYPE["media"])
+        filtered_table = self._table.filter(mask)
+        return filtered_table.column("file").to_pylist()
 
     @property
     def removed_media(self) -> list[str]:
@@ -196,10 +266,14 @@ class Dependencies:
             list of media
 
         """
-        return self._df[
-            (self._df["type"] == define.DEPENDENCY_TYPE["media"])
-            & (self._df["removed"] == 1)
-        ].index.tolist()
+        type_col = self._table.column("type")
+        removed_col = self._table.column("removed")
+        mask = pc.and_(
+            pc.equal(type_col, define.DEPENDENCY_TYPE["media"]),
+            pc.equal(removed_col, 1),
+        )
+        filtered_table = self._table.filter(mask)
+        return filtered_table.column("file").to_pylist()
 
     @property
     def table_ids(self) -> list[str]:
@@ -223,9 +297,25 @@ class Dependencies:
             list of tables
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["meta"]
-        ].index.tolist()
+        type_col = self._table.column("type")
+        mask = pc.equal(type_col, define.DEPENDENCY_TYPE["meta"])
+        filtered_table = self._table.filter(mask)
+        return filtered_table.column("file").to_pylist()
+
+    def get_files_with_sampling_rate(self) -> list[str]:
+        r"""Get files that have a non-zero sampling rate.
+
+        This is a helper method for filtering files that need
+        flavor conversion based on sampling rate.
+
+        Returns:
+            list of file paths with non-zero sampling rate
+
+        """
+        sampling_rate_col = self._table.column("sampling_rate")
+        mask = pc.not_equal(sampling_rate_col, 0)
+        filtered_table = self._table.filter(mask)
+        return filtered_table.column("file").to_pylist()
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
@@ -237,7 +327,7 @@ class Dependencies:
             archive name
 
         """
-        return self._df.archive[file]
+        return self._column_loc("archive", file)
 
     def bit_depth(self, file: str) -> int:
         r"""Bit depth of media file.
@@ -304,38 +394,62 @@ class Dependencies:
 
         Clears existing dependencies.
 
+        Supports auto-detection of file format.
+        If no extension is provided or the file doesn't exist,
+        tries loading in order: Arrow IPC (``.arrow``),
+        Parquet (``.parquet``), CSV (``.csv``).
+
         Args:
             path: path to file.
-                File extension can be ``csv``
-                ``pkl``,
-                or ``parquet``
+                File extension can be ``arrow``, ``parquet``, or ``csv``.
+                If the path doesn't exist, will attempt auto-detection
+                by trying different extensions in order
 
         Raises:
             ValueError: if file extension is not one of
-                ``csv``, ``pkl``, ``parquet``
-            FileNotFoundError: if ``path`` does not exists
+                ``arrow``, ``parquet``, ``csv``
+            FileNotFoundError: if ``path`` does not exist
+                and auto-detection fails
 
         """
-        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         path = audeer.path(path)
+
+        # Check extension validity
         extension = audeer.file_extension(path)
-        if extension not in ["csv", "pkl", "parquet"]:
+        # If extension is provided and invalid, raise error
+        if extension and extension not in ["arrow", "parquet", "csv"]:
             raise ValueError(
-                f"File extension of 'path' has to be 'csv', 'pkl', or 'parquet' "
+                f"File extension of 'path' has to be "
+                f"'arrow', 'parquet', or 'csv', "
                 f"not '{extension}'"
             )
-        if not os.path.exists(path):
-            raise FileNotFoundError(
-                errno.ENOENT,
-                os.strerror(errno.ENOENT),
-                path,
-            )
-        if extension == "pkl":
-            self._df = pd.read_pickle(path)
-            # Correct dtypes
-            # to make backward compatiple
-            # with old pickle files in cache
-            self._df = self._set_dtypes(self._df)
+
+        # Auto-detection: try to find the file with different extensions
+        # if file doesn't exist or extension is empty
+        if not os.path.exists(path) or not extension:
+            base_path = os.path.splitext(path)[0]
+            for ext in [".arrow", ".parquet", ".csv"]:
+                candidate_path = base_path + ext
+                if os.path.exists(candidate_path):
+                    path = candidate_path
+                    extension = audeer.file_extension(path)
+                    break
+            else:
+                # No file found with any extension
+                raise FileNotFoundError(
+                    errno.ENOENT,
+                    os.strerror(errno.ENOENT),
+                    path,
+                )
+
+        if extension == "arrow":
+            with ipc.open_file(path) as reader:
+                table = reader.read_all()
+            self._table = table
+
+        elif extension == "parquet":
+            table = parquet.read_table(path)
+            self._table = table
 
         elif extension == "csv":
             table = csv.read_csv(
@@ -346,11 +460,11 @@ class Dependencies:
                 ),
                 convert_options=csv.ConvertOptions(column_types=self._schema),
             )
-            self._df = self._table_to_dataframe(table)
+            self._table = table
 
-        elif extension == "parquet":
-            table = parquet.read_table(path)
-            self._df = self._table_to_dataframe(table)
+        # Rebuild index and invalidate cache
+        self._rebuild_index()
+        self._invalidate_df_cache()
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
@@ -381,25 +495,46 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv``, ``pkl``, or ``parquet``
+                File extension can be ``arrow``, ``parquet``, or ``csv``
+
+        Raises:
+            ValueError: if file extension is not one of
+                ``arrow``, ``parquet``, ``csv``
 
         """
         path = audeer.path(path)
-        if path.endswith("csv"):
-            table = self._dataframe_to_table(self._df)
+        extension = audeer.file_extension(path)
+
+        # Convert from DataFrame to capture any in-place modifications
+        # made via _df property
+        table = self._dataframe_to_table(self.__call__(), file_column=True)
+
+        if extension == "arrow":
+            # Write as Arrow IPC format with LZ4 compression
+            with ipc.RecordBatchFileWriter(
+                path,
+                schema=self._schema,
+                options=ipc.IpcWriteOptions(compression="lz4"),
+            ) as writer:
+                writer.write_table(table)
+        elif extension == "parquet":
+            parquet.write_table(table, path)
+        elif extension == "csv":
+            # For CSV, rename file column to empty string for compatibility
+            columns = table.column_names
+            columns = ["" if c == "file" else c for c in columns]
+            table = table.rename_columns(columns)
             csv.write_csv(
                 table,
                 path,
                 write_options=csv.WriteOptions(quoting_style="none"),
             )
-        elif path.endswith("pkl"):
-            self._df.to_pickle(
-                path,
-                protocol=4,  # supported by Python >= 3.4
+        else:
+            raise ValueError(
+                f"File extension of 'path' has to be "
+                f"'arrow', 'parquet', or 'csv', "
+                f"not '{extension}'"
             )
-        elif path.endswith("parquet"):
-            table = self._dataframe_to_table(self._df, file_column=True)
-            parquet.write_table(table, path)
 
     def type(self, file: str) -> int:
         r"""Type of file.
@@ -443,18 +578,52 @@ class Dependencies:
         """
         format = audeer.file_extension(file).lower()
 
-        self._df.loc[file] = [
-            archive,  # archive
-            0,  # bit_depth
-            0,  # channels
-            checksum,  # checksum
-            0.0,  # duration
-            format,  # format
-            0,  # removed
-            0,  # sampling_rate
-            define.DEPENDENCY_TYPE["attachment"],  # type
-            version,  # version
-        ]
+        # If file exists, update it in place to preserve row order
+        if file in self._file_index:
+            row_idx = self._file_index[file]
+            # Update each column value at the specific row index
+            for col_name, value in [
+                ("archive", archive),
+                ("bit_depth", 0),
+                ("channels", 0),
+                ("checksum", checksum),
+                ("duration", 0.0),
+                ("format", format),
+                ("removed", 0),
+                ("sampling_rate", 0),
+                ("type", define.DEPENDENCY_TYPE["attachment"]),
+                ("version", version),
+            ]:
+                col = self._table.column(col_name)
+                col_list = col.to_pylist()
+                col_list[row_idx] = value
+                col_type = self._schema.field(col_name).type
+                new_col = pa.array(col_list, type=col_type)
+                col_idx = self._schema.get_field_index(col_name)
+                self._table = self._table.set_column(col_idx, col_name, new_col)
+            self._invalidate_df_cache()
+        else:
+            # Build single-row table for new file
+            new_row = pa.table(
+                {
+                    "file": [file],
+                    "archive": [archive],
+                    "bit_depth": [0],
+                    "channels": [0],
+                    "checksum": [checksum],
+                    "duration": [0.0],
+                    "format": [format],
+                    "removed": [0],
+                    "sampling_rate": [0],
+                    "type": [define.DEPENDENCY_TYPE["attachment"]],
+                    "version": [version],
+                },
+                schema=self._schema,
+            )
+            # Append new row
+            self._table = pa.concat_tables([self._table, new_row])
+            self._rebuild_index()
+            self._invalidate_df_cache()
 
     def _add_media(
         self,
@@ -481,12 +650,32 @@ class Dependencies:
                 where each tuple holds the values of a new media entry
 
         """
-        df = pd.DataFrame.from_records(
-            values,
-            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
-        ).set_index("file")
-        df = self._set_dtypes(df)
-        self._df = pd.concat([self._df, df])
+        # Build table directly from tuples (transpose to get column arrays)
+        if not values:
+            return
+
+        arrays = list(zip(*values))
+        new_rows = pa.table(
+            {
+                "file": arrays[0],
+                "archive": arrays[1],
+                "bit_depth": arrays[2],
+                "channels": arrays[3],
+                "checksum": arrays[4],
+                "duration": arrays[5],
+                "format": arrays[6],
+                "removed": arrays[7],
+                "sampling_rate": arrays[8],
+                "type": arrays[9],
+                "version": arrays[10],
+            },
+            schema=self._schema,
+        )
+
+        # Concatenate with existing table
+        self._table = pa.concat_tables([self._table, new_rows])
+        self._rebuild_index()
+        self._invalidate_df_cache()
 
     def _add_meta(
         self,
@@ -508,18 +697,52 @@ class Dependencies:
         else:
             archive = os.path.splitext(file[3:])[0]
 
-        self._df.loc[file] = [
-            archive,  # archive
-            0,  # bit_depth
-            0,  # channels
-            checksum,  # checksum
-            0.0,  # duration
-            format,  # format
-            0,  # removed
-            0,  # sampling_rate
-            define.DEPENDENCY_TYPE["meta"],  # type
-            version,  # version
-        ]
+        # If file exists, update it in place to preserve row order
+        if file in self._file_index:
+            row_idx = self._file_index[file]
+            # Update each column value at the specific row index
+            for col_name, value in [
+                ("archive", archive),
+                ("bit_depth", 0),
+                ("channels", 0),
+                ("checksum", checksum),
+                ("duration", 0.0),
+                ("format", format),
+                ("removed", 0),
+                ("sampling_rate", 0),
+                ("type", define.DEPENDENCY_TYPE["meta"]),
+                ("version", version),
+            ]:
+                col = self._table.column(col_name)
+                col_list = col.to_pylist()
+                col_list[row_idx] = value
+                col_type = self._schema.field(col_name).type
+                new_col = pa.array(col_list, type=col_type)
+                col_idx = self._schema.get_field_index(col_name)
+                self._table = self._table.set_column(col_idx, col_name, new_col)
+            self._invalidate_df_cache()
+        else:
+            # Build single-row table for new file
+            new_row = pa.table(
+                {
+                    "file": [file],
+                    "archive": [archive],
+                    "bit_depth": [0],
+                    "channels": [0],
+                    "checksum": [checksum],
+                    "duration": [0.0],
+                    "format": [format],
+                    "removed": [0],
+                    "sampling_rate": [0],
+                    "type": [define.DEPENDENCY_TYPE["meta"]],
+                    "version": [version],
+                },
+                schema=self._schema,
+            )
+            # Append new row
+            self._table = pa.concat_tables([self._table, new_row])
+            self._rebuild_index()
+            self._invalidate_df_cache()
 
     def _column_loc(
         self,
@@ -538,7 +761,10 @@ class Dependencies:
             scalar value
 
         """
-        value = self._df.at[file, column]
+        if file not in self._file_index:
+            raise KeyError(file)
+        row_idx = self._file_index[file]
+        value = self._table.column(column)[row_idx].as_py()
         if dtype is not None:
             value = dtype(value)
         return value
@@ -579,13 +805,12 @@ class Dependencies:
             files: relative file paths
 
         """
-        # self._df.drop is slow,
-        # see https://stackoverflow.com/a/53394627.
-        # The solution presented in https://stackoverflow.com/a/53395360
-        # self._df = self._df.loc[self._df.index.drop(files)]
-        # which is claimed to be faster,
-        # isn't.
-        self._df = self._df[~self._df.index.isin(files)]
+        # Use Arrow compute filter with inverted is_in mask
+        file_col = self._table.column("file")
+        mask = pc.invert(pc.is_in(file_col, pa.array(files, type=pa.string())))
+        self._table = self._table.filter(mask)
+        self._rebuild_index()
+        self._invalidate_df_cache()
 
     def _remove(self, file: str):
         r"""Mark file as removed.
@@ -594,7 +819,20 @@ class Dependencies:
             file: relative file path
 
         """
-        self._df.at[file, "removed"] = 1
+        if file not in self._file_index:
+            raise KeyError(file)
+
+        # Get row index and update removed column
+        row_idx = self._file_index[file]
+        removed_col = self._table.column("removed")
+        removed_list = removed_col.to_pylist()
+        removed_list[row_idx] = 1
+
+        # Replace column
+        new_removed_col = pa.array(removed_list, type=pa.int32())
+        col_idx = self._schema.get_field_index("removed")
+        self._table = self._table.set_column(col_idx, "removed", new_removed_col)
+        self._invalidate_df_cache()
 
     @staticmethod
     def _set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
@@ -664,12 +902,47 @@ class Dependencies:
                 where each tuple holds the new values for a media entry
 
         """
-        df = pd.DataFrame.from_records(
-            values,
-            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
-        ).set_index("file")
-        df = self._set_dtypes(df)
-        self._df.loc[df.index] = df
+        if not values:
+            return
+
+        # Build table from tuples
+        arrays = list(zip(*values))
+        files_to_update = list(arrays[0])
+
+        # Check that all files exist (to match pandas behavior)
+        for file in files_to_update:
+            if file not in self._file_index:
+                raise KeyError(file)
+
+        # Filter out rows that need updating
+        file_col = self._table.column("file")
+        mask = pc.invert(
+            pc.is_in(file_col, pa.array(files_to_update, type=pa.string()))
+        )
+        filtered_table = self._table.filter(mask)
+
+        # Build new rows table
+        new_rows = pa.table(
+            {
+                "file": arrays[0],
+                "archive": arrays[1],
+                "bit_depth": arrays[2],
+                "channels": arrays[3],
+                "checksum": arrays[4],
+                "duration": arrays[5],
+                "format": arrays[6],
+                "removed": arrays[7],
+                "sampling_rate": arrays[8],
+                "type": arrays[9],
+                "version": arrays[10],
+            },
+            schema=self._schema,
+        )
+
+        # Concatenate filtered table with new rows
+        self._table = pa.concat_tables([filtered_table, new_rows])
+        self._rebuild_index()
+        self._invalidate_df_cache()
 
     def _update_media_version(
         self,
@@ -683,7 +956,45 @@ class Dependencies:
             version: version string
 
         """
-        self._df.loc[files, "version"] = version
+        # Get row indices for files
+        row_indices = [self._file_index[f] for f in files if f in self._file_index]
+
+        if not row_indices:
+            return
+
+        # Update version column
+        version_col = self._table.column("version")
+        version_list = version_col.to_pylist()
+        for idx in row_indices:
+            version_list[idx] = version
+
+        # Replace column
+        new_version_col = pa.array(version_list, type=pa.string())
+        col_idx = self._schema.get_field_index("version")
+        self._table = self._table.set_column(col_idx, "version", new_version_col)
+        self._invalidate_df_cache()
+
+    def _rebuild_index(self):
+        r"""Rebuild file path to row index mapping.
+
+        Creates a dictionary mapping each file path
+        to its row index in the Arrow table
+        for O(1) file lookups.
+        Called after any operation that changes row order.
+
+        """
+        file_col = self._table.column("file")
+        self._file_index = {file: i for i, file in enumerate(file_col.to_pylist())}
+
+    def _invalidate_df_cache(self):
+        r"""Invalidate the cached DataFrame.
+
+        Marks the DataFrame cache as stale
+        so it will be regenerated on next __call__().
+        Called after any mutation operation.
+
+        """
+        self._table_modified = True
 
 
 def error_message_missing_object(
@@ -794,6 +1105,11 @@ def download_dependencies(
     and return an dependency object
     loaded from that file.
 
+    Tries formats in order:
+    Arrow IPC (``.arrow``),
+    Parquet (``.parquet``),
+    CSV (``.csv`` in ``.zip``).
+
     Args:
         backend_interface: backend interface
         name: database name
@@ -805,9 +1121,14 @@ def download_dependencies(
 
     """
     with tempfile.TemporaryDirectory() as tmp_root:
-        # Load `db.parquet` file,
-        # or if non-existent `db.zip`
-        # from backend
+        # Try loading dependency file in order of preference:
+        # 1. db.arrow (Arrow IPC format, newest)
+        # 2. db.parquet (Parquet format, introduced in v1.7.0)
+        # 3. db.zip containing db.csv (legacy format, pre-v1.7.0)
+
+        local_deps_file = None
+
+        # Try Arrow IPC first
         remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
         if backend_interface.exists(remote_deps_file, version):
             local_deps_file = os.path.join(tmp_root, define.DEPENDENCY_FILE)
@@ -818,17 +1139,32 @@ def download_dependencies(
                 verbose=verbose,
             )
         else:
-            remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
-            local_deps_file = os.path.join(
-                tmp_root,
-                define.LEGACY_DEPENDENCY_FILE,
+            # Fall back to Parquet
+            remote_deps_file = backend_interface.join(
+                "/", name, define.PARQUET_DEPENDENCY_FILE
             )
-            backend_interface.get_archive(
-                remote_deps_file,
-                tmp_root,
-                version,
-                verbose=verbose,
-            )
+            if backend_interface.exists(remote_deps_file, version):
+                local_deps_file = os.path.join(tmp_root, define.PARQUET_DEPENDENCY_FILE)
+                backend_interface.get_file(
+                    remote_deps_file,
+                    local_deps_file,
+                    version,
+                    verbose=verbose,
+                )
+            else:
+                # Fall back to legacy CSV in ZIP
+                remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
+                local_deps_file = os.path.join(
+                    tmp_root,
+                    define.LEGACY_DEPENDENCY_FILE,
+                )
+                backend_interface.get_archive(
+                    remote_deps_file,
+                    tmp_root,
+                    version,
+                    verbose=verbose,
+                )
+
         # Create deps object from downloaded file
         deps = Dependencies()
         deps.load(local_deps_file)

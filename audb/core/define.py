@@ -11,16 +11,22 @@ DB = "db"
 HEADER_FILE = f"{DB}.yaml"
 
 # Dependencies
-DEPENDENCY_FILE = f"{DB}.parquet"
-r"""Filename and extension of dependency table file."""
+DEPENDENCY_FILE = f"{DB}.arrow"
+r"""Filename and extension of dependency table file.
 
-CACHED_DEPENDENCY_FILE = f"{DB}.pkl"
-r"""Filename and extension of cached dependency table file.
+Since ``audb`` version 1.12.0,
+the dependency table is stored in an Apache Arrow IPC file.
 
-As loading from a pickle file is still faster
-than loading from a parquet file,
-we are storing the dependency table
-as a pickle file in cache.
+"""
+
+PARQUET_DEPENDENCY_FILE = f"{DB}.parquet"
+r"""Filename and extension of Parquet dependency table file.
+
+In ``audb`` versions 1.7.0 to 1.7.x,
+the dependency table was stored in a Parquet file.
+For backward compatibility,
+the loader will try this format
+if the Arrow IPC file is not found.
 
 """
 
@@ -28,7 +34,7 @@ LEGACY_DEPENDENCY_FILE = f"{DB}.csv"
 r"""Filename and extension of legacy dependency table file.
 
 In ``audb`` versions smaller than 1.7.0,
-the dependency table was stored in a csv file.
+the dependency table was stored in a CSV file.
 
 """
 
