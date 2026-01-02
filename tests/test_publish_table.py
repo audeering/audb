@@ -90,7 +90,7 @@ def assert_db_published_to_repo(
     """
     repo = audeer.path(repository.host, repository.name)
 
-    dependency_file = "db.parquet"
+    dependency_file = "db.arrow"
     header_file = "db.yaml"
     files = list(db.files)
     tables = list(db)

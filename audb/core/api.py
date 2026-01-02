@@ -224,6 +224,7 @@ def cached(
             files = audeer.list_file_names(version_path, basenames=True)
             if (
                 define.DEPENDENCY_FILE not in files
+                and define.PARQUET_DEPENDENCY_FILE not in files
                 and define.LEGACY_DEPENDENCY_FILE not in files
             ):
                 # Skip all cache entries

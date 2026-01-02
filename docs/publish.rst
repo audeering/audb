@@ -126,7 +126,7 @@ data/
   data-local/
     age-test/
       1.0.0/
-        db.parquet
+        db.arrow
         db.yaml
       media/
         1.0.0/
@@ -142,7 +142,7 @@ inside the ``media/`` folder,
 all tables inside the ``meta/`` folder,
 the database header in the file ``db.yaml``,
 and the database dependencies
-in the file ``db.parquet``.
+in the file ``db.arrow``.
 Note,
 that the structure of the folders
 used for versioning
@@ -247,10 +247,10 @@ data/
   data-local/
     age-test/
       1.0.0/
-        db.parquet
+        db.arrow
         db.yaml
       1.1.0/
-        db.parquet
+        db.arrow
         db.yaml
       media/
         1.0.0/

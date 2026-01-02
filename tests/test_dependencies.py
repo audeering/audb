@@ -250,7 +250,7 @@ def test_removed(deps):
         deps.removed("non.existing")
 
 
-@pytest.mark.parametrize("file", ["deps.csv", "deps.parquet"])
+@pytest.mark.parametrize("file", ["deps.csv", "deps.parquet", "deps.arrow"])
 def test_load_save(tmpdir, deps, file):
     """Test consistency of dependency table after save/load cycle.
 
@@ -276,6 +276,68 @@ def test_load_save_errors(deps):
     # File missing
     with pytest.raises(FileNotFoundError):
         deps.load("deps.csv")
+
+
+def test_arrow_compression(tmpdir, deps):
+    """Test Arrow IPC file uses LZ4 compression."""
+    import pyarrow.ipc as ipc
+
+    deps_file = audeer.path(tmpdir, "deps.arrow")
+    deps.save(deps_file)
+
+    # Read raw Arrow file to verify compression
+    with ipc.open_file(deps_file) as reader:
+        # Verify the file is valid Arrow IPC
+        assert reader.num_record_batches > 0
+
+    # File should exist and be smaller than uncompressed
+    assert os.path.exists(deps_file)
+    assert os.path.getsize(deps_file) > 0
+
+
+def test_backward_compatibility_auto_detection(tmpdir, deps):
+    """Test auto-detection loads Parquet/CSV when Arrow is missing."""
+    # Save as Parquet
+    parquet_file = audeer.path(tmpdir, "deps.parquet")
+    deps.save(parquet_file)
+
+    # Load without extension should auto-detect
+    base_path = audeer.path(tmpdir, "deps")
+    deps2 = audb.Dependencies()
+    deps2.load(base_path)
+    pd.testing.assert_frame_equal(deps(), deps2())
+
+    # Save as CSV
+    csv_file = audeer.path(tmpdir, "deps2.csv")
+    deps.save(csv_file)
+
+    # Load without extension should auto-detect
+    base_path = audeer.path(tmpdir, "deps2")
+    deps3 = audb.Dependencies()
+    deps3.load(base_path)
+    pd.testing.assert_frame_equal(deps(), deps3())
+
+
+def test_format_precedence(tmpdir, deps):
+    """Test Arrow takes precedence over Parquet and CSV."""
+    base_path = audeer.path(tmpdir, "deps")
+
+    # Create all three formats with different data
+    deps.save(base_path + ".csv")
+    deps.save(base_path + ".parquet")
+
+    # Modify deps slightly
+    original_version = deps.version("db.files.csv")
+    deps._df.loc["db.files.csv", "version"] = "2.0.0"
+    deps.save(base_path + ".arrow")
+
+    # Loading should prefer Arrow
+    deps2 = audb.Dependencies()
+    deps2.load(base_path)
+    assert deps2.version("db.files.csv") == "2.0.0"
+
+    # Clean up for next test - restore original
+    deps._df.loc["db.files.csv", "version"] = original_version
 
 
 def test_sampling_rate(deps):

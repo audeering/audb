@@ -776,7 +776,11 @@ def publish(
 
     # load database and dependencies
     deps = Dependencies()
-    for deps_file in [define.DEPENDENCY_FILE, define.LEGACY_DEPENDENCY_FILE]:
+    for deps_file in [
+        define.DEPENDENCY_FILE,
+        define.PARQUET_DEPENDENCY_FILE,
+        define.LEGACY_DEPENDENCY_FILE,
+    ]:
         deps_path = os.path.join(db_root, deps_file)
         if os.path.exists(deps_path):
             deps.load(deps_path)

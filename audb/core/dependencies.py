@@ -10,6 +10,7 @@ import tempfile
 import pandas as pd
 import pyarrow as pa
 import pyarrow.csv as csv
+import pyarrow.ipc as ipc
 import pyarrow.parquet as parquet
 
 import audbackend
@@ -304,32 +305,65 @@ class Dependencies:
 
         Clears existing dependencies.
 
+        Supports auto-detection of file format.
+        If no extension is provided or the file doesn't exist,
+        tries loading in order: Arrow IPC (``.arrow``),
+        Parquet (``.parquet``), CSV (``.csv``).
+
         Args:
             path: path to file.
-                File extension can be ``csv``
-                or ``parquet``
+                File extension can be ``arrow``, ``parquet``, or ``csv``.
+                If the path doesn't exist, will attempt auto-detection
+                by trying different extensions in order
 
         Raises:
             ValueError: if file extension is not one of
-                ``csv``, ``parquet``
-            FileNotFoundError: if ``path`` does not exists
+                ``arrow``, ``parquet``, ``csv``
+            FileNotFoundError: if ``path`` does not exist
+                and auto-detection fails
 
         """
         self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         path = audeer.path(path)
+
+        # Check extension validity
         extension = audeer.file_extension(path)
-        if extension not in ["csv", "parquet"]:
+        # If extension is provided and invalid, raise error
+        if extension and extension not in ["arrow", "parquet", "csv"]:
             raise ValueError(
-                f"File extension of 'path' has to be 'csv' or 'parquet' "
+                f"File extension of 'path' has to be "
+                f"'arrow', 'parquet', or 'csv', "
                 f"not '{extension}'"
             )
-        if not os.path.exists(path):
-            raise FileNotFoundError(
-                errno.ENOENT,
-                os.strerror(errno.ENOENT),
-                path,
-            )
-        if extension == "csv":
+
+        # Auto-detection: try to find the file with different extensions
+        # if file doesn't exist or extension is empty
+        if not os.path.exists(path) or not extension:
+            base_path = os.path.splitext(path)[0]
+            for ext in [".arrow", ".parquet", ".csv"]:
+                candidate_path = base_path + ext
+                if os.path.exists(candidate_path):
+                    path = candidate_path
+                    extension = audeer.file_extension(path)
+                    break
+            else:
+                # No file found with any extension
+                raise FileNotFoundError(
+                    errno.ENOENT,
+                    os.strerror(errno.ENOENT),
+                    path,
+                )
+
+        if extension == "arrow":
+            with ipc.open_file(path) as reader:
+                table = reader.read_all()
+            self._df = self._table_to_dataframe(table)
+
+        elif extension == "parquet":
+            table = parquet.read_table(path)
+            self._df = self._table_to_dataframe(table)
+
+        elif extension == "csv":
             table = csv.read_csv(
                 path,
                 read_options=csv.ReadOptions(
@@ -338,10 +372,6 @@ class Dependencies:
                 ),
                 convert_options=csv.ConvertOptions(column_types=self._schema),
             )
-            self._df = self._table_to_dataframe(table)
-
-        elif extension == "parquet":
-            table = parquet.read_table(path)
             self._df = self._table_to_dataframe(table)
 
     def removed(self, file: str) -> bool:
@@ -373,20 +403,41 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv`` or ``parquet``
+                File extension can be ``arrow``, ``parquet``, or ``csv``
+
+        Raises:
+            ValueError: if file extension is not one of
+                ``arrow``, ``parquet``, ``csv``
 
         """
         path = audeer.path(path)
-        if path.endswith("csv"):
+        extension = audeer.file_extension(path)
+
+        if extension == "arrow":
+            # Write as Arrow IPC format with LZ4 compression
+            table = self._dataframe_to_table(self._df, file_column=True)
+            with ipc.RecordBatchFileWriter(
+                path,
+                schema=self._schema,
+                options=ipc.IpcWriteOptions(compression="lz4"),
+            ) as writer:
+                writer.write_table(table)
+        elif extension == "parquet":
+            table = self._dataframe_to_table(self._df, file_column=True)
+            parquet.write_table(table, path)
+        elif extension == "csv":
             table = self._dataframe_to_table(self._df)
             csv.write_csv(
                 table,
                 path,
                 write_options=csv.WriteOptions(quoting_style="none"),
             )
-        elif path.endswith("parquet"):
-            table = self._dataframe_to_table(self._df, file_column=True)
-            parquet.write_table(table, path)
+        else:
+            raise ValueError(
+                f"File extension of 'path' has to be "
+                f"'arrow', 'parquet', or 'csv', "
+                f"not '{extension}'"
+            )
 
     def type(self, file: str) -> int:
         r"""Type of file.
@@ -781,6 +832,11 @@ def download_dependencies(
     and return an dependency object
     loaded from that file.
 
+    Tries formats in order:
+    Arrow IPC (``.arrow``),
+    Parquet (``.parquet``),
+    CSV (``.csv`` in ``.zip``).
+
     Args:
         backend_interface: backend interface
         name: database name
@@ -792,9 +848,14 @@ def download_dependencies(
 
     """
     with tempfile.TemporaryDirectory() as tmp_root:
-        # Load `db.parquet` file,
-        # or if non-existent `db.zip`
-        # from backend
+        # Try loading dependency file in order of preference:
+        # 1. db.arrow (Arrow IPC format, newest)
+        # 2. db.parquet (Parquet format, introduced in v1.7.0)
+        # 3. db.zip containing db.csv (legacy format, pre-v1.7.0)
+
+        local_deps_file = None
+
+        # Try Arrow IPC first
         remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
         if backend_interface.exists(remote_deps_file, version):
             local_deps_file = os.path.join(tmp_root, define.DEPENDENCY_FILE)
@@ -805,17 +866,32 @@ def download_dependencies(
                 verbose=verbose,
             )
         else:
-            remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
-            local_deps_file = os.path.join(
-                tmp_root,
-                define.LEGACY_DEPENDENCY_FILE,
+            # Fall back to Parquet
+            remote_deps_file = backend_interface.join(
+                "/", name, define.PARQUET_DEPENDENCY_FILE
             )
-            backend_interface.get_archive(
-                remote_deps_file,
-                tmp_root,
-                version,
-                verbose=verbose,
-            )
+            if backend_interface.exists(remote_deps_file, version):
+                local_deps_file = os.path.join(tmp_root, define.PARQUET_DEPENDENCY_FILE)
+                backend_interface.get_file(
+                    remote_deps_file,
+                    local_deps_file,
+                    version,
+                    verbose=verbose,
+                )
+            else:
+                # Fall back to legacy CSV in ZIP
+                remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
+                local_deps_file = os.path.join(
+                    tmp_root,
+                    define.LEGACY_DEPENDENCY_FILE,
+                )
+                backend_interface.get_archive(
+                    remote_deps_file,
+                    tmp_root,
+                    version,
+                    verbose=verbose,
+                )
+
         # Create deps object from downloaded file
         deps = Dependencies()
         deps.load(local_deps_file)
