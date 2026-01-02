@@ -471,7 +471,9 @@ def _get_media_from_backend(
             tmp_root=db_root_tmp,
         )
         # media files that can be changed to a requested flavor
-        flavor_files = deps._df[deps._df.sampling_rate != 0].index
+        # Get files with sampling_rate != 0 (audio files)
+        df = deps()
+        flavor_files = df[df.sampling_rate != 0].index
         for file in files:
             if os.name == "nt":  # pragma: no cover
                 file = file.replace(os.sep, "/")

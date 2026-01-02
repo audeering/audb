@@ -5,6 +5,7 @@ from collections.abc import Sequence
 import errno
 import os
 import re
+import sqlite3
 import tempfile
 
 import pandas as pd
@@ -16,6 +17,14 @@ import audbackend
 import audeer
 
 from audb.core import define
+
+
+# SQLITE query variables
+DEPENDENCIES = (
+    "(file, archive, bit_depth, channels, checksum, duration, format, "
+    "removed, sampling_rate, type, version)"
+)
+VALUES = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 
 class Dependencies:
@@ -43,7 +52,7 @@ class Dependencies:
         >>> deps = audb.dependencies("emodb", version="1.4.1")
         >>> # List all files or archives
         >>> deps.files[:3]
-        ['db.emotion.csv', 'db.files.csv', 'wav/03a01Fa.wav']
+        ['db.emotion.categories.test.gold_standard.csv', 'db.emotion.categories.train.gold_standard.csv', 'db.emotion.csv']
         >>> deps.archives[:2]
         ['005d2b91-5317-0c80-d602-6d55f0323f8c', '014f82d8-3491-fd00-7397-c3b2ac3b2875']
         >>> # Access properties for a given file
@@ -60,8 +69,38 @@ class Dependencies:
     """  # noqa: E501
 
     def __init__(self):
-        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
-        self._df = self._set_dtypes(self._df)
+        # Use in-memory SQLite database instead of pandas DataFrame
+        # Set check_same_thread=False to allow usage across threads
+        self._conn = sqlite3.connect(":memory:", check_same_thread=False)
+        self._db_path = None  # Track if connected to a file or in-memory
+
+        # Create the dependencies table
+        self._conn.execute("""
+            CREATE TABLE dependencies (
+                file TEXT PRIMARY KEY,
+                archive TEXT,
+                bit_depth INTEGER,
+                channels INTEGER,
+                checksum TEXT,
+                duration REAL,
+                format TEXT,
+                removed INTEGER,
+                sampling_rate INTEGER,
+                type INTEGER,
+                version TEXT
+            )
+        """)
+
+        # Create indexes for frequently queried columns
+        self._conn.execute("CREATE INDEX idx_type ON dependencies(type)")
+        self._conn.execute("CREATE INDEX idx_removed ON dependencies(removed)")
+        self._conn.execute("CREATE INDEX idx_archive ON dependencies(archive)")
+        self._conn.execute(
+            "CREATE INDEX idx_type_removed ON dependencies(type, removed)"
+        )
+
+        self._conn.commit()
+
         # pyarrow schema
         # used for reading and writing files
         self._schema = pa.schema(
@@ -87,7 +126,16 @@ class Dependencies:
             table with dependencies
 
         """
-        return self._df
+        df = pd.read_sql_query(
+            "SELECT * FROM dependencies",
+            self._conn,
+            index_col="file",
+        )
+        # Remove index name to match expected format
+        df.index.name = None
+        # Set correct dtypes
+        df = self._set_dtypes(df)
+        return df
 
     def __contains__(self, file: str) -> bool:
         r"""Check if file is part of dependencies.
@@ -99,7 +147,10 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        return file in self._df.index
+        cursor = self._conn.execute(
+            "SELECT 1 FROM dependencies WHERE file = ? LIMIT 1", (file,)
+        )
+        return cursor.fetchone() is not None
 
     def __eq__(self, other: "Dependencies") -> bool:
         r"""Check if two dependency tables are equal.
@@ -111,7 +162,8 @@ class Dependencies:
             ``True`` if both dependency tables have the same entries
 
         """
-        return self._df.equals(other._df)
+        # Compare by converting to DataFrames
+        return self().equals(other())
 
     def __getitem__(self, file: str) -> list:
         r"""File information.
@@ -123,14 +175,113 @@ class Dependencies:
             list with meta information
 
         """
-        return self._df.loc[file].tolist()
+        cursor = self._conn.execute(
+            "SELECT archive, bit_depth, channels, checksum, duration, "
+            "format, removed, sampling_rate, type, version "
+            "FROM dependencies WHERE file = ?",
+            (file,),
+        )
+        row = cursor.fetchone()
+        if row is None:
+            raise KeyError(file)
+        return list(row)
 
     def __len__(self) -> int:
         r"""Number of all media, table, attachment files."""
-        return len(self._df)
+        cursor = self._conn.execute("SELECT COUNT(*) FROM dependencies")
+        return cursor.fetchone()[0]
 
     def __str__(self) -> str:  # noqa: D105
-        return str(self._df)
+        return str(self())
+
+    def __del__(self):
+        """Clean up SQLite connection when object is deleted."""
+        if hasattr(self, "_conn") and self._conn:
+            self._conn.close()
+
+    def __getstate__(self):
+        """Make object serializable."""
+        # Get all data as a DataFrame
+        df = self()
+        # Return the DataFrame and schema for reconstruction
+        return {
+            "data": df.to_dict("records"),
+            "index": df.index.tolist(),
+        }
+
+    def __setstate__(self, state):
+        """Restore object from serialized state."""
+        # Recreate the SQLite connection
+        self._conn = sqlite3.connect(":memory:", check_same_thread=False)
+        self._db_path = None
+
+        # Recreate the table structure
+        self._conn.execute("""
+            CREATE TABLE dependencies (
+                file TEXT PRIMARY KEY,
+                archive TEXT,
+                bit_depth INTEGER,
+                channels INTEGER,
+                checksum TEXT,
+                duration REAL,
+                format TEXT,
+                removed INTEGER,
+                sampling_rate INTEGER,
+                type INTEGER,
+                version TEXT
+            )
+        """)
+
+        # Create indexes
+        self._conn.execute("CREATE INDEX idx_type ON dependencies(type)")
+        self._conn.execute("CREATE INDEX idx_removed ON dependencies(removed)")
+        self._conn.execute("CREATE INDEX idx_archive ON dependencies(archive)")
+        self._conn.execute(
+            "CREATE INDEX idx_type_removed ON dependencies(type, removed)"
+        )
+
+        self._conn.commit()
+
+        # Recreate the schema
+        self._schema = pa.schema(
+            [
+                ("file", pa.string()),
+                ("archive", pa.string()),
+                ("bit_depth", pa.int32()),
+                ("channels", pa.int32()),
+                ("checksum", pa.string()),
+                ("duration", pa.float64()),
+                ("format", pa.string()),
+                ("removed", pa.int32()),
+                ("sampling_rate", pa.int32()),
+                ("type", pa.int32()),
+                ("version", pa.string()),
+            ]
+        )
+
+        # Restore the data
+        if state["data"]:
+            data = state["data"]
+            index = state["index"]
+            for i, row in enumerate(data):
+                file = index[i]
+                self._conn.execute(
+                    f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
+                    (
+                        file,
+                        row["archive"],
+                        row["bit_depth"],
+                        row["channels"],
+                        row["checksum"],
+                        row["duration"],
+                        row["format"],
+                        row["removed"],
+                        row["sampling_rate"],
+                        row["type"],
+                        row["version"],
+                    ),
+                )
+            self._conn.commit()
 
     @property
     def archives(self) -> list[str]:
@@ -140,7 +291,10 @@ class Dependencies:
             list of archives
 
         """
-        return sorted(self._df.archive.unique().tolist())
+        cursor = self._conn.execute(
+            "SELECT DISTINCT archive FROM dependencies ORDER BY archive"
+        )
+        return [row[0] for row in cursor.fetchall()]
 
     @property
     def attachments(self) -> list[str]:
@@ -150,9 +304,11 @@ class Dependencies:
             list of attachments
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
-        ].index.tolist()
+        cursor = self._conn.execute(
+            "SELECT file FROM dependencies WHERE type = ?",
+            (define.DEPENDENCY_TYPE["attachment"],),
+        )
+        return [row[0] for row in cursor.fetchall()]
 
     @property
     def attachment_ids(self) -> list[str]:
@@ -162,9 +318,11 @@ class Dependencies:
             list of attachment IDs
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
-        ].archive.tolist()
+        cursor = self._conn.execute(
+            "SELECT archive FROM dependencies WHERE type = ?",
+            (define.DEPENDENCY_TYPE["attachment"],),
+        )
+        return [row[0] for row in cursor.fetchall()]
 
     @property
     def files(self) -> list[str]:
@@ -174,7 +332,8 @@ class Dependencies:
             list of files
 
         """
-        return self._df.index.tolist()
+        cursor = self._conn.execute("SELECT file FROM dependencies")
+        return [row[0] for row in cursor.fetchall()]
 
     @property
     def media(self) -> list[str]:
@@ -184,9 +343,11 @@ class Dependencies:
             list of media
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["media"]
-        ].index.tolist()
+        cursor = self._conn.execute(
+            "SELECT file FROM dependencies WHERE type = ?",
+            (define.DEPENDENCY_TYPE["media"],),
+        )
+        return [row[0] for row in cursor.fetchall()]
 
     @property
     def removed_media(self) -> list[str]:
@@ -196,10 +357,11 @@ class Dependencies:
             list of media
 
         """
-        return self._df[
-            (self._df["type"] == define.DEPENDENCY_TYPE["media"])
-            & (self._df["removed"] == 1)
-        ].index.tolist()
+        cursor = self._conn.execute(
+            "SELECT file FROM dependencies WHERE type = ? AND removed = 1",
+            (define.DEPENDENCY_TYPE["media"],),
+        )
+        return [row[0] for row in cursor.fetchall()]
 
     @property
     def table_ids(self) -> list[str]:
@@ -223,9 +385,11 @@ class Dependencies:
             list of tables
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["meta"]
-        ].index.tolist()
+        cursor = self._conn.execute(
+            "SELECT file FROM dependencies WHERE type = ?",
+            (define.DEPENDENCY_TYPE["meta"],),
+        )
+        return [row[0] for row in cursor.fetchall()]
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
@@ -237,7 +401,7 @@ class Dependencies:
             archive name
 
         """
-        return self._df.archive[file]
+        return self._column_loc("archive", file)
 
     def bit_depth(self, file: str) -> int:
         r"""Bit depth of media file.
@@ -306,22 +470,20 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv``
-                ``pkl``,
-                or ``parquet``
+                File extension can be ``csv``,
+                ``parquet``, or ``sqlite``
 
         Raises:
             ValueError: if file extension is not one of
-                ``csv``, ``pkl``, ``parquet``
+                ``csv``, ``parquet``, ``sqlite``
             FileNotFoundError: if ``path`` does not exists
 
         """
-        self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         path = audeer.path(path)
         extension = audeer.file_extension(path)
-        if extension not in ["csv", "pkl", "parquet"]:
+        if extension not in ["csv", "parquet", "sqlite"]:
             raise ValueError(
-                f"File extension of 'path' has to be 'csv', 'pkl', or 'parquet' "
+                f"File extension of 'path' has to be 'csv', 'parquet', or 'sqlite' "
                 f"not '{extension}'"
             )
         if not os.path.exists(path):
@@ -330,27 +492,48 @@ class Dependencies:
                 os.strerror(errno.ENOENT),
                 path,
             )
-        if extension == "pkl":
-            self._df = pd.read_pickle(path)
-            # Correct dtypes
-            # to make backward compatiple
-            # with old pickle files in cache
-            self._df = self._set_dtypes(self._df)
 
-        elif extension == "csv":
-            table = csv.read_csv(
-                path,
-                read_options=csv.ReadOptions(
-                    column_names=self._schema.names,
-                    skip_rows=1,
-                ),
-                convert_options=csv.ConvertOptions(column_types=self._schema),
+        # Clear existing data
+        self._conn.execute("DELETE FROM dependencies")
+        self._conn.commit()
+
+        if extension == "sqlite":
+            # For SQLite files, we can attach and copy the data
+            self._conn.execute(f"ATTACH DATABASE '{path}' AS source_db")
+            try:
+                self._conn.execute(
+                    "INSERT INTO dependencies SELECT * FROM source_db.dependencies"
+                )
+                self._conn.commit()
+            finally:
+                self._conn.execute("DETACH DATABASE source_db")
+
+        else:
+            # For CSV and parquet, load via pandas and insert into SQLite
+            if extension == "csv":
+                table = csv.read_csv(
+                    path,
+                    read_options=csv.ReadOptions(
+                        column_names=self._schema.names,
+                        skip_rows=1,
+                    ),
+                    convert_options=csv.ConvertOptions(column_types=self._schema),
+                )
+                df = self._table_to_dataframe(table)
+
+            elif extension == "parquet":
+                table = parquet.read_table(path)
+                df = self._table_to_dataframe(table)
+
+            # Insert the dataframe into SQLite
+            df_to_insert = df.reset_index()
+            df_to_insert.columns = ["file"] + list(df.columns)
+            df_to_insert.to_sql(
+                "dependencies",
+                self._conn,
+                if_exists="append",
+                index=False,
             )
-            self._df = self._table_to_dataframe(table)
-
-        elif extension == "parquet":
-            table = parquet.read_table(path)
-            self._df = self._table_to_dataframe(table)
 
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
@@ -381,25 +564,64 @@ class Dependencies:
 
         Args:
             path: path to file.
-                File extension can be ``csv``, ``pkl``, or ``parquet``
+                File extension can be ``csv``, ``parquet``, or ``sqlite``
 
         """
         path = audeer.path(path)
         if path.endswith("csv"):
-            table = self._dataframe_to_table(self._df)
+            df = self()
+            table = self._dataframe_to_table(df)
             csv.write_csv(
                 table,
                 path,
                 write_options=csv.WriteOptions(quoting_style="none"),
             )
-        elif path.endswith("pkl"):
-            self._df.to_pickle(
-                path,
-                protocol=4,  # supported by Python >= 3.4
-            )
         elif path.endswith("parquet"):
-            table = self._dataframe_to_table(self._df, file_column=True)
+            df = self()
+            table = self._dataframe_to_table(df, file_column=True)
             parquet.write_table(table, path)
+        elif path.endswith("sqlite"):
+            # Remove existing database file if it exists
+            if os.path.exists(path):
+                os.remove(path)
+
+            # Create a new connection to the file database
+            file_conn = sqlite3.connect(path)
+            try:
+                # Create table with proper schema
+                file_conn.execute("""
+                    CREATE TABLE dependencies (
+                        file TEXT PRIMARY KEY,
+                        archive TEXT,
+                        bit_depth INTEGER,
+                        channels INTEGER,
+                        checksum TEXT,
+                        duration REAL,
+                        format TEXT,
+                        removed INTEGER,
+                        sampling_rate INTEGER,
+                        type INTEGER,
+                        version TEXT
+                    )
+                """)
+
+                # Create indexes for frequently queried columns
+                file_conn.execute("CREATE INDEX idx_type ON dependencies(type)")
+                file_conn.execute("CREATE INDEX idx_removed ON dependencies(removed)")
+                file_conn.execute("CREATE INDEX idx_archive ON dependencies(archive)")
+                file_conn.execute(
+                    "CREATE INDEX idx_type_removed ON dependencies(type, removed)"
+                )
+
+                # Copy data from in-memory database to file
+                # Use iterdump to copy all data
+                for line in self._conn.iterdump():
+                    if line.startswith("INSERT INTO"):
+                        file_conn.execute(line)
+
+                file_conn.commit()
+            finally:
+                file_conn.close()
 
     def type(self, file: str) -> int:
         r"""Type of file.
@@ -443,18 +665,23 @@ class Dependencies:
         """
         format = audeer.file_extension(file).lower()
 
-        self._df.loc[file] = [
-            archive,  # archive
-            0,  # bit_depth
-            0,  # channels
-            checksum,  # checksum
-            0.0,  # duration
-            format,  # format
-            0,  # removed
-            0,  # sampling_rate
-            define.DEPENDENCY_TYPE["attachment"],  # type
-            version,  # version
-        ]
+        self._conn.execute(
+            f"INSERT OR REPLACE INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
+            (
+                file,
+                archive,
+                0,
+                0,
+                checksum,
+                0.0,
+                format,
+                0,
+                0,
+                define.DEPENDENCY_TYPE["attachment"],
+                version,
+            ),
+        )
+        self._conn.commit()
 
     def _add_media(
         self,
@@ -481,12 +708,11 @@ class Dependencies:
                 where each tuple holds the values of a new media entry
 
         """
-        df = pd.DataFrame.from_records(
+        self._conn.executemany(
+            f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
             values,
-            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
-        ).set_index("file")
-        df = self._set_dtypes(df)
-        self._df = pd.concat([self._df, df])
+        )
+        self._conn.commit()
 
     def _add_meta(
         self,
@@ -508,18 +734,23 @@ class Dependencies:
         else:
             archive = os.path.splitext(file[3:])[0]
 
-        self._df.loc[file] = [
-            archive,  # archive
-            0,  # bit_depth
-            0,  # channels
-            checksum,  # checksum
-            0.0,  # duration
-            format,  # format
-            0,  # removed
-            0,  # sampling_rate
-            define.DEPENDENCY_TYPE["meta"],  # type
-            version,  # version
-        ]
+        self._conn.execute(
+            f"INSERT OR REPLACE INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
+            (
+                file,
+                archive,
+                0,
+                0,
+                checksum,
+                0.0,
+                format,
+                0,
+                0,
+                define.DEPENDENCY_TYPE["meta"],
+                version,
+            ),
+        )
+        self._conn.commit()
 
     def _column_loc(
         self,
@@ -538,7 +769,13 @@ class Dependencies:
             scalar value
 
         """
-        value = self._df.at[file, column]
+        cursor = self._conn.execute(
+            f"SELECT {column} FROM dependencies WHERE file = ?", (file,)
+        )
+        row = cursor.fetchone()
+        if row is None:
+            raise KeyError(file)
+        value = row[0]
         if dtype is not None:
             value = dtype(value)
         return value
@@ -579,13 +816,15 @@ class Dependencies:
             files: relative file paths
 
         """
-        # self._df.drop is slow,
-        # see https://stackoverflow.com/a/53394627.
-        # The solution presented in https://stackoverflow.com/a/53395360
-        # self._df = self._df.loc[self._df.index.drop(files)]
-        # which is claimed to be faster,
-        # isn't.
-        self._df = self._df[~self._df.index.isin(files)]
+        if not files:
+            return
+        # Convert to tuple if needed (e.g., if files is a set)
+        files = tuple(files) if not isinstance(files, (list, tuple)) else files
+        placeholders = ",".join("?" * len(files))
+        self._conn.execute(
+            f"DELETE FROM dependencies WHERE file IN ({placeholders})", files
+        )
+        self._conn.commit()
 
     def _remove(self, file: str):
         r"""Mark file as removed.
@@ -594,7 +833,10 @@ class Dependencies:
             file: relative file path
 
         """
-        self._df.at[file, "removed"] = 1
+        self._conn.execute(
+            "UPDATE dependencies SET removed = 1 WHERE file = ?", (file,)
+        )
+        self._conn.commit()
 
     @staticmethod
     def _set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
@@ -663,13 +905,34 @@ class Dependencies:
             values: list of tuples,
                 where each tuple holds the new values for a media entry
 
+        Raises:
+            KeyError: if a file in values does not exist in dependencies
+
         """
-        df = pd.DataFrame.from_records(
-            values,
-            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
-        ).set_index("file")
-        df = self._set_dtypes(df)
-        self._df.loc[df.index] = df
+        # Check if all files exist before updating
+        for value in values:
+            file = value[0]
+            cursor = self._conn.execute(
+                "SELECT 1 FROM dependencies WHERE file = ? LIMIT 1", (file,)
+            )
+            if cursor.fetchone() is None:
+                raise KeyError(file)
+
+        # Update existing entries
+        self._conn.executemany(
+            """
+            UPDATE dependencies
+            SET archive = ?, bit_depth = ?, channels = ?, checksum = ?, duration = ?,
+                format = ?, removed = ?, sampling_rate = ?, type = ?, version = ?
+            WHERE file = ?
+            """,
+            # Reorder tuple to put file at the end
+            [
+                (v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[0])
+                for v in values
+            ],
+        )
+        self._conn.commit()
 
     def _update_media_version(
         self,
@@ -683,7 +946,16 @@ class Dependencies:
             version: version string
 
         """
-        self._df.loc[files, "version"] = version
+        if not files:
+            return
+        # Convert to tuple if needed (e.g., if files is a set)
+        files = tuple(files) if not isinstance(files, (list, tuple)) else files
+        placeholders = ",".join("?" * len(files))
+        self._conn.execute(
+            f"UPDATE dependencies SET version = ? WHERE file IN ({placeholders})",
+            [version] + list(files),
+        )
+        self._conn.commit()
 
 
 def error_message_missing_object(
@@ -805,9 +1077,8 @@ def download_dependencies(
 
     """
     with tempfile.TemporaryDirectory() as tmp_root:
-        # Load `db.parquet` file,
-        # or if non-existent `db.zip`
-        # from backend
+        # Try to load in order: db.sqlite, db.parquet, db.zip (legacy CSV)
+        # First, try SQLite (current format)
         remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
         if backend_interface.exists(remote_deps_file, version):
             local_deps_file = os.path.join(tmp_root, define.DEPENDENCY_FILE)
@@ -818,17 +1089,31 @@ def download_dependencies(
                 verbose=verbose,
             )
         else:
-            remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
-            local_deps_file = os.path.join(
-                tmp_root,
-                define.LEGACY_DEPENDENCY_FILE,
+            # Try parquet (previous format)
+            remote_deps_file = backend_interface.join(
+                "/", name, define.PARQUET_DEPENDENCY_FILE
             )
-            backend_interface.get_archive(
-                remote_deps_file,
-                tmp_root,
-                version,
-                verbose=verbose,
-            )
+            if backend_interface.exists(remote_deps_file, version):
+                local_deps_file = os.path.join(tmp_root, define.PARQUET_DEPENDENCY_FILE)
+                backend_interface.get_file(
+                    remote_deps_file,
+                    local_deps_file,
+                    version,
+                    verbose=verbose,
+                )
+            else:
+                # Fall back to legacy CSV format
+                remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
+                local_deps_file = os.path.join(
+                    tmp_root,
+                    define.LEGACY_DEPENDENCY_FILE,
+                )
+                backend_interface.get_archive(
+                    remote_deps_file,
+                    tmp_root,
+                    version,
+                    verbose=verbose,
+                )
         # Create deps object from downloaded file
         deps = Dependencies()
         deps.load(local_deps_file)

@@ -51,6 +51,11 @@ ROWS = [
         "version": "1.0.0",
     },
 ]
+DEPENDENCIES = (
+    "(file, archive, bit_depth, channels, checksum, duration, format, "
+    "removed, sampling_rate, type, version)"
+)
+VALUES = "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 
 def get_entries(column):
@@ -66,13 +71,25 @@ def test_get_entries():
 )
 def deps():
     deps = audb.Dependencies()
-    df = pd.DataFrame.from_records(ROWS)
-    df.set_index("file", inplace=True)
-    # Ensure correct dtype
-    df.index = df.index.astype(audb.core.define.DEPENDENCY_INDEX_DTYPE)
-    df.index.name = None
-    df = df.astype(audb.core.define.DEPENDENCY_TABLE)
-    deps._df = df
+    # Insert test data directly into SQLite
+    for row in ROWS:
+        deps._conn.execute(
+            f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
+            (
+                row["file"],
+                row["archive"],
+                row["bit_depth"],
+                row["channels"],
+                row["checksum"],
+                row["duration"],
+                row["format"],
+                row["removed"],
+                row["sampling_rate"],
+                row["type"],
+                row["version"],
+            ),
+        )
+    deps._conn.commit()
     return deps
 
 
@@ -80,10 +97,10 @@ def test_instantiation():
     r"""Test instantiation of audb.Dependencies.
 
     During instantiation of ``audb.Dependencies``
-    an empty dataframe is created under ``self._df``,
+    an empty SQLite database is created under ``self._conn``,
     that stores the dependency table.
     This test ensures,
-    that the dataframe
+    that the database
     contains the correct column names and data types,
     and the correct name and data type of its index.
 
@@ -106,9 +123,8 @@ def test_instantiation():
         audb.core.define.DEPENDENCY_INDEX_DTYPE
     )
     expected_df = expected_df.astype(audb.core.define.DEPENDENCY_TABLE)
-    pd.testing.assert_frame_equal(deps._df, expected_df)
-    assert list(deps._df.columns) == expected_columns
     df = deps()
+    pd.testing.assert_frame_equal(df, expected_df)
     assert list(df.columns) == expected_columns
 
 
@@ -139,10 +155,32 @@ def test_equals(deps):
     assert deps != audb.Dependencies()
     # example table vs. example table
     assert deps == deps
-    _deps._df = deps._df.copy()
+    # Copy data to new Dependencies object
+    _deps = audb.Dependencies()
+    for row in ROWS:
+        _deps._conn.execute(
+            f"INSERT INTO dependencies {DEPENDENCIES} VALUES {VALUES}",
+            (
+                row["file"],
+                row["archive"],
+                row["bit_depth"],
+                row["channels"],
+                row["checksum"],
+                row["duration"],
+                row["format"],
+                row["removed"],
+                row["sampling_rate"],
+                row["type"],
+                row["version"],
+            ),
+        )
+    _deps._conn.commit()
     assert deps == _deps
     # example table vs. different table
-    _deps._df.loc["db.files.csv", "channels"] = 4
+    _deps._conn.execute(
+        "UPDATE dependencies SET channels = 4 WHERE file = 'db.files.csv'"
+    )
+    _deps._conn.commit()
     assert deps != _deps
 
 
@@ -250,7 +288,7 @@ def test_removed(deps):
         deps.removed("non.existing")
 
 
-@pytest.mark.parametrize("file", ["deps.csv", "deps.pkl", "deps.parquet"])
+@pytest.mark.parametrize("file", ["deps.csv", "deps.parquet", "deps.sqlite"])
 def test_load_save(tmpdir, deps, file):
     """Test consistency of dependency table after save/load cycle.
 
@@ -265,76 +303,7 @@ def test_load_save(tmpdir, deps, file):
     deps2 = audb.Dependencies()
     deps2.load(deps_file)
     pd.testing.assert_frame_equal(deps(), deps2())
-    assert list(deps2._df.dtypes) == list(audb.core.define.DEPENDENCY_TABLE.values())
-
-
-def test_load_save_backward_compatibility(tmpdir, deps):
-    """Test backward compatibility with old pickle cache files.
-
-    As the dtype of the index has changed,
-    we need to make sure this is corrected
-    when loading old cache files.
-
-    Old behaviour (audb<1.7):
-
-    archive          string[python]
-    bit_depth                 int32
-    channels                  int32
-    checksum         string[python]
-    duration                float64
-    format           string[python]
-    removed                   int32
-    sampling_rate             int32
-    type                      int32
-    version          string[python]
-
-    New behaviour (audb>=1.7):
-
-    archive          string[pyarrow]
-    bit_depth         int32[pyarrow]
-    channels          int32[pyarrow]
-    checksum         string[pyarrow]
-    duration         double[pyarrow]
-    format           string[pyarrow]
-    removed           int32[pyarrow]
-    sampling_rate     int32[pyarrow]
-    type              int32[pyarrow]
-    version          string[pyarrow]
-
-    """
-    deps_file = audeer.path(tmpdir, "deps.pkl")
-
-    deps_old = audb.Dependencies()
-    deps_old._df = deps._df.copy()
-
-    # Change dtype of index from object to string
-    # to mimic previous behavior
-    deps_old._df.index = deps_old._df.index.astype("string")
-    # Change dtype of columns
-    # to mimic previous behavior
-    deps_old._df = deps_old._df.astype(
-        {
-            "archive": "string",
-            "bit_depth": "int32",
-            "channels": "int32",
-            "checksum": "string",
-            "duration": "float64",
-            "format": "string",
-            "removed": "int32",
-            "sampling_rate": "int32",
-            "type": "int32",
-            "version": "string",
-        }
-    )
-    deps_old.save(deps_file)
-
-    # Check that we get the correct dtypes,
-    # when loading from cache
-    deps2 = audb.Dependencies()
-    deps2.load(deps_file)
-    assert deps2._df.index.dtype == audb.core.define.DEPENDENCY_INDEX_DTYPE
-    pd.testing.assert_frame_equal(deps._df, deps2._df)
-    assert deps == deps2
+    assert list(deps2().dtypes) == list(audb.core.define.DEPENDENCY_TABLE.values())
 
 
 def test_load_save_errors(deps):
@@ -394,7 +363,8 @@ def test_str(deps):
     )
     print(str(deps))
     assert expected_str.match(str(deps))
-    assert expected_str.match(deps._df.to_string())
+    # str(deps) now calls __str__ which calls __call__ which returns a DataFrame
+    assert expected_str.match(deps().to_string())
 
 
 # === Test hidden methods ===
