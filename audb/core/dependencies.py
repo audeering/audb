@@ -184,9 +184,12 @@ class Dependencies:
         if file not in self._file_index:
             raise KeyError(file)
         row_idx = self._file_index[file]
-        # Use Arrow's take() for O(1) row access, skip first column (file)
-        row = self._table.take([row_idx])
-        return [row.column(i)[0].as_py() for i in range(1, row.num_columns)]
+        # Direct column access is much faster than take() for single rows,
+        # especially with chunked arrays from parquet/arrow files
+        return [
+            self._table.column(i)[row_idx].as_py()
+            for i in range(1, self._table.num_columns)
+        ]
 
     def __len__(self) -> int:
         r"""Number of all media, table, attachment files."""
