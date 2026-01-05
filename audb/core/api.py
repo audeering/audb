@@ -293,6 +293,7 @@ def dependencies(
         version,
         cache_root=cache_root,
     )
+    audeer.mkdir(db_root)
     cached_deps_file = os.path.join(db_root, define.CACHED_DEPENDENCY_FILE)
 
     with FolderLock(db_root):

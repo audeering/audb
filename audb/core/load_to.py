@@ -339,6 +339,7 @@ def load_to(
 
     db_root = audeer.path(root, follow_symlink=True)
     db_root_tmp = database_tmp_root(db_root)
+    audeer.mkdir(db_root_tmp)
 
     # remove files with a wrong checksum
     # to ensure we load correct version

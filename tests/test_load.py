@@ -610,7 +610,8 @@ def test_load_media(cache, version, media, format):
         cache,
         audb.Flavor(format=format),
     )
-    shutil.rmtree(cache_root)
+    if os.path.exists(cache_root):
+        shutil.rmtree(cache_root)
     paths2 = audb.load_media(
         DB_NAME,
         media,

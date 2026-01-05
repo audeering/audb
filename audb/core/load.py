@@ -275,6 +275,7 @@ def _get_attachments_from_cache(
         )
         missing_attachments = [deps.archive(path) for path in missing_paths]
         db_root_tmp = database_tmp_root(db_root)
+        audeer.mkdir(db_root_tmp)
 
         def job(cache_root: str, file: str):
             _copy_path(file, cache_root, db_root_tmp, db_root)
@@ -343,6 +344,7 @@ def _get_files_from_cache(
                 verbose,
             )
             db_root_tmp = database_tmp_root(db_root)
+            audeer.mkdir(db_root_tmp)
 
             # Tables are stored as CSV or PARQUET files,
             # and are also cached as PKL files
@@ -387,6 +389,7 @@ def _get_attachments_from_backend(
 ):
     r"""Load attachments from backend."""
     db_root_tmp = database_tmp_root(db_root)
+    audeer.mkdir(db_root_tmp)
 
     paths = [db.attachments[attachment].path for attachment in attachments]
 
@@ -541,6 +544,7 @@ def _get_tables_from_backend(
 
     """
     db_root_tmp = database_tmp_root(db_root)
+    audeer.mkdir(db_root_tmp)
 
     def job(table: str):
         csv_file = f"db.{table}.csv"
@@ -1136,6 +1140,7 @@ def load(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_root(name, version, cache_root, flavor)
+    audeer.mkdir(db_root)
 
     if verbose:  # pragma: no cover
         print(f"Get:   {name} v{version}")
@@ -1336,6 +1341,7 @@ def load_attachment(
         version = latest_version(name)
 
     db_root = database_cache_root(name, version, cache_root)
+    audeer.mkdir(db_root)
 
     if verbose:  # pragma: no cover
         print(f"Get:   {name} v{version}")
@@ -1410,6 +1416,7 @@ def load_header(
         version = latest_version(name)
 
     db_root = database_cache_root(name, version, cache_root)
+    audeer.mkdir(db_root)
 
     with FolderLock(db_root):
         db, _ = load_header_to(db_root, name, version)
@@ -1455,6 +1462,7 @@ def load_header_to(
         remote_header = backend_interface.join("/", name, define.HEADER_FILE)
         if add_audb_meta:
             db_root_tmp = database_tmp_root(db_root)
+            audeer.mkdir(db_root_tmp)
             local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
         backend_interface.get_file(remote_header, local_header, version)
         if add_audb_meta:
@@ -1565,6 +1573,7 @@ def load_media(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_root(name, version, cache_root, flavor)
+    audeer.mkdir(db_root)
 
     if verbose:  # pragma: no cover
         print(f"Get:   {name} v{version}")
@@ -1720,6 +1729,7 @@ def load_table(
         version = latest_version(name)
 
     db_root = database_cache_root(name, version, cache_root)
+    audeer.mkdir(db_root)
 
     if verbose:  # pragma: no cover
         print(f"Get:   {name} v{version}")
