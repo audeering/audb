@@ -10,6 +10,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as parquet
 
+import audeer
 import audformat
 
 from audb.core import define
@@ -550,6 +551,7 @@ def stream(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_root(name, version, cache_root, flavor)
+    audeer.mkdir(db_root)
 
     deps = dependencies(
         name,
