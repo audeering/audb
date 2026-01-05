@@ -94,9 +94,11 @@ deps()
 t = time.time() - t0
 results.at[method, "result"] = t
 
-# Access the index one time.
+# Pre-warm accesses
 # Further calls will be faster
 "file-10.wav" in deps
+deps.archives
+_ = deps.archive(_files[0])
 
 method = rf"Dependencies.\_\_contains\_\_({n_files} files)"
 t0 = time.time()
