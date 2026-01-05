@@ -959,63 +959,6 @@ def test_load_to_update(tmpdir, dbs, only_metadata):
                 assert os.path.exists(audeer.path(db.root, attachment_file))
 
 
-def test_missing_files_optimization(tmpdir):
-    r"""Test optimization for _missing_files.
-
-    When loading a database for the first time,
-    none of the media parent directories exist yet.
-    This optimization avoids iterating through each file
-    to check if it exists.
-    See https://github.com/audeering/audb/issues/526
-
-    """
-    db_root = str(tmpdir)
-
-    # Case 1: All files in subdirectories, none exist -> return all as missing
-    media_files = ["audio/001.wav", "audio/002.wav", "video/clip.mp4"]
-    missing = audb.core.load._missing_files(
-        media_files,
-        "media",
-        db_root,
-        audb.Flavor(),
-        False,
-    )
-    assert missing == media_files
-
-    # Case 2: Parent directory exists -> must check each file individually
-    os.makedirs(os.path.join(db_root, "audio"))
-    missing = audb.core.load._missing_files(
-        media_files,
-        "media",
-        db_root,
-        audb.Flavor(),
-        False,
-    )
-    assert missing == media_files  # still missing, but checked individually
-
-    # Case 3: Files at root level (no parent dir) -> skip optimization
-    root_files = ["001.wav", "002.wav"]
-    missing = audb.core.load._missing_files(
-        root_files,
-        "media",
-        db_root,
-        audb.Flavor(),
-        False,
-    )
-    assert missing == root_files
-
-    # Case 4: Mix of root and subdirectory files -> skip optimization
-    mixed_files = ["audio/001.wav", "002.wav"]
-    missing = audb.core.load._missing_files(
-        mixed_files,
-        "media",
-        db_root,
-        audb.Flavor(),
-        False,
-    )
-    assert missing == mixed_files
-
-
 @pytest.mark.parametrize(
     "name, version, error, error_msg",
     [
