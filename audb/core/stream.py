@@ -24,6 +24,7 @@ from audb.core.load import latest_version
 from audb.core.load import load_header_to
 from audb.core.load import load_media
 from audb.core.lock import FolderLock
+from audb.core.utils import is_empty
 
 
 class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
@@ -550,6 +551,7 @@ def stream(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_root(name, version, cache_root, flavor)
+    scan_for_missing_files = not is_empty(db_root)
 
     deps = dependencies(
         name,
@@ -588,6 +590,7 @@ def stream(
             Flavor(),
             cache_root,
             False,  # pickle_tables
+            scan_for_missing_files,
             num_workers,
             verbose,
         )
