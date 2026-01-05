@@ -2,6 +2,8 @@ import sys
 
 import audbackend
 
+from audb.core.define import PYTHON_VERSION_WITHOUT_ARTIFACTORY
+
 
 class Repository:
     r"""Repository object.
@@ -41,8 +43,6 @@ class Repository:
 
     Holds mapping between registered backend names,
     and their corresponding backend classes.
-    The ``"artifactory"`` backend is currently not available
-    under Python >=3.13.
 
     """
 
@@ -123,13 +123,18 @@ class Repository:
             interface to repository
 
         Raises:
-            ValueError: if an artifactory backend is requested in Python>=3.14
+            ValueError: if an artifactory backend is requested in with a Python version
+                that does not yet support it
             ValueError: if a non-supported backend is requested
 
         """
-        if sys.version_info >= (3, 14) and self.backend == "artifactory":
+        version_tuple = tuple(
+            int(x) for x in PYTHON_VERSION_WITHOUT_ARTIFACTORY.split(".")
+        )
+        if sys.version_info >= version_tuple and self.backend == "artifactory":
             raise ValueError(  # pragma: no cover
-                "The 'artifactory' backend is not supported in Python>=3.14"
+                "The 'artifactory' backend is not supported in "
+                f"Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
             )
         if self.backend not in self.backend_registry:
             raise ValueError(f"'{self.backend}' is not a registered backend")

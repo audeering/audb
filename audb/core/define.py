@@ -1,6 +1,9 @@
 import os
 
 
+# First Python version without Artifactory support
+PYTHON_VERSION_WITHOUT_ARTIFACTORY = "3.14"
+
 # Configuration files
 CONFIG_FILE = os.path.join("etc", "audb.yaml")
 USER_CONFIG_FILE = "~/.config/audb.yaml"
