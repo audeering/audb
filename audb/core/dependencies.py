@@ -443,18 +443,22 @@ class Dependencies:
         """
         format = audeer.file_extension(file).lower()
 
-        self._df.loc[file] = [
-            archive,  # archive
-            0,  # bit_depth
-            0,  # channels
-            checksum,  # checksum
-            0.0,  # duration
-            format,  # format
-            0,  # removed
-            0,  # sampling_rate
-            define.DEPENDENCY_TYPE["attachment"],  # type
-            version,  # version
+        values = [
+            (
+                file,  # file
+                archive,  # archive
+                0,  # bit_depth
+                0,  # channels
+                checksum,  # checksum
+                0.0,  # duration
+                format,  # format
+                0,  # removed
+                0,  # sampling_rate
+                define.DEPENDENCY_TYPE["attachment"],  # type
+                version,  # version
+            )
         ]
+        self._add_rows(values)
 
     def _add_media(
         self,
@@ -481,12 +485,7 @@ class Dependencies:
                 where each tuple holds the values of a new media entry
 
         """
-        df = pd.DataFrame.from_records(
-            values,
-            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
-        ).set_index("file")
-        df = self._set_dtypes(df)
-        self._df = pd.concat([self._df, df])
+        self._add_rows(values)
 
     def _add_meta(
         self,
@@ -508,18 +507,54 @@ class Dependencies:
         else:
             archive = os.path.splitext(file[3:])[0]
 
-        self._df.loc[file] = [
-            archive,  # archive
-            0,  # bit_depth
-            0,  # channels
-            checksum,  # checksum
-            0.0,  # duration
-            format,  # format
-            0,  # removed
-            0,  # sampling_rate
-            define.DEPENDENCY_TYPE["meta"],  # type
-            version,  # version
+        values = [
+            (
+                file,  # file
+                archive,  # archive
+                0,  # bit_depth
+                0,  # channels
+                checksum,  # checksum
+                0.0,  # duration
+                format,  # format
+                0,  # removed
+                0,  # sampling_rate
+                define.DEPENDENCY_TYPE["meta"],  # type
+                version,  # version
+            )
         ]
+        self._add_rows(values)
+
+    def _add_rows(
+        self,
+        rows: Sequence[
+            tuple[
+                str,  # file
+                str,  # archive
+                int,  # bit_depth
+                int,  # channels
+                str,  # checksum
+                float,  # duration
+                str,  # format
+                int,  # removed
+                float,  # sampling_rate
+                int,  # type
+                str,  # version
+            ]
+        ],
+    ):
+        r"""Add new entries.
+
+        Args:
+            rows: list of tuples,
+                where each tuple holds the values of a new dependency table row
+
+        """
+        df = pd.DataFrame.from_records(
+            rows,
+            columns=["file"] + list(define.DEPENDENCY_TABLE.keys()),
+        ).set_index("file")
+        df = self._set_dtypes(df)
+        self._df = pd.concat([self._df, df])
 
     def _column_loc(
         self,
