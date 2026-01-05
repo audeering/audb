@@ -174,6 +174,9 @@ deps.tables
 t = time.time() - t0
 results.at[method, "result"] = t
 
+# Pre-warm _df access
+_ = deps.archive(_files[0])
+
 method = f"Dependencies.archive({n_files} files)"
 t0 = time.time()
 for file in _files:
