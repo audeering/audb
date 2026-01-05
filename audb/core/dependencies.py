@@ -432,7 +432,7 @@ class Dependencies:
         archive: str,
         checksum: str,
     ):
-        r"""Add or update attachment.
+        r"""Add attachment.
 
         Args:
             file: relative path of attachment
@@ -493,7 +493,7 @@ class Dependencies:
         version: str,
         checksum: str,
     ):
-        r"""Add or update table file.
+        r"""Add table file.
 
         Args:
             file: relative file path
@@ -674,6 +674,36 @@ class Dependencies:
         df.index = df.index.astype(define.DEPENDENCY_INDEX_DTYPE)
         return df
 
+    def _update_attachment(
+        self,
+        file: str,
+        version: str,
+        archive: str,
+        checksum: str,
+    ):
+        r"""Update attachment.
+
+        Args:
+            file: relative path of attachment
+            version: version string
+            archive: archive name without extension
+            checksum: checksum of file
+
+        """
+        format = audeer.file_extension(file).lower()
+        self._df.loc[file] = [
+            archive,  # archive
+            0,  # bit_depth
+            0,  # channels
+            checksum,  # checksum
+            0.0,  # duration
+            format,  # format
+            0,  # removed
+            0,  # sampling_rate
+            define.DEPENDENCY_TYPE["attachment"],  # type
+            version,  # version
+        ]
+
     def _update_media(
         self,
         values: Sequence[
@@ -719,6 +749,39 @@ class Dependencies:
 
         """
         self._df.loc[files, "version"] = version
+
+    def _update_meta(
+        self,
+        file: str,
+        version: str,
+        checksum: str,
+    ):
+        r"""Update table file.
+
+        Args:
+            file: relative file path
+            checksum: checksum of file
+            version: version string
+
+        """
+        format = audeer.file_extension(file).lower()
+        if format == "parquet":
+            archive = ""
+        else:
+            archive = os.path.splitext(file[3:])[0]
+
+        self._df.loc[file] = [
+            archive,  # archive
+            0,  # bit_depth
+            0,  # channels
+            checksum,  # checksum
+            0.0,  # duration
+            format,  # format
+            0,  # removed
+            0,  # sampling_rate
+            define.DEPENDENCY_TYPE["meta"],  # type
+            version,  # version
+        ]
 
 
 def error_message_missing_object(

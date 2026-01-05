@@ -150,8 +150,16 @@ def _find_attachments(
                 db.attachments[attachment_id].files
         else:
             checksum = utils.md5(audeer.path(db_root, path))
-            if path not in deps or checksum != deps.checksum(path):
+            if path not in deps:
                 deps._add_attachment(
+                    file=path,
+                    version=version,
+                    archive=attachment_id,
+                    checksum=checksum,
+                )
+                attachment_ids.append(attachment_id)
+            elif checksum != deps.checksum(path):
+                deps._update_attachment(
                     file=path,
                     version=version,
                     archive=attachment_id,
@@ -302,8 +310,11 @@ def _find_tables(
         disable=not verbose,
     ):
         checksum = utils.md5(os.path.join(db_root, file))
-        if file not in deps or checksum != deps.checksum(file):
+        if file not in deps:
             deps._add_meta(file, version, checksum)
+            tables.append(table)
+        elif checksum != deps.checksum(file):
+            deps._update_meta(file, version, checksum)
             tables.append(table)
 
     return tables
