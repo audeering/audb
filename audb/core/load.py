@@ -857,6 +857,24 @@ def _missing_files(
         list of missing files or table IDs
 
     """
+    # Optimization: for media files, if none of the parent directories exist,
+    # all files are missing (first time load scenario).
+    # This avoids iterating through each file when loading a fresh database.
+    # See https://github.com/audeering/audb/issues/526
+    if files_type == "media" and len(files) > 0:
+        parent_dirs = set()
+        has_root_files = False
+        for file in files:
+            parent_dir = os.path.dirname(file)
+            if parent_dir:
+                parent_dirs.add(parent_dir)
+            else:
+                has_root_files = True
+        # If all files have parent directories and none exist,
+        # all files are missing
+        if parent_dirs and not has_root_files:
+            if not any(os.path.isdir(os.path.join(db_root, d)) for d in parent_dirs):
+                return list(files)
 
     def is_cached(file):
         if files_type == "table":
