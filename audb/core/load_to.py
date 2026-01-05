@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 import os
+import shutil
 
 import audbackend
 import audeer
@@ -447,11 +448,12 @@ def load_to(
     # save dependencies
 
     dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCY_FILE)
+    dep_path_final = os.path.join(db_root, define.DEPENDENCY_FILE)
     deps.save(dep_path_tmp)
-    audeer.move_file(
-        dep_path_tmp,
-        os.path.join(db_root, define.DEPENDENCY_FILE),
-    )
+    # lancedb is a folder, so we use shutil.move
+    if os.path.exists(dep_path_final):
+        shutil.rmtree(dep_path_final)
+    shutil.move(dep_path_tmp, dep_path_final)
 
     # save database and PKL tables
 

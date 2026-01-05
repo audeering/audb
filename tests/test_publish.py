@@ -1044,7 +1044,7 @@ def test_publish_error_cross_repository(tmpdir):
             audb.publish(db_path_v2, "2.0.0", repo2, previous_version="1.0.0")
 
         # Publishing to repo2 with previous_version=None should work
-        os.remove(audeer.path(db_path, "db.lance"))
+        shutil.rmtree(audeer.path(db_path, audb.core.define.DEPENDENCY_FILE))
         audb.publish(db_path, "2.0.0", repo2, previous_version=None)
 
         # Assert that the new version appears in repo2
@@ -1227,7 +1227,7 @@ def test_update_database(dbs, persistent_repository):
         dbs[version],
         audb.core.define.DEPENDENCY_FILE,
     )
-    os.remove(dep_file)
+    shutil.rmtree(dep_file)
     error_msg = (
         f"You want to depend on '{previous_version}' "
         f"of {DB_NAME}, "

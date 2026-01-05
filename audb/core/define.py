@@ -11,8 +11,11 @@ DB = "db"
 HEADER_FILE = f"{DB}.yaml"
 
 # Dependencies
-DEPENDENCY_FILE = f"{DB}.lance"
-r"""Filename and extension of dependency table file."""
+DEPENDENCY_FILE = f"{DB}.lancedb"
+r"""Folder name of lancedb dependency table."""
+
+DEPENDENCY_TABLE_NAME = "dependencies"
+r"""Name of the table inside the lancedb dependency folder."""
 
 PARQUET_DEPENDENCY_FILE = f"{DB}.parquet"
 r"""Filename and extension of parquet dependency table file.

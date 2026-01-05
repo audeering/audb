@@ -222,12 +222,13 @@ def cached(
 
             # Skip old audb cache (e.g. 1 as flavor)
             files = audeer.list_file_names(version_path, basenames=True)
+            folders = audeer.list_dir_names(version_path, basenames=True)
             if (
-                define.DEPENDENCY_FILE not in files
+                define.DEPENDENCY_FILE not in folders
                 and define.LEGACY_DEPENDENCY_FILE not in files
             ):
                 # Skip all cache entries
-                # that don't contain a dependency file
+                # that don't contain a dependency file/folder
                 # as those stem from audb<1.0.0.
                 continue  # pragma: no cover
 

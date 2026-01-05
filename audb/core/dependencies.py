@@ -5,10 +5,10 @@ from collections.abc import Sequence
 import errno
 import os
 import re
+import shutil
 import tempfile
 
-from lance.file import LanceFileReader
-from lance.file import LanceFileWriter
+import lancedb
 import pandas as pd
 import pyarrow as pa
 import pyarrow.compute as pc
@@ -46,7 +46,7 @@ class Dependencies:
         >>> deps = audb.dependencies("emodb", version="1.4.1")
         >>> # List all files or archives
         >>> deps.files[:3]
-        ['db.emotion.categories.test.gold_standard.csv', 'db.emotion.categories.train.gold_standard.csv', 'db.emotion.csv']
+        ['db.emotion.csv', 'db.files.csv', 'wav/03a01Fa.wav']
         >>> deps.archives[:2]
         ['005d2b91-5317-0c80-d602-6d55f0323f8c', '014f82d8-3491-fd00-7397-c3b2ac3b2875']
         >>> # Access properties for a given file
@@ -410,59 +410,67 @@ class Dependencies:
         return self._column_loc("format", file)
 
     def load(self, path: str):
-        r"""Read dependencies from file.
+        r"""Read dependencies from file or folder.
 
         Clears existing dependencies.
 
         Args:
-            path: path to file.
-                File extension can be ``csv``,
-                ``parquet``, or ``lance``
+            path: path to file or folder.
+                For files, extension can be ``csv``,
+                ``parquet``, or ``lance``.
+                For folders, name should end with ``lancedb``.
 
         Raises:
             ValueError: if file extension is not one of
                 ``csv``, ``parquet``, ``lance``
-            FileNotFoundError: if ``path`` does not exists
+                or folder name does not end with ``lancedb``
+            FileNotFoundError: if ``path`` does not exist
 
         """
         path = audeer.path(path)
-        extension = audeer.file_extension(path)
-        if extension not in ["csv", "parquet", "lance"]:
-            raise ValueError(
-                f"File extension of 'path' has to be 'csv', 'parquet', or 'lance' "
-                f"not '{extension}'"
-            )
-        if not os.path.exists(path):
-            raise FileNotFoundError(
-                errno.ENOENT,
-                os.strerror(errno.ENOENT),
-                path,
-            )
 
-        # Load data based on format
-        if extension == "lance":
-            # Read from Lance file
-            reader = LanceFileReader(path)
-            results = reader.read_all()
-            # Convert ReaderResults to PyArrow table
-            table = results.to_table()
-            # Note: LanceFileReader doesn't need explicit close
+        # Check if path is a lancedb folder (based on name ending with 'lancedb')
+        if path.endswith("lancedb"):
+            if not os.path.exists(path):
+                raise FileNotFoundError(
+                    errno.ENOENT,
+                    os.strerror(errno.ENOENT),
+                    path,
+                )
+            # Read from LanceDB folder
+            db = lancedb.connect(path)
+            lance_table = db.open_table(define.DEPENDENCY_TABLE_NAME)
+            table = lance_table.to_arrow()
+        else:
+            extension = audeer.file_extension(path)
+            if extension not in ["csv", "parquet"]:
+                raise ValueError(
+                    f"File extension of 'path' has to be 'csv' or 'parquet', "
+                    f"not '{extension}'"
+                )
+            if not os.path.exists(path):
+                raise FileNotFoundError(
+                    errno.ENOENT,
+                    os.strerror(errno.ENOENT),
+                    path,
+                )
 
-        elif extension == "csv":
-            # Read from CSV file
-            # Provide explicit column names and skip the header row
-            table = csv.read_csv(
-                path,
-                read_options=csv.ReadOptions(
-                    column_names=self._schema.names,
-                    skip_rows=1,
-                ),
-                convert_options=csv.ConvertOptions(column_types=self._schema),
-            )
+            # Load data based on format
+            if extension == "csv":
+                # Read from CSV file
+                # Provide explicit column names and skip the header row
+                table = csv.read_csv(
+                    path,
+                    read_options=csv.ReadOptions(
+                        column_names=self._schema.names,
+                        skip_rows=1,
+                    ),
+                    convert_options=csv.ConvertOptions(column_types=self._schema),
+                )
 
-        elif extension == "parquet":
-            # Read from Parquet file
-            table = parquet.read_table(path)
+            elif extension == "parquet":
+                # Read from Parquet file
+                table = parquet.read_table(path)
 
         # Set the table and rebuild index
         self._table = table
@@ -493,11 +501,12 @@ class Dependencies:
         return self._column_loc("sampling_rate", file, int)
 
     def save(self, path: str):
-        r"""Write dependencies to file.
+        r"""Write dependencies to file or folder.
 
         Args:
-            path: path to file.
-                File extension can be ``csv``, ``parquet``, or ``lance``
+            path: path to file or folder.
+                For files, extension can be ``csv`` or ``parquet``.
+                For folders, name should end with ``lancedb``.
 
         """
         path = audeer.path(path)
@@ -515,16 +524,15 @@ class Dependencies:
             df = self()
             table = self._dataframe_to_table(df, file_column=True)
             parquet.write_table(table, path)
-        elif path.endswith("lance"):
-            # Write to Lance file
-            # Remove existing file if it exists
+        elif path.endswith("lancedb"):
+            # Write to LanceDB folder
+            # Remove existing folder if it exists
             if os.path.exists(path):
-                os.remove(path)
+                shutil.rmtree(path)
 
-            # Create a new Lance file
-            # Provide schema to handle empty tables
-            with LanceFileWriter(path, schema=self._schema) as writer:
-                writer.write_batch(self._table)
+            # Create lancedb database and table
+            db = lancedb.connect(path)
+            db.create_table(define.DEPENDENCY_TABLE_NAME, self._table)
 
     def type(self, file: str) -> int:
         r"""Type of file.
@@ -1092,14 +1100,18 @@ def download_dependencies(
 
     """
     with tempfile.TemporaryDirectory() as tmp_root:
-        # Try to load in order: db.lance, db.parquet, db.zip (legacy CSV)
-        # First, try Lance (current format)
-        remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
+        # Try to load in order:
+        # db.lancedb.zip (current), db.parquet, db.zip (legacy CSV)
+
+        # First, try LanceDB (current format, stored as zip archive)
+        remote_deps_file = backend_interface.join(
+            "/", name, define.DEPENDENCY_FILE + ".zip"
+        )
         if backend_interface.exists(remote_deps_file, version):
-            local_deps_file = os.path.join(tmp_root, define.DEPENDENCY_FILE)
-            backend_interface.get_file(
+            local_deps_path = os.path.join(tmp_root, define.DEPENDENCY_FILE)
+            backend_interface.get_archive(
                 remote_deps_file,
-                local_deps_file,
+                tmp_root,
                 version,
                 verbose=verbose,
             )
@@ -1109,17 +1121,21 @@ def download_dependencies(
                 "/", name, define.PARQUET_DEPENDENCY_FILE
             )
             if backend_interface.exists(remote_deps_file, version):
-                local_deps_file = os.path.join(tmp_root, define.PARQUET_DEPENDENCY_FILE)
+                local_deps_path = os.path.join(
+                    tmp_root, define.PARQUET_DEPENDENCY_FILE
+                )
                 backend_interface.get_file(
                     remote_deps_file,
-                    local_deps_file,
+                    local_deps_path,
                     version,
                     verbose=verbose,
                 )
             else:
                 # Fall back to legacy CSV format
-                remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
-                local_deps_file = os.path.join(
+                remote_deps_file = backend_interface.join(
+                    "/", name, define.DB + ".zip"
+                )
+                local_deps_path = os.path.join(
                     tmp_root,
                     define.LEGACY_DEPENDENCY_FILE,
                 )
@@ -1129,9 +1145,9 @@ def download_dependencies(
                     version,
                     verbose=verbose,
                 )
-        # Create deps object from downloaded file
+        # Create deps object from downloaded file/folder
         deps = Dependencies()
-        deps.load(local_deps_file)
+        deps.load(local_deps_path)
     return deps
 
 
@@ -1144,9 +1160,9 @@ def upload_dependencies(
 ):
     r"""Upload dependency file to backend.
 
-    Store a dependency file
+    Store a dependency folder
     in the local database root folder,
-    and upload it to the backend.
+    and upload it as a zip archive to the backend.
 
     Args:
         backend_interface: backend interface
@@ -1156,7 +1172,24 @@ def upload_dependencies(
         version: database version
 
     """
-    local_deps_file = os.path.join(db_root, define.DEPENDENCY_FILE)
-    remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
-    deps.save(local_deps_file)
-    backend_interface.put_file(local_deps_file, remote_deps_file, version)
+    local_deps_folder = os.path.join(db_root, define.DEPENDENCY_FILE)
+    remote_deps_file = backend_interface.join(
+        "/", name, define.DEPENDENCY_FILE + ".zip"
+    )
+    deps.save(local_deps_folder)
+    # Get all files inside the lancedb folder
+    # audeer.list_file_names returns files with basenames=False by default
+    lancedb_files = audeer.list_file_names(
+        local_deps_folder,
+        basenames=False,
+        recursive=True,
+    )
+    # Convert to relative paths from db_root for put_archive
+    relative_files = [os.path.relpath(f, db_root) for f in lancedb_files]
+    # Upload as archive (zip the folder contents)
+    backend_interface.put_archive(
+        db_root,
+        remote_deps_file,
+        version,
+        files=relative_files,
+    )

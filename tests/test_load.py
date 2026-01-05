@@ -133,7 +133,7 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
 
     db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
-    shutil.copy(
+    shutil.copytree(
         audeer.path(previous_db_root, audb.core.define.DEPENDENCY_FILE),
         audeer.path(db_root, audb.core.define.DEPENDENCY_FILE),
     )
@@ -160,7 +160,7 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
 
     db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
-    shutil.copy(
+    shutil.copytree(
         audeer.path(previous_db_root, audb.core.define.DEPENDENCY_FILE),
         audeer.path(db_root, audb.core.define.DEPENDENCY_FILE),
     )
@@ -196,7 +196,7 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
     os.remove(audeer.path(db_root, file))
     db.save(db_root, storage_format=storage_format)
 
-    shutil.copy(
+    shutil.copytree(
         os.path.join(previous_db_root, audb.core.define.DEPENDENCY_FILE),
         os.path.join(db_root, audb.core.define.DEPENDENCY_FILE),
     )
@@ -224,7 +224,7 @@ def dbs(tmpdir_factory, persistent_repository, storage_format):
     db.drop_tables("train")
     db.save(db_root, storage_format=storage_format)
     audformat.testing.create_audio_files(db)
-    shutil.copy(
+    shutil.copytree(
         os.path.join(previous_db_root, audb.core.define.DEPENDENCY_FILE),
         os.path.join(db_root, audb.core.define.DEPENDENCY_FILE),
     )
