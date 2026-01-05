@@ -24,6 +24,7 @@ from audb.core.dependencies import error_message_missing_object
 from audb.core.dependencies import filter_deps
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
+from audb.core.utils import is_empty
 from audb.core.utils import lookup_backend
 
 
@@ -687,6 +688,7 @@ def _load_files(
     flavor: Flavor,
     cache_root: str,
     pickle_tables: bool,
+    scan_for_missing_files: bool,
     num_workers: int,
     verbose: bool,
 ) -> CachedVersions | None:
@@ -723,6 +725,8 @@ def _load_files(
             and as pickle files.
             This allows for faster loading,
             when loading from cache
+        scan_for_missing_files: if ``False``
+            all ``files`` are considered to be missing
         num_workers: number of workers to use
         verbose: if ``True`` show progress bars
             for each step
@@ -732,13 +736,17 @@ def _load_files(
             if other versions of the database are found in cache
 
     """
-    missing_files = _missing_files(
-        files,
-        files_type,
-        db_root,
-        flavor,
-        verbose,
-    )
+    if scan_for_missing_files:
+        missing_files = _missing_files(
+            files,
+            files_type,
+            db_root,
+            flavor,
+            verbose,
+        )
+    else:
+        missing_files = list(files)
+
     if missing_files:
         if cached_versions is None:
             cached_versions = _cached_versions(
@@ -857,24 +865,6 @@ def _missing_files(
         list of missing files or table IDs
 
     """
-    # Optimization: for media files, if none of the parent directories exist,
-    # all files are missing (first time load scenario).
-    # This avoids iterating through each file when loading a fresh database.
-    # See https://github.com/audeering/audb/issues/526
-    if files_type == "media" and len(files) > 0:
-        parent_dirs = set()
-        has_root_files = False
-        for file in files:
-            parent_dir = os.path.dirname(file)
-            if parent_dir:
-                parent_dirs.add(parent_dir)
-            else:
-                has_root_files = True
-        # If all files have parent directories and none exist,
-        # all files are missing
-        if parent_dirs and not has_root_files:
-            if not any(os.path.isdir(os.path.join(db_root, d)) for d in parent_dirs):
-                return list(files)
 
     def is_cached(file):
         if files_type == "table":
@@ -1154,6 +1144,7 @@ def load(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_root(name, version, cache_root, flavor)
+    scan_for_missing_files = not is_empty(db_root)
 
     if verbose:  # pragma: no cover
         print(f"Get:   {name} v{version}")
@@ -1234,6 +1225,7 @@ def load(
                         flavor,
                         cache_root,
                         pickle_tables,
+                        scan_for_missing_files,
                         num_workers,
                         verbose,
                     )
@@ -1270,6 +1262,7 @@ def load(
                     flavor,
                     cache_root,
                     False,
+                    scan_for_missing_files,
                     num_workers,
                     verbose,
                 )
@@ -1583,6 +1576,7 @@ def load_media(
         sampling_rate=sampling_rate,
     )
     db_root = database_cache_root(name, version, cache_root, flavor)
+    scan_for_missing_files = not is_empty(db_root)
 
     if verbose:  # pragma: no cover
         print(f"Get:   {name} v{version}")
@@ -1633,6 +1627,7 @@ def load_media(
                     flavor,
                     cache_root,
                     False,
+                    scan_for_missing_files,
                     num_workers,
                     verbose,
                 )
@@ -1738,6 +1733,7 @@ def load_table(
         version = latest_version(name)
 
     db_root = database_cache_root(name, version, cache_root)
+    scan_for_missing_files = not is_empty(db_root)
 
     if verbose:  # pragma: no cover
         print(f"Get:   {name} v{version}")
@@ -1796,6 +1792,7 @@ def load_table(
                     Flavor(),
                     cache_root,
                     pickle_tables,
+                    scan_for_missing_files,
                     num_workers,
                     verbose,
                 )
