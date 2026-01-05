@@ -5,7 +5,6 @@ import pytest
 import audbackend
 
 import audb
-
 from audb.core.define import PYTHON_VERSION_WITHOUT_ARTIFACTORY
 
 
@@ -201,12 +200,13 @@ def test_repository_create_backend_interface(
             "repo",
             (
                 "The 'artifactory' backend is not supported in "
-                f"Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}",
+                f"Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
+            ),
             ValueError,
             marks=pytest.mark.skipif(
                 sys.version_info < PYTHON_VERSION_WITHOUT_ARTIFACTORY_TUPLE,
                 reason=(
-                    "Should only fail for Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
+                    f"Should only fail for Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
                 ),
             ),
         ),
