@@ -12,6 +12,20 @@ from audb.core.config import config
 from audb.core.repository import Repository
 
 
+def is_empty(path: str) -> bool:
+    """Check if path is an empty folder.
+
+    Args:
+        path: path to folder
+
+    Returns:
+        ``True`` if folder is empty
+
+    """
+    with os.scandir(path) as entries:
+        return next(entries, None) is None
+
+
 def lookup_backend(
     name: str,
     version: str,
