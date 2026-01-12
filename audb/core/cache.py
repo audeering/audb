@@ -12,7 +12,7 @@ def database_cache_root(
     cache_root: str = None,
     flavor: Flavor = None,
 ) -> str:
-    r"""Create and return database cache folder.
+    r"""Database cache folder.
 
     Args:
         name: name of database
@@ -39,16 +39,15 @@ def database_cache_root(
         if os.path.exists(db_root):
             break
 
-    audeer.mkdir(db_root)
     return db_root
 
 
 def database_tmp_root(
     db_root: str,
 ) -> str:
-    r"""Create and return temporary database cache folder.
+    r"""Temporary database cache folder.
 
-    The temporary cache folder is created under ``db_root + '~'``.
+    The temporary cache folder is ``db_root + '~'``.
 
     Args:
         db_root: path to database cache folder
@@ -57,9 +56,7 @@ def database_tmp_root(
         path to temporary cache folder
 
     """
-    tmp_root = db_root + "~"
-    tmp_root = audeer.mkdir(tmp_root)
-    return tmp_root
+    return db_root + "~"
 
 
 def default_cache_root(
