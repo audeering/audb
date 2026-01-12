@@ -5,7 +5,12 @@ import pytest
 import audbackend
 
 import audb
+from audb.core.define import PYTHON_VERSION_WITHOUT_ARTIFACTORY
 
+
+PYTHON_VERSION_WITHOUT_ARTIFACTORY_TUPLE = tuple(
+    int(x) for x in PYTHON_VERSION_WITHOUT_ARTIFACTORY.split(".")
+)
 
 if hasattr(audbackend.backend, "Artifactory"):
     artifactory_backend = audbackend.backend.Artifactory
@@ -146,8 +151,11 @@ def test_repository_repr(backend, host, repo, expected):
             artifactory_backend,
             audbackend.interface.Maven,
             marks=pytest.mark.skipif(
-                sys.version_info >= (3, 13),
-                reason="No artifactory backend support in Python>=3.13",
+                sys.version_info >= PYTHON_VERSION_WITHOUT_ARTIFACTORY_TUPLE,
+                reason=(
+                    "No artifactory backend support in "
+                    f"Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
+                ),
             ),
         ),
     ],
@@ -190,11 +198,16 @@ def test_repository_create_backend_interface(
             "artifactory",
             "host",
             "repo",
-            "The 'artifactory' backend is not supported in Python>=3.13",
+            (
+                "The 'artifactory' backend is not supported in "
+                f"Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
+            ),
             ValueError,
             marks=pytest.mark.skipif(
-                sys.version_info < (3, 13),
-                reason="Should only fail for Python>=3.13",
+                sys.version_info < PYTHON_VERSION_WITHOUT_ARTIFACTORY_TUPLE,
+                reason=(
+                    f"Should only fail for Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
+                ),
             ),
         ),
     ],
