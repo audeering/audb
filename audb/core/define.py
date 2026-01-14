@@ -79,6 +79,7 @@ Currently, a database can contain the following files:
 TIMEOUT = 86400  # 24 h
 CACHED_VERSIONS_TIMEOUT = 10  # Timeout to acquire access to cached versions
 LOCK_FILE = ".lock"
+COMPLETE_FILE = ".complete"
 TIMEOUT_MSG = "Lock could not be acquired. Timeout exceeded."
 
 
