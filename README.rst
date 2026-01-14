@@ -8,32 +8,11 @@
 
 |docs| | |python-versions| | |license|
 
-
-.. code-block::
-
-                   _ _
-                  | | |
-    __ _ _   _  __| | |__
-   / _` | | | |/ _` | '_ \
-  | (_| | |_| | (_| | |_) |
-   \__,_|\__,_|\__,_|_.__/
-
-
 .. raw:: html
 
     </div>
 
 ----
-
-.. code-block::
-
-                     _ _
-                    | | |
-      __ _ _   _  __| | |__
-     / _` | | | |/ _` | '_ \
-    | (_| | |_| | (_| | |_) |
-     \__,_|\__,_|\__,_|_.__/
-
 
 **audb** manages your annotated media files.
 
@@ -73,10 +52,6 @@ If you want to cite **audb**, you can refer to our paper_:
       journal={arXiv preprint arXiv:2303.00645},
       year={2023},
     }
-
-.. code-block::
-
-    ABCD
 
 
 .. _Artifactory: https://jfrog.com/artifactory/
