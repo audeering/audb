@@ -1,8 +1,12 @@
-====
-audb
-====
+<p align="center">
+  <img src="logo.png" width="300px">
+</p>
 
-|tests| |coverage| |docs| |python-versions| |license|
+<div align="center">
+
+|docs| |python-versions| |license|
+
+</div>
 
 **audb** manages your annotated media files.
 
@@ -53,19 +57,7 @@ If you want to cite **audb**, you can refer to our paper_:
 .. _S3: https://aws.amazon.com/s3/
 
 
-.. badges images and links:
-.. |tests| image:: https://github.com/audeering/audb/workflows/Test/badge.svg
-    :target: https://github.com/audeering/audb/actions?query=workflow%3ATest
-    :alt: Test status
-.. |coverage| image:: https://codecov.io/gh/audeering/audb/branch/main/graph/badge.svg?token=drrULW8vEG
-    :target: https://codecov.io/gh/audeering/audb/
-    :alt: code coverage
-.. |docs| image:: https://img.shields.io/pypi/v/audb?label=docs
-    :target: https://audeering.github.io/audb/
-    :alt: audb's documentation
-.. |license| image:: https://img.shields.io/badge/license-MIT-green.svg
-    :target: https://github.com/audeering/audb/blob/main/LICENSE
-    :alt: audb's MIT license
-.. |python-versions| image:: https://img.shields.io/pypi/pyversions/audb.svg
-    :target: https://pypi.org/project/audb/
-    :alt: audbs's supported Python versions
+.. header links:
+.. |docs| `Documentation <https://audeering.github.io/audb/>`__
+.. |license| `MIT license <https://github.com/audeering/audb/blob/main/LICENSE>`__
+.. |python-versions| `Python 3.9, 3.10, 3.11, 3.12, 3.13 <https://pypi.org/project/audb/>`__
