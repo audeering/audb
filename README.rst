@@ -6,7 +6,7 @@
 
     <div align="center">
 
-|docs| | |python-versions| | `**MIT license** <https://github.com/audeering/audb/blob/main/LICENSE>`__
+|docs| | |python-versions| | **MIT license**_
 
 
 .. code-block::
@@ -71,6 +71,8 @@ If you want to cite **audb**, you can refer to our paper_:
 .. _paper: https://arxiv.org/abs/2303.00645
 .. _quickstart: https://audeering.github.io/audb/quickstart.html
 .. _S3: https://aws.amazon.com/s3/
+
+.. _MIT license: https://github.com/audeering/audb/blob/main/LICENSE
 
 
 .. header links:
