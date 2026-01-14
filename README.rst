@@ -1,7 +1,7 @@
 .. raw:: html
 
     <p align="center">
-      <img src="logo.png">
+      <img src="logo.png" height="175px">
     </p>
 
     <div align="center">
