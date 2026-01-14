@@ -9,6 +9,15 @@
 |docs| | |python-versions| | `**MIT license** <https://github.com/audeering/audb/blob/main/LICENSE>`__
 
 
+.. code-block::
+                   _ _     
+                  | | |    
+    __ _ _   _  __| | |__  
+   / _` | | | |/ _` | '_ \ 
+  | (_| | |_| | (_| | |_) |
+   \__,_|\__,_|\__,_|_.__/ 
+
+
 .. raw:: html
 
     </div>
