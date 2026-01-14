@@ -6,7 +6,7 @@
 
     <div align="center">
 
-|docs| | |python-versions| | **MIT license**_
+|docs| | |python-versions| | |license|
 
 
 .. code-block::
@@ -23,6 +23,15 @@
     </div>
 
 ----
+
+.. code-block::
+                   _ _     
+                  | | |    
+    __ _ _   _  __| | |__  
+   / _` | | | |/ _` | '_ \ 
+  | (_| | |_| | (_| | |_) |
+   \__,_|\__,_|\__,_|_.__/ 
+
 
 **audb** manages your annotated media files.
 
@@ -72,10 +81,8 @@ If you want to cite **audb**, you can refer to our paper_:
 .. _quickstart: https://audeering.github.io/audb/quickstart.html
 .. _S3: https://aws.amazon.com/s3/
 
-.. _MIT license: https://github.com/audeering/audb/blob/main/LICENSE
-
 
 .. header links:
-.. |docs| replace:: `**Documentation** <https://audeering.github.io/audb/>`__
-.. |license| replace:: **`MIT license <https://github.com/audeering/audb/blob/main/LICENSE>`__**
-.. |python-versions| replace:: **`Python 3.9, 3.10, 3.11, 3.12, 3.13** <https://pypi.org/project/audb/>`__**
+.. |docs| replace:: `Documentation <https://audeering.github.io/audb/>`__
+.. |license| replace:: `MIT license <https://github.com/audeering/audb/blob/main/LICENSE>`__
+.. |python-versions| replace:: `Python 3.9, 3.10, 3.11, 3.12, 3.13** <https://pypi.org/project/audb/>`__
