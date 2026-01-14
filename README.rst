@@ -1,9 +1,14 @@
+====
+audb
+====
+
 .. raw:: html
 
-    <p align="center">
-      <img src="logo.png" height="102px">
-    </p>
-
+    <style>
+    h1 {
+        text-align: center;
+    }
+    </style>
     <div align="center">
 
 |docs| | |python-versions| | |license|
