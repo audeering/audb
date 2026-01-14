@@ -13,6 +13,8 @@
 
     </div>
 
+----
+
 **audb** manages your annotated media files.
 
 Databases used in machine learning
