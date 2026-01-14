@@ -2,22 +2,8 @@
 audb
 ====
 
-.. raw:: html
-
-    <style>
-    h1 {
-        text-align: center;
-    }
-    </style>
-    <div align="center">
-
 |docs| | |python-versions| | |license|
 
-.. raw:: html
-
-    </div>
-
-----
 
 **audb** manages your annotated media files.
 
