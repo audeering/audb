@@ -1,19 +1,8 @@
-.. raw:: html
-
-    <p align="center">
-      <img src="logo.png" height="102px">
-    </p>
-
-    <div align="center">
+====
+audb
+====
 
 |docs| | |python-versions| | |license|
-
-
-.. raw:: html
-
-    </div>
-
-----
 
 **audb** manages your annotated media files.
 
