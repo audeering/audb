@@ -6,7 +6,7 @@
 
     <div align="center">
 
-|docs| |python-versions| |license|
+|docs| | |python-versions| | |license|
 
 
 .. raw:: html
