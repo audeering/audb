@@ -409,7 +409,7 @@ class DatabaseIteratorParquet(DatabaseIterator):
         df = batch.to_pandas(
             deduplicate_objects=False,
             types_mapper={
-                pa.string(): pd.StringDtype(),
+                pa.string(): pd.StringDtype(na_value=pd.NA),
             }.get,  # we have to provide a callable, not a dict
         )
         return df
