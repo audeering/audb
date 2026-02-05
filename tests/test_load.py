@@ -763,7 +763,9 @@ def test_load_table(version, table):
                         ),
                         name="speaker",
                         data=["adam", "adam", "eve", "eve", None],
-                        dtype=pd.CategoricalDtype(["adam", "eve"]),
+                        dtype=pd.CategoricalDtype(
+                            pd.Index(["adam", "eve"], dtype="object")
+                        ),
                     ),
                     pd.Series(
                         index=audformat.filewise_index(
@@ -789,7 +791,9 @@ def test_load_table(version, table):
                         ),
                         name="speaker",
                         data=["adam", "adam", "eve", "eve", None],
-                        dtype=pd.CategoricalDtype(["adam", "eve"]),
+                        dtype=pd.CategoricalDtype(
+                            pd.Index(["adam", "eve"], dtype="object")
+                        ),
                     ),
                     pd.Series(
                         index=audformat.filewise_index(
@@ -797,7 +801,12 @@ def test_load_table(version, table):
                         ),
                         name="emotion",
                         data=["positive", "positive", "positive", "negative", None],
-                        dtype=pd.CategoricalDtype(["positive", "neutral", "negative"]),
+                        dtype=pd.CategoricalDtype(
+                            pd.Index(
+                                ["positive", "neutral", "negative"],
+                                dtype="object",
+                            )
+                        ),
                     ),
                 ],
                 axis=1,
