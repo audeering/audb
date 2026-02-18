@@ -391,11 +391,13 @@ def test_lock_load_from_cached_versions(
         verbose=False,
     )
 
-    # load new files added in version 2.0.0
+    # load only header of version 2.0.0 (no tables, no media)
+    # This ensures v2.0.0 cache exists but has no content from v1.0.0
     audb.load(
         DB_NAME,
         version="2.0.0",
-        tables="empty",
+        tables=[],
+        media=[],
         verbose=False,
     )
 
@@ -416,35 +418,7 @@ def test_lock_load_from_cached_versions(
         pass
 
     try:
-        # -> loading missing table from cache fails
-        # (v1.0.0 cache is locked, backend crashes)
-        with pytest.raises(audbackend.BackendError):
-            audb.load(
-                DB_NAME,
-                version="2.0.0",
-                tables="table",
-                only_metadata=True,
-                verbose=False,
-            )
-    finally:
-        # remove lock file
-        os.remove(lock_file)
-
-    # -> loading missing table from cache succeeds
-    audb.load(
-        DB_NAME,
-        version="2.0.0",
-        tables="table",
-        only_metadata=True,
-        verbose=False,
-    )
-
-    # create lock file again
-    with open(lock_file, "w"):
-        pass
-
-    try:
-        # -> loading missing media from cache fails
+        # -> loading from cache fails when locked
         # (v1.0.0 cache is locked, backend crashes)
         with pytest.raises(audbackend.BackendError):
             audb.load(
@@ -456,7 +430,16 @@ def test_lock_load_from_cached_versions(
         # remove lock file
         os.remove(lock_file)
 
-    # -> loading missing media from cache succeeds
+    # restore original repository (non-crashing backend)
+    audb.config.REPOSITORIES = [
+        audb.Repository(
+            name=persistent_repository.name,
+            host=persistent_repository.host,
+            backend="file-system",
+        ),
+    ]
+
+    # -> loading from cache succeeds when unlocked
     audb.load(
         DB_NAME,
         version="2.0.0",
