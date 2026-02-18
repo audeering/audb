@@ -42,7 +42,7 @@ dependencies = [
     'audresample >=0.1.6',
     'filelock',
     'oyaml',
-    'pandas >=3.0.0',
+    'pandas >=2.1.0',
     'pyarrow',
 ]
 # Get version dynamically from git
