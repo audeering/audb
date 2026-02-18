@@ -32,17 +32,17 @@ classifiers = [
     'Programming Language :: Python :: 3.13',
     'Topic :: Scientific/Engineering',
 ]
-requires-python = '>=3.10'
+requires-python = '>=3.11'
 dependencies = [
     'audbackend[all] >=2.2.2',
     'audeer >=2.2.0',
-    'audformat >=1.2.0',
+    'audformat >=1.3.4',
     'audiofile >=1.0.0',
     'audobject >=0.5.0',
     'audresample >=0.1.6',
     'filelock',
     'oyaml',
-    'pandas >=2.1.0',
+    'pandas >=3.0.0',
     'pyarrow',
 ]
 # Get version dynamically from git
