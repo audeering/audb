@@ -401,8 +401,13 @@ def test_lock_load_from_cached_versions(
     ]
 
     # lock cache folder of version 1.0.0
+    lock_file = os.path.join(db_v1.root, ".lock")
+
     def lock_v1(lock_acquired):
         with audb.core.lock.FolderLock(db_v1.root):
+            # Verify lock file exists before signaling
+            while not os.path.exists(lock_file):
+                time.sleep(0.01)
             lock_acquired.set()
             event.wait()
 
@@ -411,6 +416,8 @@ def test_lock_load_from_cached_versions(
     thread = threading.Thread(target=lock_v1, args=(lock_acquired,))
     thread.start()
     lock_acquired.wait()  # ensure lock is acquired before proceeding
+    # Additional wait to ensure lock file is visible to other processes
+    time.sleep(0.1)
 
     # -> loading missing table from cache fails
     with pytest.raises(audbackend.BackendError):
@@ -441,6 +448,8 @@ def test_lock_load_from_cached_versions(
     thread = threading.Thread(target=lock_v1, args=(lock_acquired,))
     thread.start()
     lock_acquired.wait()  # ensure lock is acquired before proceeding
+    # Additional wait to ensure lock file is visible to other processes
+    time.sleep(0.1)
 
     # -> loading missing media from cache fails
     with pytest.raises(audbackend.BackendError):
