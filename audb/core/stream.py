@@ -406,10 +406,14 @@ class DatabaseIteratorParquet(DatabaseIterator):
         return parquet.ParquetFile(file).iter_batches(batch_size=self._samples)
 
     def _postprocess_batch(self, batch: pa.RecordBatch) -> pd.DataFrame:
+        if pd.__version__ >= "3":
+            string_dtype = pd.StringDtype(na_value=pd.NA)
+        else:
+            string_dtype = pd.StringDtype()
         df = batch.to_pandas(
             deduplicate_objects=False,
             types_mapper={
-                pa.string(): pd.StringDtype(na_value=pd.NA),
+                pa.string(): string_dtype,
             }.get,  # we have to provide a callable, not a dict
         )
         return df
