@@ -406,9 +406,9 @@ class DatabaseIteratorParquet(DatabaseIterator):
         return parquet.ParquetFile(file).iter_batches(batch_size=self._samples)
 
     def _postprocess_batch(self, batch: pa.RecordBatch) -> pd.DataFrame:
-        if pd.__version__ >= "3":
+        if pd.__version__ >= "3":  # pragma: nocover
             string_dtype = pd.StringDtype(na_value=pd.NA)
-        else:
+        else:  # pragma: nocover
             string_dtype = pd.StringDtype()
         df = batch.to_pandas(
             deduplicate_objects=False,
