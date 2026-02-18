@@ -4,10 +4,8 @@ import abc
 from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
-from importlib.metadata import version
 import os
 
-from packaging.version import Version
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as parquet
@@ -408,20 +406,7 @@ class DatabaseIteratorParquet(DatabaseIterator):
         return parquet.ParquetFile(file).iter_batches(batch_size=self._samples)
 
     def _postprocess_batch(self, batch: pa.RecordBatch) -> pd.DataFrame:
-        string_dtype = pd.StringDtype(
-            **(
-                {"na_value": pd.NA}
-                if Version(version("pandas")) >= Version("3")
-                else {}
-            )
-        )
-        df = batch.to_pandas(
-            deduplicate_objects=False,
-            types_mapper={
-                pa.string(): string_dtype,
-            }.get,  # we have to provide a callable, not a dict
-        )
-        return df
+        return batch.to_pandas(deduplicate_objects=False)
 
 
 def stream(
