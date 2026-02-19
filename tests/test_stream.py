@@ -1,6 +1,8 @@
+from importlib.metadata import version as get_version
 import os
 
 import numpy as np
+from packaging.version import Version
 import pandas as pd
 import pytest
 
@@ -399,6 +401,38 @@ class TestStreaming:
         if shuffle:
             expected_df = expected_df.sample(frac=1)
         pd.testing.assert_frame_equal(df, expected_df)
+
+    def test_string_dtype_na_value(self):
+        r"""Test that string columns use pd.NA as NA value.
+
+        In pandas 3.0, the default NA value for StringDtype
+        changed from pd.NA to np.nan.
+        This test ensures we explicitly set pd.NA
+        to maintain consistent behavior across pandas versions.
+
+        """
+        db = audb.stream(
+            self.name,
+            "acronym",  # has index and column with dtype="string"
+            version=self.version,
+            batch_size=16,
+            only_metadata=True,
+            verbose=False,
+        )
+        df = next(db)
+
+        # Check index dtype
+        index_dtype = df.index.dtype
+        assert isinstance(index_dtype, pd.StringDtype)
+
+        # Check column dtype ("full-name" has scheme "str")
+        column_dtype = df["full-name"].dtype
+        assert isinstance(column_dtype, pd.StringDtype)
+
+        # In pandas >= 3.0, verify na_value is pd.NA (not np.nan)
+        if Version(get_version("pandas")) >= Version("3"):
+            assert index_dtype.na_value is pd.NA
+            assert column_dtype.na_value is pd.NA
 
     @pytest.mark.parametrize(
         "table, error, error_msg",

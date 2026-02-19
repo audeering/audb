@@ -406,13 +406,7 @@ class DatabaseIteratorParquet(DatabaseIterator):
         return parquet.ParquetFile(file).iter_batches(batch_size=self._samples)
 
     def _postprocess_batch(self, batch: pa.RecordBatch) -> pd.DataFrame:
-        df = batch.to_pandas(
-            deduplicate_objects=False,
-            types_mapper={
-                pa.string(): pd.StringDtype(),
-            }.get,  # we have to provide a callable, not a dict
-        )
-        return df
+        return batch.to_pandas(deduplicate_objects=False)
 
 
 def stream(

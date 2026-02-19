@@ -608,8 +608,8 @@ class Dependencies:
             with correct dtypes
 
         """
-        df.index = df.index.astype(define.DEPENDENCY_INDEX_DTYPE, copy=False)
-        df = df.astype(define.DEPENDENCY_TABLE, copy=False)
+        df.index = df.index.astype(define.DEPENDENCY_INDEX_DTYPE)
+        df = df.astype(define.DEPENDENCY_TABLE)
         return df
 
     def _table_to_dataframe(self, table: pa.Table) -> pd.DataFrame:
