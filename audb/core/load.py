@@ -1577,16 +1577,16 @@ def load_media(
         verbose=verbose,
     )
 
-    available_files = deps.media
-    for media_file in media:
-        if media_file not in available_files:
-            msg = error_message_missing_object(
-                "media",
-                [media_file],
-                name,
-                version,
-            )
-            raise ValueError(msg)
+    available_files = set(deps.media)
+    missing = set(media) - available_files
+    if missing:
+        msg = error_message_missing_object(
+            "media",
+            sorted(missing),
+            name,
+            version,
+        )
+        raise ValueError(msg)
 
     try:
         with FolderLock(db_root, timeout=timeout):
