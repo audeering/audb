@@ -413,7 +413,7 @@ class TestStreaming:
         """
         db = audb.stream(
             self.name,
-            "acronym",  # has index with dtype="string"
+            "acronym",  # has index and column with dtype="string"
             version=self.version,
             batch_size=16,
             only_metadata=True,
@@ -421,12 +421,18 @@ class TestStreaming:
         )
         df = next(db)
 
+        # Check index dtype
         index_dtype = df.index.dtype
         assert isinstance(index_dtype, pd.StringDtype)
+
+        # Check column dtype ("full-name" has scheme "str")
+        column_dtype = df["full-name"].dtype
+        assert isinstance(column_dtype, pd.StringDtype)
 
         # In pandas >= 3.0, verify na_value is pd.NA (not np.nan)
         if Version(get_version("pandas")) >= Version("3"):
             assert index_dtype.na_value is pd.NA
+            assert column_dtype.na_value is pd.NA
 
     @pytest.mark.parametrize(
         "table, error, error_msg",
