@@ -362,7 +362,6 @@ class DatabaseIteratorCsv(DatabaseIterator):
 
         # index
         columns_and_dtypes = self[self._table]._levels_and_dtypes.copy()
-        levels = list(columns_and_dtypes.keys())
         # add columns
         for column_id, column in self[self._table].columns.items():
             if column.scheme_id is not None:
@@ -393,22 +392,9 @@ class DatabaseIteratorCsv(DatabaseIterator):
                 chunksize=self._samples,
                 usecols=list(columns_and_dtypes.keys()),
                 dtype=dtypes_wo_converters,
-                index_col=levels,
                 converters=converters,
                 float_precision="round_trip",
             )
-
-    def _postprocess_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
-        r"""Post-process dataframe to have correct index and data types.
-
-        Args:
-            df: dataframe
-
-        Returns:
-            dataframe
-
-        """
-        return df
 
 
 class DatabaseIteratorParquet(DatabaseIterator):
