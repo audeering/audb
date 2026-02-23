@@ -254,3 +254,24 @@ def test_dir():
     ]
     for attr in standard_attrs:
         assert attr in attrs, f"Missing standard attribute: {attr}"
+
+    # Test dir(audb.core) includes submodules
+    core_attrs = dir(audb.core)
+    core_submodules = [
+        "api",
+        "cache",
+        "config",
+        "define",
+        "dependencies",
+        "flavor",
+        "info",
+        "load",
+        "load_to",
+        "lock",
+        "publish",
+        "repository",
+        "stream",
+        "utils",
+    ]
+    for submodule in core_submodules:
+        assert submodule in core_attrs, f"Missing core submodule: {submodule}"
