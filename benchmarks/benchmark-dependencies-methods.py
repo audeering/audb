@@ -97,7 +97,7 @@ results.at[method, "result"] = t
 # Pre-warm accesses
 # Further calls will be faster
 "file-10.wav" in deps
-deps.archives
+deps._df
 _ = deps.archive(_files[0])
 
 method = rf"Dependencies.\_\_contains\_\_({n_files} files)"

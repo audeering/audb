@@ -62,6 +62,10 @@ class Dependencies:
     def __init__(self):
         self._df = pd.DataFrame(columns=define.DEPENDENCY_TABLE.keys())
         self._df = self._set_dtypes(self._df)
+        # Lazy dictionary index for O(1) file lookups
+        self._file_index: dict[str, int] | None = None
+        # Property cache (invalidated on modifications)
+        self._cache: dict[str, object] = {}
         # pyarrow schema
         # used for reading and writing files
         self._schema = pa.schema(
@@ -79,6 +83,17 @@ class Dependencies:
                 ("version", pa.string()),
             ]
         )
+
+    def _get_file_index(self) -> dict[str, int]:
+        r"""Lazily build dictionary index mapping file -> row position."""
+        if self._file_index is None:
+            self._file_index = {f: i for i, f in enumerate(self._df.index)}
+        return self._file_index
+
+    def _invalidate_cache(self):
+        r"""Invalidate cached properties and lazy index."""
+        self._cache.clear()
+        self._file_index = None
 
     def __call__(self) -> pd.DataFrame:
         r"""Return dependencies as a table.
@@ -99,7 +114,7 @@ class Dependencies:
             ``True`` if a dependency to the file exists
 
         """
-        return file in self._df.index
+        return file in self._get_file_index()
 
     def __eq__(self, other: "Dependencies") -> bool:
         r"""Check if two dependency tables are equal.
@@ -123,7 +138,8 @@ class Dependencies:
             list with meta information
 
         """
-        return self._df.loc[file].tolist()
+        pos = self._get_file_index()[file]
+        return self._df.iloc[pos].tolist()
 
     def __len__(self) -> int:
         r"""Number of all media, table, attachment files."""
@@ -140,7 +156,9 @@ class Dependencies:
             list of archives
 
         """
-        return sorted(self._df.archive.unique().tolist())
+        if "archives" not in self._cache:
+            self._cache["archives"] = sorted(self._df.archive.unique().tolist())
+        return self._cache["archives"]
 
     @property
     def attachments(self) -> list[str]:
@@ -150,9 +168,10 @@ class Dependencies:
             list of attachments
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
-        ].index.tolist()
+        if "attachments" not in self._cache:
+            mask = self._df["type"].to_numpy() == define.DEPENDENCY_TYPE["attachment"]
+            self._cache["attachments"] = self._df.index[mask].tolist()
+        return self._cache["attachments"]
 
     @property
     def attachment_ids(self) -> list[str]:
@@ -162,9 +181,10 @@ class Dependencies:
             list of attachment IDs
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["attachment"]
-        ].archive.tolist()
+        if "attachment_ids" not in self._cache:
+            mask = self._df["type"].to_numpy() == define.DEPENDENCY_TYPE["attachment"]
+            self._cache["attachment_ids"] = self._df.archive[mask].tolist()
+        return self._cache["attachment_ids"]
 
     @property
     def files(self) -> list[str]:
@@ -174,7 +194,9 @@ class Dependencies:
             list of files
 
         """
-        return self._df.index.tolist()
+        if "files" not in self._cache:
+            self._cache["files"] = self._df.index.tolist()
+        return self._cache["files"]
 
     @property
     def media(self) -> list[str]:
@@ -184,9 +206,10 @@ class Dependencies:
             list of media
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["media"]
-        ].index.tolist()
+        if "media" not in self._cache:
+            mask = self._df["type"].to_numpy() == define.DEPENDENCY_TYPE["media"]
+            self._cache["media"] = self._df.index[mask].tolist()
+        return self._cache["media"]
 
     @property
     def removed_media(self) -> list[str]:
@@ -196,10 +219,12 @@ class Dependencies:
             list of media
 
         """
-        return self._df[
-            (self._df["type"] == define.DEPENDENCY_TYPE["media"])
-            & (self._df["removed"] == 1)
-        ].index.tolist()
+        if "removed_media" not in self._cache:
+            type_arr = self._df["type"].to_numpy()
+            removed_arr = self._df["removed"].to_numpy()
+            mask = (type_arr == define.DEPENDENCY_TYPE["media"]) & (removed_arr == 1)
+            self._cache["removed_media"] = self._df.index[mask].tolist()
+        return self._cache["removed_media"]
 
     @property
     def table_ids(self) -> list[str]:
@@ -213,7 +238,11 @@ class Dependencies:
             list of table IDs
 
         """
-        return [os.path.splitext(table[3:])[0] for table in self.tables]
+        if "table_ids" not in self._cache:
+            self._cache["table_ids"] = [
+                os.path.splitext(table[3:])[0] for table in self.tables
+            ]
+        return self._cache["table_ids"]
 
     @property
     def tables(self) -> list[str]:
@@ -223,9 +252,10 @@ class Dependencies:
             list of tables
 
         """
-        return self._df[
-            self._df["type"] == define.DEPENDENCY_TYPE["meta"]
-        ].index.tolist()
+        if "tables" not in self._cache:
+            mask = self._df["type"].to_numpy() == define.DEPENDENCY_TYPE["meta"]
+            self._cache["tables"] = self._df.index[mask].tolist()
+        return self._cache["tables"]
 
     def archive(self, file: str) -> str:
         r"""Name of archive the file belongs to.
@@ -352,6 +382,9 @@ class Dependencies:
             table = parquet.read_table(path)
             self._df = self._table_to_dataframe(table)
 
+        # Invalidate cache (lazy index will rebuild on demand)
+        self._invalidate_cache()
+
     def removed(self, file: str) -> bool:
         r"""Check if file is marked as removed.
 
@@ -455,6 +488,7 @@ class Dependencies:
             define.DEPENDENCY_TYPE["attachment"],  # type
             version,  # version
         ]
+        self._invalidate_cache()
 
     def _add_media(
         self,
@@ -487,6 +521,7 @@ class Dependencies:
         ).set_index("file")
         df = self._set_dtypes(df)
         self._df = pd.concat([self._df, df])
+        self._invalidate_cache()
 
     def _add_meta(
         self,
@@ -520,6 +555,7 @@ class Dependencies:
             define.DEPENDENCY_TYPE["meta"],  # type
             version,  # version
         ]
+        self._invalidate_cache()
 
     def _column_loc(
         self,
@@ -586,6 +622,7 @@ class Dependencies:
         # which is claimed to be faster,
         # isn't.
         self._df = self._df[~self._df.index.isin(files)]
+        self._invalidate_cache()
 
     def _remove(self, file: str):
         r"""Mark file as removed.
@@ -595,6 +632,7 @@ class Dependencies:
 
         """
         self._df.at[file, "removed"] = 1
+        self._invalidate_cache()
 
     @staticmethod
     def _set_dtypes(df: pd.DataFrame) -> pd.DataFrame:
@@ -670,6 +708,7 @@ class Dependencies:
         ).set_index("file")
         df = self._set_dtypes(df)
         self._df.loc[df.index] = df
+        self._invalidate_cache()
 
     def _update_media_version(
         self,
@@ -684,6 +723,7 @@ class Dependencies:
 
         """
         self._df.loc[files, "version"] = version
+        self._invalidate_cache()
 
 
 def error_message_missing_object(
