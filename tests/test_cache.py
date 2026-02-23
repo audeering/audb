@@ -88,3 +88,55 @@ def test_cached_name(cache):
     assert set(df["name"]) == {DB_NAMES[1]}
     df = audb.cached(name="non-existent")
     assert len(df) == 0
+
+
+def test_database_tmp_root_cleanup(tmpdir):
+    """Test that database_tmp_root cleans up leftover tmp folders."""
+    db_root = str(tmpdir / "db_root")
+    tmp_root = db_root + "~"
+
+    # Create tmp folder with some leftover files
+    # (simulating an interrupted download)
+    audeer.mkdir(tmp_root)
+    leftover_file = os.path.join(tmp_root, "leftover.txt")
+    with open(leftover_file, "w") as f:
+        f.write("leftover content")
+    leftover_dir = os.path.join(tmp_root, "leftover_dir")
+    audeer.mkdir(leftover_dir)
+    nested_file = os.path.join(leftover_dir, "nested.txt")
+    with open(nested_file, "w") as f:
+        f.write("nested content")
+
+    # Verify leftover files exist
+    assert os.path.exists(tmp_root)
+    assert os.path.exists(leftover_file)
+    assert os.path.exists(leftover_dir)
+    assert os.path.exists(nested_file)
+
+    # Call database_tmp_root - should clean up old tmp folder
+    from audb.core.cache import database_tmp_root
+
+    result_tmp_root = database_tmp_root(db_root)
+
+    # Verify tmp folder was cleaned and recreated empty
+    assert result_tmp_root == tmp_root
+    assert os.path.exists(tmp_root)
+    assert not os.path.exists(leftover_file)
+    assert not os.path.exists(leftover_dir)
+    assert not os.path.exists(nested_file)
+    # Verify tmp folder is empty
+    assert len(os.listdir(tmp_root)) == 0
+
+    # Test calling it again - should handle already empty tmp folder
+    result_tmp_root2 = database_tmp_root(db_root)
+    assert result_tmp_root2 == tmp_root
+    assert os.path.exists(tmp_root)
+    assert len(os.listdir(tmp_root)) == 0
+
+    # Test when tmp folder doesn't exist at all
+    audeer.rmdir(tmp_root)
+    assert not os.path.exists(tmp_root)
+    result_tmp_root3 = database_tmp_root(db_root)
+    assert result_tmp_root3 == tmp_root
+    assert os.path.exists(tmp_root)
+    assert len(os.listdir(tmp_root)) == 0

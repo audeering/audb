@@ -49,6 +49,8 @@ def database_tmp_root(
     r"""Create and return temporary database cache folder.
 
     The temporary cache folder is created under ``db_root + '~'``.
+    Any existing temporary folder from previous interrupted downloads
+    is removed before creating a fresh one.
 
     Args:
         db_root: path to database cache folder
@@ -58,6 +60,8 @@ def database_tmp_root(
 
     """
     tmp_root = db_root + "~"
+    # Clean up any leftover tmp folder from previous interrupted downloads
+    audeer.rmdir(tmp_root)
     tmp_root = audeer.mkdir(tmp_root)
     return tmp_root
 
