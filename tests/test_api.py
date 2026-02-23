@@ -309,3 +309,55 @@ def test_dir():
         for attr in submodule_standard_attrs:
             err_msg = f"Missing standard attribute '{attr}' in submodule '{submodule}'"
             assert attr in dir(submodule), err_msg
+
+
+def test_public_api_accessible():
+    """Test that all public API symbols are accessible via lazy loading."""
+    import types
+
+    # Functions from audb.core.api
+    api_functions = [
+        "available",
+        "cached",
+        "dependencies",
+        "exists",
+        "flavor_path",
+        "latest_version",
+        "remove_media",
+        "repository",
+        "versions",
+    ]
+    for name in api_functions:
+        attr = getattr(audb, name)
+        assert callable(attr), f"audb.{name} should be callable"
+
+    # Functions from other modules
+    other_functions = [
+        "default_cache_root",
+        "load",
+        "load_attachment",
+        "load_media",
+        "load_table",
+        "load_to",
+        "publish",
+        "stream",
+    ]
+    for name in other_functions:
+        attr = getattr(audb, name)
+        assert callable(attr), f"audb.{name} should be callable"
+
+    # Classes
+    classes = ["Dependencies", "Flavor", "Repository", "DatabaseIterator"]
+    for name in classes:
+        attr = getattr(audb, name)
+        assert isinstance(attr, type), f"audb.{name} should be a class"
+
+    # Config object
+    assert audb.config is not None
+
+    # Submodules
+    assert isinstance(audb.core, types.ModuleType)
+    assert isinstance(audb.info, types.ModuleType)
+
+    # Version
+    assert isinstance(audb.__version__, str)
