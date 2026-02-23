@@ -5,11 +5,15 @@
 import importlib
 
 
-# Submodules that should be lazily imported
+# Single source of truth for all lazy-loaded names.
+# Submodules map to their fully-qualified module names.
+# Symbols map to the module that defines them.
 _LAZY_SUBMODULES = {"info", "core"}
 
-# Define what should be lazily imported and from where
-_LAZY_IMPORTS = {
+_LAZY_TARGETS = {
+    # Submodules
+    "info": "audb.info",
+    "core": "audb.core",
     # From audb.core.api
     "available": "audb.core.api",
     "cached": "audb.core.api",
@@ -44,32 +48,31 @@ _LAZY_IMPORTS = {
     "stream": "audb.core.stream",
 }
 
-# Cache for lazily loaded attributes
 _loaded = {}
 
 
 def __getattr__(name: str):
-    """Lazily import attributes on first access."""
-    # Handle submodules
+    """Lazily import attributes and submodules on first access."""
+    if name not in _LAZY_TARGETS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+    if name in _loaded:
+        return _loaded[name]
+
+    module = importlib.import_module(_LAZY_TARGETS[name])
+    # For submodules, return the module itself
     if name in _LAZY_SUBMODULES:
-        if name not in _loaded:
-            _loaded[name] = importlib.import_module(f"audb.{name}")
-        return _loaded[name]
+        value = module
+    else:
+        value = getattr(module, name)
 
-    # Handle attributes from modules
-    if name in _LAZY_IMPORTS:
-        if name not in _loaded:
-            module_path = _LAZY_IMPORTS[name]
-            module = importlib.import_module(module_path)
-            _loaded[name] = getattr(module, name)
-        return _loaded[name]
-
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    _loaded[name] = value
+    return value
 
 
 def __dir__():
     """List available attributes for autocomplete."""
-    return list(_LAZY_SUBMODULES) + list(_LAZY_IMPORTS.keys()) + ["__version__"]
+    return list(_LAZY_TARGETS) + ["__version__"]
 
 
 __all__ = []

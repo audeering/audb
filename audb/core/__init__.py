@@ -6,7 +6,6 @@ _SUBMODULES = {
     "api",
     "cache",
     "config",
-    "conftest",
     "define",
     "dependencies",
     "flavor",
