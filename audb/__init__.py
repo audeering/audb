@@ -72,7 +72,9 @@ def __getattr__(name: str):
 
 def __dir__():
     """List available attributes for autocomplete."""
-    return list(_LAZY_TARGETS) + ["__version__"]
+    # Standard module attributes (exclude private implementation details)
+    standard = [k for k in globals().keys() if k.startswith("__")]
+    return standard + list(_LAZY_TARGETS)
 
 
 __all__ = []
