@@ -229,6 +229,51 @@ def test_versions(tmpdir, repository):
     assert audb.versions(name) == [version]
 
 
+def test_lazy_import():
+    """Test that heavy dependencies are not imported with 'import audb'.
+
+    With lazy loading, importing audb should not import pandas
+    or other heavy dependencies until they are actually needed.
+
+    """
+    import subprocess
+    import sys
+
+    # Test that pandas is NOT imported after 'import audb'
+    code = """
+import sys
+import audb
+# Check that pandas is not yet imported
+if 'pandas' in sys.modules:
+    print('FAIL: pandas was imported')
+    sys.exit(1)
+print('PASS: pandas not imported')
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, f"Lazy import failed: {result.stdout}{result.stderr}"
+
+    # Test that pandas IS imported after accessing audb.Dependencies
+    code = """
+import sys
+import audb
+_ = audb.Dependencies
+if 'pandas' not in sys.modules:
+    print('FAIL: pandas should be imported after accessing Dependencies')
+    sys.exit(1)
+print('PASS: pandas imported after access')
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, f"Lazy import failed: {result.stdout}{result.stderr}"
+
+
 def test_dir():
     """Test that dir() includes standard module attributes.
 
