@@ -227,3 +227,30 @@ def test_versions(tmpdir, repository):
     audb.publish(build_dir, version, repository)
 
     assert audb.versions(name) == [version]
+
+
+def test_dir():
+    """Test that dir(audb) includes standard module attributes.
+
+    With lazy loading, we need to ensure that standard module
+    attributes are still available in dir(audb).
+
+    """
+    attrs = dir(audb)
+
+    # Standard module attributes
+    standard_attrs = [
+        "__all__",
+        "__builtins__",
+        "__cached__",
+        "__doc__",
+        "__file__",
+        "__loader__",
+        "__name__",
+        "__package__",
+        "__path__",
+        "__spec__",
+        "__version__",
+    ]
+    for attr in standard_attrs:
+        assert attr in attrs, f"Missing standard attribute: {attr}"
