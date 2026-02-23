@@ -32,4 +32,6 @@ def __getattr__(name: str):
 
 
 def __dir__():
-    return list(_SUBMODULES)
+    # Standard module attributes + lazy-loaded submodules
+    standard = [k for k in globals().keys() if k.startswith("__")]
+    return standard + list(_SUBMODULES)

@@ -230,14 +230,12 @@ def test_versions(tmpdir, repository):
 
 
 def test_dir():
-    """Test that dir(audb) includes standard module attributes.
+    """Test that dir() includes standard module attributes.
 
     With lazy loading, we need to ensure that standard module
-    attributes are still available in dir(audb).
+    attributes are still available in dir().
 
     """
-    attrs = dir(audb)
-
     # Standard module attributes
     standard_attrs = [
         "__all__",
@@ -253,25 +251,22 @@ def test_dir():
         "__version__",
     ]
     for attr in standard_attrs:
-        assert attr in attrs, f"Missing standard attribute: {attr}"
+        assert attr in dir(audb), f"Missing standard attribute '{attr}'"
 
-    # Test dir(audb.core) includes submodules
-    core_attrs = dir(audb.core)
-    core_submodules = [
-        "api",
-        "cache",
-        "config",
-        "define",
-        "dependencies",
-        "flavor",
-        "info",
-        "load",
-        "load_to",
-        "lock",
-        "publish",
-        "repository",
-        "stream",
-        "utils",
+    # Test dir(audb.core) includes standard attributes and submodules
+    submodule_standard_attrs = [
+        "__builtins__",
+        "__cached__",
+        "__doc__",
+        "__file__",
+        "__loader__",
+        "__name__",
+        "__package__",
+        "__path__",
+        "__spec__",
     ]
-    for submodule in core_submodules:
-        assert submodule in core_attrs, f"Missing core submodule: {submodule}"
+    submodules = [audb.core, audb.info]
+    for submodule in submodules:
+        for attr in submodule_standard_attrs:
+            err_msg = f"Missing standard attribute '{attr}' in submodule '{submodule}'"
+            assert attr in dir(submodule), err_msg
