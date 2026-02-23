@@ -72,7 +72,7 @@ def __dir__():
     return list(_LAZY_SUBMODULES) + list(_LAZY_IMPORTS.keys()) + ["__version__"]
 
 
-__all__ = list(_LAZY_SUBMODULES) + list(_LAZY_IMPORTS.keys())
+__all__ = []
 
 
 # Dynamically get the version of the installed module
