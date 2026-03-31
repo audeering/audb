@@ -218,21 +218,29 @@ def _files_duration(
     deps: Dependencies,
     files: Sequence[str],
     format: str | None,
+    verbose: bool = False,
 ):
-    durs = deps().loc[files, "duration"]
-    durs = durs[durs > 0]
-    durs = pd.to_timedelta(durs, unit="s")
-    durs.index.name = "file"
-    if format is not None:
-        durs.index = audformat.utils.replace_file_extension(durs.index, format)
-    # Norm file path under Windows to include `\`
-    if os.name == "nt":  # pragma: nocover as tested in Windows runner
-        durs.index = audformat.utils.map_file_path(
-            durs.index,
-            os.path.normpath,
-        )
-    durs.index = audformat.utils.expand_file_path(durs.index, db.root)
-    db._files_duration = durs.to_dict()
+    def _run():
+        durs = deps().loc[files, "duration"]
+        durs = durs[durs > 0]
+        durs = pd.to_timedelta(durs, unit="s")
+        durs.index.name = "file"
+        if format is not None:
+            durs.index = audformat.utils.replace_file_extension(durs.index, format)
+        # Norm file path under Windows to include `\`
+        if os.name == "nt":  # pragma: nocover as tested in Windows runner
+            durs.index = audformat.utils.map_file_path(
+                durs.index,
+                os.path.normpath,
+            )
+        durs.index = audformat.utils.expand_file_path(durs.index, db.root)
+        db._files_duration = durs.to_dict()
+
+    if verbose:
+        with utils.delayed_print("Set file durations"):
+            _run()
+    else:
+        _run()
 
 
 def _get_attachments_from_cache(
@@ -1303,6 +1311,7 @@ def load(
                 deps,
                 requested_media,
                 flavor.format,
+                verbose,
             )
 
             # check if database is now complete
