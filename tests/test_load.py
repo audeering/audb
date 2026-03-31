@@ -471,6 +471,16 @@ def test_load_from_cache(dbs):
         assert os.path.exists(os.path.join(db_root, file))
 
 
+def test_load_verbose(dbs):
+    """Test that load with verbose=True covers all progress messages."""
+    audb.load(
+        DB_NAME,
+        version="1.0.0",
+        num_workers=pytest.NUM_WORKERS,
+        verbose=True,
+    )
+
+
 @pytest.mark.parametrize(
     "version, attachment_id",
     [
