@@ -184,7 +184,10 @@ def _database_check_complete(
                     return False
         return complete
 
-    with utils.delayed_print("Check completeness", verbose=verbose):
+    if verbose:
+        with utils.delayed_print("Check completeness"):
+            is_complete = check()
+    else:
         is_complete = check()
 
     if is_complete:
