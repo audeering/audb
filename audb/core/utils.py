@@ -1,5 +1,7 @@
 from collections.abc import Sequence
+from contextlib import contextmanager
 import os
+import threading
 import warnings
 
 import pyarrow.parquet as parquet
@@ -10,6 +12,17 @@ import audeer
 from audb.core import define
 from audb.core.config import config
 from audb.core.repository import Repository
+
+
+@contextmanager
+def delayed_print(message, delay=0.5):
+    """Print message only if the block takes longer than `delay` seconds."""
+    timer = threading.Timer(delay, print, args=(message,))
+    timer.start()
+    try:
+        yield
+    finally:
+        timer.cancel()
 
 
 def is_empty(path: str) -> bool:
