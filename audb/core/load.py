@@ -165,6 +165,8 @@ def _database_check_complete(
     db_root: str,
     flavor: Flavor,
     deps: Dependencies,
+    *,
+    verbose: bool = False,
 ):
     def check() -> bool:
         complete = True
@@ -182,7 +184,10 @@ def _database_check_complete(
                     return False
         return complete
 
-    if check():
+    with utils.delayed_print("Check completeness", verbose=verbose):
+        is_complete = check()
+
+    if is_complete:
         db_root_tmp = database_tmp_root(db_root)
         db.meta["audb"]["complete"] = True
         db_original = audformat.Database.load(db_root, load_data=False)
@@ -1304,6 +1309,7 @@ def load(
                     db_root,
                     flavor,
                     deps,
+                    verbose=verbose,
                 )
 
     except filelock.Timeout:
