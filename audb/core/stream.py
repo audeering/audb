@@ -566,6 +566,7 @@ def stream(
             version,
             flavor=flavor,
             add_audb_meta=True,
+            verbose=verbose,
         )
 
         # Misc tables required by schemes of requested table

@@ -372,6 +372,7 @@ def load_to(
         name,
         version,
         overwrite=True,
+        verbose=verbose,
     )
     db_header.save(db_root_tmp, header_only=True)
 

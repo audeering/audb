@@ -1166,6 +1166,7 @@ def load(
                 version,
                 flavor=flavor,
                 add_audb_meta=True,
+                verbose=verbose,
             )
 
             db_is_complete = _database_is_complete(db)
@@ -1374,6 +1375,7 @@ def load_attachment(
             db_root,
             name,
             version,
+            verbose=verbose,
         )
 
         # Load attachment
@@ -1436,6 +1438,7 @@ def load_header_to(
     flavor: Flavor = None,
     add_audb_meta: bool = False,
     overwrite: bool = False,
+    verbose: bool = False,
 ) -> tuple[audformat.Database, type[audbackend.interface.Base] | None]:
     r"""Load database header from folder or backend.
 
@@ -1454,6 +1457,8 @@ def load_header_to(
             to the database header before storing it in cache
         overwrite: always load header from backend
             and overwrite the one found in ``db_root``
+        verbose: if ``True``,
+            show message when downloading the header
 
     Returns:
         database header and backend
@@ -1467,7 +1472,11 @@ def load_header_to(
         if add_audb_meta:
             db_root_tmp = database_tmp_root(db_root)
             local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
-        backend_interface.get_file(remote_header, local_header, version)
+        if verbose:
+            with utils.delayed_print("Load header"):
+                backend_interface.get_file(remote_header, local_header, version)
+        else:
+            backend_interface.get_file(remote_header, local_header, version)
         if add_audb_meta:
             db = audformat.Database.load(db_root_tmp, load_data=False)
             db.meta["audb"] = {
@@ -1609,6 +1618,7 @@ def load_media(
                 version,
                 flavor=flavor,
                 add_audb_meta=True,
+                verbose=verbose,
             )
 
             db_is_complete = _database_is_complete(db)
@@ -1761,6 +1771,7 @@ def load_table(
             db_root,
             name,
             version,
+            verbose=verbose,
         )
 
         # Find only those misc tables used in schemes of the requested table
