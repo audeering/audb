@@ -61,7 +61,7 @@ def _find_media(
         params=[([file], {}) for file in db.files],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description="Find media",
+        task_description="Scan media",
         maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
