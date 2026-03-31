@@ -298,7 +298,11 @@ def dependencies(
     with FolderLock(db_root):
         try:
             deps = Dependencies()
-            deps.load(cached_deps_file)
+            if verbose:
+                with utils.delayed_print("Load dependencies"):
+                    deps.load(cached_deps_file)
+            else:
+                deps.load(cached_deps_file)
         except Exception:  # does not catch KeyboardInterupt
             # If loading cached file fails, load again from backend
             #
