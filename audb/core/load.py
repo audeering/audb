@@ -1237,7 +1237,11 @@ def load(
                 db.pick_tables(requested_tables)
 
             # load tables
-            for table in requested_tables:
+            for table in audeer.progress_bar(
+                requested_tables,
+                desc="Read tables",
+                disable=not verbose,
+            ):
                 db[table].load(os.path.join(db_root, f"db.{table}"))
 
             # filter media
