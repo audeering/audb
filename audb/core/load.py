@@ -1261,13 +1261,23 @@ def load(
                 db[table].load(os.path.join(db_root, f"db.{table}"))
 
             # filter media
-            requested_media = filter_deps(
-                media,
-                db.files,
-                "media",
-                name,
-                version,
-            )
+            if verbose:
+                with utils.delayed_print("Filter media"):
+                    requested_media = filter_deps(
+                        media,
+                        db.files,
+                        "media",
+                        name,
+                        version,
+                    )
+            else:
+                requested_media = filter_deps(
+                    media,
+                    db.files,
+                    "media",
+                    name,
+                    version,
+                )
 
             # load missing media
             if not db_is_complete and not only_metadata:
