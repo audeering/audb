@@ -15,8 +15,15 @@ from audb.core.repository import Repository
 
 
 @contextmanager
-def delayed_print(message, delay=0.5):
-    """Print message only if the block takes longer than `delay` seconds."""
+def delayed_print(message, delay=0.5, verbose=True):
+    """Print message only if the block takes longer than `delay` seconds.
+
+    When ``verbose`` is ``False``, the block executes without any timer.
+
+    """
+    if not verbose:
+        yield
+        return
     timer = threading.Timer(delay, print, args=(message,))
     timer.start()
     try:

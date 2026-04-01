@@ -473,6 +473,22 @@ def test_load_from_cache(dbs):
 
 def test_load_verbose(dbs):
     """Test that load with verbose=True covers all progress messages."""
+    # Load from cache
+    audb.load(
+        DB_NAME,
+        version="1.0.0",
+        num_workers=pytest.NUM_WORKERS,
+        verbose=True,
+    )
+    # Clear cache to force loading from backend,
+    # which covers the _load_files verbose branches
+    cache_root = audb.core.load.database_cache_root(
+        DB_NAME,
+        "1.0.0",
+        None,
+        audb.Flavor(),
+    )
+    shutil.rmtree(cache_root)
     audb.load(
         DB_NAME,
         version="1.0.0",

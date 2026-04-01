@@ -184,10 +184,7 @@ def _database_check_complete(
                     return False
         return complete
 
-    if verbose:
-        with utils.delayed_print("Check completeness"):
-            is_complete = check()
-    else:
+    with utils.delayed_print("Check completeness", verbose=verbose):
         is_complete = check()
 
     if is_complete:
@@ -236,10 +233,7 @@ def _files_duration(
         durs.index = audformat.utils.expand_file_path(durs.index, db.root)
         db._files_duration = durs.to_dict()
 
-    if verbose:
-        with utils.delayed_print("Set file durations"):
-            _run()
-    else:
+    with utils.delayed_print("Set file durations", verbose=verbose):
         _run()
 
 
@@ -765,12 +759,13 @@ def _load_files(
 
     if missing_files:
         if cached_versions is None:
-            cached_versions = _cached_versions(
-                db.name,
-                version,
-                flavor,
-                cache_root,
-            )
+            with utils.delayed_print("Find cached versions", verbose=verbose):
+                cached_versions = _cached_versions(
+                    db.name,
+                    version,
+                    flavor,
+                    cache_root,
+                )
         if cached_versions:
             missing_files = _get_files_from_cache(
                 missing_files,
@@ -1261,16 +1256,7 @@ def load(
                 db[table].load(os.path.join(db_root, f"db.{table}"))
 
             # filter media
-            if verbose:
-                with utils.delayed_print("Filter media"):
-                    requested_media = filter_deps(
-                        media,
-                        db.files,
-                        "media",
-                        name,
-                        version,
-                    )
-            else:
+            with utils.delayed_print("Filter media", verbose=verbose):
                 requested_media = filter_deps(
                     media,
                     db.files,
@@ -1504,10 +1490,7 @@ def load_header_to(
         if add_audb_meta:
             db_root_tmp = database_tmp_root(db_root)
             local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
-        if verbose:
-            with utils.delayed_print("Load header"):
-                backend_interface.get_file(remote_header, local_header, version)
-        else:
+        with utils.delayed_print("Load header", verbose=verbose):
             backend_interface.get_file(remote_header, local_header, version)
         if add_audb_meta:
             db = audformat.Database.load(db_root_tmp, load_data=False)
