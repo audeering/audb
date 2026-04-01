@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from contextlib import contextmanager
 import os
+import sys
 import threading
 import warnings
 
@@ -18,18 +19,32 @@ from audb.core.repository import Repository
 def delayed_print(message, delay=0.5, verbose=True):
     """Print message only if the block takes longer than `delay` seconds.
 
+    The message is shown as a temporary status line on stderr
+    (matching tqdm's output stream) and is cleared
+    when the block finishes.
+
     When ``verbose`` is ``False``, the block executes without any timer.
 
     """
     if not verbose:
         yield
         return
-    timer = threading.Timer(delay, print, args=(message,))
+    printed = threading.Event()
+
+    def _print():
+        sys.stderr.write(f"\r{message}")
+        sys.stderr.flush()
+        printed.set()
+
+    timer = threading.Timer(delay, _print)
     timer.start()
     try:
         yield
     finally:
         timer.cancel()
+        if printed.is_set():
+            sys.stderr.write("\r\033[K")
+            sys.stderr.flush()
 
 
 def is_empty(path: str) -> bool:

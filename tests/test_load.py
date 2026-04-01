@@ -1,6 +1,7 @@
 import os
 import random
 import shutil
+import time
 
 import numpy as np
 import pandas as pd
@@ -11,6 +12,7 @@ import audformat.testing
 import audiofile
 
 import audb
+from audb.core.utils import delayed_print
 
 
 DB_NAME = "test_load"
@@ -495,6 +497,27 @@ def test_load_verbose(dbs):
         num_workers=pytest.NUM_WORKERS,
         verbose=True,
     )
+
+
+def test_delayed_print(capsys):
+    """Test delayed_print shows and clears message."""
+    # Fast block: message should not appear
+    with delayed_print("should not appear", delay=0.5):
+        pass
+    assert capsys.readouterr().err == ""
+
+    # Slow block: message should appear and be cleared
+    with delayed_print("loading", delay=0.01):
+        time.sleep(0.1)
+    captured = capsys.readouterr().err
+    assert "loading" in captured
+    # Message should be cleared (line erased with \r\033[K)
+    assert "\r\033[K" in captured
+
+    # verbose=False: no output regardless of delay
+    with delayed_print("hidden", delay=0.01, verbose=False):
+        time.sleep(0.1)
+    assert capsys.readouterr().err == ""
 
 
 @pytest.mark.parametrize(
