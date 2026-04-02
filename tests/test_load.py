@@ -11,6 +11,7 @@ import audformat.testing
 import audiofile
 
 import audb
+from audb.core.utils import _status_frames
 from audb.core.utils import status_line
 
 
@@ -498,27 +499,58 @@ def test_load_verbose(dbs):
     )
 
 
-def test_status_line(capsys):
-    """Test status_line shows status and restores it after progress bars."""
-    # verbose=True: status is shown and cleared
-    with status_line("...", verbose=True):
-        captured = capsys.readouterr().err
-        assert "..." in captured
+def test_status_frames():
+    """Test _status_frames with different audeer configs."""
+    # Default config: coloured frames
+    frames = _status_frames()
+    assert len(frames) == 4  # bounce: 0, 1, 2, 1
 
-        # progress bar should restore status after closing
+    # No bar character: falls back to "."
+    original_bar = audeer.config.TQDM_BAR
+    audeer.config.TQDM_BAR = None
+    frames = _status_frames()
+    assert len(frames) == 4
+    audeer.config.TQDM_BAR = original_bar
+
+    # No colours: plain characters without ANSI codes
+    original_fg = audeer.config.TQDM_COLOUR
+    audeer.config.TQDM_COLOUR = None
+    frames = _status_frames()
+    assert len(frames) == 4
+    assert "\033[" not in frames[0]
+    audeer.config.TQDM_COLOUR = original_fg
+
+
+def test_status_line(capsys):
+    """Test status_line shows animated status and restores after progress bars."""
+    import time
+
+    bar_char = audeer.config.TQDM_BAR
+    if bar_char is None:
+        bar_char = "."
+    symbol = bar_char[0]
+
+    # verbose=True: animation is shown
+    with status_line(verbose=True):
+        time.sleep(0.1)  # let timer fire at least once
+        captured = capsys.readouterr().err
+        assert symbol in captured
+
+        # progress bar should restore animation after closing
         bar = audeer.progress_bar([1, 2], desc="test", disable=False)
         for _ in bar:
             pass
         bar.close()
+        time.sleep(0.1)
         captured = capsys.readouterr().err
-        assert "..." in captured
+        assert symbol in captured
 
     # Status is cleared on exit
     captured = capsys.readouterr().err
     assert "\r\033[K" in captured
 
     # verbose=False: no output, audeer.progress_bar not wrapped
-    with status_line("...", verbose=False):
+    with status_line(verbose=False):
         pass
     assert capsys.readouterr().err == ""
 

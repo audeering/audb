@@ -2,29 +2,70 @@ from collections.abc import Sequence
 from contextlib import contextmanager
 import os
 import sys
+import threading
 import warnings
 
 import pyarrow.parquet as parquet
 
 import audbackend
 import audeer
+from audeer.core.tqdm import _ANSI_COLOR_RESET
+from audeer.core.tqdm import _ansi_colour
 
 from audb.core import define
 from audb.core.config import config
 from audb.core.repository import Repository
 
 
-@contextmanager
-def status_line(message="...", verbose=True):
-    r"""Show a persistent status message between progress bars.
+def _status_frames():
+    """Build animated status frames from audeer progress bar config.
 
-    Displays ``message`` on stderr as a temporary status line.
-    When a progress bar starts, it overwrites the status.
-    When the progress bar finishes, the status is restored.
+    Returns a list of strings representing animation frames.
+    A highlighted symbol bounces left-to-right-to-left
+    across 3 positions, e.g. ``["╸╸╸", "╸╸╸", "╸╸╸"]``
+    with ANSI colours applied.
+
+    """
+    bar = audeer.config.TQDM_BAR
+    fg = audeer.config.TQDM_COLOUR
+    bg = audeer.config.TQDM_BG_COLOUR
+
+    if bar is None:
+        bar = "."
+    char = bar[0]
+
+    if fg and bg:
+        fg_code = _ansi_colour(fg)
+        bg_code = _ansi_colour(bg)
+        bright = f"{fg_code}{char}{_ANSI_COLOR_RESET}"
+        dim = f"{bg_code}{char}{_ANSI_COLOR_RESET}"
+    else:
+        bright = char
+        dim = char
+
+    n = 3
+    # Bounce pattern: 0, 1, 2, 1
+    indices = list(range(n)) + list(range(n - 2, 0, -1))
+    frames = []
+    for active in indices:
+        parts = [bright if i == active else dim for i in range(n)]
+        frames.append("".join(parts))
+    return frames
+
+
+@contextmanager
+def status_line(verbose=True):
+    r"""Show an animated status indicator between progress bars.
+
+    Displays a bouncing symbol animation on stderr
+    using the progress bar character and colours
+    from ``audeer.config``.
+    When a progress bar starts, the animation is paused.
+    When the progress bar finishes, it resumes.
 
     This works by temporarily wrapping ``audeer.progress_bar``
-    so that each bar clears the status on open
-    and restores it on close.
+    so that each bar pauses the animation on open
+    and resumes it on close.
 
     When ``verbose`` is ``False``, no output is produced
     and ``audeer.progress_bar`` is not wrapped.
@@ -34,13 +75,36 @@ def status_line(message="...", verbose=True):
         yield
         return
 
+    frames = _status_frames()
+    frame_idx = [0]
+    timer = [None]
+    running = threading.Event()
+    running.set()
+
     def _show():
-        sys.stderr.write(f"\r{message}")
+        if not running.is_set():
+            return
+        sys.stderr.write(f"\r{frames[frame_idx[0]]}")
         sys.stderr.flush()
+        frame_idx[0] = (frame_idx[0] + 1) % len(frames)
+        timer[0] = threading.Timer(0.3, _show)
+        timer[0].daemon = True
+        timer[0].start()
+
+    def _stop():
+        running.clear()
+        if timer[0] is not None:
+            timer[0].cancel()
+            timer[0] = None
 
     def _clear():
+        _stop()
         sys.stderr.write("\r\033[K")
         sys.stderr.flush()
+
+    def _resume():
+        running.set()
+        _show()
 
     original_progress_bar = audeer.progress_bar
 
@@ -48,12 +112,13 @@ def status_line(message="...", verbose=True):
         _clear()
         bar = original_progress_bar(*args, **kwargs)
         if bar.disable:
+            _resume()
             return bar
         original_close = bar.close
 
         def _patched_close():
             original_close()
-            _show()
+            _resume()
 
         bar.close = _patched_close
         return bar
