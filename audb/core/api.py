@@ -296,26 +296,25 @@ def dependencies(
     cached_deps_file = os.path.join(db_root, define.CACHED_DEPENDENCY_FILE)
 
     with FolderLock(db_root):
-        with utils.delayed_print("Load dependencies...", verbose=verbose):
-            try:
-                deps = Dependencies()
-                deps.load(cached_deps_file)
-            except Exception:  # does not catch KeyboardInterupt
-                # If loading cached file fails, load again from backend
-                #
-                # Loading a cache file can fail
-                # as we use PyArrow data types,
-                # which when loading from pickle
-                # are not compatible between all pandas versions.
-                # We had originally some tests for it,
-                # but as the actual failure is not that important,
-                # we removed them in
-                # See https://github.com/audeering/audb/pull/507
-                #
-                backend_interface = utils.lookup_backend(name, version)
-                deps = download_dependencies(backend_interface, name, version)
-                # Store as pickle in cache
-                deps.save(cached_deps_file)
+        try:
+            deps = Dependencies()
+            deps.load(cached_deps_file)
+        except Exception:  # does not catch KeyboardInterupt
+            # If loading cached file fails, load again from backend
+            #
+            # Loading a cache file can fail
+            # as we use PyArrow data types,
+            # which when loading from pickle
+            # are not compatible between all pandas versions.
+            # We had originally some tests for it,
+            # but as the actual failure is not that important,
+            # we removed them in
+            # See https://github.com/audeering/audb/pull/507
+            #
+            backend_interface = utils.lookup_backend(name, version)
+            deps = download_dependencies(backend_interface, name, version)
+            # Store as pickle in cache
+            deps.save(cached_deps_file)
 
     return deps
 

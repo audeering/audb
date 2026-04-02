@@ -435,23 +435,22 @@ def _get_media_from_backend(
 ):
     r"""Load media from backend."""
     # figure out archives
-    with utils.delayed_print("Collect archives to download...", verbose=verbose):
-        archives = set()
-        archive_names = set()
-        for file in media:
-            archive_name = deps.archive(file)
-            archive_version = deps.version(file)
-            archives.add((archive_name, archive_version))
-            archive_names.add(archive_name)
-        # collect all files that will be extracted,
-        # if we have more files than archives
-        if len(deps.files) > len(deps.archives):
-            files = list()
-            for file in deps.media:
-                archive = deps.archive(file)
-                if archive in archive_names:
-                    files.append(file)
-            media = files
+    archives = set()
+    archive_names = set()
+    for file in media:
+        archive_name = deps.archive(file)
+        archive_version = deps.version(file)
+        archives.add((archive_name, archive_version))
+        archive_names.add(archive_name)
+    # collect all files that will be extracted,
+    # if we have more files than archives
+    if len(deps.files) > len(deps.archives):
+        files = list()
+        for file in deps.media:
+            archive = deps.archive(file)
+            if archive in archive_names:
+                files.append(file)
+        media = files
 
     # create folder tree to avoid race condition
     # in os.makedirs when files are unpacked
@@ -748,13 +747,12 @@ def _load_files(
 
     if missing_files:
         if cached_versions is None:
-            with utils.delayed_print("Find cached versions...", verbose=verbose):
-                cached_versions = _cached_versions(
-                    db.name,
-                    version,
-                    flavor,
-                    cache_root,
-                )
+            cached_versions = _cached_versions(
+                db.name,
+                version,
+                flavor,
+                cache_root,
+            )
         if cached_versions:
             missing_files = _get_files_from_cache(
                 missing_files,
@@ -768,8 +766,7 @@ def _load_files(
             )
         if missing_files:
             if backend_interface is None:
-                with utils.delayed_print("Connect to repository...", verbose=verbose):
-                    backend_interface = lookup_backend(db.name, version)
+                backend_interface = lookup_backend(db.name, version)
             if files_type == "media":
                 _get_media_from_backend(
                     db.name,
@@ -1151,73 +1148,39 @@ def load(
         print(f"Get:   {name} v{version}")
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
+    with utils.status_line(verbose=verbose):
+        deps = dependencies(
+            name,
+            version=version,
+            cache_root=cache_root,
+            verbose=verbose,
+        )
 
-    try:
-        with FolderLock(db_root, timeout=timeout):
-            # Start with database header without tables
-            db, backend_interface = load_header_to(
-                db_root,
-                name,
-                version,
-                flavor=flavor,
-                add_audb_meta=True,
-                verbose=verbose,
-            )
-
-            db_is_complete = _database_is_complete(db)
-
-            # load attachments
-            if not db_is_complete and not only_metadata:
-                # filter attachments
-                requested_attachments = filter_deps(
-                    attachments,
-                    db.attachments,
-                    "attachment",
-                )
-
-                cached_versions = _load_attachments(
-                    requested_attachments,
-                    backend_interface,
+        try:
+            with FolderLock(db_root, timeout=timeout):
+                # Start with database header without tables
+                db, backend_interface = load_header_to(
                     db_root,
-                    db,
+                    name,
                     version,
-                    cached_versions,
-                    deps,
-                    flavor,
-                    cache_root,
-                    num_workers,
-                    verbose,
+                    flavor=flavor,
+                    add_audb_meta=True,
+                    verbose=verbose,
                 )
 
-            # filter tables (convert regexp pattern to list of tables)
-            requested_tables = filter_deps(tables, list(db), "table")
+                db_is_complete = _database_is_complete(db)
 
-            # add/split into misc tables used in a scheme
-            # and all other (misc) tables
-            requested_misc_tables = _misc_tables_used_in_scheme(db)
-            requested_tables = [
-                table
-                for table in requested_tables
-                if table not in requested_misc_tables
-            ]
+                # load attachments
+                if not db_is_complete and not only_metadata:
+                    # filter attachments
+                    requested_attachments = filter_deps(
+                        attachments,
+                        db.attachments,
+                        "attachment",
+                    )
 
-            # load missing tables
-            if not db_is_complete:
-                for _tables in [
-                    requested_misc_tables,
-                    requested_tables,
-                ]:
-                    # need to load misc tables used in a scheme first
-                    # as loading is done in parallel
-                    cached_versions = _load_files(
-                        _tables,
-                        "table",
+                    cached_versions = _load_attachments(
+                        requested_attachments,
                         backend_interface,
                         db_root,
                         db,
@@ -1226,25 +1189,58 @@ def load(
                         deps,
                         flavor,
                         cache_root,
-                        pickle_tables,
-                        scan_for_missing_files,
                         num_workers,
                         verbose,
                     )
 
-            requested_tables = requested_misc_tables + requested_tables
+                # filter tables (convert regexp pattern to list of tables)
+                requested_tables = filter_deps(tables, list(db), "table")
 
-            # filter tables
-            if tables is not None:
-                db.pick_tables(requested_tables)
+                # add/split into misc tables used in a scheme
+                # and all other (misc) tables
+                requested_misc_tables = _misc_tables_used_in_scheme(db)
+                requested_tables = [
+                    table
+                    for table in requested_tables
+                    if table not in requested_misc_tables
+                ]
 
-            # load tables
-            with utils.delayed_print("Read tables...", verbose=verbose):
+                # load missing tables
+                if not db_is_complete:
+                    for _tables in [
+                        requested_misc_tables,
+                        requested_tables,
+                    ]:
+                        # need to load misc tables used in a scheme first
+                        # as loading is done in parallel
+                        cached_versions = _load_files(
+                            _tables,
+                            "table",
+                            backend_interface,
+                            db_root,
+                            db,
+                            version,
+                            cached_versions,
+                            deps,
+                            flavor,
+                            cache_root,
+                            pickle_tables,
+                            scan_for_missing_files,
+                            num_workers,
+                            verbose,
+                        )
+
+                requested_tables = requested_misc_tables + requested_tables
+
+                # filter tables
+                if tables is not None:
+                    db.pick_tables(requested_tables)
+
+                # load tables
                 for table in requested_tables:
                     db[table].load(os.path.join(db_root, f"db.{table}"))
 
-            # filter media
-            with utils.delayed_print("Filter media...", verbose=verbose):
+                # filter media
                 requested_media = filter_deps(
                     media,
                     db.files,
@@ -1253,63 +1249,63 @@ def load(
                     version,
                 )
 
-            # load missing media
-            if not db_is_complete and not only_metadata:
-                cached_versions = _load_files(
-                    requested_media,
-                    "media",
-                    backend_interface,
-                    db_root,
+                # load missing media
+                if not db_is_complete and not only_metadata:
+                    cached_versions = _load_files(
+                        requested_media,
+                        "media",
+                        backend_interface,
+                        db_root,
+                        db,
+                        version,
+                        cached_versions,
+                        deps,
+                        flavor,
+                        cache_root,
+                        False,
+                        scan_for_missing_files,
+                        num_workers,
+                        verbose,
+                    )
+
+                # filter media
+                if media is not None or tables is not None:
+                    db.pick_files(requested_media)
+
+                if not removed_media:
+                    _remove_media(db, deps, num_workers, verbose)
+
+                # Adjust full paths and file extensions in tables
+                _update_path(
                     db,
-                    version,
-                    cached_versions,
-                    deps,
-                    flavor,
-                    cache_root,
-                    False,
-                    scan_for_missing_files,
+                    db_root,
+                    full_path,
+                    flavor.format,
                     num_workers,
                     verbose,
                 )
 
-            # filter media
-            if media is not None or tables is not None:
-                db.pick_files(requested_media)
-
-            if not removed_media:
-                _remove_media(db, deps, num_workers, verbose)
-
-            # Adjust full paths and file extensions in tables
-            _update_path(
-                db,
-                db_root,
-                full_path,
-                flavor.format,
-                num_workers,
-                verbose,
-            )
-
-            # set file durations
-            _files_duration(
-                db,
-                deps,
-                requested_media,
-                flavor.format,
-            )
-
-            # check if database is now complete
-            if not db_is_complete:
-                _database_check_complete(
+                # set file durations
+                _files_duration(
                     db,
-                    db_root,
-                    flavor,
                     deps,
+                    requested_media,
+                    flavor.format,
                 )
 
-    except filelock.Timeout:
-        utils.timeout_warning()
+                # check if database is now complete
+                if not db_is_complete:
+                    _database_check_complete(
+                        db,
+                        db_root,
+                        flavor,
+                        deps,
+                    )
 
-    return db
+        except filelock.Timeout:
+            utils.timeout_warning()
+
+        return db
 
 
 def load_attachment(

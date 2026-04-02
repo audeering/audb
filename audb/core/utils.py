@@ -2,7 +2,6 @@ from collections.abc import Sequence
 from contextlib import contextmanager
 import os
 import sys
-import threading
 import warnings
 
 import pyarrow.parquet as parquet
@@ -16,35 +15,56 @@ from audb.core.repository import Repository
 
 
 @contextmanager
-def delayed_print(message, delay=0.5, verbose=True):
-    """Print message only if the block takes longer than `delay` seconds.
+def status_line(message="...", verbose=True):
+    r"""Show a persistent status message between progress bars.
 
-    The message is shown as a temporary status line on stderr
-    (matching tqdm's output stream) and is cleared
-    when the block finishes.
+    Displays ``message`` on stderr as a temporary status line.
+    When a progress bar starts, it overwrites the status.
+    When the progress bar finishes, the status is restored.
 
-    When ``verbose`` is ``False``, the block executes without any timer.
+    This works by temporarily wrapping ``audeer.progress_bar``
+    so that each bar clears the status on open
+    and restores it on close.
+
+    When ``verbose`` is ``False``, no output is produced
+    and ``audeer.progress_bar`` is not wrapped.
 
     """
     if not verbose:
         yield
         return
-    printed = threading.Event()
 
-    def _print():
+    def _show():
         sys.stderr.write(f"\r{message}")
         sys.stderr.flush()
-        printed.set()
 
-    timer = threading.Timer(delay, _print)
-    timer.start()
+    def _clear():
+        sys.stderr.write("\r\033[K")
+        sys.stderr.flush()
+
+    original_progress_bar = audeer.progress_bar
+
+    def _wrapped_progress_bar(*args, **kwargs):
+        _clear()
+        bar = original_progress_bar(*args, **kwargs)
+        if bar.disable:
+            return bar
+        original_close = bar.close
+
+        def _patched_close():
+            original_close()
+            _show()
+
+        bar.close = _patched_close
+        return bar
+
+    _show()
+    audeer.progress_bar = _wrapped_progress_bar
     try:
         yield
     finally:
-        timer.cancel()
-        if printed.is_set():
-            sys.stderr.write("\r\033[K")
-            sys.stderr.flush()
+        audeer.progress_bar = original_progress_bar
+        _clear()
 
 
 def is_empty(path: str) -> bool:
