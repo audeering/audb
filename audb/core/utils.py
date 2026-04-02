@@ -78,38 +78,52 @@ def status_line(verbose=True):
     frames = _status_frames()
     frame_idx = [0]
     timer = [None]
-    running = threading.Event()
-    running.set()
+    lock = threading.Lock()
+    active = [True]
 
-    def _show():
-        if not running.is_set():
-            return
-        sys.stderr.write(f"\r{frames[frame_idx[0]]}")
-        sys.stderr.flush()
-        frame_idx[0] = (frame_idx[0] + 1) % len(frames)
-        timer[0] = threading.Timer(0.3, _show)
-        timer[0].daemon = True
-        timer[0].start()
+    def _tick():
+        """Timer callback: write one frame and schedule the next."""
+        with lock:
+            if not active[0]:
+                return
+            sys.stderr.write(f"\r{frames[frame_idx[0]]}")
+            sys.stderr.flush()
+            frame_idx[0] = (frame_idx[0] + 1) % len(frames)
+            timer[0] = threading.Timer(0.3, _tick)
+            timer[0].daemon = True
+            timer[0].start()
 
-    def _stop():
-        running.clear()
-        if timer[0] is not None:
-            timer[0].cancel()
-            timer[0] = None
+    def _pause():
+        """Stop animation and clear the line.
 
-    def _clear():
-        _stop()
-        sys.stderr.write("\r\033[K")
-        sys.stderr.flush()
+        Holds the lock so no timer callback can write
+        between cancellation and the clear.
+        """
+        with lock:
+            active[0] = False
+            if timer[0] is not None:
+                timer[0].cancel()
+                timer[0] = None
+            sys.stderr.write("\r\033[K")
+            sys.stderr.flush()
 
     def _resume():
-        running.set()
-        _show()
+        """Restart the animation."""
+        with lock:
+            active[0] = True
+            # Write first frame immediately under the lock
+            # so nothing can sneak in before it appears
+            sys.stderr.write(f"\r{frames[frame_idx[0]]}")
+            sys.stderr.flush()
+            frame_idx[0] = (frame_idx[0] + 1) % len(frames)
+            timer[0] = threading.Timer(0.3, _tick)
+            timer[0].daemon = True
+            timer[0].start()
 
     original_progress_bar = audeer.progress_bar
 
     def _wrapped_progress_bar(*args, **kwargs):
-        _clear()
+        _pause()
         bar = original_progress_bar(*args, **kwargs)
         if bar.disable:
             _resume()
@@ -123,13 +137,13 @@ def status_line(verbose=True):
         bar.close = _patched_close
         return bar
 
-    _show()
+    _resume()
     audeer.progress_bar = _wrapped_progress_bar
     try:
         yield
     finally:
         audeer.progress_bar = original_progress_bar
-        _clear()
+        _pause()
 
 
 def is_empty(path: str) -> bool:
