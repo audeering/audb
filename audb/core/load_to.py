@@ -344,47 +344,63 @@ def load_to(
     # to ensure we load correct version
     update = os.path.exists(db_root) and os.listdir(db_root)
     audeer.mkdir(db_root)
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
-    if update:
-        if only_metadata:
-            files = deps.tables
-        else:
-            files = deps.attachments + deps.files
-        for file in files:
-            full_file = os.path.join(db_root, file)
-            if os.path.exists(full_file):
-                checksum = utils.md5(full_file)
-                if checksum != deps.checksum(file):
-                    if os.path.isdir(full_file):
-                        audeer.rmdir(full_file)
-                    else:
-                        os.remove(full_file)
 
-    # load database header without tables from backend
-
-    db_header, backend_interface = load_header_to(
-        db_root_tmp,
-        name,
-        version,
-        overwrite=True,
-        verbose=verbose,
-    )
-    db_header.save(db_root_tmp, header_only=True)
-
-    # get altered and new attachments
-
-    if not only_metadata:
-        attachments = _find_attachments(
-            db_root,
-            deps,
+    with utils.status_line(verbose=verbose):
+        deps = dependencies(
+            name,
+            version=version,
+            cache_root=cache_root,
+            verbose=verbose,
         )
-        _get_attachments(
-            attachments,
+        if update:
+            if only_metadata:
+                files = deps.tables
+            else:
+                files = deps.attachments + deps.files
+            for file in files:
+                full_file = os.path.join(db_root, file)
+                if os.path.exists(full_file):
+                    checksum = utils.md5(full_file)
+                    if checksum != deps.checksum(file):
+                        if os.path.isdir(full_file):
+                            audeer.rmdir(full_file)
+                        else:
+                            os.remove(full_file)
+
+        # load database header without tables from backend
+
+        db_header, backend_interface = load_header_to(
+            db_root_tmp,
+            name,
+            version,
+            overwrite=True,
+            verbose=verbose,
+        )
+        db_header.save(db_root_tmp, header_only=True)
+
+        # get altered and new attachments
+
+        if not only_metadata:
+            attachments = _find_attachments(
+                db_root,
+                deps,
+            )
+            _get_attachments(
+                attachments,
+                db_root,
+                db_root_tmp,
+                name,
+                deps,
+                backend_interface,
+                num_workers,
+                verbose,
+            )
+
+        # get altered and new tables
+
+        tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
+        _get_tables(
+            tables,
             db_root,
             db_root_tmp,
             name,
@@ -394,98 +410,84 @@ def load_to(
             verbose,
         )
 
-    # get altered and new tables
+        # load database
 
-    tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
-    _get_tables(
-        tables,
-        db_root,
-        db_root_tmp,
-        name,
-        deps,
-        backend_interface,
-        num_workers,
-        verbose,
-    )
-
-    # load database
-
-    # move header to root and load database ...
-    audeer.move_file(
-        os.path.join(db_root_tmp, define.HEADER_FILE),
-        os.path.join(db_root, define.HEADER_FILE),
-    )
-    try:
-        db = audformat.Database.load(
-            db_root,
-            num_workers=num_workers,
-            verbose=verbose,
+        # move header to root and load database ...
+        audeer.move_file(
+            os.path.join(db_root_tmp, define.HEADER_FILE),
+            os.path.join(db_root, define.HEADER_FILE),
         )
-    except (KeyboardInterrupt, Exception):  # pragma: no cover
-        # make sure to remove header if user interrupts
+        try:
+            db = audformat.Database.load(
+                db_root,
+                num_workers=num_workers,
+                verbose=verbose,
+            )
+        except (KeyboardInterrupt, Exception):  # pragma: no cover
+            # make sure to remove header if user interrupts
+            os.remove(os.path.join(db_root, define.HEADER_FILE))
+            raise
+
+        # afterwards remove header to avoid the database
+        # can be loaded before download is complete
         os.remove(os.path.join(db_root, define.HEADER_FILE))
-        raise
 
-    # afterwards remove header to avoid the database
-    # can be loaded before download is complete
-    os.remove(os.path.join(db_root, define.HEADER_FILE))
+        # get altered and new media files
 
-    # get altered and new media files
+        if not only_metadata:
+            media = _find_media(db, db_root, deps, num_workers, verbose)
+            _get_media(
+                media,
+                db_root,
+                db_root_tmp,
+                name,
+                deps,
+                backend_interface,
+                num_workers,
+                verbose,
+            )
 
-    if not only_metadata:
-        media = _find_media(db, db_root, deps, num_workers, verbose)
-        _get_media(
-            media,
-            db_root,
-            db_root_tmp,
-            name,
-            deps,
-            backend_interface,
-            num_workers,
-            verbose,
+        # save dependencies
+
+        dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCY_FILE)
+        deps.save(dep_path_tmp)
+        audeer.move_file(
+            dep_path_tmp,
+            os.path.join(db_root, define.DEPENDENCY_FILE),
         )
 
-    # save dependencies
+        # save database and PKL tables
 
-    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCY_FILE)
-    deps.save(dep_path_tmp)
-    audeer.move_file(
-        dep_path_tmp,
-        os.path.join(db_root, define.DEPENDENCY_FILE),
-    )
+        if pickle_tables:
+            # Store database header,
+            # and add table as pickle files
+            # (tables are already stored in their original format).
+            # Uses `num_workers` to save tables in parallel.
+            db.save(
+                db_root,
+                storage_format=audformat.define.TableStorageFormat.PICKLE,
+                update_other_formats=False,
+                num_workers=num_workers,
+                verbose=verbose,
+            )
+        else:
+            # Store database header
+            # (tables are already stored)
+            db.save(
+                db_root,
+                header_only=True,
+                verbose=verbose,
+            )
 
-    # save database and PKL tables
+        # remove the temporal directory
+        # to signal all files were correctly loaded
+        try:
+            _remove_empty_dirs(db_root_tmp)
+        except OSError:  # pragma: no cover
+            raise RuntimeError(
+                "Could not remove temporary directory, "
+                "probably there are some leftover files. "
+                "This should not happen."
+            )
 
-    if pickle_tables:
-        # Store database header,
-        # and add table as pickle files
-        # (tables are already stored in their original format).
-        # Uses `num_workers` to save tables in parallel.
-        db.save(
-            db_root,
-            storage_format=audformat.define.TableStorageFormat.PICKLE,
-            update_other_formats=False,
-            num_workers=num_workers,
-            verbose=verbose,
-        )
-    else:
-        # Store database header
-        # (tables are already stored)
-        db.save(
-            db_root,
-            header_only=True,
-            verbose=verbose,
-        )
-
-    # remove the temporal directory
-    # to signal all files were correctly loaded
-    try:
-        _remove_empty_dirs(db_root_tmp)
-    except OSError:  # pragma: no cover
-        raise RuntimeError(
-            "Could not remove temporary directory, "
-            "probably there are some leftover files. "
-            "This should not happen."
-        )
-
-    return db
+        return db
