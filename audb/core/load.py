@@ -1353,45 +1353,46 @@ def load_attachment(
         print(f"Get:   {name} v{version}")
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
-
-    if attachment not in deps.archives:
-        msg = error_message_missing_object(
-            "attachment",
-            [attachment],
+    with utils.status_line(verbose=verbose):
+        deps = dependencies(
             name,
-            version,
-        )
-        raise ValueError(msg)
-
-    with FolderLock(db_root):
-        # Start with database header
-        db, backend_interface = load_header_to(
-            db_root,
-            name,
-            version,
+            version=version,
+            cache_root=cache_root,
             verbose=verbose,
         )
 
-        # Load attachment
-        _load_attachments(
-            [attachment],
-            backend_interface,
-            db_root,
-            db,
-            version,
-            None,
-            deps,
-            Flavor(),
-            cache_root,
-            1,
-            verbose,
-        )
+        if attachment not in deps.archives:
+            msg = error_message_missing_object(
+                "attachment",
+                [attachment],
+                name,
+                version,
+            )
+            raise ValueError(msg)
+
+        with FolderLock(db_root):
+            # Start with database header
+            db, backend_interface = load_header_to(
+                db_root,
+                name,
+                version,
+                verbose=verbose,
+            )
+
+            # Load attachment
+            _load_attachments(
+                [attachment],
+                backend_interface,
+                db_root,
+                db,
+                version,
+                None,
+                deps,
+                Flavor(),
+                cache_root,
+                1,
+                verbose,
+            )
 
     attachment_files = db.attachments[attachment].files
     attachment_files = [
@@ -1587,68 +1588,71 @@ def load_media(
         print(f"Get:   {name} v{version}")
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
-
-    available_files = set(deps.media)
-    missing = set(media) - available_files
-    if missing:
-        msg = error_message_missing_object(
-            "media",
-            sorted(missing),
+    with utils.status_line(verbose=verbose):
+        deps = dependencies(
             name,
-            version,
+            version=version,
+            cache_root=cache_root,
+            verbose=verbose,
         )
-        raise ValueError(msg)
 
-    try:
-        with FolderLock(db_root, timeout=timeout):
-            # Start with database header without tables
-            db, backend_interface = load_header_to(
-                db_root,
+        available_files = set(deps.media)
+        missing = set(media) - available_files
+        if missing:
+            msg = error_message_missing_object(
+                "media",
+                sorted(missing),
                 name,
                 version,
-                flavor=flavor,
-                add_audb_meta=True,
-                verbose=verbose,
             )
+            raise ValueError(msg)
 
-            db_is_complete = _database_is_complete(db)
-
-            # load missing media
-            if not db_is_complete:
-                _load_files(
-                    media,
-                    "media",
-                    backend_interface,
+        try:
+            with FolderLock(db_root, timeout=timeout):
+                # Start with database header without tables
+                db, backend_interface = load_header_to(
                     db_root,
-                    db,
+                    name,
                     version,
-                    None,
-                    deps,
-                    flavor,
-                    cache_root,
-                    False,
-                    scan_for_missing_files,
-                    num_workers,
-                    verbose,
+                    flavor=flavor,
+                    add_audb_meta=True,
+                    verbose=verbose,
                 )
 
-            if format is not None:
-                media = [audeer.replace_file_extension(m, format) for m in media]
-            files = [
-                os.path.join(db_root, os.path.normpath(file))  # convert "/" to os.sep
-                for file in media
-            ]
+                db_is_complete = _database_is_complete(db)
 
-    except filelock.Timeout:
-        utils.timeout_warning()
+                # load missing media
+                if not db_is_complete:
+                    _load_files(
+                        media,
+                        "media",
+                        backend_interface,
+                        db_root,
+                        db,
+                        version,
+                        None,
+                        deps,
+                        flavor,
+                        cache_root,
+                        False,
+                        scan_for_missing_files,
+                        num_workers,
+                        verbose,
+                    )
 
-    return files
+                if format is not None:
+                    media = [audeer.replace_file_extension(m, format) for m in media]
+                files = [
+                    os.path.join(
+                        db_root, os.path.normpath(file)
+                    )  # convert "/" to os.sep
+                    for file in media
+                ]
+
+        except filelock.Timeout:
+            utils.timeout_warning()
+
+        return files
 
 
 def load_table(
@@ -1745,69 +1749,70 @@ def load_table(
         print(f"Get:   {name} v{version}")
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
-
-    if table not in deps.table_ids:
-        msg = error_message_missing_object(
-            "table",
-            [table],
+    with utils.status_line(verbose=verbose):
+        deps = dependencies(
             name,
-            version,
-        )
-        raise ValueError(msg)
-
-    with FolderLock(db_root):
-        # Start with database header without tables
-        db, backend_interface = load_header_to(
-            db_root,
-            name,
-            version,
+            version=version,
+            cache_root=cache_root,
             verbose=verbose,
         )
 
-        # Find only those misc tables used in schemes of the requested table
-        scheme_misc_tables = []
-        for column_id, column in db[table].columns.items():
-            if column.scheme_id is not None:
-                scheme = db.schemes[column.scheme_id]
-                if scheme.uses_table:
-                    scheme_misc_tables.append(scheme.labels)
-        scheme_misc_tables = audeer.unique(scheme_misc_tables)
+        if table not in deps.table_ids:
+            msg = error_message_missing_object(
+                "table",
+                [table],
+                name,
+                version,
+            )
+            raise ValueError(msg)
 
-        # Load table
-        tables = scheme_misc_tables + [table]
-        for _table in tables:
-            table_file = os.path.join(db_root, f"db.{_table}")
-            # `_load_files()` downloads a table
-            # from the backend,
-            # if it cannot find its corresponding csv or parquet file
-            if not os.path.exists(f"{table_file}.pkl"):
-                _load_files(
-                    [_table],
-                    "table",
-                    backend_interface,
-                    db_root,
-                    db,
-                    version,
-                    None,
-                    deps,
-                    Flavor(),
-                    cache_root,
-                    pickle_tables,
-                    scan_for_missing_files,
-                    num_workers,
-                    verbose,
-                )
-            db[_table].load(table_file)
+        with FolderLock(db_root):
+            # Start with database header without tables
+            db, backend_interface = load_header_to(
+                db_root,
+                name,
+                version,
+                verbose=verbose,
+            )
 
-    if map is None:
-        df = db[table]._df
-    else:
-        df = db[table].get(map=map)
+            # Find only those misc tables used in schemes of the requested table
+            scheme_misc_tables = []
+            for column_id, column in db[table].columns.items():
+                if column.scheme_id is not None:
+                    scheme = db.schemes[column.scheme_id]
+                    if scheme.uses_table:
+                        scheme_misc_tables.append(scheme.labels)
+            scheme_misc_tables = audeer.unique(scheme_misc_tables)
 
-    return df
+            # Load table
+            tables = scheme_misc_tables + [table]
+            for _table in tables:
+                table_file = os.path.join(db_root, f"db.{_table}")
+                # `_load_files()` downloads a table
+                # from the backend,
+                # if it cannot find its corresponding csv or parquet file
+                if not os.path.exists(f"{table_file}.pkl"):
+                    _load_files(
+                        [_table],
+                        "table",
+                        backend_interface,
+                        db_root,
+                        db,
+                        version,
+                        None,
+                        deps,
+                        Flavor(),
+                        cache_root,
+                        pickle_tables,
+                        scan_for_missing_files,
+                        num_workers,
+                        verbose,
+                    )
+                db[_table].load(table_file)
+
+        if map is None:
+            df = db[table]._df
+        else:
+            df = db[table].get(map=map)
+
+        return df
