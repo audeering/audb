@@ -184,7 +184,7 @@ def _database_check_complete(
                     return False
         return complete
 
-    with utils.delayed_print("Check completeness", verbose=verbose):
+    with utils.delayed_print("Check completeness...", verbose=verbose):
         is_complete = check()
 
     if is_complete:
@@ -233,7 +233,7 @@ def _files_duration(
         durs.index = audformat.utils.expand_file_path(durs.index, db.root)
         db._files_duration = durs.to_dict()
 
-    with utils.delayed_print("Set file durations", verbose=verbose):
+    with utils.delayed_print("Set file durations...", verbose=verbose):
         _run()
 
 
@@ -447,7 +447,7 @@ def _get_media_from_backend(
 ):
     r"""Load media from backend."""
     # figure out archives
-    with utils.delayed_print("Collect archives to download", verbose=verbose):
+    with utils.delayed_print("Collect archives to download...", verbose=verbose):
         archives = set()
         archive_names = set()
         for file in media:
@@ -762,7 +762,7 @@ def _load_files(
     print("M.2")
     if missing_files:
         if cached_versions is None:
-            with utils.delayed_print("Find cached versions", verbose=verbose):
+            with utils.delayed_print("Find cached versions...", verbose=verbose):
                 cached_versions = _cached_versions(
                     db.name,
                     version,
@@ -1276,17 +1276,14 @@ def load(
             print("K")
 
             # load tables
-            for table in audeer.progress_bar(
-                requested_tables,
-                desc="Read tables",
-                disable=not verbose,
-            ):
-                db[table].load(os.path.join(db_root, f"db.{table}"))
+            with utils.delayed_print("Read tables...", verbose=verbose):
+                for table in requested_tables:
+                    db[table].load(os.path.join(db_root, f"db.{table}"))
 
             print("L")
 
             # filter media
-            with utils.delayed_print("Filter media", verbose=verbose):
+            with utils.delayed_print("Filter media...", verbose=verbose):
                 requested_media = filter_deps(
                     media,
                     db.files,
@@ -1532,8 +1529,7 @@ def load_header_to(
         if add_audb_meta:
             db_root_tmp = database_tmp_root(db_root)
             local_header = os.path.join(db_root_tmp, define.HEADER_FILE)
-        with utils.delayed_print("Load header", verbose=verbose):
-            backend_interface.get_file(remote_header, local_header, version)
+        backend_interface.get_file(remote_header, local_header, version)
         if add_audb_meta:
             db = audformat.Database.load(db_root_tmp, load_data=False)
             db.meta["audb"] = {
