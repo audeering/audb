@@ -1167,16 +1167,12 @@ def load(
         print(f"Get:   {name} v{version}")
         print(f"Cache: {db_root}")
 
-    print("A")
-
     deps = dependencies(
         name,
         version=version,
         cache_root=cache_root,
         verbose=verbose,
     )
-
-    print("B")
 
     try:
         with FolderLock(db_root, timeout=timeout):

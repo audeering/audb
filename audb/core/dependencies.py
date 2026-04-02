@@ -824,7 +824,6 @@ def download_dependencies(
     backend_interface: type[audbackend.interface.Base],
     name: str,
     version: str,
-    verbose: bool,
 ) -> Dependencies:
     r"""Load dependency file from backend.
 
@@ -851,24 +850,11 @@ def download_dependencies(
         remote_deps_file = backend_interface.join("/", name, define.DEPENDENCY_FILE)
         if backend_interface.exists(remote_deps_file, version):
             local_deps_file = os.path.join(tmp_root, define.DEPENDENCY_FILE)
-            backend_interface.get_file(
-                remote_deps_file,
-                local_deps_file,
-                version,
-                verbose=verbose,
-            )
+            backend_interface.get_file(remote_deps_file, local_deps_file, version)
         else:
             remote_deps_file = backend_interface.join("/", name, define.DB + ".zip")
-            local_deps_file = os.path.join(
-                tmp_root,
-                define.LEGACY_DEPENDENCY_FILE,
-            )
-            backend_interface.get_archive(
-                remote_deps_file,
-                tmp_root,
-                version,
-                verbose=verbose,
-            )
+            local_deps_file = os.path.join(tmp_root, define.LEGACY_DEPENDENCY_FILE)
+            backend_interface.get_archive(remote_deps_file, tmp_root, version)
         # Create deps object from downloaded file
         deps = Dependencies()
         deps.load(local_deps_file)
