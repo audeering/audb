@@ -165,27 +165,20 @@ def _database_check_complete(
     db_root: str,
     flavor: Flavor,
     deps: Dependencies,
-    *,
-    verbose: bool = False,
 ):
-    def check() -> bool:
-        complete = True
-        for attachment in deps.attachments:
-            if not os.path.exists(os.path.join(db_root, attachment)):
-                return False
-        for table in deps.tables:
-            if not os.path.exists(os.path.join(db_root, table)):
-                return False
-        for media in deps.media:
-            if not deps.removed(media):
-                path = os.path.join(db_root, media)
-                path = flavor.destination(path)
-                if not os.path.exists(path):
-                    return False
-        return complete
-
-    with utils.delayed_print("Check completeness...", verbose=verbose):
-        is_complete = check()
+    is_complete = True
+    for attachment in deps.attachments:
+        if not os.path.exists(os.path.join(db_root, attachment)):
+            is_complete = False
+    for table in deps.tables:
+        if not os.path.exists(os.path.join(db_root, table)):
+            is_complete = False
+    for media in deps.media:
+        if not deps.removed(media):
+            path = os.path.join(db_root, media)
+            path = flavor.destination(path)
+            if not os.path.exists(path):
+                is_complete = False
 
     if is_complete:
         db_root_tmp = database_tmp_root(db_root)
@@ -215,26 +208,21 @@ def _files_duration(
     deps: Dependencies,
     files: Sequence[str],
     format: str | None,
-    verbose: bool = False,
 ):
-    def _run():
-        durs = deps().loc[files, "duration"]
-        durs = durs[durs > 0]
-        durs = pd.to_timedelta(durs, unit="s")
-        durs.index.name = "file"
-        if format is not None:
-            durs.index = audformat.utils.replace_file_extension(durs.index, format)
-        # Norm file path under Windows to include `\`
-        if os.name == "nt":  # pragma: nocover as tested in Windows runner
-            durs.index = audformat.utils.map_file_path(
-                durs.index,
-                os.path.normpath,
-            )
-        durs.index = audformat.utils.expand_file_path(durs.index, db.root)
-        db._files_duration = durs.to_dict()
-
-    with utils.delayed_print("Set file durations...", verbose=verbose):
-        _run()
+    durs = deps().loc[files, "duration"]
+    durs = durs[durs > 0]
+    durs = pd.to_timedelta(durs, unit="s")
+    durs.index.name = "file"
+    if format is not None:
+        durs.index = audformat.utils.replace_file_extension(durs.index, format)
+    # Norm file path under Windows to include `\`
+    if os.name == "nt":  # pragma: nocover as tested in Windows runner
+        durs.index = audformat.utils.map_file_path(
+            durs.index,
+            os.path.normpath,
+        )
+    durs.index = audformat.utils.expand_file_path(durs.index, db.root)
+    db._files_duration = durs.to_dict()
 
 
 def _get_attachments_from_cache(
@@ -747,7 +735,6 @@ def _load_files(
             if other versions of the database are found in cache
 
     """
-    print("M.1")
     if scan_for_missing_files:
         missing_files = _missing_files(
             files,
@@ -759,7 +746,6 @@ def _load_files(
     else:
         missing_files = list(files)
 
-    print("M.2")
     if missing_files:
         if cached_versions is None:
             with utils.delayed_print("Find cached versions...", verbose=verbose):
@@ -769,7 +755,6 @@ def _load_files(
                     flavor,
                     cache_root,
                 )
-        print("M.3")
         if cached_versions:
             missing_files = _get_files_from_cache(
                 missing_files,
@@ -781,11 +766,9 @@ def _load_files(
                 num_workers,
                 verbose,
             )
-        print("M.4")
         if missing_files:
             if backend_interface is None:
                 backend_interface = lookup_backend(db.name, version)
-            print("M.5")
             if files_type == "media":
                 _get_media_from_backend(
                     db.name,
@@ -1186,11 +1169,7 @@ def load(
                 verbose=verbose,
             )
 
-            print("C")
-
             db_is_complete = _database_is_complete(db)
-
-            print("D")
 
             # load attachments
             if not db_is_complete and not only_metadata:
@@ -1200,8 +1179,6 @@ def load(
                     db.attachments,
                     "attachment",
                 )
-
-                print("E")
 
                 cached_versions = _load_attachments(
                     requested_attachments,
@@ -1217,12 +1194,8 @@ def load(
                     verbose,
                 )
 
-                print("F")
-
             # filter tables (convert regexp pattern to list of tables)
             requested_tables = filter_deps(tables, list(db), "table")
-
-            print("G")
 
             # add/split into misc tables used in a scheme
             # and all other (misc) tables
@@ -1232,8 +1205,6 @@ def load(
                 for table in requested_tables
                 if table not in requested_misc_tables
             ]
-
-            print("H")
 
             # load missing tables
             if not db_is_complete:
@@ -1259,24 +1230,17 @@ def load(
                         num_workers,
                         verbose,
                     )
-                print("I")
 
             requested_tables = requested_misc_tables + requested_tables
-
-            print("J")
 
             # filter tables
             if tables is not None:
                 db.pick_tables(requested_tables)
 
-            print("K")
-
             # load tables
             with utils.delayed_print("Read tables...", verbose=verbose):
                 for table in requested_tables:
                     db[table].load(os.path.join(db_root, f"db.{table}"))
-
-            print("L")
 
             # filter media
             with utils.delayed_print("Filter media...", verbose=verbose):
@@ -1287,8 +1251,6 @@ def load(
                     name,
                     version,
                 )
-
-            print("M")
 
             # load missing media
             if not db_is_complete and not only_metadata:
@@ -1309,18 +1271,12 @@ def load(
                     verbose,
                 )
 
-            print("N")
-
             # filter media
             if media is not None or tables is not None:
                 db.pick_files(requested_media)
 
-            print("O")
-
             if not removed_media:
                 _remove_media(db, deps, num_workers, verbose)
-
-            print("P")
 
             # Adjust full paths and file extensions in tables
             _update_path(
@@ -1332,18 +1288,13 @@ def load(
                 verbose,
             )
 
-            print("Q")
-
             # set file durations
             _files_duration(
                 db,
                 deps,
                 requested_media,
                 flavor.format,
-                verbose,
             )
-
-            print("R")
 
             # check if database is now complete
             if not db_is_complete:
@@ -1352,7 +1303,6 @@ def load(
                     db_root,
                     flavor,
                     deps,
-                    verbose=verbose,
                 )
 
     except filelock.Timeout:
