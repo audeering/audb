@@ -768,7 +768,8 @@ def _load_files(
             )
         if missing_files:
             if backend_interface is None:
-                backend_interface = lookup_backend(db.name, version)
+                with utils.delayed_print("Connect to repository...", verbose=verbose):
+                    backend_interface = lookup_backend(db.name, version)
             if files_type == "media":
                 _get_media_from_backend(
                     db.name,
