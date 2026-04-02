@@ -731,202 +731,225 @@ def publish(
             f"but yours is {previous_version} >= {version}."
         )
 
-    db = audformat.Database.load(
-        db_root,
-        load_data=False,
-        num_workers=num_workers,
-        verbose=verbose,
-    )
-
-    backend_interface = repository.create_backend_interface()
-
-    with backend_interface.backend:
-        remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
-        versions = backend_interface.versions(
-            remote_header,
-            suppress_backend_errors=True,
-        )
-
-    if version in versions:
-        raise RuntimeError(
-            f"A version '{version}' already exists for database '{db.name}'."
-        )
-    if previous_version == "latest":
-        # Find latest version across all repositories (like audb.latest_version)
-        all_versions = api_versions(db.name)
-        previous_version = all_versions[-1] if len(all_versions) > 0 else None
-    # Check repository consistency when previous_version is specified
-    if previous_version is not None:
-        previous_repository = utils._lookup(db.name, previous_version)[0]
-        if previous_repository != repository:
-            raise RuntimeError(
-                f"Cannot publish version '{version}' "
-                f"to repository '{repository.name}' "
-                f"based on previous version '{previous_version}'. "
-                "The previous version is stored in repository "
-                f"'{previous_repository.name}'. "
-                "Publishing to a different repository would split the database "
-                "across multiple repositories, "
-                "which can create data privacy risks "
-                "and is not supported. "
-                "Use previous_version=None "
-                f"to start a new database in '{repository.name}' "
-                f"or publish to the same repository '{previous_repository.name}'."
-            )
-
-    # load database and dependencies
-    deps = Dependencies()
-    for deps_file in [define.DEPENDENCY_FILE, define.LEGACY_DEPENDENCY_FILE]:
-        deps_path = os.path.join(db_root, deps_file)
-        if os.path.exists(deps_path):
-            deps.load(deps_path)
-            break
-
-    # check if database folder depends on the right version
-
-    # dependencies shouldn't be there
-    if previous_version is None and len(deps) > 0:
-        raise RuntimeError(
-            f"You did not set a dependency to a previous version, "
-            f"but you have a '{deps_file}' file present "
-            f"in {db_root}."
-        )
-
-    # dependencies missing
-    if previous_version is not None and len(deps) == 0:
-        raise RuntimeError(
-            f"You want to depend on '{previous_version}' "
-            f"of {db.name}, "
-            f"but you don't have a '{define.DEPENDENCY_FILE}' file present "
-            f"in {db_root}. "
-            f"Did you forgot to call "
-            f"'audb.load_to({db_root}, {db.name}, "
-            f"version={previous_version}?"
-        )
-
-    # dependencies do not match version
-    if previous_version is not None and len(deps) > 0:
-        previous_deps = dependencies(
-            db.name,
-            version=previous_version,
-            cache_root=cache_root,
+    with utils.status_line(verbose=verbose):
+        db = audformat.Database.load(
+            db_root,
+            load_data=False,
+            num_workers=num_workers,
             verbose=verbose,
         )
-        if not deps().equals(previous_deps()):
+
+        backend_interface = repository.create_backend_interface()
+
+        with backend_interface.backend:
+            remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
+            versions = backend_interface.versions(
+                remote_header,
+                suppress_backend_errors=True,
+            )
+
+        if version in versions:
+            raise RuntimeError(
+                f"A version '{version}' already exists for database '{db.name}'."
+            )
+        if previous_version == "latest":
+            # Find latest version across all repositories
+            # (like audb.latest_version)
+            all_versions = api_versions(db.name)
+            previous_version = all_versions[-1] if len(all_versions) > 0 else None
+        # Check repository consistency when previous_version is specified
+        if previous_version is not None:
+            previous_repository = utils._lookup(db.name, previous_version)[0]
+            if previous_repository != repository:
+                raise RuntimeError(
+                    f"Cannot publish version '{version}' "
+                    f"to repository '{repository.name}' "
+                    f"based on previous version '{previous_version}'. "
+                    "The previous version is stored in repository "
+                    f"'{previous_repository.name}'. "
+                    "Publishing to a different repository would split "
+                    "the database across multiple repositories, "
+                    "which can create data privacy risks "
+                    "and is not supported. "
+                    "Use previous_version=None "
+                    f"to start a new database in '{repository.name}' "
+                    "or publish to the same repository "
+                    f"'{previous_repository.name}'."
+                )
+
+        # load database and dependencies
+        deps = Dependencies()
+        for deps_file in [define.DEPENDENCY_FILE, define.LEGACY_DEPENDENCY_FILE]:
+            deps_path = os.path.join(db_root, deps_file)
+            if os.path.exists(deps_path):
+                deps.load(deps_path)
+                break
+
+        # check if database folder depends on the right version
+
+        # dependencies shouldn't be there
+        if previous_version is None and len(deps) > 0:
+            raise RuntimeError(
+                f"You did not set a dependency to a previous version, "
+                f"but you have a '{deps_file}' file present "
+                f"in {db_root}."
+            )
+
+        # dependencies missing
+        if previous_version is not None and len(deps) == 0:
             raise RuntimeError(
                 f"You want to depend on '{previous_version}' "
                 f"of {db.name}, "
-                f"but the dependency file '{deps_file}' "
-                f"in {db_root} "
-                f"does not match the dependency file "
-                f"for the requested version in the repository. "
+                f"but you don't have a '{define.DEPENDENCY_FILE}' file "
+                f"present in {db_root}. "
                 f"Did you forgot to call "
                 f"'audb.load_to({db_root}, {db.name}, "
-                f"version='{previous_version}') "
-                f"or modified the file manually?"
+                f"version={previous_version}?"
             )
 
-    # load database with table data
-    db = audformat.Database.load(
-        db_root,
-        load_data=True,
-        num_workers=num_workers,
-        verbose=verbose,
-    )
-
-    # ensure table and attachment IDs
-    # contain only chars allowed by the backend
-    # as the IDs are included in the filenames of the archives
-    # uploaded to the backend
-    allowed_chars = audbackend.core.utils.BACKEND_ALLOWED_CHARS
-    allowed_chars = allowed_chars.replace("/", "")
-    allowed_chars_compiled = re.compile(allowed_chars)
-    for table_id in list(db):
-        if allowed_chars_compiled.fullmatch(table_id) is None:
-            raise RuntimeError(
-                "Table IDs must only contain chars from "
-                f"{allowed_chars[:-1]}, "
-                f"which is not the case for table '{table_id}'."
+        # dependencies do not match version
+        if previous_version is not None and len(deps) > 0:
+            previous_deps = dependencies(
+                db.name,
+                version=previous_version,
+                cache_root=cache_root,
+                verbose=verbose,
             )
-    for attachment_id in list(db.attachments):
-        if allowed_chars_compiled.fullmatch(attachment_id) is None:
-            raise RuntimeError(
-                "Attachment IDs must only contain chars from "
-                f"{allowed_chars[:-1]}, "
-                f"which is not the case for attachment '{attachment_id}'."
-            )
+            if not deps().equals(previous_deps()):
+                raise RuntimeError(
+                    f"You want to depend on '{previous_version}' "
+                    f"of {db.name}, "
+                    f"but the dependency file '{deps_file}' "
+                    f"in {db_root} "
+                    f"does not match the dependency file "
+                    f"for the requested version in the repository. "
+                    f"Did you forgot to call "
+                    f"'audb.load_to({db_root}, {db.name}, "
+                    f"version='{previous_version}') "
+                    f"or modified the file manually?"
+                )
 
-    # check all tables are conform with audformat
-    if not db.is_portable:
-        raise RuntimeError(
-            "Some files in the tables have absolute paths "
-            "or use '\\', '.', '..' in its path. "
-            "Please replace those paths by relative paths, "
-            "use folder names instead of dots, "
-            "and avoid Windows path notation."
-        )
-    _check_for_duplicates(db, num_workers, verbose)
-
-    # check all media referenced in a table exist
-    # on disk or are already part of the database
-    db_root_files = _get_root_files(db_root)
-    _check_for_missing_media(db, db_root, db_root_files, deps)
-
-    # Make sure all tables are stored in CSV or PARQUET format.
-    # If only a PKL is found,
-    # the table is stored as PARQUET instead
-    for table_id in list(db):
-        table = db[table_id]
-        table_path = os.path.join(db_root, f"db.{table_id}")
-        if not os.path.exists(f"{table_path}.csv") and not os.path.exists(
-            f"{table_path}.parquet"
-        ):
-            table.save(table_path, storage_format="parquet")
-
-    # check archives
-    archives = archives or {}
-
-    with backend_interface.backend:
-        # publish attachments
-        attachments = _find_attachments(db, db_root, version, deps, verbose)
-        _put_attachments(
-            attachments, db_root, db, version, backend_interface, num_workers, verbose
-        )
-
-        # publish tables
-        tables = _find_tables(db, db_root, version, deps, verbose)
-        _put_tables(
-            tables, db_root, db.name, version, backend_interface, num_workers, verbose
-        )
-
-        # publish media
-        media_archives = _find_media(
-            db, db_root, db_root_files, version, deps, archives, num_workers, verbose
-        )
-        _put_media(
-            media_archives,
+        # load database with table data
+        db = audformat.Database.load(
             db_root,
-            db.name,
-            version,
-            previous_version,
-            deps,
-            backend_interface,
-            num_workers,
-            verbose,
+            load_data=True,
+            num_workers=num_workers,
+            verbose=verbose,
         )
 
-        # publish dependencies and header
-        upload_dependencies(backend_interface, deps, db_root, db.name, version)
-        try:
-            local_header = os.path.join(db_root, define.HEADER_FILE)
-            remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
-            backend_interface.put_file(local_header, remote_header, version)
-        except Exception:  # pragma: no cover
-            # after the header is published
-            # the new version becomes visible,
-            # so if something goes wrong here
-            # we better clean up
-            if backend_interface.exists(remote_header, version):
-                backend_interface.remove_file(remote_header, version)
+        # ensure table and attachment IDs
+        # contain only chars allowed by the backend
+        # as the IDs are included in the filenames of the archives
+        # uploaded to the backend
+        allowed_chars = audbackend.core.utils.BACKEND_ALLOWED_CHARS
+        allowed_chars = allowed_chars.replace("/", "")
+        allowed_chars_compiled = re.compile(allowed_chars)
+        for table_id in list(db):
+            if allowed_chars_compiled.fullmatch(table_id) is None:
+                raise RuntimeError(
+                    "Table IDs must only contain chars from "
+                    f"{allowed_chars[:-1]}, "
+                    f"which is not the case for table '{table_id}'."
+                )
+        for attachment_id in list(db.attachments):
+            if allowed_chars_compiled.fullmatch(attachment_id) is None:
+                raise RuntimeError(
+                    "Attachment IDs must only contain chars from "
+                    f"{allowed_chars[:-1]}, "
+                    "which is not the case for attachment "
+                    f"'{attachment_id}'."
+                )
 
-    return deps
+        # check all tables are conform with audformat
+        if not db.is_portable:
+            raise RuntimeError(
+                "Some files in the tables have absolute paths "
+                "or use '\\', '.', '..' in its path. "
+                "Please replace those paths by relative paths, "
+                "use folder names instead of dots, "
+                "and avoid Windows path notation."
+            )
+        _check_for_duplicates(db, num_workers, verbose)
+
+        # check all media referenced in a table exist
+        # on disk or are already part of the database
+        db_root_files = _get_root_files(db_root)
+        _check_for_missing_media(db, db_root, db_root_files, deps)
+
+        # Make sure all tables are stored in CSV or PARQUET format.
+        # If only a PKL is found,
+        # the table is stored as PARQUET instead
+        for table_id in list(db):
+            table = db[table_id]
+            table_path = os.path.join(db_root, f"db.{table_id}")
+            if not os.path.exists(f"{table_path}.csv") and not os.path.exists(
+                f"{table_path}.parquet"
+            ):
+                table.save(table_path, storage_format="parquet")
+
+        # check archives
+        archives = archives or {}
+
+        with backend_interface.backend:
+            # publish attachments
+            attachments = _find_attachments(db, db_root, version, deps, verbose)
+            _put_attachments(
+                attachments,
+                db_root,
+                db,
+                version,
+                backend_interface,
+                num_workers,
+                verbose,
+            )
+
+            # publish tables
+            tables = _find_tables(db, db_root, version, deps, verbose)
+            _put_tables(
+                tables,
+                db_root,
+                db.name,
+                version,
+                backend_interface,
+                num_workers,
+                verbose,
+            )
+
+            # publish media
+            media_archives = _find_media(
+                db,
+                db_root,
+                db_root_files,
+                version,
+                deps,
+                archives,
+                num_workers,
+                verbose,
+            )
+            _put_media(
+                media_archives,
+                db_root,
+                db.name,
+                version,
+                previous_version,
+                deps,
+                backend_interface,
+                num_workers,
+                verbose,
+            )
+
+            # publish dependencies and header
+            upload_dependencies(backend_interface, deps, db_root, db.name, version)
+            try:
+                local_header = os.path.join(db_root, define.HEADER_FILE)
+                remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
+                backend_interface.put_file(local_header, remote_header, version)
+            except Exception:  # pragma: no cover
+                # after the header is published
+                # the new version becomes visible,
+                # so if something goes wrong here
+                # we better clean up
+                if backend_interface.exists(remote_header, version):
+                    backend_interface.remove_file(remote_header, version)
+
+        return deps
