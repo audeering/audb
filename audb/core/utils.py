@@ -106,16 +106,22 @@ def status_line(verbose=True):
     timer = [None]
     lock = threading.Lock()
     active = [True]
+    # Generation counter to invalidate stale _tick callbacks.
+    # When a Timer fires but its callback hasn't acquired the lock yet,
+    # cancel() has no effect. Without this counter, the stale callback
+    # would see active[0]=True (set by a newer _resume) and start
+    # a duplicate timer chain, making the animation speed up over time.
+    generation = [0]
 
-    def _tick():
+    def _tick(gen):
         """Timer callback: write one frame and schedule the next."""
         with lock:
-            if not active[0]:
-                return  # pragma: no cover
+            if not active[0] or gen != generation[0]:
+                return
             sys.stderr.write(f"\r{frames[frame_idx[0]]}")
             sys.stderr.flush()
             frame_idx[0] = (frame_idx[0] + 1) % len(frames)
-            timer[0] = threading.Timer(interval, _tick)
+            timer[0] = threading.Timer(interval, _tick, args=(gen,))
             timer[0].daemon = True
             timer[0].start()
 
@@ -127,6 +133,7 @@ def status_line(verbose=True):
         """
         with lock:
             active[0] = False
+            generation[0] += 1
             if timer[0] is not None:
                 timer[0].cancel()
                 timer[0] = None
@@ -136,11 +143,14 @@ def status_line(verbose=True):
     def _resume():
         """Restart the animation.
 
-        Cancels any existing timer first to prevent
-        parallel chains from accumulating.
+        Increments the generation counter so any
+        stale timer callbacks from previous chains
+        are silently ignored.
         """
         with lock:
             active[0] = True
+            generation[0] += 1
+            gen = generation[0]
             if timer[0] is not None:  # pragma: no cover
                 timer[0].cancel()
             # Write first frame immediately under the lock
@@ -148,7 +158,7 @@ def status_line(verbose=True):
             sys.stderr.write(f"\r{frames[frame_idx[0]]}")
             sys.stderr.flush()
             frame_idx[0] = (frame_idx[0] + 1) % len(frames)
-            timer[0] = threading.Timer(interval, _tick)
+            timer[0] = threading.Timer(interval, _tick, args=(gen,))
             timer[0].daemon = True
             timer[0].start()
 
