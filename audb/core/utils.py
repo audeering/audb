@@ -9,8 +9,10 @@ import pyarrow.parquet as parquet
 
 import audbackend
 import audeer
+import audeer.core.tqdm
 from audeer.core.tqdm import _ANSI_COLOR_RESET
 from audeer.core.tqdm import _ansi_colour
+import audeer.core.utils
 
 from audb.core import define
 from audb.core.config import config
@@ -132,18 +134,34 @@ def status_line(verbose=True):
 
         def _patched_close():
             original_close()
-            _resume()
+            if active[0] is not None:
+                _resume()
 
         bar.close = _patched_close
         return bar
 
+    def _patch():
+        """Replace progress_bar in all modules that import it."""
+        audeer.progress_bar = _wrapped_progress_bar
+        audeer.core.tqdm.progress_bar = _wrapped_progress_bar
+        audeer.core.utils.audeer_progress_bar = _wrapped_progress_bar
+
+    def _restore():
+        """Restore original progress_bar references."""
+        audeer.progress_bar = original_progress_bar
+        audeer.core.tqdm.progress_bar = original_progress_bar
+        audeer.core.utils.audeer_progress_bar = original_progress_bar
+
     _resume()
-    audeer.progress_bar = _wrapped_progress_bar
+    _patch()
     try:
         yield
     finally:
-        audeer.progress_bar = original_progress_bar
+        _restore()
         _pause()
+        # Prevent _patched_close from restarting animation
+        # if tqdm.__del__ fires during interpreter shutdown
+        active[0] = None
 
 
 def is_empty(path: str) -> bool:

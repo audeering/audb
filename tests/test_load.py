@@ -532,7 +532,7 @@ def test_status_line(capsys):
 
     # verbose=True: animation is shown
     with status_line(verbose=True):
-        time.sleep(0.1)  # let timer fire at least once
+        time.sleep(0.5)  # let timer tick at least once
         captured = capsys.readouterr().err
         assert symbol in captured
 
@@ -541,7 +541,7 @@ def test_status_line(capsys):
         for _ in bar:
             pass
         bar.close()
-        time.sleep(0.1)
+        time.sleep(0.5)
         captured = capsys.readouterr().err
         assert symbol in captured
 
