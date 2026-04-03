@@ -87,7 +87,7 @@ def status_line(verbose=True):
         """Timer callback: write one frame and schedule the next."""
         with lock:
             if not active[0]:
-                return
+                return  # pragma: no cover
             sys.stderr.write(f"\r{frames[frame_idx[0]]}")
             sys.stderr.flush()
             frame_idx[0] = (frame_idx[0] + 1) % len(frames)
@@ -110,9 +110,15 @@ def status_line(verbose=True):
             sys.stderr.flush()
 
     def _resume():
-        """Restart the animation."""
+        """Restart the animation.
+
+        Cancels any existing timer first to prevent
+        parallel chains from accumulating.
+        """
         with lock:
             active[0] = True
+            if timer[0] is not None:
+                timer[0].cancel()
             # Write first frame immediately under the lock
             # so nothing can sneak in before it appears
             sys.stderr.write(f"\r{frames[frame_idx[0]]}")
@@ -131,8 +137,12 @@ def status_line(verbose=True):
             _resume()
             return bar
         original_close = bar.close
+        closed = [False]
 
         def _patched_close():
+            if closed[0]:
+                return
+            closed[0] = True
             original_close()
             if active[0] is not None:
                 _resume()
