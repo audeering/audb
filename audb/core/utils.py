@@ -52,11 +52,12 @@ def _status_frames():
     bar_pos = fmt.find("{bar}")
     if bar_pos > 0:
         prefix = " " * len(fmt[:bar_pos].format(percentage=0))
-        # Compute bar length: total columns minus non-bar parts
+        # Compute bar length: total columns minus non-bar parts.
+        # Use "00:00" for elapsed/remaining to match runtime width.
         non_bar = fmt.replace("{bar}", "").format(
             percentage=0,
             elapsed="00:00",
-            remaining="?",
+            remaining="00:00",
             desc=" " * audeer.config.TQDM_DESCLEN,
         )
         n = max(3, ncols - len(non_bar))
