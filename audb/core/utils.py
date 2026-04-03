@@ -45,30 +45,37 @@ def _status_frames():
         bright = char
         dim = char
 
-    # Compute padding to align with progress bar start.
-    # The format is e.g. "{percentage:3.0f}% {bar} ..." so the bar
-    # starts after "  0% " which is 5 chars. We use spaces only.
+    # Compute padding and bar length to match progress bar layout.
+    # The format is e.g. "{percentage:3.0f}% {bar} {elapsed}<{remaining} {desc:60}"
     fmt = audeer.config.TQDM_FORMAT
+    ncols = audeer.config.TQDM_COLUMNS or 100
     bar_pos = fmt.find("{bar}")
     if bar_pos > 0:
         prefix = " " * len(fmt[:bar_pos].format(percentage=0))
+        # Compute bar length: total columns minus non-bar parts
+        non_bar = fmt.replace("{bar}", "").format(
+            percentage=0,
+            elapsed="00:00",
+            remaining="?",
+            desc=" " * audeer.config.TQDM_DESCLEN,
+        )
+        n = max(3, ncols - len(non_bar))
     else:
         prefix = ""
+        n = 3
 
-    n = 3
-    # Pad to full terminal width so cursor sits at end of line,
-    # matching the progress bar behaviour.
-    ncols = audeer.config.TQDM_COLUMNS or 100
     visible_len = len(prefix) + n
     suffix = " " * max(0, ncols - visible_len)
 
-    # Bounce pattern: 0, 1, 2, 1
+    # Bounce pattern: 0, 1, ..., n-1, n-2, ..., 1
     indices = list(range(n)) + list(range(n - 2, 0, -1))
     frames = []
     for active in indices:
         parts = [bright if i == active else dim for i in range(n)]
         frames.append(prefix + "".join(parts) + suffix)
-    return frames
+    # Interval per frame: target ~2.5s per full bounce cycle
+    interval = 2.5 / max(len(frames), 1)
+    return frames, interval
 
 
 @contextmanager
@@ -93,7 +100,7 @@ def status_line(verbose=True):
         yield
         return
 
-    frames = _status_frames()
+    frames, interval = _status_frames()
     frame_idx = [0]
     timer = [None]
     lock = threading.Lock()
@@ -107,7 +114,7 @@ def status_line(verbose=True):
             sys.stderr.write(f"\r{frames[frame_idx[0]]}")
             sys.stderr.flush()
             frame_idx[0] = (frame_idx[0] + 1) % len(frames)
-            timer[0] = threading.Timer(0.3, _tick)
+            timer[0] = threading.Timer(interval, _tick)
             timer[0].daemon = True
             timer[0].start()
 
@@ -140,7 +147,7 @@ def status_line(verbose=True):
             sys.stderr.write(f"\r{frames[frame_idx[0]]}")
             sys.stderr.flush()
             frame_idx[0] = (frame_idx[0] + 1) % len(frames)
-            timer[0] = threading.Timer(0.3, _tick)
+            timer[0] = threading.Timer(interval, _tick)
             timer[0].daemon = True
             timer[0].start()
 

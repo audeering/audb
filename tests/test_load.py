@@ -501,30 +501,36 @@ def test_load_verbose(dbs):
 
 def test_status_frames():
     """Test _status_frames with different audeer configs."""
-    # Default config: coloured frames
-    frames = _status_frames()
-    assert len(frames) == 4  # bounce: 0, 1, 2, 1
+    # Default config: coloured frames matching bar length (26 chars)
+    frames, interval = _status_frames()
+    bar_char = audeer.config.TQDM_BAR[0]
+    n_chars = frames[0].count(bar_char)
+    assert n_chars == 26
+    # Bounce: 0..25..1 = 50 frames
+    assert len(frames) == 50
+    assert interval > 0
 
     # No bar character: falls back to "."
     original_bar = audeer.config.TQDM_BAR
     audeer.config.TQDM_BAR = None
-    frames = _status_frames()
-    assert len(frames) == 4
+    frames, _ = _status_frames()
+    assert len(frames) == 50
     audeer.config.TQDM_BAR = original_bar
 
     # No colours: plain characters without ANSI codes
     original_fg = audeer.config.TQDM_COLOUR
     audeer.config.TQDM_COLOUR = None
-    frames = _status_frames()
-    assert len(frames) == 4
+    frames, _ = _status_frames()
+    assert len(frames) == 50
     assert "\033[" not in frames[0]
     audeer.config.TQDM_COLOUR = original_fg
 
-    # No {bar} in format: no padding prefix
+    # No {bar} in format: no padding prefix, 3 chars fallback
     original_fmt = audeer.config.TQDM_FORMAT
     audeer.config.TQDM_FORMAT = "no bar here"
-    frames = _status_frames()
+    frames, _ = _status_frames()
     assert not frames[0].startswith(" ")
+    assert len(frames) == 4  # bounce: 0, 1, 2, 1
     audeer.config.TQDM_FORMAT = original_fmt
 
 
