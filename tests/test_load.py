@@ -520,6 +520,13 @@ def test_status_frames():
     assert "\033[" not in frames[0]
     audeer.config.TQDM_COLOUR = original_fg
 
+    # No {bar} in format: no padding prefix
+    original_fmt = audeer.config.TQDM_FORMAT
+    audeer.config.TQDM_FORMAT = "no bar here"
+    frames = _status_frames()
+    assert not frames[0].startswith(" ")
+    audeer.config.TQDM_FORMAT = original_fmt
+
 
 def test_status_line(capsys):
     """Test status_line shows animated status and restores after progress bars."""

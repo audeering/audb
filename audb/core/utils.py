@@ -45,13 +45,24 @@ def _status_frames():
         bright = char
         dim = char
 
+    # Compute padding to align with progress bar start.
+    # The format is e.g. "{percentage:3.0f}% {bar} ..." so the bar
+    # starts after "  0% " which is 5 chars.
+    fmt = audeer.config.TQDM_FORMAT
+    bar_pos = fmt.find("{bar}")
+    if bar_pos > 0:
+        # Render the prefix with percentage=0 to get the actual width
+        prefix = fmt[:bar_pos].format(percentage=0)
+    else:
+        prefix = ""
+
     n = 3
     # Bounce pattern: 0, 1, 2, 1
     indices = list(range(n)) + list(range(n - 2, 0, -1))
     frames = []
     for active in indices:
         parts = [bright if i == active else dim for i in range(n)]
-        frames.append("".join(parts))
+        frames.append(prefix + "".join(parts))
     return frames
 
 
