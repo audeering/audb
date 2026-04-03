@@ -56,12 +56,18 @@ def _status_frames():
         prefix = ""
 
     n = 3
+    # Pad to full terminal width so cursor sits at end of line,
+    # matching the progress bar behaviour.
+    ncols = audeer.config.TQDM_COLUMNS or 100
+    visible_len = len(prefix) + n
+    suffix = " " * max(0, ncols - visible_len)
+
     # Bounce pattern: 0, 1, 2, 1
     indices = list(range(n)) + list(range(n - 2, 0, -1))
     frames = []
     for active in indices:
         parts = [bright if i == active else dim for i in range(n)]
-        frames.append(prefix + "".join(parts))
+        frames.append(prefix + "".join(parts) + suffix)
     return frames
 
 
