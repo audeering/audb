@@ -519,46 +519,47 @@ def remove_media(
             # Track if we need to upload the dependency table again
             upload = False
 
-            for file in audeer.progress_bar(
+            with audeer.progress_bar(
                 files,
                 disable=not verbose,
                 desc=f"Remove media from v{version}",
-            ):
-                if file in deps.media:
-                    archive = deps.archive(file)
+            ) as pbar:
+                for file in pbar:
+                    if file in deps.media:
+                        archive = deps.archive(file)
 
-                    # if archive exists in this version,
-                    # remove file from it and re-publish
-                    remote_archive = backend_interface.join(
-                        "/", name, "media", archive + ".zip"
-                    )
-                    if backend_interface.exists(remote_archive, version):
-                        files_in_archive = backend_interface.get_archive(
-                            remote_archive,
-                            db_root,
-                            version,
+                        # if archive exists in this version,
+                        # remove file from it and re-publish
+                        remote_archive = backend_interface.join(
+                            "/", name, "media", archive + ".zip"
                         )
-
-                        if os.name == "nt":  # pragma: no cover
-                            files_in_archive = [
-                                file.replace(os.path.sep, "/")
-                                for file in files_in_archive
-                            ]
-
-                        # skip if file was already deleted
-                        if file in files_in_archive:
-                            os.remove(os.path.join(db_root, file))
-                            files_in_archive.remove(file)
-                            backend_interface.put_archive(
-                                db_root,
+                        if backend_interface.exists(remote_archive, version):
+                            files_in_archive = backend_interface.get_archive(
                                 remote_archive,
+                                db_root,
                                 version,
-                                files=files_in_archive,
                             )
 
-                    # mark file as removed
-                    deps._remove(file)
-                    upload = True
+                            if os.name == "nt":  # pragma: no cover
+                                files_in_archive = [
+                                    file.replace(os.path.sep, "/")
+                                    for file in files_in_archive
+                                ]
+
+                            # skip if file was already deleted
+                            if file in files_in_archive:
+                                os.remove(os.path.join(db_root, file))
+                                files_in_archive.remove(file)
+                                backend_interface.put_archive(
+                                    db_root,
+                                    remote_archive,
+                                    version,
+                                    files=files_in_archive,
+                                )
+
+                        # mark file as removed
+                        deps._remove(file)
+                        upload = True
 
             # upload dependencies
             if upload:

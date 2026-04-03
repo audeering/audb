@@ -102,41 +102,42 @@ def _cached_files(
     cached_files = []
     missing_files = []
 
-    for file in audeer.progress_bar(
+    with audeer.progress_bar(
         files,
         desc="Cached files",
         disable=not verbose,
-    ):
-        found = False
-        if f"db.{file}.csv" in deps.tables:
-            file_path = f"db.{file}.csv"
-        elif f"db.{file}.parquet" in deps.tables:
-            file_path = f"db.{file}.parquet"
-        else:
-            file_path = file
-        file_version = audeer.StrictVersion(deps.version(file_path))
-        for cache_version, cache_root, cache_deps in cached_versions:
-            if cache_version >= file_version:
-                if file_path in cache_deps:
-                    if deps.checksum(file_path) == cache_deps.checksum(file_path):
-                        path = os.path.join(cache_root, file_path)
-                        if flavor and flavor.format is not None:
-                            path = audeer.replace_file_extension(
-                                path,
-                                flavor.format,
-                            )
-                        if os.path.exists(path):
-                            found = True
-                            break
-        if found:
-            if flavor and flavor.format is not None:
-                file = audeer.replace_file_extension(
-                    file,
-                    flavor.format,
-                )
-            cached_files.append((cache_root, file))
-        else:
-            missing_files.append(file)
+    ) as pbar:
+        for file in pbar:
+            found = False
+            if f"db.{file}.csv" in deps.tables:
+                file_path = f"db.{file}.csv"
+            elif f"db.{file}.parquet" in deps.tables:
+                file_path = f"db.{file}.parquet"
+            else:
+                file_path = file
+            file_version = audeer.StrictVersion(deps.version(file_path))
+            for cache_version, cache_root, cache_deps in cached_versions:
+                if cache_version >= file_version:
+                    if file_path in cache_deps:
+                        if deps.checksum(file_path) == cache_deps.checksum(file_path):
+                            path = os.path.join(cache_root, file_path)
+                            if flavor and flavor.format is not None:
+                                path = audeer.replace_file_extension(
+                                    path,
+                                    flavor.format,
+                                )
+                            if os.path.exists(path):
+                                found = True
+                                break
+            if found:
+                if flavor and flavor.format is not None:
+                    file = audeer.replace_file_extension(
+                        file,
+                        flavor.format,
+                    )
+                cached_files.append((cache_root, file))
+            else:
+                missing_files.append(file)
 
     return cached_files, missing_files
 
@@ -876,8 +877,10 @@ def _missing_files(
         else:
             return os.path.exists(os.path.join(db_root, file))
 
-    pbar = audeer.progress_bar(files, desc=f"Missing {files_type}", disable=not verbose)
-    return [file for file in pbar if not is_cached(file)]
+    with audeer.progress_bar(
+        files, desc=f"Missing {files_type}", disable=not verbose
+    ) as pbar:
+        return [file for file in pbar if not is_cached(file)]
 
 
 def _remove_media(

@@ -82,9 +82,6 @@ def status_line(verbose=True):
     timer = [None]
     lock = threading.Lock()
     active = [True]
-    # Track how many progress bars are currently open.
-    # Only resume animation when all bars have closed.
-    depth = [0]
 
     def _tick():
         """Timer callback: write one frame and schedule the next."""
@@ -115,13 +112,10 @@ def status_line(verbose=True):
     def _resume():
         """Restart the animation.
 
-        Only resumes if no progress bars are open.
         Cancels any existing timer first to prevent
         parallel chains from accumulating.
         """
         with lock:
-            if depth[0] > 0:
-                return
             active[0] = True
             if timer[0] is not None:  # pragma: no cover
                 timer[0].cancel()
@@ -142,8 +136,6 @@ def status_line(verbose=True):
         if bar.disable:
             _resume()
             return bar
-        with lock:
-            depth[0] += 1
         original_close = bar.close
         closed = [False]
 
@@ -152,8 +144,6 @@ def status_line(verbose=True):
                 return
             closed[0] = True
             original_close()
-            with lock:
-                depth[0] -= 1
             if active[0] is not None:
                 _resume()
 

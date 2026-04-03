@@ -132,32 +132,33 @@ def _find_attachments(
 
     # add dependencies to new or updated attachments
     attachment_ids = []
-    for attachment_id in audeer.progress_bar(
+    with audeer.progress_bar(
         list(db.attachments),
         desc="Find attachments",
         disable=not verbose,
-    ):
-        # use one archive per attachment ID
-        path = db.attachments[attachment_id].path
-        if not os.path.exists(audeer.path(db_root, path)):
-            if path not in deps:
-                # Raise FileNotFoundError
-                #
-                # Attachment is not in deps,
-                # but its path does not exist on disk either.
-                # We call its `files` property
-                # which raises a FileNotFoundError in this case
-                db.attachments[attachment_id].files
-        else:
-            checksum = utils.md5(audeer.path(db_root, path))
-            if path not in deps or checksum != deps.checksum(path):
-                deps._add_attachment(
-                    file=path,
-                    version=version,
-                    archive=attachment_id,
-                    checksum=checksum,
-                )
-                attachment_ids.append(attachment_id)
+    ) as pbar:
+        for attachment_id in pbar:
+            # use one archive per attachment ID
+            path = db.attachments[attachment_id].path
+            if not os.path.exists(audeer.path(db_root, path)):
+                if path not in deps:
+                    # Raise FileNotFoundError
+                    #
+                    # Attachment is not in deps,
+                    # but its path does not exist on disk either.
+                    # We call its `files` property
+                    # which raises a FileNotFoundError in this case
+                    db.attachments[attachment_id].files
+            else:
+                checksum = utils.md5(audeer.path(db_root, path))
+                if path not in deps or checksum != deps.checksum(path):
+                    deps._add_attachment(
+                        file=path,
+                        version=version,
+                        archive=attachment_id,
+                        checksum=checksum,
+                    )
+                    attachment_ids.append(attachment_id)
 
     return list(attachment_ids)
 
@@ -296,15 +297,16 @@ def _find_tables(
 
     # new database tables
     tables = []
-    for table, file in audeer.progress_bar(
+    with audeer.progress_bar(
         zip(table_ids, table_files),
         desc="Find tables",
         disable=not verbose,
-    ):
-        checksum = utils.md5(os.path.join(db_root, file))
-        if file not in deps or checksum != deps.checksum(file):
-            deps._add_meta(file, version, checksum)
-            tables.append(table)
+    ) as pbar:
+        for table, file in pbar:
+            checksum = utils.md5(os.path.join(db_root, file))
+            if file not in deps or checksum != deps.checksum(file):
+                deps._add_meta(file, version, checksum)
+                tables.append(table)
 
     return tables
 
