@@ -131,17 +131,17 @@ class Shimmer:
         write = self._original_stdout_write or sys.stdout.write
         with self._lock:
             n = self._lines_below
-        # Always move up: +1 accounts for the newline
-        # printed by start() after the shimmer line.
-        up = n + 1
-        buf = [
-            SAVE_CURSOR,
-            f"\033[{up}A",
-            f"\r{self._prefix}{rendered_text}{self._suffix}{CLEAR_LINE_RIGHT}",
-            RESTORE_CURSOR,
-        ]
-        write("".join(buf))
-        sys.stdout.flush()
+            # Always move up: +1 accounts for the newline
+            # printed by start() after the shimmer line.
+            up = n + 1
+            buf = [
+                SAVE_CURSOR,
+                f"\033[{up}A",
+                f"\r{self._prefix}{rendered_text}{self._suffix}{CLEAR_LINE_RIGHT}",
+                RESTORE_CURSOR,
+            ]
+            write("".join(buf))
+            sys.stdout.flush()
 
     def _render_frame(self, center: float) -> str:
         """Render one frame with a bright window centered at *center*."""
