@@ -1,6 +1,7 @@
 import io
 import sys
 
+from audb.core import shimmer as shimmer_module
 from audb.core.shimmer import BOLD
 from audb.core.shimmer import RESET
 from audb.core.shimmer import Shimmer
@@ -38,7 +39,7 @@ def test_stderr_write_hook():
     assert shimmer._paused is False
 
 
-def test_write_hooks_preserve_stream_identity():
+def test_write_hooks_preserve_stream_identity(monkeypatch):
     """Ensure monkey-patching does not replace the stream objects.
 
     After start(), sys.stdout must still be the same object
@@ -46,6 +47,7 @@ def test_write_hooks_preserve_stream_identity():
     isatty(), encoding, etc. continues to work.
 
     """
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
     original_stdout = sys.stdout
     original_stderr = sys.stderr
     shimmer = Shimmer("", "test")
@@ -53,10 +55,82 @@ def test_write_hooks_preserve_stream_identity():
     try:
         assert sys.stdout is original_stdout
         assert sys.stderr is original_stderr
+        # write should be replaced with the hook
+        assert sys.stdout.write == shimmer._stdout_write_hook
     finally:
         shimmer.stop()
-    assert sys.stdout.write is original_stdout.write
-    assert sys.stderr.write is original_stderr.write
+    # After stop, write should no longer be the hook
+    assert sys.stdout.write != shimmer._stdout_write_hook
+
+
+def test_start_stop_tracks_newlines(monkeypatch):
+    """Integration test: start installs hook, stdout tracks newlines, stop restores."""
+    # Ensure stdout looks like a TTY for the shimmer to activate
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
+    original_write = sys.stdout.write
+
+    shimmer = Shimmer("", "test")
+    shimmer.start()
+    try:
+        # The hook should be installed
+        assert sys.stdout.write is not original_write
+        # Write text with newlines via the hooked stdout
+        sys.stdout.write("line1\nline2\nline3\n")
+        assert shimmer._lines_below == 3
+        # Write more
+        sys.stdout.write("another\n")
+        assert shimmer._lines_below == 4
+    finally:
+        shimmer.stop()
+
+    # After stop(), original write must be restored
+    assert sys.stdout.write is original_write
+
+
+def test_noop_when_not_a_tty(monkeypatch):
+    """Shimmer becomes a no-op when stdout is not a TTY."""
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: False)
+    original_write = sys.stdout.write
+
+    shimmer = Shimmer("", "test")
+    shimmer.start()
+    # Should not have patched stdout
+    assert sys.stdout.write is original_write
+    assert shimmer._noop is True
+    shimmer.stop()
+
+
+def test_noop_with_env_var(monkeypatch):
+    """Shimmer becomes a no-op when AUDB_NO_SHIMMER=1."""
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
+    monkeypatch.setenv("AUDB_NO_SHIMMER", "1")
+    original_write = sys.stdout.write
+
+    shimmer = Shimmer("", "test")
+    shimmer.start()
+    assert sys.stdout.write is original_write
+    assert shimmer._noop is True
+    shimmer.stop()
+
+
+def test_second_shimmer_becomes_noop(monkeypatch):
+    """Only one Shimmer can be active; a second one becomes a no-op."""
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
+
+    s1 = Shimmer("", "first")
+    s1.start()
+    try:
+        s2 = Shimmer("", "second")
+        s2.start()
+        assert s2._noop is True
+        s2.stop()
+        # s1 should still be the active shimmer
+        assert shimmer_module._active_shimmer is s1
+    finally:
+        s1.stop()
+
+    # After both stopped, no active shimmer
+    assert shimmer_module._active_shimmer is None
 
 
 def test_render_frame():
