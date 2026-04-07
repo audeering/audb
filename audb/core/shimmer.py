@@ -26,10 +26,8 @@ class Shimmer:
 
     Args:
         prefix: static text before the animated portion
-            (e.g. ``"Get:   "``).
         text: the text to animate (e.g. the database name).
         suffix: static text after the animated portion
-            (e.g. ``" v1.0.0"``).
         interval: seconds between animation frames.
         width: number of characters in the bright window.
 
