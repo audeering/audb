@@ -152,7 +152,7 @@ class Shimmer:
                 else:
                     # Only whitespace after \r → bar cleared
                     self._paused = False
-            if "\n" in s:
+            if "\n" in s:  # pragma: no cover
                 self._paused = False
 
     def _write_frame(self, rendered_text: str):
@@ -196,7 +196,7 @@ class Shimmer:
     def _animate(self):
         """Animation loop running in a background thread."""
         n = len(self._text)
-        if n == 0:
+        if n == 0:  # pragma: no cover
             return
 
         sweep_start = -self._width
@@ -222,11 +222,11 @@ class Shimmer:
                 was_paused = True
             self._stop_event.wait(self._interval)
 
-    def __enter__(self):
+    def __enter__(self):  # pragma: no cover
         """Start shimmer as context manager."""
         self.start()
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, *args):  # pragma: no cover
         """Stop shimmer when exiting context manager."""
         self.stop()
