@@ -341,6 +341,7 @@ def load_to(
     db_root = audeer.path(root, follow_symlink=True)
     db_root_tmp = database_tmp_root(db_root)
 
+    shimmer = None
     if verbose:  # pragma: no cover
         shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
@@ -484,7 +485,7 @@ def load_to(
             )
 
     finally:
-        if verbose:  # pragma: no cover
+        if shimmer is not None:  # pragma: no cover
             shimmer.stop()
 
     # remove the temporal directory

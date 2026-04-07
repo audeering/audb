@@ -739,6 +739,7 @@ def publish(
         verbose=verbose,
     )
 
+    shimmer = None
     if verbose:  # pragma: no cover
         shimmer = Shimmer("Put:   ", f"{db.name} v{version}")
         shimmer.start()
@@ -956,7 +957,7 @@ def publish(
                     backend_interface.remove_file(remote_header, version)
 
     finally:
-        if verbose:  # pragma: no cover
+        if shimmer is not None:  # pragma: no cover
             shimmer.stop()
 
     return deps
