@@ -14,8 +14,8 @@ def test_stdout_write_hook():
     shimmer = Shimmer("", "test")
     shimmer._original_stdout_write = buf.write
 
-    result = shimmer._stdout_write_hook("hello\nworld\n")
-    assert result == 12
+    num_chars = shimmer._stdout_write_hook("hello\nworld\n")
+    assert num_chars == 12
     assert buf.getvalue() == "hello\nworld\n"
     assert shimmer._lines_below == 2
 
