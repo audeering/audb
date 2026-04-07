@@ -344,7 +344,7 @@ def load_to(
     if verbose:  # pragma: no cover
         shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
-        print(f"Root: {db_root}")
+        print(f"To: {db_root}")
 
     try:
         # remove files with a wrong checksum
