@@ -126,18 +126,19 @@ def test_animate_paused_clears_bold(monkeypatch):
     monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
     frames = []
     shimmer = Shimmer("", "hello", interval=0.01)
+
+    # Patch _write_frame before start() to avoid race with animation thread
+    original_write_frame = shimmer._write_frame
+
+    def capture_frame(rendered_text):
+        frames.append(rendered_text)
+        original_write_frame(rendered_text)
+
+    shimmer._write_frame = capture_frame
     shimmer.start()
     try:
-        # Capture frames written by the animation thread
-        original_write_frame = shimmer._write_frame
-
-        def capture_frame(rendered_text):
-            frames.append(rendered_text)
-            original_write_frame(rendered_text)
-
-        shimmer._write_frame = capture_frame
         # Let animation run a couple of frames unpaused
-        time.sleep(0.05)
+        time.sleep(0.2)
         # At least one animated frame should contain BOLD
         assert any(BOLD in f for f in frames)
         # Simulate a progress bar pausing the shimmer
@@ -145,7 +146,7 @@ def test_animate_paused_clears_bold(monkeypatch):
         with shimmer._lock:
             shimmer._paused = True
         # Let the animation loop pick up the paused state
-        time.sleep(0.05)
+        time.sleep(0.2)
         # The paused frame should be plain text without BOLD
         assert len(frames) == 1
         assert BOLD not in frames[0]
