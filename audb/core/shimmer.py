@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import io
 import math
 import sys
 import threading
@@ -14,39 +13,6 @@ RESET = "\033[0m"
 SAVE_CURSOR = "\033[s"
 RESTORE_CURSOR = "\033[u"
 CLEAR_LINE_RIGHT = "\033[K"
-
-
-class _StreamProxy(io.TextIOBase):
-    """Proxy for a text stream that observes writes.
-
-    Calls *on_write* for every ``write()`` so the shimmer
-    can count newlines and detect progress-bar activity.
-
-    """
-
-    def __init__(self, target: io.TextIOBase, on_write):
-        self._target = target
-        self._on_write = on_write
-
-    def write(self, s: str) -> int:
-        self._on_write(s)
-        return self._target.write(s)
-
-    def flush(self):
-        self._target.flush()
-
-    def fileno(self):
-        return self._target.fileno()
-
-    @property
-    def encoding(self):
-        return self._target.encoding
-
-    def isatty(self):
-        return self._target.isatty()
-
-    def writable(self):
-        return True
 
 
 class Shimmer:
@@ -88,23 +54,21 @@ class Shimmer:
         self._lines_below = 0
         self._paused = False
         self._lock = threading.Lock()
-        self._original_stdout: io.TextIOBase | None = None
-        self._original_stderr: io.TextIOBase | None = None
-        self._stdout_proxy: _StreamProxy | None = None
-        self._stderr_proxy: _StreamProxy | None = None
+        self._original_stdout_write = None
+        self._original_stderr_write = None
 
     def start(self):
         """Start the shimmer animation in a background thread."""
-        self._original_stdout = sys.stdout
-        self._original_stderr = sys.stderr
         # Print the initial static line with a newline
         # so subsequent output appears below it.
-        self._original_stdout.write(f"{self._prefix}{self._text}{self._suffix}\n")
-        self._original_stdout.flush()
-        self._stdout_proxy = _StreamProxy(self._original_stdout, self._on_stdout_write)
-        self._stderr_proxy = _StreamProxy(self._original_stderr, self._on_stderr_write)
-        sys.stdout = self._stdout_proxy
-        sys.stderr = self._stderr_proxy
+        sys.stdout.write(f"{self._prefix}{self._text}{self._suffix}\n")
+        sys.stdout.flush()
+        # Monkey-patch write() on the existing stream objects
+        # so all other attributes (fileno, encoding, isatty, …) stay intact.
+        self._original_stdout_write = sys.stdout.write
+        self._original_stderr_write = sys.stderr.write
+        sys.stdout.write = self._stdout_write_hook
+        sys.stderr.write = self._stderr_write_hook
         self._thread = threading.Thread(target=self._animate, daemon=True)
         self._thread.start()
 
@@ -113,23 +77,24 @@ class Shimmer:
         self._stop_event.set()
         if self._thread is not None:
             self._thread.join()
-        # Restore original streams
-        if self._original_stdout is not None:
-            sys.stdout = self._original_stdout
-        if self._original_stderr is not None:
-            sys.stderr = self._original_stderr
+        # Restore original write methods
+        if self._original_stdout_write is not None:
+            sys.stdout.write = self._original_stdout_write
+        if self._original_stderr_write is not None:
+            sys.stderr.write = self._original_stderr_write
         # Write final static line over the animated one
         self._write_frame(self._text)
 
-    def _on_stdout_write(self, s: str):
-        """Track newlines from stdout to update line count."""
+    def _stdout_write_hook(self, s: str) -> int:
+        """Wrap stdout.write to track newlines."""
         count = s.count("\n")
         if count:
             with self._lock:
                 self._lines_below += count
+        return self._original_stdout_write(s)
 
-    def _on_stderr_write(self, s: str):
-        r"""Detect progress-bar activity on stderr.
+    def _stderr_write_hook(self, s: str) -> int:
+        r"""Wrap stderr.write to detect progress-bar activity.
 
         Progress bars (tqdm) write ``\r`` followed by bar content
         to update in-place. When the bar finishes with
@@ -154,6 +119,7 @@ class Shimmer:
                     self._paused = False
             if "\n" in s:  # pragma: no cover
                 self._paused = False
+        return self._original_stderr_write(s)
 
     def _write_frame(self, rendered_text: str):
         """Write a single frame to the terminal.
@@ -162,7 +128,7 @@ class Shimmer:
         rewrites it, then moves back down.
 
         """
-        out = self._original_stdout
+        write = self._original_stdout_write or sys.stdout.write
         with self._lock:
             n = self._lines_below
         # Always move up: +1 accounts for the newline
@@ -174,8 +140,8 @@ class Shimmer:
             f"\r{self._prefix}{rendered_text}{self._suffix}{CLEAR_LINE_RIGHT}",
             RESTORE_CURSOR,
         ]
-        out.write("".join(buf))
-        out.flush()
+        write("".join(buf))
+        sys.stdout.flush()
 
     def _render_frame(self, center: float) -> str:
         """Render one frame with a bright window centered at *center*."""

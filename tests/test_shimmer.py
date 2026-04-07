@@ -1,54 +1,62 @@
 import io
+import sys
 
 from audb.core.shimmer import BOLD
 from audb.core.shimmer import RESET
 from audb.core.shimmer import Shimmer
-from audb.core.shimmer import _StreamProxy
 
 
-def test_stream_proxy_isatty():
-    """Ensure _StreamProxy delegates isatty() to the target stream.
+def test_stdout_write_hook():
+    """Ensure stdout write hook tracks newlines and delegates."""
+    buf = io.StringIO()
+    shimmer = Shimmer("", "test")
+    shimmer._original_stdout_write = buf.write
 
-    tqdm checks isatty() to decide whether to render progress bars.
-    If the proxy returns False for a TTY target, bars silently vanish.
-
-    """
-
-    class FakeTTY(io.StringIO):
-        def isatty(self):
-            return True
-
-    class FakeNonTTY(io.StringIO):
-        def isatty(self):
-            return False
-
-    proxy_tty = _StreamProxy(FakeTTY(), on_write=lambda s: None)
-    assert proxy_tty.isatty() is True
-
-    proxy_non_tty = _StreamProxy(FakeNonTTY(), on_write=lambda s: None)
-    assert proxy_non_tty.isatty() is False
+    result = shimmer._stdout_write_hook("hello\nworld\n")
+    assert result == 12
+    assert buf.getvalue() == "hello\nworld\n"
+    assert shimmer._lines_below == 2
 
 
-def test_stream_proxy_fileno():
-    """Ensure _StreamProxy delegates fileno() to the target stream."""
+def test_stderr_write_hook():
+    r"""Ensure stderr write hook detects progress-bar activity.
 
-    class FakeStream(io.StringIO):
-        def fileno(self):
-            return 42
-
-    proxy = _StreamProxy(FakeStream(), on_write=lambda s: None)
-    assert proxy.fileno() == 42
-
-
-def test_stream_proxy_writable():
-    """Ensure _StreamProxy reports as writable.
-
-    Code that checks writable() before writing
-    would skip the proxy otherwise.
+    A ``\r`` followed by visible content pauses the shimmer,
+    and ``\r`` followed by only whitespace resumes it.
 
     """
-    proxy = _StreamProxy(io.StringIO(), on_write=lambda s: None)
-    assert proxy.writable() is True
+    buf = io.StringIO()
+    shimmer = Shimmer("", "test")
+    shimmer._original_stderr_write = buf.write
+
+    # Visible bar content after \r → pause
+    shimmer._stderr_write_hook("\r50%|####")
+    assert shimmer._paused is True
+
+    # Only whitespace after \r → resume
+    shimmer._stderr_write_hook("\r   \r")
+    assert shimmer._paused is False
+
+
+def test_write_hooks_preserve_stream_identity():
+    """Ensure monkey-patching does not replace the stream objects.
+
+    After start(), sys.stdout must still be the same object
+    (not a proxy), so that attribute access like fileno(),
+    isatty(), encoding, etc. continues to work.
+
+    """
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+    shimmer = Shimmer("", "test")
+    shimmer.start()
+    try:
+        assert sys.stdout is original_stdout
+        assert sys.stderr is original_stderr
+    finally:
+        shimmer.stop()
+    assert sys.stdout.write is original_stdout.write
+    assert sys.stderr.write is original_stderr.write
 
 
 def test_render_frame():
