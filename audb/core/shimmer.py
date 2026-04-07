@@ -205,6 +205,7 @@ class Shimmer:
         pos = 0.0
         speed = 0.8  # characters per frame
 
+        was_paused = False
         while not self._stop_event.is_set():
             with self._lock:
                 paused = self._paused
@@ -213,6 +214,12 @@ class Shimmer:
                 frame = self._render_frame(center)
                 self._write_frame(frame)
                 pos += speed
+                was_paused = False
+            elif not was_paused:
+                # Write plain text on first paused frame
+                # to clear any leftover bold highlighting.
+                self._write_frame(self._text)
+                was_paused = True
             self._stop_event.wait(self._interval)
 
     def __enter__(self):
