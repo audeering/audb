@@ -1157,7 +1157,6 @@ def load(
             name,
             version=version,
             cache_root=cache_root,
-            verbose=verbose,
         )
 
         try:
@@ -1365,7 +1364,6 @@ def load_attachment(
             name,
             version=version,
             cache_root=cache_root,
-            verbose=verbose,
         )
 
         if attachment not in deps.archives:
@@ -1601,7 +1599,6 @@ def load_media(
             name,
             version=version,
             cache_root=cache_root,
-            verbose=verbose,
         )
 
         available_files = set(deps.media)
@@ -1766,7 +1763,6 @@ def load_table(
             name,
             version=version,
             cache_root=cache_root,
-            verbose=verbose,
         )
 
         if table not in deps.table_ids:
