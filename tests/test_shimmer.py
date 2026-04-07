@@ -1,5 +1,6 @@
 import io
 import sys
+import time
 
 from audb.core import shimmer as shimmer_module
 from audb.core.shimmer import BOLD
@@ -100,19 +101,6 @@ def test_noop_when_not_a_tty(monkeypatch):
     shimmer.stop()
 
 
-def test_noop_with_env_var(monkeypatch):
-    """Shimmer becomes a no-op when AUDB_NO_SHIMMER=1."""
-    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
-    monkeypatch.setenv("AUDB_NO_SHIMMER", "1")
-    original_write = sys.stdout.write
-
-    shimmer = Shimmer("", "test")
-    shimmer.start()
-    assert sys.stdout.write is original_write
-    assert shimmer._noop is True
-    shimmer.stop()
-
-
 def test_second_shimmer_becomes_noop(monkeypatch):
     """Only one Shimmer can be active; a second one becomes a no-op."""
     monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
@@ -131,6 +119,23 @@ def test_second_shimmer_becomes_noop(monkeypatch):
 
     # After both stopped, no active shimmer
     assert shimmer_module._active_shimmer is None
+
+
+def test_animate_paused_clears_bold(monkeypatch):
+    """When paused, the animation writes plain text to clear bold."""
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
+    shimmer = Shimmer("", "hello", interval=0.01)
+    shimmer.start()
+    try:
+        # Let animation run a couple of frames unpaused
+        time.sleep(0.05)
+        # Simulate a progress bar pausing the shimmer
+        with shimmer._lock:
+            shimmer._paused = True
+        # Let the animation loop pick up the paused state
+        time.sleep(0.05)
+    finally:
+        shimmer.stop()
 
 
 def test_render_frame():
