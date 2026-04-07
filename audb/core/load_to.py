@@ -14,6 +14,7 @@ from audb.core.api import latest_version
 from audb.core.dependencies import Dependencies
 from audb.core.load import database_tmp_root
 from audb.core.load import load_header_to
+from audb.core.shimmer import Shimmer
 
 
 def _find_attachments(
@@ -340,101 +341,70 @@ def load_to(
     db_root = audeer.path(root, follow_symlink=True)
     db_root_tmp = database_tmp_root(db_root)
 
-    # remove files with a wrong checksum
-    # to ensure we load correct version
-    update = os.path.exists(db_root) and os.listdir(db_root)
-    audeer.mkdir(db_root)
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
-    if update:
-        if only_metadata:
-            files = deps.tables
-        else:
-            files = deps.attachments + deps.files
-        for file in files:
-            full_file = os.path.join(db_root, file)
-            if os.path.exists(full_file):
-                checksum = utils.md5(full_file)
-                if checksum != deps.checksum(file):
-                    if os.path.isdir(full_file):
-                        audeer.rmdir(full_file)
-                    else:
-                        os.remove(full_file)
+    if verbose:  # pragma: no cover
+        shimmer = Shimmer("Get:   ", f"{name} v{version}")
+        shimmer.start()
+        print(f"Root: {db_root}")
 
-    # load database header without tables from backend
-
-    db_header, backend_interface = load_header_to(
-        db_root_tmp,
-        name,
-        version,
-        overwrite=True,
-    )
-    db_header.save(db_root_tmp, header_only=True)
-
-    # get altered and new attachments
-
-    if not only_metadata:
-        attachments = _find_attachments(
-            db_root,
-            deps,
-        )
-        _get_attachments(
-            attachments,
-            db_root,
-            db_root_tmp,
-            name,
-            deps,
-            backend_interface,
-            num_workers,
-            verbose,
-        )
-
-    # get altered and new tables
-
-    tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
-    _get_tables(
-        tables,
-        db_root,
-        db_root_tmp,
-        name,
-        deps,
-        backend_interface,
-        num_workers,
-        verbose,
-    )
-
-    # load database
-
-    # move header to root and load database ...
-    audeer.move_file(
-        os.path.join(db_root_tmp, define.HEADER_FILE),
-        os.path.join(db_root, define.HEADER_FILE),
-    )
     try:
-        db = audformat.Database.load(
-            db_root,
-            num_workers=num_workers,
+        # remove files with a wrong checksum
+        # to ensure we load correct version
+        update = os.path.exists(db_root) and os.listdir(db_root)
+        audeer.mkdir(db_root)
+        deps = dependencies(
+            name,
+            version=version,
+            cache_root=cache_root,
             verbose=verbose,
         )
-    except (KeyboardInterrupt, Exception):  # pragma: no cover
-        # make sure to remove header if user interrupts
-        os.remove(os.path.join(db_root, define.HEADER_FILE))
-        raise
+        if update:
+            if only_metadata:
+                files = deps.tables
+            else:
+                files = deps.attachments + deps.files
+            for file in files:
+                full_file = os.path.join(db_root, file)
+                if os.path.exists(full_file):
+                    checksum = utils.md5(full_file)
+                    if checksum != deps.checksum(file):
+                        if os.path.isdir(full_file):
+                            audeer.rmdir(full_file)
+                        else:
+                            os.remove(full_file)
 
-    # afterwards remove header to avoid the database
-    # can be loaded before download is complete
-    os.remove(os.path.join(db_root, define.HEADER_FILE))
+        # load database header without tables from backend
 
-    # get altered and new media files
+        db_header, backend_interface = load_header_to(
+            db_root_tmp,
+            name,
+            version,
+            overwrite=True,
+        )
+        db_header.save(db_root_tmp, header_only=True)
 
-    if not only_metadata:
-        media = _find_media(db, db_root, deps, num_workers, verbose)
-        _get_media(
-            media,
+        # get altered and new attachments
+
+        if not only_metadata:
+            attachments = _find_attachments(
+                db_root,
+                deps,
+            )
+            _get_attachments(
+                attachments,
+                db_root,
+                db_root_tmp,
+                name,
+                deps,
+                backend_interface,
+                num_workers,
+                verbose,
+            )
+
+        # get altered and new tables
+
+        tables = _find_tables(db_header, db_root, deps, num_workers, verbose)
+        _get_tables(
+            tables,
             db_root,
             db_root_tmp,
             name,
@@ -444,37 +414,78 @@ def load_to(
             verbose,
         )
 
-    # save dependencies
+        # load database
 
-    dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCY_FILE)
-    deps.save(dep_path_tmp)
-    audeer.move_file(
-        dep_path_tmp,
-        os.path.join(db_root, define.DEPENDENCY_FILE),
-    )
-
-    # save database and PKL tables
-
-    if pickle_tables:
-        # Store database header,
-        # and add table as pickle files
-        # (tables are already stored in their original format).
-        # Uses `num_workers` to save tables in parallel.
-        db.save(
-            db_root,
-            storage_format=audformat.define.TableStorageFormat.PICKLE,
-            update_other_formats=False,
-            num_workers=num_workers,
-            verbose=verbose,
+        # move header to root and load database ...
+        audeer.move_file(
+            os.path.join(db_root_tmp, define.HEADER_FILE),
+            os.path.join(db_root, define.HEADER_FILE),
         )
-    else:
-        # Store database header
-        # (tables are already stored)
-        db.save(
-            db_root,
-            header_only=True,
-            verbose=verbose,
+        try:
+            db = audformat.Database.load(
+                db_root,
+                num_workers=num_workers,
+                verbose=verbose,
+            )
+        except (KeyboardInterrupt, Exception):  # pragma: no cover
+            # make sure to remove header if user interrupts
+            os.remove(os.path.join(db_root, define.HEADER_FILE))
+            raise
+
+        # afterwards remove header to avoid the database
+        # can be loaded before download is complete
+        os.remove(os.path.join(db_root, define.HEADER_FILE))
+
+        # get altered and new media files
+
+        if not only_metadata:
+            media = _find_media(db, db_root, deps, num_workers, verbose)
+            _get_media(
+                media,
+                db_root,
+                db_root_tmp,
+                name,
+                deps,
+                backend_interface,
+                num_workers,
+                verbose,
+            )
+
+        # save dependencies
+
+        dep_path_tmp = os.path.join(db_root_tmp, define.DEPENDENCY_FILE)
+        deps.save(dep_path_tmp)
+        audeer.move_file(
+            dep_path_tmp,
+            os.path.join(db_root, define.DEPENDENCY_FILE),
         )
+
+        # save database and PKL tables
+
+        if pickle_tables:
+            # Store database header,
+            # and add table as pickle files
+            # (tables are already stored in their original format).
+            # Uses `num_workers` to save tables in parallel.
+            db.save(
+                db_root,
+                storage_format=audformat.define.TableStorageFormat.PICKLE,
+                update_other_formats=False,
+                num_workers=num_workers,
+                verbose=verbose,
+            )
+        else:
+            # Store database header
+            # (tables are already stored)
+            db.save(
+                db_root,
+                header_only=True,
+                verbose=verbose,
+            )
+
+    finally:
+        if verbose:  # pragma: no cover
+            shimmer.stop()
 
     # remove the temporal directory
     # to signal all files were correctly loaded
