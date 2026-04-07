@@ -90,20 +90,15 @@ def available(
                     # Avoid `ls(recursive=True)` for S3 and MinIO
                     # as this is slow for large databases
                     for obj in backend._client.list_objects(repository.name):
+                        sub_folders = backend._client.list_objects(
+                            repository.name, obj.object_name
+                        )
                         name = obj.object_name[:-1]  # remove "/" at end
-                        header_file = f"/{name}/{define.HEADER_FILE}"
-                        for _obj in backend._client.list_objects(
-                            repository.name, f"{name}/"
-                        ):
-                            version = _obj.object_name.split("/")[1]
-                            header_file = f"/{name}/{version}/{define.HEADER_FILE}"
-                            if version not in [
-                                "attachment",
-                                "media",
-                                "meta",
-                            ] and backend.exists(header_file):
-                                add_database(name, version, repository)
-
+                        for sub_folder in sub_folders:
+                            version = sub_folder.object_name.split("/")[1]
+                            if version in ["attachment", "media", "meta"]:
+                                continue
+                            add_database(name, version, repository)
                 else:
                     for path, version in backend_interface.ls("/"):
                         if path.endswith(define.HEADER_FILE):
