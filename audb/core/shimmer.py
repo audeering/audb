@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import os
 import sys
 import threading
 
@@ -13,6 +14,10 @@ RESET = "\033[0m"
 SAVE_CURSOR = "\033[s"
 RESTORE_CURSOR = "\033[u"
 CLEAR_LINE_RIGHT = "\033[K"
+
+# Global lock and reference for enforcing single active Shimmer
+_active_lock = threading.Lock()
+_active_shimmer: Shimmer | None = None
 
 
 class Shimmer:
@@ -54,9 +59,42 @@ class Shimmer:
         self._lock = threading.Lock()
         self._original_stdout_write = None
         self._original_stderr_write = None
+        self._noop = False
 
     def start(self):
-        """Start the shimmer animation in a background thread."""
+        """Start the shimmer animation in a background thread.
+
+        The animation is silently skipped (no-op) when:
+
+        * ``sys.stdout`` is not a TTY
+          (e.g. redirected output, Jupyter, CI logs).
+        * The environment variable ``AUDB_NO_SHIMMER=1`` is set.
+        * Another ``Shimmer`` instance is already active
+          (only one may run at a time).
+
+        """
+        global _active_shimmer
+
+        # Skip animation in non-interactive environments
+        if (
+            not hasattr(sys.stdout, "isatty")
+            or not sys.stdout.isatty()
+            or os.environ.get("AUDB_NO_SHIMMER", "") == "1"
+        ):
+            sys.stdout.write(f"{self._prefix}{self._text}{self._suffix}\n")
+            sys.stdout.flush()
+            self._noop = True
+            return
+
+        # Enforce single active Shimmer
+        with _active_lock:
+            if _active_shimmer is not None:
+                sys.stdout.write(f"{self._prefix}{self._text}{self._suffix}\n")
+                sys.stdout.flush()
+                self._noop = True
+                return
+            _active_shimmer = self
+
         # Print the initial static line with a newline
         # so subsequent output appears below it.
         sys.stdout.write(f"{self._prefix}{self._text}{self._suffix}\n")
@@ -72,6 +110,11 @@ class Shimmer:
 
     def stop(self):
         """Stop the animation and restore streams."""
+        global _active_shimmer
+
+        if self._noop:
+            return
+
         self._stop_event.set()
         if self._thread is not None:
             self._thread.join()
@@ -82,6 +125,10 @@ class Shimmer:
             sys.stderr.write = self._original_stderr_write
         # Write final static line over the animated one
         self._write_frame(self._text)
+
+        with _active_lock:
+            if _active_shimmer is self:
+                _active_shimmer = None
 
     def _stdout_write_hook(self, s: str) -> int:
         """Wrap stdout.write to track newlines."""
