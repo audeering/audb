@@ -29,6 +29,17 @@ def test_stream_proxy_isatty():
     assert proxy_non_tty.isatty() is False
 
 
+def test_stream_proxy_fileno():
+    """Ensure _StreamProxy delegates fileno() to the target stream."""
+
+    class FakeStream(io.StringIO):
+        def fileno(self):
+            return 42
+
+    proxy = _StreamProxy(FakeStream(), on_write=lambda s: None)
+    assert proxy.fileno() == 42
+
+
 def test_stream_proxy_writable():
     """Ensure _StreamProxy reports as writable.
 
