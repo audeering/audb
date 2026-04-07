@@ -1148,7 +1148,7 @@ def load(
     scan_for_missing_files = not is_empty(db_root)
 
     if verbose:  # pragma: no cover
-        shimmer = Shimmer("Get:   ", name, f" v{version}")
+        shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
         print(f"Cache: {db_root}")
 
@@ -1356,7 +1356,7 @@ def load_attachment(
     db_root = database_cache_root(name, version, cache_root)
 
     if verbose:  # pragma: no cover
-        shimmer = Shimmer("Get:   ", name, f" v{version}")
+        shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
         print(f"Cache: {db_root}")
 
@@ -1592,7 +1592,7 @@ def load_media(
     scan_for_missing_files = not is_empty(db_root)
 
     if verbose:  # pragma: no cover
-        shimmer = Shimmer("Get:   ", name, f" v{version}")
+        shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
         print(f"Cache: {db_root}")
 
@@ -1757,7 +1757,7 @@ def load_table(
     scan_for_missing_files = not is_empty(db_root)
 
     if verbose:  # pragma: no cover
-        shimmer = Shimmer("Get:   ", name, f" v{version}")
+        shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
         print(f"Cache: {db_root}")
 
