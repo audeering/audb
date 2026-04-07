@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import math
-import os
 import sys
 import threading
 
@@ -68,7 +67,6 @@ class Shimmer:
 
         * ``sys.stdout`` is not a TTY
           (e.g. redirected output, Jupyter, CI logs).
-        * The environment variable ``AUDB_NO_SHIMMER=1`` is set.
         * Another ``Shimmer`` instance is already active
           (only one may run at a time).
 
@@ -76,11 +74,7 @@ class Shimmer:
         global _active_shimmer
 
         # Skip animation in non-interactive environments
-        if (
-            not hasattr(sys.stdout, "isatty")
-            or not sys.stdout.isatty()
-            or os.environ.get("AUDB_NO_SHIMMER", "") == "1"
-        ):
+        if not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty():
             sys.stdout.write(f"{self._prefix}{self._text}{self._suffix}\n")
             sys.stdout.flush()
             self._noop = True
