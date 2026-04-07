@@ -1147,6 +1147,7 @@ def load(
     db_root = database_cache_root(name, version, cache_root, flavor)
     scan_for_missing_files = not is_empty(db_root)
 
+    shimmer = None
     if verbose:  # pragma: no cover
         shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
@@ -1307,7 +1308,7 @@ def load(
             utils.timeout_warning()
 
     finally:
-        if verbose:  # pragma: no cover
+        if shimmer is not None:  # pragma: no cover
             shimmer.stop()
 
     return db
@@ -1354,6 +1355,7 @@ def load_attachment(
 
     db_root = database_cache_root(name, version, cache_root)
 
+    shimmer = None
     if verbose:  # pragma: no cover
         shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
@@ -1399,7 +1401,7 @@ def load_attachment(
             )
 
     finally:
-        if verbose:  # pragma: no cover
+        if shimmer is not None:  # pragma: no cover
             shimmer.stop()
 
     attachment_files = db.attachments[attachment].files
@@ -1589,6 +1591,7 @@ def load_media(
     db_root = database_cache_root(name, version, cache_root, flavor)
     scan_for_missing_files = not is_empty(db_root)
 
+    shimmer = None
     if verbose:  # pragma: no cover
         shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
@@ -1657,7 +1660,7 @@ def load_media(
             utils.timeout_warning()
 
     finally:
-        if verbose:  # pragma: no cover
+        if shimmer is not None:  # pragma: no cover
             shimmer.stop()
 
     return files
@@ -1753,6 +1756,7 @@ def load_table(
     db_root = database_cache_root(name, version, cache_root)
     scan_for_missing_files = not is_empty(db_root)
 
+    shimmer = None
     if verbose:  # pragma: no cover
         shimmer = Shimmer("Get:   ", f"{name} v{version}")
         shimmer.start()
@@ -1818,7 +1822,7 @@ def load_table(
                 db[_table].load(table_file)
 
     finally:
-        if verbose:  # pragma: no cover
+        if shimmer is not None:  # pragma: no cover
             shimmer.stop()
 
     if map is None:
