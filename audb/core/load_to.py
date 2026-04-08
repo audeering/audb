@@ -61,7 +61,7 @@ def _find_media(
         params=[([file], {}) for file in db.files],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description="Find media",
+        task_description="Scan media",
         maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
@@ -110,7 +110,7 @@ def _find_tables(
         params=[([table], {}) for table in list(db_header)],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description="Find tables",
+        task_description="Scan tables",
         maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 

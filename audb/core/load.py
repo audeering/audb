@@ -878,7 +878,7 @@ def _missing_files(
         else:
             return os.path.exists(os.path.join(db_root, file))
 
-    pbar = audeer.progress_bar(files, desc=f"Missing {files_type}", disable=not verbose)
+    pbar = audeer.progress_bar(files, desc=f"Scan {files_type}", disable=not verbose)
     return [file for file in pbar if not is_cached(file)]
 
 
