@@ -43,9 +43,13 @@ jobs:
 
     # Documentation
     - name: Install doc dependencies
-      run: |
-        sudo apt-get install --no-install-recommends --yes libsndfile1 sox
-        sudo apt-get install --yes graphviz
+      uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05  # v1.6.0
+      with:
+        packages: libsndfile1 sox graphviz
+        version: 1.0
+
+    - name: Register graphviz plugins
+      run: sudo dot -c
 
     - name: Build documentation
       run: |

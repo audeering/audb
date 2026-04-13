@@ -33,13 +33,20 @@ jobs:
       uses: astral-sh/setup-uv@v5
 
     - name: Ubuntu - install libsndfile
-      run: |
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends --yes libsndfile1
+      uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05  # v1.6.0
+      with:
+        packages: libsndfile1
+        version: 1.0
 
       # DOCS
     - name: Ubuntu - install graphviz
-      run: sudo apt-get install --yes graphviz
+      uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05  # v1.6.0
+      with:
+        packages: graphviz
+        version: 1.0
+
+    - name: Ubuntu - register graphviz plugins
+      run: sudo dot -c
 
     - name: Test building documentation
       run: uv run python -m sphinx docs/ docs/_build/ -b html -W
