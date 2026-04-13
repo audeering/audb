@@ -250,10 +250,15 @@ class Shimmer:
             # the lock; RLock makes that safe.
             with self._lock:
                 if not self._paused:
-                    center = sweep_start + (pos % sweep_range)
+                    center = sweep_start + pos
                     frame = self._render_frame(center)
                     self._write_frame(frame)
-                    pos += speed
+                    # Wrap pos each step so it stays bounded in
+                    # [0, sweep_range). Over a long publish (hours
+                    # at 20 Hz) an unbounded float would grow into
+                    # the range where adding 0.8 loses precision and
+                    # the modulo-on-render drifts.
+                    pos = (pos + speed) % sweep_range
                     was_paused = False
                 elif not was_paused:
                     # Write plain text on first paused frame
