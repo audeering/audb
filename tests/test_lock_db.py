@@ -52,6 +52,9 @@ def _get_config():
     This captures the current config so it can be passed as arguments.
 
     """
+    assert audb.config.REPOSITORIES, (
+        "audb.config.REPOSITORIES must contain at least one repository"
+    )
     repo = audb.config.REPOSITORIES[0]
     return {
         "cache_root": str(audb.config.CACHE_ROOT),
