@@ -53,9 +53,8 @@ class TestStreaming:
     seed = 2
     """Seed for random operations."""
 
-    @classmethod
     @pytest.fixture(scope="class", autouse=True, params=["parquet", "csv"])
-    def setup(cls, request, tmpdir_factory, persistent_repository):
+    def setup(self, request, tmpdir_factory, persistent_repository):
         r"""Publish a database.
 
         This creates a database,
@@ -77,7 +76,7 @@ class TestStreaming:
 
         db_root = tmpdir_factory.mktemp("build")
 
-        db = audformat.Database(cls.name)
+        db = audformat.Database(self.name)
 
         # Misc table for scheme labels
         db.schemes["year-of-birth"] = audformat.Scheme("date")
@@ -125,7 +124,7 @@ class TestStreaming:
         audeer.rmdir(persistent_repository.host)
         audeer.mkdir(persistent_repository.host, persistent_repository.name)
 
-        audb.publish(db_root, cls.version, persistent_repository)
+        audb.publish(db_root, self.version, persistent_repository)
 
         yield
 

@@ -9,9 +9,8 @@ import audb
 class TestAvailable:
     r"""Test collecting available datasets."""
 
-    @classmethod
     @pytest.fixture(scope="class", autouse=True)
-    def setup(cls, tmpdir_factory):
+    def setup(self, tmpdir_factory):
         r"""Prepare repositories and datasets.
 
         Create two repositories
