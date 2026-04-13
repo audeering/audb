@@ -818,7 +818,6 @@ def publish(
                 db.name,
                 version=previous_version,
                 cache_root=cache_root,
-                verbose=verbose,
             )
             if not deps().equals(previous_deps()):
                 raise RuntimeError(

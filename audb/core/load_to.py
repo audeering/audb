@@ -356,7 +356,6 @@ def load_to(
             name,
             version=version,
             cache_root=cache_root,
-            verbose=verbose,
         )
         if update:
             if only_metadata:
