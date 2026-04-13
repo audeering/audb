@@ -44,7 +44,9 @@ jobs:
       with:
         packages: graphviz
         version: 1.0
-        execute_install_scripts: true
+
+    - name: Ubuntu - register graphviz plugins
+      run: sudo dot -c
 
     - name: Test building documentation
       run: uv run python -m sphinx docs/ docs/_build/ -b html -W
