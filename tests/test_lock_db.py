@@ -1,3 +1,4 @@
+import contextlib
 import os
 import sys
 import time
@@ -42,6 +43,58 @@ class CrashFileSystem(audbackend.backend.FileSystem):
 
 
 audb.Repository.register("crash-file-system", CrashFileSystem)
+
+
+def _get_config():
+    """Return current audb config for passing to child processes.
+
+    With ``"spawn"`` or ``"forkserver"`` start methods,
+    child processes don't inherit the parent's memory.
+    This captures the current config so it can be passed as arguments.
+
+    """
+    assert audb.config.REPOSITORIES, (
+        "audb.config.REPOSITORIES must contain at least one repository"
+    )
+    repo = audb.config.REPOSITORIES[0]
+    return {
+        "cache_root": str(audb.config.CACHE_ROOT),
+        "shared_cache_root": str(audb.config.SHARED_CACHE_ROOT),
+        "repo_name": repo.name,
+        "repo_host": str(repo.host),
+        "repo_backend": repo.backend,
+    }
+
+
+@contextlib.contextmanager
+def _applied_config(config):
+    """Apply audb config and restore previous values on exit.
+
+    When workers run in threads (``multiprocessing=False``),
+    ``_apply_config()`` mutates the parent process' global state.
+    This context manager restores the previous config on exit
+    to avoid cross-test interference.
+
+    """
+    previous_cache_root = audb.config.CACHE_ROOT
+    previous_shared_cache_root = audb.config.SHARED_CACHE_ROOT
+    previous_repositories = audb.config.REPOSITORIES
+
+    audb.config.CACHE_ROOT = config["cache_root"]
+    audb.config.SHARED_CACHE_ROOT = config["shared_cache_root"]
+    audb.config.REPOSITORIES = [
+        audb.Repository(
+            name=config["repo_name"],
+            host=config["repo_host"],
+            backend=config["repo_backend"],
+        )
+    ]
+    try:
+        yield
+    finally:
+        audb.config.CACHE_ROOT = previous_cache_root
+        audb.config.SHARED_CACHE_ROOT = previous_shared_cache_root
+        audb.config.REPOSITORIES = previous_repositories
 
 
 def lock_paths(cache):
@@ -164,11 +217,12 @@ def dbs(tmpdir_factory, persistent_repository):
     )
 
 
-def load_deps():
-    return audb.dependencies(
-        DB_NAME,
-        version="1.0.0",
-    )
+def load_deps(config):
+    with _applied_config(config):
+        return audb.dependencies(
+            DB_NAME,
+            version="1.0.0",
+        )
 
 
 @pytest.mark.parametrize(
@@ -200,9 +254,10 @@ def test_lock_dependencies(
     if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
+    config = _get_config()
     result = audeer.run_tasks(
         load_deps,
-        [([], {})] * num_workers,
+        [([config], {})] * num_workers,
         num_workers=num_workers,
         multiprocessing=multiprocessing,
     )
@@ -210,11 +265,12 @@ def test_lock_dependencies(
     assert len(result) == num_workers
 
 
-def load_header():
-    return audb.info.header(
-        DB_NAME,
-        version="1.0.0",
-    )
+def load_header(config):
+    with _applied_config(config):
+        return audb.info.header(
+            DB_NAME,
+            version="1.0.0",
+        )
 
 
 @pytest.mark.parametrize(
@@ -242,9 +298,10 @@ def test_lock_header(set_repositories, multiprocessing, num_workers):
     if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
+    config = _get_config()
     result = audeer.run_tasks(
         load_header,
-        [([], {})] * num_workers,
+        [([config], {})] * num_workers,
         num_workers=num_workers,
         multiprocessing=multiprocessing,
     )
@@ -252,13 +309,14 @@ def test_lock_header(set_repositories, multiprocessing, num_workers):
     assert len(result) == num_workers
 
 
-def load_db(timeout):
-    return audb.load(
-        DB_NAME,
-        version="1.0.0",
-        timeout=timeout,
-        verbose=False,
-    )
+def load_db(config, timeout):
+    with _applied_config(config):
+        return audb.load(
+            DB_NAME,
+            version="1.0.0",
+            timeout=timeout,
+            verbose=False,
+        )
 
 
 @pytest.mark.parametrize(
@@ -294,7 +352,8 @@ def test_lock_load(
         return
 
     warns = not multiprocessing and num_workers != expected
-    params = [([timeout], {})] * num_workers
+    config = _get_config()
+    params = [([config, timeout], {})] * num_workers
     if warns:
         with pytest.warns(
             UserWarning,
@@ -325,7 +384,7 @@ def test_lock_load(
 )
 def test_lock_load_crash(set_repositories):
     with pytest.raises(audbackend.BackendError):
-        load_db(-1)
+        load_db(_get_config(), -1)
 
 
 @pytest.mark.parametrize(
@@ -346,7 +405,8 @@ def test_lock_load_deprecated_timeout(
     expected,
 ):
     """Test timeout <0 argument."""
-    params = [([timeout], {})] * num_workers
+    config = _get_config()
+    params = [([config, timeout], {})] * num_workers
     msg = (
         "'timeout' values <0 are no longer supported. "
         f"Changing your provided value of {timeout} to {audb.core.define.TIMEOUT}"
@@ -450,13 +510,14 @@ def test_lock_load_from_cached_versions(
     audb.core.define.CACHED_VERSIONS_TIMEOUT = cached_version_timeout
 
 
-def load_attachment():
-    return audb.load_attachment(
-        DB_NAME,
-        "folder",
-        version="1.0.0",
-        verbose=False,
-    )
+def load_attachment(config):
+    with _applied_config(config):
+        return audb.load_attachment(
+            DB_NAME,
+            "folder",
+            version="1.0.0",
+            verbose=False,
+        )
 
 
 @pytest.mark.parametrize(
@@ -488,9 +549,10 @@ def test_lock_load_attachment(
     if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
+    config = _get_config()
     result = audeer.run_tasks(
         load_attachment,
-        [([], {})] * num_workers,
+        [([config], {})] * num_workers,
         num_workers=num_workers,
         multiprocessing=multiprocessing,
     )
@@ -498,14 +560,15 @@ def test_lock_load_attachment(
     assert len(result) == num_workers
 
 
-def load_media(timeout):
-    return audb.load_media(
-        DB_NAME,
-        "audio/001.wav",
-        version="1.0.0",
-        timeout=timeout,
-        verbose=False,
-    )
+def load_media(config, timeout):
+    with _applied_config(config):
+        return audb.load_media(
+            DB_NAME,
+            "audio/001.wav",
+            version="1.0.0",
+            timeout=timeout,
+            verbose=False,
+        )
 
 
 @pytest.mark.parametrize(
@@ -541,7 +604,8 @@ def test_lock_load_media(
         return
 
     warns = not multiprocessing and num_workers != expected
-    params = [([timeout], {})] * num_workers
+    config = _get_config()
+    params = [([config, timeout], {})] * num_workers
     if warns:
         with pytest.warns(
             UserWarning,
@@ -565,13 +629,14 @@ def test_lock_load_media(
     assert len(result) == expected
 
 
-def load_table():
-    return audb.load_table(
-        DB_NAME,
-        "table",
-        version="1.0.0",
-        verbose=False,
-    )
+def load_table(config):
+    with _applied_config(config):
+        return audb.load_table(
+            DB_NAME,
+            "table",
+            version="1.0.0",
+            verbose=False,
+        )
 
 
 @pytest.mark.parametrize(
@@ -599,9 +664,10 @@ def test_lock_load_table(set_repositories, multiprocessing, num_workers):
     if multiprocessing and sys.platform in ["win32", "darwin"]:
         return
 
+    config = _get_config()
     result = audeer.run_tasks(
         load_table,
-        [([], {})] * num_workers,
+        [([config], {})] * num_workers,
         num_workers=num_workers,
         multiprocessing=multiprocessing,
     )
