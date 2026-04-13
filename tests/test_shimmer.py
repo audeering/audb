@@ -1,4 +1,5 @@
 import io
+import os
 import sys
 import time
 
@@ -191,3 +192,46 @@ def test_render_frame():
     frame_outside = shimmer._render_frame(-10.0)
     assert BOLD not in frame_outside
     assert frame_outside == "abcde"
+
+
+def test_write_frame_skips_when_scrolled_off(monkeypatch):
+    """Frame is skipped once the shimmer line has scrolled off the viewport.
+
+    Cursor-up is clamped to row 0 by the terminal and cannot reach
+    into scrollback, so writing anyway would corrupt an unrelated
+    visible row. Simulated here by pinning terminal height via the
+    ``LINES`` env var (which ``shutil.get_terminal_size`` honours).
+
+    """
+    buf = io.StringIO()
+    shimmer = Shimmer("", "test")
+    shimmer._original_stdout_write = buf.write
+
+    # Pin a small terminal height. COLUMNS must also be set for
+    # get_terminal_size to take the env-var path on some platforms.
+    monkeypatch.setenv("LINES", "10")
+    monkeypatch.setenv("COLUMNS", "80")
+    # get_terminal_size prefers an actual TTY over env vars when
+    # stdout is a terminal; force the env path by detaching fileno.
+    monkeypatch.setattr(
+        shimmer_module.shutil,
+        "get_terminal_size",
+        lambda fallback=(80, 24): os.terminal_size((80, 10)),
+    )
+
+    # Still within viewport: 0 lines below + 1 = 1 < 10
+    shimmer._lines_below = 0
+    shimmer._write_frame("test")
+    assert buf.getvalue() != ""
+    buf.truncate(0)
+    buf.seek(0)
+
+    # Right at the boundary: up = 10 == height → skip
+    shimmer._lines_below = 9
+    shimmer._write_frame("test")
+    assert buf.getvalue() == ""
+
+    # Well past the boundary: still skip, no corruption
+    shimmer._lines_below = 1000
+    shimmer._write_frame("test")
+    assert buf.getvalue() == ""
