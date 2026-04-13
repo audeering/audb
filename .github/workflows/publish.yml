@@ -47,6 +47,7 @@ jobs:
       with:
         packages: libsndfile1 sox graphviz
         version: 1.0
+        execute_install_scripts: true
 
     - name: Build documentation
       run: |
