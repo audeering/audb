@@ -138,7 +138,11 @@ class Shimmer:
         Progress bars (tqdm) write ``\r`` followed by bar content
         to update in-place. When the bar finishes with
         ``leave=False``, tqdm clears it by writing
-        ``\r`` + whitespace + ``\r``.
+        ``\r`` + whitespace + ``\r``. When it finishes with
+        ``leave=True`` (the default), tqdm emits a trailing ``\n``,
+        which scrolls the terminal and pushes the animated line
+        one row further up — so we must track ``\n`` here too,
+        otherwise subsequent frames render on the wrong row.
 
         We pause when we see ``\r`` followed by visible
         (non-whitespace) content, and resume when we see
@@ -156,7 +160,9 @@ class Shimmer:
                 else:
                     # Only whitespace after \r → bar cleared
                     self._paused = False
-            if "\n" in s:  # pragma: no cover
+            newline_count = s.count("\n")
+            if newline_count:
+                self._lines_below += newline_count
                 self._paused = False
         return self._original_stderr_write(s)
 

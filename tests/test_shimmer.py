@@ -25,6 +25,9 @@ def test_stderr_write_hook():
 
     A ``\r`` followed by visible content pauses the shimmer,
     and ``\r`` followed by only whitespace resumes it.
+    A ``\n`` on stderr (e.g. tqdm finishing with ``leave=True``,
+    log records, warnings) scrolls the terminal and must
+    advance ``_lines_below``.
 
     """
     buf = io.StringIO()
@@ -38,6 +41,16 @@ def test_stderr_write_hook():
     # Only whitespace after \r → resume
     shimmer._stderr_write_hook("\r   \r")
     assert shimmer._paused is False
+
+    # tqdm leave=True finisher: trailing \n scrolls the terminal
+    assert shimmer._lines_below == 0
+    shimmer._stderr_write_hook("\n")
+    assert shimmer._lines_below == 1
+    assert shimmer._paused is False
+
+    # Plain stderr log line with an embedded newline also scrolls
+    shimmer._stderr_write_hook("oops\nmore\n")
+    assert shimmer._lines_below == 3
 
 
 def test_write_hooks_preserve_stream_identity(monkeypatch):
