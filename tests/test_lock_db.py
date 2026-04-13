@@ -1,3 +1,4 @@
+import contextlib
 import os
 import sys
 import time
@@ -65,8 +66,20 @@ def _get_config():
     }
 
 
-def _apply_config(config):
-    """Apply audb config in a child process."""
+@contextlib.contextmanager
+def _applied_config(config):
+    """Apply audb config and restore previous values on exit.
+
+    When workers run in threads (``multiprocessing=False``),
+    ``_apply_config()`` mutates the parent process' global state.
+    This context manager restores the previous config on exit
+    to avoid cross-test interference.
+
+    """
+    previous_cache_root = audb.config.CACHE_ROOT
+    previous_shared_cache_root = audb.config.SHARED_CACHE_ROOT
+    previous_repositories = audb.config.REPOSITORIES
+
     audb.config.CACHE_ROOT = config["cache_root"]
     audb.config.SHARED_CACHE_ROOT = config["shared_cache_root"]
     audb.config.REPOSITORIES = [
@@ -76,6 +89,12 @@ def _apply_config(config):
             backend=config["repo_backend"],
         )
     ]
+    try:
+        yield
+    finally:
+        audb.config.CACHE_ROOT = previous_cache_root
+        audb.config.SHARED_CACHE_ROOT = previous_shared_cache_root
+        audb.config.REPOSITORIES = previous_repositories
 
 
 def lock_paths(cache):
@@ -199,11 +218,11 @@ def dbs(tmpdir_factory, persistent_repository):
 
 
 def load_deps(config):
-    _apply_config(config)
-    return audb.dependencies(
-        DB_NAME,
-        version="1.0.0",
-    )
+    with _applied_config(config):
+        return audb.dependencies(
+            DB_NAME,
+            version="1.0.0",
+        )
 
 
 @pytest.mark.parametrize(
@@ -247,11 +266,11 @@ def test_lock_dependencies(
 
 
 def load_header(config):
-    _apply_config(config)
-    return audb.info.header(
-        DB_NAME,
-        version="1.0.0",
-    )
+    with _applied_config(config):
+        return audb.info.header(
+            DB_NAME,
+            version="1.0.0",
+        )
 
 
 @pytest.mark.parametrize(
@@ -291,13 +310,13 @@ def test_lock_header(set_repositories, multiprocessing, num_workers):
 
 
 def load_db(config, timeout):
-    _apply_config(config)
-    return audb.load(
-        DB_NAME,
-        version="1.0.0",
-        timeout=timeout,
-        verbose=False,
-    )
+    with _applied_config(config):
+        return audb.load(
+            DB_NAME,
+            version="1.0.0",
+            timeout=timeout,
+            verbose=False,
+        )
 
 
 @pytest.mark.parametrize(
@@ -492,13 +511,13 @@ def test_lock_load_from_cached_versions(
 
 
 def load_attachment(config):
-    _apply_config(config)
-    return audb.load_attachment(
-        DB_NAME,
-        "folder",
-        version="1.0.0",
-        verbose=False,
-    )
+    with _applied_config(config):
+        return audb.load_attachment(
+            DB_NAME,
+            "folder",
+            version="1.0.0",
+            verbose=False,
+        )
 
 
 @pytest.mark.parametrize(
@@ -542,14 +561,14 @@ def test_lock_load_attachment(
 
 
 def load_media(config, timeout):
-    _apply_config(config)
-    return audb.load_media(
-        DB_NAME,
-        "audio/001.wav",
-        version="1.0.0",
-        timeout=timeout,
-        verbose=False,
-    )
+    with _applied_config(config):
+        return audb.load_media(
+            DB_NAME,
+            "audio/001.wav",
+            version="1.0.0",
+            timeout=timeout,
+            verbose=False,
+        )
 
 
 @pytest.mark.parametrize(
@@ -611,13 +630,13 @@ def test_lock_load_media(
 
 
 def load_table(config):
-    _apply_config(config)
-    return audb.load_table(
-        DB_NAME,
-        "table",
-        version="1.0.0",
-        verbose=False,
-    )
+    with _applied_config(config):
+        return audb.load_table(
+            DB_NAME,
+            "table",
+            version="1.0.0",
+            verbose=False,
+        )
 
 
 @pytest.mark.parametrize(
