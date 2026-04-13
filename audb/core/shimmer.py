@@ -55,7 +55,10 @@ class Shimmer:
         self._thread: threading.Thread | None = None
         self._lines_below = 0
         self._paused = False
-        self._lock = threading.Lock()
+        # RLock so _animate can hold the lock across pause-check + frame
+        # emission while _write_frame still takes it internally. Also lets
+        # _write_frame be called from stop() with no lock held.
+        self._lock = threading.RLock()
         self._original_stdout_write = None
         self._original_stderr_write = None
         self._noop = False
@@ -125,12 +128,20 @@ class Shimmer:
                 _active_shimmer = None
 
     def _stdout_write_hook(self, s: str) -> int:
-        """Wrap stdout.write to track newlines."""
-        count = s.count("\n")
-        if count:
-            with self._lock:
+        """Wrap stdout.write to track newlines.
+
+        The lock is held across the actual write so that a concurrent
+        shimmer frame on the other thread cannot interleave between
+        this write and its bookkeeping — otherwise SAVE_CURSOR /
+        cursor-up / RESTORE_CURSOR from the animation thread could
+        land mid-write on the terminal and leave visual artifacts.
+
+        """
+        with self._lock:
+            count = s.count("\n")
+            if count:
                 self._lines_below += count
-        return self._original_stdout_write(s)
+            return self._original_stdout_write(s)
 
     def _stderr_write_hook(self, s: str) -> int:
         r"""Wrap stderr.write to detect progress-bar activity.
@@ -164,7 +175,9 @@ class Shimmer:
             if newline_count:
                 self._lines_below += newline_count
                 self._paused = False
-        return self._original_stderr_write(s)
+            # Write under the lock so shimmer frames on stdout cannot
+            # interleave at the terminal with a tqdm bar update on stderr.
+            return self._original_stderr_write(s)
 
     def _write_frame(self, rendered_text: str):
         """Write a single frame to the terminal.
@@ -218,19 +231,22 @@ class Shimmer:
 
         was_paused = False
         while not self._stop_event.is_set():
+            # Hold the lock across the pause check *and* the frame emit,
+            # so another thread cannot flip _paused or scroll the terminal
+            # between the decision and the draw. _write_frame reacquires
+            # the lock; RLock makes that safe.
             with self._lock:
-                paused = self._paused
-            if not paused:
-                center = sweep_start + (pos % sweep_range)
-                frame = self._render_frame(center)
-                self._write_frame(frame)
-                pos += speed
-                was_paused = False
-            elif not was_paused:
-                # Write plain text on first paused frame
-                # to clear any leftover bold highlighting.
-                self._write_frame(self._text)
-                was_paused = True
+                if not self._paused:
+                    center = sweep_start + (pos % sweep_range)
+                    frame = self._render_frame(center)
+                    self._write_frame(frame)
+                    pos += speed
+                    was_paused = False
+                elif not was_paused:
+                    # Write plain text on first paused frame
+                    # to clear any leftover bold highlighting.
+                    self._write_frame(self._text)
+                    was_paused = True
             self._stop_event.wait(self._interval)
 
     def __enter__(self):  # pragma: no cover
