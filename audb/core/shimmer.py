@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import shutil
 import sys
 import threading
 
@@ -185,6 +186,13 @@ class Shimmer:
         Moves cursor up to the animated line,
         rewrites it, then moves back down.
 
+        Skipped entirely when the shimmer line would sit at
+        or beyond the top of the viewport: cursor-up is clamped
+        to row 0 by the terminal and cannot reach into scrollback,
+        so moving up further would land on an unrelated visible
+        row and corrupt it. Terminal size is re-read on each call
+        to pick up window resizes mid-run.
+
         """
         write = self._original_stdout_write or sys.stdout.write
         with self._lock:
@@ -192,6 +200,11 @@ class Shimmer:
             # Always move up: +1 accounts for the newline
             # printed by start() after the shimmer line.
             up = n + 1
+            # Bail if the shimmer line has scrolled into (or past)
+            # the top of the viewport. get_terminal_size falls back
+            # to (80, 24) if the size cannot be determined.
+            if up >= shutil.get_terminal_size().lines:
+                return
             buf = [
                 SAVE_CURSOR,
                 f"\033[{up}A",
