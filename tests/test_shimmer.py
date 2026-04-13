@@ -3,6 +3,13 @@ import os
 import sys
 import time
 
+import numpy as np
+
+import audeer
+import audformat
+import audiofile
+
+import audb
 from audb.core import shimmer as shimmer_module
 from audb.core.shimmer import BOLD
 from audb.core.shimmer import RESET
@@ -235,3 +242,83 @@ def test_write_frame_skips_when_scrolled_off(monkeypatch):
     shimmer._lines_below = 1000
     shimmer._write_frame("test")
     assert buf.getvalue() == ""
+
+
+def test_shimmer_load_table_smoke(tmp_path, monkeypatch, repository):
+    """End-to-end smoke test for the Shimmer <-> load_table integration.
+
+    The call sites in ``load.py`` / ``load_to.py`` / ``publish.py``
+    that instantiate ``Shimmer`` are all marked ``# pragma: no cover``
+    because ``Shimmer.start()`` becomes a no-op under pytest (stdout
+    is not a TTY). This test forces ``isatty=True`` so the Shimmer
+    genuinely starts its animation thread and installs the stdout /
+    stderr write hooks, then runs ``audb.load_table`` against a tiny
+    freshly-published fixture. It verifies:
+
+    * the call returns correct data;
+    * the Shimmer is torn down (no global reference leak);
+    * the monkey-patched write methods are restored after the call.
+
+    This is a smoke test: it does not assert anything about the
+    animation frames themselves — those are covered by the unit
+    tests above. Its job is to catch regressions where the hooks,
+    locking, or lifecycle break the real load pipeline.
+
+    """
+    # Build a minimal database: one silent wav, one filewise table.
+    build_dir = audeer.mkdir(tmp_path, "build")
+    media_rel = "data/file1.wav"
+    audeer.mkdir(build_dir, os.path.dirname(media_rel))
+    audio_path = audeer.path(build_dir, media_rel)
+    audiofile.write(audio_path, np.zeros((1, 800)), 8000)
+
+    db_name = "shimmer-smoke-db"
+    db = audformat.Database(db_name)
+    db.schemes["speaker"] = audformat.Scheme("str")
+    db["files"] = audformat.Table(audformat.filewise_index([media_rel]))
+    db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
+    db["files"]["speaker"].set(["adam"])
+    db.save(build_dir)
+
+    # Publish with verbose=False so no Shimmer is created during publish,
+    # keeping the shimmer activation isolated to the load_table call below.
+    audb.publish(build_dir, "1.0.0", repository, verbose=False)
+
+    # Force stdout/stderr to look like a TTY so Shimmer.start() takes the
+    # real path instead of the no-op branch.
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
+    monkeypatch.setattr(sys.stderr, "isatty", lambda: True)
+
+    # Track that at least one Shimmer actually took the non-noop path —
+    # otherwise the test would silently pass even if the TTY forcing
+    # above stopped working (e.g. pytest capture changes).
+    real_starts: list[bool] = []
+    original_start = Shimmer.start
+
+    def tracking_start(self):
+        original_start(self)
+        real_starts.append(not self._noop)
+
+    monkeypatch.setattr(Shimmer, "start", tracking_start)
+
+    # Sanity: no shimmer leaking in from an earlier test.
+    assert shimmer_module._active_shimmer is None
+    original_stdout_write = sys.stdout.write
+    original_stderr_write = sys.stderr.write
+
+    df = audb.load_table(db_name, "files", version="1.0.0", verbose=True)
+
+    # At least one Shimmer must have been started AND taken the real path.
+    assert real_starts, "no Shimmer was started — load_table path changed?"
+    assert any(real_starts), "every Shimmer became a no-op — TTY guard fired"
+
+    assert list(df.columns) == ["speaker"]
+    assert len(df) == 1
+    assert df["speaker"].iloc[0] == "adam"
+    # The shimmer must have cleaned up after itself.
+    assert shimmer_module._active_shimmer is None
+    # The hooks must have been uninstalled. Bound methods compare by
+    # value, not identity — a fresh attribute access returns a new
+    # bound method object, so use ``==`` rather than ``is``.
+    assert sys.stdout.write == original_stdout_write
+    assert sys.stderr.write == original_stderr_write
