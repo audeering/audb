@@ -229,6 +229,7 @@ convention = 'google'
 #
 # Find all (sub-)modules of the Python package
 [tool.setuptools.packages.find]
+include = ['audb*']
 
 [tool.setuptools.package-data]
 audb = ['core/etc/*']
