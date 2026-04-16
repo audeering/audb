@@ -2,6 +2,10 @@
 audb
 ====
 
+====== ================= ========= =======
+|docs| |python-versions| |license| |paper|
+====== ================= ========= =======
+
 |docs| | |python-versions| | |license| | |paper|
 
 
@@ -35,7 +39,7 @@ Have a look at the installation_ and quickstart_ instructions.
 
 
 .. header links:
-.. |docs| replace:: `📚Documentation <https://audeering.github.io/audb/>`__
+.. |docs| replace:: `📚 Documentation <https://audeering.github.io/audb/>`__
 .. |license| replace:: `📜 MIT license <https://github.com/audeering/audb/blob/main/LICENSE>`__
 .. |python-versions| replace:: `🐍 Python 3.9, 3.10, 3.11, 3.12, 3.13 <https://pypi.org/project/audb/>`__
 .. |paper| replace:: `📑 Paper <https://arxiv.org/abs/2303.00645/>`__
