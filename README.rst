@@ -2,6 +2,18 @@
 audb
 ====
 
+== ==================================
+📚 Documentation
+🐍 Python 3.9, 3.10, 3.11, 3.12, 3.13
+📜 MIT license
+📑 Paper
+== ==================================
+
+|docs| 
+|python-versions| 
+|license| 
+|paper|
+
 ====== ================= ========= =======
 |docs| |python-versions| |license| |paper|
 ====== ================= ========= =======
