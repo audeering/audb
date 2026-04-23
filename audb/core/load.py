@@ -24,6 +24,7 @@ from audb.core.dependencies import error_message_missing_object
 from audb.core.dependencies import filter_deps
 from audb.core.flavor import Flavor
 from audb.core.lock import FolderLock
+from audb.core.shimmer import Shimmer
 from audb.core.utils import is_empty
 from audb.core.utils import lookup_backend
 
@@ -1146,18 +1147,19 @@ def load(
     db_root = database_cache_root(name, version, cache_root, flavor)
     scan_for_missing_files = not is_empty(db_root)
 
+    shimmer = None
     if verbose:  # pragma: no cover
-        print(f"Get:   {name} v{version}")
+        shimmer = Shimmer("Get:   ", f"{name} v{version}")
+        shimmer.start()
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
-
     try:
+        deps = dependencies(
+            name,
+            version=version,
+            cache_root=cache_root,
+        )
+
         with FolderLock(db_root, timeout=timeout):
             # Start with database header without tables
             db, backend_interface = load_header_to(
@@ -1304,6 +1306,10 @@ def load(
     except filelock.Timeout:
         utils.timeout_warning()
 
+    finally:
+        if shimmer is not None:  # pragma: no cover
+            shimmer.stop()
+
     return db
 
 
@@ -1348,48 +1354,54 @@ def load_attachment(
 
     db_root = database_cache_root(name, version, cache_root)
 
+    shimmer = None
     if verbose:  # pragma: no cover
-        print(f"Get:   {name} v{version}")
+        shimmer = Shimmer("Get:   ", f"{name} v{version}")
+        shimmer.start()
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
-
-    if attachment not in deps.archives:
-        msg = error_message_missing_object(
-            "attachment",
-            [attachment],
+    try:
+        deps = dependencies(
             name,
-            version,
-        )
-        raise ValueError(msg)
-
-    with FolderLock(db_root):
-        # Start with database header
-        db, backend_interface = load_header_to(
-            db_root,
-            name,
-            version,
+            version=version,
+            cache_root=cache_root,
         )
 
-        # Load attachment
-        _load_attachments(
-            [attachment],
-            backend_interface,
-            db_root,
-            db,
-            version,
-            None,
-            deps,
-            Flavor(),
-            cache_root,
-            1,
-            verbose,
-        )
+        if attachment not in deps.archives:
+            msg = error_message_missing_object(
+                "attachment",
+                [attachment],
+                name,
+                version,
+            )
+            raise ValueError(msg)
+
+        with FolderLock(db_root):
+            # Start with database header
+            db, backend_interface = load_header_to(
+                db_root,
+                name,
+                version,
+            )
+
+            # Load attachment
+            _load_attachments(
+                [attachment],
+                backend_interface,
+                db_root,
+                db,
+                version,
+                None,
+                deps,
+                Flavor(),
+                cache_root,
+                1,
+                verbose,
+            )
+
+    finally:
+        if shimmer is not None:  # pragma: no cover
+            shimmer.stop()
 
     attachment_files = db.attachments[attachment].files
     attachment_files = [
@@ -1578,29 +1590,30 @@ def load_media(
     db_root = database_cache_root(name, version, cache_root, flavor)
     scan_for_missing_files = not is_empty(db_root)
 
+    shimmer = None
     if verbose:  # pragma: no cover
-        print(f"Get:   {name} v{version}")
+        shimmer = Shimmer("Get:   ", f"{name} v{version}")
+        shimmer.start()
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
-
-    available_files = set(deps.media)
-    missing = set(media) - available_files
-    if missing:
-        msg = error_message_missing_object(
-            "media",
-            sorted(missing),
-            name,
-            version,
-        )
-        raise ValueError(msg)
-
     try:
+        deps = dependencies(
+            name,
+            version=version,
+            cache_root=cache_root,
+        )
+
+        available_files = set(deps.media)
+        missing = set(media) - available_files
+        if missing:
+            msg = error_message_missing_object(
+                "media",
+                sorted(missing),
+                name,
+                version,
+            )
+            raise ValueError(msg)
+
         with FolderLock(db_root, timeout=timeout):
             # Start with database header without tables
             db, backend_interface = load_header_to(
@@ -1641,6 +1654,10 @@ def load_media(
 
     except filelock.Timeout:
         utils.timeout_warning()
+
+    finally:
+        if shimmer is not None:  # pragma: no cover
+            shimmer.stop()
 
     return files
 
@@ -1735,68 +1752,74 @@ def load_table(
     db_root = database_cache_root(name, version, cache_root)
     scan_for_missing_files = not is_empty(db_root)
 
+    shimmer = None
     if verbose:  # pragma: no cover
-        print(f"Get:   {name} v{version}")
+        shimmer = Shimmer("Get:   ", f"{name} v{version}")
+        shimmer.start()
         print(f"Cache: {db_root}")
 
-    deps = dependencies(
-        name,
-        version=version,
-        cache_root=cache_root,
-        verbose=verbose,
-    )
-
-    if table not in deps.table_ids:
-        msg = error_message_missing_object(
-            "table",
-            [table],
+    try:
+        deps = dependencies(
             name,
-            version,
-        )
-        raise ValueError(msg)
-
-    with FolderLock(db_root):
-        # Start with database header without tables
-        db, backend_interface = load_header_to(
-            db_root,
-            name,
-            version,
+            version=version,
+            cache_root=cache_root,
         )
 
-        # Find only those misc tables used in schemes of the requested table
-        scheme_misc_tables = []
-        for column_id, column in db[table].columns.items():
-            if column.scheme_id is not None:
-                scheme = db.schemes[column.scheme_id]
-                if scheme.uses_table:
-                    scheme_misc_tables.append(scheme.labels)
-        scheme_misc_tables = audeer.unique(scheme_misc_tables)
+        if table not in deps.table_ids:
+            msg = error_message_missing_object(
+                "table",
+                [table],
+                name,
+                version,
+            )
+            raise ValueError(msg)
 
-        # Load table
-        tables = scheme_misc_tables + [table]
-        for _table in tables:
-            table_file = os.path.join(db_root, f"db.{_table}")
-            # `_load_files()` downloads a table
-            # from the backend,
-            # if it cannot find its corresponding csv or parquet file
-            if not os.path.exists(f"{table_file}.pkl"):
-                _load_files(
-                    [_table],
-                    "table",
-                    backend_interface,
-                    db_root,
-                    db,
-                    version,
-                    None,
-                    deps,
-                    Flavor(),
-                    cache_root,
-                    pickle_tables,
-                    scan_for_missing_files,
-                    num_workers,
-                    verbose,
-                )
-            db[_table].load(table_file)
+        with FolderLock(db_root):
+            # Start with database header without tables
+            db, backend_interface = load_header_to(
+                db_root,
+                name,
+                version,
+            )
+
+            # Find only those misc tables used in schemes of the requested table
+            scheme_misc_tables = []
+            for column_id, column in db[table].columns.items():
+                if column.scheme_id is not None:
+                    scheme = db.schemes[column.scheme_id]
+                    if scheme.uses_table:
+                        scheme_misc_tables.append(scheme.labels)
+            scheme_misc_tables = audeer.unique(scheme_misc_tables)
+
+            # Load table
+            tables = scheme_misc_tables + [table]
+            for _table in tables:
+                table_file = os.path.join(db_root, f"db.{_table}")
+                # `_load_files()` downloads a table
+                # from the backend,
+                # if it cannot find its corresponding csv or parquet file
+                if not os.path.exists(f"{table_file}.pkl"):
+                    _load_files(
+                        [_table],
+                        "table",
+                        backend_interface,
+                        db_root,
+                        db,
+                        version,
+                        None,
+                        deps,
+                        Flavor(),
+                        cache_root,
+                        pickle_tables,
+                        scan_for_missing_files,
+                        num_workers,
+                        verbose,
+                    )
+                db[_table].load(table_file)
+
+    finally:
+        if shimmer is not None:  # pragma: no cover
+            shimmer.stop()
 
     if map is None:
         df = db[table]._df
