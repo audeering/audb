@@ -134,7 +134,7 @@ def _find_attachments(
     attachment_ids = []
     for attachment_id in audeer.progress_bar(
         list(db.attachments),
-        desc="Find attachments",
+        desc="Scan attachments",
         disable=not verbose,
     ):
         # use one archive per attachment ID
@@ -254,7 +254,7 @@ def _find_media(
         params=[([file], {}) for file in db_media_in_root],
         num_workers=num_workers,
         progress_bar=verbose,
-        task_description="Find media",
+        task_description="Scan media",
         maximum_refresh_time=define.MAXIMUM_REFRESH_TIME,
     )
 
@@ -298,7 +298,7 @@ def _find_tables(
     tables = []
     for table, file in audeer.progress_bar(
         zip(table_ids, table_files),
-        desc="Find tables",
+        desc="Scan tables",
         disable=not verbose,
     ):
         checksum = utils.md5(os.path.join(db_root, file))
