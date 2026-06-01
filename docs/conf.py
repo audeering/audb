@@ -60,6 +60,7 @@ linkcheck_ignore = [
     ),
     "http://emodb.bilderbar.info/start.html",
     "https://sourceforge.net/projects/sox/",
+    "https://sphinx-doc.org",
     # This permalink fails from time to time and should never be broken
     "https://superuser.com/a/264406",
 ]
