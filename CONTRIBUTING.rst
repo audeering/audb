@@ -91,7 +91,7 @@ It is also possible to automatically check if all links are still valid::
 
     uv run python -m sphinx docs/ build/html -b linkcheck
 
-.. _Sphinx: http://sphinx-doc.org
+.. _Sphinx: https://sphinx-doc.org
 
 
 Running the Tests
