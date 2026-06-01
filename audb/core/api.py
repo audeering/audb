@@ -72,42 +72,14 @@ def available(
         try:
             backend_interface = repository.create_backend_interface()
             with backend_interface.backend as backend:
-                if repository.backend == "artifactory":  # pragma: nocover
-                    # avoid backend_interface.ls('/')
-                    # which is very slow on Artifactory
-                    # see https://github.com/audeering/audbackend/issues/132
-                    for p in backend.path("/"):
-                        name = p.name
-                        try:
-                            for version in [str(x).split("/")[-1] for x in p / "db"]:
-                                add_database(name, version, repository)
-                        except FileNotFoundError:
-                            # If the `db` folder does not exist,
-                            # we do not include the dataset
-                            pass
-
-                elif repository.backend in ["minio", "s3"]:
-                    # Avoid `ls(recursive=True)` for S3 and MinIO
-                    # as this is slow for large databases
-                    for obj in backend._client.list_objects(repository.name):
-                        name = obj.object_name[:-1]  # remove "/" at end
-                        header_file = f"/{name}/{define.HEADER_FILE}"
-                        for _obj in backend._client.list_objects(
-                            repository.name, f"{name}/"
-                        ):
-                            version = _obj.object_name.split("/")[1]
-                            header_file = f"/{name}/{version}/{define.HEADER_FILE}"
-                            if version not in [
-                                "attachment",
-                                "media",
-                                "meta",
-                            ] and backend.exists(header_file):
-                                add_database(name, version, repository)
-
-                else:
-                    for path, version in backend_interface.ls("/"):
-                        if path.endswith(define.HEADER_FILE):
-                            name = path.split("/")[1]
+                for name in backend.ls_dirs("/"):
+                    for version in backend.ls_dirs(f"/{name}/"):
+                        header_file = f"/{name}/{version}/{define.HEADER_FILE}"
+                        if version not in [
+                            "attachment",
+                            "media",
+                            "meta",
+                        ] and backend.exists(header_file):
                             add_database(name, version, repository)
 
         except (audbackend.BackendError, ValueError):
