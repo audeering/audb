@@ -74,7 +74,13 @@ def available(
             with backend_interface.backend as backend:
                 for name in backend.ls_dirs("/"):
                     for version in backend.ls_dirs(f"/{name}/"):
-                        add_database(name, version, repository)
+                        header_file = f"/{name}/{version}/{define.HEADER_FILE}"
+                        if version not in [
+                            "attachment",
+                            "media",
+                            "meta",
+                        ] and backend.exists(header_file):
+                            add_database(name, version, repository)
 
         except (audbackend.BackendError, ValueError):
             continue
