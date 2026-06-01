@@ -72,15 +72,14 @@ def available(
         try:
             backend_interface = repository.create_backend_interface()
             with backend_interface.backend as backend:
-                for name in backend.ls_dirs("/"):
-                    for version in backend.ls_dirs(f"/{name}/"):
-                        header_file = f"/{name}/{version}/{define.HEADER_FILE}"
-                        if version not in [
-                            "attachment",
-                            "media",
-                            "meta",
-                        ] and backend.exists(header_file):
-                            add_database(name, version, repository)
+                for db_name in backend.ls_dirs("/"):
+                    header_file = f"/{db_name}/{define.HEADER_FILE}"
+                    versions = (
+                        [backend_interface.latest_version(header_file)] if only_latest
+                        else backend_interface.versions(header_file)
+                    )
+                    for version in versions:
+                        add_database(db_name, version, repository)
 
         except (audbackend.BackendError, ValueError):
             continue
@@ -89,18 +88,6 @@ def available(
         databases,
         columns=["name", "backend", "host", "repository", "version"],
     )
-    if only_latest:
-        # Pick latest version for every database, see
-        # https://stackoverflow.com/a/53842408
-        df = df[
-            df["version"]
-            == df.groupby("name")["version"].transform(
-                lambda x: audeer.sort_versions(x)[-1]
-            )
-        ]
-    else:
-        # Sort by version
-        df = df.sort_values(by=["version"], key=audeer.sort_versions)
     df = df.sort_values(by=["name"])
     return df.set_index("name")
 
