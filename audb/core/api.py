@@ -70,23 +70,6 @@ def available(
 
     num_workers = max(1, num_workers)
 
-    def match_connection_pool_size(backend):
-        """Match the HTTP connection pool size to ``num_workers``.
-
-        On MinIO/S3 backends the underlying ``urllib3.PoolManager``
-        keeps only a single connection per host by default.
-        Without this, the parallel workers
-        would constantly open and discard connections.
-
-        """
-        pool_kw = getattr(
-            getattr(getattr(backend, "_client", None), "_http", None),
-            "connection_pool_kw",
-            None,
-        )
-        if isinstance(pool_kw, dict):
-            pool_kw["maxsize"] = num_workers
-
     if repositories is not None:
         repositories = audeer.to_list(repositories)
     else:
@@ -97,7 +80,7 @@ def available(
             backend_interface = repository.create_backend_interface()
             # Set the connection pool size before opening the backend,
             # as the pool is created lazily on the first request.
-            match_connection_pool_size(backend_interface.backend)
+            _match_connection_pool_size(backend_interface.backend, num_workers)
             with backend_interface.backend as backend:
 
                 def version_exists(name, version):
@@ -153,6 +136,24 @@ def available(
 
     df = df.sort_values(by=["name"])
     return df.set_index("name")
+
+
+def _match_connection_pool_size(backend, maxsize: int) -> None:
+    """Match the HTTP connection pool size to ``num_workers``.
+
+    On MinIO/S3 backends the underlying ``urllib3.PoolManager``
+    keeps only a single connection per host by default.
+    Without this, the parallel workers
+    would constantly open and discard connections.
+
+    """
+    pool_kw = getattr(
+        getattr(getattr(backend, "_client", None), "_http", None),
+        "connection_pool_kw",
+        None,
+    )
+    if isinstance(pool_kw, dict):
+        pool_kw["maxsize"] = maxsize
 
 
 def cached(
