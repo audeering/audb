@@ -72,6 +72,18 @@ def available(
         try:
             backend_interface = repository.create_backend_interface()
             with backend_interface.backend as backend:
+
+                def version_exists(name, version):
+                    """Check if a database version exists on the backend.
+
+                    A version exists
+                    if the corresponding header file
+                    can be found on the backend.
+
+                    """
+                    header_file = f"/{name}/{version}/{define.HEADER_FILE}"
+                    return backend.exists(header_file)
+
                 if repository.backend == "artifactory":  # pragma: nocover
                     # avoid backend_interface.ls('/')
                     # which is very slow on Artifactory
@@ -79,7 +91,18 @@ def available(
                     for p in backend.path("/"):
                         name = p.name
                         try:
-                            for version in [str(x).split("/")[-1] for x in p / "db"]:
+                            versions = audeer.sort_versions(
+                                [
+                                    v
+                                    for x in p / "db"
+                                    if audeer.is_semantic_version(
+                                        v := str(x).split("/")[-1]
+                                    )
+                                ]
+                            )
+                            if only_latest:
+                                versions = versions[-1:]
+                            for version in versions:
                                 add_database(name, version, repository)
                         except FileNotFoundError:
                             # If the `db` folder does not exist,
@@ -87,28 +110,51 @@ def available(
                             pass
 
                 elif repository.backend in ["minio", "s3"]:
-                    # Avoid `ls(recursive=True)` for S3 and MinIO
-                    # as this is slow for large databases
+                    # Avoid `ls_dirs()` for S3 and MinIO
+                    # and check manually for file existence
+                    # for meaningful candidates
                     for obj in backend._client.list_objects(repository.name):
                         name = obj.object_name[:-1]  # remove "/" at end
-                        header_file = f"/{name}/{define.HEADER_FILE}"
-                        for _obj in backend._client.list_objects(
+                        objects = backend._client.list_objects(
                             repository.name, f"{name}/"
-                        ):
-                            version = _obj.object_name.split("/")[1]
-                            header_file = f"/{name}/{version}/{define.HEADER_FILE}"
-                            if version not in [
-                                "attachment",
-                                "media",
-                                "meta",
-                            ] and backend.exists(header_file):
-                                add_database(name, version, repository)
+                        )
+                        versions = audeer.sort_versions(
+                            [
+                                v
+                                for obj in objects
+                                if audeer.is_semantic_version(
+                                    v := obj.object_name.split("/")[1]
+                                )
+                            ]
+                        )
+                        if only_latest:
+                            for version in reversed(versions):
+                                if version_exists(name, version):
+                                    add_database(name, version, repository)
+                                    break
+                        else:
+                            for version in versions:
+                                if version_exists(name, version):
+                                    add_database(name, version, repository)
 
                 else:
-                    for path, version in backend_interface.ls("/"):
-                        if path.endswith(define.HEADER_FILE):
-                            name = path.split("/")[1]
-                            add_database(name, version, repository)
+                    for name in backend.ls_dirs("/"):
+                        versions = audeer.sort_versions(
+                            [
+                                v
+                                for v in backend.ls_dirs(f"/{name}/")
+                                if audeer.is_semantic_version(v)
+                            ]
+                        )
+                        if only_latest:
+                            for version in reversed(versions):
+                                if version_exists(name, version):
+                                    add_database(name, version, repository)
+                                    break
+                        else:
+                            for version in versions:
+                                if version_exists(name, version):
+                                    add_database(name, version, repository)
 
         except (audbackend.BackendError, ValueError):
             continue
@@ -117,18 +163,6 @@ def available(
         databases,
         columns=["name", "backend", "host", "repository", "version"],
     )
-    if only_latest:
-        # Pick latest version for every database, see
-        # https://stackoverflow.com/a/53842408
-        df = df[
-            df["version"]
-            == df.groupby("name")["version"].transform(
-                lambda x: audeer.sort_versions(x)[-1]
-            )
-        ]
-    else:
-        # Sort by version
-        df = df.sort_values(by=["version"], key=audeer.sort_versions)
     df = df.sort_values(by=["name"])
     return df.set_index("name")
 
