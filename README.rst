@@ -2,7 +2,7 @@
 audb
 ====
 
-|docs| | |python-versions| | |license| | |paper|
+|docs| • |python-versions| • |license| • |paper|
 
 
 **audb** manages your annotated media files.
