@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+import concurrent.futures
 import os
 import tempfile
 
@@ -23,15 +24,32 @@ from audb.core.lock import FolderLock
 from audb.core.repository import Repository
 
 
+# Backends whose read operations (``ls_dirs``/``exists``)
+# are safe to call concurrently from multiple threads,
+# and that benefit from doing so:
+# ``file-system`` uses stateless ``os`` calls,
+# ``minio``/``s3`` use the MinIO client,
+# which is documented as thread-safe under ``threading``.
+# Other backends (e.g. ``artifactory``, or custom ones
+# registered via ``Repository.register``) are accessed
+# with a single worker to avoid sharing a potentially
+# non-thread-safe client across threads.
+_THREAD_SAFE_BACKENDS = ("file-system", "minio", "s3")
+
+
 def available(
     *,
     only_latest: bool = False,
+    num_workers: int = 1,
     repositories: Repository | Sequence[Repository] = None,
 ) -> pd.DataFrame:
     r"""List all databases that are available to the user.
 
     Args:
         only_latest: include only latest version of database
+        num_workers: number of parallel workers
+            used to collect the versions of the databases.
+            Brings speedups under On MinIO/S3 backends
         repositories: search only in the given repositories.
             If ``None``,
             :attr:`audb.config.REPOSITORIES` is used
@@ -63,6 +81,8 @@ def available(
             ]
         )
 
+    num_workers = max(1, num_workers)
+
     if repositories is not None:
         repositories = audeer.to_list(repositories)
     else:
@@ -70,44 +90,45 @@ def available(
 
     for repository in repositories:
         try:
+            workers = num_workers if repository.backend in _THREAD_SAFE_BACKENDS else 1
             backend_interface = repository.create_backend_interface()
+            # Set the connection pool size before opening the backend,
+            # as the pool is created lazily on the first request.
+            _match_connection_pool_size(backend_interface.backend, workers)
             with backend_interface.backend as backend:
-                if repository.backend == "artifactory":  # pragma: nocover
-                    # avoid backend_interface.ls('/')
-                    # which is very slow on Artifactory
-                    # see https://github.com/audeering/audbackend/issues/132
-                    for p in backend.path("/"):
-                        name = p.name
-                        try:
-                            for version in [str(x).split("/")[-1] for x in p / "db"]:
-                                add_database(name, version, repository)
-                        except FileNotFoundError:
-                            # If the `db` folder does not exist,
-                            # we do not include the dataset
-                            pass
 
-                elif repository.backend in ["minio", "s3"]:
-                    # Avoid `ls(recursive=True)` for S3 and MinIO
-                    # as this is slow for large databases
-                    for obj in backend._client.list_objects(repository.name):
-                        name = obj.object_name[:-1]  # remove "/" at end
-                        header_file = f"/{name}/{define.HEADER_FILE}"
-                        for _obj in backend._client.list_objects(
-                            repository.name, f"{name}/"
-                        ):
-                            version = _obj.object_name.split("/")[1]
-                            header_file = f"/{name}/{version}/{define.HEADER_FILE}"
-                            if version not in [
-                                "attachment",
-                                "media",
-                                "meta",
-                            ] and backend.exists(header_file):
-                                add_database(name, version, repository)
+                def version_exists(name, version):
+                    """Check if a database version exists on the backend.
 
-                else:
-                    for path, version in backend_interface.ls("/"):
-                        if path.endswith(define.HEADER_FILE):
-                            name = path.split("/")[1]
+                    A version exists
+                    if the corresponding header file
+                    can be found on the backend.
+
+                    """
+                    header_file = f"/{name}/{version}/{define.HEADER_FILE}"
+                    return backend.exists(header_file)
+
+                def collect_versions(name):
+                    """Existing versions of a database on the backend.
+
+                    Is limited to the latest with ``latest_version``.
+
+                    """
+                    versions = audeer.sort_versions(
+                        [
+                            v
+                            for v in backend.ls_dirs(f"/{name}/")
+                            if audeer.is_semantic_version(v)
+                        ]
+                    )
+                    existing = [v for v in versions if version_exists(name, v)]
+                    return name, existing
+
+                names = backend.ls_dirs("/")
+                max_workers = min(workers, max(1, len(names)))
+                with concurrent.futures.ThreadPoolExecutor(max_workers) as pool:
+                    for name, versions in pool.map(collect_versions, names):
+                        for version in versions:
                             add_database(name, version, repository)
 
         except (audbackend.BackendError, ValueError):
@@ -131,6 +152,24 @@ def available(
         df = df.sort_values(by=["version"], key=audeer.sort_versions)
     df = df.sort_values(by=["name"])
     return df.set_index("name")
+
+
+def _match_connection_pool_size(backend, maxsize: int) -> None:
+    """Match the HTTP connection pool size to ``num_workers``.
+
+    On MinIO/S3 backends the underlying ``urllib3.PoolManager``
+    keeps only a single connection per host by default.
+    Without this, the parallel workers
+    would constantly open and discard connections.
+
+    """
+    pool_kw = getattr(
+        getattr(getattr(backend, "_client", None), "_http", None),
+        "connection_pool_kw",
+        None,
+    )
+    if isinstance(pool_kw, dict):
+        pool_kw["maxsize"] = maxsize
 
 
 def cached(

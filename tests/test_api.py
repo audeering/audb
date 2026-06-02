@@ -1,9 +1,70 @@
+import concurrent.futures
+
 import pytest
 
 import audeer
 import audformat
 
 import audb
+
+
+class _FakePoolManager:
+    r"""Mimic ``urllib3.PoolManager`` connection pool configuration."""
+
+    def __init__(self):
+        self.connection_pool_kw = {}
+
+
+class _FakeClient:
+    r"""Mimic ``minio.Minio`` holding an HTTP connection pool."""
+
+    def __init__(self):
+        self._http = _FakePoolManager()
+
+
+class _FakeBackend:
+    r"""Mimic a MinIO/S3 backend.
+
+    Args:
+        folders: mapping of database name
+            to the list of folders stored under it,
+            e.g. ``{"db": ["1.0.0", "media"]}``
+        headers: mapping of database name
+            to the list of versions
+            for which a header file exists
+
+    """
+
+    def __init__(self, folders, headers):
+        self.folders = folders
+        self.headers = headers
+        self._client = _FakeClient()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return False
+
+    def ls_dirs(self, path):
+        path = path.strip("/")
+        if path == "":
+            # Top level: database names
+            return list(self.folders)
+        # Sub level: folders under the database
+        return self.folders[path]
+
+    def exists(self, path):
+        # ``path`` has the form ``/<name>/<version>/db.yaml``
+        name, version = path.strip("/").split("/")[:2]
+        return version in self.headers.get(name, [])
+
+
+class _FakeInterface:
+    r"""Mimic a backend interface wrapping a ``_FakeBackend``."""
+
+    def __init__(self, backend):
+        self.backend = backend
 
 
 class TestAvailable:
@@ -194,6 +255,130 @@ class TestAvailable:
         assert len(df) == len(expected_databases)
         assert list(df.index) == expected_databases
         assert list(df["version"]) == expected_versions
+
+    @pytest.fixture(scope="function", autouse=False)
+    def minio_repository(self, monkeypatch):
+        """Add an S3 repository served by a fake backend.
+
+        The repository contains a single database ``"name-s3"`` with:
+
+        * ``1.0.0`` and ``2.0.0`` -- proper versions with a header file
+        * ``3.0.0`` -- version folder without a header file
+        * ``media`` -- non-version folder
+
+        ``audb.available()`` should only report
+        ``1.0.0`` and ``2.0.0``.
+
+        Yields:
+            the fake backend instance,
+            so its connection pool can be inspected
+
+        """
+        folders = {"name-s3": ["1.0.0", "2.0.0", "3.0.0", "media"]}
+        headers = {"name-s3": ["1.0.0", "2.0.0"]}
+        backend = _FakeBackend(folders, headers)
+
+        original = audb.Repository.create_backend_interface
+
+        def create_backend_interface(self):
+            if self.backend == "s3":
+                return _FakeInterface(backend)
+            return original(self)
+
+        monkeypatch.setattr(
+            audb.Repository, "create_backend_interface", create_backend_interface
+        )
+        current_repositories = audb.config.REPOSITORIES
+        audb.config.REPOSITORIES = current_repositories + [
+            audb.Repository("repo-s3", "host-s3", "s3")
+        ]
+        yield backend
+        audb.config.REPOSITORIES = current_repositories
+
+    @pytest.mark.parametrize(
+        "only_latest, expected_versions",
+        [
+            (False, ["1.0.0", "2.0.0"]),
+            (True, ["2.0.0"]),
+        ],
+    )
+    def test_minio_s3_backend(self, minio_repository, only_latest, expected_versions):
+        """Test collecting versions from a MinIO/S3 backend.
+
+        Args:
+            minio_repository: minio_repository fixture
+            only_latest: only_latest argument of audb.available()
+            expected_versions: expected versions of ``"name-s3"``
+
+        """
+        num_workers = 4
+        df = audb.available(only_latest=only_latest, num_workers=num_workers)
+        assert "name-s3" in df.index
+        versions = df.loc[["name-s3"], "version"].tolist()
+        assert sorted(versions) == expected_versions
+        # The HTTP connection pool size is matched to num_workers
+        pool_kw = minio_repository._client._http.connection_pool_kw
+        assert pool_kw["maxsize"] == num_workers
+
+    @pytest.fixture(scope="function", autouse=False)
+    def artifactory_repository(self, monkeypatch):
+        """Add an Artifactory repository served by a fake backend.
+
+        ``artifactory`` is not in the thread-safe allowlist,
+        so ``audb.available()`` must access it
+        with a single worker,
+        regardless of ``num_workers``.
+        Two databases are provided,
+        so a missing single-worker limit
+        would result in more than one worker.
+
+        Yields:
+            tuple of the fake backend instance and the repository
+
+        """
+        folders = {"db-a": ["1.0.0", "2.0.0"], "db-b": ["1.0.0"]}
+        headers = {"db-a": ["1.0.0", "2.0.0"], "db-b": ["1.0.0"]}
+        backend = _FakeBackend(folders, headers)
+        repository = audb.Repository("repo-art", "host-art", "artifactory")
+
+        def create_backend_interface(self):
+            return _FakeInterface(backend)
+
+        monkeypatch.setattr(
+            audb.Repository, "create_backend_interface", create_backend_interface
+        )
+        yield backend, repository
+
+    def test_non_thread_safe_backend_single_worker(
+        self, artifactory_repository, monkeypatch
+    ):
+        """Test non-thread-safe backends are accessed with a single worker.
+
+        Args:
+            artifactory_repository: artifactory_repository fixture
+            monkeypatch: monkeypatch fixture
+
+        """
+        backend, repository = artifactory_repository
+
+        # Record the number of workers requested from the thread pool
+        requested_workers = []
+        executor = concurrent.futures.ThreadPoolExecutor
+
+        def spy(max_workers, *args, **kwargs):
+            requested_workers.append(max_workers)
+            return executor(max_workers, *args, **kwargs)
+
+        monkeypatch.setattr(concurrent.futures, "ThreadPoolExecutor", spy)
+
+        df = audb.available(num_workers=10, repositories=repository)
+
+        # A single worker is used, even with num_workers=10 and two databases
+        assert requested_workers == [1]
+        # The connection pool is limited to a single connection as well
+        assert backend._client._http.connection_pool_kw["maxsize"] == 1
+        # Versions are still collected correctly
+        assert sorted(df.index) == ["db-a", "db-a", "db-b"]
 
 
 def test_versions(tmpdir, repository):
