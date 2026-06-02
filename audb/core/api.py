@@ -24,6 +24,19 @@ from audb.core.lock import FolderLock
 from audb.core.repository import Repository
 
 
+# Backends whose read operations (``ls_dirs``/``exists``)
+# are safe to call concurrently from multiple threads,
+# and that benefit from doing so:
+# ``file-system`` uses stateless ``os`` calls,
+# ``minio``/``s3`` use the MinIO client,
+# which is documented as thread-safe under ``threading``.
+# Other backends (e.g. ``artifactory``, or custom ones
+# registered via ``Repository.register``) are accessed
+# with a single worker to avoid sharing a potentially
+# non-thread-safe client across threads.
+_THREAD_SAFE_BACKENDS = ("file-system", "minio", "s3")
+
+
 def available(
     *,
     only_latest: bool = False,
@@ -77,10 +90,11 @@ def available(
 
     for repository in repositories:
         try:
+            workers = num_workers if repository.backend in _THREAD_SAFE_BACKENDS else 1
             backend_interface = repository.create_backend_interface()
             # Set the connection pool size before opening the backend,
             # as the pool is created lazily on the first request.
-            _match_connection_pool_size(backend_interface.backend, num_workers)
+            _match_connection_pool_size(backend_interface.backend, workers)
             with backend_interface.backend as backend:
 
                 def version_exists(name, version):
@@ -111,7 +125,7 @@ def available(
                     return name, existing
 
                 names = backend.ls_dirs("/")
-                max_workers = min(num_workers, max(1, len(names)))
+                max_workers = min(workers, max(1, len(names)))
                 with concurrent.futures.ThreadPoolExecutor(max_workers) as pool:
                     for name, versions in pool.map(collect_versions, names):
                         for version in versions:

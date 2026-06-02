@@ -1,3 +1,5 @@
+import concurrent.futures
+
 import pytest
 
 import audeer
@@ -317,6 +319,66 @@ class TestAvailable:
         # The HTTP connection pool size is matched to num_workers
         pool_kw = minio_repository._client._http.connection_pool_kw
         assert pool_kw["maxsize"] == num_workers
+
+    @pytest.fixture(scope="function", autouse=False)
+    def artifactory_repository(self, monkeypatch):
+        """Add an Artifactory repository served by a fake backend.
+
+        ``artifactory`` is not in the thread-safe allowlist,
+        so ``audb.available()`` must access it
+        with a single worker,
+        regardless of ``num_workers``.
+        Two databases are provided,
+        so a missing single-worker limit
+        would result in more than one worker.
+
+        Yields:
+            tuple of the fake backend instance and the repository
+
+        """
+        folders = {"db-a": ["1.0.0", "2.0.0"], "db-b": ["1.0.0"]}
+        headers = {"db-a": ["1.0.0", "2.0.0"], "db-b": ["1.0.0"]}
+        backend = _FakeBackend(folders, headers)
+        repository = audb.Repository("repo-art", "host-art", "artifactory")
+
+        def create_backend_interface(self):
+            return _FakeInterface(backend)
+
+        monkeypatch.setattr(
+            audb.Repository, "create_backend_interface", create_backend_interface
+        )
+        yield backend, repository
+
+    def test_non_thread_safe_backend_single_worker(
+        self, artifactory_repository, monkeypatch
+    ):
+        """Test non-thread-safe backends are accessed with a single worker.
+
+        Args:
+            artifactory_repository: artifactory_repository fixture
+            monkeypatch: monkeypatch fixture
+
+        """
+        backend, repository = artifactory_repository
+
+        # Record the number of workers requested from the thread pool
+        requested_workers = []
+        executor = concurrent.futures.ThreadPoolExecutor
+
+        def spy(max_workers, *args, **kwargs):
+            requested_workers.append(max_workers)
+            return executor(max_workers, *args, **kwargs)
+
+        monkeypatch.setattr(concurrent.futures, "ThreadPoolExecutor", spy)
+
+        df = audb.available(num_workers=10, repositories=repository)
+
+        # A single worker is used, even with num_workers=10 and two databases
+        assert requested_workers == [1]
+        # The connection pool is limited to a single connection as well
+        assert backend._client._http.connection_pool_kw["maxsize"] == 1
+        # Versions are still collected correctly
+        assert sorted(df.index) == ["db-a", "db-a", "db-b"]
 
 
 def test_versions(tmpdir, repository):
