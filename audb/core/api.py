@@ -84,52 +84,23 @@ def available(
                     header_file = f"/{name}/{version}/{define.HEADER_FILE}"
                     return backend.exists(header_file)
 
-                if repository.backend in ["minio", "s3"]:
-                    # Avoid `ls_dirs()` for S3 and MinIO
-                    # and check manually for file existence
-                    # for meaningful candidates
-                    for obj in backend._client.list_objects(repository.name):
-                        name = obj.object_name[:-1]  # remove "/" at end
-                        objects = backend._client.list_objects(
-                            repository.name, f"{name}/"
-                        )
-                        versions = audeer.sort_versions(
-                            [
-                                v
-                                for obj in objects
-                                if audeer.is_semantic_version(
-                                    v := obj.object_name.split("/")[1]
-                                )
-                            ]
-                        )
-                        if only_latest:
-                            for version in reversed(versions):
-                                if version_exists(name, version):
-                                    add_database(name, version, repository)
-                                    break
-                        else:
-                            for version in versions:
-                                if version_exists(name, version):
-                                    add_database(name, version, repository)
-
-                else:
-                    for name in backend.ls_dirs("/"):
-                        versions = audeer.sort_versions(
-                            [
-                                v
-                                for v in backend.ls_dirs(f"/{name}/")
-                                if audeer.is_semantic_version(v)
-                            ]
-                        )
-                        if only_latest:
-                            for version in reversed(versions):
-                                if version_exists(name, version):
-                                    add_database(name, version, repository)
-                                    break
-                        else:
-                            for version in versions:
-                                if version_exists(name, version):
-                                    add_database(name, version, repository)
+                for name in backend.ls_dirs("/"):
+                    versions = audeer.sort_versions(
+                        [
+                            v
+                            for v in backend.ls_dirs(f"/{name}/")
+                            if audeer.is_semantic_version(v)
+                        ]
+                    )
+                    if only_latest:
+                        for version in reversed(versions):
+                            if version_exists(name, version):
+                                add_database(name, version, repository)
+                                break
+                    else:
+                        for version in versions:
+                            if version_exists(name, version):
+                                add_database(name, version, repository)
 
         except (audbackend.BackendError, ValueError):
             continue
