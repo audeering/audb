@@ -84,32 +84,7 @@ def available(
                     header_file = f"/{name}/{version}/{define.HEADER_FILE}"
                     return backend.exists(header_file)
 
-                if repository.backend == "artifactory":  # pragma: nocover
-                    # avoid backend_interface.ls('/')
-                    # which is very slow on Artifactory
-                    # see https://github.com/audeering/audbackend/issues/132
-                    for p in backend.path("/"):
-                        name = p.name
-                        try:
-                            versions = audeer.sort_versions(
-                                [
-                                    v
-                                    for x in p / "db"
-                                    if audeer.is_semantic_version(
-                                        v := str(x).split("/")[-1]
-                                    )
-                                ]
-                            )
-                            if only_latest:
-                                versions = versions[-1:]
-                            for version in versions:
-                                add_database(name, version, repository)
-                        except FileNotFoundError:
-                            # If the `db` folder does not exist,
-                            # we do not include the dataset
-                            pass
-
-                elif repository.backend in ["minio", "s3"]:
+                if repository.backend in ["minio", "s3"]:
                     # Avoid `ls_dirs()` for S3 and MinIO
                     # and check manually for file existence
                     # for meaningful candidates
