@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-import concurrent
+import concurrent.futures
 import os
 import tempfile
 
