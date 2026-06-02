@@ -55,9 +55,8 @@ class Shimmer:
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
         self._lines_below = 0
-        self._paused = False
-        # RLock so _animate can hold the lock across pause-check + frame
-        # emission while _write_frame still takes it internally. Also lets
+        # RLock so _animate can hold the lock across the frame emission
+        # while _write_frame still takes it internally. Also lets
         # _write_frame be called from stop() with no lock held.
         self._lock = threading.RLock()
         self._original_stdout_write = None
@@ -145,37 +144,18 @@ class Shimmer:
             return self._original_stdout_write(s)
 
     def _stderr_write_hook(self, s: str) -> int:
-        r"""Wrap stderr.write to detect progress-bar activity.
+        r"""Wrap stderr.write to track newlines.
 
-        Progress bars (tqdm) write ``\r`` followed by bar content
-        to update in-place. When the bar finishes with
-        ``leave=False``, tqdm clears it by writing
-        ``\r`` + whitespace + ``\r``. When it finishes with
-        ``leave=True`` (the default), tqdm emits a trailing ``\n``,
-        which scrolls the terminal and pushes the animated line
-        one row further up — so we must track ``\n`` here too,
-        otherwise subsequent frames render on the wrong row.
-
-        We pause when we see ``\r`` followed by visible
-        (non-whitespace) content, and resume when we see
-        ``\n`` or the clear pattern (only whitespace after ``\r``).
+        A ``\n`` on stderr (e.g. tqdm finishing with ``leave=True``,
+        log records, warnings) scrolls the terminal and pushes the
+        animated line one row further up — so we must track ``\n``
+        here too, otherwise subsequent frames render on the wrong row.
 
         """
         with self._lock:
-            if "\r" in s:
-                # Text after the last \r determines
-                # whether a bar is on screen.
-                after_cr = s.rsplit("\r", 1)[1]
-                if after_cr.strip():
-                    # Visible bar content → pause
-                    self._paused = True
-                else:
-                    # Only whitespace after \r → bar cleared
-                    self._paused = False
             newline_count = s.count("\n")
             if newline_count:
                 self._lines_below += newline_count
-                self._paused = False
             # Write under the lock so shimmer frames on stdout cannot
             # interleave at the terminal with a tqdm bar update on stderr.
             return self._original_stderr_write(s)
@@ -242,29 +222,20 @@ class Shimmer:
         pos = 0.0
         speed = 0.8  # characters per frame
 
-        was_paused = False
         while not self._stop_event.is_set():
-            # Hold the lock across the pause check *and* the frame emit,
-            # so another thread cannot flip _paused or scroll the terminal
-            # between the decision and the draw. _write_frame reacquires
-            # the lock; RLock makes that safe.
+            # Hold the lock across the frame emit, so another thread
+            # cannot scroll the terminal between rendering and the draw.
+            # _write_frame reacquires the lock; RLock makes that safe.
             with self._lock:
-                if not self._paused:
-                    center = sweep_start + pos
-                    frame = self._render_frame(center)
-                    self._write_frame(frame)
-                    # Wrap pos each step so it stays bounded in
-                    # [0, sweep_range). Over a long publish (hours
-                    # at 20 Hz) an unbounded float would grow into
-                    # the range where adding 0.8 loses precision and
-                    # the modulo-on-render drifts.
-                    pos = (pos + speed) % sweep_range
-                    was_paused = False
-                elif not was_paused:
-                    # Write plain text on first paused frame
-                    # to clear any leftover bold highlighting.
-                    self._write_frame(self._text)
-                    was_paused = True
+                center = sweep_start + pos
+                frame = self._render_frame(center)
+                self._write_frame(frame)
+                # Wrap pos each step so it stays bounded in
+                # [0, sweep_range). Over a long publish (hours
+                # at 20 Hz) an unbounded float would grow into
+                # the range where adding 0.8 loses precision and
+                # the modulo-on-render drifts.
+                pos = (pos + speed) % sweep_range
             self._stop_event.wait(self._interval)
 
     def __enter__(self):  # pragma: no cover

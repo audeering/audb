@@ -1,7 +1,6 @@
 import io
 import os
 import sys
-import time
 
 import numpy as np
 
@@ -29,32 +28,27 @@ def test_stdout_write_hook():
 
 
 def test_stderr_write_hook():
-    r"""Ensure stderr write hook detects progress-bar activity.
+    r"""Ensure stderr write hook tracks newlines.
 
-    A ``\r`` followed by visible content pauses the shimmer,
-    and ``\r`` followed by only whitespace resumes it.
     A ``\n`` on stderr (e.g. tqdm finishing with ``leave=True``,
     log records, warnings) scrolls the terminal and must
-    advance ``_lines_below``.
+    advance ``_lines_below``. Carriage returns from in-place
+    progress-bar updates do not scroll and must be ignored.
 
     """
     buf = io.StringIO()
     shimmer = Shimmer("", "test")
     shimmer._original_stderr_write = buf.write
 
-    # Visible bar content after \r → pause
+    # Carriage-return bar updates do not scroll the terminal
+    assert shimmer._lines_below == 0
     shimmer._stderr_write_hook("\r50%|####")
-    assert shimmer._paused is True
-
-    # Only whitespace after \r → resume
     shimmer._stderr_write_hook("\r   \r")
-    assert shimmer._paused is False
+    assert shimmer._lines_below == 0
 
     # tqdm leave=True finisher: trailing \n scrolls the terminal
-    assert shimmer._lines_below == 0
     shimmer._stderr_write_hook("\n")
     assert shimmer._lines_below == 1
-    assert shimmer._paused is False
 
     # Plain stderr log line with an embedded newline also scrolls
     shimmer._stderr_write_hook("oops\nmore\n")
@@ -140,40 +134,6 @@ def test_second_shimmer_becomes_noop(monkeypatch):
 
     # After both stopped, no active shimmer
     assert shimmer_module._active_shimmer is None
-
-
-def test_animate_paused_clears_bold(monkeypatch):
-    """When paused, the animation writes plain text to clear bold."""
-    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
-    frames = []
-    shimmer = Shimmer("", "hello", interval=0.01)
-
-    # Patch _write_frame before start() to avoid race with animation thread
-    original_write_frame = shimmer._write_frame
-
-    def capture_frame(rendered_text):
-        frames.append(rendered_text)
-        original_write_frame(rendered_text)
-
-    shimmer._write_frame = capture_frame
-    shimmer.start()
-    try:
-        # Let animation run a couple of frames unpaused
-        time.sleep(0.2)
-        # At least one animated frame should contain BOLD
-        assert any(BOLD in f for f in frames)
-        # Simulate a progress bar pausing the shimmer
-        frames.clear()
-        with shimmer._lock:
-            shimmer._paused = True
-        # Let the animation loop pick up the paused state
-        time.sleep(0.2)
-        # The paused frame should be plain text without BOLD
-        assert len(frames) == 1
-        assert BOLD not in frames[0]
-        assert frames[0] == "hello"
-    finally:
-        shimmer.stop()
 
 
 def test_render_frame():
