@@ -124,17 +124,8 @@ def available(
                             if audeer.is_semantic_version(v)
                         ]
                     )
-                    found = []
-                    if only_latest:
-                        for version in reversed(versions):
-                            if version_exists(name, version):
-                                found.append(version)
-                                break
-                    else:
-                        for version in versions:
-                            if version_exists(name, version):
-                                found.append(version)
-                    return name, found
+                    existing = [v for v in versions if version_exists(name, v)]
+                    return name, existing
 
                 names = backend.ls_dirs("/")
                 max_workers = min(num_workers, max(1, len(names)))
@@ -150,6 +141,16 @@ def available(
         databases,
         columns=["name", "backend", "host", "repository", "version"],
     )
+    if only_latest:
+        df = df[
+            df["version"]
+            == df.groupby("name")["version"].transform(
+                lambda x: audeer.sort_versions(x)[-1]
+            )
+        ]
+    else:
+        df = df.sort_values(by=["version"], key=audeer.sort_versions)
+
     df = df.sort_values(by=["name"])
     return df.set_index("name")
 
