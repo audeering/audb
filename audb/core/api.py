@@ -27,12 +27,16 @@ from audb.core.repository import Repository
 def available(
     *,
     only_latest: bool = False,
+    num_workers: int = 1,
     repositories: Repository | Sequence[Repository] = None,
 ) -> pd.DataFrame:
     r"""List all databases that are available to the user.
 
     Args:
         only_latest: include only latest version of database
+        num_workers: number of parallel workers
+            used to collect the versions of the databases.
+            Brings speedups under On MinIO/S3 backends
         repositories: search only in the given repositories.
             If ``None``,
             :attr:`audb.config.REPOSITORIES` is used
@@ -64,6 +68,25 @@ def available(
             ]
         )
 
+    num_workers = max(1, num_workers)
+
+    def match_connection_pool_size(backend):
+        """Match the HTTP connection pool size to ``num_workers``.
+
+        On MinIO/S3 backends the underlying ``urllib3.PoolManager``
+        keeps only a single connection per host by default.
+        Without this, the parallel workers
+        would constantly open and discard connections.
+
+        """
+        pool_kw = getattr(
+            getattr(getattr(backend, "_client", None), "_http", None),
+            "connection_pool_kw",
+            None,
+        )
+        if isinstance(pool_kw, dict):
+            pool_kw["maxsize"] = num_workers
+
     if repositories is not None:
         repositories = audeer.to_list(repositories)
     else:
@@ -72,6 +95,9 @@ def available(
     for repository in repositories:
         try:
             backend_interface = repository.create_backend_interface()
+            # Set the connection pool size before opening the backend,
+            # as the pool is created lazily on the first request.
+            match_connection_pool_size(backend_interface.backend)
             with backend_interface.backend as backend:
 
                 def version_exists(name, version):
@@ -111,7 +137,7 @@ def available(
                     return name, found
 
                 names = backend.ls_dirs("/")
-                max_workers = min(10, max(1, len(names)))
+                max_workers = min(num_workers, max(1, len(names)))
                 with concurrent.futures.ThreadPoolExecutor(max_workers) as pool:
                     for name, versions in pool.map(collect_versions, names):
                         for version in versions:
