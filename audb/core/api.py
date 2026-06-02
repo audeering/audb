@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+import concurrent
 import os
 import tempfile
 
@@ -84,7 +85,12 @@ def available(
                     header_file = f"/{name}/{version}/{define.HEADER_FILE}"
                     return backend.exists(header_file)
 
-                for name in backend.ls_dirs("/"):
+                def collect_versions(name):
+                    """Existing versions of a database on the backend.
+
+                    Is limited to the latest with ``latest_version``.
+
+                    """
                     versions = audeer.sort_versions(
                         [
                             v
@@ -92,15 +98,24 @@ def available(
                             if audeer.is_semantic_version(v)
                         ]
                     )
+                    found = []
                     if only_latest:
                         for version in reversed(versions):
                             if version_exists(name, version):
-                                add_database(name, version, repository)
+                                found.append(version)
                                 break
                     else:
                         for version in versions:
                             if version_exists(name, version):
-                                add_database(name, version, repository)
+                                found.append(version)
+                    return name, found
+
+                names = backend.ls_dirs("/")
+                max_workers = min(10, max(1, len(names)))
+                with concurrent.futures.ThreadPoolExecutor(max_workers) as pool:
+                    for name, versions in pool.map(collect_versions, names):
+                        for version in versions:
+                            add_database(name, version, repository)
 
         except (audbackend.BackendError, ValueError):
             continue
