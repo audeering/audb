@@ -257,15 +257,6 @@ class Shimmer:
                 pos = (pos + speed) % sweep_range
             self._stop_event.wait(self._interval)
 
-    def __enter__(self):  # pragma: no cover
-        """Start shimmer as context manager."""
-        self.start()
-        return self
-
-    def __exit__(self, *args):  # pragma: no cover
-        """Stop shimmer when exiting context manager."""
-        self.stop()
-
 
 @contextlib.contextmanager
 def shimmer(
