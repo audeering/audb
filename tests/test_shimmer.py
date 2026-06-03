@@ -194,6 +194,13 @@ def test_write_frame_skips_when_scrolled_off(monkeypatch):
     buf.truncate(0)
     buf.seek(0)
 
+    # Still within viewport: 8 lines below + 1 = 9 < 10
+    shimmer._lines_below = 8
+    shimmer._write_frame("test")
+    assert buf.getvalue() != ""
+    buf.truncate(0)
+    buf.seek(0)
+
     # Right at the boundary: up = 10 == height → skip
     shimmer._lines_below = 9
     shimmer._write_frame("test")
