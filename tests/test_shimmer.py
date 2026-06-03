@@ -145,7 +145,8 @@ def test_render_frame():
     assert f"{BOLD}c{RESET}" in frame
 
     # Characters far from center should be plain
-    assert frame.startswith("a") or frame.startswith(f"{BOLD}a{RESET}")
+    assert frame.startswith("a")
+    assert frame.endswith("e")
 
     # Character at fading edge (within window but low brightness)
     # should appear plain. With width=4, half=2.0, a character at
