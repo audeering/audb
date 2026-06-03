@@ -1135,8 +1135,6 @@ def load(
     if version is None:
         version = latest_version(name)
 
-    db = None
-    cached_versions = None
     flavor = Flavor(
         channels=channels,
         format=format,
@@ -1153,158 +1151,206 @@ def load(
         enabled=verbose,
         message=f"Cache: {db_root}",
     ):
-        try:
-            deps = dependencies(
+        db = _load(
+            name,
+            version,
+            only_metadata,
+            attachments,
+            tables,
+            media,
+            removed_media,
+            full_path,
+            pickle_tables,
+            cache_root,
+            num_workers,
+            timeout,
+            verbose,
+            flavor,
+            db_root,
+            scan_for_missing_files,
+        )
+
+    return db
+
+
+def _load(
+    name: str,
+    version: str,
+    only_metadata: bool,
+    attachments: str | Sequence[str],
+    tables: str | Sequence[str],
+    media: str | Sequence[str],
+    removed_media: bool,
+    full_path: bool,
+    pickle_tables: bool,
+    cache_root: str | None,
+    num_workers: int | None,
+    timeout: float,
+    verbose: bool,
+    flavor: Flavor,
+    db_root: str,
+    scan_for_missing_files: bool,
+) -> audformat.Database | None:
+    r"""Load database without the progress animation.
+
+    The body of :func:`load` lives here so that :func:`load`
+    only sets up and tears down the :func:`shimmer` animation.
+
+    """
+    db = None
+    cached_versions = None
+    try:
+        deps = dependencies(
+            name,
+            version=version,
+            cache_root=cache_root,
+        )
+
+        with FolderLock(db_root, timeout=timeout):
+            # Start with database header without tables
+            db, backend_interface = load_header_to(
+                db_root,
                 name,
-                version=version,
-                cache_root=cache_root,
+                version,
+                flavor=flavor,
+                add_audb_meta=True,
             )
 
-            with FolderLock(db_root, timeout=timeout):
-                # Start with database header without tables
-                db, backend_interface = load_header_to(
+            db_is_complete = _database_is_complete(db)
+
+            # load attachments
+            if not db_is_complete and not only_metadata:
+                # filter attachments
+                requested_attachments = filter_deps(
+                    attachments,
+                    db.attachments,
+                    "attachment",
+                )
+
+                cached_versions = _load_attachments(
+                    requested_attachments,
+                    backend_interface,
                     db_root,
-                    name,
-                    version,
-                    flavor=flavor,
-                    add_audb_meta=True,
-                )
-
-                db_is_complete = _database_is_complete(db)
-
-                # load attachments
-                if not db_is_complete and not only_metadata:
-                    # filter attachments
-                    requested_attachments = filter_deps(
-                        attachments,
-                        db.attachments,
-                        "attachment",
-                    )
-
-                    cached_versions = _load_attachments(
-                        requested_attachments,
-                        backend_interface,
-                        db_root,
-                        db,
-                        version,
-                        cached_versions,
-                        deps,
-                        flavor,
-                        cache_root,
-                        num_workers,
-                        verbose,
-                    )
-
-                # filter tables (convert regexp pattern to list of tables)
-                requested_tables = filter_deps(tables, list(db), "table")
-
-                # add/split into misc tables used in a scheme
-                # and all other (misc) tables
-                requested_misc_tables = _misc_tables_used_in_scheme(db)
-                requested_tables = [
-                    table
-                    for table in requested_tables
-                    if table not in requested_misc_tables
-                ]
-
-                # load missing tables
-                if not db_is_complete:
-                    for _tables in [
-                        requested_misc_tables,
-                        requested_tables,
-                    ]:
-                        # need to load misc tables used in a scheme first
-                        # as loading is done in parallel
-                        cached_versions = _load_files(
-                            _tables,
-                            "table",
-                            backend_interface,
-                            db_root,
-                            db,
-                            version,
-                            cached_versions,
-                            deps,
-                            flavor,
-                            cache_root,
-                            pickle_tables,
-                            scan_for_missing_files,
-                            num_workers,
-                            verbose,
-                        )
-                requested_tables = requested_misc_tables + requested_tables
-
-                # filter tables
-                if tables is not None:
-                    db.pick_tables(requested_tables)
-
-                # load tables
-                for table in requested_tables:
-                    db[table].load(os.path.join(db_root, f"db.{table}"))
-
-                # filter media
-                requested_media = filter_deps(
-                    media,
-                    db.files,
-                    "media",
-                    name,
-                    version,
-                )
-
-                # load missing media
-                if not db_is_complete and not only_metadata:
-                    cached_versions = _load_files(
-                        requested_media,
-                        "media",
-                        backend_interface,
-                        db_root,
-                        db,
-                        version,
-                        cached_versions,
-                        deps,
-                        flavor,
-                        cache_root,
-                        False,
-                        scan_for_missing_files,
-                        num_workers,
-                        verbose,
-                    )
-
-                # filter media
-                if media is not None or tables is not None:
-                    db.pick_files(requested_media)
-
-                if not removed_media:
-                    _remove_media(db, deps, num_workers, verbose)
-
-                # Adjust full paths and file extensions in tables
-                _update_path(
                     db,
-                    db_root,
-                    full_path,
-                    flavor.format,
+                    version,
+                    cached_versions,
+                    deps,
+                    flavor,
+                    cache_root,
                     num_workers,
                     verbose,
                 )
 
-                # set file durations
-                _files_duration(
-                    db,
-                    deps,
+            # filter tables (convert regexp pattern to list of tables)
+            requested_tables = filter_deps(tables, list(db), "table")
+
+            # add/split into misc tables used in a scheme
+            # and all other (misc) tables
+            requested_misc_tables = _misc_tables_used_in_scheme(db)
+            requested_tables = [
+                table
+                for table in requested_tables
+                if table not in requested_misc_tables
+            ]
+
+            # load missing tables
+            if not db_is_complete:
+                for _tables in [
+                    requested_misc_tables,
+                    requested_tables,
+                ]:
+                    # need to load misc tables used in a scheme first
+                    # as loading is done in parallel
+                    cached_versions = _load_files(
+                        _tables,
+                        "table",
+                        backend_interface,
+                        db_root,
+                        db,
+                        version,
+                        cached_versions,
+                        deps,
+                        flavor,
+                        cache_root,
+                        pickle_tables,
+                        scan_for_missing_files,
+                        num_workers,
+                        verbose,
+                    )
+            requested_tables = requested_misc_tables + requested_tables
+
+            # filter tables
+            if tables is not None:
+                db.pick_tables(requested_tables)
+
+            # load tables
+            for table in requested_tables:
+                db[table].load(os.path.join(db_root, f"db.{table}"))
+
+            # filter media
+            requested_media = filter_deps(
+                media,
+                db.files,
+                "media",
+                name,
+                version,
+            )
+
+            # load missing media
+            if not db_is_complete and not only_metadata:
+                cached_versions = _load_files(
                     requested_media,
-                    flavor.format,
+                    "media",
+                    backend_interface,
+                    db_root,
+                    db,
+                    version,
+                    cached_versions,
+                    deps,
+                    flavor,
+                    cache_root,
+                    False,
+                    scan_for_missing_files,
+                    num_workers,
+                    verbose,
                 )
 
-                # check if database is now complete
-                if not db_is_complete:
-                    _database_check_complete(
-                        db,
-                        db_root,
-                        flavor,
-                        deps,
-                    )
+            # filter media
+            if media is not None or tables is not None:
+                db.pick_files(requested_media)
 
-        except filelock.Timeout:
-            utils.timeout_warning()
+            if not removed_media:
+                _remove_media(db, deps, num_workers, verbose)
+
+            # Adjust full paths and file extensions in tables
+            _update_path(
+                db,
+                db_root,
+                full_path,
+                flavor.format,
+                num_workers,
+                verbose,
+            )
+
+            # set file durations
+            _files_duration(
+                db,
+                deps,
+                requested_media,
+                flavor.format,
+            )
+
+            # check if database is now complete
+            if not db_is_complete:
+                _database_check_complete(
+                    db,
+                    db_root,
+                    flavor,
+                    deps,
+                )
+
+    except filelock.Timeout:
+        utils.timeout_warning()
 
     return db
 
@@ -1570,7 +1616,6 @@ def load_media(
     if version is None:
         version = latest_version(name)
 
-    files = None
     flavor = Flavor(
         channels=channels,
         format=format,
@@ -1587,66 +1632,102 @@ def load_media(
         enabled=verbose,
         message=f"Cache: {db_root}",
     ):
-        try:
-            deps = dependencies(
+        files = _load_media(
+            name,
+            media,
+            version,
+            format,
+            cache_root,
+            num_workers,
+            timeout,
+            verbose,
+            flavor,
+            db_root,
+            scan_for_missing_files,
+        )
+
+    return files
+
+
+def _load_media(
+    name: str,
+    media: Sequence[str],
+    version: str,
+    format: str | None,
+    cache_root: str | None,
+    num_workers: int | None,
+    timeout: float,
+    verbose: bool,
+    flavor: Flavor,
+    db_root: str,
+    scan_for_missing_files: bool,
+) -> list | None:
+    r"""Load media file(s) without the progress animation.
+
+    The body of :func:`load_media` lives here so that
+    :func:`load_media` only sets up and tears down the
+    :func:`shimmer` animation.
+
+    """
+    files = None
+    try:
+        deps = dependencies(
+            name,
+            version=version,
+            cache_root=cache_root,
+        )
+
+        available_files = set(deps.media)
+        missing = set(media) - available_files
+        if missing:
+            msg = error_message_missing_object(
+                "media",
+                sorted(missing),
                 name,
-                version=version,
-                cache_root=cache_root,
+                version,
+            )
+            raise ValueError(msg)
+
+        with FolderLock(db_root, timeout=timeout):
+            # Start with database header without tables
+            db, backend_interface = load_header_to(
+                db_root,
+                name,
+                version,
+                flavor=flavor,
+                add_audb_meta=True,
             )
 
-            available_files = set(deps.media)
-            missing = set(media) - available_files
-            if missing:
-                msg = error_message_missing_object(
+            db_is_complete = _database_is_complete(db)
+
+            # load missing media
+            if not db_is_complete:
+                _load_files(
+                    media,
                     "media",
-                    sorted(missing),
-                    name,
-                    version,
-                )
-                raise ValueError(msg)
-
-            with FolderLock(db_root, timeout=timeout):
-                # Start with database header without tables
-                db, backend_interface = load_header_to(
+                    backend_interface,
                     db_root,
-                    name,
+                    db,
                     version,
-                    flavor=flavor,
-                    add_audb_meta=True,
+                    None,
+                    deps,
+                    flavor,
+                    cache_root,
+                    False,
+                    scan_for_missing_files,
+                    num_workers,
+                    verbose,
                 )
 
-                db_is_complete = _database_is_complete(db)
+            if format is not None:
+                media = [audeer.replace_file_extension(m, format) for m in media]
+            files = [
+                os.path.join(db_root, os.path.normpath(file))  # convert "/" to os.sep
+                for file in media
+            ]
 
-                # load missing media
-                if not db_is_complete:
-                    _load_files(
-                        media,
-                        "media",
-                        backend_interface,
-                        db_root,
-                        db,
-                        version,
-                        None,
-                        deps,
-                        flavor,
-                        cache_root,
-                        False,
-                        scan_for_missing_files,
-                        num_workers,
-                        verbose,
-                    )
-
-                if format is not None:
-                    media = [audeer.replace_file_extension(m, format) for m in media]
-                files = [
-                    os.path.join(
-                        db_root, os.path.normpath(file)
-                    )  # convert "/" to os.sep
-                    for file in media
-                ]
-
-        except filelock.Timeout:
-            utils.timeout_warning()
+    except filelock.Timeout:
+        utils.timeout_warning()
 
     return files
 
