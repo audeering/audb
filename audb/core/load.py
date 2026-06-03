@@ -1146,10 +1146,10 @@ def load(
     scan_for_missing_files = not is_empty(db_root)
 
     with shimmer(
-        "Get:   ",
-        f"{name} v{version}",
+        prefix="Get:   ",
+        text=f"{name} v{version}",
+        next_line=f"Cache: {db_root}",
         enabled=verbose,
-        message=f"Cache: {db_root}",
     ):
         db = _load(
             name,
@@ -1397,10 +1397,10 @@ def load_attachment(
     db_root = database_cache_root(name, version, cache_root)
 
     with shimmer(
-        "Get:   ",
-        f"{name} v{version}",
+        prefix="Get:   ",
+        text=f"{name} v{version}",
+        next_line=f"Cache: {db_root}",
         enabled=verbose,
-        message=f"Cache: {db_root}",
     ):
         deps = dependencies(
             name,
@@ -1627,10 +1627,10 @@ def load_media(
     scan_for_missing_files = not is_empty(db_root)
 
     with shimmer(
-        "Get:   ",
-        f"{name} v{version}",
+        prefix="Get:   ",
+        text=f"{name} v{version}",
+        next_line=f"Cache: {db_root}",
         enabled=verbose,
-        message=f"Cache: {db_root}",
     ):
         files = _load_media(
             name,
@@ -1823,10 +1823,10 @@ def load_table(
     scan_for_missing_files = not is_empty(db_root)
 
     with shimmer(
-        "Get:   ",
-        f"{name} v{version}",
+        prefix="Get:   ",
+        text=f"{name} v{version}",
+        next_line=f"Cache: {db_root}",
         enabled=verbose,
-        message=f"Cache: {db_root}",
     ):
         deps = dependencies(
             name,

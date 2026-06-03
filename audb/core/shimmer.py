@@ -263,8 +263,8 @@ def shimmer(
     prefix: str,
     text: str,
     *,
+    next_line: str | None = None,
     enabled: bool = True,
-    message: str | None = None,
 ):
     r"""Animate *text* for the duration of the ``with`` block.
 
@@ -277,11 +277,11 @@ def shimmer(
     Args:
         prefix: static text before the animated portion
         text: text to animate (e.g. the database name)
+        next_line: optional line printed right after the
+            animation starts, e.g. the cache or target directory
         enabled: whether to run the animation at all.
             When ``False`` the block runs untouched,
             which is typically wired to ``verbose``
-        message: optional line printed right after the
-            animation starts, e.g. the cache or target directory
 
     """
     if not enabled:
@@ -289,8 +289,8 @@ def shimmer(
         return
     animation = Shimmer(prefix, text)
     animation.start()
-    if message is not None:
-        print(message)
+    if next_line is not None:
+        print(next_line)
     try:
         yield
     finally:

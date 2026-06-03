@@ -342,10 +342,10 @@ def load_to(
     db_root_tmp = database_tmp_root(db_root)
 
     with shimmer(
-        "Get:   ",
-        f"{name} v{version}",
+        prefix="Get:   ",
+        text=f"{name} v{version}",
+        next_line=f"To: {db_root}",
         enabled=verbose,
-        message=f"To: {db_root}",
     ):
         db = _load_to(
             db_root,
