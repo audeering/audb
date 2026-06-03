@@ -19,7 +19,7 @@ from audb.core.api import versions as api_versions
 from audb.core.dependencies import Dependencies
 from audb.core.dependencies import upload_dependencies
 from audb.core.repository import Repository
-from audb.core.shimmer import Shimmer
+from audb.core.shimmer import shimmer
 
 
 def _check_for_duplicates(
@@ -739,13 +739,12 @@ def publish(
         verbose=verbose,
     )
 
-    shimmer = None
-    if verbose:  # pragma: no cover
-        shimmer = Shimmer("Put:   ", f"{db.name} v{version}")
-        shimmer.start()
-        print(f"Source: {db_root}")
-
-    try:
+    with shimmer(
+        "Put:   ",
+        f"{db.name} v{version}",
+        enabled=verbose,
+        message=f"Source: {db_root}",
+    ):
         deps = _publish(
             db,
             db_root,
@@ -757,9 +756,6 @@ def publish(
             num_workers,
             verbose,
         )
-    finally:
-        if shimmer is not None:  # pragma: no cover
-            shimmer.stop()
 
     return deps
 

@@ -14,7 +14,7 @@ from audb.core.api import latest_version
 from audb.core.dependencies import Dependencies
 from audb.core.load import database_tmp_root
 from audb.core.load import load_header_to
-from audb.core.shimmer import Shimmer
+from audb.core.shimmer import shimmer
 
 
 def _find_attachments(
@@ -341,13 +341,12 @@ def load_to(
     db_root = audeer.path(root, follow_symlink=True)
     db_root_tmp = database_tmp_root(db_root)
 
-    shimmer = None
-    if verbose:  # pragma: no cover
-        shimmer = Shimmer("Get:   ", f"{name} v{version}")
-        shimmer.start()
-        print(f"To: {db_root}")
-
-    try:
+    with shimmer(
+        "Get:   ",
+        f"{name} v{version}",
+        enabled=verbose,
+        message=f"To: {db_root}",
+    ):
         db = _load_to(
             db_root,
             db_root_tmp,
@@ -359,9 +358,6 @@ def load_to(
             num_workers,
             verbose,
         )
-    finally:
-        if shimmer is not None:  # pragma: no cover
-            shimmer.stop()
 
     # remove the temporal directory
     # to signal all files were correctly loaded

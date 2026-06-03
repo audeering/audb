@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import math
 import shutil
 import sys
@@ -264,3 +265,42 @@ class Shimmer:
     def __exit__(self, *args):  # pragma: no cover
         """Stop shimmer when exiting context manager."""
         self.stop()
+
+
+@contextlib.contextmanager
+def shimmer(
+    prefix: str,
+    text: str,
+    *,
+    enabled: bool = True,
+    message: str | None = None,
+):
+    r"""Animate *text* for the duration of the ``with`` block.
+
+    Wraps :class:`Shimmer` so a call site needs only a single
+    ``with`` statement instead of the
+    ``start()`` / ``try`` / ``finally`` / ``stop()`` dance.
+    The animation is always stopped on exit,
+    including when the block raises.
+
+    Args:
+        prefix: static text before the animated portion
+        text: text to animate (e.g. the database name)
+        enabled: whether to run the animation at all.
+            When ``False`` the block runs untouched,
+            which is typically wired to ``verbose``
+        message: optional line printed right after the
+            animation starts, e.g. the cache or target directory
+
+    """
+    if not enabled:
+        yield
+        return
+    animation = Shimmer(prefix, text)
+    animation.start()
+    if message is not None:
+        print(message)
+    try:
+        yield
+    finally:
+        animation.stop()
