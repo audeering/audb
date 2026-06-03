@@ -83,13 +83,17 @@ def test_start_stop_tracks_newlines(monkeypatch):
     """Integration test: start installs hook, stdout tracks newlines, stop restores."""
     # Ensure stdout looks like a TTY for the shimmer to activate
     monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
+    # stdout normally exposes ``write`` as a class method, so there is
+    # no instance-level override before we patch.
+    assert "write" not in vars(sys.stdout)
     original_write = sys.stdout.write
 
     shimmer = Shimmer("", "test")
     shimmer.start()
     try:
-        # The hook should be installed
+        # The hook should be installed as an instance-level override
         assert sys.stdout.write is not original_write
+        assert "write" in vars(sys.stdout)
         # Write text with newlines via the hooked stdout
         sys.stdout.write("line1\nline2\nline3\n")
         assert shimmer._lines_below == 3
@@ -99,8 +103,12 @@ def test_start_stop_tracks_newlines(monkeypatch):
     finally:
         shimmer.stop()
 
-    # After stop(), original write must be restored
-    assert sys.stdout.write is original_write
+    # After stop(), the instance-level override must be removed entirely
+    # (not merely re-pointed at the original), so attribute lookup falls
+    # back to the class method. Bound methods compare equal by value, so
+    # use ``==`` rather than ``is``.
+    assert "write" not in vars(sys.stdout)
+    assert sys.stdout.write == original_write
 
 
 def test_noop_when_not_a_tty(monkeypatch):
@@ -110,10 +118,63 @@ def test_noop_when_not_a_tty(monkeypatch):
 
     shimmer = Shimmer("", "test")
     shimmer.start()
-    # Should not have patched stdout
-    assert sys.stdout.write is original_write
+    # Should not have patched stdout: no instance-level override installed.
+    # (Bound methods compare equal by value, not identity, so use ``==``.)
+    assert "write" not in vars(sys.stdout)
+    assert sys.stdout.write == original_write
     assert shimmer._noop is True
     shimmer.stop()
+
+
+def test_restores_pre_existing_instance_write(monkeypatch):
+    """A pre-existing instance-level ``write`` is restored, not deleted.
+
+    When the stream already carries its own ``write`` in ``__dict__``
+    (e.g. it has been wrapped by another tool), stop() must put that
+    exact object back rather than removing the attribute and exposing
+    a class method that does not exist on such a stream.
+
+    """
+
+    class _FakeTTY:
+        def __init__(self):
+            self.data = []
+            # Pre-existing instance-level write override.
+            self.write = self._write
+
+        def _write(self, s):
+            self.data.append(s)
+            return len(s)
+
+        def flush(self):
+            pass
+
+        def isatty(self):
+            return True
+
+    fake_out = _FakeTTY()
+    fake_err = _FakeTTY()
+    monkeypatch.setattr(sys, "stdout", fake_out)
+    monkeypatch.setattr(sys, "stderr", fake_err)
+
+    original_out_write = fake_out.write
+    original_err_write = fake_err.write
+    assert "write" in vars(fake_out)
+    assert "write" in vars(fake_err)
+
+    shimmer = Shimmer("", "test")
+    shimmer.start()
+    try:
+        # Hooks installed over the pre-existing overrides.
+        assert fake_out.write == shimmer._stdout_write_hook
+        assert fake_err.write == shimmer._stderr_write_hook
+    finally:
+        shimmer.stop()
+
+    # The original instance-level overrides are restored exactly,
+    # not removed (which would have re-exposed a non-existent class method).
+    assert fake_out.write is original_out_write
+    assert fake_err.write is original_err_write
 
 
 def test_second_shimmer_becomes_noop(monkeypatch):

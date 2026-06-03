@@ -61,6 +61,10 @@ class Shimmer:
         self._lock = threading.RLock()
         self._original_stdout_write = None
         self._original_stderr_write = None
+        # Whether stdout/stderr already had an instance-level ``write``
+        # override before we patched, so stop() can restore exactly.
+        self._stdout_had_own_write = False
+        self._stderr_had_own_write = False
         self._noop = False
 
     def start(self):
@@ -98,6 +102,11 @@ class Shimmer:
         sys.stdout.flush()
         # Monkey-patch write() on the existing stream objects
         # so all other attributes (fileno, encoding, isatty, …) stay intact.
+        # Remember whether ``write`` already lived in the stream's instance
+        # __dict__ (vs. being the class method) so stop() can decide between
+        # deleting our override and restoring a pre-existing one.
+        self._stdout_had_own_write = "write" in vars(sys.stdout)
+        self._stderr_had_own_write = "write" in vars(sys.stderr)
         self._original_stdout_write = sys.stdout.write
         self._original_stderr_write = sys.stderr.write
         sys.stdout.write = self._stdout_write_hook
@@ -115,11 +124,20 @@ class Shimmer:
         self._stop_event.set()
         if self._thread is not None:
             self._thread.join()
-        # Restore original write methods
+        # Restore original write methods. If we introduced the instance-level
+        # override, delete it so attribute lookup falls back to the class
+        # method and the stream's __dict__ returns to its pre-patch state.
+        # If an override already existed, put that exact object back.
         if self._original_stdout_write is not None:
-            sys.stdout.write = self._original_stdout_write
+            if self._stdout_had_own_write:
+                sys.stdout.write = self._original_stdout_write
+            else:
+                del sys.stdout.write
         if self._original_stderr_write is not None:
-            sys.stderr.write = self._original_stderr_write
+            if self._stderr_had_own_write:
+                sys.stderr.write = self._original_stderr_write
+            else:
+                del sys.stderr.write
         # Write final static line over the animated one
         self._write_frame(self._text)
 
