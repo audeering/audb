@@ -1700,8 +1700,7 @@ def _load_media(
             raise ValueError(msg)
 
         # A complete database is never modified,
-        # so its cache folder does not need to be locked,
-        # see https://github.com/audeering/audb/issues/197
+        # so its cache folder does not need to be locked.
         complete = utils.database_is_complete(db_root)
         if complete:
             lock = contextlib.nullcontext()
