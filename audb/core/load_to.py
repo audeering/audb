@@ -14,6 +14,7 @@ from audb.core.api import latest_version
 from audb.core.dependencies import Dependencies
 from audb.core.load import database_tmp_root
 from audb.core.load import load_header_to
+from audb.core.shimmer import shimmer
 
 
 def _find_attachments(
@@ -340,6 +341,56 @@ def load_to(
     db_root = audeer.path(root, follow_symlink=True)
     db_root_tmp = database_tmp_root(db_root)
 
+    with shimmer(
+        prefix="Get:   ",
+        text=f"{name} v{version}",
+        next_line=f"To: {db_root}",
+        enabled=verbose,
+    ):
+        db = _load_to(
+            db_root,
+            db_root_tmp,
+            name,
+            version,
+            only_metadata,
+            pickle_tables,
+            cache_root,
+            num_workers,
+            verbose,
+        )
+
+    # remove the temporal directory
+    # to signal all files were correctly loaded
+    try:
+        _remove_empty_dirs(db_root_tmp)
+    except OSError:  # pragma: no cover
+        raise RuntimeError(
+            "Could not remove temporary directory, "
+            "probably there are some leftover files. "
+            "This should not happen."
+        )
+
+    return db
+
+
+def _load_to(
+    db_root: str,
+    db_root_tmp: str,
+    name: str,
+    version: str,
+    only_metadata: bool,
+    pickle_tables: bool,
+    cache_root: str | None,
+    num_workers: int | None,
+    verbose: bool,
+) -> audformat.Database:
+    r"""Load database to directory without the progress animation.
+
+    The body of :func:`load_to` lives here so that :func:`load_to`
+    only sets up and tears down the :class:`Shimmer` animation
+    and performs the final temporary-directory cleanup.
+
+    """
     # remove files with a wrong checksum
     # to ensure we load correct version
     update = os.path.exists(db_root) and os.listdir(db_root)
@@ -348,7 +399,6 @@ def load_to(
         name,
         version=version,
         cache_root=cache_root,
-        verbose=verbose,
     )
     if update:
         if only_metadata:
@@ -474,17 +524,6 @@ def load_to(
             db_root,
             header_only=True,
             verbose=verbose,
-        )
-
-    # remove the temporal directory
-    # to signal all files were correctly loaded
-    try:
-        _remove_empty_dirs(db_root_tmp)
-    except OSError:  # pragma: no cover
-        raise RuntimeError(
-            "Could not remove temporary directory, "
-            "probably there are some leftover files. "
-            "This should not happen."
         )
 
     return db

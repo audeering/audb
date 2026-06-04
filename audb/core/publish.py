@@ -19,6 +19,7 @@ from audb.core.api import versions as api_versions
 from audb.core.dependencies import Dependencies
 from audb.core.dependencies import upload_dependencies
 from audb.core.repository import Repository
+from audb.core.shimmer import shimmer
 
 
 def _check_for_duplicates(
@@ -738,6 +739,47 @@ def publish(
         verbose=verbose,
     )
 
+    with shimmer(
+        prefix="Put:   ",
+        text=f"{db.name} v{version}",
+        next_line=f"Source: {db_root}",
+        enabled=verbose,
+    ):
+        deps = _publish(
+            db,
+            db_root,
+            version,
+            repository,
+            archives,
+            previous_version,
+            cache_root,
+            num_workers,
+            verbose,
+        )
+
+    return deps
+
+
+def _publish(
+    db: audformat.Database,
+    db_root: str,
+    version: str,
+    repository: Repository,
+    archives: Mapping[str, str] | None,
+    previous_version: str | None,
+    cache_root: str | None,
+    num_workers: int | None,
+    verbose: bool,
+) -> Dependencies:
+    r"""Publish database without the progress animation.
+
+    The body of :func:`publish` lives here so that :func:`publish`
+    only sets up and tears down the :class:`Shimmer` animation,
+    keeping that plumbing separate from the publication logic.
+    ``db`` is the database header (loaded with ``load_data=False``);
+    it is reloaded with table data below.
+
+    """
     backend_interface = repository.create_backend_interface()
 
     with backend_interface.backend:
@@ -810,7 +852,6 @@ def publish(
             db.name,
             version=previous_version,
             cache_root=cache_root,
-            verbose=verbose,
         )
         if not deps().equals(previous_deps()):
             raise RuntimeError(
@@ -890,18 +931,37 @@ def publish(
         # publish attachments
         attachments = _find_attachments(db, db_root, version, deps, verbose)
         _put_attachments(
-            attachments, db_root, db, version, backend_interface, num_workers, verbose
+            attachments,
+            db_root,
+            db,
+            version,
+            backend_interface,
+            num_workers,
+            verbose,
         )
 
         # publish tables
         tables = _find_tables(db, db_root, version, deps, verbose)
         _put_tables(
-            tables, db_root, db.name, version, backend_interface, num_workers, verbose
+            tables,
+            db_root,
+            db.name,
+            version,
+            backend_interface,
+            num_workers,
+            verbose,
         )
 
         # publish media
         media_archives = _find_media(
-            db, db_root, db_root_files, version, deps, archives, num_workers, verbose
+            db,
+            db_root,
+            db_root_files,
+            version,
+            deps,
+            archives,
+            num_workers,
+            verbose,
         )
         _put_media(
             media_archives,
