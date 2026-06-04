@@ -20,7 +20,7 @@ If this file is present
 in the cache folder of a database,
 the database is loaded completely
 and its cache folder does not need to be locked,
-see https://github.com/audeering/audb/issues/197.
+see https://github.com/audeering/audb/pull/569.
 
 """
 

@@ -7,6 +7,7 @@ import pyarrow.parquet as parquet
 
 import audbackend
 import audeer
+import audformat
 
 from audb.core import define
 from audb.core.config import config
@@ -59,6 +60,53 @@ def mark_database_complete(db_root: str):
 
     """
     audeer.touch(os.path.join(db_root, define.COMPLETE_FILE))
+
+
+def database_is_complete_in_header(db: audformat.Database) -> bool:
+    r"""Check if a database is marked complete in its header.
+
+    Before the introduction of the ``.complete`` file
+    (see :func:`database_is_complete`),
+    the information if a database is complete
+    was stored in the database header (``db.yaml``).
+    This is still checked
+    for databases that were cached
+    with such an older version of audb.
+
+    Args:
+        db: database header object
+
+    Returns:
+        ``True`` if the header marks the database as complete
+
+    """
+    return db.meta.get("audb", {}).get("complete", False)
+
+
+def legacy_complete(db_root: str, db: audformat.Database) -> bool:
+    r"""Create a ``.complete`` file from a legacy header flag.
+
+    Databases cached with a version of audb
+    before the introduction of the ``.complete`` file
+    store their completeness in the database header instead
+    (see :func:`database_is_complete_in_header`).
+    If the header marks the database as complete,
+    the ``.complete`` file is created,
+    so the database can be loaded
+    without locking its cache folder afterwards.
+
+    Args:
+        db_root: database cache folder
+        db: database header object
+
+    Returns:
+        ``True`` if the header marks the database as complete
+
+    """
+    if database_is_complete_in_header(db):
+        mark_database_complete(db_root)
+        return True
+    return False
 
 
 def lock_cache(

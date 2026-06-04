@@ -203,29 +203,6 @@ def _database_check_complete(
     return True
 
 
-def _database_is_complete_in_header(
-    db: audformat.Database,
-) -> bool:
-    r"""Check if a database is marked complete in its header.
-
-    Before the introduction of the ``.complete`` file,
-    the information if a database is complete
-    was stored in the database header (``db.yaml``).
-    This is still checked
-    for databases that were cached
-    with such an older version of audb,
-    see :func:`audb.core.utils.database_is_complete`.
-
-    Args:
-        db: database object
-
-    Returns:
-        ``True`` if the header marks the database as complete
-
-    """
-    return db.meta.get("audb", {}).get("complete", False)
-
-
 def _files_duration(
     db: audformat.Database,
     deps: Dependencies,
@@ -1228,9 +1205,6 @@ def _load(
 
         # A complete database is never modified,
         # so its cache folder does not need to be locked.
-        # Completeness is indicated by a ``.complete`` file,
-        # which can be checked without acquiring the lock,
-        # see https://github.com/audeering/audb/issues/197
         complete = utils.database_is_complete(db_root)
         if complete:
             lock = contextlib.nullcontext()
@@ -1247,15 +1221,11 @@ def _load(
                 add_audb_meta=True,
             )
 
-            db_is_complete = complete
-            if not db_is_complete and _database_is_complete_in_header(db):
-                # Database was cached as complete
-                # with an older version of audb,
-                # which stored this information in the header.
-                # Create the ``.complete`` file,
-                # so locking can be skipped next time.
-                db_is_complete = True
-                utils.mark_database_complete(db_root)
+            # A database cached with an older version of audb
+            # stores its completeness in the header instead of
+            # in a ``.complete`` file, which is migrated here,
+            # see https://github.com/audeering/audb/pull/569
+            db_is_complete = complete or utils.legacy_complete(db_root, db)
 
             # load attachments
             if not db_is_complete and not only_metadata:
@@ -1387,9 +1357,7 @@ def _load(
                     deps,
                 )
 
-            # Store completeness in the returned database object.
-            # It is no longer written to the database header,
-            # see https://github.com/audeering/audb/issues/197
+            # Store completeness in the returned database object
             if "audb" in db.meta:
                 db.meta["audb"]["complete"] = db_is_complete
 
@@ -1754,13 +1722,11 @@ def _load_media(
                 add_audb_meta=True,
             )
 
-            db_is_complete = complete
-            if not db_is_complete and _database_is_complete_in_header(db):
-                # Database was cached as complete
-                # with an older version of audb,
-                # which stored this information in the header.
-                db_is_complete = True
-                utils.mark_database_complete(db_root)
+            # A database cached with an older version of audb
+            # stores its completeness in the header instead of
+            # in a ``.complete`` file, which is migrated here,
+            # see https://github.com/audeering/audb/pull/569
+            db_is_complete = complete or utils.legacy_complete(db_root, db)
 
             # load missing media
             if not db_is_complete:

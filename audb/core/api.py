@@ -285,10 +285,10 @@ def cached(
                     # Completeness is indicated by a ``.complete`` file.
                     # For databases cached with an older version of audb,
                     # it is still stored in the database header,
-                    # see https://github.com/audeering/audb/issues/197
-                    complete = utils.database_is_complete(flavor_id_path)
-                    if not complete:
-                        complete = db.meta["audb"].get("complete", False)
+                    # see https://github.com/audeering/audb/pull/569
+                    complete = utils.database_is_complete(
+                        flavor_id_path
+                    ) or utils.database_is_complete_in_header(db)
                     df.loc[flavor_id_path] = [
                         database,
                         flavor_id,
