@@ -1531,10 +1531,6 @@ def load_header_to(
         backend_interface.get_file(remote_header, local_header, version)
         if add_audb_meta:
             db = audformat.Database.load(db_root_tmp, load_data=False)
-            # Whether a database is complete
-            # is no longer stored in the header,
-            # but indicated by a ``.complete`` file in the cache folder,
-            # see https://github.com/audeering/audb/issues/197
             db.meta["audb"] = {
                 "root": db_root,
                 "version": version,
