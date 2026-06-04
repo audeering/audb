@@ -24,8 +24,7 @@ def database_is_complete(db_root: str) -> bool:
     As this file can be checked
     without acquiring a lock on the cache folder,
     it allows to load a complete database
-    without locking,
-    see https://github.com/audeering/audb/issues/197.
+    without locking.
 
     Databases that were cached
     with a version of audb
