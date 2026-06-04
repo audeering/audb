@@ -342,18 +342,53 @@ def test_complete_file(dbs):
 
 
 def test_complete_skips_lock(dbs):
-    r"""A complete database is loaded without acquiring the lock."""
+    r"""The cache folder is locked only for an incomplete database.
+
+    A complete database is loaded without acquiring the lock,
+    whereas an incomplete database still requires it.
+
+    """
+    # Partially load the database
+    # -> no `.complete` file
     db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        only_metadata=True,
+        full_path=False,
+        verbose=False,
+    )
+    db_root = db.meta["audb"]["root"]
+    lock_file = os.path.join(db_root, audb.core.define.LOCK_FILE)
+    assert not os.path.exists(os.path.join(db_root, audb.core.define.COMPLETE_FILE))
+
+    # Simulate a lock held by another process
+    audeer.touch(lock_file)
+    try:
+        # Loading acquires the lock for an incomplete database,
+        # hence it cannot be loaded with ``timeout=0``
+        with pytest.warns(UserWarning, match=audb.core.define.TIMEOUT_MSG):
+            db = audb.load(
+                DB_NAME,
+                version=DB_VERSION,
+                full_path=False,
+                timeout=0,
+                verbose=False,
+            )
+        assert db is None
+    finally:
+        os.remove(lock_file)
+
+    # Completely load the database
+    # -> `.complete` file is created
+    audb.load(
         DB_NAME,
         version=DB_VERSION,
         full_path=False,
         verbose=False,
     )
-    db_root = db.meta["audb"]["root"]
     assert os.path.exists(os.path.join(db_root, audb.core.define.COMPLETE_FILE))
 
     # Simulate a lock held by another process
-    lock_file = os.path.join(db_root, audb.core.define.LOCK_FILE)
     audeer.touch(lock_file)
     try:
         # Loading does not acquire the lock for a complete database,
