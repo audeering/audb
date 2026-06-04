@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+import contextlib
 import os
 import shutil
 
@@ -162,48 +163,67 @@ def _copy_path(
 
 
 def _database_check_complete(
-    db: audformat.Database,
     db_root: str,
     flavor: Flavor,
     deps: Dependencies,
-):
-    def check() -> bool:
-        complete = True
-        for attachment in deps.attachments:
-            if not os.path.exists(os.path.join(db_root, attachment)):
+) -> bool:
+    r"""Check if all files of a database are present in cache.
+
+    If the database is complete,
+    a ``.complete`` file is created
+    in its cache folder
+    (see :func:`audb.core.utils.database_is_complete`).
+    The presence of this file
+    allows to load the database afterwards
+    without locking its cache folder.
+
+    Args:
+        db_root: database cache folder
+        flavor: database flavor
+        deps: database dependencies
+
+    Returns:
+        ``True`` if the database is complete
+
+    """
+    for attachment in deps.attachments:
+        if not os.path.exists(os.path.join(db_root, attachment)):
+            return False
+    for table in deps.tables:
+        if not os.path.exists(os.path.join(db_root, table)):
+            return False
+    for media in deps.media:
+        if not deps.removed(media):
+            path = os.path.join(db_root, media)
+            path = flavor.destination(path)
+            if not os.path.exists(path):
                 return False
-        for table in deps.tables:
-            if not os.path.exists(os.path.join(db_root, table)):
-                return False
-        for media in deps.media:
-            if not deps.removed(media):
-                path = os.path.join(db_root, media)
-                path = flavor.destination(path)
-                if not os.path.exists(path):
-                    return False
-        return complete
 
-    if check():
-        db_root_tmp = database_tmp_root(db_root)
-        db.meta["audb"]["complete"] = True
-        db_original = audformat.Database.load(db_root, load_data=False)
-        db_original.meta["audb"]["complete"] = True
-        db_original.save(db_root_tmp, header_only=True)
-        audeer.move_file(
-            os.path.join(db_root_tmp, define.HEADER_FILE),
-            os.path.join(db_root, define.HEADER_FILE),
-        )
-        audeer.rmdir(db_root_tmp)
+    utils.mark_database_complete(db_root)
+    return True
 
 
-def _database_is_complete(
+def _database_is_complete_in_header(
     db: audformat.Database,
 ) -> bool:
-    complete = False
-    if "audb" in db.meta:
-        if "complete" in db.meta["audb"]:
-            complete = db.meta["audb"]["complete"]
-    return complete
+    r"""Check if a database is marked complete in its header.
+
+    Before the introduction of the ``.complete`` file,
+    the information if a database is complete
+    was stored in the database header (``db.yaml``).
+    This is still checked
+    for databases that were cached
+    with such an older version of audb,
+    see :func:`audb.core.utils.database_is_complete`.
+
+    Args:
+        db: database object
+
+    Returns:
+        ``True`` if the header marks the database as complete
+
+    """
+    return db.meta.get("audb", {}).get("complete", False)
 
 
 def _files_duration(
@@ -1206,7 +1226,18 @@ def _load(
             cache_root=cache_root,
         )
 
-        with FolderLock(db_root, timeout=timeout):
+        # A complete database is never modified,
+        # so its cache folder does not need to be locked.
+        # Completeness is indicated by a ``.complete`` file,
+        # which can be checked without acquiring the lock,
+        # see https://github.com/audeering/audb/issues/197
+        complete = utils.database_is_complete(db_root)
+        if complete:
+            lock = contextlib.nullcontext()
+        else:
+            lock = FolderLock(db_root, timeout=timeout)
+
+        with lock:
             # Start with database header without tables
             db, backend_interface = load_header_to(
                 db_root,
@@ -1216,7 +1247,15 @@ def _load(
                 add_audb_meta=True,
             )
 
-            db_is_complete = _database_is_complete(db)
+            db_is_complete = complete
+            if not db_is_complete and _database_is_complete_in_header(db):
+                # Database was cached as complete
+                # with an older version of audb,
+                # which stored this information in the header.
+                # Create the ``.complete`` file,
+                # so locking can be skipped next time.
+                db_is_complete = True
+                utils.mark_database_complete(db_root)
 
             # load attachments
             if not db_is_complete and not only_metadata:
@@ -1342,12 +1381,17 @@ def _load(
 
             # check if database is now complete
             if not db_is_complete:
-                _database_check_complete(
-                    db,
+                db_is_complete = _database_check_complete(
                     db_root,
                     flavor,
                     deps,
                 )
+
+            # Store completeness in the returned database object.
+            # It is no longer written to the database header,
+            # see https://github.com/audeering/audb/issues/197
+            if "audb" in db.meta:
+                db.meta["audb"]["complete"] = db_is_complete
 
     except filelock.Timeout:
         utils.timeout_warning()
@@ -1417,7 +1461,7 @@ def load_attachment(
             )
             raise ValueError(msg)
 
-        with FolderLock(db_root):
+        with utils.lock_cache(db_root):
             # Start with database header
             db, backend_interface = load_header_to(
                 db_root,
@@ -1471,7 +1515,7 @@ def load_header(
 
     db_root = database_cache_root(name, version, cache_root)
 
-    with FolderLock(db_root):
+    with utils.lock_cache(db_root):
         db, _ = load_header_to(db_root, name, version)
 
     return db
@@ -1519,11 +1563,14 @@ def load_header_to(
         backend_interface.get_file(remote_header, local_header, version)
         if add_audb_meta:
             db = audformat.Database.load(db_root_tmp, load_data=False)
+            # Whether a database is complete
+            # is no longer stored in the header,
+            # but indicated by a ``.complete`` file in the cache folder,
+            # see https://github.com/audeering/audb/issues/197
             db.meta["audb"] = {
                 "root": db_root,
                 "version": version,
                 "flavor": flavor.arguments,
-                "complete": False,
             }
             db.save(db_root_tmp, header_only=True)
             audeer.move_file(
@@ -1688,7 +1735,16 @@ def _load_media(
             )
             raise ValueError(msg)
 
-        with FolderLock(db_root, timeout=timeout):
+        # A complete database is never modified,
+        # so its cache folder does not need to be locked,
+        # see https://github.com/audeering/audb/issues/197
+        complete = utils.database_is_complete(db_root)
+        if complete:
+            lock = contextlib.nullcontext()
+        else:
+            lock = FolderLock(db_root, timeout=timeout)
+
+        with lock:
             # Start with database header without tables
             db, backend_interface = load_header_to(
                 db_root,
@@ -1698,7 +1754,13 @@ def _load_media(
                 add_audb_meta=True,
             )
 
-            db_is_complete = _database_is_complete(db)
+            db_is_complete = complete
+            if not db_is_complete and _database_is_complete_in_header(db):
+                # Database was cached as complete
+                # with an older version of audb,
+                # which stored this information in the header.
+                db_is_complete = True
+                utils.mark_database_complete(db_root)
 
             # load missing media
             if not db_is_complete:
@@ -1843,7 +1905,7 @@ def load_table(
             )
             raise ValueError(msg)
 
-        with FolderLock(db_root):
+        with utils.lock_cache(db_root):
             # Start with database header without tables
             db, backend_interface = load_header_to(
                 db_root,

@@ -23,8 +23,8 @@ from audb.core.load import _update_path
 from audb.core.load import latest_version
 from audb.core.load import load_header_to
 from audb.core.load import load_media
-from audb.core.lock import FolderLock
 from audb.core.utils import is_empty
+from audb.core.utils import lock_cache
 
 
 class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
@@ -558,7 +558,7 @@ def stream(
         msg = error_message_missing_object("table", [table], name, version)
         raise ValueError(msg)
 
-    with FolderLock(db_root):
+    with lock_cache(db_root):
         # Start with database header without tables
         db, backend_interface = load_header_to(
             db_root,
