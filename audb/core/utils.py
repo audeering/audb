@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+import contextlib
 import os
 import warnings
 
@@ -6,10 +7,133 @@ import pyarrow.parquet as parquet
 
 import audbackend
 import audeer
+import audformat
 
 from audb.core import define
 from audb.core.config import config
+from audb.core.lock import FolderLock
 from audb.core.repository import Repository
+
+
+def database_is_complete(db_root: str) -> bool:
+    r"""Check if a database is completely cached.
+
+    A database is considered complete,
+    if a ``.complete`` file is present
+    in its cache folder.
+    As this file can be checked
+    without acquiring a lock on the cache folder,
+    it allows to load a complete database
+    without locking.
+
+    Databases that were cached
+    with a version of audb
+    before the introduction of the ``.complete`` file
+    do not contain this file.
+    For those, completeness is still stored
+    in the database header (``db.yaml``),
+    which has to be checked separately.
+
+    Args:
+        db_root: database cache folder
+
+    Returns:
+        ``True`` if the ``.complete`` file exists
+
+    """
+    return os.path.exists(os.path.join(db_root, define.COMPLETE_FILE))
+
+
+def mark_database_complete(db_root: str):
+    r"""Mark a database as completely cached.
+
+    Creates a ``.complete`` file
+    in the database cache folder,
+    see :func:`database_is_complete`.
+    The file is never removed afterwards,
+    as a complete database
+    does not change anymore.
+
+    Args:
+        db_root: database cache folder
+
+    """
+    audeer.touch(os.path.join(db_root, define.COMPLETE_FILE))
+
+
+def database_is_complete_in_header(db: audformat.Database) -> bool:
+    r"""Check if a database is marked complete in its header.
+
+    Before the introduction of the ``.complete`` file
+    (see :func:`database_is_complete`),
+    the information if a database is complete
+    was stored in the database header (``db.yaml``).
+    This is still checked
+    for databases that were cached
+    with such an older version of audb.
+
+    Args:
+        db: database header object
+
+    Returns:
+        ``True`` if the header marks the database as complete
+
+    """
+    return db.meta.get("audb", {}).get("complete", False)
+
+
+def legacy_complete(db_root: str, db: audformat.Database) -> bool:
+    r"""Create a ``.complete`` file from a legacy header flag.
+
+    Databases cached with a version of audb
+    before the introduction of the ``.complete`` file
+    store their completeness in the database header instead
+    (see :func:`database_is_complete_in_header`).
+    If the header marks the database as complete,
+    the ``.complete`` file is created,
+    so the database can be loaded
+    without locking its cache folder afterwards.
+
+    Args:
+        db_root: database cache folder
+        db: database header object
+
+    Returns:
+        ``True`` if the header marks the database as complete
+
+    """
+    if database_is_complete_in_header(db):
+        mark_database_complete(db_root)
+        return True
+    return False
+
+
+def lock_cache(
+    db_root: str,
+    timeout: float = define.TIMEOUT,
+) -> contextlib.AbstractContextManager:
+    r"""Context manager to lock the cache folder of a database.
+
+    If the database is already complete
+    (see :func:`database_is_complete`),
+    a no-op context manager is returned,
+    as a complete database is never modified
+    and therefore does not need to be locked.
+    Otherwise a :class:`audb.core.lock.FolderLock`
+    for ``db_root`` is returned.
+
+    Args:
+        db_root: database cache folder
+        timeout: maximum time in seconds
+            before giving up acquiring a lock
+
+    Returns:
+        context manager locking the cache folder
+
+    """
+    if database_is_complete(db_root):
+        return contextlib.nullcontext()
+    return FolderLock(db_root, timeout=timeout)
 
 
 def is_empty(path: str) -> bool:

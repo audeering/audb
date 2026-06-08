@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 import audeer
+import audformat
 import audformat.testing
 
 import audb
@@ -307,3 +308,192 @@ def test_load_filter(
         else:
             assert not os.path.exists(path)
     assert db.meta["audb"]["complete"] == complete
+
+
+def test_complete_file(dbs):
+    r"""A completely loaded database is marked by a ``.complete`` file."""
+    # Partial load does not mark the database as complete
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        tables=[],
+        media=[],
+        full_path=False,
+        verbose=False,
+    )
+    db_root = db.meta["audb"]["root"]
+    complete_file = os.path.join(db_root, audb.core.define.COMPLETE_FILE)
+    assert not os.path.exists(complete_file)
+    assert not db.meta["audb"]["complete"]
+
+    # Full load creates the ``.complete`` file
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        full_path=False,
+        verbose=False,
+    )
+    assert os.path.exists(complete_file)
+    assert db.meta["audb"]["complete"]
+
+    # Completeness is no longer stored in the database header
+    header = audformat.Database.load(db_root, load_data=False)
+    assert "complete" not in header.meta["audb"]
+
+
+def test_complete_skips_lock(dbs):
+    r"""The cache folder is locked only for an incomplete database.
+
+    A complete database is loaded without acquiring the lock,
+    whereas an incomplete database still requires it.
+
+    """
+    # Partially load the database
+    # -> no `.complete` file
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        only_metadata=True,
+        full_path=False,
+        verbose=False,
+    )
+    db_root = db.meta["audb"]["root"]
+    lock_file = os.path.join(db_root, audb.core.define.LOCK_FILE)
+    assert not os.path.exists(os.path.join(db_root, audb.core.define.COMPLETE_FILE))
+
+    # Simulate a lock held by another process
+    audeer.touch(lock_file)
+    try:
+        # Loading acquires the lock for an incomplete database,
+        # hence it cannot be loaded with ``timeout=0``
+        with pytest.warns(UserWarning, match=audb.core.define.TIMEOUT_MSG):
+            db = audb.load(
+                DB_NAME,
+                version=DB_VERSION,
+                full_path=False,
+                timeout=0,
+                verbose=False,
+            )
+        assert db is None
+    finally:
+        os.remove(lock_file)
+
+    # Completely load the database
+    # -> `.complete` file is created
+    audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        full_path=False,
+        verbose=False,
+    )
+    assert os.path.exists(os.path.join(db_root, audb.core.define.COMPLETE_FILE))
+
+    # Simulate a lock held by another process
+    audeer.touch(lock_file)
+    try:
+        # Loading does not acquire the lock for a complete database,
+        # hence it succeeds even with ``timeout=0``
+        db = audb.load(
+            DB_NAME,
+            version=DB_VERSION,
+            full_path=False,
+            timeout=0,
+            verbose=False,
+        )
+        assert db is not None
+        assert db.meta["audb"]["complete"]
+    finally:
+        os.remove(lock_file)
+
+
+def test_complete_legacy_header(dbs):
+    r"""Fall back to completeness stored in the header.
+
+    Databases cached with a version of audb
+    before the introduction of the ``.complete`` file
+    store the completeness information
+    in the database header instead.
+
+    """
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        full_path=False,
+        verbose=False,
+    )
+    db_root = db.meta["audb"]["root"]
+    complete_file = os.path.join(db_root, audb.core.define.COMPLETE_FILE)
+    assert os.path.exists(complete_file)
+
+    # Emulate an old cache:
+    # remove the ``.complete`` file
+    # and store the completeness in the header
+    os.remove(complete_file)
+    header = audformat.Database.load(db_root, load_data=False)
+    header.meta["audb"]["complete"] = True
+    header.save(db_root, header_only=True)
+
+    # Loading recognizes the database as complete
+    # and recreates the ``.complete`` file
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        full_path=False,
+        verbose=False,
+    )
+    assert os.path.exists(complete_file)
+    assert db.meta["audb"]["complete"]
+
+
+def test_complete_other_loaders(dbs):
+    r"""On-demand loaders use no lock for a complete database."""
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        full_path=False,
+        verbose=False,
+    )
+    db_root = db.meta["audb"]["root"]
+    assert os.path.exists(os.path.join(db_root, audb.core.define.COMPLETE_FILE))
+    media = list(db.files)[0]
+
+    # All on-demand loaders work on a complete database without locking
+    audb.info.header(DB_NAME, version=DB_VERSION)
+    audb.load_table(DB_NAME, "table1", version=DB_VERSION, verbose=False)
+    audb.load_media(DB_NAME, media, version=DB_VERSION, verbose=False)
+    audb.load_attachment(DB_NAME, "file", version=DB_VERSION, verbose=False)
+    next(
+        audb.stream(
+            DB_NAME,
+            "table1",
+            version=DB_VERSION,
+            batch_size=1,
+            verbose=False,
+        )
+    )
+
+
+def test_complete_legacy_header_load_media(dbs):
+    r"""``load_media`` falls back to completeness stored in the header."""
+    db = audb.load(
+        DB_NAME,
+        version=DB_VERSION,
+        full_path=False,
+        verbose=False,
+    )
+    db_root = db.meta["audb"]["root"]
+    complete_file = os.path.join(db_root, audb.core.define.COMPLETE_FILE)
+    media = list(db.files)[0]
+
+    # Emulate an old cache:
+    # remove the ``.complete`` file
+    # and store the completeness in the header
+    os.remove(complete_file)
+    header = audformat.Database.load(db_root, load_data=False)
+    header.meta["audb"]["complete"] = True
+    header.save(db_root, header_only=True)
+
+    # ``load_media`` recognizes the database as complete from the header,
+    # and recreates the ``.complete`` file
+    audb.load_media(DB_NAME, media, version=DB_VERSION, verbose=False)
+    assert os.path.exists(complete_file)

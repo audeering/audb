@@ -162,48 +162,44 @@ def _copy_path(
 
 
 def _database_check_complete(
-    db: audformat.Database,
     db_root: str,
     flavor: Flavor,
     deps: Dependencies,
-):
-    def check() -> bool:
-        complete = True
-        for attachment in deps.attachments:
-            if not os.path.exists(os.path.join(db_root, attachment)):
-                return False
-        for table in deps.tables:
-            if not os.path.exists(os.path.join(db_root, table)):
-                return False
-        for media in deps.media:
-            if not deps.removed(media):
-                path = os.path.join(db_root, media)
-                path = flavor.destination(path)
-                if not os.path.exists(path):
-                    return False
-        return complete
-
-    if check():
-        db_root_tmp = database_tmp_root(db_root)
-        db.meta["audb"]["complete"] = True
-        db_original = audformat.Database.load(db_root, load_data=False)
-        db_original.meta["audb"]["complete"] = True
-        db_original.save(db_root_tmp, header_only=True)
-        audeer.move_file(
-            os.path.join(db_root_tmp, define.HEADER_FILE),
-            os.path.join(db_root, define.HEADER_FILE),
-        )
-        audeer.rmdir(db_root_tmp)
-
-
-def _database_is_complete(
-    db: audformat.Database,
 ) -> bool:
-    complete = False
-    if "audb" in db.meta:
-        if "complete" in db.meta["audb"]:
-            complete = db.meta["audb"]["complete"]
-    return complete
+    r"""Check if all files of a database are present in cache.
+
+    If the database is complete,
+    a ``.complete`` file is created
+    in its cache folder
+    (see :func:`audb.core.utils.database_is_complete`).
+    The presence of this file
+    allows to load the database afterwards
+    without locking its cache folder.
+
+    Args:
+        db_root: database cache folder
+        flavor: database flavor
+        deps: database dependencies
+
+    Returns:
+        ``True`` if the database is complete
+
+    """
+    for attachment in deps.attachments:
+        if not os.path.exists(os.path.join(db_root, attachment)):
+            return False
+    for table in deps.tables:
+        if not os.path.exists(os.path.join(db_root, table)):
+            return False
+    for media in deps.media:
+        if not deps.removed(media):
+            path = os.path.join(db_root, media)
+            path = flavor.destination(path)
+            if not os.path.exists(path):
+                return False
+
+    utils.mark_database_complete(db_root)
+    return True
 
 
 def _files_duration(
@@ -1206,7 +1202,7 @@ def _load(
             cache_root=cache_root,
         )
 
-        with FolderLock(db_root, timeout=timeout):
+        with utils.lock_cache(db_root, timeout=timeout):
             # Start with database header without tables
             db, backend_interface = load_header_to(
                 db_root,
@@ -1216,7 +1212,13 @@ def _load(
                 add_audb_meta=True,
             )
 
-            db_is_complete = _database_is_complete(db)
+            # A database cached with an older version of audb
+            # stores its completeness in the header instead of
+            # in a ``.complete`` file, which is migrated here,
+            # see https://github.com/audeering/audb/pull/569
+            db_is_complete = utils.database_is_complete(
+                db_root
+            ) or utils.legacy_complete(db_root, db)
 
             # load attachments
             if not db_is_complete and not only_metadata:
@@ -1342,12 +1344,15 @@ def _load(
 
             # check if database is now complete
             if not db_is_complete:
-                _database_check_complete(
-                    db,
+                db_is_complete = _database_check_complete(
                     db_root,
                     flavor,
                     deps,
                 )
+
+            # Store completeness in the returned database object
+            if "audb" in db.meta:
+                db.meta["audb"]["complete"] = db_is_complete
 
     except filelock.Timeout:
         utils.timeout_warning()
@@ -1417,7 +1422,7 @@ def load_attachment(
             )
             raise ValueError(msg)
 
-        with FolderLock(db_root):
+        with utils.lock_cache(db_root):
             # Start with database header
             db, backend_interface = load_header_to(
                 db_root,
@@ -1471,7 +1476,7 @@ def load_header(
 
     db_root = database_cache_root(name, version, cache_root)
 
-    with FolderLock(db_root):
+    with utils.lock_cache(db_root):
         db, _ = load_header_to(db_root, name, version)
 
     return db
@@ -1523,7 +1528,6 @@ def load_header_to(
                 "root": db_root,
                 "version": version,
                 "flavor": flavor.arguments,
-                "complete": False,
             }
             db.save(db_root_tmp, header_only=True)
             audeer.move_file(
@@ -1688,7 +1692,7 @@ def _load_media(
             )
             raise ValueError(msg)
 
-        with FolderLock(db_root, timeout=timeout):
+        with utils.lock_cache(db_root, timeout=timeout):
             # Start with database header without tables
             db, backend_interface = load_header_to(
                 db_root,
@@ -1698,7 +1702,13 @@ def _load_media(
                 add_audb_meta=True,
             )
 
-            db_is_complete = _database_is_complete(db)
+            # A database cached with an older version of audb
+            # stores its completeness in the header instead of
+            # in a ``.complete`` file, which is migrated here,
+            # see https://github.com/audeering/audb/pull/569
+            db_is_complete = utils.database_is_complete(
+                db_root
+            ) or utils.legacy_complete(db_root, db)
 
             # load missing media
             if not db_is_complete:
@@ -1843,7 +1853,7 @@ def load_table(
             )
             raise ValueError(msg)
 
-        with FolderLock(db_root):
+        with utils.lock_cache(db_root):
             # Start with database header without tables
             db, backend_interface = load_header_to(
                 db_root,

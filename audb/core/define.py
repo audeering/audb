@@ -13,6 +13,17 @@ DEPRECATED_USER_CONFIG_FILE = "~/.audb.yaml"
 DB = "db"
 HEADER_FILE = f"{DB}.yaml"
 
+COMPLETE_FILE = ".complete"
+r"""Filename of marker file for a complete database.
+
+If this file is present
+in the cache folder of a database,
+the database is loaded completely
+and its cache folder does not need to be locked,
+see https://github.com/audeering/audb/pull/569.
+
+"""
+
 # Dependencies
 DEPENDENCY_FILE = f"{DB}.parquet"
 r"""Filename and extension of dependency table file."""
