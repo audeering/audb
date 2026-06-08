@@ -12,7 +12,7 @@ Version 1.12.0 (2026-06-08)
 
 * Added: support for Python 3.14
 * Added: support for ``pandas>=3.0``
-* Added: support Artifactory backend with Python 3.13
+* Added: support for the Artifactory backend on Python 3.13
 * Added: ``num_workers`` argument to ``audb.available()``.
   This decreases lookup time on MinIO/S3 backends
   proportional to the number of workers
