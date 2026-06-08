@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-import contextlib
 import os
 import shutil
 
@@ -1203,15 +1202,8 @@ def _load(
             cache_root=cache_root,
         )
 
-        # A complete database is never modified,
-        # so its cache folder does not need to be locked.
         complete = utils.database_is_complete(db_root)
-        if complete:
-            lock = contextlib.nullcontext()
-        else:
-            lock = FolderLock(db_root, timeout=timeout)
-
-        with lock:
+        with utils.lock_cache(db_root, timeout=timeout):
             # Start with database header without tables
             db, backend_interface = load_header_to(
                 db_root,
@@ -1699,15 +1691,8 @@ def _load_media(
             )
             raise ValueError(msg)
 
-        # A complete database is never modified,
-        # so its cache folder does not need to be locked.
         complete = utils.database_is_complete(db_root)
-        if complete:
-            lock = contextlib.nullcontext()
-        else:
-            lock = FolderLock(db_root, timeout=timeout)
-
-        with lock:
+        with utils.lock_cache(db_root, timeout=timeout):
             # Start with database header without tables
             db, backend_interface = load_header_to(
                 db_root,
