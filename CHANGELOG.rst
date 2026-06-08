@@ -40,7 +40,7 @@ Version 1.12.0 (2026-06-08)
 * Fixed: ensure we start with a clean temporary folder
   when downloading files
 * Fixed: only scan for missing files
-  when we have already some files in cache
+  when we already have some files in the cache
 
 
 Version 1.11.4 (2025-07-22)
