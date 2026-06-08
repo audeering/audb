@@ -1202,7 +1202,6 @@ def _load(
             cache_root=cache_root,
         )
 
-        complete = utils.database_is_complete(db_root)
         with utils.lock_cache(db_root, timeout=timeout):
             # Start with database header without tables
             db, backend_interface = load_header_to(
@@ -1217,7 +1216,9 @@ def _load(
             # stores its completeness in the header instead of
             # in a ``.complete`` file, which is migrated here,
             # see https://github.com/audeering/audb/pull/569
-            db_is_complete = complete or utils.legacy_complete(db_root, db)
+            db_is_complete = utils.database_is_complete(
+                db_root
+            ) or utils.legacy_complete(db_root, db)
 
             # load attachments
             if not db_is_complete and not only_metadata:
@@ -1691,7 +1692,6 @@ def _load_media(
             )
             raise ValueError(msg)
 
-        complete = utils.database_is_complete(db_root)
         with utils.lock_cache(db_root, timeout=timeout):
             # Start with database header without tables
             db, backend_interface = load_header_to(
@@ -1706,7 +1706,9 @@ def _load_media(
             # stores its completeness in the header instead of
             # in a ``.complete`` file, which is migrated here,
             # see https://github.com/audeering/audb/pull/569
-            db_is_complete = complete or utils.legacy_complete(db_root, db)
+            db_is_complete = utils.database_is_complete(
+                db_root
+            ) or utils.legacy_complete(db_root, db)
 
             # load missing media
             if not db_is_complete:
