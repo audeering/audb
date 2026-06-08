@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>repository() &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -175,31 +176,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="repository">
-<h1>repository()<a class="headerlink" href="#repository" title="Permalink to this heading">¶</a></h1>
+  <section id="repository">
+<h1>repository()<a class="headerlink" href="#repository" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.repository">
-<span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">repository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/api.html#repository"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.repository" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">repository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/api.html#repository"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.repository" title="Link to this definition">¶</a></dt>
 <dd><p>Return repository that stores the requested database.</p>
 <p>If the database is stored in several repositories,
 only the first one is returned.
 The order of the repositories to look for the database
 is given by <a class="reference internal" href="audb.config.html#audb.config.REPOSITORIES" title="audb.config.REPOSITORIES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.REPOSITORIES</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – database name</p></li>
-<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – database name</p></li>
+<li><p><strong>version</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – version string</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="audb.Repository.html#audb.Repository" title="audb.core.repository.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repository</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="audb.Repository.html#audb.Repository" title="audb.core.repository.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repository</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>repository that contains the database</p>
 </dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.13)"><strong>RuntimeError</strong></a> – if database or version is not found</p>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – if database or version is not found</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -209,7 +210,7 @@ is given by <a class="reference internal" href="audb.config.html#audb.config.REP
 </div>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
@@ -234,7 +235,7 @@ is given by <a class="reference internal" href="audb.config.html#audb.config.REP
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -242,7 +243,7 @@ is given by <a class="reference internal" href="audb.config.html#audb.config.REP
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -266,18 +267,16 @@ is given by <a class="reference internal" href="audb.config.html#audb.config.REP
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">

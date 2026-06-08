@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -165,6 +165,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dependencies</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.load</span><span class="w"> </span><span class="kn">import</span> <span class="n">database_tmp_root</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.load</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_header_to</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.shimmer</span><span class="w"> </span><span class="kn">import</span> <span class="n">shimmer</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_find_attachments</span><span class="p">(</span>
@@ -212,7 +213,7 @@
         <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">file</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Find media&quot;</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Scan media&quot;</span><span class="p">,</span>
         <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -261,7 +262,7 @@
         <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">table</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">db_header</span><span class="p">)],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Find tables&quot;</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Scan tables&quot;</span><span class="p">,</span>
         <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -441,7 +442,9 @@
     <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="load_to"><a class="viewcode-back" href="../../../api/audb.load_to.html#audb.load_to">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">load_to</span><span class="p">(</span>
+<div class="viewcode-block" id="load_to">
+<a class="viewcode-back" href="../../../api/audb.load_to.html#audb.load_to">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_to</span><span class="p">(</span>
     <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -491,6 +494,57 @@
     <span class="n">db_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">follow_symlink</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_root</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
+    <span class="k">with</span> <span class="n">shimmer</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;Get:   &quot;</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;To: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">enabled</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">_load_to</span><span class="p">(</span>
+            <span class="n">db_root</span><span class="p">,</span>
+            <span class="n">db_root_tmp</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">only_metadata</span><span class="p">,</span>
+            <span class="n">pickle_tables</span><span class="p">,</span>
+            <span class="n">cache_root</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># remove the temporal directory</span>
+    <span class="c1"># to signal all files were correctly loaded</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">_remove_empty_dirs</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Could not remove temporary directory, &quot;</span>
+            <span class="s2">&quot;probably there are some leftover files. &quot;</span>
+            <span class="s2">&quot;This should not happen.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">db</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_to</span><span class="p">(</span>
+    <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">db_root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">only_metadata</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">pickle_tables</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database to directory without the progress animation.</span>
+
+<span class="sd">    The body of :func:`load_to` lives here so that :func:`load_to`</span>
+<span class="sd">    only sets up and tears down the :class:`Shimmer` animation</span>
+<span class="sd">    and performs the final temporary-directory cleanup.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># remove files with a wrong checksum</span>
     <span class="c1"># to ensure we load correct version</span>
     <span class="n">update</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
@@ -499,7 +553,6 @@
         <span class="n">name</span><span class="p">,</span>
         <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
-        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">only_metadata</span><span class="p">:</span>
@@ -627,18 +680,7 @@
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="c1"># remove the temporal directory</span>
-    <span class="c1"># to signal all files were correctly loaded</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">_remove_empty_dirs</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;Could not remove temporary directory, &quot;</span>
-            <span class="s2">&quot;probably there are some leftover files. &quot;</span>
-            <span class="s2">&quot;This should not happen.&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">db</span></div>
+    <span class="k">return</span> <span class="n">db</span>
 </pre></div>
 
            </div>
@@ -654,7 +696,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -662,7 +704,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -686,18 +728,16 @@
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../../../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">

@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Publish a database &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -156,18 +157,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="publish-a-database">
-<span id="publish"></span><h1>Publish a database<a class="headerlink" href="#publish-a-database" title="Permalink to this heading">¶</a></h1>
+  <section id="publish-a-database">
+<span id="publish"></span><h1>Publish a database<a class="headerlink" href="#publish-a-database" title="Link to this heading">¶</a></h1>
 <p>To publish a database we need to first create
-and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.html#module-audformat" title="(in audformat vv1.3.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
+and store a database in <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.html#module-audformat" title="(in audformat v1.4.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat</span></code></a>.
 Afterwards we publish the database to a <a class="reference internal" href="api/audb.Repository.html#audb.Repository" title="audb.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>.
 Finally,
 we add more files
 and release a new version.</p>
-<div class="section" id="create-a-database">
-<h2>Create a database<a class="headerlink" href="#create-a-database" title="Permalink to this heading">¶</a></h2>
+<section id="create-a-database">
+<h2>Create a database<a class="headerlink" href="#create-a-database" title="Link to this heading">¶</a></h2>
 <p>We can create an example database
-with the <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.testing.html#module-audformat.testing" title="(in audformat vv1.3.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
+with the <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.testing.html#module-audformat.testing" title="(in audformat v1.4.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audformat.testing</span></code></a> module.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">audeer</span>
@@ -217,9 +218,9 @@ stored under <code class="file docutils literal notranslate"><span class="pre">b
 <span class="go">audio/003.wav   52</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="publish-the-first-version">
-<h2>Publish the first version<a class="headerlink" href="#publish-the-first-version" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="publish-the-first-version">
+<h2>Publish the first version<a class="headerlink" href="#publish-the-first-version" title="Link to this heading">¶</a></h2>
 <p>We define a repository on the local file system
 to publish the database to.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="s2">&quot;data-local&quot;</span><span class="p">)</span>
@@ -304,9 +305,9 @@ instead of its default ones.</p>
 <span class="go">age-test  file-system  ./data  data-local   1.0.0</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="update-a-database">
-<h2>Update a database<a class="headerlink" href="#update-a-database" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="update-a-database">
+<h2>Update a database<a class="headerlink" href="#update-a-database" title="Link to this heading">¶</a></h2>
 <p>In a next step we will add another file with age annotation
 to the database.
 As a first step we load
@@ -412,9 +413,9 @@ We can again inspect the repository.</p>
 <p>As you can even <a class="reference external" href="https://audeering.github.io/audformat/update-database.html">update one database by another one</a>,
 you could automate the update step
 and let a database grow every day.</p>
-</div>
-<div class="section" id="real-world-example">
-<h2>Real world example<a class="headerlink" href="#real-world-example" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="real-world-example">
+<h2>Real world example<a class="headerlink" href="#real-world-example" title="Link to this heading">¶</a></h2>
 <p>We published a version of a small German acted emotional speech databases
 called <a class="reference external" href="http://emodb.bilderbar.info/start.html">emodb</a>
 in the default Artifactory repository of <a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a>.
@@ -422,8 +423,8 @@ You can find the example code at
 <a class="reference external" href="https://github.com/audeering/emodb">https://github.com/audeering/emodb</a>
 and can continue at <a class="reference internal" href="load.html#load"><span class="std std-ref">Load a database</span></a>
 to see how to load and use a database.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -448,7 +449,7 @@ to see how to load and use a database.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -456,7 +457,7 @@ to see how to load and use a database.</p>
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -480,18 +481,16 @@ to see how to load and use a database.</p>
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="_static/js/jquery.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">

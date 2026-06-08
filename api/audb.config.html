@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>config &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -180,11 +181,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="config">
-<h1>config<a class="headerlink" href="#config" title="Permalink to this heading">¶</a></h1>
+  <section id="config">
+<h1>config<a class="headerlink" href="#config" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="audb.config">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">config</span></span><a class="reference internal" href="../_modules/audb/core/config.html#config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.config" title="Permalink to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">config</span></span><a class="reference internal" href="../_modules/audb/core/config.html#config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.config" title="Link to this definition">¶</a></dt>
 <dd><p>Get/set configuration values for the <a class="reference internal" href="audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> module.</p>
 <p>The configuration values are read in during module import
 from the <a class="reference internal" href="../configuration.html#configuration"><span class="std std-ref">configuration file</span></a>
@@ -203,20 +204,20 @@ can be overwritten by environment variables.</p>
 </div>
 </dd></dl>
 
-<div class="section" id="cache-root">
-<h2>CACHE_ROOT<a class="headerlink" href="#cache-root" title="Permalink to this heading">¶</a></h2>
+<section id="cache-root">
+<h2>CACHE_ROOT<a class="headerlink" href="#cache-root" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.config.CACHE_ROOT">
-<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">CACHE_ROOT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'~/audb'</span></em><a class="headerlink" href="#audb.config.CACHE_ROOT" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">CACHE_ROOT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'~/audb'</span></span><a class="headerlink" href="#audb.config.CACHE_ROOT" title="Link to this definition">¶</a></dt>
 <dd><p>Default user cache folder.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="repositories">
-<h2>REPOSITORIES<a class="headerlink" href="#repositories" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="repositories">
+<h2>REPOSITORIES<a class="headerlink" href="#repositories" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.config.REPOSITORIES">
-<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">REPOSITORIES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[Repository('audb-public',</span> <span class="pre">'s3.dualstack.eu-north-1.amazonaws.com',</span> <span class="pre">'s3')]</span></em><a class="headerlink" href="#audb.config.REPOSITORIES" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">REPOSITORIES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[Repository('audb-public',</span> <span class="pre">'s3.dualstack.eu-north-1.amazonaws.com',</span> <span class="pre">'s3')]</span></span><a class="headerlink" href="#audb.config.REPOSITORIES" title="Link to this definition">¶</a></dt>
 <dd><p>Repositories, will be iterated in given order.</p>
 <p>A repository is defined by the object <a class="reference internal" href="audb.Repository.html#audb.Repository" title="audb.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>,
 containing the following attributes:</p>
@@ -228,17 +229,17 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;s3.duals
 </ul>
 </dd></dl>
 
-</div>
-<div class="section" id="shared-cache-root">
-<h2>SHARED_CACHE_ROOT<a class="headerlink" href="#shared-cache-root" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="shared-cache-root">
+<h2>SHARED_CACHE_ROOT<a class="headerlink" href="#shared-cache-root" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.config.SHARED_CACHE_ROOT">
-<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">SHARED_CACHE_ROOT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/data/audb'</span></em><a class="headerlink" href="#audb.config.SHARED_CACHE_ROOT" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">SHARED_CACHE_ROOT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/data/audb'</span></span><a class="headerlink" href="#audb.config.SHARED_CACHE_ROOT" title="Link to this definition">¶</a></dt>
 <dd><p>Shared cache folder.</p>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -263,7 +264,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;s3.duals
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -271,7 +272,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;s3.duals
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -295,18 +296,16 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;s3.duals
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">

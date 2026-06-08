@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Installation &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -150,8 +151,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
 <p>To install <a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> run:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>audb
 </pre></div>
@@ -160,9 +161,9 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>uvx<span class="w"> </span>--with<span class="w"> </span>audb<span class="w"> </span>ipython
 </pre></div>
 </div>
-<p><a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> uses <a class="reference external" href="https://audeering.github.io/audiofile/api/audiofile.html#module-audiofile" title="(in audiofile vv1.5.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a> to access media files,
+<p><a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> uses <a class="reference external" href="https://audeering.github.io/audiofile/api/audiofile.html#module-audiofile" title="(in audiofile v1.6.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a> to access media files,
 which supports WAV, FLAC, OGG out of the box.
-<a class="reference external" href="https://audeering.github.io/audiofile/api/audiofile.html#module-audiofile" title="(in audiofile vv1.5.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a> requires the <a class="reference external" href="https://github.com/libsndfile/libsndfile">libsndfile</a> C library,
+<a class="reference external" href="https://audeering.github.io/audiofile/api/audiofile.html#module-audiofile" title="(in audiofile v1.6.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audiofile</span></code></a> requires the <a class="reference external" href="https://github.com/libsndfile/libsndfile">libsndfile</a> C library,
 which should be installed on most systems.
 Under Ubuntu you can install it with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libsndfile1
@@ -170,7 +171,7 @@ Under Ubuntu you can install it with</p>
 </div>
 <p>In order to handle all possible audio files,
 please make sure <a class="reference external" href="https://www.ffmpeg.org/">ffmpeg</a>,
-<a class="reference external" href="http://sox.sourceforge.net/">sox</a>,
+<a class="reference external" href="https://sourceforge.net/projects/sox/">sox</a>,
 and <a class="reference external" href="https://mediaarea.net/en/MediaInfo/">mediainfo</a>
 are installed on your system.
 Under Ubuntu this can be achieved with</p>
@@ -179,7 +180,7 @@ Under Ubuntu this can be achieved with</p>
 </div>
 <p>Under Windows you have to install those libraries manually,
 and ensure that they are added to the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> variable.</p>
-</div>
+</section>
 
 
            </div>
@@ -204,7 +205,7 @@ and ensure that they are added to the <code class="docutils literal notranslate"
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -212,7 +213,7 @@ and ensure that they are added to the <code class="docutils literal notranslate"
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -236,18 +237,16 @@ and ensure that they are added to the <code class="docutils literal notranslate"
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="_static/js/jquery.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">

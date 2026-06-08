@@ -40,5 +40,5 @@ and ensure that they are added to the ``PATH`` variable.
 
 .. _libsndfile: https://github.com/libsndfile/libsndfile
 .. _ffmpeg: https://www.ffmpeg.org/
-.. _sox: http://sox.sourceforge.net/
+.. _sox: https://sourceforge.net/projects/sox/
 .. _mediainfo: https://mediaarea.net/en/MediaInfo/

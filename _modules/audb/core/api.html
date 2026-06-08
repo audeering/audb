@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -152,6 +152,7 @@
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">concurrent.futures</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
@@ -174,15 +175,34 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">Repository</span>
 
 
-<div class="viewcode-block" id="available"><a class="viewcode-back" href="../../../api/audb.available.html#audb.available">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span>
+<span class="c1"># Backends whose read operations (``ls_dirs``/``exists``)</span>
+<span class="c1"># are safe to call concurrently from multiple threads,</span>
+<span class="c1"># and that benefit from doing so:</span>
+<span class="c1"># ``file-system`` uses stateless ``os`` calls,</span>
+<span class="c1"># ``minio``/``s3`` use the MinIO client,</span>
+<span class="c1"># which is documented as thread-safe under ``threading``.</span>
+<span class="c1"># Other backends (e.g. ``artifactory``, or custom ones</span>
+<span class="c1"># registered via ``Repository.register``) are accessed</span>
+<span class="c1"># with a single worker to avoid sharing a potentially</span>
+<span class="c1"># non-thread-safe client across threads.</span>
+<span class="n">_THREAD_SAFE_BACKENDS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;file-system&quot;</span><span class="p">,</span> <span class="s2">&quot;minio&quot;</span><span class="p">,</span> <span class="s2">&quot;s3&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="available">
+<a class="viewcode-back" href="../../../api/audb.available.html#audb.available">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">only_latest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">repositories</span><span class="p">:</span> <span class="n">Repository</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Repository</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;List all databases that are available to the user.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        only_latest: include only latest version of database</span>
+<span class="sd">        num_workers: number of parallel workers</span>
+<span class="sd">            used to collect the versions of the databases.</span>
+<span class="sd">            Brings speedups under On MinIO/S3 backends</span>
 <span class="sd">        repositories: search only in the given repositories.</span>
 <span class="sd">            If ``None``,</span>
 <span class="sd">            :attr:`audb.config.REPOSITORIES` is used</span>
@@ -214,6 +234,8 @@
             <span class="p">]</span>
         <span class="p">)</span>
 
+    <span class="n">num_workers</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">repositories</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">repositories</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">repositories</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -221,44 +243,45 @@
 
     <span class="k">for</span> <span class="n">repository</span> <span class="ow">in</span> <span class="n">repositories</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="n">workers</span> <span class="o">=</span> <span class="n">num_workers</span> <span class="k">if</span> <span class="n">repository</span><span class="o">.</span><span class="n">backend</span> <span class="ow">in</span> <span class="n">_THREAD_SAFE_BACKENDS</span> <span class="k">else</span> <span class="mi">1</span>
             <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
+            <span class="c1"># Set the connection pool size before opening the backend,</span>
+            <span class="c1"># as the pool is created lazily on the first request.</span>
+            <span class="n">_match_connection_pool_size</span><span class="p">(</span><span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="n">workers</span><span class="p">)</span>
             <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span> <span class="k">as</span> <span class="n">backend</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">repository</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>  <span class="c1"># pragma: nocover</span>
-                    <span class="c1"># avoid backend_interface.ls(&#39;/&#39;)</span>
-                    <span class="c1"># which is very slow on Artifactory</span>
-                    <span class="c1"># see https://github.com/audeering/audbackend/issues/132</span>
-                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
-                        <span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span>
-                        <span class="k">try</span><span class="p">:</span>
-                            <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;db&quot;</span><span class="p">]:</span>
-                                <span class="n">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
-                        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-                            <span class="c1"># If the `db` folder does not exist,</span>
-                            <span class="c1"># we do not include the dataset</span>
-                            <span class="k">pass</span>
 
-                <span class="k">elif</span> <span class="n">repository</span><span class="o">.</span><span class="n">backend</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;minio&quot;</span><span class="p">,</span> <span class="s2">&quot;s3&quot;</span><span class="p">]:</span>
-                    <span class="c1"># Avoid `ls(recursive=True)` for S3 and MinIO</span>
-                    <span class="c1"># as this is slow for large databases</span>
-                    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-                        <span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">object_name</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># remove &quot;/&quot; at end</span>
-                        <span class="n">header_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
-                        <span class="k">for</span> <span class="n">_obj</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span>
-                            <span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/&quot;</span>
-                        <span class="p">):</span>
-                            <span class="n">version</span> <span class="o">=</span> <span class="n">_obj</span><span class="o">.</span><span class="n">object_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-                            <span class="n">header_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
-                            <span class="k">if</span> <span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
-                                <span class="s2">&quot;attachment&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;media&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;meta&quot;</span><span class="p">,</span>
-                            <span class="p">]</span> <span class="ow">and</span> <span class="n">backend</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">header_file</span><span class="p">):</span>
-                                <span class="n">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">version_exists</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;Check if a database version exists on the backend.</span>
 
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">):</span>
-                            <span class="n">name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="sd">                    A version exists</span>
+<span class="sd">                    if the corresponding header file</span>
+<span class="sd">                    can be found on the backend.</span>
+
+<span class="sd">                    &quot;&quot;&quot;</span>
+                    <span class="n">header_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">return</span> <span class="n">backend</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">header_file</span><span class="p">)</span>
+
+                <span class="k">def</span><span class="w"> </span><span class="nf">collect_versions</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;Existing versions of a database on the backend.</span>
+
+<span class="sd">                    Is limited to the latest with ``latest_version``.</span>
+
+<span class="sd">                    &quot;&quot;&quot;</span>
+                    <span class="n">versions</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">sort_versions</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">v</span>
+                            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">ls_dirs</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">audeer</span><span class="o">.</span><span class="n">is_semantic_version</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="n">existing</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">versions</span> <span class="k">if</span> <span class="n">version_exists</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">v</span><span class="p">)]</span>
+                    <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">existing</span>
+
+                <span class="n">names</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">ls_dirs</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+                <span class="n">max_workers</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">workers</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)))</span>
+                <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">versions</span> <span class="ow">in</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">collect_versions</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+                        <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">:</span>
                             <span class="n">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">audbackend</span><span class="o">.</span><span class="n">BackendError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
@@ -284,7 +307,28 @@
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cached"><a class="viewcode-back" href="../../../api/audb.cached.html#audb.cached">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">cached</span><span class="p">(</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_match_connection_pool_size</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">maxsize</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Match the HTTP connection pool size to ``num_workers``.</span>
+
+<span class="sd">    On MinIO/S3 backends the underlying ``urllib3.PoolManager``</span>
+<span class="sd">    keeps only a single connection per host by default.</span>
+<span class="sd">    Without this, the parallel workers</span>
+<span class="sd">    would constantly open and discard connections.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pool_kw</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="s2">&quot;_client&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">&quot;_http&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="s2">&quot;connection_pool_kw&quot;</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pool_kw</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">pool_kw</span><span class="p">[</span><span class="s2">&quot;maxsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxsize</span>
+
+
+<div class="viewcode-block" id="cached">
+<a class="viewcode-back" href="../../../api/audb.cached.html#audb.cached">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cached</span><span class="p">(</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -394,7 +438,13 @@
                         <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="p">)</span>
                     <span class="n">flavor</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;audb&quot;</span><span class="p">][</span><span class="s2">&quot;flavor&quot;</span><span class="p">]</span>
-                    <span class="n">complete</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;audb&quot;</span><span class="p">][</span><span class="s2">&quot;complete&quot;</span><span class="p">]</span>
+                    <span class="c1"># Completeness is indicated by a ``.complete`` file.</span>
+                    <span class="c1"># For databases cached with an older version of audb,</span>
+                    <span class="c1"># it is still stored in the database header,</span>
+                    <span class="c1"># see https://github.com/audeering/audb/pull/569</span>
+                    <span class="n">complete</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">database_is_complete</span><span class="p">(</span>
+                        <span class="n">flavor_id_path</span>
+                    <span class="p">)</span> <span class="ow">or</span> <span class="n">utils</span><span class="o">.</span><span class="n">database_is_complete_in_header</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
                     <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">flavor_id_path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
                         <span class="n">database</span><span class="p">,</span>
                         <span class="n">flavor_id</span><span class="p">,</span>
@@ -411,7 +461,10 @@
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="dependencies"><a class="viewcode-back" href="../../../api/audb.dependencies.html#audb.dependencies">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">dependencies</span><span class="p">(</span>
+
+<div class="viewcode-block" id="dependencies">
+<a class="viewcode-back" href="../../../api/audb.dependencies.html#audb.dependencies">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dependencies</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -470,7 +523,10 @@
     <span class="k">return</span> <span class="n">deps</span></div>
 
 
-<div class="viewcode-block" id="exists"><a class="viewcode-back" href="../../../api/audb.exists.html#audb.exists">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span>
+
+<div class="viewcode-block" id="exists">
+<a class="viewcode-back" href="../../../api/audb.exists.html#audb.exists">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -551,7 +607,10 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="flavor_path"><a class="viewcode-back" href="../../../api/audb.flavor_path.html#audb.flavor_path">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">flavor_path</span><span class="p">(</span>
+
+<div class="viewcode-block" id="flavor_path">
+<a class="viewcode-back" href="../../../api/audb.flavor_path.html#audb.flavor_path">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">flavor_path</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -613,7 +672,10 @@
     <span class="k">return</span> <span class="n">flavor</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="latest_version"><a class="viewcode-back" href="../../../api/audb.latest_version.html#audb.latest_version">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">latest_version</span><span class="p">(</span>
+
+<div class="viewcode-block" id="latest_version">
+<a class="viewcode-back" href="../../../api/audb.latest_version.html#audb.latest_version">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">latest_version</span><span class="p">(</span>
     <span class="n">name</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Latest version of database.</span>
@@ -640,7 +702,10 @@
     <span class="k">return</span> <span class="n">vs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="remove_media"><a class="viewcode-back" href="../../../api/audb.remove_media.html#audb.remove_media">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">remove_media</span><span class="p">(</span>
+
+<div class="viewcode-block" id="remove_media">
+<a class="viewcode-back" href="../../../api/audb.remove_media.html#audb.remove_media">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_media</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">files</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
@@ -716,7 +781,10 @@
                 <span class="n">upload_dependencies</span><span class="p">(</span><span class="n">backend_interface</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="repository"><a class="viewcode-back" href="../../../api/audb.repository.html#audb.repository">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">repository</span><span class="p">(</span>
+
+<div class="viewcode-block" id="repository">
+<a class="viewcode-back" href="../../../api/audb.repository.html#audb.repository">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">repository</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Repository</span><span class="p">:</span>
@@ -743,11 +811,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">versions</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot find database &quot;</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot find database &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">_lookup</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="versions"><a class="viewcode-back" href="../../../api/audb.versions.html#audb.versions">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">versions</span><span class="p">(</span>
+
+<div class="viewcode-block" id="versions">
+<a class="viewcode-back" href="../../../api/audb.versions.html#audb.versions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">versions</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Available versions of database.</span>
@@ -812,6 +883,7 @@
             <span class="c1"># and continue with the next repository</span>
             <span class="k">continue</span>
     <span class="k">return</span> <span class="n">audeer</span><span class="o">.</span><span class="n">sort_versions</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -827,7 +899,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -835,7 +907,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -859,18 +931,16 @@
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../../../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">

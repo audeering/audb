@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Load a database &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -156,8 +157,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="load-a-database">
-<span id="load"></span><h1>Load a database<a class="headerlink" href="#load-a-database" title="Permalink to this heading">¶</a></h1>
+  <section id="load-a-database">
+<span id="load"></span><h1>Load a database<a class="headerlink" href="#load-a-database" title="Link to this heading">¶</a></h1>
 <p>To load a database you only need its name.
 However,
 we recommend to specify its version as well.
@@ -171,7 +172,7 @@ even if a new version of the database is published.</p>
 </div>
 <p><a class="reference internal" href="api/audb.load.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> will download the data,
 store them in a cache folder,
-and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
+and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
 The most important content of that object
 are the database tables.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
@@ -201,7 +202,7 @@ are the database tables.</p>
 </pre></div>
 </div>
 <p>They contain the annotations of the database,
-and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
+and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="go">                   emotion  emotion.confidence</span>
 <span class="go">file</span>
@@ -220,7 +221,7 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
 <span class="go">[535 rows x 2 columns]</span>
 </pre></div>
 </div>
-<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
+<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v3.0.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">][</span><span class="s2">&quot;duration&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="go">file</span>
 <span class="go">wav/03a01Fa.wav      0 days 00:00:01.898250</span>
@@ -249,8 +250,8 @@ we continue with discussing
 <a class="reference internal" href="#media-conversion-and-flavors"><span class="std std-ref">Media conversion and flavors</span></a>,
 how to load <a class="reference internal" href="#metadata"><span class="std std-ref">Metadata and header only</span></a>,
 and <a class="reference internal" href="#filter"><span class="std std-ref">Loading on demand</span></a>.</p>
-<div class="section" id="media-conversion-and-flavors">
-<span id="id1"></span><h2>Media conversion and flavors<a class="headerlink" href="#media-conversion-and-flavors" title="Permalink to this heading">¶</a></h2>
+<section id="media-conversion-and-flavors">
+<span id="id1"></span><h2>Media conversion and flavors<a class="headerlink" href="#media-conversion-and-flavors" title="Link to this heading">¶</a></h2>
 <p>When loading a database,
 audio files can be automatically converted.
 This creates a new flavor of the database,
@@ -313,9 +314,9 @@ inside the <code class="docutils literal notranslate"><span class="pre">db.meta[
 </div>
 <p>The entry <code class="docutils literal notranslate"><span class="pre">&quot;complete&quot;</span></code> tells you if a database flavor is completely cached,
 or if some table or media files are still missing.</p>
-</div>
-<div class="section" id="metadata-and-header-only">
-<span id="metadata"></span><h2>Metadata and header only<a class="headerlink" href="#metadata-and-header-only" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="metadata-and-header-only">
+<span id="metadata"></span><h2>Metadata and header only<a class="headerlink" href="#metadata-and-header-only" title="Link to this heading">¶</a></h2>
 <p>It is possible to request only metadata
 (header and annotations)
 of a database.
@@ -364,9 +365,9 @@ It can list all table definitions.</p>
 </pre></div>
 </div>
 <p>See <a class="reference internal" href="api/audb.info.html#module-audb.info" title="audb.info"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb.info</span></code></a> for a list of all available options.</p>
-</div>
-<div class="section" id="loading-on-demand">
-<span id="filter"></span><h2>Loading on demand<a class="headerlink" href="#loading-on-demand" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="loading-on-demand">
+<span id="filter"></span><h2>Loading on demand<a class="headerlink" href="#loading-on-demand" title="Link to this heading">¶</a></h2>
 <p>It is possible to request only
 specific tables or media of a database.</p>
 <p>For instance, many databases are organized
@@ -473,9 +474,9 @@ from the tables.</p>
 <span class="go">wav/03a02Nc.wav    neutral                1.00</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="streaming">
-<span id="id2"></span><h2>Streaming<a class="headerlink" href="#streaming" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="streaming">
+<span id="id2"></span><h2>Streaming<a class="headerlink" href="#streaming" title="Link to this heading">¶</a></h2>
 <p><a class="reference internal" href="api/audb.stream.html#audb.stream" title="audb.stream"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.stream()</span></code></a> provides a pseudo-streaming mode,
 which helps to load large datasets.
 It will only load <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> number of rows
@@ -495,7 +496,7 @@ are still stored in the cache.</p>
 </pre></div>
 </div>
 <p>It returns an <a class="reference internal" href="api/audb.DatabaseIterator.html#audb.DatabaseIterator" title="audb.DatabaseIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.DatabaseIterator</span></code></a> object,
-which behaves as <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat vv1.3.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a>,
+which behaves as <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a>,
 but provides the ability
 to iterate over the database:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
@@ -536,8 +537,8 @@ into an buffer and selected randomly from those.</p>
 <span class="go">wav/13a07Na.wav    neutral                 0.9</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -562,7 +563,7 @@ into an buffer and selected randomly from those.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -570,7 +571,7 @@ into an buffer and selected randomly from those.</p>
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -594,18 +595,16 @@ into an buffer and selected randomly from those.</p>
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="_static/js/jquery.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">

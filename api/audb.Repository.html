@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Repository &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -184,11 +185,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="repository">
-<h1>Repository<a class="headerlink" href="#repository" title="Permalink to this heading">¶</a></h1>
+  <section id="repository">
+<h1>Repository<a class="headerlink" href="#repository" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="audb.Repository">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">Repository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository" title="Permalink to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">Repository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository" title="Link to this definition">¶</a></dt>
 <dd><p>Repository object.</p>
 <p>It stores all information
 needed to address a repository:
@@ -200,11 +201,11 @@ it also provides a method
 to create a backend interface
 to access the repository.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository name</p></li>
-<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository host</p></li>
-<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository backend</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – repository name</p></li>
+<li><p><strong>host</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – repository host</p></li>
+<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – repository backend</p></li>
 </ul>
 </dd>
 </dl>
@@ -215,55 +216,53 @@ to access the repository.</p>
 </div>
 </dd></dl>
 
-<div class="section" id="eq">
-<h2>__eq__()<a class="headerlink" href="#eq" title="Permalink to this heading">¶</a></h2>
+<section id="eq">
+<h2>__eq__()<a class="headerlink" href="#eq" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Repository.__eq__">
-<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository.__eq__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository.__eq__" title="Link to this definition">¶</a></dt>
 <dd><p>Compare two repository instances.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> – repository instance</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the string representation of the repositories matches</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="backend">
-<h2>backend<a class="headerlink" href="#backend" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="backend">
+<h2>backend<a class="headerlink" href="#backend" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Repository.backend">
-<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">backend</span></span><a class="headerlink" href="#audb.Repository.backend" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">backend</span></span><a class="headerlink" href="#audb.Repository.backend" title="Link to this definition">¶</a></dt>
 <dd><p>Repository backend name.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="backend-registry">
-<h2>backend_registry<a class="headerlink" href="#backend-registry" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="backend-registry">
+<h2>backend_registry<a class="headerlink" href="#backend-registry" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Repository.backend_registry">
-<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">backend_registry</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'artifactory':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.artifactory.Artifactory'&gt;,</span> <span class="pre">'file-system':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.filesystem.FileSystem'&gt;,</span> <span class="pre">'minio':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.minio.Minio'&gt;,</span> <span class="pre">'s3':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.minio.Minio'&gt;}</span></em><a class="headerlink" href="#audb.Repository.backend_registry" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">backend_registry</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'artifactory':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.artifactory.Artifactory'&gt;,</span> <span class="pre">'file-system':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.filesystem.FileSystem'&gt;,</span> <span class="pre">'minio':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.minio.Minio'&gt;,</span> <span class="pre">'s3':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.minio.Minio'&gt;}</span></span><a class="headerlink" href="#audb.Repository.backend_registry" title="Link to this definition">¶</a></dt>
 <dd><p>Backend registry.</p>
 <p>Holds mapping between registered backend names,
-and their corresponding backend classes.
-The <code class="docutils literal notranslate"><span class="pre">&quot;artifactory&quot;</span></code> backend is currently not available
-under Python &gt;=3.13.</p>
+and their corresponding backend classes.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="create-backend-interface">
-<h2>create_backend_interface()<a class="headerlink" href="#create-backend-interface" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="create-backend-interface">
+<h2>create_backend_interface()<a class="headerlink" href="#create-backend-interface" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Repository.create_backend_interface">
-<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">create_backend_interface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository.create_backend_interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository.create_backend_interface" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">create_backend_interface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository.create_backend_interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository.create_backend_interface" title="Link to this definition">¶</a></dt>
 <dd><p>Create backend interface to access repository.</p>
-<p>It wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Versioned.html#audbackend.interface.Versioned" title="(in audbackend v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Versioned</span></code></a> interface
+<p>It wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Versioned.html#audbackend.interface.Versioned" title="(in audbackend v2.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Versioned</span></code></a> interface
 around it.
 The files will then be stored
 with the following structure on the backend
@@ -276,7 +275,7 @@ with the following structure on the backend
 </pre></div>
 </div>
 <p>When <a class="reference internal" href="#audb.Repository.backend" title="audb.Repository.backend"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Repository.backend</span></code></a> equals <code class="docutils literal notranslate"><span class="pre">artifactory</span></code>,
-it wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Maven.html#audbackend.interface.Maven" title="(in audbackend v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Maven</span></code></a> interface
+it wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Maven.html#audbackend.interface.Maven" title="(in audbackend v2.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Maven</span></code></a> interface
 around it.
 The files will then be stored
 with the following structure on the Artifactory backend
@@ -296,56 +295,57 @@ or use the <code class="docutils literal notranslate"><span class="pre">open()</
 The backend is stored as the inside the <code class="docutils literal notranslate"><span class="pre">backend</span></code> attribute
 of the returned backend interface.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v2.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</span></p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>interface to repository</p>
 </dd>
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – if an artifactory backend is requested in Python&gt;=3.13</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – if a non-supported backend is requested</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if an artifactory backend is requested in with a Python version
+    that does not yet support it</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if a non-supported backend is requested</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="host">
-<h2>host<a class="headerlink" href="#host" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="host">
+<h2>host<a class="headerlink" href="#host" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Repository.host">
-<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">host</span></span><a class="headerlink" href="#audb.Repository.host" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">host</span></span><a class="headerlink" href="#audb.Repository.host" title="Link to this definition">¶</a></dt>
 <dd><p>Repository host.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="name">
-<h2>name<a class="headerlink" href="#name" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="name">
+<h2>name<a class="headerlink" href="#name" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Repository.name">
-<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#audb.Repository.name" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#audb.Repository.name" title="Link to this definition">¶</a></dt>
 <dd><p>Repository name.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="register">
-<h2>register()<a class="headerlink" href="#register" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="register">
+<h2>register()<a class="headerlink" href="#register" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Repository.register">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository.register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository.register" title="Permalink to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/repository.html#Repository.register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Repository.register" title="Link to this definition">¶</a></dt>
 <dd><p>Register backend class.</p>
 <p>Adds an entry to the dictionary
 stored in the class variable <a class="reference internal" href="#audb.Repository.backend_registry" title="audb.Repository.backend_registry"><code class="xref py py-data docutils literal notranslate"><span class="pre">Repository.backend_registry</span></code></a>,
 mapping a backend name
 to an actual backend class.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the backend,
+<li><p><strong>backend_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – name of the backend,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;file-system&quot;</span></code></p></li>
-<li><p><strong>backend_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]) – class of the backend,
+<li><p><strong>backend_class</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v2.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</span>) – class of the backend,
 that should be associated with <code class="docutils literal notranslate"><span class="pre">backend_name</span></code>,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbackend.backend.Filesystem&quot;</span></code></p></li>
 </ul>
@@ -358,8 +358,8 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
 </div>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -384,7 +384,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -392,7 +392,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -416,18 +416,16 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">

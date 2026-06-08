@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Changelog &mdash; Documentation</title>
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -113,6 +114,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-12-0-2026-06-08">Version 1.12.0 (2026-06-08)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-11-4-2025-07-22">Version 1.11.4 (2025-07-22)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-11-3-2025-02-20">Version 1.11.3 (2025-02-20)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-11-2-2025-02-03">Version 1.11.2 (2025-02-03)</a></li>
@@ -209,13 +211,49 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="changelog">
-<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h1>
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<div class="section" id="version-1-11-4-2025-07-22">
-<h2>Version 1.11.4 (2025-07-22)<a class="headerlink" href="#version-1-11-4-2025-07-22" title="Permalink to this heading">¶</a></h2>
+<section id="version-1-12-0-2026-06-08">
+<h2>Version 1.12.0 (2026-06-08)<a class="headerlink" href="#version-1-12-0-2026-06-08" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: support for Python 3.14</p></li>
+<li><p>Added: support for <code class="docutils literal notranslate"><span class="pre">pandas&gt;=3.0</span></code></p></li>
+<li><p>Added: support for the Artifactory backend on Python 3.13</p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">num_workers</span></code> argument to <code class="docutils literal notranslate"><span class="pre">audb.available()</span></code>.
+This decreases lookup time on MinIO/S3 backends
+proportional to the number of workers</p></li>
+<li><p>Added: extra animation to the database name
+when loading or publishing data
+with <code class="docutils literal notranslate"><span class="pre">verbose=True</span></code></p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audformat&gt;=1.4.2</span></code></p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audbackend[all]&gt;=2.4.0</span></code></p></li>
+<li><p>Changed: speed up looking for missing files
+in <code class="docutils literal notranslate"><span class="pre">audb.load_media()</span></code></p></li>
+<li><p>Changed: speed up lookups of multiple files
+in the dependency table</p></li>
+<li><p>Changed: speed up <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">audb</span></code>
+by using lazy imports</p></li>
+<li><p>Changed: speed up <code class="docutils literal notranslate"><span class="pre">audb.versions()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">audb.latest_version()</span></code>
+on MinIO/S3 backends</p></li>
+<li><p>Changed: only acquire lock for cache folder
+if the stored database is not complete</p></li>
+<li><p>Changed: exclude <code class="docutils literal notranslate"><span class="pre">tests/</span></code> and <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folders from the Python package</p></li>
+<li><p>Removed: Python 3.9 support</p></li>
+<li><p>Fixed: error message for missing files in <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code>.
+It does now state clearly
+that files are missing and not tables</p></li>
+<li><p>Fixed: ensure we start with a clean temporary folder
+when downloading files</p></li>
+<li><p>Fixed: only scan for missing files
+when we already have some files in the cache</p></li>
+</ul>
+</section>
+<section id="version-1-11-4-2025-07-22">
+<h2>Version 1.11.4 (2025-07-22)<a class="headerlink" href="#version-1-11-4-2025-07-22" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: restrict publishing of a new version of a database
 with dependencies to a previous version
@@ -226,9 +264,9 @@ when requesting a flavor,
 e.g. don’t raise an error for a JSON file</p></li>
 <li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.stream()</span></code> for <code class="docutils literal notranslate"><span class="pre">pyarrow&gt;=21.0.0</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-11-3-2025-02-20">
-<h2>Version 1.11.3 (2025-02-20)<a class="headerlink" href="#version-1-11-3-2025-02-20" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-11-3-2025-02-20">
+<h2>Version 1.11.3 (2025-02-20)<a class="headerlink" href="#version-1-11-3-2025-02-20" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: reduce the timeout for acquiring a lock for a cache folder
 from infinity to 24h</p></li>
@@ -237,16 +275,16 @@ if a lock for a cache folder cannot be acquired within 2s.
 The warning message suggests how to check
 whether the existing lock file needs to be deleted manually</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-11-2-2025-02-03">
-<h2>Version 1.11.2 (2025-02-03)<a class="headerlink" href="#version-1-11-2-2025-02-03" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-11-2-2025-02-03">
+<h2>Version 1.11.2 (2025-02-03)<a class="headerlink" href="#version-1-11-2-2025-02-03" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: support for Artifactory backend in Python 3.12</p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audbackend&gt;=2.2.2</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-11-1-2025-01-06">
-<h2>Version 1.11.1 (2025-01-06)<a class="headerlink" href="#version-1-11-1-2025-01-06" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-11-1-2025-01-06">
+<h2>Version 1.11.1 (2025-01-06)<a class="headerlink" href="#version-1-11-1-2025-01-06" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">repositories</span></code> argument to <code class="docutils literal notranslate"><span class="pre">audb.available()</span></code>
 to limit it to selected repositories</p></li>
@@ -254,9 +292,9 @@ to limit it to selected repositories</p></li>
 <li><p>Fixed: default value for <code class="docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code>
 in documentation</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-11-0-2024-12-06">
-<h2>Version 1.11.0 (2024-12-06)<a class="headerlink" href="#version-1-11-0-2024-12-06" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-11-0-2024-12-06">
+<h2>Version 1.11.0 (2024-12-06)<a class="headerlink" href="#version-1-11-0-2024-12-06" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: a sampling rate of 24000 Hz as flavor</p></li>
 <li><p>Added: a sampling rate of 22050 Hz as flavor</p></li>
@@ -283,16 +321,16 @@ of the documentation</p></li>
 <li><p>Removed: file-system repository from default configuration</p></li>
 <li><p>Fixed: handle an empty configuration file</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-10-2-2024-11-18">
-<h2>Version 1.10.2 (2024-11-18)<a class="headerlink" href="#version-1-10-2-2024-11-18" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-10-2-2024-11-18">
+<h2>Version 1.10.2 (2024-11-18)<a class="headerlink" href="#version-1-10-2-2024-11-18" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: remove extra <code class="docutils literal notranslate"><span class="pre">&quot;/&quot;</span></code> at end of dataset names
 in <code class="docutils literal notranslate"><span class="pre">audb.available()</span></code> for S3 and Minio backends</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-10-1-2024-11-18">
-<h2>Version 1.10.1 (2024-11-18)<a class="headerlink" href="#version-1-10-1-2024-11-18" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-10-1-2024-11-18">
+<h2>Version 1.10.1 (2024-11-18)<a class="headerlink" href="#version-1-10-1-2024-11-18" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">&quot;s3&quot;</span></code> as a registered backend name</p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audbackend&gt;=2.2.0</span></code></p></li>
@@ -300,9 +338,9 @@ in <code class="docutils literal notranslate"><span class="pre">audb.available()
 to allow importing <code class="docutils literal notranslate"><span class="pre">audb</span></code> in Python&gt;=3.12</p></li>
 <li><p>Fixed:  speedup <code class="docutils literal notranslate"><span class="pre">audb.available()</span></code> for S3 and Minio backends</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-10-0-2024-11-04">
-<h2>Version 1.10.0 (2024-11-04)<a class="headerlink" href="#version-1-10-0-2024-11-04" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-10-0-2024-11-04">
+<h2>Version 1.10.0 (2024-11-04)<a class="headerlink" href="#version-1-10-0-2024-11-04" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: support for repositories
 on S3 and MinIO servers,
@@ -310,9 +348,9 @@ using the <code class="docutils literal notranslate"><span class="pre">minio</sp
 of <code class="docutils literal notranslate"><span class="pre">audbackend</span></code></p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audbackend&gt;=2.1.0</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-9-0-2024-08-22">
-<h2>Version 1.9.0 (2024-08-22)<a class="headerlink" href="#version-1-9-0-2024-08-22" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-9-0-2024-08-22">
+<h2>Version 1.9.0 (2024-08-22)<a class="headerlink" href="#version-1-9-0-2024-08-22" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: pseudo-streaming support with <code class="docutils literal notranslate"><span class="pre">audb.stream()</span></code>,
 which returns the new <code class="docutils literal notranslate"><span class="pre">audb.DatabaseIterator</span></code> object.
@@ -334,9 +372,9 @@ in cache/root folder</p></li>
 that are used as scheme labels inside the requested table,
 and not in the whole database</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-8-0-2024-07-10">
-<h2>Version 1.8.0 (2024-07-10)<a class="headerlink" href="#version-1-8-0-2024-07-10" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-8-0-2024-07-10">
+<h2>Version 1.8.0 (2024-07-10)<a class="headerlink" href="#version-1-8-0-2024-07-10" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: support for publishing tables as parquet files</p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audeer</span> <span class="pre">&gt;=2.1.0</span></code></p></li>
@@ -351,18 +389,18 @@ in <code class="docutils literal notranslate"><span class="pre">audb.load()</spa
 <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code></p></li>
 <li><p>Removed: support for Python 3.8</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-7-4-2024-06-25">
-<h2>Version 1.7.4 (2024-06-25)<a class="headerlink" href="#version-1-7-4-2024-06-25" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-7-4-2024-06-25">
+<h2>Version 1.7.4 (2024-06-25)<a class="headerlink" href="#version-1-7-4-2024-06-25" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: ensure correct data types
 in dependency table
 when loaded from a version in cache,
 stored by <code class="docutils literal notranslate"><span class="pre">audb&lt;=1.6.3</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-7-3-2024-06-04">
-<h2>Version 1.7.3 (2024-06-04)<a class="headerlink" href="#version-1-7-3-2024-06-04" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-7-3-2024-06-04">
+<h2>Version 1.7.3 (2024-06-04)<a class="headerlink" href="#version-1-7-3-2024-06-04" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: ensure correct data types
 in dependency table
@@ -384,24 +422,24 @@ when the previous version
 was stored in cache
 by a different <code class="docutils literal notranslate"><span class="pre">pandas</span></code> version</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-7-2-2024-05-16">
-<h2>Version 1.7.2 (2024-05-16)<a class="headerlink" href="#version-1-7-2-2024-05-16" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-7-2-2024-05-16">
+<h2>Version 1.7.2 (2024-05-16)<a class="headerlink" href="#version-1-7-2-2024-05-16" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: loading of dependency table from cache
 under Python 3.8,
 when stored by an older version of <code class="docutils literal notranslate"><span class="pre">audb</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-7-1-2024-05-14">
-<h2>Version 1.7.1 (2024-05-14)<a class="headerlink" href="#version-1-7-1-2024-05-14" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-7-1-2024-05-14">
+<h2>Version 1.7.1 (2024-05-14)<a class="headerlink" href="#version-1-7-1-2024-05-14" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: require <code class="docutils literal notranslate"><span class="pre">pandas&gt;=2.0.1</span></code>
 for <code class="docutils literal notranslate"><span class="pre">pyarrow</span></code> based data types</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-7-0-2024-05-10">
-<h2>Version 1.7.0 (2024-05-10)<a class="headerlink" href="#version-1-7-0-2024-05-10" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-7-0-2024-05-10">
+<h2>Version 1.7.0 (2024-05-10)<a class="headerlink" href="#version-1-7-0-2024-05-10" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: experimental support for text files
 as media files</p></li>
@@ -436,9 +474,9 @@ instead as a CSV file</p></li>
 for non-existing repositories</p></li>
 <li><p>Fixed: documentation of <code class="docutils literal notranslate"><span class="pre">audb.Repository.__eq__()</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-6-5-2024-03-28">
-<h2>Version 1.6.5 (2024-03-28)<a class="headerlink" href="#version-1-6-5-2024-03-28" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-6-5-2024-03-28">
+<h2>Version 1.6.5 (2024-03-28)<a class="headerlink" href="#version-1-6-5-2024-03-28" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies.__eq__()</span></code>
 to compare two dependency tables</p></li>
@@ -446,9 +484,9 @@ to compare two dependency tables</p></li>
 skip incomplete datasets
 instead of raising an error</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-6-4-2024-02-23">
-<h2>Version 1.6.4 (2024-02-23)<a class="headerlink" href="#version-1-6-4-2024-02-23" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-6-4-2024-02-23">
+<h2>Version 1.6.4 (2024-02-23)<a class="headerlink" href="#version-1-6-4-2024-02-23" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: in <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code>
 updating of multi-file archives
@@ -463,18 +501,18 @@ returned by <code class="docutils literal notranslate"><span class="pre">audb.De
 is now <code class="docutils literal notranslate"><span class="pre">string</span></code>
 instead of <code class="docutils literal notranslate"><span class="pre">object</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-6-3-2024-01-30">
-<h2>Version 1.6.3 (2024-01-30)<a class="headerlink" href="#version-1-6-3-2024-01-30" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-6-3-2024-01-30">
+<h2>Version 1.6.3 (2024-01-30)<a class="headerlink" href="#version-1-6-3-2024-01-30" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.versions()</span></code>
 when <code class="docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code>
 includes non-existing Artifactory repositories
 or Artifactory repositories without read access</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-6-2-2024-01-25">
-<h2>Version 1.6.2 (2024-01-25)<a class="headerlink" href="#version-1-6-2-2024-01-25" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-6-2-2024-01-25">
+<h2>Version 1.6.2 (2024-01-25)<a class="headerlink" href="#version-1-6-2-2024-01-25" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audeer&gt;=2.0.0</span></code></p></li>
 <li><p>Changed: speed up <code class="docutils literal notranslate"><span class="pre">audb.versions()</span></code></p></li>
@@ -482,25 +520,25 @@ or Artifactory repositories without read access</p></li>
 <li><p>Fixed: make documentation independent
 of the number of public datasets</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-6-1-2023-11-16">
-<h2>Version 1.6.1 (2023-11-16)<a class="headerlink" href="#version-1-6-1-2023-11-16" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-6-1-2023-11-16">
+<h2>Version 1.6.1 (2023-11-16)<a class="headerlink" href="#version-1-6-1-2023-11-16" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: accessing a database in any repository
 listed after a repository with access restrictions
 or a non-existing repository
 in <code class="docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-6-0-2023-10-17">
-<h2>Version 1.6.0 (2023-10-17)<a class="headerlink" href="#version-1-6-0-2023-10-17" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-6-0-2023-10-17">
+<h2>Version 1.6.0 (2023-10-17)<a class="headerlink" href="#version-1-6-0-2023-10-17" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: support for new backend API</p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audbackend&gt;=1.0.0</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-5-2-2023-09-26">
-<h2>Version 1.5.2 (2023-09-26)<a class="headerlink" href="#version-1-5-2-2023-09-26" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-5-2-2023-09-26">
+<h2>Version 1.5.2 (2023-09-26)<a class="headerlink" href="#version-1-5-2-2023-09-26" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: BibTeX reference to README</p></li>
 <li><p>Fixed: link to Artifactory anonymous access
@@ -509,9 +547,9 @@ in the documentation</p></li>
 of media files entries in dependency table
 during publication</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-5-1-2023-05-04">
-<h2>Version 1.5.1 (2023-05-04)<a class="headerlink" href="#version-1-5-1-2023-05-04" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-5-1-2023-05-04">
+<h2>Version 1.5.1 (2023-05-04)<a class="headerlink" href="#version-1-5-1-2023-05-04" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: require <code class="docutils literal notranslate"><span class="pre">audeer&gt;=1.20.0</span></code></p></li>
 <li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code>,
@@ -521,9 +559,9 @@ and <code class="docutils literal notranslate"><span class="pre">audb.remove_med
 were failing with <code class="docutils literal notranslate"><span class="pre">audeer==1.20.0</span></code>
 under Windows</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-5-0-2023-04-27">
-<h2>Version 1.5.0 (2023-04-27)<a class="headerlink" href="#version-1-5-0-2023-04-27" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-5-0-2023-04-27">
+<h2>Version 1.5.0 (2023-04-27)<a class="headerlink" href="#version-1-5-0-2023-04-27" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: support loading and publishing
 of database attachments
@@ -552,9 +590,9 @@ as <code class="docutils literal notranslate"><span class="pre">audbackend</span
 when loading databases with large tables
 using <code class="docutils literal notranslate"><span class="pre">only_metadata=True</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-4-2-2023-02-13">
-<h2>Version 1.4.2 (2023-02-13)<a class="headerlink" href="#version-1-4-2-2023-02-13" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-4-2-2023-02-13">
+<h2>Version 1.4.2 (2023-02-13)<a class="headerlink" href="#version-1-4-2-2023-02-13" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: support for Python 3.10</p></li>
 <li><p>Added: document optional needed overwrite permissions
@@ -564,18 +602,18 @@ when continuing a canceled publishing command</p></li>
 <li><p>Changed: split API documentation into sub-pages
 for each function</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-4-1-2022-10-17">
-<h2>Version 1.4.1 (2022-10-17)<a class="headerlink" href="#version-1-4-1-2022-10-17" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-4-1-2022-10-17">
+<h2>Version 1.4.1 (2022-10-17)<a class="headerlink" href="#version-1-4-1-2022-10-17" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code> and <code class="docutils literal notranslate"><span class="pre">audb.load_to()</span></code>
 extract archives in the corresponding database folder
 inside the <code class="docutils literal notranslate"><span class="pre">audb</span></code> cache
 instead of the system-wide temporary folder</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-4-0-2022-08-18">
-<h2>Version 1.4.0 (2022-08-18)<a class="headerlink" href="#version-1-4-0-2022-08-18" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-4-0-2022-08-18">
+<h2>Version 1.4.0 (2022-08-18)<a class="headerlink" href="#version-1-4-0-2022-08-18" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: support for <code class="docutils literal notranslate"><span class="pre">audformat</span></code>’s newly introduced misc tables</p></li>
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.info.misc_tables()</span></code></p></li>
@@ -591,9 +629,9 @@ should be downloaded</p></li>
 in the documentation examples</p></li>
 <li><p>Removed: support for Python 3.7</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-3-0-2022-07-14">
-<h2>Version 1.3.0 (2022-07-14)<a class="headerlink" href="#version-1-3-0-2022-07-14" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-3-0-2022-07-14">
+<h2>Version 1.3.0 (2022-07-14)<a class="headerlink" href="#version-1-3-0-2022-07-14" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: lock cache folder with a lock file
 when modifying it</p></li>
@@ -613,9 +651,9 @@ if a table or media file is requested
 that is not part of the database</p></li>
 <li><p>Fixed: add missing exceptions to docstrings</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-2-6-2022-04-01">
-<h2>Version 1.2.6 (2022-04-01)<a class="headerlink" href="#version-1-2-6-2022-04-01" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-2-6-2022-04-01">
+<h2>Version 1.2.6 (2022-04-01)<a class="headerlink" href="#version-1-2-6-2022-04-01" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: use emodb v1.2.0 for examples and tests</p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audobject&gt;=0.5.0</span></code></p></li>
@@ -629,44 +667,44 @@ when requesting versions of a database</p></li>
 <li><p>Removed: <code class="docutils literal notranslate"><span class="pre">include</span></code>/<code class="docutils literal notranslate"><span class="pre">exclude</span></code> keyword arguments</p></li>
 <li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audb.get_default_cache_root()</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-2-5-2022-02-23">
-<h2>Version 1.2.5 (2022-02-23)<a class="headerlink" href="#version-1-2-5-2022-02-23" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-2-5-2022-02-23">
+<h2>Version 1.2.5 (2022-02-23)<a class="headerlink" href="#version-1-2-5-2022-02-23" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: make moving of local files Windows compatible</p></li>
 <li><p>Fixed: create folder tree more efficiently when loading to cache</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-2-4-2022-02-07">
-<h2>Version 1.2.4 (2022-02-07)<a class="headerlink" href="#version-1-2-4-2022-02-07" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-2-4-2022-02-07">
+<h2>Version 1.2.4 (2022-02-07)<a class="headerlink" href="#version-1-2-4-2022-02-07" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audformat&gt;=0.13.3</span></code></p></li>
 <li><p>Fixed: conversion of pickle protocol 5 files to pickle protocol 4 in cache</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-2-3-2022-02-01">
-<h2>Version 1.2.3 (2022-02-01)<a class="headerlink" href="#version-1-2-3-2022-02-01" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-2-3-2022-02-01">
+<h2>Version 1.2.3 (2022-02-01)<a class="headerlink" href="#version-1-2-3-2022-02-01" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: more examples to the API docstrings</p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audformat&gt;=0.13.2</span></code></p></li>
 <li><p>Changed: use pickle protocol-4 for caching dependencies</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-2-2-2022-01-03">
-<h2>Version 1.2.2 (2022-01-03)<a class="headerlink" href="#version-1-2-2-2022-01-03" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-2-2-2022-01-03">
+<h2>Version 1.2.2 (2022-01-03)<a class="headerlink" href="#version-1-2-2-2022-01-03" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: small improvements to API documentation</p></li>
 <li><p>Fixed: speed up <code class="docutils literal notranslate"><span class="pre">audb.load_to()</span></code> storing of CSV files</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-2-1-2021-11-18">
-<h2>Version 1.2.1 (2021-11-18)<a class="headerlink" href="#version-1-2-1-2021-11-18" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-2-1-2021-11-18">
+<h2>Version 1.2.1 (2021-11-18)<a class="headerlink" href="#version-1-2-1-2021-11-18" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: build documentation inside the release process with Python 3.8</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-2-0-2021-11-18">
-<h2>Version 1.2.0 (2021-11-18)<a class="headerlink" href="#version-1-2-0-2021-11-18" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-2-0-2021-11-18">
+<h2>Version 1.2.0 (2021-11-18)<a class="headerlink" href="#version-1-2-0-2021-11-18" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: support for Python 3.9</p></li>
 <li><p>Added: store file duration of the database
@@ -679,9 +717,9 @@ from <code class="docutils literal notranslate"><span class="pre">audb.load_to()
 and not the temporal folder</p></li>
 <li><p>Removed: support for Python 3.6</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-9-2021-08-05">
-<h2>Version 1.1.9 (2021-08-05)<a class="headerlink" href="#version-1-1-9-2021-08-05" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-9-2021-08-05">
+<h2>Version 1.1.9 (2021-08-05)<a class="headerlink" href="#version-1-1-9-2021-08-05" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">name</span></code> argument to <code class="docutils literal notranslate"><span class="pre">audb.cached()</span></code>
 to limit search to given database name</p></li>
@@ -690,53 +728,53 @@ to limit search to given database name</p></li>
 for estimating durations for dependency files</p></li>
 <li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.cached()</span></code> for empty or missing shared cache</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-8-2021-08-03">
-<h2>Version 1.1.8 (2021-08-03)<a class="headerlink" href="#version-1-1-8-2021-08-03" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-8-2021-08-03">
+<h2>Version 1.1.8 (2021-08-03)<a class="headerlink" href="#version-1-1-8-2021-08-03" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: set <code class="docutils literal notranslate"><span class="pre">bit_depth</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code> instead of <code class="docutils literal notranslate"><span class="pre">None</span></code>
 for non SND formats in the dependency table</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-7-2021-08-03">
-<h2>Version 1.1.7 (2021-08-03)<a class="headerlink" href="#version-1-1-7-2021-08-03" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-7-2021-08-03">
+<h2>Version 1.1.7 (2021-08-03)<a class="headerlink" href="#version-1-1-7-2021-08-03" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: store metadata in dependency table for non SND formats
 like MP3 and MP4 files</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-6-2021-07-29">
-<h2>Version 1.1.6 (2021-07-29)<a class="headerlink" href="#version-1-1-6-2021-07-29" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-6-2021-07-29">
+<h2>Version 1.1.6 (2021-07-29)<a class="headerlink" href="#version-1-1-6-2021-07-29" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: documentation sub-section on database duration info</p></li>
 <li><p>Fixed: made compatible with future versions of <code class="docutils literal notranslate"><span class="pre">pandas</span></code></p></li>
 <li><p>Fixed: missing <code class="docutils literal notranslate"><span class="pre">audb.Repository</span></code> documentation</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-5-2021-05-26">
-<h2>Version 1.1.5 (2021-05-26)<a class="headerlink" href="#version-1-1-5-2021-05-26" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-5-2021-05-26">
+<h2>Version 1.1.5 (2021-05-26)<a class="headerlink" href="#version-1-1-5-2021-05-26" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code> raises now error for wrong keyword argument</p></li>
 <li><p>Fixed: look also in shared cache for partial loaded databases</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-4-2021-05-19">
-<h2>Version 1.1.4 (2021-05-19)<a class="headerlink" href="#version-1-1-4-2021-05-19" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-4-2021-05-19">
+<h2>Version 1.1.4 (2021-05-19)<a class="headerlink" href="#version-1-1-4-2021-05-19" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: version number shown in the documentation table of content</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-3-2021-05-18">
-<h2>Version 1.1.3 (2021-05-18)<a class="headerlink" href="#version-1-1-3-2021-05-18" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-3-2021-05-18">
+<h2>Version 1.1.3 (2021-05-18)<a class="headerlink" href="#version-1-1-3-2021-05-18" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: discussion of needed system packages for handling audio files
 in the documentation</p></li>
 <li><p>Changed: allow only to publish portable databases</p></li>
 <li><p>Fixed: macOS support by relying on new <code class="docutils literal notranslate"><span class="pre">audresample</span></code> version</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-2-2021-05-06">
-<h2>Version 1.1.2 (2021-05-06)<a class="headerlink" href="#version-1-1-2-2021-05-06" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-2-2021-05-06">
+<h2>Version 1.1.2 (2021-05-06)<a class="headerlink" href="#version-1-1-2-2021-05-06" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.load_media()</span></code></p></li>
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.load_table()</span></code></p></li>
@@ -749,15 +787,15 @@ for shared cache folder</p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audformat&gt;=0.11.0</span></code></p></li>
 <li><p>Fixed: allow <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code> to work offline if database is cached</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-1-2021-04-30">
-<h2>Version 1.1.1 (2021-04-30)<a class="headerlink" href="#version-1-1-1-2021-04-30" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-1-2021-04-30">
+<h2>Version 1.1.1 (2021-04-30)<a class="headerlink" href="#version-1-1-1-2021-04-30" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: update removal version of deprecated stuff to 1.2.0</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-1-0-2021-04-29">
-<h2>Version 1.1.0 (2021-04-29)<a class="headerlink" href="#version-1-1-0-2021-04-29" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-1-0-2021-04-29">
+<h2>Version 1.1.0 (2021-04-29)<a class="headerlink" href="#version-1-1-0-2021-04-29" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies._remove()</span></code></p></li>
 <li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies</span></code> internally uses <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> instead of <code class="docutils literal notranslate"><span class="pre">dict</span></code></p></li>
@@ -773,9 +811,9 @@ for shared cache folder</p></li>
 <li><p>Fixed: add missing link to <code class="docutils literal notranslate"><span class="pre">emodb</span></code> example repository</p></li>
 <li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies.data</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-0-4-2021-04-09">
-<h2>Version 1.0.4 (2021-04-09)<a class="headerlink" href="#version-1-0-4-2021-04-09" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-0-4-2021-04-09">
+<h2>Version 1.0.4 (2021-04-09)<a class="headerlink" href="#version-1-0-4-2021-04-09" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies.bit_depth()</span></code> now always returns an integer</p></li>
 <li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audb.Dependencies.channels()</span></code> now always returns an integer</p></li>
@@ -785,30 +823,30 @@ for shared cache folder</p></li>
 duration of 0s</p></li>
 <li><p>Fixed: remove dependency to <code class="docutils literal notranslate"><span class="pre">fire</span></code> package</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-0-3-2021-04-08">
-<h2>Version 1.0.3 (2021-04-08)<a class="headerlink" href="#version-1-0-3-2021-04-08" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-0-3-2021-04-08">
+<h2>Version 1.0.3 (2021-04-08)<a class="headerlink" href="#version-1-0-3-2021-04-08" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: docstring of <code class="docutils literal notranslate"><span class="pre">audb.exists()</span></code> falsely claimed that it was not
 returning a boolean</p></li>
 <li><p>Fixed: several typos in documentation</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-0-2-2021-04-07">
-<h2>Version 1.0.2 (2021-04-07)<a class="headerlink" href="#version-1-0-2-2021-04-07" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-0-2-2021-04-07">
+<h2>Version 1.0.2 (2021-04-07)<a class="headerlink" href="#version-1-0-2-2021-04-07" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: renamed <code class="docutils literal notranslate"><span class="pre">latest_only</span></code> argument of <code class="docutils literal notranslate"><span class="pre">audb.available()</span></code>
 to <code class="docutils literal notranslate"><span class="pre">only_latest</span></code> as it was before</p></li>
 </ul>
-</div>
-<div class="section" id="version-1-0-1-2021-04-07">
-<h2>Version 1.0.1 (2021-04-07)<a class="headerlink" href="#version-1-0-1-2021-04-07" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-0-1-2021-04-07">
+<h2>Version 1.0.1 (2021-04-07)<a class="headerlink" href="#version-1-0-1-2021-04-07" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: appearance of documentation TOC by requirering <code class="docutils literal notranslate"><span class="pre">docutils&lt;0.17</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-1-0-0-2021-04-07">
-<h2>Version 1.0.0 (2021-04-07)<a class="headerlink" href="#version-1-0-0-2021-04-07" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-1-0-0-2021-04-07">
+<h2>Version 1.0.0 (2021-04-07)<a class="headerlink" href="#version-1-0-0-2021-04-07" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: first public release</p></li>
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.info.author()</span></code></p></li>
@@ -829,9 +867,9 @@ to <code class="docutils literal notranslate"><span class="pre">only_latest</spa
 <li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audb.cached_databases()</span></code></p></li>
 <li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audb.define</span></code> module</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-93-0-2021-03-29">
-<h2>Version 0.93.0 (2021-03-29)<a class="headerlink" href="#version-0-93-0-2021-03-29" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-93-0-2021-03-29">
+<h2>Version 0.93.0 (2021-03-29)<a class="headerlink" href="#version-0-93-0-2021-03-29" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">complete</span></code> column in <code class="docutils literal notranslate"><span class="pre">audb.cached()</span></code></p></li>
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">previous_version</span></code> argument to <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code></p></li>
@@ -851,23 +889,23 @@ of <code class="docutils literal notranslate"><span class="pre">audb.Flavor</spa
 <li><p>Fixed: allow for cross-backend dependencies for <code class="docutils literal notranslate"><span class="pre">audb.publish()</span></code></p></li>
 <li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audb.remove_media()</span></code> can now be called several times</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-92-1-2021-03-19">
-<h2>Version 0.92.1 (2021-03-19)<a class="headerlink" href="#version-0-92-1-2021-03-19" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-92-1-2021-03-19">
+<h2>Version 0.92.1 (2021-03-19)<a class="headerlink" href="#version-0-92-1-2021-03-19" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: enforce <code class="docutils literal notranslate"><span class="pre">mixdown=False</span></code> for mono file flavors</p></li>
 <li><p>Fixed: global config file was missing in PyPI package</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-92-0-2021-03-09">
-<h2>Version 0.92.0 (2021-03-09)<a class="headerlink" href="#version-0-92-0-2021-03-09" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-92-0-2021-03-09">
+<h2>Version 0.92.0 (2021-03-09)<a class="headerlink" href="#version-0-92-0-2021-03-09" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: configuration file</p></li>
 <li><p>Changed: use external package for backend implementations</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-91-0-2021-02-19">
-<h2>Version 0.91.0 (2021-02-19)<a class="headerlink" href="#version-0-91-0-2021-02-19" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-91-0-2021-02-19">
+<h2>Version 0.91.0 (2021-02-19)<a class="headerlink" href="#version-0-91-0-2021-02-19" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.Backend.latest_version()</span></code></p></li>
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audb.Backend.create()</span></code></p></li>
@@ -879,32 +917,32 @@ of <code class="docutils literal notranslate"><span class="pre">audb.Flavor</spa
 <li><p>Fixed: use <code class="docutils literal notranslate"><span class="pre">sphinx&gt;=3.5.1</span></code> to fix inherited attributes
 in documentation</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-90-3-2021-02-01">
-<h2>Version 0.90.3 (2021-02-01)<a class="headerlink" href="#version-0-90-3-2021-02-01" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-90-3-2021-02-01">
+<h2>Version 0.90.3 (2021-02-01)<a class="headerlink" href="#version-0-90-3-2021-02-01" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: define data types when reading dependency file</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-90-2-2021-01-28">
-<h2>Version 0.90.2 (2021-01-28)<a class="headerlink" href="#version-0-90-2-2021-01-28" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-90-2-2021-01-28">
+<h2>Version 0.90.2 (2021-01-28)<a class="headerlink" href="#version-0-90-2-2021-01-28" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">data-provate-local</span></code> to the default repositories</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-90-1-2021-01-25">
-<h2>Version 0.90.1 (2021-01-25)<a class="headerlink" href="#version-0-90-1-2021-01-25" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-90-1-2021-01-25">
+<h2>Version 0.90.1 (2021-01-25)<a class="headerlink" href="#version-0-90-1-2021-01-25" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: CHANGELOG</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-90-0-2021-01-22">
-<h2>Version 0.90.0 (2021-01-22)<a class="headerlink" href="#version-0-90-0-2021-01-22" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-90-0-2021-01-22">
+<h2>Version 0.90.0 (2021-01-22)<a class="headerlink" href="#version-0-90-0-2021-01-22" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: initial release</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -927,7 +965,7 @@ in documentation</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -935,7 +973,7 @@ in documentation</p></li>
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -959,18 +997,16 @@ in documentation</p></li>
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="_static/js/jquery.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">

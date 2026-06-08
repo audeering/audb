@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Caching &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -155,8 +156,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <span class="target" id="caching"></span><div class="section" id="id1">
-<h1>Caching<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h1>
+  <span class="target" id="caching"></span><section id="id1">
+<h1>Caching<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <p>When you request a database the first time,
 <a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> will unpack (and convert) annotations and data to
 <code class="file docutils literal notranslate"><span class="pre">&lt;cache&gt;/&lt;name&gt;/&lt;version&gt;/&lt;flavor&gt;/</span></code>.
@@ -164,8 +165,8 @@ Next time your request it again,
 <a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> will directly load the database from there.</p>
 <p><a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> distinguishes two <code class="file docutils literal notranslate"><span class="pre">&lt;cache&gt;</span></code> folders.
 A system wide shared cache folder and a user cache folder.</p>
-<div class="section" id="shared-cache">
-<h2>Shared cache<a class="headerlink" href="#shared-cache" title="Permalink to this heading">¶</a></h2>
+<section id="shared-cache">
+<h2>Shared cache<a class="headerlink" href="#shared-cache" title="Link to this heading">¶</a></h2>
 <p>By default the shared cache is located at</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">&#39;/data/audb&#39;</span>
@@ -182,9 +183,9 @@ $<span class="w"> </span>chmod<span class="w"> </span>g+s<span class="w"> </span
 $<span class="w"> </span>setfacl<span class="w"> </span>-d<span class="w"> </span>-m<span class="w"> </span>u::rwx,g::rwx,o::rx-<span class="w"> </span>/data/audb<span class="w">  </span><span class="c1"># content inherits rights</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="user-cache">
-<h2>User cache<a class="headerlink" href="#user-cache" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="user-cache">
+<h2>User cache<a class="headerlink" href="#user-cache" title="Link to this heading">¶</a></h2>
 <p>The second cache folder should be
 accessible to you only.
 By default it points to</p>
@@ -195,9 +196,9 @@ By default it points to</p>
 <p>When you request a database with <a class="reference internal" href="api/audb.load.html#audb.load" title="audb.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.load()</span></code></a>,
 <a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> first looks for it in the shared cache folder
 and afterwards in your local cache folder.</p>
-</div>
-<div class="section" id="changing-cache-locations">
-<h2>Changing cache locations<a class="headerlink" href="#changing-cache-locations" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="changing-cache-locations">
+<h2>Changing cache locations<a class="headerlink" href="#changing-cache-locations" title="Link to this heading">¶</a></h2>
 <p>There are four ways to change the default locations:</p>
 <ol class="arabic simple">
 <li><p>By setting the argument <code class="docutils literal notranslate"><span class="pre">cache_root</span></code> during a function call, e.g.</p></li>
@@ -234,8 +235,8 @@ using the <a class="reference internal" href="configuration.html#configuration">
 1. overwrites all other methods,
 2. overwrites 3. and 4.,
 and so on.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -260,7 +261,7 @@ and so on.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -268,7 +269,7 @@ and so on.</p>
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -292,18 +293,16 @@ and so on.</p>
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="_static/js/jquery.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">

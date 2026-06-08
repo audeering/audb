@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -200,6 +200,8 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create and return temporary database cache folder.</span>
 
 <span class="sd">    The temporary cache folder is created under ``db_root + &#39;~&#39;``.</span>
+<span class="sd">    Any existing temporary folder from previous interrupted downloads</span>
+<span class="sd">    is removed before creating a fresh one.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        db_root: path to database cache folder</span>
@@ -209,11 +211,15 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tmp_root</span> <span class="o">=</span> <span class="n">db_root</span> <span class="o">+</span> <span class="s2">&quot;~&quot;</span>
+    <span class="c1"># Clean up any leftover tmp folder from previous interrupted downloads</span>
+    <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">)</span>
     <span class="n">tmp_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tmp_root</span>
 
 
-<div class="viewcode-block" id="default_cache_root"><a class="viewcode-back" href="../../../api/audb.default_cache_root.html#audb.default_cache_root">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">default_cache_root</span><span class="p">(</span>
+<div class="viewcode-block" id="default_cache_root">
+<a class="viewcode-back" href="../../../api/audb.default_cache_root.html#audb.default_cache_root">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_cache_root</span><span class="p">(</span>
     <span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default cache folder.</span>
@@ -243,6 +249,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUDB_CACHE_ROOT&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
     <span class="k">return</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">follow_symlink</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
@@ -258,7 +265,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -266,7 +273,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -290,18 +297,16 @@
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../../../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">

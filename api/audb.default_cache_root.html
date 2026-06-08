@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>default_cache_root() &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -175,11 +176,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="default-cache-root">
-<h1>default_cache_root()<a class="headerlink" href="#default-cache-root" title="Permalink to this heading">¶</a></h1>
+  <section id="default-cache-root">
+<h1>default_cache_root()<a class="headerlink" href="#default-cache-root" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="audb.default_cache_root">
-<span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">default_cache_root</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/cache.html#default_cache_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.default_cache_root" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">default_cache_root</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/cache.html#default_cache_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.default_cache_root" title="Link to this definition">¶</a></dt>
 <dd><p>Default cache folder.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">shared</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>,
 returns the path specified
@@ -194,19 +195,19 @@ by the environment variable
 or
 <code class="docutils literal notranslate"><span class="pre">audb.config.CACHE_ROOT</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>shared</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> returns path to shared cache folder</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>path normalized by <a class="reference external" href="https://audeering.github.io/audeer/api/audeer.path.html#audeer.path" title="(in audeer vv2.2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audeer.path()</span></code></a></p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>path normalized by <a class="reference external" href="https://audeering.github.io/audeer/api/audeer.path.html#audeer.path" title="(in audeer v2.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audeer.path()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
@@ -231,7 +232,7 @@ or
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -239,7 +240,7 @@ or
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -263,18 +264,16 @@ or
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">

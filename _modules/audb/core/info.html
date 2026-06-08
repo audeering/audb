@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -162,7 +162,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.load</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_table</span>
 
 
-<div class="viewcode-block" id="attachments"><a class="viewcode-back" href="../../../api/audb.info.attachments.html#audb.info.attachments">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">attachments</span><span class="p">(</span>
+<div class="viewcode-block" id="attachments">
+<a class="viewcode-back" href="../../../api/audb.info.attachments.html#audb.info.attachments">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">attachments</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -193,7 +195,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span></div>
 
 
-<div class="viewcode-block" id="author"><a class="viewcode-back" href="../../../api/audb.info.author.html#audb.info.author">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">author</span><span class="p">(</span>
+
+<div class="viewcode-block" id="author">
+<a class="viewcode-back" href="../../../api/audb.info.author.html#audb.info.author">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">author</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -224,7 +229,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">author</span></div>
 
 
-<div class="viewcode-block" id="bit_depths"><a class="viewcode-back" href="../../../api/audb.info.bit_depths.html#audb.info.bit_depths">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">bit_depths</span><span class="p">(</span>
+
+<div class="viewcode-block" id="bit_depths">
+<a class="viewcode-back" href="../../../api/audb.info.bit_depths.html#audb.info.bit_depths">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bit_depths</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -260,7 +268,10 @@
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_TYPE</span><span class="p">[</span><span class="s2">&quot;media&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="channels"><a class="viewcode-back" href="../../../api/audb.info.channels.html#audb.info.channels">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">channels</span><span class="p">(</span>
+
+<div class="viewcode-block" id="channels">
+<a class="viewcode-back" href="../../../api/audb.info.channels.html#audb.info.channels">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">channels</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -296,7 +307,10 @@
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_TYPE</span><span class="p">[</span><span class="s2">&quot;media&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="description"><a class="viewcode-back" href="../../../api/audb.info.description.html#audb.info.description">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">description</span><span class="p">(</span>
+
+<div class="viewcode-block" id="description">
+<a class="viewcode-back" href="../../../api/audb.info.description.html#audb.info.description">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">description</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -328,7 +342,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">description</span></div>
 
 
-<div class="viewcode-block" id="duration"><a class="viewcode-back" href="../../../api/audb.info.duration.html#audb.info.duration">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">duration</span><span class="p">(</span>
+
+<div class="viewcode-block" id="duration">
+<a class="viewcode-back" href="../../../api/audb.info.duration.html#audb.info.duration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">duration</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -369,7 +386,10 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="files"><a class="viewcode-back" href="../../../api/audb.info.files.html#audb.info.files">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">files</span><span class="p">(</span>
+
+<div class="viewcode-block" id="files">
+<a class="viewcode-back" href="../../../api/audb.info.files.html#audb.info.files">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">files</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -395,7 +415,10 @@
     <span class="k">return</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span></div>
 
 
-<div class="viewcode-block" id="formats"><a class="viewcode-back" href="../../../api/audb.info.formats.html#audb.info.formats">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">formats</span><span class="p">(</span>
+
+<div class="viewcode-block" id="formats">
+<a class="viewcode-back" href="../../../api/audb.info.formats.html#audb.info.formats">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">formats</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -431,7 +454,10 @@
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_TYPE</span><span class="p">[</span><span class="s2">&quot;media&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">format</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="header"><a class="viewcode-back" href="../../../api/audb.info.header.html#audb.info.header">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span>
+
+<div class="viewcode-block" id="header">
+<a class="viewcode-back" href="../../../api/audb.info.header.html#audb.info.header">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -473,7 +499,10 @@
     <span class="k">return</span> <span class="n">db</span></div>
 
 
-<div class="viewcode-block" id="languages"><a class="viewcode-back" href="../../../api/audb.info.languages.html#audb.info.languages">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">languages</span><span class="p">(</span>
+
+<div class="viewcode-block" id="languages">
+<a class="viewcode-back" href="../../../api/audb.info.languages.html#audb.info.languages">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">languages</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -504,7 +533,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">languages</span></div>
 
 
-<div class="viewcode-block" id="license"><a class="viewcode-back" href="../../../api/audb.info.license.html#audb.info.license">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">license</span><span class="p">(</span>
+
+<div class="viewcode-block" id="license">
+<a class="viewcode-back" href="../../../api/audb.info.license.html#audb.info.license">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">license</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -535,7 +567,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">license</span></div>
 
 
-<div class="viewcode-block" id="license_url"><a class="viewcode-back" href="../../../api/audb.info.license_url.html#audb.info.license_url">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">license_url</span><span class="p">(</span>
+
+<div class="viewcode-block" id="license_url">
+<a class="viewcode-back" href="../../../api/audb.info.license_url.html#audb.info.license_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">license_url</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -566,7 +601,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">license_url</span></div>
 
 
-<div class="viewcode-block" id="media"><a class="viewcode-back" href="../../../api/audb.info.media.html#audb.info.media">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">media</span><span class="p">(</span>
+
+<div class="viewcode-block" id="media">
+<a class="viewcode-back" href="../../../api/audb.info.media.html#audb.info.media">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">media</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -598,7 +636,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">media</span></div>
 
 
-<div class="viewcode-block" id="meta"><a class="viewcode-back" href="../../../api/audb.info.meta.html#audb.info.meta">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">meta</span><span class="p">(</span>
+
+<div class="viewcode-block" id="meta">
+<a class="viewcode-back" href="../../../api/audb.info.meta.html#audb.info.meta">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">meta</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -630,7 +671,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">meta</span></div>
 
 
-<div class="viewcode-block" id="misc_tables"><a class="viewcode-back" href="../../../api/audb.info.misc_tables.html#audb.info.misc_tables">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">misc_tables</span><span class="p">(</span>
+
+<div class="viewcode-block" id="misc_tables">
+<a class="viewcode-back" href="../../../api/audb.info.misc_tables.html#audb.info.misc_tables">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">misc_tables</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -661,7 +705,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">misc_tables</span></div>
 
 
-<div class="viewcode-block" id="organization"><a class="viewcode-back" href="../../../api/audb.info.organization.html#audb.info.organization">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">organization</span><span class="p">(</span>
+
+<div class="viewcode-block" id="organization">
+<a class="viewcode-back" href="../../../api/audb.info.organization.html#audb.info.organization">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">organization</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -692,7 +739,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">organization</span></div>
 
 
-<div class="viewcode-block" id="raters"><a class="viewcode-back" href="../../../api/audb.info.raters.html#audb.info.raters">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">raters</span><span class="p">(</span>
+
+<div class="viewcode-block" id="raters">
+<a class="viewcode-back" href="../../../api/audb.info.raters.html#audb.info.raters">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">raters</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -724,7 +774,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">raters</span></div>
 
 
-<div class="viewcode-block" id="sampling_rates"><a class="viewcode-back" href="../../../api/audb.info.sampling_rates.html#audb.info.sampling_rates">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">sampling_rates</span><span class="p">(</span>
+
+<div class="viewcode-block" id="sampling_rates">
+<a class="viewcode-back" href="../../../api/audb.info.sampling_rates.html#audb.info.sampling_rates">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sampling_rates</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -760,7 +813,10 @@
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">DEPENDENCY_TYPE</span><span class="p">[</span><span class="s2">&quot;media&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="schemes"><a class="viewcode-back" href="../../../api/audb.info.schemes.html#audb.info.schemes">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">schemes</span><span class="p">(</span>
+
+<div class="viewcode-block" id="schemes">
+<a class="viewcode-back" href="../../../api/audb.info.schemes.html#audb.info.schemes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">schemes</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -795,7 +851,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">schemes</span></div>
 
 
-<div class="viewcode-block" id="source"><a class="viewcode-back" href="../../../api/audb.info.source.html#audb.info.source">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">source</span><span class="p">(</span>
+
+<div class="viewcode-block" id="source">
+<a class="viewcode-back" href="../../../api/audb.info.source.html#audb.info.source">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">source</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -826,7 +885,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">source</span></div>
 
 
-<div class="viewcode-block" id="splits"><a class="viewcode-back" href="../../../api/audb.info.splits.html#audb.info.splits">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">splits</span><span class="p">(</span>
+
+<div class="viewcode-block" id="splits">
+<a class="viewcode-back" href="../../../api/audb.info.splits.html#audb.info.splits">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">splits</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -860,7 +922,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">splits</span></div>
 
 
-<div class="viewcode-block" id="tables"><a class="viewcode-back" href="../../../api/audb.info.tables.html#audb.info.tables">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span>
+
+<div class="viewcode-block" id="tables">
+<a class="viewcode-back" href="../../../api/audb.info.tables.html#audb.info.tables">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -891,7 +956,10 @@
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">tables</span></div>
 
 
-<div class="viewcode-block" id="usage"><a class="viewcode-back" href="../../../api/audb.info.usage.html#audb.info.usage">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">usage</span><span class="p">(</span>
+
+<div class="viewcode-block" id="usage">
+<a class="viewcode-back" href="../../../api/audb.info.usage.html#audb.info.usage">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">usage</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -920,6 +988,7 @@
         <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">usage</span></div>
+
 </pre></div>
 
            </div>
@@ -935,7 +1004,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -943,7 +1012,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -967,18 +1036,16 @@
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../../../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">

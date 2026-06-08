@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -170,6 +170,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dependencies</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">upload_dependencies</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">Repository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.shimmer</span><span class="w"> </span><span class="kn">import</span> <span class="n">shimmer</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_for_duplicates</span><span class="p">(</span>
@@ -212,8 +213,8 @@
         <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;The following &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">missing_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;files are referenced in tables &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;that cannot be found on disk &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;files are referenced in tables, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;but cannot be found on disk &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;and are not yet part of the database: &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">missing_files</span><span class="p">[:</span><span class="n">number_of_presented_files</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
@@ -285,7 +286,7 @@
     <span class="n">attachment_ids</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">attachment_id</span> <span class="ow">in</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span>
         <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">),</span>
-        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Find attachments&quot;</span><span class="p">,</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Scan attachments&quot;</span><span class="p">,</span>
         <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># use one archive per attachment ID</span>
@@ -405,7 +406,7 @@
         <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">file</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">db_media_in_root</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Find media&quot;</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Scan media&quot;</span><span class="p">,</span>
         <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -449,7 +450,7 @@
     <span class="n">tables</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span>
         <span class="nb">zip</span><span class="p">(</span><span class="n">table_ids</span><span class="p">,</span> <span class="n">table_files</span><span class="p">),</span>
-        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Find tables&quot;</span><span class="p">,</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Scan tables&quot;</span><span class="p">,</span>
         <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">checksum</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
@@ -527,8 +528,7 @@
         <span class="c1"># If sox or mediafile are not installed</span>
         <span class="c1"># we get a FileNotFoundError error</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;sox and mediainfo have to be installed &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;to publish &#39;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2">&#39; media files.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;sox and mediainfo have to be installed to publish &#39;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2">&#39; media files.&quot;</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
         <span class="c1"># Skip audio/video metadata for media files,</span>
@@ -731,7 +731,9 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="publish"><a class="viewcode-back" href="../../../api/audb.publish.html#audb.publish">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span>
+<div class="viewcode-block" id="publish">
+<a class="viewcode-back" href="../../../api/audb.publish.html#audb.publish">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span>
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">,</span>
@@ -890,6 +892,48 @@
         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="k">with</span> <span class="n">shimmer</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;Put:   &quot;</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Source: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">enabled</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">deps</span> <span class="o">=</span> <span class="n">_publish</span><span class="p">(</span>
+            <span class="n">db</span><span class="p">,</span>
+            <span class="n">db_root</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">repository</span><span class="p">,</span>
+            <span class="n">archives</span><span class="p">,</span>
+            <span class="n">previous_version</span><span class="p">,</span>
+            <span class="n">cache_root</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">deps</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_publish</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+    <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">,</span>
+    <span class="n">archives</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">previous_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dependencies</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Publish database without the progress animation.</span>
+
+<span class="sd">    The body of :func:`publish` lives here so that :func:`publish`</span>
+<span class="sd">    only sets up and tears down the :class:`Shimmer` animation,</span>
+<span class="sd">    keeping that plumbing separate from the publication logic.</span>
+<span class="sd">    ``db`` is the database header (loaded with ``load_data=False``);</span>
+<span class="sd">    it is reloaded with table data below.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
 
     <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
@@ -901,7 +945,7 @@
 
     <span class="k">if</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;A version &quot;</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&#39; &quot;</span> <span class="s2">&quot;already exists for database &quot;</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;A version &#39;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&#39; already exists for database &#39;</span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">previous_version</span> <span class="o">==</span> <span class="s2">&quot;latest&quot;</span><span class="p">:</span>
         <span class="c1"># Find latest version across all repositories (like audb.latest_version)</span>
@@ -962,7 +1006,6 @@
             <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="n">version</span><span class="o">=</span><span class="n">previous_version</span><span class="p">,</span>
             <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
-            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">previous_deps</span><span class="p">()):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -1042,18 +1085,37 @@
         <span class="c1"># publish attachments</span>
         <span class="n">attachments</span> <span class="o">=</span> <span class="n">_find_attachments</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="n">_put_attachments</span><span class="p">(</span>
-            <span class="n">attachments</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">backend_interface</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span>
+            <span class="n">attachments</span><span class="p">,</span>
+            <span class="n">db_root</span><span class="p">,</span>
+            <span class="n">db</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">backend_interface</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># publish tables</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="n">_find_tables</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="n">_put_tables</span><span class="p">(</span>
-            <span class="n">tables</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">backend_interface</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span>
+            <span class="n">tables</span><span class="p">,</span>
+            <span class="n">db_root</span><span class="p">,</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">backend_interface</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># publish media</span>
         <span class="n">media_archives</span> <span class="o">=</span> <span class="n">_find_media</span><span class="p">(</span>
-            <span class="n">db</span><span class="p">,</span> <span class="n">db_root</span><span class="p">,</span> <span class="n">db_root_files</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">archives</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">verbose</span>
+            <span class="n">db</span><span class="p">,</span>
+            <span class="n">db_root</span><span class="p">,</span>
+            <span class="n">db_root_files</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">deps</span><span class="p">,</span>
+            <span class="n">archives</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">_put_media</span><span class="p">(</span>
             <span class="n">media_archives</span><span class="p">,</span>
@@ -1081,7 +1143,7 @@
             <span class="k">if</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
                 <span class="n">backend_interface</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">deps</span></div>
+    <span class="k">return</span> <span class="n">deps</span>
 </pre></div>
 
            </div>
@@ -1097,7 +1159,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1105,7 +1167,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -1129,18 +1191,16 @@
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../../../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">

@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Overview &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -155,8 +156,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h1>
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> is similar to a version control system
 for text and binary data.
 It allows to manage your databases
@@ -174,10 +175,10 @@ of the underlying workings of <a class="reference internal" href="api/audb.html#
 If you just want to use it,
 you might read on at <a class="reference internal" href="publish.html#publish"><span class="std std-ref">Publish a database</span></a>
 or <a class="reference internal" href="load.html#load"><span class="std std-ref">Load a database</span></a>.</p>
-<div class="section" id="backends">
-<h2>Backends<a class="headerlink" href="#backends" title="Permalink to this heading">¶</a></h2>
+<section id="backends">
+<h2>Backends<a class="headerlink" href="#backends" title="Link to this heading">¶</a></h2>
 <p><a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> abstracts the database storage
-by using the <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.html#module-audbackend" title="(in audbackend v2.2.2)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audbackend</span></code></a> package
+by using the <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.html#module-audbackend" title="(in audbackend v2.4.0)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audbackend</span></code></a> package
 to communicate with the underlying backend.
 At the moment,
 it supports to store the data
@@ -204,9 +205,9 @@ you would use the following repository.</p>
 <p>The default repositories are configured in <a class="reference internal" href="api/audb.config.html#audb.config.REPOSITORIES" title="audb.config.REPOSITORIES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code></a>
 and can be managed best
 by specifying them in the <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">Configuration</span></a>.</p>
-</div>
-<div class="section" id="publish">
-<h2>Publish<a class="headerlink" href="#publish" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="publish">
+<h2>Publish<a class="headerlink" href="#publish" title="Link to this heading">¶</a></h2>
 <p>When publishing your data
 with <a class="reference internal" href="api/audb.publish.html#audb.publish" title="audb.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.publish()</span></code></a>
 the following operations are performed:</p>
@@ -215,7 +216,7 @@ the following operations are performed:</p>
 <li><p>pack media and csv files into ZIP archives</p></li>
 <li><p>upload all files to the backend</p></li>
 </ol>
-<div class="graphviz"><object data="_images/graphviz-ea52394b96b4d166658039c641060616646beaf2.svg" type="image/svg+xml" class="graphviz">
+<div class="graphviz"><object data="_images/graphviz-f4171f8195f86e565e3e305ebd54299247683d43.svg" type="image/svg+xml" class="graphviz">
 <p class="warning">digraph G {
 
     rankdir=LR
@@ -255,9 +256,9 @@ the following operations are performed:</p>
     upload-&gt;header_out [lhead=cluster_database]
 
 }</p></object></div>
-</div>
-<div class="section" id="load">
-<h2>Load<a class="headerlink" href="#load" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="load">
+<h2>Load<a class="headerlink" href="#load" title="Link to this heading">¶</a></h2>
 <p>In the process of loading data
 with <a class="reference internal" href="api/audb.load.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>
 the following operations are performed:</p>
@@ -271,7 +272,7 @@ the following operations are performed:</p>
 the audio files (optional)</p></li>
 <li><p>store the data in a <a class="reference internal" href="caching.html#caching"><span class="std std-ref">cache</span></a> folder</p></li>
 </ol>
-<div class="graphviz"><object data="_images/graphviz-f63a0c9ca71772ae5481e92a5da6c68e00889dec.svg" type="image/svg+xml" class="graphviz">
+<div class="graphviz"><object data="_images/graphviz-90f8292e5b27734f4d47961130b05467f2fffc87.svg" type="image/svg+xml" class="graphviz">
 <p class="warning">digraph G {
 
     rankdir=LR
@@ -312,8 +313,8 @@ the audio files (optional)</p></li>
     convert-&gt;header_out [lhead=cluster_flavor]
 
 }</p></object></div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -338,7 +339,7 @@ the audio files (optional)</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -346,7 +347,7 @@ the audio files (optional)</p></li>
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -370,18 +371,16 @@ the audio files (optional)</p></li>
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="_static/js/jquery.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">

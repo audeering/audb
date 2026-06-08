@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Dependencies &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -202,11 +203,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="dependencies">
-<h1>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">¶</a></h1>
+  <section id="dependencies">
+<h1>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="audb.Dependencies">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">Dependencies</span></span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies" title="Permalink to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audb.</span></span><span class="sig-name descname"><span class="pre">Dependencies</span></span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies" title="Link to this definition">¶</a></dt>
 <dd><p>Dependencies of a database.</p>
 <p><a class="reference internal" href="#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> gathers
 all database media, table, and attachment files
@@ -245,453 +246,453 @@ but also what version of the file is required.</p>
 </div>
 </dd></dl>
 
-<div class="section" id="call">
-<h2>__call__()<a class="headerlink" href="#call" title="Permalink to this heading">¶</a></h2>
+<section id="call">
+<h2>__call__()<a class="headerlink" href="#call" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.__call__">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__call__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__call__" title="Link to this definition">¶</a></dt>
 <dd><p>Return dependencies as a table.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></span></p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>table with dependencies</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="contains">
-<h2>__contains__()<a class="headerlink" href="#contains" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="contains">
+<h2>__contains__()<a class="headerlink" href="#contains" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.__contains__">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__contains__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__contains__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__contains__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__contains__" title="Link to this definition">¶</a></dt>
 <dd><p>Check if file is part of dependencies.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if a dependency to the file exists</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="eq">
-<h2>__eq__()<a class="headerlink" href="#eq" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="eq">
+<h2>__eq__()<a class="headerlink" href="#eq" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.__eq__">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__eq__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__eq__" title="Link to this definition">¶</a></dt>
 <dd><p>Check if two dependency tables are equal.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#audb.Dependencies" title="audb.core.dependencies.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dependencies</span></code></a>) – dependency table to compare against</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#audb.Dependencies" title="audb.core.dependencies.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dependencies</span></code></a></span>) – dependency table to compare against</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if both dependency tables have the same entries</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="getitem">
-<h2>__getitem__()<a class="headerlink" href="#getitem" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="getitem">
+<h2>__getitem__()<a class="headerlink" href="#getitem" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.__getitem__">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__getitem__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__getitem__" title="Link to this definition">¶</a></dt>
 <dd><p>File information.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list with meta information</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="len">
-<h2>__len__()<a class="headerlink" href="#len" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="len">
+<h2>__len__()<a class="headerlink" href="#len" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.__len__">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__len__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.__len__" title="Link to this definition">¶</a></dt>
 <dd><p>Number of all media, table, attachment files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="archive">
-<h2>archive()<a class="headerlink" href="#archive" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="archive">
+<h2>archive()<a class="headerlink" href="#archive" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.archive">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.archive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.archive" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.archive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.archive" title="Link to this definition">¶</a></dt>
 <dd><p>Name of archive the file belongs to.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>archive name</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="archives">
-<h2>archives<a class="headerlink" href="#archives" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="archives">
+<h2>archives<a class="headerlink" href="#archives" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Dependencies.archives">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">archives</span></span><a class="headerlink" href="#audb.Dependencies.archives" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">archives</span></span><a class="headerlink" href="#audb.Dependencies.archives" title="Link to this definition">¶</a></dt>
 <dd><p>All media, table, attachment archives.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of archives</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="attachment-ids">
-<h2>attachment_ids<a class="headerlink" href="#attachment-ids" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="attachment-ids">
+<h2>attachment_ids<a class="headerlink" href="#attachment-ids" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Dependencies.attachment_ids">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">attachment_ids</span></span><a class="headerlink" href="#audb.Dependencies.attachment_ids" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">attachment_ids</span></span><a class="headerlink" href="#audb.Dependencies.attachment_ids" title="Link to this definition">¶</a></dt>
 <dd><p>Attachment IDs.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of attachment IDs</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="attachments">
-<h2>attachments<a class="headerlink" href="#attachments" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="attachments">
+<h2>attachments<a class="headerlink" href="#attachments" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Dependencies.attachments">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">attachments</span></span><a class="headerlink" href="#audb.Dependencies.attachments" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">attachments</span></span><a class="headerlink" href="#audb.Dependencies.attachments" title="Link to this definition">¶</a></dt>
 <dd><p>Attachment paths (can be a file or a folder).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of attachments</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="bit-depth">
-<h2>bit_depth()<a class="headerlink" href="#bit-depth" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="bit-depth">
+<h2>bit_depth()<a class="headerlink" href="#bit-depth" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.bit_depth">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">bit_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.bit_depth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.bit_depth" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">bit_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.bit_depth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.bit_depth" title="Link to this definition">¶</a></dt>
 <dd><p>Bit depth of media file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bit depth</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="channels">
-<h2>channels()<a class="headerlink" href="#channels" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="channels">
+<h2>channels()<a class="headerlink" href="#channels" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.channels">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.channels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.channels" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.channels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.channels" title="Link to this definition">¶</a></dt>
 <dd><p>Number of channels of media file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>number of channels</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="checksum">
-<h2>checksum()<a class="headerlink" href="#checksum" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="checksum">
+<h2>checksum()<a class="headerlink" href="#checksum" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.checksum">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">checksum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.checksum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.checksum" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">checksum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.checksum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.checksum" title="Link to this definition">¶</a></dt>
 <dd><p>Checksum of file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>checksum of file</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="duration">
-<h2>duration()<a class="headerlink" href="#duration" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="duration">
+<h2>duration()<a class="headerlink" href="#duration" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.duration">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.duration" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.duration" title="Link to this definition">¶</a></dt>
 <dd><p>Duration of file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>duration in seconds</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="files">
-<h2>files<a class="headerlink" href="#files" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="files">
+<h2>files<a class="headerlink" href="#files" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Dependencies.files">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#audb.Dependencies.files" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#audb.Dependencies.files" title="Link to this definition">¶</a></dt>
 <dd><p>All media, table, attachments.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of files</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="format">
-<h2>format()<a class="headerlink" href="#format" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="format">
+<h2>format()<a class="headerlink" href="#format" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.format">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.format" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.format" title="Link to this definition">¶</a></dt>
 <dd><p>Format of file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>file format (always lower case)</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="load">
-<h2>load()<a class="headerlink" href="#load" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="load">
+<h2>load()<a class="headerlink" href="#load" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.load">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.load" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.load" title="Link to this definition">¶</a></dt>
 <dd><p>Read dependencies from file.</p>
 <p>Clears existing dependencies.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to file.
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – path to file.
 File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code>
 <code class="docutils literal notranslate"><span class="pre">pkl</span></code>,
 or <code class="docutils literal notranslate"><span class="pre">parquet</span></code></p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – if file extension is not one of
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if file extension is not one of
     <code class="docutils literal notranslate"><span class="pre">csv</span></code>, <code class="docutils literal notranslate"><span class="pre">pkl</span></code>, <code class="docutils literal notranslate"><span class="pre">parquet</span></code></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.13)"><strong>FileNotFoundError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">path</span></code> does not exists</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.14)"><strong>FileNotFoundError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">path</span></code> does not exists</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="media">
-<h2>media<a class="headerlink" href="#media" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="media">
+<h2>media<a class="headerlink" href="#media" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Dependencies.media">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#audb.Dependencies.media" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#audb.Dependencies.media" title="Link to this definition">¶</a></dt>
 <dd><p>Media files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of media</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="removed">
-<h2>removed()<a class="headerlink" href="#removed" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="removed">
+<h2>removed()<a class="headerlink" href="#removed" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.removed">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">removed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.removed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.removed" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">removed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.removed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.removed" title="Link to this definition">¶</a></dt>
 <dd><p>Check if file is marked as removed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if file was removed</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="removed-media">
-<h2>removed_media<a class="headerlink" href="#removed-media" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="removed-media">
+<h2>removed_media<a class="headerlink" href="#removed-media" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Dependencies.removed_media">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">removed_media</span></span><a class="headerlink" href="#audb.Dependencies.removed_media" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">removed_media</span></span><a class="headerlink" href="#audb.Dependencies.removed_media" title="Link to this definition">¶</a></dt>
 <dd><p>Removed media files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of media</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="sampling-rate">
-<h2>sampling_rate()<a class="headerlink" href="#sampling-rate" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="sampling-rate">
+<h2>sampling_rate()<a class="headerlink" href="#sampling-rate" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.sampling_rate">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">sampling_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.sampling_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.sampling_rate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">sampling_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.sampling_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.sampling_rate" title="Link to this definition">¶</a></dt>
 <dd><p>Sampling rate of media file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>sampling rate in Hz</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="save">
-<h2>save()<a class="headerlink" href="#save" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="save">
+<h2>save()<a class="headerlink" href="#save" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.save">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.save" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.save" title="Link to this definition">¶</a></dt>
 <dd><p>Write dependencies to file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – path to file.
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – path to file.
 File extension can be <code class="docutils literal notranslate"><span class="pre">csv</span></code>, <code class="docutils literal notranslate"><span class="pre">pkl</span></code>, or <code class="docutils literal notranslate"><span class="pre">parquet</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="table-ids">
-<h2>table_ids<a class="headerlink" href="#table-ids" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="table-ids">
+<h2>table_ids<a class="headerlink" href="#table-ids" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Dependencies.table_ids">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">table_ids</span></span><a class="headerlink" href="#audb.Dependencies.table_ids" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">table_ids</span></span><a class="headerlink" href="#audb.Dependencies.table_ids" title="Link to this definition">¶</a></dt>
 <dd><p>Table IDs.</p>
 <p>Like <a class="reference internal" href="#audb.Dependencies.tables" title="audb.Dependencies.tables"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.Dependencies.tables()</span></code></a>,
 but only returns the table ID,
 i.e. <code class="docutils literal notranslate"><span class="pre">db.&lt;id&gt;.csv</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of table IDs</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="tables">
-<h2>tables<a class="headerlink" href="#tables" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="tables">
+<h2>tables<a class="headerlink" href="#tables" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audb.Dependencies.tables">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">tables</span></span><a class="headerlink" href="#audb.Dependencies.tables" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">tables</span></span><a class="headerlink" href="#audb.Dependencies.tables" title="Link to this definition">¶</a></dt>
 <dd><p>Tables files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of tables</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="type">
-<h2>type()<a class="headerlink" href="#type" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="type">
+<h2>type()<a class="headerlink" href="#type" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.type">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.type" title="Link to this definition">¶</a></dt>
 <dd><p>Type of file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>type</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="version">
-<h2>version()<a class="headerlink" href="#version" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version">
+<h2>version()<a class="headerlink" href="#version" title="Link to this heading">¶</a></h2>
 <dl class="py method">
 <dt class="sig sig-object py" id="audb.Dependencies.version">
-<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.version" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Dependencies.</span></span><span class="sig-name descname"><span class="pre">version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audb/core/dependencies.html#Dependencies.version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audb.Dependencies.version" title="Link to this definition">¶</a></dt>
 <dd><p>Version of file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – relative file path</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – relative file path</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>version string</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -716,7 +717,7 @@ i.e. <code class="docutils literal notranslate"><span class="pre">db.&lt;id&gt;.
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -724,7 +725,7 @@ i.e. <code class="docutils literal notranslate"><span class="pre">db.&lt;id&gt;.
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -748,18 +749,16 @@ i.e. <code class="docutils literal notranslate"><span class="pre">db.&lt;id&gt;.
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="../_static/js/jquery.js"></script>
   <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">

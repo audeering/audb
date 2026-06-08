@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Database dependencies &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.11.4
+                v1.12.0
               </div>
             
           
@@ -153,8 +154,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="database-dependencies">
-<span id="id1"></span><h1>Database dependencies<a class="headerlink" href="#database-dependencies" title="Permalink to this heading">¶</a></h1>
+  <section id="database-dependencies">
+<span id="id1"></span><h1>Database dependencies<a class="headerlink" href="#database-dependencies" title="Link to this heading">¶</a></h1>
 <p>Media and table files of databases are stored
 in archive files.
 A database can also reuse an archive file
@@ -189,8 +190,8 @@ for every version of a database.</p>
 </pre></div>
 </div>
 <p>See <a class="reference internal" href="api/audb.Dependencies.html#audb.Dependencies" title="audb.Dependencies"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Dependencies</span></code></a> for all available methods.</p>
-<div class="section" id="duration-of-a-database">
-<h2>Duration of a database<a class="headerlink" href="#duration-of-a-database" title="Permalink to this heading">¶</a></h2>
+<section id="duration-of-a-database">
+<h2>Duration of a database<a class="headerlink" href="#duration-of-a-database" title="Link to this heading">¶</a></h2>
 <p>If your database contains only WAV or FLAC files,
 we store the duration in seconds of every file
 in the database dependency table.</p>
@@ -236,7 +237,7 @@ of the emodb database.</p>
 and you would like to get the duration
 of its segments
 that contain a label
-you can use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv1.3.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
+you can use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat v1.4.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>,
 which calculates the duration
 from the <code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> entries.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">audformat</span>
@@ -256,14 +257,14 @@ for which no duration information is stored
 in the dependency table of the database,
 like MP4 files,
 you have to download the database first
-and use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat vv1.3.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
+and use <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.utils.duration.html#audformat.utils.duration" title="(in audformat v1.4.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audformat.utils.duration()</span></code></a>
 to calculate the duration on the fly.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;database-with-videos&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -288,7 +289,7 @@ to calculate the duration on the fly.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -296,7 +297,7 @@ to calculate the duration on the fly.</p>
   <div role="contentinfo">
     <p>
         
-      &copy; 2020-2025 audEERING GmbH
+      &copy; 2020-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -320,18 +321,16 @@ to calculate the duration on the fly.</p>
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     
 
   
 
+  <script type="text/javascript" src="_static/js/jquery.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">
