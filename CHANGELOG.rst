@@ -7,6 +7,42 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.12.0 (2026-06-08)
+---------------------------
+
+* Added: support for Python 3.14
+* Added: support for ``pandas>=3.0``
+* Added: support Artifactory backend with Python 3.13
+* Added: ``num_workers`` argument to ``audb.available()``.
+  This decreases lookup time on MinIO/S3 backends
+  proportional to the number of workers
+* Added: extra animation to the database name
+  when loading or publishing data
+  with ``verbose=True``
+* Changed: depend on ``audformat>=1.4.2``
+* Changed: depend on ``audbackend[all]>=2.4.0``
+* Changed: speed up looking for missing files
+  in ``audb.load_media()``
+* Changed: speed up lookups of multiple files
+  in the dependency table
+* Changed: speed up ``import audb``
+  by using lazy imports
+* Changed: speed up ``audb.versions()``
+  and ``audb.latest_version()``
+  on MinIO/S3 backends
+* Changed: only acquire lock for cache folder
+  if the stored database is not complete
+* Changed: exclude ``tests/`` and ``docs/`` folders from the Python package
+* Removed: Python 3.9 support
+* Fixed: error message for missing files in ``audb.publish()``
+  does now state clearly
+  that files are missing and not tables
+* Fixed: ensure we start with clean temporary folder
+  when downloading files
+* Fixed: only scan for missing files
+  when we have already some files in cache
+
+
 Version 1.11.4 (2025-07-22)
 ---------------------------
 
