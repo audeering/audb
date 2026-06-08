@@ -37,7 +37,7 @@ Version 1.12.0 (2026-06-08)
 * Fixed: error message for missing files in ``audb.publish()``
   does now state clearly
   that files are missing and not tables
-* Fixed: ensure we start with clean temporary folder
+* Fixed: ensure we start with a clean temporary folder
   when downloading files
 * Fixed: only scan for missing files
   when we have already some files in cache
