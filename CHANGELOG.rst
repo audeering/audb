@@ -34,8 +34,8 @@ Version 1.12.0 (2026-06-08)
   if the stored database is not complete
 * Changed: exclude ``tests/`` and ``docs/`` folders from the Python package
 * Removed: Python 3.9 support
-* Fixed: error message for missing files in ``audb.publish()``
-  does now state clearly
+* Fixed: error message for missing files in ``audb.publish()``.
+  It does now state clearly
   that files are missing and not tables
 * Fixed: ensure we start with a clean temporary folder
   when downloading files
