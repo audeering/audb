@@ -118,13 +118,6 @@ class _FakeBackend:
         return _FakeArtifactoryPath(path, self.files)
 
 
-class _FakeInterface:
-    r"""Mimic a backend interface wrapping a ``_FakeBackend``."""
-
-    def __init__(self, backend):
-        self.backend = backend
-
-
 class TestAvailable:
     r"""Test collecting available datasets."""
 
@@ -344,7 +337,7 @@ class TestAvailable:
 
         def create_backend_interface(self):
             if self.backend == "s3":
-                return _FakeInterface(backend)
+                return audbackend.interface.Versioned(backend)
             return original(self)
 
         monkeypatch.setattr(
@@ -412,7 +405,7 @@ class TestAvailable:
         repository = audb.Repository("repo-art", "host-art", "artifactory")
 
         def create_backend_interface(self):
-            return _FakeInterface(backend)
+            return audbackend.interface.Maven(backend)
 
         monkeypatch.setattr(
             audb.Repository, "create_backend_interface", create_backend_interface
@@ -477,7 +470,7 @@ class TestAvailable:
         repository = audb.Repository("repo-custom", "host-custom", "custom")
 
         def create_backend_interface(self):
-            return _FakeInterface(backend)
+            return audbackend.interface.Versioned(backend)
 
         monkeypatch.setattr(
             audb.Repository, "create_backend_interface", create_backend_interface
