@@ -2,6 +2,7 @@ import concurrent.futures
 
 import pytest
 
+import audbackend
 import audeer
 import audformat
 
@@ -22,22 +23,77 @@ class _FakeClient:
         self._http = _FakePoolManager()
 
 
-class _FakeBackend:
-    r"""Mimic a MinIO/S3 backend.
+def _children(files, path):
+    r"""Immediate subdirectory names of ``path`` in ``files``."""
+    prefix = "/" if path.strip("/") == "" else "/" + path.strip("/") + "/"
+    return sorted(
+        {
+            file[len(prefix) :].split("/")[0]
+            for file in files
+            if file.startswith(prefix) and "/" in file[len(prefix) :]
+        }
+    )
+
+
+class _FakeArtifactoryPath:
+    r"""Mimic an :class:`artifactory.ArtifactoryPath`.
+
+    Provides just enough behaviour for ``audb.available()``:
+    iterating yields the immediate child paths,
+    ``name`` returns the last path part,
+    ``/`` joins a sub-path,
+    and iterating a non-existing path
+    raises a ``FileNotFoundError``
+    (as the real Artifactory backend does).
 
     Args:
-        folders: mapping of database name
-            to the list of folders stored under it,
-            e.g. ``{"db": ["1.0.0", "media"]}``
-        headers: mapping of database name
-            to the list of versions
-            for which a header file exists
+        path: backend path
+        files: backend paths of all files stored on the backend
 
     """
 
-    def __init__(self, folders, headers):
-        self.folders = folders
-        self.headers = headers
+    def __init__(self, path, files):
+        self.path = "/" + path.strip("/") if path.strip("/") else "/"
+        self.files = files
+
+    @property
+    def name(self):
+        return self.path.rstrip("/").split("/")[-1]
+
+    def __str__(self):
+        return self.path
+
+    def __truediv__(self, other):
+        return _FakeArtifactoryPath(f"{self.path.rstrip('/')}/{other}", self.files)
+
+    def __iter__(self):
+        prefix = "/" if self.path == "/" else self.path.rstrip("/") + "/"
+        if not any(file.startswith(prefix) for file in self.files):
+            raise FileNotFoundError(self.path)
+        for child in _children(self.files, self.path):
+            yield _FakeArtifactoryPath(prefix + child, self.files)
+
+
+class _FakeBackend:
+    r"""Mimic a backend storing a fixed set of files.
+
+    ``ls_dirs()``, ``exists()`` and ``path()`` are derived
+    from the given list of file paths,
+    so the fake faithfully reproduces
+    the on-backend folder structure,
+    including the different layouts of the
+    ``Versioned`` interface (``/<name>/<version>/db.yaml``)
+    and the ``Maven`` interface used by Artifactory
+    (``/<name>/db/<version>/db-<version>.yaml``).
+
+    Args:
+        files: backend paths of all files stored on the backend,
+            e.g. ``["/name/1.0.0/db.yaml"]``
+
+    """
+
+    def __init__(self, files):
+        self.files = ["/" + file.strip("/") for file in files]
         self._client = _FakeClient()
 
     def __enter__(self):
@@ -46,25 +102,20 @@ class _FakeBackend:
     def __exit__(self, *args):
         return False
 
-    def ls_dirs(self, path):
-        path = path.strip("/")
-        if path == "":
-            # Top level: database names
-            return list(self.folders)
-        # Sub level: folders under the database
-        return self.folders[path]
+    def ls_dirs(self, path, *, suppress_backend_errors=False):
+        prefix = "/" if path.strip("/") == "" else "/" + path.strip("/") + "/"
+        path_exists = prefix == "/" or any(
+            file.startswith(prefix) for file in self.files
+        )
+        if not path_exists and not suppress_backend_errors:
+            raise audbackend.BackendError(FileNotFoundError(prefix))
+        return _children(self.files, path)
 
     def exists(self, path):
-        # ``path`` has the form ``/<name>/<version>/db.yaml``
-        name, version = path.strip("/").split("/")[:2]
-        return version in self.headers.get(name, [])
+        return ("/" + path.strip("/")) in self.files
 
-
-class _FakeInterface:
-    r"""Mimic a backend interface wrapping a ``_FakeBackend``."""
-
-    def __init__(self, backend):
-        self.backend = backend
+    def path(self, path):
+        return _FakeArtifactoryPath(path, self.files)
 
 
 class TestAvailable:
@@ -274,15 +325,19 @@ class TestAvailable:
             so its connection pool can be inspected
 
         """
-        folders = {"name-s3": ["1.0.0", "2.0.0", "3.0.0", "media"]}
-        headers = {"name-s3": ["1.0.0", "2.0.0"]}
-        backend = _FakeBackend(folders, headers)
+        files = [
+            "/name-s3/1.0.0/db.yaml",  # proper version
+            "/name-s3/2.0.0/db.yaml",  # proper version
+            "/name-s3/3.0.0/db.zip",  # version folder without header
+            "/name-s3/media/file.wav",  # non-version folder
+        ]
+        backend = _FakeBackend(files)
 
         original = audb.Repository.create_backend_interface
 
         def create_backend_interface(self):
             if self.backend == "s3":
-                return _FakeInterface(backend)
+                return audbackend.interface.Versioned(backend)
             return original(self)
 
         monkeypatch.setattr(
@@ -324,7 +379,77 @@ class TestAvailable:
     def artifactory_repository(self, monkeypatch):
         """Add an Artifactory repository served by a fake backend.
 
-        ``artifactory`` is not in the thread-safe allowlist,
+        The Artifactory backend uses a ``Maven`` interface,
+        which stores files under
+        ``/<name>/db/<version>/db-<version>.yaml``,
+        a different layout than all other backends,
+        see https://github.com/audeering/audb/issues/571.
+
+        Yields:
+            the repository
+
+        """
+        files = [
+            # Maven layout: ``/<name>/db/<version>/db-<version>.yaml``
+            "/db-a/db/1.0.0/db-1.0.0.yaml",
+            "/db-a/db/2.0.0/db-2.0.0.yaml",
+            "/db-b/db/1.0.0/db-1.0.0.yaml",
+            # Other interface folders next to ``db``,
+            # which must not be mistaken for version folders
+            "/db-a/meta/db/1.0.0/db.zip",
+            "/db-a/media/db/1.0.0/file.wav",
+            # Dataset without a ``db`` folder, which is not included
+            "/db-c/attachment/file.txt",
+        ]
+        backend = _FakeBackend(files)
+        repository = audb.Repository("repo-art", "host-art", "artifactory")
+
+        def create_backend_interface(self):
+            return audbackend.interface.Maven(backend)
+
+        monkeypatch.setattr(
+            audb.Repository, "create_backend_interface", create_backend_interface
+        )
+        yield repository
+
+    @pytest.mark.parametrize(
+        "only_latest, expected_index, expected_versions",
+        [
+            (False, ["db-a", "db-a", "db-b"], ["1.0.0", "2.0.0", "1.0.0"]),
+            (True, ["db-a", "db-b"], ["2.0.0", "1.0.0"]),
+        ],
+    )
+    def test_artifactory_backend(
+        self,
+        artifactory_repository,
+        only_latest,
+        expected_index,
+        expected_versions,
+    ):
+        """Test collecting versions from an Artifactory backend.
+
+        The ``Maven`` interface stores versions under a ``db`` subfolder,
+        which broke ``audb.available()`` in v1.12.0,
+        see https://github.com/audeering/audb/issues/571.
+
+        Args:
+            artifactory_repository: artifactory_repository fixture
+            only_latest: only_latest argument of audb.available()
+            expected_index: expected database names in the index
+            expected_versions: expected versions
+
+        """
+        df = audb.available(
+            only_latest=only_latest, repositories=artifactory_repository
+        )
+        assert list(df.index) == expected_index
+        assert list(df["version"]) == expected_versions
+
+    @pytest.fixture(scope="function", autouse=False)
+    def custom_backend_repository(self, monkeypatch):
+        """Add a repository served by a custom, non-thread-safe backend.
+
+        A custom backend is not part of the thread-safe allowlist,
         so ``audb.available()`` must access it
         with a single worker,
         regardless of ``num_workers``.
@@ -336,13 +461,16 @@ class TestAvailable:
             tuple of the fake backend instance and the repository
 
         """
-        folders = {"db-a": ["1.0.0", "2.0.0"], "db-b": ["1.0.0"]}
-        headers = {"db-a": ["1.0.0", "2.0.0"], "db-b": ["1.0.0"]}
-        backend = _FakeBackend(folders, headers)
-        repository = audb.Repository("repo-art", "host-art", "artifactory")
+        files = [
+            "/db-a/1.0.0/db.yaml",
+            "/db-a/2.0.0/db.yaml",
+            "/db-b/1.0.0/db.yaml",
+        ]
+        backend = _FakeBackend(files)
+        repository = audb.Repository("repo-custom", "host-custom", "custom")
 
         def create_backend_interface(self):
-            return _FakeInterface(backend)
+            return audbackend.interface.Versioned(backend)
 
         monkeypatch.setattr(
             audb.Repository, "create_backend_interface", create_backend_interface
@@ -350,16 +478,16 @@ class TestAvailable:
         yield backend, repository
 
     def test_non_thread_safe_backend_single_worker(
-        self, artifactory_repository, monkeypatch
+        self, custom_backend_repository, monkeypatch
     ):
         """Test non-thread-safe backends are accessed with a single worker.
 
         Args:
-            artifactory_repository: artifactory_repository fixture
+            custom_backend_repository: custom_backend_repository fixture
             monkeypatch: monkeypatch fixture
 
         """
-        backend, repository = artifactory_repository
+        backend, repository = custom_backend_repository
 
         # Record the number of workers requested from the thread pool
         requested_workers = []
