@@ -96,40 +96,66 @@ def available(
             # as the pool is created lazily on the first request.
             _match_connection_pool_size(backend_interface.backend, workers)
             with backend_interface.backend as backend:
+                if repository.backend == "artifactory":
+                    # The Artifactory backend uses a ``Maven`` interface,
+                    # which stores the version folders and header file under
+                    # ``/<name>/db/<version>/db-<version>.yaml``,
+                    # see ``audb.Repository.create_backend_interface()``.
+                    #
+                    # We do not use ``backend.ls_dirs()``/``backend.exists()``
+                    # here, as each of those calls is slow on Artifactory,
+                    # see https://github.com/audeering/audbackend/issues/132.
+                    # Instead we walk the ``ArtifactoryPath`` objects directly,
+                    # which only requires a single listing per database
+                    # and is significantly faster.
+                    for p in backend.path("/"):
+                        name = p.name
+                        try:
+                            for version in [str(x).split("/")[-1] for x in p / "db"]:
+                                add_database(name, version, repository)
+                        except FileNotFoundError:
+                            # If the ``db`` folder does not exist,
+                            # the dataset is not included
+                            pass
 
-                def version_exists(name, version):
-                    """Check if a database version exists on the backend.
+                else:
+                    # All other backends use a ``Versioned`` interface,
+                    # storing the version folders and header file under
+                    # ``/<name>/<version>/db.yaml``.
 
-                    A version exists
-                    if the corresponding header file
-                    can be found on the backend.
+                    def version_exists(name, version):
+                        """Check if a database version exists on the backend.
 
-                    """
-                    header_file = f"/{name}/{version}/{define.HEADER_FILE}"
-                    return backend.exists(header_file)
+                        A version exists
+                        if the corresponding header file
+                        can be found on the backend.
 
-                def collect_versions(name):
-                    """Existing versions of a database on the backend.
+                        """
+                        header_file = f"/{name}/{version}/{define.HEADER_FILE}"
+                        return backend.exists(header_file)
 
-                    Is limited to the latest with ``latest_version``.
+                    def collect_versions(name):
+                        """Existing versions of a database on the backend.
 
-                    """
-                    versions = audeer.sort_versions(
-                        [
-                            v
-                            for v in backend.ls_dirs(f"/{name}/")
-                            if audeer.is_semantic_version(v)
-                        ]
-                    )
-                    existing = [v for v in versions if version_exists(name, v)]
-                    return name, existing
+                        Is limited to the latest with ``latest_version``.
 
-                names = backend.ls_dirs("/")
-                max_workers = min(workers, max(1, len(names)))
-                with concurrent.futures.ThreadPoolExecutor(max_workers) as pool:
-                    for name, versions in pool.map(collect_versions, names):
-                        for version in versions:
-                            add_database(name, version, repository)
+                        """
+                        versions = audeer.sort_versions(
+                            [
+                                v
+                                for v in backend.ls_dirs(f"/{name}/")
+                                if audeer.is_semantic_version(v)
+                            ]
+                        )
+                        existing = [v for v in versions if version_exists(name, v)]
+                        return name, existing
+
+                    names = backend.ls_dirs("/")
+                    max_workers = min(workers, max(1, len(names)))
+                    with concurrent.futures.ThreadPoolExecutor(max_workers) as pool:
+                        for name, versions in pool.map(collect_versions, names):
+                            for version in versions:
+                                add_database(name, version, repository)
 
         except (audbackend.BackendError, ValueError):
             continue
