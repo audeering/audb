@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.12.1 (2026-06-19)
+---------------------------
+
+* Fixed: ``audb.available()`` on Artifactory backends
+
+
 Version 1.12.0 (2026-06-08)
 ---------------------------
 
