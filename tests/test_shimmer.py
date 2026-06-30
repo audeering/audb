@@ -11,6 +11,7 @@ import audiofile
 import audb
 from audb.core import shimmer as shimmer_module
 from audb.core.shimmer import BOLD
+from audb.core.shimmer import NORMAL
 from audb.core.shimmer import RESET
 from audb.core.shimmer import Shimmer
 
@@ -201,26 +202,64 @@ def test_render_frame():
     """Test that _render_frame highlights characters near center."""
     shimmer = Shimmer("", "abcde", width=4)
 
-    # Center on character 2 ('c'): nearby chars should be bold
+    # Center on character 2 ('c'): nearby chars should be bold.
+    # A bold character is closed with NORMAL (not RESET) so following
+    # base characters stay non-bold on bold-default terminals.
     frame = shimmer._render_frame(2.0)
-    assert f"{BOLD}c{RESET}" in frame
+    assert f"{BOLD}c{NORMAL}" in frame
 
-    # Characters far from center should be plain
-    assert frame.startswith("a")
-    assert frame.endswith("e")
+    # The whole frame is wrapped: it starts by forcing normal intensity
+    # and ends by resetting, so the base text is explicitly non-bold.
+    assert frame.startswith(NORMAL)
+    assert frame.endswith(RESET)
 
     # Character at fading edge (within window but low brightness)
     # should appear plain. With width=4, half=2.0, a character at
     # dist ~1.9 from center has brightness cos(1.9/2.0 * pi/2) ≈ 0.08.
     frame_edge = shimmer._render_frame(0.1)
     # 'a' is at index 0, dist=0.1 → bold; 'c' at index 2, dist=1.9 → plain
-    assert f"{BOLD}a{RESET}" in frame_edge
-    assert f"{BOLD}c{RESET}" not in frame_edge
+    assert f"{BOLD}a{NORMAL}" in frame_edge
+    assert f"{BOLD}c{NORMAL}" not in frame_edge
 
-    # Center far outside text: no characters should be bold
+    # Center far outside text: no characters should be bold, but the
+    # text is still wrapped in normal-intensity / reset codes.
     frame_outside = shimmer._render_frame(-10.0)
     assert BOLD not in frame_outside
-    assert frame_outside == "abcde"
+    assert frame_outside == f"{NORMAL}abcde{RESET}"
+
+
+def test_render_frame_non_bold_on_bold_default_terminal():
+    """Base text is forced non-bold, so the shimmer shows on bold terminals.
+
+    On a terminal whose default font weight is bold, characters emitted
+    bare (or a bold run closed with a full ``RESET``) render bold, which
+    hides the shimmer. The frame must therefore:
+
+    * begin with ``NORMAL`` to force the base text to non-bold;
+    * close every bold character with ``NORMAL`` (not ``RESET``), so the
+      base characters following the bright window do not fall back to the
+      terminal's bold default;
+    * use ``RESET`` exactly once, at the very end.
+
+    """
+    shimmer = Shimmer("", "abcde", width=4)
+    frame = shimmer._render_frame(2.0)
+
+    # The base text is explicitly set to normal intensity up front.
+    assert frame.startswith(NORMAL)
+
+    # RESET only ever appears once, as the trailing wrapper. If it were
+    # used to close bold characters, the base text after the shimmer
+    # window would inherit the terminal's bold default again.
+    assert frame.count(RESET) == 1
+    assert frame.endswith(RESET)
+
+    # Every bold opener is paired with a NORMAL closer, plus the single
+    # leading NORMAL that opens the frame.
+    assert frame.count(NORMAL) == frame.count(BOLD) + 1
+    for piece in frame.split(BOLD)[1:]:
+        # The character right after BOLD is closed by NORMAL.
+        assert NORMAL in piece
 
 
 def test_write_frame_skips_when_scrolled_off(monkeypatch):

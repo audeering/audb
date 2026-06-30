@@ -11,6 +11,11 @@ import threading
 
 # ANSI escape codes
 BOLD = "\033[1m"
+# Normal intensity: explicitly turns *off* bold (and faint) without
+# resetting other attributes. Used to force the base text to non-bold
+# even in terminals whose default font weight is bold, where a plain
+# character or a full RESET would otherwise render bold.
+NORMAL = "\033[22m"
 RESET = "\033[0m"
 SAVE_CURSOR = "\033[s"
 RESTORE_CURSOR = "\033[u"
@@ -139,8 +144,10 @@ class Shimmer:
                 sys.stderr.write = self._original_stderr_write
             else:
                 del sys.stderr.write
-        # Write final static line over the animated one
-        self._write_frame(self._text)
+        # Write final static line over the animated one. Force normal
+        # intensity so the resting text is non-bold even on terminals
+        # whose default font weight is bold.
+        self._write_frame(f"{NORMAL}{self._text}{RESET}")
 
         with _active_lock:
             if _active_shimmer is self:
@@ -214,19 +221,25 @@ class Shimmer:
             sys.stdout.flush()
 
     def _render_frame(self, center: float) -> str:
-        """Render one frame with a bright window centered at *center*."""
-        chars = []
+        """Render one frame with a bright window centered at *center*.
+
+        The whole text is forced to normal intensity (non-bold) and only
+        the bright window is rendered bold. Each bold character is closed
+        with ``NORMAL`` rather than ``RESET`` so that the following base
+        characters stay non-bold even on terminals whose default font
+        weight is bold (where ``RESET`` would fall back to bold). The
+        frame ends with ``RESET`` to avoid leaking the normal-intensity
+        attribute into the suffix.
+        """
+        chars = [NORMAL]
         half = self._width / 2
         for i, ch in enumerate(self._text):
             dist = abs(i - center)
-            if dist < half:
-                brightness = math.cos(dist / half * (math.pi / 2))
-                if brightness > 0.3:
-                    chars.append(f"{BOLD}{ch}{RESET}")
-                else:
-                    chars.append(ch)
+            if dist < half and math.cos(dist / half * (math.pi / 2)) > 0.3:
+                chars.append(f"{BOLD}{ch}{NORMAL}")
             else:
                 chars.append(ch)
+        chars.append(RESET)
         return "".join(chars)
 
     def _animate(self):
