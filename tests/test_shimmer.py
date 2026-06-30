@@ -208,10 +208,10 @@ def test_render_frame():
     frame = shimmer._render_frame(2.0)
     assert f"{BOLD}c{NORMAL}" in frame
 
-    # The whole frame is wrapped: it starts by forcing normal intensity
-    # and ends by resetting, so the base text is explicitly non-bold.
-    assert frame.startswith(NORMAL)
-    assert frame.endswith(RESET)
+    # Characters far from center should be plain
+    # and frame should start with NORMAL and end with RESET
+    assert frame.startswith(f"{NORMAL}a")
+    assert frame.endswith(f"e{RESET}")
 
     # Character at fading edge (within window but low brightness)
     # should appear plain. With width=4, half=2.0, a character at
