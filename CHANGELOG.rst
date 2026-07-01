@@ -13,7 +13,7 @@ Version 1.13.0 (2026-07-01)
 * Changed: depend on ``audbackend[all]>=3.0.0``
 * Removed: support for Artifactory backends
 * Fixed: load/publish animation
-  for terminals that defaults to bold font
+  for terminals that default to bold font
 * Fixed: ``audb.publish(..., previous_version="latest")``
   now also looks for the latest version
   in the repository the database should be published to
