@@ -634,6 +634,64 @@ def test_publish_change_archive(tmpdir, dbs, repository):
     )
 
 
+def test_publish_previous_version_latest_not_in_config(tmpdir, dbs):
+    """Publish with ``previous_version='latest'`` for an unregistered repo.
+
+    Regression test for
+    https://github.com/audeering/audb/issues/519.
+
+    ``previous_version='latest'`` has to be resolved against the repository
+    that is passed to :func:`audb.publish`,
+    even when that repository is not part of
+    the globally configured ``audb.config.REPOSITORIES``.
+
+    """
+    host = audeer.mkdir(tmpdir, "host")
+    name = "data-unittests-local"
+    repository = audb.Repository(name=name, host=host, backend="file-system")
+    audeer.mkdir(host, name)
+
+    current_repositories = audb.config.REPOSITORIES
+    try:
+        # Publish version 1.0.0 with the repository registered globally,
+        # so that it can be loaded again below.
+        audb.config.REPOSITORIES = [repository]
+        build_dir = audeer.path(tmpdir, "build")
+        shutil.copytree(dbs["1.0.0"], build_dir)
+        audb.publish(
+            build_dir,
+            "1.0.0",
+            repository,
+            previous_version=None,
+            verbose=False,
+        )
+
+        # Recreate the build dir in the state a user has
+        # before publishing a follow-up version:
+        # loading the previous version writes
+        # the dependency file into the build dir.
+        audeer.rmdir(build_dir)
+        db = audb.load_to(build_dir, DB_NAME, version="1.0.0", verbose=False)
+        db.save(build_dir)
+        assert os.path.exists(audeer.path(build_dir, "db.parquet"))
+
+        # The target repository is now *not* part of the global config.
+        audb.config.REPOSITORIES = []
+        audb.publish(
+            build_dir,
+            "2.0.0",
+            repository,
+            previous_version="latest",
+            verbose=False,
+        )
+
+        # Version 2.0.0 was published on top of 1.0.0.
+        audb.config.REPOSITORIES = [repository]
+        assert "2.0.0" in audb.versions(DB_NAME)
+    finally:
+        audb.config.REPOSITORIES = current_repositories
+
+
 @pytest.mark.parametrize(
     "version1, version2, media_difference, attachment_difference",
     [
