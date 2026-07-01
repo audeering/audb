@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.12.1
+                v1.13.0
               </div>
             
           
@@ -289,11 +289,8 @@ the database header in the file <code class="docutils literal notranslate"><span
 and the database dependencies
 in the file <code class="docutils literal notranslate"><span class="pre">db.parquet</span></code>.
 Note,
-that the structure of the folders
-used for versioning
-<a class="reference internal" href="api/audb.Repository.html#audb.Repository.create_backend_interface" title="audb.Repository.create_backend_interface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">depends</span> <span class="pre">on</span> <span class="pre">the</span> <span class="pre">backend</span></code></a>,
-and differs slightly
-for an Artifactory backend.</p>
+the structure of the folders
+is managed by <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Versioned.html#audbackend.interface.Versioned" title="(in audbackend v3.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Versioned</span></code></a>.</p>
 <p>To load the database,
 or see which databases are available in your repository,
 we need to tell <a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> that it should use our repository
@@ -416,9 +413,9 @@ and let a database grow every day.</p>
 </section>
 <section id="real-world-example">
 <h2>Real world example<a class="headerlink" href="#real-world-example" title="Link to this heading">¶</a></h2>
-<p>We published a version of a small German acted emotional speech databases
+<p>We published a version of a small German acted emotional speech database
 called <a class="reference external" href="http://emodb.bilderbar.info/start.html">emodb</a>
-in the default Artifactory repository of <a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a>.
+in the public repository of <a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a>.
 You can find the example code at
 <a class="reference external" href="https://github.com/audeering/emodb">https://github.com/audeering/emodb</a>
 and can continue at <a class="reference internal" href="load.html#load"><span class="std std-ref">Load a database</span></a>
@@ -449,7 +446,7 @@ to see how to load and use a database.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/19 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

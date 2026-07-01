@@ -144,11 +144,8 @@ the database header in the file ``db.yaml``,
 and the database dependencies
 in the file ``db.parquet``.
 Note,
-that the structure of the folders
-used for versioning
-:meth:`depends on the backend <audb.Repository.create_backend_interface>`,
-and differs slightly
-for an Artifactory backend.
+the structure of the folders
+is managed by :class:`audbackend.interface.Versioned`.
 
 To load the database,
 or see which databases are available in your repository,
@@ -282,9 +279,9 @@ and let a database grow every day.
 Real world example
 ------------------
 
-We published a version of a small German acted emotional speech databases
+We published a version of a small German acted emotional speech database
 called emodb_
-in the default Artifactory repository of :mod:`audb`.
+in the public repository of :mod:`audb`.
 You can find the example code at
 https://github.com/audeering/emodb
 and can continue at :ref:`load`

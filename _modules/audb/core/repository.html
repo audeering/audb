@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.12.1
+                v1.13.0
               </div>
             
           
@@ -149,11 +149,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audb.core.repository</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">audbackend</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.define</span><span class="w"> </span><span class="kn">import</span> <span class="n">PYTHON_VERSION_WITHOUT_ARTIFACTORY</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">audbackend</span>
 
 
 <div class="viewcode-block" id="Repository">
@@ -187,9 +183,6 @@
         <span class="s2">&quot;minio&quot;</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Minio</span><span class="p">,</span>
         <span class="s2">&quot;s3&quot;</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Minio</span><span class="p">,</span>
     <span class="p">}</span>
-
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s2">&quot;Artifactory&quot;</span><span class="p">):</span>
-        <span class="n">_backends</span><span class="p">[</span><span class="s2">&quot;artifactory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Artifactory</span>  <span class="c1"># pragma: no cover</span>
 
     <span class="n">backend_registry</span> <span class="o">=</span> <span class="n">_backends</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Backend registry.</span>
@@ -256,19 +249,6 @@
 <span class="sd">            emodb/media/1.0.0/...          &lt;-- media files</span>
 <span class="sd">            emodb/meta/1.0.0/...           &lt;-- tables</span>
 
-<span class="sd">        When :attr:`Repository.backend` equals ``artifactory``,</span>
-<span class="sd">        it wraps an :class:`audbackend.interface.Maven` interface</span>
-<span class="sd">        around it.</span>
-<span class="sd">        The files will then be stored</span>
-<span class="sd">        with the following structure on the Artifactory backend</span>
-<span class="sd">        (shown by the example of version 1.0.0 of the emodb dataset)::</span>
-
-<span class="sd">            emodb/db/1.0.0/db-1.0.0.yaml   &lt;-- header</span>
-<span class="sd">            emodb/db/1.0.0/db-1.0.0.zip    &lt;-- dependency table</span>
-<span class="sd">            emodb/attachment/.../1.0.0/... &lt;-- attachments</span>
-<span class="sd">            emodb/media/.../1.0.0/...      &lt;-- media files</span>
-<span class="sd">            emodb/meta/.../1.0.0/...       &lt;-- tables</span>
-
 <span class="sd">        The returned backend instance</span>
 <span class="sd">        has not yet established a connection to the backend.</span>
 <span class="sd">        To establish a connection,</span>
@@ -281,27 +261,14 @@
 <span class="sd">            interface to repository</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if an artifactory backend is requested in with a Python version</span>
-<span class="sd">                that does not yet support it</span>
 <span class="sd">            ValueError: if a non-supported backend is requested</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">version_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-            <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">PYTHON_VERSION_WITHOUT_ARTIFACTORY</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="n">version_tuple</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
-                <span class="s2">&quot;The &#39;artifactory&#39; backend is not supported in &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Python&gt;=</span><span class="si">{</span><span class="n">PYTHON_VERSION_WITHOUT_ARTIFACTORY</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39; is not a registered backend&quot;</span><span class="p">)</span>
         <span class="n">backend_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">]</span>
         <span class="n">backend</span> <span class="o">=</span> <span class="n">backend_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
-            <span class="n">interface</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Maven</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">interface</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Versioned</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
+        <span class="n">interface</span> <span class="o">=</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Versioned</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">interface</span></div>
 
 
@@ -350,7 +317,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/19 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

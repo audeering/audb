@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.12.1
+                v1.13.0
               </div>
             
           
@@ -869,7 +869,6 @@
 <span class="sd">        ValueError: if ``version`` or ``previous_version``</span>
 <span class="sd">            cannot be parsed by :class:`audeer.StrictVersion`</span>
 <span class="sd">        ValueError: if ``previous_version`` &gt;= ``version``</span>
-<span class="sd">        ValueError: if ``repository`` has artifactory as backend in Python&gt;=3.13</span>
 <span class="sd">        ValueError: if ``repository`` has a non-supported backend</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -948,27 +947,27 @@
             <span class="sa">f</span><span class="s2">&quot;A version &#39;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&#39; already exists for database &#39;</span><span class="si">{</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">previous_version</span> <span class="o">==</span> <span class="s2">&quot;latest&quot;</span><span class="p">:</span>
-        <span class="c1"># Find latest version across all repositories (like audb.latest_version)</span>
-        <span class="n">all_versions</span> <span class="o">=</span> <span class="n">api_versions</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="c1"># Resolve to the latest version of the database.</span>
+        <span class="c1"># We search the union of ``audb.config.REPOSITORIES`` + ``repository``.</span>
+        <span class="n">all_versions</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">sort_versions</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">api_versions</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="n">versions</span><span class="p">)))</span>
         <span class="n">previous_version</span> <span class="o">=</span> <span class="n">all_versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_versions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
-    <span class="c1"># Check repository consistency when previous_version is specified</span>
-    <span class="k">if</span> <span class="n">previous_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># Check previous_version is in same repository</span>
+    <span class="k">if</span> <span class="n">previous_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">previous_version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">:</span>
         <span class="n">previous_repository</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">_lookup</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">previous_version</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">previous_repository</span> <span class="o">!=</span> <span class="n">repository</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Cannot publish version &#39;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;to repository &#39;</span><span class="si">{</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;based on previous version &#39;</span><span class="si">{</span><span class="n">previous_version</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-                <span class="s2">&quot;The previous version is stored in repository &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">previous_repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-                <span class="s2">&quot;Publishing to a different repository would split the database &quot;</span>
-                <span class="s2">&quot;across multiple repositories, &quot;</span>
-                <span class="s2">&quot;which can create data privacy risks &quot;</span>
-                <span class="s2">&quot;and is not supported. &quot;</span>
-                <span class="s2">&quot;Use previous_version=None &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;to start a new database in &#39;</span><span class="si">{</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;or publish to the same repository &#39;</span><span class="si">{</span><span class="n">previous_repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
-            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Cannot publish version &#39;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;to repository &#39;</span><span class="si">{</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;based on previous version &#39;</span><span class="si">{</span><span class="n">previous_version</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+            <span class="s2">&quot;The previous version is stored in repository &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">previous_repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+            <span class="s2">&quot;Publishing to a different repository would split the database &quot;</span>
+            <span class="s2">&quot;across multiple repositories, &quot;</span>
+            <span class="s2">&quot;which can create data privacy risks &quot;</span>
+            <span class="s2">&quot;and is not supported. &quot;</span>
+            <span class="s2">&quot;Use previous_version=None &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;to start a new database in &#39;</span><span class="si">{</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;or publish to the same repository &#39;</span><span class="si">{</span><span class="n">previous_repository</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+        <span class="p">)</span>
 
     <span class="c1"># load database and dependencies</span>
     <span class="n">deps</span> <span class="o">=</span> <span class="n">Dependencies</span><span class="p">()</span>
@@ -1159,7 +1158,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/19 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

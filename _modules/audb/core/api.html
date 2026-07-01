@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.12.1
+                v1.13.0
               </div>
             
           
@@ -175,16 +175,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">audb.core.repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">Repository</span>
 
 
-<span class="c1"># Backends whose read operations (``ls_dirs``/``exists``)</span>
-<span class="c1"># are safe to call concurrently from multiple threads,</span>
-<span class="c1"># and that benefit from doing so:</span>
-<span class="c1"># ``file-system`` uses stateless ``os`` calls,</span>
-<span class="c1"># ``minio``/``s3`` use the MinIO client,</span>
-<span class="c1"># which is documented as thread-safe under ``threading``.</span>
-<span class="c1"># Other backends (e.g. ``artifactory``, or custom ones</span>
-<span class="c1"># registered via ``Repository.register``) are accessed</span>
-<span class="c1"># with a single worker to avoid sharing a potentially</span>
-<span class="c1"># non-thread-safe client across threads.</span>
+<span class="c1"># Backends whose read operations are thread-safe.</span>
+<span class="c1"># Skip custom backends, for which we don&#39;t have this information.</span>
 <span class="n">_THREAD_SAFE_BACKENDS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;file-system&quot;</span><span class="p">,</span> <span class="s2">&quot;minio&quot;</span><span class="p">,</span> <span class="s2">&quot;s3&quot;</span><span class="p">)</span>
 
 
@@ -249,12 +241,7 @@
             <span class="c1"># as the pool is created lazily on the first request.</span>
             <span class="n">_match_connection_pool_size</span><span class="p">(</span><span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="n">workers</span><span class="p">)</span>
             <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span> <span class="k">as</span> <span class="n">backend</span><span class="p">:</span>
-                <span class="c1"># The on-backend folder layout depends on the interface,</span>
-                <span class="c1"># see ``audb.Repository.create_backend_interface()``.</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">backend_interface</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Maven</span><span class="p">):</span>
-                    <span class="n">versions</span> <span class="o">=</span> <span class="n">_collect_versions_maven</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">versions</span> <span class="o">=</span> <span class="n">_collect_versions_versioned</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">workers</span><span class="p">)</span>
+                <span class="n">versions</span> <span class="o">=</span> <span class="n">_collect_versions</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">workers</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">:</span>
                     <span class="n">add_database</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
 
@@ -282,43 +269,10 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_collect_versions_maven</span><span class="p">(</span><span class="n">backend</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yield ``(name, version)`` for databases on a Maven interface.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_collect_versions</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yield ``(name, version)`` for all databases in a repository.</span>
 
-<span class="sd">    The ``Maven`` interface, used by the Artifactory backend,</span>
-<span class="sd">    stores the version folders and header file under</span>
-<span class="sd">    ``/&lt;name&gt;/db/&lt;version&gt;/db-&lt;version&gt;.yaml``.</span>
-
-<span class="sd">    ``backend.ls_dirs()``/``backend.exists()`` are not used here,</span>
-<span class="sd">    as each of those calls is slow on Artifactory,</span>
-<span class="sd">    see https://github.com/audeering/audbackend/issues/132.</span>
-<span class="sd">    Instead the ``ArtifactoryPath`` objects are walked directly,</span>
-<span class="sd">    which only requires a single listing per database</span>
-<span class="sd">    and is significantly faster.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        backend: opened backend</span>
-
-<span class="sd">    Yields:</span>
-<span class="sd">        tuple of database name and version</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">versions</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;db&quot;</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-            <span class="c1"># If the ``db`` folder does not exist,</span>
-            <span class="c1"># the dataset is not included</span>
-            <span class="k">continue</span>
-        <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_collect_versions_versioned</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yield ``(name, version)`` for databases on a Versioned interface.</span>
-
-<span class="sd">    All backends besides Artifactory use a ``Versioned`` interface,</span>
+<span class="sd">    All backends use a ``Versioned`` interface,</span>
 <span class="sd">    which stores the version folders and header file under</span>
 <span class="sd">    ``/&lt;name&gt;/&lt;version&gt;/db.yaml``.</span>
 <span class="sd">    A version exists</span>
@@ -883,44 +837,11 @@
     <span class="k">for</span> <span class="n">repository</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">repository</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
-            <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span> <span class="k">as</span> <span class="n">backend</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">repository</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>  <span class="c1"># pragma: nocover</span>
-                    <span class="c1"># Do not use `backend_interface.versions()` on Artifactory,</span>
-                    <span class="c1"># as calling `backend_interface.ls()` is slow on Artifactory,</span>
-                    <span class="c1"># see https://github.com/devopshq/artifactory/issues/423.</span>
-                    <span class="c1"># Instead, use `backend.path()`</span>
-                    <span class="c1"># from the low level backend object</span>
-                    <span class="c1"># to return an ArtifactoryPath object,</span>
-                    <span class="c1"># which allows to walk through the dataset directory</span>
-                    <span class="c1"># and to collect all existing versions.</span>
-                    <span class="n">folder</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">)</span>
-                    <span class="n">path</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
-                                <span class="n">version</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                                <span class="n">header</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;db-</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">.yaml&quot;</span><span class="p">)</span>
-                                <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                                    <span class="n">vs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">version</span><span class="p">])</span>
-                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                        <span class="c1"># Might happen,</span>
-                        <span class="c1"># if a database is not available on the backend,</span>
-                        <span class="c1"># or we don&#39;t have read permissions.</span>
-                        <span class="c1">#</span>
-                        <span class="c1"># We cannot test this at the moment</span>
-                        <span class="c1"># on the public Artifactory server.</span>
-                        <span class="c1"># Because after trying</span>
-                        <span class="c1"># to connect to a path without read access</span>
-                        <span class="c1"># the connection is also blocked for valid paths.</span>
-                        <span class="k">pass</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">header</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db.yaml&quot;</span><span class="p">)</span>
-                    <span class="n">vs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-                        <span class="n">backend_interface</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span>
-                            <span class="n">header</span><span class="p">,</span>
-                            <span class="n">suppress_backend_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="p">)</span>
-                    <span class="p">)</span>
+            <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+                <span class="n">header</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db.yaml&quot;</span><span class="p">)</span>
+                <span class="n">vs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                    <span class="n">backend_interface</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">suppress_backend_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">audbackend</span><span class="o">.</span><span class="n">BackendError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
             <span class="c1"># If the backend cannot be accessed,</span>
             <span class="c1"># e.g. host or repository do not exist,</span>
@@ -944,7 +865,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/19 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
