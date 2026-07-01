@@ -1,21 +1,8 @@
-import sys
-
 import pytest
 
 import audbackend
 
 import audb
-from audb.core.define import PYTHON_VERSION_WITHOUT_ARTIFACTORY
-
-
-PYTHON_VERSION_WITHOUT_ARTIFACTORY_TUPLE = tuple(
-    int(x) for x in PYTHON_VERSION_WITHOUT_ARTIFACTORY.split(".")
-)
-
-if hasattr(audbackend.backend, "Artifactory"):
-    artifactory_backend = audbackend.backend.Artifactory
-else:
-    artifactory_backend = None
 
 
 @pytest.mark.parametrize(
@@ -144,20 +131,6 @@ def test_repository_repr(backend, host, repo, expected):
             audbackend.backend.FileSystem,
             audbackend.interface.Versioned,
         ),
-        pytest.param(
-            "artifactory",
-            "host",
-            "repo",
-            artifactory_backend,
-            audbackend.interface.Maven,
-            marks=pytest.mark.skipif(
-                sys.version_info >= PYTHON_VERSION_WITHOUT_ARTIFACTORY_TUPLE,
-                reason=(
-                    "No artifactory backend support in "
-                    f"Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
-                ),
-            ),
-        ),
     ],
 )
 def test_repository_create_backend_interface(
@@ -193,22 +166,6 @@ def test_repository_create_backend_interface(
             "repo",
             "'custom' is not a registered backend",
             ValueError,
-        ),
-        pytest.param(
-            "artifactory",
-            "host",
-            "repo",
-            (
-                "The 'artifactory' backend is not supported in "
-                f"Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
-            ),
-            ValueError,
-            marks=pytest.mark.skipif(
-                sys.version_info < PYTHON_VERSION_WITHOUT_ARTIFACTORY_TUPLE,
-                reason=(
-                    f"Should only fail for Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
-                ),
-            ),
         ),
     ],
 )

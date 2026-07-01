@@ -1,7 +1,6 @@
 import glob
 import os
 import platform
-import sys
 
 import pytest
 
@@ -194,11 +193,8 @@ def private_and_public_repository():
 
     Configure the following repositories:
 
-    * data-private: repo on public Artifactory without access
     * audb-private: repo on public S3 without access
-    * data-public: repo on public Artifactory with anonymous access
     * audb-public: repo on public S3 with anonymous access
-    * data-public2: repo on public Artifactory with anonymous access
 
     Note, that the order of the repos is important.
     audb will visit the repos in the given order
@@ -206,18 +202,11 @@ def private_and_public_repository():
 
     """
     current_repositories = audb.config.REPOSITORIES
-    public_artifactory_host = "https://audeering.jfrog.io/artifactory"
     public_s3_host = "s3.dualstack.eu-north-1.amazonaws.com"
     audb.config.REPOSITORIES = [
         audb.Repository("audb-private", public_s3_host, "s3"),
         audb.Repository("audb-public", public_s3_host, "s3"),
     ]
-    if sys.version_info < (3, 13):
-        audb.config.REPOSITORIES += [
-            audb.Repository("data-private", public_artifactory_host, "artifactory"),
-            audb.Repository("data-public", public_artifactory_host, "artifactory"),
-            audb.Repository("data-public2", public_artifactory_host, "artifactory"),
-        ]
 
     yield repository
 
@@ -229,8 +218,8 @@ def non_existing_repository():
     r"""Non-existing repository.
 
     Configure the following repositories:
-    * non-existing: non-exsiting repo on public Artifactory
-    * audb-public: repo on public Artifactory with anonymous access
+    * non-existing: non-exsiting repo on public backend
+    * audb-public: repo on public backend with anonymous access
 
     Note, that the order of the repos is important.
     audb will visit the repos in the given order

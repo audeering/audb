@@ -60,7 +60,7 @@ def cache(tmpdir_factory):
 
 @pytest.fixture(autouse=True)
 def public_repository():
-    r"""Provide access to the public Artifactory repository."""
+    r"""Provide access to the public repository."""
     audb.config.REPOSITORIES = [
         audb.Repository(
             name="audb-public",

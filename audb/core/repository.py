@@ -1,8 +1,4 @@
-import sys
-
 import audbackend
-
-from audb.core.define import PYTHON_VERSION_WITHOUT_ARTIFACTORY
 
 
 class Repository:
@@ -34,9 +30,6 @@ class Repository:
         "minio": audbackend.backend.Minio,
         "s3": audbackend.backend.Minio,
     }
-
-    if hasattr(audbackend.backend, "Artifactory"):
-        _backends["artifactory"] = audbackend.backend.Artifactory  # pragma: no cover
 
     backend_registry = _backends
     r"""Backend registry.
@@ -98,19 +91,6 @@ class Repository:
             emodb/media/1.0.0/...          <-- media files
             emodb/meta/1.0.0/...           <-- tables
 
-        When :attr:`Repository.backend` equals ``artifactory``,
-        it wraps an :class:`audbackend.interface.Maven` interface
-        around it.
-        The files will then be stored
-        with the following structure on the Artifactory backend
-        (shown by the example of version 1.0.0 of the emodb dataset)::
-
-            emodb/db/1.0.0/db-1.0.0.yaml   <-- header
-            emodb/db/1.0.0/db-1.0.0.zip    <-- dependency table
-            emodb/attachment/.../1.0.0/... <-- attachments
-            emodb/media/.../1.0.0/...      <-- media files
-            emodb/meta/.../1.0.0/...       <-- tables
-
         The returned backend instance
         has not yet established a connection to the backend.
         To establish a connection,
@@ -123,27 +103,14 @@ class Repository:
             interface to repository
 
         Raises:
-            ValueError: if an artifactory backend is requested in with a Python version
-                that does not yet support it
             ValueError: if a non-supported backend is requested
 
         """
-        version_tuple = tuple(
-            int(x) for x in PYTHON_VERSION_WITHOUT_ARTIFACTORY.split(".")
-        )
-        if sys.version_info >= version_tuple and self.backend == "artifactory":
-            raise ValueError(  # pragma: no cover
-                "The 'artifactory' backend is not supported in "
-                f"Python>={PYTHON_VERSION_WITHOUT_ARTIFACTORY}"
-            )
         if self.backend not in self.backend_registry:
             raise ValueError(f"'{self.backend}' is not a registered backend")
         backend_class = self.backend_registry[self.backend]
         backend = backend_class(self.host, self.name)
-        if self.backend == "artifactory":
-            interface = audbackend.interface.Maven(backend)  # pragma: no cover
-        else:
-            interface = audbackend.interface.Versioned(backend)
+        interface = audbackend.interface.Versioned(backend)
         return interface
 
     @classmethod

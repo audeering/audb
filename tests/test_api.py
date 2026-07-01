@@ -35,56 +35,14 @@ def _children(files, path):
     )
 
 
-class _FakeArtifactoryPath:
-    r"""Mimic an :class:`artifactory.ArtifactoryPath`.
-
-    Provides just enough behaviour for ``audb.available()``:
-    iterating yields the immediate child paths,
-    ``name`` returns the last path part,
-    ``/`` joins a sub-path,
-    and iterating a non-existing path
-    raises a ``FileNotFoundError``
-    (as the real Artifactory backend does).
-
-    Args:
-        path: backend path
-        files: backend paths of all files stored on the backend
-
-    """
-
-    def __init__(self, path, files):
-        self.path = "/" + path.strip("/") if path.strip("/") else "/"
-        self.files = files
-
-    @property
-    def name(self):
-        return self.path.rstrip("/").split("/")[-1]
-
-    def __str__(self):
-        return self.path
-
-    def __truediv__(self, other):
-        return _FakeArtifactoryPath(f"{self.path.rstrip('/')}/{other}", self.files)
-
-    def __iter__(self):
-        prefix = "/" if self.path == "/" else self.path.rstrip("/") + "/"
-        if not any(file.startswith(prefix) for file in self.files):
-            raise FileNotFoundError(self.path)
-        for child in _children(self.files, self.path):
-            yield _FakeArtifactoryPath(prefix + child, self.files)
-
-
 class _FakeBackend:
     r"""Mimic a backend storing a fixed set of files.
 
-    ``ls_dirs()``, ``exists()`` and ``path()`` are derived
+    ``ls_dirs()`` and ``exists()`` are derived
     from the given list of file paths,
     so the fake faithfully reproduces
-    the on-backend folder structure,
-    including the different layouts of the
-    ``Versioned`` interface (``/<name>/<version>/db.yaml``)
-    and the ``Maven`` interface used by Artifactory
-    (``/<name>/db/<version>/db-<version>.yaml``).
+    the on-backend folder structure
+    (``/<name>/<version>/db.yaml``).
 
     Args:
         files: backend paths of all files stored on the backend,
@@ -113,9 +71,6 @@ class _FakeBackend:
 
     def exists(self, path):
         return ("/" + path.strip("/")) in self.files
-
-    def path(self, path):
-        return _FakeArtifactoryPath(path, self.files)
 
 
 class TestAvailable:
@@ -170,20 +125,6 @@ class TestAvailable:
         repository = audb.config.REPOSITORIES[0]
         audb.config.REPOSITORIES.append(
             audb.Repository("non-existing", repository.host, "file-system")
-        )
-        yield
-        audb.config.REPOSITORIES = audb.config.REPOSITORIES[:-1]
-
-    @pytest.fixture(scope="function", autouse=False)
-    def non_existing_artifactory_host(self):
-        """Add non-existing host on Artifactory backend.
-
-        This should also not fail under Python 3.12,
-        which no longher supports Artifactory.
-
-        """
-        audb.config.REPOSITORIES.append(
-            audb.Repository("repo", "https:artifactory.url.com", "artifactory")
         )
         yield
         audb.config.REPOSITORIES = audb.config.REPOSITORIES[:-1]
@@ -265,13 +206,6 @@ class TestAvailable:
 
     def test_non_existing_repository(self, non_existing_repository):
         """Test having a non-existing repository in config."""
-        df = audb.available()
-        assert len(df) == 2
-        assert "name0" in df.index
-        assert "name1" in df.index
-
-    def test_non_existing_artifactory_host(self, non_existing_artifactory_host):
-        """Test having a non-existing host on an Artifactory backend."""
         df = audb.available()
         assert len(df) == 2
         assert "name0" in df.index
@@ -374,76 +308,6 @@ class TestAvailable:
         # The HTTP connection pool size is matched to num_workers
         pool_kw = minio_repository._client._http.connection_pool_kw
         assert pool_kw["maxsize"] == num_workers
-
-    @pytest.fixture(scope="function", autouse=False)
-    def artifactory_repository(self, monkeypatch):
-        """Add an Artifactory repository served by a fake backend.
-
-        The Artifactory backend uses a ``Maven`` interface,
-        which stores files under
-        ``/<name>/db/<version>/db-<version>.yaml``,
-        a different layout than all other backends,
-        see https://github.com/audeering/audb/issues/571.
-
-        Yields:
-            the repository
-
-        """
-        files = [
-            # Maven layout: ``/<name>/db/<version>/db-<version>.yaml``
-            "/db-a/db/1.0.0/db-1.0.0.yaml",
-            "/db-a/db/2.0.0/db-2.0.0.yaml",
-            "/db-b/db/1.0.0/db-1.0.0.yaml",
-            # Other interface folders next to ``db``,
-            # which must not be mistaken for version folders
-            "/db-a/meta/db/1.0.0/db.zip",
-            "/db-a/media/db/1.0.0/file.wav",
-            # Dataset without a ``db`` folder, which is not included
-            "/db-c/attachment/file.txt",
-        ]
-        backend = _FakeBackend(files)
-        repository = audb.Repository("repo-art", "host-art", "artifactory")
-
-        def create_backend_interface(self):
-            return audbackend.interface.Maven(backend)
-
-        monkeypatch.setattr(
-            audb.Repository, "create_backend_interface", create_backend_interface
-        )
-        yield repository
-
-    @pytest.mark.parametrize(
-        "only_latest, expected_index, expected_versions",
-        [
-            (False, ["db-a", "db-a", "db-b"], ["1.0.0", "2.0.0", "1.0.0"]),
-            (True, ["db-a", "db-b"], ["2.0.0", "1.0.0"]),
-        ],
-    )
-    def test_artifactory_backend(
-        self,
-        artifactory_repository,
-        only_latest,
-        expected_index,
-        expected_versions,
-    ):
-        """Test collecting versions from an Artifactory backend.
-
-        The ``Maven`` interface stores versions under a ``db`` subfolder,
-        which broke ``audb.available()`` in v1.12.0,
-        see https://github.com/audeering/audb/issues/571.
-
-        Args:
-            artifactory_repository: artifactory_repository fixture
-            only_latest: only_latest argument of audb.available()
-            expected_index: expected database names in the index
-            expected_versions: expected versions
-
-        """
-        df = audb.available(
-            only_latest=only_latest, repositories=artifactory_repository
-        )
-        assert list(df.index) == expected_index
-        assert list(df["version"]) == expected_versions
 
     @pytest.fixture(scope="function", autouse=False)
     def custom_backend_repository(self, monkeypatch):

@@ -15,8 +15,7 @@ and manages different versions of a database.
 Databases are stored in repositories
 on local file systems,
 MinIO_,
-S3_,
-or Artifactory_ servers.
+or S3_.
 
 You can request resampling or remixing of audio content
 and filter the downloaded data,
@@ -44,7 +43,6 @@ If you want to cite **audb**, you can refer to our paper_:
     }
 
 
-.. _Artifactory: https://jfrog.com/artifactory/
 .. _common format: https://audeering.github.io/audformat/
 .. _installation: https://audeering.github.io/audb/install.html
 .. _MinIO: https://min.io
