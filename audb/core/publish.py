@@ -797,28 +797,23 @@ def _publish(
         # We search the union of ``audb.config.REPOSITORIES`` + ``repository``.
         all_versions = audeer.sort_versions(list(set(api_versions(db.name) + versions)))
         previous_version = all_versions[-1] if len(all_versions) > 0 else None
-    # Check repository consistency when previous_version is specified.
-    #
-    # If the previous version is already stored in the target repository,
-    # publishing does not split the database across repositories,
-    # so no further lookup is needed.
+    # Check previous_version is in same repository
     if previous_version is not None and previous_version not in versions:
         previous_repository = utils._lookup(db.name, previous_version)[0]
-        if previous_repository != repository:
-            raise RuntimeError(
-                f"Cannot publish version '{version}' "
-                f"to repository '{repository.name}' "
-                f"based on previous version '{previous_version}'. "
-                "The previous version is stored in repository "
-                f"'{previous_repository.name}'. "
-                "Publishing to a different repository would split the database "
-                "across multiple repositories, "
-                "which can create data privacy risks "
-                "and is not supported. "
-                "Use previous_version=None "
-                f"to start a new database in '{repository.name}' "
-                f"or publish to the same repository '{previous_repository.name}'."
-            )
+        raise RuntimeError(
+            f"Cannot publish version '{version}' "
+            f"to repository '{repository.name}' "
+            f"based on previous version '{previous_version}'. "
+            "The previous version is stored in repository "
+            f"'{previous_repository.name}'. "
+            "Publishing to a different repository would split the database "
+            "across multiple repositories, "
+            "which can create data privacy risks "
+            "and is not supported. "
+            "Use previous_version=None "
+            f"to start a new database in '{repository.name}' "
+            f"or publish to the same repository '{previous_repository.name}'."
+        )
 
     # load database and dependencies
     deps = Dependencies()
