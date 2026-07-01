@@ -24,16 +24,8 @@ from audb.core.lock import FolderLock
 from audb.core.repository import Repository
 
 
-# Backends whose read operations (``ls_dirs``/``exists``)
-# are safe to call concurrently from multiple threads,
-# and that benefit from doing so:
-# ``file-system`` uses stateless ``os`` calls,
-# ``minio``/``s3`` use the MinIO client,
-# which is documented as thread-safe under ``threading``.
-# Other backends (e.g. ``artifactory``, or custom ones
-# registered via ``Repository.register``) are accessed
-# with a single worker to avoid sharing a potentially
-# non-thread-safe client across threads.
+# Backends whose read operations are thread-safe.
+# Skip custom backends, for which we don't have this information.
 _THREAD_SAFE_BACKENDS = ("file-system", "minio", "s3")
 
 
@@ -96,12 +88,7 @@ def available(
             # as the pool is created lazily on the first request.
             _match_connection_pool_size(backend_interface.backend, workers)
             with backend_interface.backend as backend:
-                # The on-backend folder layout depends on the interface,
-                # see ``audb.Repository.create_backend_interface()``.
-                if isinstance(backend_interface, audbackend.interface.Maven):
-                    versions = _collect_versions_maven(backend)
-                else:
-                    versions = _collect_versions_versioned(backend, workers)
+                versions = _collect_versions(backend, workers)
                 for name, version in versions:
                     add_database(name, version, repository)
 
@@ -128,43 +115,10 @@ def available(
     return df.set_index("name")
 
 
-def _collect_versions_maven(backend):
-    r"""Yield ``(name, version)`` for databases on a Maven interface.
+def _collect_versions(backend, workers: int):
+    r"""Yield ``(name, version)`` for all databases in a repository.
 
-    The ``Maven`` interface, used by the Artifactory backend,
-    stores the version folders and header file under
-    ``/<name>/db/<version>/db-<version>.yaml``.
-
-    ``backend.ls_dirs()``/``backend.exists()`` are not used here,
-    as each of those calls is slow on Artifactory,
-    see https://github.com/audeering/audbackend/issues/132.
-    Instead the ``ArtifactoryPath`` objects are walked directly,
-    which only requires a single listing per database
-    and is significantly faster.
-
-    Args:
-        backend: opened backend
-
-    Yields:
-        tuple of database name and version
-
-    """
-    for p in backend.path("/"):
-        name = p.name
-        try:
-            versions = [str(x).split("/")[-1] for x in p / "db"]
-        except FileNotFoundError:
-            # If the ``db`` folder does not exist,
-            # the dataset is not included
-            continue
-        for version in versions:
-            yield name, version
-
-
-def _collect_versions_versioned(backend, workers: int):
-    r"""Yield ``(name, version)`` for databases on a Versioned interface.
-
-    All backends besides Artifactory use a ``Versioned`` interface,
+    All backends use a ``Versioned`` interface,
     which stores the version folders and header file under
     ``/<name>/<version>/db.yaml``.
     A version exists
@@ -706,44 +660,11 @@ def versions(
     for repository in config.REPOSITORIES:
         try:
             backend_interface = repository.create_backend_interface()
-            with backend_interface.backend as backend:
-                if repository.backend == "artifactory":  # pragma: nocover
-                    # Do not use `backend_interface.versions()` on Artifactory,
-                    # as calling `backend_interface.ls()` is slow on Artifactory,
-                    # see https://github.com/devopshq/artifactory/issues/423.
-                    # Instead, use `backend.path()`
-                    # from the low level backend object
-                    # to return an ArtifactoryPath object,
-                    # which allows to walk through the dataset directory
-                    # and to collect all existing versions.
-                    folder = backend.join("/", name, "db")
-                    path = backend.path(folder)
-                    try:
-                        if path.exists():
-                            for p in path:
-                                version = p.parts[-1]
-                                header = p.joinpath(f"db-{version}.yaml")
-                                if header.exists():
-                                    vs.extend([version])
-                    except Exception:
-                        # Might happen,
-                        # if a database is not available on the backend,
-                        # or we don't have read permissions.
-                        #
-                        # We cannot test this at the moment
-                        # on the public Artifactory server.
-                        # Because after trying
-                        # to connect to a path without read access
-                        # the connection is also blocked for valid paths.
-                        pass
-                else:
-                    header = backend_interface.join("/", name, "db.yaml")
-                    vs.extend(
-                        backend_interface.versions(
-                            header,
-                            suppress_backend_errors=True,
-                        )
-                    )
+            with backend_interface.backend:
+                header = backend_interface.join("/", name, "db.yaml")
+                vs.extend(
+                    backend_interface.versions(header, suppress_backend_errors=True)
+                )
         except (audbackend.BackendError, ValueError):
             # If the backend cannot be accessed,
             # e.g. host or repository do not exist,
