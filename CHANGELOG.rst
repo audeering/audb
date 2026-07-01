@@ -7,6 +7,19 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.13.0 (2026-07-01)
+---------------------------
+
+* Changed: depend on ``audbackend[all]>=3.0.0``
+* Removed: support for Artifactory backends
+* Fixed: load/publish animation
+  for terminals that default to bold font
+* Fixed: ``audb.publish(..., previous_version="latest")``
+  now also looks for the latest version
+  in the repository the database should be published to
+  when not listed in ``audb.config.REPOSITORIES``
+
+
 Version 1.12.1 (2026-06-19)
 ---------------------------
 
