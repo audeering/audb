@@ -279,7 +279,7 @@ and let a database grow every day.
 Real world example
 ------------------
 
-We published a version of a small German acted emotional speech databases
+We published a version of a small German acted emotional speech database
 called emodb_
 in the public repository of :mod:`audb`.
 You can find the example code at
