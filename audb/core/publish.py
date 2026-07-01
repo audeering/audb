@@ -793,11 +793,16 @@ def _publish(
             f"A version '{version}' already exists for database '{db.name}'."
         )
     if previous_version == "latest":
-        # Find latest version across all repositories (like audb.latest_version)
-        all_versions = api_versions(db.name)
+        # Resolve to the latest version of the database.
+        # We search the union of ``audb.config.REPOSITORIES`` + ``repository``.
+        all_versions = audeer.sort_versions(list(set(api_versions(db.name) + versions)))
         previous_version = all_versions[-1] if len(all_versions) > 0 else None
-    # Check repository consistency when previous_version is specified
-    if previous_version is not None:
+    # Check repository consistency when previous_version is specified.
+    #
+    # If the previous version is already stored in the target repository,
+    # publishing does not split the database across repositories,
+    # so no further lookup is needed.
+    if previous_version is not None and previous_version not in versions:
         previous_repository = utils._lookup(db.name, previous_version)[0]
         if previous_repository != repository:
             raise RuntimeError(
