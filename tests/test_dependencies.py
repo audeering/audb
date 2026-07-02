@@ -604,8 +604,7 @@ def test_update_media_version(deps, files, version):
 
 
 @pytest.mark.parametrize(
-    "object_type, missing_object_id, database_name, database_version, "
-    "tables, expected",
+    "object_type, missing_object_id, database_name, database_version, tables, expected",
     [
         # No database and no tables
         ("media", ["b.wav"], None, None, None, "Could not find the media file 'b.wav'"),
