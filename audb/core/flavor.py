@@ -81,7 +81,7 @@ class Flavor(audobject.Object):
             sampling_rate = int(sampling_rate)
             if sampling_rate not in define.SAMPLING_RATES:
                 raise ValueError(
-                    f"Sampling_rate has to be one of "
+                    f"sampling_rate has to be one of "
                     f"{define.SAMPLING_RATES}, not {sampling_rate}."
                 )
 
