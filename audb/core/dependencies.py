@@ -731,6 +731,7 @@ def error_message_missing_object(
     missing_object_id: str | Sequence,
     database_name: str = None,
     database_version: str = None,
+    tables: Sequence[str] = None,
 ) -> str:
     r"""Error message for missing objects.
 
@@ -743,6 +744,11 @@ def error_message_missing_object(
         missing_object_id: ID of missing object
         database_name: name of affected database
         database_version: name of affected database
+        tables: tables the object was searched in.
+            If provided,
+            the error message clarifies
+            that the object was only looked for
+            inside those tables
 
     Returns:
         error message
@@ -757,7 +763,15 @@ def error_message_missing_object(
         msg = f"Could not find a {object_name} matching '{missing_object_id}'"
     else:
         msg = f"Could not find the {object_name} '{missing_object_id[0]}'"
-    if database_name is not None and database_version is not None:
+    if tables is not None and len(tables) > 0:
+        if len(tables) == 1:
+            msg += f" in table '{tables[0]}'"
+        else:
+            table_list = ", ".join(f"'{table}'" for table in tables)
+            msg += f" in tables {table_list}"
+        if database_name is not None and database_version is not None:
+            msg += f" of {database_name} v{database_version}"
+    elif database_name is not None and database_version is not None:
         msg += f" in {database_name} v{database_version}"
     return msg
 
@@ -768,6 +782,7 @@ def filter_deps(
     deps_type: str,
     database_name: str = None,
     database_version: str = None,
+    tables: Sequence[str] = None,
 ) -> Sequence[str]:
     r"""Filter dependency files by requested files.
 
@@ -779,6 +794,11 @@ def filter_deps(
         deps_type: ``'attachment'``, ``'media'`` or ``'table'``
         database_name: name of affected database
         database_version: name of affected database
+        tables: tables ``available_deps`` was restricted to.
+            If provided,
+            an error message for a missing dependency
+            clarifies that it was only searched for
+            inside those tables
 
     Returns:
         list of attachments, media or tables
@@ -804,6 +824,7 @@ def filter_deps(
                 request,
                 database_name,
                 database_version,
+                tables,
             )
             raise ValueError(msg)
     else:
@@ -814,6 +835,7 @@ def filter_deps(
                     [dep],
                     database_name,
                     database_version,
+                    tables,
                 )
                 raise ValueError(msg)
 
