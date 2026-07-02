@@ -601,3 +601,123 @@ def test_update_media_version(deps, files, version):
     assert len(deps) == len(ROWS)
     for file in files:
         assert deps.version(file) == version
+
+
+@pytest.mark.parametrize(
+    "object_type, missing_object_id, database_name, database_version, tables, expected",
+    [
+        # No database and no tables
+        ("media", ["b.wav"], None, None, None, "Could not find the media file 'b.wav'"),
+        (
+            "media",
+            "b.*",
+            None,
+            None,
+            None,
+            "Could not find a media file matching 'b.*'",
+        ),
+        # Database, but no tables
+        (
+            "media",
+            ["b.wav"],
+            "mydb",
+            "1.0.0",
+            None,
+            "Could not find the media file 'b.wav' in mydb v1.0.0",
+        ),
+        (
+            "table",
+            ["a"],
+            "mydb",
+            "1.0.0",
+            None,
+            "Could not find the table 'a' in mydb v1.0.0",
+        ),
+        # Single table
+        (
+            "media",
+            ["b.wav"],
+            "mydb",
+            "1.0.0",
+            ["a"],
+            "Could not find the media file 'b.wav' in table 'a' of mydb v1.0.0",
+        ),
+        # Multiple tables
+        (
+            "media",
+            ["b.wav"],
+            "mydb",
+            "1.0.0",
+            ["a", "c"],
+            "Could not find the media file 'b.wav' in tables 'a', 'c' of mydb v1.0.0",
+        ),
+        # Regular expression request with tables
+        (
+            "media",
+            "b.*",
+            "mydb",
+            "1.0.0",
+            ["a"],
+            "Could not find a media file matching 'b.*' in table 'a' of mydb v1.0.0",
+        ),
+        # Empty table list behaves as no tables
+        (
+            "media",
+            ["b.wav"],
+            "mydb",
+            "1.0.0",
+            [],
+            "Could not find the media file 'b.wav' in mydb v1.0.0",
+        ),
+    ],
+)
+def test_error_message_missing_object(
+    object_type,
+    missing_object_id,
+    database_name,
+    database_version,
+    tables,
+    expected,
+):
+    msg = audb.core.dependencies.error_message_missing_object(
+        object_type,
+        missing_object_id,
+        database_name,
+        database_version,
+        tables,
+    )
+    assert msg == expected
+
+
+@pytest.mark.parametrize(
+    "requested_deps, available_deps, tables, expected_msg",
+    [
+        (
+            ["b.wav"],
+            ["a.wav"],
+            None,
+            "Could not find the media file 'b.wav' in mydb v1.0.0",
+        ),
+        (
+            ["b.wav"],
+            ["a.wav"],
+            ["a"],
+            "Could not find the media file 'b.wav' in table 'a' of mydb v1.0.0",
+        ),
+    ],
+)
+def test_filter_deps_missing_media(
+    requested_deps,
+    available_deps,
+    tables,
+    expected_msg,
+):
+    with pytest.raises(ValueError, match=re.escape(expected_msg)):
+        audb.core.dependencies.filter_deps(
+            requested_deps,
+            available_deps,
+            "media",
+            "mydb",
+            "1.0.0",
+            tables,
+        )

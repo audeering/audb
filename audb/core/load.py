@@ -1246,6 +1246,12 @@ def _load(
             # filter tables (convert regexp pattern to list of tables)
             requested_tables = filter_deps(tables, list(db), "table")
 
+            # Store requested tables
+            # to provide a helpful error message
+            # if a requested media file
+            # is not part of them
+            media_tables = requested_tables if tables is not None else None
+
             # add/split into misc tables used in a scheme
             # and all other (misc) tables
             requested_misc_tables = _misc_tables_used_in_scheme(db)
@@ -1296,6 +1302,7 @@ def _load(
                 "media",
                 name,
                 version,
+                media_tables,
             )
 
             # load missing media
