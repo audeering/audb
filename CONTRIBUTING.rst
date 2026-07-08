@@ -77,7 +77,7 @@ Building the Documentation
 If you make changes to the documentation,
 you can re-create the HTML pages using Sphinx_::
 
-    uv run sphinx-build docs/ build/html -b html
+    uv run sphinx-build -b html docs/ build/html
 
 The generated files will be available
 in the directory :file:`build/html/`.
@@ -89,7 +89,7 @@ that you need ``graphviz`` for building the documentation::
 
 It is also possible to automatically check if all links are still valid::
 
-    uv run sphinx-build docs/ build/html -b linkcheck
+    uv run sphinx-build -b linkcheck docs/ build/html
 
 .. _Sphinx: https://sphinx-doc.org
 

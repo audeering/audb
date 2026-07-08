@@ -49,7 +49,7 @@ jobs:
       run: sudo dot -c
 
     - name: Test building documentation
-      run: uv run sphinx-build docs/ docs/_build/ -b html -W
+      run: uv run sphinx-build -b html docs/ docs/_build/ -W
 
     - name: Check links in documentation
-      run: uv run sphinx-build docs/ docs/_build/ -b linkcheck -W
+      run: uv run sphinx-build -b linkcheck docs/ docs/_build/ -W
