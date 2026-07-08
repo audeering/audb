@@ -61,14 +61,14 @@ and call it directly::
 
 It can be restricted to specific folders::
 
-    uvx ruff check audfoo/ tests/
-    uvx codespell audfoo/ tests/
+    uvx ruff check audb/ tests/
+    uvx codespell audb/ tests/
 
 
 .. _codespell: https://github.com/codespell-project/codespell/
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
 .. _pre-commit: https://pre-commit.com
-.. _ruff: https://beta.ruff.rs
+.. _ruff: https://docs.astral.sh/ruff/
 
 
 Building the Documentation
@@ -77,7 +77,7 @@ Building the Documentation
 If you make changes to the documentation,
 you can re-create the HTML pages using Sphinx_::
 
-    uv run python -m sphinx docs/ build/html -b html
+    uv run sphinx-build -b html docs/ build/html
 
 The generated files will be available
 in the directory :file:`build/html/`.
@@ -89,7 +89,7 @@ that you need ``graphviz`` for building the documentation::
 
 It is also possible to automatically check if all links are still valid::
 
-    uv run python -m sphinx docs/ build/html -b linkcheck
+    uv run sphinx-build -b linkcheck docs/ build/html
 
 .. _Sphinx: https://sphinx-doc.org
 
