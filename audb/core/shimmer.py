@@ -49,7 +49,7 @@ def animations_enabled() -> bool:
     """
     if os.environ.get("NO_COLOR", ""):
         return False
-    if os.environ.get("TERM", "") == "dumb":
+    if os.environ.get("TERM", "").lower() == "dumb":
         return False
     return True
 

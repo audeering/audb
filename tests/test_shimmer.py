@@ -163,9 +163,19 @@ def test_animations_enabled(monkeypatch):
     monkeypatch.setenv("TERM", "dumb")
     assert animations_enabled() is False
 
+    # TERM matching is case-insensitive
+    monkeypatch.setenv("TERM", "DUMB")
+    assert animations_enabled() is False
+
     # Other TERM values keep animations enabled
     monkeypatch.setenv("TERM", "screen-256color")
     assert animations_enabled() is True
+
+    # Either variable alone is enough to disable,
+    # and both set together stays disabled
+    monkeypatch.setenv("NO_COLOR", "1")
+    monkeypatch.setenv("TERM", "dumb")
+    assert animations_enabled() is False
 
 
 @pytest.mark.parametrize(
