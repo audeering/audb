@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import math
+import os
 import shutil
 import sys
 import threading
@@ -24,6 +25,33 @@ CLEAR_LINE_RIGHT = "\033[K"
 # Global lock and reference for enforcing single active Shimmer
 _active_lock = threading.Lock()
 _active_shimmer: Shimmer | None = None
+
+
+def animations_enabled() -> bool:
+    r"""If the environment allows terminal animations.
+
+    Terminal animations rely on ANSI escape sequences,
+    which end up as garbage in log files
+    when the output is captured,
+    e.g. by ``screen -L`` or ``script``.
+    Since a capturing pseudo-terminal is indistinguishable
+    from an interactive one,
+    users can disable animations explicitly
+    through their environment.
+    Animations are disabled if
+
+    * ``NO_COLOR`` is set to a non-empty value
+    * ``TERM`` is set to ``dumb``
+
+    Returns:
+        ``True`` if terminal animations are allowed
+
+    """
+    if os.environ.get("NO_COLOR", ""):
+        return False
+    if os.environ.get("TERM", "") == "dumb":
+        return False
+    return True
 
 
 class Shimmer:
@@ -80,14 +108,25 @@ class Shimmer:
 
         * ``sys.stdout`` is not a TTY
           (e.g. redirected output, Jupyter, CI logs).
+        * The environment disables animations
+          via ``NO_COLOR`` or ``TERM=dumb``,
+          see :func:`animations_enabled`.
         * Another ``Shimmer`` instance is already active
           (only one may run at a time).
+
+        In all those cases the static text
+        is still printed once.
 
         """
         global _active_shimmer
 
         # Skip animation in non-interactive environments
-        if not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty():
+        # and when disabled via NO_COLOR or TERM=dumb
+        if (
+            not hasattr(sys.stdout, "isatty")
+            or not sys.stdout.isatty()
+            or not animations_enabled()
+        ):
             sys.stdout.write(f"{self._prefix}{self._text}{self._suffix}\n")
             sys.stdout.flush()
             self._noop = True
@@ -286,6 +325,12 @@ def shimmer(
     ``start()`` / ``try`` / ``finally`` / ``stop()`` dance.
     The animation is always stopped on exit,
     including when the block raises.
+    Independent of ``enabled``,
+    the animation is skipped
+    (but the static text still printed)
+    in non-interactive environments
+    and when disabled via ``NO_COLOR`` or ``TERM=dumb``,
+    see :meth:`Shimmer.start`.
 
     Args:
         prefix: static text before the animated portion
