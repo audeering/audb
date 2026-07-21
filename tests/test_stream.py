@@ -478,3 +478,42 @@ def test_database_iterator_error():
             num_workers=1,
             verbose=False,
         )
+
+
+def test_stream_mixed_media_format(tmpdir, repository):
+    r"""Stream mixed-media database with format flavor.
+
+    Only audio media is converted to the requested format,
+    non-audio media is stored under its original name.
+    The index of streamed tables needs to match the stored files,
+    see https://github.com/audeering/audb/issues/583
+
+    """
+    audio_file = "file0.wav"
+    text_file = "file1.json"
+
+    db_root = audeer.mkdir(tmpdir, "build")
+    db = audformat.Database("mixed-media")
+    index = audformat.filewise_index([audio_file, text_file])
+    create_audio_files(db_root, audformat.filewise_index([audio_file]))
+    with open(os.path.join(db_root, text_file), "w") as fp:
+        fp.write('{"transcription": "hello"}\n')
+    db["files"] = audformat.Table(index)
+    db.save(db_root)
+    audb.publish(db_root, "1.0.0", repository)
+
+    db = audb.stream(
+        "mixed-media",
+        "files",
+        version="1.0.0",
+        format="flac",
+        verbose=False,
+    )
+    df = next(db)
+    expected_files = [
+        os.path.join(db.root, audeer.replace_file_extension(audio_file, "flac")),
+        os.path.join(db.root, text_file),
+    ]
+    assert list(df.index) == expected_files
+    for path in expected_files:
+        assert os.path.exists(path)
