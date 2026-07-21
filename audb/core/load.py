@@ -191,10 +191,12 @@ def _database_check_complete(
     for table in deps.tables:
         if not os.path.exists(os.path.join(db_root, table)):
             return False
+    flavor_files = _flavor_files(deps)
     for media in deps.media:
         if not deps.removed(media):
             path = os.path.join(db_root, media)
-            path = flavor.destination(path)
+            if media in flavor_files:
+                path = flavor.destination(path)
             if not os.path.exists(path):
                 return False
 
@@ -222,6 +224,27 @@ def _files_duration(
         )
     durs.index = audformat.utils.expand_file_path(durs.index, db.root)
     db._files_duration = durs.to_dict()
+
+
+def _flavor_files(deps: Dependencies) -> set[str]:
+    r"""Media files that are converted to a flavor format.
+
+    When loading a database with a format flavor,
+    only media files that can be converted
+    (i.e. audio files)
+    are stored with the flavor format,
+    all other media files
+    (e.g. text files)
+    keep their original file extension.
+
+    Args:
+        deps: database dependencies
+
+    Returns:
+        media files that are converted to a flavor format
+
+    """
+    return set(deps._df[deps._df.sampling_rate != 0].index)
 
 
 def _get_attachments_from_cache(
@@ -458,6 +481,9 @@ def _get_media_from_backend(
     utils.mkdir_tree(media, db_root)
     utils.mkdir_tree(media, db_root_tmp)
 
+    # media files that can be changed to a requested flavor
+    flavor_files = _flavor_files(deps)
+
     def job(archive: str, version: str):
         archive = backend_interface.join("/", name, "media", archive + ".zip")
         # extract and move all files that are stored in the archive,
@@ -468,8 +494,6 @@ def _get_media_from_backend(
             version,
             tmp_root=db_root_tmp,
         )
-        # media files that can be changed to a requested flavor
-        flavor_files = deps._df[deps._df.sampling_rate != 0].index
         for file in files:
             if os.name == "nt":  # pragma: no cover
                 file = file.replace(os.sep, "/")
@@ -899,6 +923,7 @@ def _update_path(
     root: str,
     full_path: bool,
     format: str | None,
+    deps: Dependencies,
     num_workers: int,
     verbose: bool,
 ):
@@ -909,6 +934,7 @@ def _update_path(
         root: root to add to path
         full_path: if ``True`` expand file path with ``root``
         format: file extension to change to in path
+        deps: database dependencies
         num_workers: number of workers to use
         verbose: if ``True`` show progress bar
 
@@ -916,7 +942,29 @@ def _update_path(
     if not full_path and format is None:
         return
 
+    if format is not None:
+        # media files that are converted to the flavor format
+        flavor_files = _flavor_files(deps)
+        # media files that keep their original extension,
+        # e.g. text files
+        other_files = set(deps.media) - flavor_files
+
     def job(table):
+        if format is not None:
+            if other_files:
+                table._df.index = audformat.utils.map_file_path(
+                    table._df.index,
+                    lambda file: (
+                        audeer.replace_file_extension(file, format)
+                        if file in flavor_files
+                        else file
+                    ),
+                )
+            else:
+                table._df.index = audformat.utils.replace_file_extension(
+                    table._df.index,
+                    format,
+                )
         if full_path:
             table._df.index = audformat.utils.expand_file_path(
                 table._df.index,
@@ -928,11 +976,6 @@ def _update_path(
                     table._df.index,
                     os.path.normpath,
                 )
-        if format is not None:
-            table._df.index = audformat.utils.replace_file_extension(
-                table._df.index,
-                format,
-            )
 
     tables = db.tables.values()
     audeer.run_tasks(
@@ -1337,6 +1380,7 @@ def _load(
                 db_root,
                 full_path,
                 flavor.format,
+                deps,
                 num_workers,
                 verbose,
             )
@@ -1737,7 +1781,12 @@ def _load_media(
                 )
 
             if format is not None:
-                media = [audeer.replace_file_extension(m, format) for m in media]
+                # media files that are converted to the flavor format
+                flavor_files = _flavor_files(deps)
+                media = [
+                    audeer.replace_file_extension(m, format) if m in flavor_files else m
+                    for m in media
+                ]
             files = [
                 os.path.join(db_root, os.path.normpath(file))  # convert "/" to os.sep
                 for file in media
