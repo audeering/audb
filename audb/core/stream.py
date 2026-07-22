@@ -507,10 +507,6 @@ def stream(
             ``format``,
             or ``sampling_rate``
             is requested
-        RuntimeError: if a flavor is requested,
-            but the database contains media files,
-            that don't contain audio,
-            e.g. text files
 
     Examples:
         >>> import numpy as np
