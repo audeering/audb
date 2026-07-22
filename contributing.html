@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.13.0
+                v1.14.0
               </div>
             
           
@@ -184,7 +184,7 @@ even if you pull new changes from the Github repository.</p>
 <section id="coding-convention">
 <h2>Coding Convention<a class="headerlink" href="#coding-convention" title="Link to this heading">¶</a></h2>
 <p>We follow the <a class="reference external" href="http://www.python.org/dev/peps/pep-0008/">PEP8</a> convention for Python code
-and use <a class="reference external" href="https://beta.ruff.rs">ruff</a> as a linter and code formatter.
+and use <a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a> as a linter and code formatter.
 In addition,
 we check for common spelling errors with <a class="reference external" href="https://github.com/codespell-project/codespell/">codespell</a>.
 Both tools and possible exceptions
@@ -195,9 +195,9 @@ You can enable those checks locally by executing:</p>
 <span class="n">uvx</span> <span class="n">pre</span><span class="o">-</span><span class="n">commit</span> <span class="n">run</span> <span class="o">--</span><span class="nb">all</span><span class="o">-</span><span class="n">files</span>
 </pre></div>
 </div>
-<p>Afterwards <a class="reference external" href="https://beta.ruff.rs">ruff</a> and <a class="reference external" href="https://github.com/codespell-project/codespell/">codespell</a> are executed
+<p>Afterwards <a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a> and <a class="reference external" href="https://github.com/codespell-project/codespell/">codespell</a> are executed
 every time you create a commit.</p>
-<p>You can also install <a class="reference external" href="https://beta.ruff.rs">ruff</a> and <a class="reference external" href="https://github.com/codespell-project/codespell/">codespell</a>
+<p>You can also install <a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a> and <a class="reference external" href="https://github.com/codespell-project/codespell/">codespell</a>
 and call it directly:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uvx</span> <span class="n">ruff</span> <span class="n">check</span> <span class="o">--</span><span class="n">fix</span> <span class="o">.</span>  <span class="c1"># lint all Python files, and fix any fixable errors</span>
 <span class="n">uvx</span> <span class="n">ruff</span> <span class="nb">format</span> <span class="o">.</span>  <span class="c1"># format code of all Python files</span>
@@ -205,8 +205,8 @@ and call it directly:</p>
 </pre></div>
 </div>
 <p>It can be restricted to specific folders:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uvx</span> <span class="n">ruff</span> <span class="n">check</span> <span class="n">audfoo</span><span class="o">/</span> <span class="n">tests</span><span class="o">/</span>
-<span class="n">uvx</span> <span class="n">codespell</span> <span class="n">audfoo</span><span class="o">/</span> <span class="n">tests</span><span class="o">/</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uvx</span> <span class="n">ruff</span> <span class="n">check</span> <span class="n">audb</span><span class="o">/</span> <span class="n">tests</span><span class="o">/</span>
+<span class="n">uvx</span> <span class="n">codespell</span> <span class="n">audb</span><span class="o">/</span> <span class="n">tests</span><span class="o">/</span>
 </pre></div>
 </div>
 </section>
@@ -214,7 +214,7 @@ and call it directly:</p>
 <h2>Building the Documentation<a class="headerlink" href="#building-the-documentation" title="Link to this heading">¶</a></h2>
 <p>If you make changes to the documentation,
 you can re-create the HTML pages using <a class="reference external" href="https://sphinx-doc.org">Sphinx</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">sphinx</span> <span class="n">docs</span><span class="o">/</span> <span class="n">build</span><span class="o">/</span><span class="n">html</span> <span class="o">-</span><span class="n">b</span> <span class="n">html</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">build</span> <span class="o">-</span><span class="n">b</span> <span class="n">html</span> <span class="n">docs</span><span class="o">/</span> <span class="n">build</span><span class="o">/</span><span class="n">html</span>
 </pre></div>
 </div>
 <p>The generated files will be available
@@ -225,7 +225,7 @@ that you need <code class="docutils literal notranslate"><span class="pre">graph
 </pre></div>
 </div>
 <p>It is also possible to automatically check if all links are still valid:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">sphinx</span> <span class="n">docs</span><span class="o">/</span> <span class="n">build</span><span class="o">/</span><span class="n">html</span> <span class="o">-</span><span class="n">b</span> <span class="n">linkcheck</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">build</span> <span class="o">-</span><span class="n">b</span> <span class="n">linkcheck</span> <span class="n">docs</span><span class="o">/</span> <span class="n">build</span><span class="o">/</span><span class="n">html</span>
 </pre></div>
 </div>
 </section>
@@ -271,7 +271,7 @@ that you need <code class="docutils literal notranslate"><span class="pre">graph
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.13.0
+                v1.14.0
               </div>
             
           
@@ -114,6 +114,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-14-0-2026-07-22">Version 1.14.0 (2026-07-22)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-13-0-2026-07-01">Version 1.13.0 (2026-07-01)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-12-1-2026-06-19">Version 1.12.1 (2026-06-19)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-12-0-2026-06-08">Version 1.12.0 (2026-06-08)</a></li>
@@ -218,6 +219,33 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<section id="version-1-14-0-2026-07-22">
+<h2>Version 1.14.0 (2026-07-22)<a class="headerlink" href="#version-1-14-0-2026-07-22" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: improved error message
+of <code class="docutils literal notranslate"><span class="pre">audb.load()</span></code>,
+when a requested media file
+cannot be found
+in the requested tables</p></li>
+<li><p>Removed: deprecated flavor sampling rate
+of 22500 Hz</p></li>
+<li><p>Fixed: file extensions of non-audio media files,
+e.g. JSON files,
+are no longer replaced by the flavor format
+in table indices,
+and in the file paths returned by
+<code class="docutils literal notranslate"><span class="pre">audb.load_media()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">audb.stream()</span></code>,
+when loading a database with a format flavor</p></li>
+<li><p>Fixed: databases containing non-audio media files
+are now marked as complete in the cache,
+when loaded with a format flavor</p></li>
+<li><p>Fixed: non-audio media files and table files
+are no longer downloaded again from the backend,
+but looked up in the cache,
+when loading a database with a format flavor</p></li>
+</ul>
+</section>
 <section id="version-1-13-0-2026-07-01">
 <h2>Version 1.13.0 (2026-07-01)<a class="headerlink" href="#version-1-13-0-2026-07-01" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -986,7 +1014,7 @@ in documentation</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/01 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
