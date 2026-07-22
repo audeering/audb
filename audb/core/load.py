@@ -227,21 +227,13 @@ def _files_duration(
 
 
 def _flavor_files(deps: Dependencies) -> set[str]:
-    r"""Media files that are converted to a flavor format.
-
-    When loading a database with a format flavor,
-    only media files that can be converted
-    (i.e. audio files)
-    are stored with the flavor format,
-    all other media files
-    (e.g. text files)
-    keep their original file extension.
+    r"""Media files that are affected when requesting a flavor.
 
     Args:
         deps: database dependencies
 
     Returns:
-        media files that are converted to a flavor format
+        media files containing audio
 
     """
     return set(deps._df[deps._df.sampling_rate != 0].index)
