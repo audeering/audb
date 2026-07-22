@@ -236,7 +236,8 @@ def _flavor_files(deps: Dependencies) -> set[str]:
         media files containing audio
 
     """
-    return set(deps._df[deps._df.sampling_rate != 0].index)
+    df = deps()
+    return set(df[df.sampling_rate != 0].index)
 
 
 def _get_attachments_from_cache(
