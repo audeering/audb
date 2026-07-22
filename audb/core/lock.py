@@ -67,7 +67,7 @@ class FolderLock:
 
     def __enter__(self) -> "FolderLock":
         r"""Acquire the lock(s)."""
-        for lock, file in zip(self.locks, self.lock_files):
+        for lock in self.locks:
             remaining_time = self.timeout
             acquired = False
             # First try to acquire lock in warning_timeout time
