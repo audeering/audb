@@ -1,4 +1,6 @@
+import os
 import re
+import stat
 import threading
 import time
 
@@ -8,6 +10,7 @@ import pytest
 import audeer
 
 from audb.core.lock import FolderLock
+from audb.core.lock import lock_file as get_lock_file
 
 
 event = threading.Event()
@@ -147,10 +150,20 @@ def test_lock(tmpdir):
     assert result == [1, 0, 1]
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX file permissions required")
+def test_lock_file_permissions(tmpdir):
+    """Lock files are created with group-write permissions."""
+    folder = audeer.mkdir(tmpdir, "db")
+    lock_file = get_lock_file(folder)
+    with FolderLock(folder):
+        mode = os.stat(lock_file).st_mode
+        assert mode & stat.S_IWGRP
+
+
 def test_lock_warning_and_failure(tmpdir):
     """Test user warning and lock failure messages."""
-    # Create lock file to force failing acquiring of lock
-    lock_file = audeer.touch(tmpdir, ".lock")
+    folder = audeer.mkdir(tmpdir, "db")
+    lock_file = get_lock_file(folder)
     lock_error = filelock.Timeout
     lock_error_msg = f"The file lock '{lock_file}' could not be acquired."
     warning_msg = (
@@ -163,7 +176,9 @@ def test_lock_warning_and_failure(tmpdir):
         f"Still trying for 0.1 "
         "more seconds...\n"
     )
-    with pytest.warns(UserWarning, match=re.escape(warning_msg)):
-        with pytest.raises(lock_error, match=re.escape(lock_error_msg)):
-            with FolderLock(tmpdir, warning_timeout=0.1, timeout=0.2):
-                pass
+    # Hold the lock to force failing acquiring of a second lock
+    with FolderLock(folder):
+        with pytest.warns(UserWarning, match=re.escape(warning_msg)):
+            with pytest.raises(lock_error, match=re.escape(lock_error_msg)):
+                with FolderLock(folder, warning_timeout=0.1, timeout=0.2):
+                    pass

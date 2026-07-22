@@ -3,6 +3,7 @@ import os
 import sys
 import time
 
+import filelock
 import pytest
 
 import audbackend
@@ -98,15 +99,20 @@ def _applied_config(config):
 
 
 def lock_paths(cache):
-    r"""Return list of lock file locations."""
+    r"""Return list of lock file locations.
+
+    Lock files are stored next to the locked folder,
+    e.g. the lock for ``cache/DB_NAME/version``
+    is at ``cache/DB_NAME/.version.lock``.
+
+    """
     paths = []
     for version in audb.versions(DB_NAME):
         paths.append(
             audeer.path(
                 cache,
                 DB_NAME,
-                version,
-                ".lock",
+                f".{version}.lock",
             )
         )
         paths.append(
@@ -114,25 +120,44 @@ def lock_paths(cache):
                 cache,
                 DB_NAME,
                 version,
-                audb.Flavor().short_id,
-                ".lock",
+                f".{audb.Flavor().short_id}.lock",
             )
         )
     return paths
+
+
+def lock_is_held(path):
+    r"""Return ``True`` if the lock file is currently held.
+
+    With :class:`filelock.FileLock` the lock file is not removed
+    on release,
+    so a leftover file does not indicate a held lock.
+    We instead try to acquire the lock to check whether it is held.
+
+    """
+    if not os.path.exists(path):
+        return False
+    lock = filelock.FileLock(path, timeout=0)
+    try:
+        lock.acquire()
+        lock.release()
+        return False
+    except filelock.Timeout:
+        return True
 
 
 @pytest.fixture(
     scope="function",
     autouse=True,
 )
-def assert_lock_file_is_deleted():
-    r"""Tests if all lock files are deleted."""
+def assert_locks_are_released():
+    r"""Tests that no lock is left held (leaked) by a test."""
     assert not any(
-        [os.path.exists(path) for path in lock_paths(audb.default_cache_root())]
+        [lock_is_held(path) for path in lock_paths(audb.default_cache_root())]
     )
     yield
     assert not any(
-        [os.path.exists(path) for path in lock_paths(audb.default_cache_root())]
+        [lock_is_held(path) for path in lock_paths(audb.default_cache_root())]
     )
 
 
@@ -433,10 +458,10 @@ def test_lock_load_from_cached_versions(
     """Test loading fails when cached version folder is locked.
 
     This test verifies that when the cache folder of a previous version
-    is locked (simulated by manually creating the lock file),
+    is locked (by acquiring the folder lock in the same process),
     loading a new version that needs files from the locked cache fails.
 
-    Uses manual lock file creation instead of threading to avoid
+    Uses an explicitly held lock instead of threading to avoid
     failing tests in Github CI runners.
 
     """
@@ -471,13 +496,8 @@ def test_lock_load_from_cached_versions(
         ),
     ]
 
-    # create lock file in cache folder of version 1.0.0
-    # (filelock.SoftFileLock checks for file existence)
-    lock_file = os.path.join(db_v1.root, ".lock")
-    with open(lock_file, "w"):
-        pass
-
-    try:
+    # acquire the folder lock of version 1.0.0
+    with audb.core.lock.FolderLock(db_v1.root):
         # -> loading from cache fails when locked
         # (v1.0.0 cache is locked, backend crashes)
         with pytest.raises(audbackend.BackendError):
@@ -486,9 +506,6 @@ def test_lock_load_from_cached_versions(
                 version="2.0.0",
                 verbose=False,
             )
-    finally:
-        # remove lock file
-        os.remove(lock_file)
 
     # restore original repository (non-crashing backend)
     audb.config.REPOSITORIES = [
