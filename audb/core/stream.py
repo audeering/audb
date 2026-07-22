@@ -15,6 +15,7 @@ import audformat
 from audb.core import define
 from audb.core.api import dependencies
 from audb.core.cache import database_cache_root
+from audb.core.dependencies import Dependencies
 from audb.core.dependencies import error_message_missing_object
 from audb.core.flavor import Flavor
 from audb.core.load import _load_files
@@ -116,6 +117,7 @@ class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
         table: str,
         *,
         version: str,
+        deps: Dependencies,
         map: dict[str, str | Sequence[str]],
         batch_size: int,
         shuffle: bool,
@@ -140,6 +142,7 @@ class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
 
         self._table = table
         self._version = version
+        self._deps = deps
         self._map = map
         self._batch_size = batch_size
         self._shuffle = shuffle
@@ -186,6 +189,7 @@ class DatabaseIterator(audformat.Database, metaclass=abc.ABCMeta):
             self.root,
             self._full_path,
             self._format,
+            self._deps,
             self._num_workers,
             self._verbose,
         )
@@ -595,6 +599,6 @@ def stream(
             db[misc_table].load(table_file)
 
     if os.path.exists(os.path.join(db_root, f"db.{table}.parquet")):
-        return DatabaseIteratorParquet(db, table, **kwargs)
+        return DatabaseIteratorParquet(db, table, deps=deps, **kwargs)
     else:
-        return DatabaseIteratorCsv(db, table, **kwargs)
+        return DatabaseIteratorCsv(db, table, deps=deps, **kwargs)

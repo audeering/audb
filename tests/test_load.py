@@ -993,3 +993,102 @@ def test_repository(persistent_repository, name, version, error, error_msg):
     else:
         repository = audb.repository(name, version)
         assert repository == persistent_repository
+
+
+DB_NAME_MIXED_MEDIA = "test_load-mixed-media"
+
+MIXED_MEDIA_AUDIO_FILE = "audio/file1.wav"
+MIXED_MEDIA_TEXT_FILE = "text/file1.json"
+
+
+@pytest.fixture(scope="module")
+def mixed_media_db_root(tmpdir_factory, persistent_repository):
+    r"""Publish a database containing audio and non-audio media.
+
+    Returns:
+        path to original database root
+
+    """
+    version = "1.0.0"
+    db_root = tmpdir_factory.mktemp("mixed-media")
+
+    db = audformat.Database(DB_NAME_MIXED_MEDIA)
+    db["files"] = audformat.Table(
+        audformat.filewise_index(
+            [MIXED_MEDIA_AUDIO_FILE, MIXED_MEDIA_TEXT_FILE],
+        ),
+    )
+    audeer.mkdir(db_root, os.path.dirname(MIXED_MEDIA_AUDIO_FILE))
+    audiofile.write(
+        os.path.join(db_root, MIXED_MEDIA_AUDIO_FILE),
+        np.zeros((1, 8000), dtype=np.float32),
+        8000,
+    )
+    audeer.mkdir(db_root, os.path.dirname(MIXED_MEDIA_TEXT_FILE))
+    with open(os.path.join(db_root, MIXED_MEDIA_TEXT_FILE), "w") as fp:
+        fp.write('{"transcription": "hello"}\n')
+    db.save(db_root)
+
+    audb.publish(
+        db_root,
+        version,
+        persistent_repository,
+        verbose=False,
+    )
+
+    return str(db_root)
+
+
+def test_load_mixed_media_format(mixed_media_db_root):
+    r"""Load mixed-media database with format flavor.
+
+    Only audio media is converted to the requested format,
+    non-audio media is stored under its original name.
+    Table indices need to match the stored files,
+    and the database needs to be marked as complete,
+    see https://github.com/audeering/audb/issues/583
+
+    """
+    db = audb.load(
+        DB_NAME_MIXED_MEDIA,
+        format="flac",
+        full_path=False,
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    db_root = db.meta["audb"]["root"]
+
+    expected_files = [
+        audeer.replace_file_extension(MIXED_MEDIA_AUDIO_FILE, "flac"),
+        MIXED_MEDIA_TEXT_FILE,
+    ]
+    assert list(db.files) == expected_files
+    for file in db.files:
+        assert os.path.exists(os.path.join(db_root, file))
+
+    assert db.meta["audb"]["complete"]
+    assert audb.core.utils.database_is_complete(db_root)
+
+
+def test_load_media_mixed_media_format(mixed_media_db_root):
+    r"""Load single media files of mixed-media database with format flavor.
+
+    ``audb.load_media()`` needs to return the paths
+    the files are actually stored under,
+    i.e. only audio media gets the requested format extension,
+    see https://github.com/audeering/audb/issues/583
+
+    """
+    paths = audb.load_media(
+        DB_NAME_MIXED_MEDIA,
+        [MIXED_MEDIA_AUDIO_FILE, MIXED_MEDIA_TEXT_FILE],
+        format="flac",
+        num_workers=pytest.NUM_WORKERS,
+        verbose=False,
+    )
+    assert [os.path.basename(path) for path in paths] == [
+        "file1.flac",
+        "file1.json",
+    ]
+    for path in paths:
+        assert os.path.exists(path)
