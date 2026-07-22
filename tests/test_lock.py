@@ -29,6 +29,17 @@ def job(lock, wait, sleep):
     return 1
 
 
+def test_lock_file(tmpdir):
+    """Lock file is placed outside the folder with ``.<name>.lock`` naming."""
+    folder = audeer.mkdir(tmpdir, "parent", "db")
+    lock_file = get_lock_file(folder)
+
+    # Expected: `.../parent/.db.lock`, i.e. next to `db`, not inside it
+    assert lock_file == audeer.path(tmpdir, "parent", ".db.lock")
+    assert os.path.dirname(lock_file) == os.path.dirname(folder)
+    assert not lock_file.startswith(folder + os.sep)
+
+
 def test_lock(tmpdir):
     # create two lock folders
 
