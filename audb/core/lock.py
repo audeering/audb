@@ -58,9 +58,9 @@ class FolderLock:
             )
             timeout = define.TIMEOUT
 
-        self.lock_files = [lock_file(folder) for folder in folders]
+        lock_files = [lock_file(folder) for folder in folders]
         self.locks = [
-            filelock.FileLock(file, mode=LOCK_FILE_MODE) for file in self.lock_files
+            filelock.FileLock(file, mode=LOCK_FILE_MODE) for file in lock_files
         ]
         self.timeout = timeout
         self.warning_timeout = warning_timeout
