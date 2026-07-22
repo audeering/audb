@@ -434,12 +434,14 @@ def test_load_from_cache(dbs):
     # when flavor format is different from original format
     # (https://github.com/audeering/audb/issues/324)
     original_files = audformat.utils.replace_file_extension(db.files, "wav")
+    deps = audb.dependencies(DB_NAME, version=version)
     assert (
         audb.core.load._missing_files(
             original_files,
             "media",
             db_root,
             audb.Flavor(format="flac"),
+            deps,
             False,
         )
         == []
@@ -1001,17 +1003,16 @@ MIXED_MEDIA_AUDIO_FILE = "audio/file1.wav"
 MIXED_MEDIA_TEXT_FILE = "text/file1.json"
 
 
-@pytest.fixture(scope="module")
-def mixed_media_db_root(tmpdir_factory, persistent_repository):
-    r"""Publish a database containing audio and non-audio media.
+def create_mixed_media_db(db_root) -> audformat.Database:
+    r"""Create database containing audio and non-audio media.
+
+    Args:
+        db_root: folder to store the database
 
     Returns:
-        path to original database root
+        database object
 
     """
-    version = "1.0.0"
-    db_root = tmpdir_factory.mktemp("mixed-media")
-
     db = audformat.Database(DB_NAME_MIXED_MEDIA)
     db["files"] = audformat.Table(
         audformat.filewise_index(
@@ -1028,6 +1029,21 @@ def mixed_media_db_root(tmpdir_factory, persistent_repository):
     with open(os.path.join(db_root, MIXED_MEDIA_TEXT_FILE), "w") as fp:
         fp.write('{"transcription": "hello"}\n')
     db.save(db_root)
+    return db
+
+
+@pytest.fixture(scope="module")
+def mixed_media_db_root(tmpdir_factory, persistent_repository):
+    r"""Publish a database containing audio and non-audio media.
+
+    Returns:
+        path to original database root
+
+    """
+    version = "1.0.0"
+    db_root = tmpdir_factory.mktemp("mixed-media")
+
+    create_mixed_media_db(db_root)
 
     audb.publish(
         db_root,
@@ -1092,3 +1108,107 @@ def test_load_media_mixed_media_format(mixed_media_db_root):
     ]
     for path in paths:
         assert os.path.exists(path)
+
+
+def test_load_media_mixed_media_format_cached(tmpdir, repository):
+    r"""Load cached media files of mixed-media database with format flavor.
+
+    Media files already stored in the cache
+    need to be recognized when loading again,
+    i.e. non-audio media must be looked up
+    under their original file extension.
+    To ensure no file is fetched from the backend again,
+    all media files are removed from it
+    before loading a second time,
+    see https://github.com/audeering/audb/issues/586
+
+    """
+    db_root = audeer.mkdir(tmpdir, "build")
+    create_mixed_media_db(db_root)
+    audb.publish(db_root, "1.0.0", repository, verbose=False)
+
+    files = [MIXED_MEDIA_AUDIO_FILE, MIXED_MEDIA_TEXT_FILE]
+    paths = audb.load_media(
+        DB_NAME_MIXED_MEDIA,
+        files,
+        version="1.0.0",
+        format="flac",
+        verbose=False,
+    )
+
+    # Remove media files from backend
+    media_backend = audeer.path(
+        repository.host,
+        repository.name,
+        DB_NAME_MIXED_MEDIA,
+        "media",
+    )
+    assert os.path.exists(media_backend)
+    audeer.rmdir(media_backend)
+
+    # Loading again has to find the media files in the cache
+    assert (
+        audb.load_media(
+            DB_NAME_MIXED_MEDIA,
+            files,
+            version="1.0.0",
+            format="flac",
+            verbose=False,
+        )
+        == paths
+    )
+
+
+def test_load_mixed_media_format_other_version_cached(tmpdir, repository):
+    r"""Load other version of mixed-media database with format flavor.
+
+    Media files unchanged between versions
+    need to be copied from the cache folder
+    of an already loaded version,
+    i.e. non-audio media must be looked up
+    under their original file extension.
+    To ensure no file is fetched from the backend,
+    all media files are removed from it
+    before loading the other version,
+    see https://github.com/audeering/audb/issues/586
+
+    """
+    db_root = audeer.mkdir(tmpdir, "build")
+    create_mixed_media_db(db_root)
+    audb.publish(db_root, "1.0.0", repository, verbose=False)
+    audb.publish(db_root, "1.1.0", repository, verbose=False)
+
+    audb.load(
+        DB_NAME_MIXED_MEDIA,
+        version="1.0.0",
+        format="flac",
+        full_path=False,
+        verbose=False,
+    )
+
+    # Remove media files from backend
+    media_backend = audeer.path(
+        repository.host,
+        repository.name,
+        DB_NAME_MIXED_MEDIA,
+        "media",
+    )
+    assert os.path.exists(media_backend)
+    audeer.rmdir(media_backend)
+
+    # Loading another version has to copy the media files
+    # from the cache folder of the already loaded version
+    db = audb.load(
+        DB_NAME_MIXED_MEDIA,
+        version="1.1.0",
+        format="flac",
+        full_path=False,
+        verbose=False,
+    )
+    expected_files = [
+        audeer.replace_file_extension(MIXED_MEDIA_AUDIO_FILE, "flac"),
+        MIXED_MEDIA_TEXT_FILE,
+    ]
+    assert list(db.files) == expected_files
+    for file in db.files:
+        assert os.path.exists(os.path.join(db.meta["audb"]["root"], file))
