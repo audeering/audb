@@ -103,6 +103,12 @@ def _cached_files(
     cached_files = []
     missing_files = []
 
+    if flavor and flavor.format is not None:
+        # media files that are converted to the flavor format
+        flavor_files = _flavor_files(deps)
+    else:
+        flavor_files = set()
+
     for file in audeer.progress_bar(
         files,
         desc="Cached files",
@@ -121,7 +127,7 @@ def _cached_files(
                 if file_path in cache_deps:
                     if deps.checksum(file_path) == cache_deps.checksum(file_path):
                         path = os.path.join(cache_root, file_path)
-                        if flavor and flavor.format is not None:
+                        if file_path in flavor_files:
                             path = audeer.replace_file_extension(
                                 path,
                                 flavor.format,
@@ -130,7 +136,7 @@ def _cached_files(
                             found = True
                             break
         if found:
-            if flavor and flavor.format is not None:
+            if file_path in flavor_files:
                 file = audeer.replace_file_extension(
                     file,
                     flavor.format,
@@ -756,6 +762,7 @@ def _load_files(
             files_type,
             db_root,
             flavor,
+            deps,
             verbose,
         )
     else:
@@ -855,6 +862,7 @@ def _missing_files(
     files_type: str,
     db_root: str,
     flavor: Flavor,
+    deps: Dependencies,
     verbose: bool,
 ) -> list[str]:
     r"""List missing files.
@@ -873,19 +881,25 @@ def _missing_files(
             ``'table'``,
             or ``'attachment'``
         flavor: requested database flavor
+        deps: database dependencies
         verbose: if ``True`` show progress bar
 
     Returns:
         list of missing files or table IDs
 
     """
+    if files_type == "media" and flavor.format is not None:
+        # media files that are converted to the flavor format
+        flavor_files = _flavor_files(deps)
+    else:
+        flavor_files = set()
 
     def is_cached(file):
         if files_type == "table":
             path1 = os.path.join(db_root, f"db.{file}.csv")
             path2 = os.path.join(db_root, f"db.{file}.parquet")
             return os.path.exists(path1) or os.path.exists(path2)
-        elif files_type == "media" and flavor.format is not None:
+        elif file in flavor_files:
             # https://github.com/audeering/audb/issues/324
             cached_file = audeer.replace_file_extension(file, flavor.format)
             return os.path.exists(os.path.join(db_root, cached_file))
@@ -1146,10 +1160,6 @@ def load(
             ``format``,
             or ``sampling_rate``
             is requested
-        RuntimeError: if a flavor is requested,
-            but the database contains media files,
-            that don't contain audio,
-            e.g. text files
 
     Examples:
         >>> db = audb.load(
