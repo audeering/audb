@@ -42,6 +42,11 @@ of the shared cache folder with
     $ chmod g+s /data/audb  # content inherits group ownership
     $ setfacl -d -m u::rwx,g::rwx,o::rx- /data/audb  # content inherits rights
 
+:mod:`audb` uses lock files to avoid race conditions
+when trying to access the same file.
+You can only use a shared cache on the same platform
+as the file lock mechanism is not cross-platform compatible.
+
 
 User cache
 ----------
