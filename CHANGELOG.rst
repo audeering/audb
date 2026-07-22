@@ -7,6 +7,33 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.14.0 (2026-07-22)
+---------------------------
+
+* Changed: improved error message
+  of ``audb.load()``,
+  when a requested media file
+  cannot be found
+  in the requested tables
+* Removed: deprecated flavor sampling rate
+  of 22500 Hz
+* Fixed: file extensions of non-audio media files,
+  e.g. JSON files,
+  are no longer replaced by the flavor format
+  in table indices,
+  and in the file paths returned by
+  ``audb.load_media()``
+  and ``audb.stream()``,
+  when loading a database with a format flavor
+* Fixed: databases containing non-audio media files
+  are now marked as complete in the cache,
+  when loaded with a format flavor
+* Fixed: non-audio media files and table files
+  are no longer downloaded again from the backend,
+  but looked up in the cache,
+  when loading a database with a format flavor
+
+
 Version 1.13.0 (2026-07-01)
 ---------------------------
 
