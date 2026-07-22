@@ -167,13 +167,9 @@ def test_lock_warning_and_failure(tmpdir):
     lock_error = filelock.Timeout
     lock_error_msg = f"The file lock '{lock_file}' could not be acquired."
     warning_msg = (
-        f"Lock could not be acquired immediately.\n"
-        "Another user might loading the same database,\n"
-        f"or the lock file '{lock_file}' is left from a failed job "
-        "and needs to be deleted manually.\n"
-        "You can check who created it when by running: "
-        f"'ls -lh {lock_file}' in bash.\n"
-        f"Still trying for 0.1 "
+        "Lock could not be acquired immediately.\n"
+        "Another process might be loading the same database.\n"
+        "Still trying for 0.1 "
         "more seconds...\n"
     )
     # Hold the lock to force failing acquiring of a second lock

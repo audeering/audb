@@ -30,12 +30,8 @@ class FolderLock:
         r"""Lock one or more folders.
 
         Waits until the locks of all folders can be acquired.
-        While a folder ``.../parent/name`` is locked,
-        a file ``.../parent/.name.lock`` is created next to it.
-
-        The lock file is placed *outside* the locked folder,
-        so the folder itself can be deleted or overwritten
-        while the lock is held.
+        For a folder ``a/b/c``,
+        the corresponding lock file is ``a/b/.c.lock``.
 
         Args:
             folders: path to one or more folders that should be locked
@@ -82,6 +78,7 @@ class FolderLock:
                 except filelock.Timeout:
                     warnings.warn(
                         f"Lock could not be acquired immediately.\n"
+                        "Another process might be loading the same database.\n"
                         f"Still trying for {self.timeout - self.warning_timeout:.1f} "
                         "more seconds...\n"
                     )
