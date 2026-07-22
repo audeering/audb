@@ -1,5 +1,6 @@
 import os
 
+import filelock
 import pandas as pd
 import pytest
 
@@ -358,12 +359,14 @@ def test_complete_skips_lock(dbs):
         verbose=False,
     )
     db_root = db.meta["audb"]["root"]
-    lock_file = os.path.join(db_root, audb.core.define.LOCK_FILE)
+    lock_file = audeer.path(
+        os.path.dirname(db_root),
+        f".{os.path.basename(db_root)}{audb.core.define.LOCK_FILE}",
+    )
     assert not os.path.exists(os.path.join(db_root, audb.core.define.COMPLETE_FILE))
 
     # Simulate a lock held by another process
-    audeer.touch(lock_file)
-    try:
+    with filelock.FileLock(lock_file):
         # Loading acquires the lock for an incomplete database,
         # hence it cannot be loaded with ``timeout=0``
         with pytest.warns(UserWarning, match=audb.core.define.TIMEOUT_MSG):
@@ -375,8 +378,6 @@ def test_complete_skips_lock(dbs):
                 verbose=False,
             )
         assert db is None
-    finally:
-        os.remove(lock_file)
 
     # Completely load the database
     # -> `.complete` file is created

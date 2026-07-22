@@ -1,4 +1,6 @@
+import os
 import re
+import stat
 import threading
 import time
 
@@ -147,23 +149,35 @@ def test_lock(tmpdir):
     assert result == [1, 0, 1]
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX file permissions required")
+def test_lock_file_location_and_permissions(tmpdir):
+    """Lock files are siblings of folders and group-writable."""
+    folder = audeer.mkdir(tmpdir, "folder")
+    lock_file = audeer.path(tmpdir, ".folder.lock")
+
+    with FolderLock(folder):
+        assert os.path.exists(lock_file)
+        mode = os.stat(lock_file).st_mode
+        assert mode & stat.S_IWGRP
+
+    # FileLock keeps the lock file after releasing the lock
+    assert os.path.exists(lock_file)
+
+
 def test_lock_warning_and_failure(tmpdir):
     """Test user warning and lock failure messages."""
-    # Create lock file to force failing acquiring of lock
-    lock_file = audeer.touch(tmpdir, ".lock")
+    folder = audeer.mkdir(tmpdir, "folder")
+    lock_file = audeer.path(tmpdir, ".folder.lock")
     lock_error = filelock.Timeout
     lock_error_msg = f"The file lock '{lock_file}' could not be acquired."
     warning_msg = (
-        f"Lock could not be acquired immediately.\n"
-        "Another user might loading the same database,\n"
-        f"or the lock file '{lock_file}' is left from a failed job "
-        "and needs to be deleted manually.\n"
-        "You can check who created it when by running: "
-        f"'ls -lh {lock_file}' in bash.\n"
-        f"Still trying for 0.1 "
-        "more seconds...\n"
+        f"Lock '{lock_file}' could not be acquired immediately.\n"
+        "Another process might be loading the same database.\n"
+        "Still trying for 0.1 more seconds...\n"
     )
-    with pytest.warns(UserWarning, match=re.escape(warning_msg)):
-        with pytest.raises(lock_error, match=re.escape(lock_error_msg)):
-            with FolderLock(tmpdir, warning_timeout=0.1, timeout=0.2):
-                pass
+    # Acquire first lock to force failing second lock
+    with filelock.FileLock(lock_file):
+        with pytest.warns(UserWarning, match=re.escape(warning_msg)):
+            with pytest.raises(lock_error, match=re.escape(lock_error_msg)):
+                with FolderLock(folder, warning_timeout=0.1, timeout=0.2):
+                    pass

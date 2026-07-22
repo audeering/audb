@@ -3,6 +3,7 @@ import os
 import sys
 import time
 
+import filelock
 import pytest
 
 import audbackend
@@ -105,8 +106,7 @@ def lock_paths(cache):
             audeer.path(
                 cache,
                 DB_NAME,
-                version,
-                ".lock",
+                f".{version}.lock",
             )
         )
         paths.append(
@@ -114,8 +114,7 @@ def lock_paths(cache):
                 cache,
                 DB_NAME,
                 version,
-                audb.Flavor().short_id,
-                ".lock",
+                f".{audb.Flavor().short_id}.lock",
             )
         )
     return paths
@@ -125,15 +124,16 @@ def lock_paths(cache):
     scope="function",
     autouse=True,
 )
-def assert_lock_file_is_deleted():
-    r"""Tests if all lock files are deleted."""
-    assert not any(
-        [os.path.exists(path) for path in lock_paths(audb.default_cache_root())]
-    )
+def cleanup_lock_files():
+    r"""Remove persistent lock files before and after each test."""
+    paths = lock_paths(audb.default_cache_root())
+    for path in paths:
+        if os.path.exists(path):
+            os.remove(path)
     yield
-    assert not any(
-        [os.path.exists(path) for path in lock_paths(audb.default_cache_root())]
-    )
+    for path in paths:
+        if os.path.exists(path):
+            os.remove(path)
 
 
 @pytest.fixture(
@@ -471,13 +471,12 @@ def test_lock_load_from_cached_versions(
         ),
     ]
 
-    # create lock file in cache folder of version 1.0.0
-    # (filelock.SoftFileLock checks for file existence)
-    lock_file = os.path.join(db_v1.root, ".lock")
-    with open(lock_file, "w"):
-        pass
-
-    try:
+    # Lock the cache folder of version 1.0.0
+    lock_file = audeer.path(
+        os.path.dirname(db_v1.root),
+        f".{os.path.basename(db_v1.root)}.lock",
+    )
+    with filelock.FileLock(lock_file):
         # -> loading from cache fails when locked
         # (v1.0.0 cache is locked, backend crashes)
         with pytest.raises(audbackend.BackendError):
@@ -486,9 +485,6 @@ def test_lock_load_from_cached_versions(
                 version="2.0.0",
                 verbose=False,
             )
-    finally:
-        # remove lock file
-        os.remove(lock_file)
 
     # restore original repository (non-crashing backend)
     audb.config.REPOSITORIES = [

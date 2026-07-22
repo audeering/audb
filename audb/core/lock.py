@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+import os
 import types
 import warnings
 
@@ -9,6 +10,13 @@ import filelock
 import audeer
 
 import audb.core.define as define
+
+
+# File permissions for lock files.
+# We use `0o664` (`-rw-rw-r--`)
+# to allow group-write access,
+# which is needed for shared caches.
+_LOCK_FILE_MODE = 0o664
 
 
 class FolderLock:
@@ -22,8 +30,8 @@ class FolderLock:
         r"""Lock one or more folders.
 
         Waits until the locks of all folders can be acquired.
-        While a folder is locked,
-        a file '.lock' will be created inside the folder.
+        For a folder ``a/b/c``,
+        the corresponding lock file is ``a/b/.c.lock``.
 
         Args:
             folders: path to one or more folders that should be locked
@@ -39,7 +47,7 @@ class FolderLock:
             :class:`filelock.Timeout`: if a timeout is reached
 
         """
-        folders = audeer.to_list(folders)
+        folders = [audeer.path(folder) for folder in sorted(audeer.to_list(folders))]
 
         # In the past we used ``-1`` as default value for timeout
         # to wait infinitely until the lock is acquired.
@@ -50,8 +58,16 @@ class FolderLock:
             )
             timeout = define.TIMEOUT
 
-        self.lock_files = [audeer.path(folder, define.LOCK_FILE) for folder in folders]
-        self.locks = [filelock.SoftFileLock(file) for file in self.lock_files]
+        self.lock_files = []
+        for folder in folders:
+            parent = audeer.mkdir(os.path.dirname(folder))
+            basename = os.path.basename(folder)
+            self.lock_files.append(
+                audeer.path(parent, f".{basename}{define.LOCK_FILE}")
+            )
+        self.locks = [
+            filelock.FileLock(file, mode=_LOCK_FILE_MODE) for file in self.lock_files
+        ]
         self.timeout = timeout
         self.warning_timeout = warning_timeout
 
@@ -67,12 +83,8 @@ class FolderLock:
                     acquired = True
                 except filelock.Timeout:
                     warnings.warn(
-                        f"Lock could not be acquired immediately.\n"
-                        "Another user might loading the same database,\n"
-                        f"or the lock file '{lock_file}' is left from a failed job "
-                        "and needs to be deleted manually.\n"
-                        "You can check who created it when by running: "
-                        f"'ls -lh {lock_file}' in bash.\n"
+                        f"Lock '{lock_file}' could not be acquired immediately.\n"
+                        "Another process might be loading the same database.\n"
                         f"Still trying for {self.timeout - self.warning_timeout:.1f} "
                         "more seconds...\n"
                     )
