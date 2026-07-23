@@ -1165,6 +1165,58 @@ def test_publish_without_repository(tmpdir, repository):
         )
 
 
+def test_publish_without_repository_multiple_repositories(tmpdir):
+    """Test repository inference with multiple configured repositories.
+
+    If ``repository`` is ``None``,
+    the new version should be published
+    to the repository holding the previous version,
+    and not simply to the first repository
+    listed in ``audb.config.REPOSITORIES``.
+
+    """
+    host = audeer.mkdir(tmpdir, "host")
+    repo1 = audb.Repository("repo1", host, "file-system")
+    repo2 = audb.Repository("repo2", host, "file-system")
+    audeer.mkdir(host, "repo1")
+    audeer.mkdir(host, "repo2")
+
+    original_repos = audb.config.REPOSITORIES
+    audb.config.REPOSITORIES = [repo1, repo2]
+
+    try:
+        # Create simple database
+        name = "test_publish_without_repository_multiple"
+        db_path = audeer.mkdir(tmpdir, "db")
+        signal = np.zeros((2, 1000))
+        sampling_rate = 8000
+        audiofile.write(audeer.path(db_path, "f1.wav"), signal, sampling_rate)
+        db = audformat.Database(name)
+        db["table"] = audformat.Table(audformat.filewise_index("f1.wav"))
+        db.save(db_path)
+
+        # Publish version 1.0.0 to repo1
+        # and version 2.0.0 to repo2 as a new database
+        audb.publish(db_path, "1.0.0", repo1)
+        os.remove(audeer.path(db_path, "db.parquet"))
+        audb.publish(db_path, "2.0.0", repo2, previous_version=None)
+
+        # Publish version 3.0.0 without specifying a repository.
+        # The latest version 2.0.0 is stored in repo2,
+        # so the new version should be published there,
+        # even though repo1 is listed first
+        # in audb.config.REPOSITORIES
+        db_root = audeer.mkdir(tmpdir, "db-3.0.0")
+        audb.load_to(db_root, name, version="2.0.0", verbose=False)
+        audb.publish(db_root, "3.0.0")
+
+        assert os.path.exists(audeer.path(host, "repo2", name, "3.0.0"))
+        assert not os.path.exists(audeer.path(host, "repo1", name, "3.0.0"))
+
+    finally:
+        audb.config.REPOSITORIES = original_repos
+
+
 def test_publish_error_repository_does_not_exist(tmpdir, repository):
     db = audformat.Database("test")
     db.save(tmpdir)
