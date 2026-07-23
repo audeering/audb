@@ -75,6 +75,19 @@ def _check_for_missing_media(
         raise RuntimeError(error_msg)
 
 
+def _database_versions(
+    backend_interface: type[audbackend.interface.Base],
+    name: str,
+) -> list[str]:
+    r"""Published versions of database in repository of backend interface."""
+    with backend_interface.backend:
+        remote_header = backend_interface.join("/", name, define.HEADER_FILE)
+        return backend_interface.versions(
+            remote_header,
+            suppress_backend_errors=True,
+        )
+
+
 def _find_attachments(
     db: audformat.Database,
     db_root: str,
@@ -785,53 +798,50 @@ def _publish(
     it is reloaded with table data below.
 
     """
-    if repository is None:
-        # Use the repository of the previous version
-        if previous_version == "latest":
-            all_versions = api_versions(db.name)
-            previous_version = all_versions[-1] if len(all_versions) > 0 else None
-        if previous_version is None:
-            raise ValueError(
-                "You have to provide a 'repository' "
-                "when publishing a database "
-                "that does not depend on a previous version."
-            )
-        repository = utils._lookup(db.name, previous_version)[0]
+    versions = []
+    if repository is not None:
+        backend_interface = repository.create_backend_interface()
+        versions = _database_versions(backend_interface, db.name)
 
-    backend_interface = repository.create_backend_interface()
-
-    with backend_interface.backend:
-        remote_header = backend_interface.join("/", db.name, define.HEADER_FILE)
-        versions = backend_interface.versions(
-            remote_header,
-            suppress_backend_errors=True,
-        )
-
-    if version in versions:
-        raise RuntimeError(
-            f"A version '{version}' already exists for database '{db.name}'."
-        )
     if previous_version == "latest":
         # Resolve to the latest version of the database.
         # We search the union of ``audb.config.REPOSITORIES`` + ``repository``.
         all_versions = audeer.sort_versions(list(set(api_versions(db.name) + versions)))
         previous_version = all_versions[-1] if len(all_versions) > 0 else None
-    # Check previous_version is in same repository
-    if previous_version is not None and previous_version not in versions:
+
+    if previous_version is None:
+        if repository is None:
+            raise ValueError(
+                "You have to provide a 'repository' "
+                "when publishing a database "
+                "that does not depend on a previous version."
+            )
+    elif previous_version not in versions:
+        # The previous version is stored in a different repository
         previous_repository = utils._lookup(db.name, previous_version)[0]
+        if repository is not None:
+            raise RuntimeError(
+                f"Cannot publish version '{version}' "
+                f"to repository '{repository.name}' "
+                f"based on previous version '{previous_version}'. "
+                "The previous version is stored in repository "
+                f"'{previous_repository.name}'. "
+                "Publishing to a different repository would split the database "
+                "across multiple repositories, "
+                "which can create data privacy risks "
+                "and is not supported. "
+                "Use previous_version=None "
+                f"to start a new database in '{repository.name}' "
+                f"or publish to the same repository '{previous_repository.name}'."
+            )
+        # Use the repository of the previous version
+        repository = previous_repository
+        backend_interface = repository.create_backend_interface()
+        versions = _database_versions(backend_interface, db.name)
+
+    if version in versions:
         raise RuntimeError(
-            f"Cannot publish version '{version}' "
-            f"to repository '{repository.name}' "
-            f"based on previous version '{previous_version}'. "
-            "The previous version is stored in repository "
-            f"'{previous_repository.name}'. "
-            "Publishing to a different repository would split the database "
-            "across multiple repositories, "
-            "which can create data privacy risks "
-            "and is not supported. "
-            "Use previous_version=None "
-            f"to start a new database in '{repository.name}' "
-            f"or publish to the same repository '{previous_repository.name}'."
+            f"A version '{version}' already exists for database '{db.name}'."
         )
 
     # load database and dependencies
