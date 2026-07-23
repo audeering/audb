@@ -76,7 +76,7 @@ def _check_for_missing_media(
 
 
 def _database_versions(
-    backend_interface: type[audbackend.interface.Base],
+    backend_interface: audbackend.interface.Base,
     name: str,
 ) -> list[str]:
     r"""Published versions of database in repository of backend interface."""
