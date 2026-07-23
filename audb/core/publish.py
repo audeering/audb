@@ -583,7 +583,7 @@ def _put_tables(
 def publish(
     db_root: str,
     version: str,
-    repository: Repository,
+    repository: Repository | None = None,
     *,
     archives: Mapping[str, str] = None,
     previous_version: str | None = "latest",
@@ -668,7 +668,11 @@ def publish(
     Args:
         db_root: root directory of database
         version: version string
-        repository: name of repository
+        repository: repository to publish the database to.
+            If ``None``,
+            the repository of ``previous_version`` is used.
+            Has to be provided
+            if the database does not depend on a previous version
         archives: dictionary mapping files to archive names.
             Can be used to bundle files into archives,
             which will speed up communication with the server
@@ -717,6 +721,8 @@ def publish(
             cannot be parsed by :class:`audeer.StrictVersion`
         ValueError: if ``previous_version`` >= ``version``
         ValueError: if ``repository`` has a non-supported backend
+        ValueError: if ``repository`` is ``None``
+            and the database does not depend on a previous version
 
     """
     # Enforce error if version cannot be converted to audeer.StrictVersion
@@ -763,7 +769,7 @@ def _publish(
     db: audformat.Database,
     db_root: str,
     version: str,
-    repository: Repository,
+    repository: Repository | None,
     archives: Mapping[str, str] | None,
     previous_version: str | None,
     cache_root: str | None,
@@ -779,6 +785,19 @@ def _publish(
     it is reloaded with table data below.
 
     """
+    if repository is None:
+        # Use the repository of the previous version
+        if previous_version == "latest":
+            all_versions = api_versions(db.name)
+            previous_version = all_versions[-1] if len(all_versions) > 0 else None
+        if previous_version is None:
+            raise ValueError(
+                "You have to provide a 'repository' "
+                "when publishing a database "
+                "that does not depend on a previous version."
+            )
+        repository = utils._lookup(db.name, previous_version)[0]
+
     backend_interface = repository.create_backend_interface()
 
     with backend_interface.backend:
