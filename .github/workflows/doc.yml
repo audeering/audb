@@ -31,6 +31,8 @@ jobs:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v9.0.0
+      with:
+        save-cache: false
 
     - name: Ubuntu - install libsndfile
       uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05  # v1.6.0
