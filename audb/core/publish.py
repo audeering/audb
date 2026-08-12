@@ -758,7 +758,7 @@ def publish(
     )
 
     with shimmer(
-        prefix="Put:   ",
+        prefix="Put:    ",
         text=f"{db.name} v{version}",
         next_line=f"Source: {db_root}",
         enabled=verbose,
