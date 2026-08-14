@@ -3,6 +3,7 @@ import os
 import sys
 
 import numpy as np
+import pytest
 
 import audeer
 import audformat
@@ -14,6 +15,22 @@ from audb.core.shimmer import BOLD
 from audb.core.shimmer import NORMAL
 from audb.core.shimmer import RESET
 from audb.core.shimmer import Shimmer
+from audb.core.shimmer import animations_enabled
+
+
+@pytest.fixture(autouse=True)
+def enable_animations(monkeypatch):
+    r"""Neutralize animation-disabling environment variables.
+
+    The tests below control animation behavior explicitly
+    (by monkey-patching ``isatty`` or setting environment variables),
+    so the environment the test runner happens to execute in
+    (e.g. CI with ``NO_COLOR`` or ``TERM=dumb``)
+    must not interfere.
+
+    """
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    monkeypatch.setenv("TERM", "xterm-256color")
 
 
 def test_stdout_write_hook():
@@ -125,6 +142,72 @@ def test_noop_when_not_a_tty(monkeypatch):
     assert sys.stdout.write == original_write
     assert shimmer._noop is True
     shimmer.stop()
+
+
+def test_animations_enabled(monkeypatch):
+    """Environment variables controlling terminal animations."""
+    # Clean environment (see enable_animations fixture): allowed
+    assert animations_enabled() is True
+
+    # NO_COLOR set to an empty string counts as unset,
+    # following the https://no-color.org convention
+    monkeypatch.setenv("NO_COLOR", "")
+    assert animations_enabled() is True
+
+    # NO_COLOR set to any non-empty value disables animations
+    monkeypatch.setenv("NO_COLOR", "1")
+    assert animations_enabled() is False
+
+    # TERM=dumb disables animations
+    monkeypatch.delenv("NO_COLOR")
+    monkeypatch.setenv("TERM", "dumb")
+    assert animations_enabled() is False
+
+    # TERM matching is case-insensitive
+    monkeypatch.setenv("TERM", "DUMB")
+    assert animations_enabled() is False
+
+    # Other TERM values keep animations enabled
+    monkeypatch.setenv("TERM", "screen-256color")
+    assert animations_enabled() is True
+
+    # Either variable alone is enough to disable,
+    # and both set together stays disabled
+    monkeypatch.setenv("NO_COLOR", "1")
+    monkeypatch.setenv("TERM", "dumb")
+    assert animations_enabled() is False
+
+
+@pytest.mark.parametrize(
+    "env_var, value",
+    [
+        ("NO_COLOR", "1"),
+        ("TERM", "dumb"),
+    ],
+)
+def test_noop_when_animations_disabled(capsys, monkeypatch, env_var, value):
+    """Shimmer becomes a no-op when the environment disables animations.
+
+    Even on a real TTY (e.g. a pseudo-terminal created by ``screen -L``,
+    whose log file would otherwise capture the escape sequences),
+    setting ``NO_COLOR`` or ``TERM=dumb`` must skip the animation,
+    while the static text is still printed once.
+
+    """
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
+    monkeypatch.setenv(env_var, value)
+    original_write = sys.stdout.write
+
+    shimmer = Shimmer("Get:   ", "db v1.0.0")
+    shimmer.start()
+    # Should not have patched stdout: no instance-level override installed.
+    assert "write" not in vars(sys.stdout)
+    assert sys.stdout.write == original_write
+    assert shimmer._noop is True
+    shimmer.stop()
+
+    # The static line is printed exactly once, without escape codes
+    assert capsys.readouterr().out == "Get:   db v1.0.0\n"
 
 
 def test_restores_pre_existing_instance_write(monkeypatch):
