@@ -1,13 +1,13 @@
 from datetime import date
-
-import toml
+import tomllib
 
 import audeer
 
 import audb
 
 
-config = toml.load(audeer.path("..", "pyproject.toml"))
+with open(audeer.path("..", "pyproject.toml"), "rb") as fp:
+    config = tomllib.load(fp)
 
 
 # Project -----------------------------------------------------------------
