@@ -1,4 +1,5 @@
 import concurrent.futures
+import sys
 
 import pytest
 
@@ -455,7 +456,6 @@ def test_dir():
     standard_attrs = [
         "__all__",
         "__builtins__",
-        "__cached__",
         "__doc__",
         "__file__",
         "__loader__",
@@ -465,13 +465,15 @@ def test_dir():
         "__spec__",
         "__version__",
     ]
+    # Python 3.15 no longer sets __cached__ on modules
+    if sys.version_info < (3, 15):
+        standard_attrs.append("__cached__")
     for attr in standard_attrs:
         assert attr in dir(audb), f"Missing standard attribute '{attr}'"
 
     # Test dir(audb.core) includes standard attributes and submodules
     submodule_standard_attrs = [
         "__builtins__",
-        "__cached__",
         "__doc__",
         "__file__",
         "__loader__",
@@ -480,6 +482,8 @@ def test_dir():
         "__path__",
         "__spec__",
     ]
+    if sys.version_info < (3, 15):
+        submodule_standard_attrs.append("__cached__")
     submodules = [audb.core, audb.info]
     for submodule in submodules:
         for attr in submodule_standard_attrs:
