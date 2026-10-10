@@ -5,6 +5,7 @@ audb
 |tests| |coverage| |docs| |python-versions| |license|
 
 **audb** manages your annotated media files.
+DEBUG
 
 Databases used in machine learning
 should be easily exchangeable
