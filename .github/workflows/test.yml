@@ -59,8 +59,10 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
 
     - name: Install requested pandas version
+      # pandas<2.2 requires numpy<2,
+      # but pyarrow>=26 requires numpy>=2
       run: |
-        uv add "${{ matrix.pandas }}"
+        uv add "${{ matrix.pandas }}" "pyarrow<26"
       if: matrix.pandas
 
     - name: Sync Python environment
