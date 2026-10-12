@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.14.0
+                v1.15.0
               </div>
             
           
@@ -192,10 +192,10 @@ but share the cache with <a class="reference internal" href="audb.load.html#audb
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – name of database</p></li>
-<li><p><strong>table</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – load table from database</p></li>
-<li><p><strong>version</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – version of database</p></li>
-<li><p><strong>map</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span>) – map scheme or scheme fields to column values.
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – name of database</p></li>
+<li><p><strong>table</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – load table from database</p></li>
+<li><p><strong>version</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – version of database</p></li>
+<li><p><strong>map</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span>) – map scheme or scheme fields to column values.
 For example if your table holds a column <code class="docutils literal notranslate"><span class="pre">speaker</span></code> with
 speaker IDs, which is assigned to a scheme that contains a
 dict mapping speaker IDs to age and gender entries,
@@ -204,40 +204,40 @@ will replace the column with two new columns that map ID
 values to age and gender, respectively.
 To also keep the original column with speaker IDS, you can do
 <code class="docutils literal notranslate"><span class="pre">map={'speaker':</span> <span class="pre">['speaker',</span> <span class="pre">'age',</span> <span class="pre">'gender']}</span></code></p></li>
-<li><p><strong>pickle_tables</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+<li><p><strong>pickle_tables</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>,
 tables are cached locally
 in their original format
 and as pickle files.
 This allows for faster loading,
 when loading from cache</p></li>
-<li><p><strong>cache_root</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – cache folder where databases are stored.
+<li><p><strong>cache_root</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – cache folder where databases are stored.
 If not set <a class="reference internal" href="audb.default_cache_root.html#audb.default_cache_root" title="audb.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.default_cache_root()</span></code></a> is used</p></li>
-<li><p><strong>num_workers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – number of parallel jobs or 1 for sequential
+<li><p><strong>num_workers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – number of parallel jobs or 1 for sequential
 processing. If <code class="docutils literal notranslate"><span class="pre">None</span></code> will be set to the number of
 processors on the machine multiplied by 5</p></li>
-<li><p><strong>verbose</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – show debug messages</p></li>
+<li><p><strong>verbose</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – show debug messages</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>database table</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if a table is requested
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – if a table is requested
     that is not part of the database</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s2">"emodb"</span><span class="p">,</span> <span class="s2">"emotion"</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
 <span class="go">                   emotion  emotion.confidence</span>
 <span class="go">file</span>
 <span class="go">wav/03a01Fa.wav  happiness                0.90</span>
 <span class="go">wav/03a01Nc.wav    neutral                1.00</span>
 <span class="go">wav/03a01Wa.wav      anger                0.95</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;files&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span><span class="s2">"emodb"</span><span class="p">,</span> <span class="s2">"files"</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
 <span class="go">                                 duration speaker transcription</span>
 <span class="go">file</span>
@@ -245,10 +245,10 @@ processors on the machine multiplied by 5</p></li>
 <span class="go">wav/03a01Nc.wav    0 days 00:00:01.611250       3           a01</span>
 <span class="go">wav/03a01Wa.wav 0 days 00:00:01.877812500       3           a01</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="s2">&quot;files&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="nb">map</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="s2">&quot;age&quot;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">"emodb"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"files"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="nb">map</span><span class="o">=</span><span class="p">{</span><span class="s2">"speaker"</span><span class="p">:</span> <span class="s2">"age"</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
@@ -286,7 +286,7 @@ processors on the machine multiplied by 5</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/10/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

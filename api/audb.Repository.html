@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.14.0
+                v1.15.0
               </div>
             
           
@@ -203,15 +203,15 @@ to access the repository.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – repository name</p></li>
-<li><p><strong>host</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – repository host</p></li>
-<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – repository backend</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – repository name</p></li>
+<li><p><strong>host</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – repository host</p></li>
+<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – repository backend</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Repository</span><span class="p">(</span><span class="s2">&quot;data-local&quot;</span><span class="p">,</span> <span class="s2">&quot;/data&quot;</span><span class="p">,</span> <span class="s2">&quot;file-system&quot;</span><span class="p">)</span>
-<span class="go">Repository(&#39;data-local&#39;, &#39;/data&#39;, &#39;file-system&#39;)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Repository</span><span class="p">(</span><span class="s2">"data-local"</span><span class="p">,</span> <span class="s2">"/data"</span><span class="p">,</span> <span class="s2">"file-system"</span><span class="p">)</span>
+<span class="go">Repository('data-local', '/data', 'file-system')</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -227,7 +227,7 @@ to access the repository.</p>
 <dd class="field-odd"><p><strong>other</strong> – repository instance</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the string representation of the repositories matches</p>
@@ -283,13 +283,13 @@ The backend is stored as the inside the <code class="docutils literal notranslat
 of the returned backend interface.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v3.0.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#type" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v3.0.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</span></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>interface to repository</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if a non-supported backend is requested</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – if a non-supported backend is requested</p>
 </dd>
 </dl>
 </dd></dl>
@@ -326,9 +326,9 @@ to an actual backend class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – name of the backend,
+<li><p><strong>backend_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – name of the backend,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;file-system&quot;</span></code></p></li>
-<li><p><strong>backend_class</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v3.0.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</span>) – class of the backend,
+<li><p><strong>backend_class</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#type" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v3.0.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</span>) – class of the backend,
 that should be associated with <code class="docutils literal notranslate"><span class="pre">backend_name</span></code>,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbackend.backend.Filesystem&quot;</span></code></p></li>
 </ul>
@@ -336,7 +336,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">audbackend</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;file-system&quot;</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">"file-system"</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -367,7 +367,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/10/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

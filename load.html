@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.14.0
+                v1.15.0
               </div>
             
           
@@ -167,12 +167,12 @@ as <a class="reference internal" href="api/audb.load.html#audb.load" title="audb
 for the latest available version,
 but it will ensure your code returns the same data,
 even if a new version of the database is published.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"emodb"</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span> <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="api/audb.load.html#audb.load" title="audb.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a> will download the data,
 store them in a cache folder,
-and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
+and return the database as an <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat v1.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a> object.
 The most important content of that object
 are the database tables.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">tables</span>
@@ -202,8 +202,8 @@ are the database tables.</p>
 </pre></div>
 </div>
 <p>They contain the annotations of the database,
-and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+and can be requested as a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">"emotion"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="go">                   emotion  emotion.confidence</span>
 <span class="go">file</span>
 <span class="go">wav/03a01Fa.wav  happiness                0.90</span>
@@ -221,8 +221,8 @@ and can be requested as a <a class="reference external" href="https://pandas.pyd
 <span class="go">[535 rows x 2 columns]</span>
 </pre></div>
 </div>
-<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v3.0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">][</span><span class="s2">&quot;duration&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<p>Or you can directly request single columns as <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v3.0.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">"files"</span><span class="p">][</span><span class="s2">"duration"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="go">file</span>
 <span class="go">wav/03a01Fa.wav      0 days 00:00:01.898250</span>
 <span class="go">wav/03a01Nc.wav      0 days 00:00:01.611250</span>
@@ -263,8 +263,8 @@ The following properties can be changed.</p>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">24</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32 (WAV only)</span>
 <span class="nt">format</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;wav&#39;</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;flac&#39;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'wav'</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'flac'</span>
 <span class="nt">channels</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">        </span><span class="c1"># select first channel</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-1</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># select first and last channel</span>
@@ -286,9 +286,9 @@ to FLAC with a sampling rate of 44100 Hz.
 For each flavor a sub-folder will be created
 inside the <a class="reference internal" href="caching.html#caching"><span class="std std-ref">cache</span></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
-    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;flac&quot;</span><span class="p">,</span>
+    <span class="s2">"emodb"</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">"flac"</span><span class="p">,</span>
     <span class="n">sampling_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
@@ -296,17 +296,17 @@ inside the <a class="reference internal" href="caching.html#caching"><span class
 </div>
 <p>The flavor information of a database is stored
 inside the <code class="docutils literal notranslate"><span class="pre">db.meta[&quot;audb&quot;]</span></code> dictionary.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;audb&quot;</span><span class="p">][</span><span class="s2">&quot;flavor&quot;</span><span class="p">]</span>
-<span class="go">{&#39;bit_depth&#39;: None,</span>
-<span class="go"> &#39;channels&#39;: None,</span>
-<span class="go"> &#39;format&#39;: &#39;flac&#39;,</span>
-<span class="go"> &#39;mixdown&#39;: False,</span>
-<span class="go"> &#39;sampling_rate&#39;: 44100}</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">"audb"</span><span class="p">][</span><span class="s2">"flavor"</span><span class="p">]</span>
+<span class="go">{'bit_depth': None,</span>
+<span class="go"> 'channels': None,</span>
+<span class="go"> 'format': 'flac',</span>
+<span class="go"> 'mixdown': False,</span>
+<span class="go"> 'sampling_rate': 44100}</span>
 </pre></div>
 </div>
 <p>You can list all available flavors and their locations in the cache with:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">cached</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="s2">&quot;complete&quot;</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">,</span> <span class="s2">&quot;sampling_rate&quot;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"version"</span><span class="p">,</span> <span class="s2">"complete"</span><span class="p">,</span> <span class="s2">"format"</span><span class="p">,</span> <span class="s2">"sampling_rate"</span><span class="p">]]</span>
 <span class="go">         name version  complete format sampling_rate</span>
 <span class="go">0       emodb   1.4.1     False   flac         44100</span>
 <span class="go">1       emodb   1.4.1     False   None          None</span>
@@ -322,7 +322,7 @@ or if some table or media files are still missing.</p>
 of a database.
 In that case media files are not loaded,
 but all the tables and the header.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span> <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"emodb"</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span> <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>For databases with many annotations,
@@ -333,7 +333,7 @@ Or if you are only interested
 in parts of the header,
 have a look at the <a class="reference internal" href="api/audb.info.html#module-audb.info" title="audb.info"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb.info</span></code></a> module.
 It can list all table definitions.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">tables</span><span class="p">(</span><span class="s2">"emodb"</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">)</span>
 <span class="go">emotion:</span>
 <span class="go">  type: filewise</span>
 <span class="go">  columns:</span>
@@ -360,8 +360,8 @@ It can list all table definitions.</p>
 </pre></div>
 </div>
 <p>Or get the total duration of all media files.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
-<span class="go">Timedelta(&#39;0 days 00:24:47.092187500&#39;)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">"emodb"</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">)</span>
+<span class="go">Timedelta('0 days 00:24:47.092187500')</span>
 </pre></div>
 </div>
 <p>See <a class="reference internal" href="api/audb.info.html#module-audb.info" title="audb.info"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb.info</span></code></a> for a list of all available options.</p>
@@ -381,9 +381,9 @@ we can do the following.
 First, we download the table with information
 about the speakers (here <code class="docutils literal notranslate"><span class="pre">db[&quot;files&quot;]</span></code>):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
-    <span class="n">tables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">],</span>
+    <span class="s2">"emodb"</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span>
+    <span class="n">tables</span><span class="o">=</span><span class="p">[</span><span class="s2">"files"</span><span class="p">],</span>
     <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -406,7 +406,7 @@ By setting <code class="docutils literal notranslate"><span class="pre">full_pat
 we further ensure that the paths
 in the table index are relative
 and therefore match the paths on the backend.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">speaker</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">][</span><span class="s2">&quot;speaker&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">speaker</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">"files"</span><span class="p">][</span><span class="s2">"speaker"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">speaker</span>
 <span class="go">file</span>
 <span class="go">wav/03a01Fa.wav     3</span>
@@ -427,34 +427,34 @@ and therefore match the paths on the backend.</p>
 <p>Now, we use the column with speaker IDs
 to get a list of media files
 that belong to speaker 3.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">media</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">speaker</span> <span class="o">==</span> <span class="mi">3</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">media</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">"files"</span><span class="p">]</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">speaker</span> <span class="o">==</span> <span class="mi">3</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">media</span>
-<span class="go">Index([&#39;wav/03a01Fa.wav&#39;, &#39;wav/03a01Nc.wav&#39;, &#39;wav/03a01Wa.wav&#39;,</span>
-<span class="go">       &#39;wav/03a02Fc.wav&#39;, &#39;wav/03a02Nc.wav&#39;, &#39;wav/03a02Ta.wav&#39;,</span>
-<span class="go">       &#39;wav/03a02Wb.wav&#39;, &#39;wav/03a02Wc.wav&#39;, &#39;wav/03a04Ad.wav&#39;,</span>
-<span class="go">       &#39;wav/03a04Fd.wav&#39;, &#39;wav/03a04Lc.wav&#39;, &#39;wav/03a04Nc.wav&#39;,</span>
-<span class="go">       &#39;wav/03a04Ta.wav&#39;, &#39;wav/03a04Wc.wav&#39;, &#39;wav/03a05Aa.wav&#39;,</span>
-<span class="go">       &#39;wav/03a05Fc.wav&#39;, &#39;wav/03a05Nd.wav&#39;, &#39;wav/03a05Tc.wav&#39;,</span>
-<span class="go">       &#39;wav/03a05Wa.wav&#39;, &#39;wav/03a05Wb.wav&#39;, &#39;wav/03a07Fa.wav&#39;,</span>
-<span class="go">       &#39;wav/03a07Fb.wav&#39;, &#39;wav/03a07La.wav&#39;, &#39;wav/03a07Nc.wav&#39;,</span>
-<span class="go">       &#39;wav/03a07Wc.wav&#39;, &#39;wav/03b01Fa.wav&#39;, &#39;wav/03b01Lb.wav&#39;,</span>
-<span class="go">       &#39;wav/03b01Nb.wav&#39;, &#39;wav/03b01Td.wav&#39;, &#39;wav/03b01Wa.wav&#39;,</span>
-<span class="go">       &#39;wav/03b01Wc.wav&#39;, &#39;wav/03b02Aa.wav&#39;, &#39;wav/03b02La.wav&#39;,</span>
-<span class="go">       &#39;wav/03b02Na.wav&#39;, &#39;wav/03b02Tb.wav&#39;, &#39;wav/03b02Wb.wav&#39;,</span>
-<span class="go">       &#39;wav/03b03Nb.wav&#39;, &#39;wav/03b03Tc.wav&#39;, &#39;wav/03b03Wc.wav&#39;,</span>
-<span class="go">       &#39;wav/03b09La.wav&#39;, &#39;wav/03b09Nc.wav&#39;, &#39;wav/03b09Tc.wav&#39;,</span>
-<span class="go">       &#39;wav/03b09Wa.wav&#39;, &#39;wav/03b10Ab.wav&#39;, &#39;wav/03b10Ec.wav&#39;,</span>
-<span class="go">       &#39;wav/03b10Na.wav&#39;, &#39;wav/03b10Nc.wav&#39;, &#39;wav/03b10Wb.wav&#39;,</span>
-<span class="go">       &#39;wav/03b10Wc.wav&#39;],</span>
-<span class="go">      dtype=&#39;string&#39;, name=&#39;file&#39;)</span>
+<span class="go">Index(['wav/03a01Fa.wav', 'wav/03a01Nc.wav', 'wav/03a01Wa.wav',</span>
+<span class="go">       'wav/03a02Fc.wav', 'wav/03a02Nc.wav', 'wav/03a02Ta.wav',</span>
+<span class="go">       'wav/03a02Wb.wav', 'wav/03a02Wc.wav', 'wav/03a04Ad.wav',</span>
+<span class="go">       'wav/03a04Fd.wav', 'wav/03a04Lc.wav', 'wav/03a04Nc.wav',</span>
+<span class="go">       'wav/03a04Ta.wav', 'wav/03a04Wc.wav', 'wav/03a05Aa.wav',</span>
+<span class="go">       'wav/03a05Fc.wav', 'wav/03a05Nd.wav', 'wav/03a05Tc.wav',</span>
+<span class="go">       'wav/03a05Wa.wav', 'wav/03a05Wb.wav', 'wav/03a07Fa.wav',</span>
+<span class="go">       'wav/03a07Fb.wav', 'wav/03a07La.wav', 'wav/03a07Nc.wav',</span>
+<span class="go">       'wav/03a07Wc.wav', 'wav/03b01Fa.wav', 'wav/03b01Lb.wav',</span>
+<span class="go">       'wav/03b01Nb.wav', 'wav/03b01Td.wav', 'wav/03b01Wa.wav',</span>
+<span class="go">       'wav/03b01Wc.wav', 'wav/03b02Aa.wav', 'wav/03b02La.wav',</span>
+<span class="go">       'wav/03b02Na.wav', 'wav/03b02Tb.wav', 'wav/03b02Wb.wav',</span>
+<span class="go">       'wav/03b03Nb.wav', 'wav/03b03Tc.wav', 'wav/03b03Wc.wav',</span>
+<span class="go">       'wav/03b09La.wav', 'wav/03b09Nc.wav', 'wav/03b09Tc.wav',</span>
+<span class="go">       'wav/03b09Wa.wav', 'wav/03b10Ab.wav', 'wav/03b10Ec.wav',</span>
+<span class="go">       'wav/03b10Na.wav', 'wav/03b10Nc.wav', 'wav/03b10Wb.wav',</span>
+<span class="go">       'wav/03b10Wc.wav'],</span>
+<span class="go">      dtype='string', name='file')</span>
 </pre></div>
 </div>
 <p>Finally, we load the database again
 and use the list to request
 only the data of this speaker.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
+    <span class="s2">"emodb"</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span>
     <span class="n">media</span><span class="o">=</span><span class="n">media</span><span class="p">,</span>
     <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -464,7 +464,7 @@ only the data of this speaker.</p>
 <p>This will also remove
 entries of other speakers
 from the tables.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;emotion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="p">[</span><span class="s2">"emotion"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 <span class="go">                   emotion  emotion.confidence</span>
 <span class="go">file</span>
 <span class="go">wav/03a01Fa.wav  happiness                0.90</span>
@@ -486,9 +486,9 @@ in each iteration.
 The table and media files
 are still stored in the cache.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
-    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;emotion&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
+    <span class="s2">"emodb"</span><span class="p">,</span>
+    <span class="s2">"emotion"</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -496,7 +496,7 @@ are still stored in the cache.</p>
 </pre></div>
 </div>
 <p>It returns an <a class="reference internal" href="api/audb.DatabaseIterator.html#audb.DatabaseIterator" title="audb.DatabaseIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.DatabaseIterator</span></code></a> object,
-which behaves as <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a>,
+which behaves as <a class="reference external" href="https://audeering.github.io/audformat/api/audformat.Database.html#audformat.Database" title="(in audformat v1.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audformat.Database</span></code></a>,
 but provides the ability
 to iterate over the database:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
@@ -516,9 +516,9 @@ into an buffer and selected randomly from those.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
-    <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;emotion&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.4.1&quot;</span><span class="p">,</span>
+    <span class="s2">"emodb"</span><span class="p">,</span>
+    <span class="s2">"emotion"</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">"1.4.1"</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">buffer_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span>
@@ -563,7 +563,7 @@ into an buffer and selected randomly from those.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/10/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

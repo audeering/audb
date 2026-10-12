@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.14.0
+                v1.15.0
               </div>
             
           
@@ -189,7 +189,7 @@
     <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span><span class="p">,</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CachedVersions</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find other cached versions of same flavor.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Find other cached versions of same flavor."""</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">cached</span><span class="p">(</span><span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
     <span class="c1"># If no explicit cache root is given,</span>
     <span class="c1"># we look into the private and shared one.</span>
@@ -200,16 +200,16 @@
         <span class="c1"># which can occur if cache and shared cache</span>
         <span class="c1"># point to the same folder.</span>
         <span class="c1"># Compare https://github.com/audeering/audb/issues/314</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">)]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s2">"first"</span><span class="p">)]</span>
 
     <span class="n">cached_versions</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">flavor_root</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;flavor_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">flavor</span><span class="o">.</span><span class="n">short_id</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">version</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">"flavor_id"</span><span class="p">]</span> <span class="o">==</span> <span class="n">flavor</span><span class="o">.</span><span class="n">short_id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">"version"</span><span class="p">]</span> <span class="o">==</span> <span class="n">version</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">deps</span> <span class="o">=</span> <span class="n">dependencies</span><span class="p">(</span>
                 <span class="n">name</span><span class="p">,</span>
-                <span class="n">version</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">],</span>
+                <span class="n">version</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">"version"</span><span class="p">],</span>
                 <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="c1"># as it is more likely we find files</span>
@@ -217,7 +217,7 @@
             <span class="n">cached_versions</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
                 <span class="mi">0</span><span class="p">,</span>
                 <span class="p">(</span>
-                    <span class="n">audeer</span><span class="o">.</span><span class="n">StrictVersion</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]),</span>
+                    <span class="n">audeer</span><span class="o">.</span><span class="n">StrictVersion</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"version"</span><span class="p">]),</span>
                     <span class="nb">str</span><span class="p">(</span><span class="n">flavor_root</span><span class="p">),</span>
                     <span class="n">deps</span><span class="p">,</span>
                 <span class="p">),</span>
@@ -233,7 +233,7 @@
     <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find cached files.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Find cached files.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        files: media, attachment files, or table IDs</span>
@@ -250,7 +250,7 @@
 <span class="sd">        ``&lt;cached_file1&gt;`` and ``&lt;missing_file1&gt;``</span>
 <span class="sd">        represent the names of media, attachment files, or table IDs</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">cached_files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">missing_files</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -262,14 +262,14 @@
 
     <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span>
         <span class="n">files</span><span class="p">,</span>
-        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Cached files&quot;</span><span class="p">,</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">"Cached files"</span><span class="p">,</span>
         <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv&quot;</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
-            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-        <span class="k">elif</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.parquet&quot;</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
-            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+        <span class="k">if</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv"</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv"</span>
+        <span class="k">elif</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.parquet"</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.parquet"</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">file_path</span> <span class="o">=</span> <span class="n">file</span>
         <span class="n">file_version</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">StrictVersion</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
@@ -305,7 +305,7 @@
     <span class="n">root_tmp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">root_dst</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Copy file."""</span>
     <span class="n">src_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_src</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
     <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_tmp</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
     <span class="n">dst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dst</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
@@ -323,7 +323,7 @@
     <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span><span class="p">,</span>
     <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if all files of a database are present in cache.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Check if all files of a database are present in cache.</span>
 
 <span class="sd">    If the database is complete,</span>
 <span class="sd">    a ``.complete`` file is created</span>
@@ -341,7 +341,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        ``True`` if the database is complete</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">attachments</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">attachment</span><span class="p">)):</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -367,14 +367,14 @@
     <span class="n">files</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="n">durs</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">files</span><span class="p">,</span> <span class="s2">&quot;duration&quot;</span><span class="p">]</span>
+    <span class="n">durs</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">files</span><span class="p">,</span> <span class="s2">"duration"</span><span class="p">]</span>
     <span class="n">durs</span> <span class="o">=</span> <span class="n">durs</span><span class="p">[</span><span class="n">durs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="n">durs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">durs</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
-    <span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;file&quot;</span>
+    <span class="n">durs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">durs</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">"s"</span><span class="p">)</span>
+    <span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"file"</span>
     <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">durs</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span><span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
     <span class="c1"># Norm file path under Windows to include `\`</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>  <span class="c1"># pragma: nocover as tested in Windows runner</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"nt"</span><span class="p">:</span>  <span class="c1"># pragma: nocover as tested in Windows runner</span>
         <span class="n">durs</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">map_file_path</span><span class="p">(</span>
             <span class="n">durs</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">,</span>
@@ -384,7 +384,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_flavor_files</span><span class="p">(</span><span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Media files that are affected when requesting a flavor.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Media files that are affected when requesting a flavor.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        deps: database dependencies</span>
@@ -392,7 +392,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        media files containing audio</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span>
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
@@ -407,7 +407,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy files from cache.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Copy files from cache.</span>
 
 <span class="sd">    This function copies all files</span>
 <span class="sd">    associated with the requested attachments</span>
@@ -426,9 +426,9 @@
 <span class="sd">        verbose: if ``True`` show progress bar</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        list of attachment IDs that couldn&#39;t be found in cache</span>
+<span class="sd">        list of attachment IDs that couldn't be found in cache</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">db_root_cached</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cached_versions</span><span class="p">]</span>
 
     <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment</span><span class="p">]</span><span class="o">.</span><span class="n">path</span> <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">attachments</span><span class="p">]</span>
@@ -455,7 +455,7 @@
             <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">root</span><span class="p">,</span> <span class="n">path</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">cached_paths</span><span class="p">],</span>
             <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
             <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-            <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Copy attachments&quot;</span><span class="p">,</span>
+            <span class="n">task_description</span><span class="o">=</span><span class="s2">"Copy attachments"</span><span class="p">,</span>
             <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -474,7 +474,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy files from cache.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Copy files from cache.</span>
 
 <span class="sd">    This function copies requested media files</span>
 <span class="sd">    or table files</span>
@@ -485,8 +485,8 @@
 <span class="sd">        files: sequence of media files,</span>
 <span class="sd">            attachment IDs,</span>
 <span class="sd">            or table IDs</span>
-<span class="sd">        files_type: ``&#39;media&#39;``,</span>
-<span class="sd">            ``&#39;table&#39;``,</span>
+<span class="sd">        files_type: ``'media'``,</span>
+<span class="sd">            ``'table'``,</span>
 <span class="sd">        db_root: database root</span>
 <span class="sd">        deps: dependency object</span>
 <span class="sd">        cached_versions: object containing information</span>
@@ -496,9 +496,9 @@
 <span class="sd">        verbose: if ``True`` show progress bar</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        list of files that couldn&#39;t be found in cache</span>
+<span class="sd">        list of files that couldn't be found in cache</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">db_root_cached</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cached_versions</span><span class="p">]</span>
 
     <span class="k">try</span><span class="p">:</span>
@@ -517,11 +517,11 @@
 
             <span class="c1"># Tables are stored as CSV or PARQUET files,</span>
             <span class="c1"># and are also cached as PKL files</span>
-            <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">"table"</span><span class="p">:</span>
 
                 <span class="k">def</span><span class="w"> </span><span class="nf">job</span><span class="p">(</span><span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;parquet&quot;</span><span class="p">,</span> <span class="s2">&quot;pkl&quot;</span><span class="p">]:</span>
-                        <span class="n">table_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"csv"</span><span class="p">,</span> <span class="s2">"parquet"</span><span class="p">,</span> <span class="s2">"pkl"</span><span class="p">]:</span>
+                        <span class="n">table_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
                         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">table_file</span><span class="p">)):</span>
                             <span class="n">_copy_path</span><span class="p">(</span><span class="n">table_file</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">db_root</span><span class="p">)</span>
 
@@ -535,7 +535,7 @@
                 <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">cached_files</span><span class="p">],</span>
                 <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
                 <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-                <span class="n">task_description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Copy </span><span class="si">{</span><span class="n">files_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">task_description</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Copy </span><span class="si">{</span><span class="n">files_type</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -556,7 +556,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load attachments from backend.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load attachments from backend."""</span>
     <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_root</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment</span><span class="p">]</span><span class="o">.</span><span class="n">path</span> <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">attachments</span><span class="p">]</span>
@@ -568,7 +568,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">job</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">archive</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;attachment&quot;</span><span class="p">,</span> <span class="n">archive</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"attachment"</span><span class="p">,</span> <span class="n">archive</span> <span class="o">+</span> <span class="s2">".zip"</span><span class="p">)</span>
         <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
             <span class="n">archive</span><span class="p">,</span>
             <span class="n">db_root_tmp</span><span class="p">,</span>
@@ -588,7 +588,7 @@
         <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">path</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Load attachments&quot;</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s2">"Load attachments"</span><span class="p">,</span>
         <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -605,7 +605,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media from backend.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load media from backend."""</span>
     <span class="c1"># figure out archives</span>
     <span class="n">archives</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">archive_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -635,7 +635,7 @@
     <span class="n">flavor_files</span> <span class="o">=</span> <span class="n">_flavor_files</span><span class="p">(</span><span class="n">deps</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">job</span><span class="p">(</span><span class="n">archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;media&quot;</span><span class="p">,</span> <span class="n">archive</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span><span class="p">)</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"media"</span><span class="p">,</span> <span class="n">archive</span> <span class="o">+</span> <span class="s2">".zip"</span><span class="p">)</span>
         <span class="c1"># extract and move all files that are stored in the archive,</span>
         <span class="c1"># even if only a single file from the archive was requested</span>
         <span class="n">files</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
@@ -645,8 +645,8 @@
             <span class="n">tmp_root</span><span class="o">=</span><span class="n">db_root_tmp</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-                <span class="n">file</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"nt"</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s2">"/"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">flavor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">flavor_files</span><span class="p">:</span>
                 <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">bit_depth</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                 <span class="n">channels</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">channels</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
@@ -674,7 +674,7 @@
         <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">archive</span><span class="p">,</span> <span class="n">version</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">archive</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">archives</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Load media&quot;</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s2">"Load media"</span><span class="p">,</span>
         <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -691,7 +691,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load tables from backend.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load tables from backend.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        db: database</span>
@@ -711,16 +711,16 @@
 <span class="sd">        num_workers: number of workers</span>
 <span class="sd">        verbose: if ``True``, show progress bar</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_root</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">job</span><span class="p">(</span><span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">csv_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-        <span class="n">parquet_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+        <span class="n">csv_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.csv"</span>
+        <span class="n">parquet_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet"</span>
 
         <span class="k">if</span> <span class="n">csv_file</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
             <span class="n">table_file</span> <span class="o">=</span> <span class="n">csv_file</span>
-            <span class="n">remote_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.zip&quot;</span><span class="p">)</span>
+            <span class="n">remote_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"meta"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.zip"</span><span class="p">)</span>
             <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_archive</span><span class="p">(</span>
                 <span class="n">remote_file</span><span class="p">,</span>
                 <span class="n">db_root_tmp</span><span class="p">,</span>
@@ -730,7 +730,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">table_file</span> <span class="o">=</span> <span class="n">parquet_file</span>
             <span class="n">remote_file</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+                <span class="s2">"/"</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"meta"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet"</span>
             <span class="p">)</span>
             <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span>
                 <span class="n">remote_file</span><span class="p">,</span>
@@ -742,8 +742,8 @@
 
         <span class="c1"># Cache table as PKL file</span>
         <span class="k">if</span> <span class="n">pickle_tables</span><span class="p">:</span>
-            <span class="n">pickle_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.pkl&quot;</span>
-            <span class="n">table_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">pickle_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.pkl"</span>
+            <span class="n">table_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">db</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">table_path</span><span class="p">)</span>
             <span class="n">db</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
                 <span class="n">table_path</span><span class="p">,</span>
@@ -763,7 +763,7 @@
         <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">table</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Load tables&quot;</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s2">"Load tables"</span><span class="p">,</span>
         <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -783,7 +783,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CachedVersions</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load attachments to cache.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load attachments to cache.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        attachments: list of attachment IDs</span>
@@ -804,7 +804,7 @@
 <span class="sd">        cached versions object</span>
 <span class="sd">            if other versions of the database are found in cache</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">missing_attachments</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">attachments</span><span class="p">:</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment</span><span class="p">]</span><span class="o">.</span><span class="n">path</span>
@@ -863,7 +863,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CachedVersions</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load files to cache.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load files to cache.</span>
 
 <span class="sd">    Loads media files,</span>
 <span class="sd">    attachment files,</span>
@@ -878,9 +878,9 @@
 <span class="sd">        files: list of media files,</span>
 <span class="sd">            attachment files,</span>
 <span class="sd">            or table IDs</span>
-<span class="sd">        files_type: ``&#39;media&#39;``,</span>
-<span class="sd">            ``&#39;table&#39;``,</span>
-<span class="sd">            or ``&#39;attachment&#39;``</span>
+<span class="sd">        files_type: ``'media'``,</span>
+<span class="sd">            ``'table'``,</span>
+<span class="sd">            or ``'attachment'``</span>
 <span class="sd">        backend_interface: backend object</span>
 <span class="sd">        db_root: database root</span>
 <span class="sd">        db: database object</span>
@@ -906,7 +906,7 @@
 <span class="sd">        cached versions object</span>
 <span class="sd">            if other versions of the database are found in cache</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">scan_for_missing_files</span><span class="p">:</span>
         <span class="n">missing_files</span> <span class="o">=</span> <span class="n">_missing_files</span><span class="p">(</span>
             <span class="n">files</span><span class="p">,</span>
@@ -941,7 +941,7 @@
         <span class="k">if</span> <span class="n">missing_files</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">backend_interface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">&quot;media&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">"media"</span><span class="p">:</span>
                 <span class="n">_get_media_from_backend</span><span class="p">(</span>
                     <span class="n">db</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                     <span class="n">missing_files</span><span class="p">,</span>
@@ -952,7 +952,7 @@
                     <span class="n">num_workers</span><span class="p">,</span>
                     <span class="n">verbose</span><span class="p">,</span>
                 <span class="p">)</span>
-            <span class="k">elif</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">"table"</span><span class="p">:</span>
                 <span class="n">_get_tables_from_backend</span><span class="p">(</span>
                     <span class="n">db</span><span class="p">,</span>
                     <span class="n">missing_files</span><span class="p">,</span>
@@ -970,7 +970,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_misc_tables_used_in_scheme</span><span class="p">(</span>
     <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;List of misc tables that are used inside a scheme.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""List of misc tables that are used inside a scheme.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        db: database object</span>
@@ -978,7 +978,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        unique list of misc tables used in schemes</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">misc_tables_used_in_scheme</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">scheme</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">schemes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">scheme</span><span class="o">.</span><span class="n">uses_table</span><span class="p">:</span>
@@ -990,7 +990,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_misc_tables_used_in_table</span><span class="p">(</span>
     <span class="n">table</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Table</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;List of misc tables that are used inside schemes of a table.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""List of misc tables that are used inside schemes of a table.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        table: table object</span>
@@ -998,7 +998,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        unique list of misc tables used in schemes of the table</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">misc_tables_used_in_table</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">column_id</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">scheme_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1016,7 +1016,7 @@
     <span class="n">deps</span><span class="p">:</span> <span class="n">Dependencies</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;List missing files.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""List missing files.</span>
 
 <span class="sd">    Checks for media files,</span>
 <span class="sd">    attachment files,</span>
@@ -1028,9 +1028,9 @@
 <span class="sd">        files: list of media files,</span>
 <span class="sd">            attachment files,</span>
 <span class="sd">            or table IDs</span>
-<span class="sd">        files_type: ``&#39;media&#39;``,</span>
-<span class="sd">            ``&#39;table&#39;``,</span>
-<span class="sd">            or ``&#39;attachment&#39;``</span>
+<span class="sd">        files_type: ``'media'``,</span>
+<span class="sd">            ``'table'``,</span>
+<span class="sd">            or ``'attachment'``</span>
 <span class="sd">        flavor: requested database flavor</span>
 <span class="sd">        deps: database dependencies</span>
 <span class="sd">        verbose: if ``True`` show progress bar</span>
@@ -1038,17 +1038,17 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        list of missing files or table IDs</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">&quot;media&quot;</span> <span class="ow">and</span> <span class="n">flavor</span><span class="o">.</span><span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">"media"</span> <span class="ow">and</span> <span class="n">flavor</span><span class="o">.</span><span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># media files that are converted to the flavor format</span>
         <span class="n">flavor_files</span> <span class="o">=</span> <span class="n">_flavor_files</span><span class="p">(</span><span class="n">deps</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">flavor_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">is_cached</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span>
-            <span class="n">path1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
-            <span class="n">path2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">files_type</span> <span class="o">==</span> <span class="s2">"table"</span><span class="p">:</span>
+            <span class="n">path1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.csv"</span><span class="p">)</span>
+            <span class="n">path2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">.parquet"</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path1</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path2</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">flavor_files</span><span class="p">:</span>
             <span class="c1"># https://github.com/audeering/audb/issues/324</span>
@@ -1057,7 +1057,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
 
-    <span class="n">pbar</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Scan </span><span class="si">{</span><span class="n">files_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Scan </span><span class="si">{</span><span class="n">files_type</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">file</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">pbar</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_cached</span><span class="p">(</span><span class="n">file</span><span class="p">)]</span>
 
 
@@ -1085,7 +1085,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Change the file path in all tables.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Change the file path in all tables.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        db: database object</span>
@@ -1096,7 +1096,7 @@
 <span class="sd">        num_workers: number of workers to use</span>
 <span class="sd">        verbose: if ``True`` show progress bar</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">full_path</span> <span class="ow">and</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span>
 
@@ -1129,7 +1129,7 @@
                 <span class="n">root</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="c1"># Norm file path under Windows to include `\`</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>  <span class="c1"># pragma: nocover as tested in Windows runner</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"nt"</span><span class="p">:</span>  <span class="c1"># pragma: nocover as tested in Windows runner</span>
                 <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">map_file_path</span><span class="p">(</span>
                     <span class="n">table</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">,</span>
@@ -1141,7 +1141,7 @@
         <span class="n">params</span><span class="o">=</span><span class="p">[([</span><span class="n">table</span><span class="p">],</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
         <span class="n">progress_bar</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-        <span class="n">task_description</span><span class="o">=</span><span class="s2">&quot;Update file path&quot;</span><span class="p">,</span>
+        <span class="n">task_description</span><span class="o">=</span><span class="s2">"Update file path"</span><span class="p">,</span>
         <span class="n">maximum_refresh_time</span><span class="o">=</span><span class="n">define</span><span class="o">.</span><span class="n">MAXIMUM_REFRESH_TIME</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -1153,7 +1153,7 @@
     <span class="n">tables</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Filter media by tables.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Filter media by tables.</span>
 
 <span class="sd">    Return all media files from ``media``</span>
 <span class="sd">    that are referenced in at least one table</span>
@@ -1171,14 +1171,14 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        filtered dependencies</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">deps</span> <span class="o">=</span> <span class="n">dependencies</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">tables</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">media</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Load header to get list of tables</span>
         <span class="n">db</span> <span class="o">=</span> <span class="n">load_header</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">)</span>
-        <span class="n">tables</span> <span class="o">=</span> <span class="n">filter_deps</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">),</span> <span class="s2">&quot;table&quot;</span><span class="p">)</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="n">filter_deps</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">),</span> <span class="s2">"table"</span><span class="p">)</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">misc_tables</span><span class="p">)]</span>
         <span class="c1"># Gather media files from tables</span>
         <span class="n">available_media</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1190,10 +1190,10 @@
                 <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">available_media</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+            <span class="n">available_media</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">"file"</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_media</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">media</span> <span class="o">=</span> <span class="n">filter_deps</span><span class="p">(</span><span class="n">media</span><span class="p">,</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">,</span> <span class="s2">&quot;media&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+            <span class="n">media</span> <span class="o">=</span> <span class="n">filter_deps</span><span class="p">(</span><span class="n">media</span><span class="p">,</span> <span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">,</span> <span class="s2">"media"</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
             <span class="n">available_media</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">media</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">available_media</span><span class="p">))]</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">available_media</span><span class="p">]</span>
 
@@ -1223,7 +1223,7 @@
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load database.</span>
 
 <span class="sd">    Loads meta and media files of a database to the local cache and returns</span>
 <span class="sd">    a :class:`audformat.Database` object.</span>
@@ -1257,7 +1257,7 @@
 <span class="sd">            and ``channels=[1]`` returns the second channel</span>
 <span class="sd">            of all multi-channel files</span>
 <span class="sd">            and all mono files</span>
-<span class="sd">        format: file format, one of ``&#39;flac&#39;``, ``&#39;wav&#39;``</span>
+<span class="sd">        format: file format, one of ``'flac'``, ``'wav'``</span>
 <span class="sd">        mixdown: apply mono mix-down</span>
 <span class="sd">        sampling_rate: sampling rate in Hz, one of</span>
 <span class="sd">            ``8000``, ``16000``, ``22050``, ``24000``, ``44100``, ``48000``</span>
@@ -1316,17 +1316,17 @@
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; db = audb.load(</span>
-<span class="sd">        ...     &quot;emodb&quot;,</span>
-<span class="sd">        ...     version=&quot;1.4.1&quot;,</span>
-<span class="sd">        ...     tables=[&quot;emotion&quot;, &quot;files&quot;],</span>
+<span class="sd">        ...     "emodb",</span>
+<span class="sd">        ...     version="1.4.1",</span>
+<span class="sd">        ...     tables=["emotion", "files"],</span>
 <span class="sd">        ...     only_metadata=True,</span>
 <span class="sd">        ...     full_path=False,</span>
 <span class="sd">        ...     verbose=False,</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; list(db.tables)</span>
-<span class="sd">        [&#39;emotion&#39;, &#39;files&#39;]</span>
+<span class="sd">        ['emotion', 'files']</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -1341,9 +1341,9 @@
     <span class="n">scan_for_missing_files</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">is_empty</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">shimmer</span><span class="p">(</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;Get:   &quot;</span><span class="p">,</span>
-        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Cache: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">"Get:   "</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Cache: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">enabled</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">db</span> <span class="o">=</span> <span class="n">_load</span><span class="p">(</span>
@@ -1387,12 +1387,12 @@
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">scan_for_missing_files</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database without the progress animation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load database without the progress animation.</span>
 
 <span class="sd">    The body of :func:`load` lives here so that :func:`load`</span>
 <span class="sd">    only sets up and tears down the :func:`shimmer` animation.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">db</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">cached_versions</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">try</span><span class="p">:</span>
@@ -1426,7 +1426,7 @@
                 <span class="n">requested_attachments</span> <span class="o">=</span> <span class="n">filter_deps</span><span class="p">(</span>
                     <span class="n">attachments</span><span class="p">,</span>
                     <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">,</span>
-                    <span class="s2">&quot;attachment&quot;</span><span class="p">,</span>
+                    <span class="s2">"attachment"</span><span class="p">,</span>
                 <span class="p">)</span>
 
                 <span class="n">cached_versions</span> <span class="o">=</span> <span class="n">_load_attachments</span><span class="p">(</span>
@@ -1444,7 +1444,7 @@
                 <span class="p">)</span>
 
             <span class="c1"># filter tables (convert regexp pattern to list of tables)</span>
-            <span class="n">requested_tables</span> <span class="o">=</span> <span class="n">filter_deps</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">),</span> <span class="s2">&quot;table&quot;</span><span class="p">)</span>
+            <span class="n">requested_tables</span> <span class="o">=</span> <span class="n">filter_deps</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">),</span> <span class="s2">"table"</span><span class="p">)</span>
 
             <span class="c1"># Store requested tables</span>
             <span class="c1"># to provide a helpful error message</span>
@@ -1471,7 +1471,7 @@
                     <span class="c1"># as loading is done in parallel</span>
                     <span class="n">cached_versions</span> <span class="o">=</span> <span class="n">_load_files</span><span class="p">(</span>
                         <span class="n">_tables</span><span class="p">,</span>
-                        <span class="s2">&quot;table&quot;</span><span class="p">,</span>
+                        <span class="s2">"table"</span><span class="p">,</span>
                         <span class="n">backend_interface</span><span class="p">,</span>
                         <span class="n">db_root</span><span class="p">,</span>
                         <span class="n">db</span><span class="p">,</span>
@@ -1493,13 +1493,13 @@
 
             <span class="c1"># load tables</span>
             <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">requested_tables</span><span class="p">:</span>
-                <span class="n">db</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+                <span class="n">db</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">"</span><span class="p">))</span>
 
             <span class="c1"># filter media</span>
             <span class="n">requested_media</span> <span class="o">=</span> <span class="n">filter_deps</span><span class="p">(</span>
                 <span class="n">media</span><span class="p">,</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">files</span><span class="p">,</span>
-                <span class="s2">&quot;media&quot;</span><span class="p">,</span>
+                <span class="s2">"media"</span><span class="p">,</span>
                 <span class="n">name</span><span class="p">,</span>
                 <span class="n">version</span><span class="p">,</span>
                 <span class="n">media_tables</span><span class="p">,</span>
@@ -1509,7 +1509,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">db_is_complete</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">only_metadata</span><span class="p">:</span>
                 <span class="n">cached_versions</span> <span class="o">=</span> <span class="n">_load_files</span><span class="p">(</span>
                     <span class="n">requested_media</span><span class="p">,</span>
-                    <span class="s2">&quot;media&quot;</span><span class="p">,</span>
+                    <span class="s2">"media"</span><span class="p">,</span>
                     <span class="n">backend_interface</span><span class="p">,</span>
                     <span class="n">db_root</span><span class="p">,</span>
                     <span class="n">db</span><span class="p">,</span>
@@ -1559,8 +1559,8 @@
                 <span class="p">)</span>
 
             <span class="c1"># Store completeness in the returned database object</span>
-            <span class="k">if</span> <span class="s2">&quot;audb&quot;</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
-                <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;audb&quot;</span><span class="p">][</span><span class="s2">&quot;complete&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db_is_complete</span>
+            <span class="k">if</span> <span class="s2">"audb"</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">"audb"</span><span class="p">][</span><span class="s2">"complete"</span><span class="p">]</span> <span class="o">=</span> <span class="n">db_is_complete</span>
 
     <span class="k">except</span> <span class="n">filelock</span><span class="o">.</span><span class="n">Timeout</span><span class="p">:</span>
         <span class="n">utils</span><span class="o">.</span><span class="n">timeout_warning</span><span class="p">()</span>
@@ -1578,7 +1578,7 @@
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load attachment(s) of database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load attachment(s) of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -1597,24 +1597,24 @@
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; paths = audb.load_attachment(</span>
-<span class="sd">        ...     &quot;emodb&quot;,</span>
-<span class="sd">        ...     &quot;bibtex&quot;,</span>
-<span class="sd">        ...     version=&quot;1.4.1&quot;,</span>
+<span class="sd">        ...     "emodb",</span>
+<span class="sd">        ...     "bibtex",</span>
+<span class="sd">        ...     version="1.4.1",</span>
 <span class="sd">        ...     verbose=False,</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; os.path.basename(paths[0])</span>
-<span class="sd">        &#39;burkhardt2005emodb.bib&#39;</span>
+<span class="sd">        'burkhardt2005emodb.bib'</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="n">db_root</span> <span class="o">=</span> <span class="n">database_cache_root</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">shimmer</span><span class="p">(</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;Get:   &quot;</span><span class="p">,</span>
-        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Cache: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">"Get:   "</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Cache: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">enabled</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">deps</span> <span class="o">=</span> <span class="n">dependencies</span><span class="p">(</span>
@@ -1625,7 +1625,7 @@
 
         <span class="k">if</span> <span class="n">attachment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">archives</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">error_message_missing_object</span><span class="p">(</span>
-                <span class="s2">&quot;attachment&quot;</span><span class="p">,</span>
+                <span class="s2">"attachment"</span><span class="p">,</span>
                 <span class="p">[</span><span class="n">attachment</span><span class="p">],</span>
                 <span class="n">name</span><span class="p">,</span>
                 <span class="n">version</span><span class="p">,</span>
@@ -1657,7 +1657,7 @@
 
     <span class="n">attachment_files</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">attachment</span><span class="p">]</span><span class="o">.</span><span class="n">files</span>
     <span class="n">attachment_files</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>  <span class="c1"># convert &quot;/&quot; to os.sep</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>  <span class="c1"># convert "/" to os.sep</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">attachment_files</span>
     <span class="p">]</span>
     <span class="k">return</span> <span class="n">attachment_files</span></div>
@@ -1670,7 +1670,7 @@
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load header of database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load header of database.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -1681,7 +1681,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        database object without table data</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -1702,7 +1702,7 @@
     <span class="n">add_audb_meta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load database header from folder or backend.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load database header from folder or backend.</span>
 
 <span class="sd">    If the database header cannot be found in ``db_root``</span>
 <span class="sd">    it will search for the backend that contains the database,</span>
@@ -1723,22 +1723,22 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        database header and backend</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">backend_interface</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">local_header</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">local_header</span><span class="p">):</span>
         <span class="n">backend_interface</span> <span class="o">=</span> <span class="n">lookup_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
-        <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
+        <span class="n">remote_header</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">add_audb_meta</span><span class="p">:</span>
             <span class="n">db_root_tmp</span> <span class="o">=</span> <span class="n">database_tmp_root</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
             <span class="n">local_header</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">HEADER_FILE</span><span class="p">)</span>
         <span class="n">backend_interface</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">remote_header</span><span class="p">,</span> <span class="n">local_header</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">add_audb_meta</span><span class="p">:</span>
             <span class="n">db</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;audb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="n">db_root</span><span class="p">,</span>
-                <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">version</span><span class="p">,</span>
-                <span class="s2">&quot;flavor&quot;</span><span class="p">:</span> <span class="n">flavor</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">"audb"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"root"</span><span class="p">:</span> <span class="n">db_root</span><span class="p">,</span>
+                <span class="s2">"version"</span><span class="p">:</span> <span class="n">version</span><span class="p">,</span>
+                <span class="s2">"flavor"</span><span class="p">:</span> <span class="n">flavor</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">db_root_tmp</span><span class="p">,</span> <span class="n">header_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">audeer</span><span class="o">.</span><span class="n">move_file</span><span class="p">(</span>
@@ -1767,7 +1767,7 @@
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media file(s).</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load media file(s).</span>
 
 <span class="sd">    If you are interested in media files</span>
 <span class="sd">    and not the corresponding tables,</span>
@@ -1789,7 +1789,7 @@
 <span class="sd">            and ``channels=[1]`` returns the second channel</span>
 <span class="sd">            of all multi-channel files</span>
 <span class="sd">            and all mono files</span>
-<span class="sd">        format: file format, one of ``&#39;flac&#39;``, ``&#39;wav&#39;``</span>
+<span class="sd">        format: file format, one of ``'flac'``, ``'wav'``</span>
 <span class="sd">        mixdown: apply mono mix-down</span>
 <span class="sd">        sampling_rate: sampling rate in Hz, one of</span>
 <span class="sd">            ``8000``, ``16000``, ``22050``, ``24000``, ``44100``, ``48000``</span>
@@ -1816,16 +1816,16 @@
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; paths = audb.load_media(</span>
-<span class="sd">        ...     &quot;emodb&quot;,</span>
-<span class="sd">        ...     [&quot;wav/03a01Fa.wav&quot;],</span>
-<span class="sd">        ...     version=&quot;1.4.1&quot;,</span>
-<span class="sd">        ...     format=&quot;flac&quot;,</span>
+<span class="sd">        ...     "emodb",</span>
+<span class="sd">        ...     ["wav/03a01Fa.wav"],</span>
+<span class="sd">        ...     version="1.4.1",</span>
+<span class="sd">        ...     format="flac",</span>
 <span class="sd">        ...     verbose=False,</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; paths[0].split(os.path.sep)[-5:]</span>
-<span class="sd">        [&#39;emodb&#39;, &#39;1.4.1&#39;, &#39;40bb2241&#39;, &#39;wav&#39;, &#39;03a01Fa.flac&#39;]</span>
+<span class="sd">        ['emodb', '1.4.1', '40bb2241', 'wav', '03a01Fa.flac']</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">media</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">media</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">media</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
@@ -1844,9 +1844,9 @@
     <span class="n">scan_for_missing_files</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">is_empty</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">shimmer</span><span class="p">(</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;Get:   &quot;</span><span class="p">,</span>
-        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Cache: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">"Get:   "</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Cache: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">enabled</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">files</span> <span class="o">=</span> <span class="n">_load_media</span><span class="p">(</span>
@@ -1880,13 +1880,13 @@
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">scan_for_missing_files</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media file(s) without the progress animation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load media file(s) without the progress animation.</span>
 
 <span class="sd">    The body of :func:`load_media` lives here so that</span>
 <span class="sd">    :func:`load_media` only sets up and tears down the</span>
 <span class="sd">    :func:`shimmer` animation.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">files</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">deps</span> <span class="o">=</span> <span class="n">dependencies</span><span class="p">(</span>
@@ -1899,7 +1899,7 @@
         <span class="n">missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">media</span><span class="p">)</span> <span class="o">-</span> <span class="n">available_files</span>
         <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">error_message_missing_object</span><span class="p">(</span>
-                <span class="s2">&quot;media&quot;</span><span class="p">,</span>
+                <span class="s2">"media"</span><span class="p">,</span>
                 <span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">),</span>
                 <span class="n">name</span><span class="p">,</span>
                 <span class="n">version</span><span class="p">,</span>
@@ -1928,7 +1928,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">db_is_complete</span><span class="p">:</span>
                 <span class="n">_load_files</span><span class="p">(</span>
                     <span class="n">media</span><span class="p">,</span>
-                    <span class="s2">&quot;media&quot;</span><span class="p">,</span>
+                    <span class="s2">"media"</span><span class="p">,</span>
                     <span class="n">backend_interface</span><span class="p">,</span>
                     <span class="n">db_root</span><span class="p">,</span>
                     <span class="n">db</span><span class="p">,</span>
@@ -1951,7 +1951,7 @@
                     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">media</span>
                 <span class="p">]</span>
             <span class="n">files</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>  <span class="c1"># convert &quot;/&quot; to os.sep</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>  <span class="c1"># convert "/" to os.sep</span>
                 <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">media</span>
             <span class="p">]</span>
 
@@ -1974,7 +1974,7 @@
     <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load a database table.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Load a database table.</span>
 
 <span class="sd">    If you are interested in a single table</span>
 <span class="sd">    from a database</span>
@@ -1992,11 +1992,11 @@
 <span class="sd">            For example if your table holds a column ``speaker`` with</span>
 <span class="sd">            speaker IDs, which is assigned to a scheme that contains a</span>
 <span class="sd">            dict mapping speaker IDs to age and gender entries,</span>
-<span class="sd">            ``map={&#39;speaker&#39;: [&#39;age&#39;, &#39;gender&#39;]}``</span>
+<span class="sd">            ``map={'speaker': ['age', 'gender']}``</span>
 <span class="sd">            will replace the column with two new columns that map ID</span>
 <span class="sd">            values to age and gender, respectively.</span>
 <span class="sd">            To also keep the original column with speaker IDS, you can do</span>
-<span class="sd">            ``map={&#39;speaker&#39;: [&#39;speaker&#39;, &#39;age&#39;, &#39;gender&#39;]}``</span>
+<span class="sd">            ``map={'speaker': ['speaker', 'age', 'gender']}``</span>
 <span class="sd">        pickle_tables: if ``True``,</span>
 <span class="sd">            tables are cached locally</span>
 <span class="sd">            in their original format</span>
@@ -2018,14 +2018,14 @@
 <span class="sd">            that is not part of the database</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; df = audb.load_table(&quot;emodb&quot;, &quot;emotion&quot;, version=&quot;1.4.1&quot;, verbose=False)</span>
+<span class="sd">        &gt;&gt;&gt; df = audb.load_table("emodb", "emotion", version="1.4.1", verbose=False)</span>
 <span class="sd">        &gt;&gt;&gt; df[:3]</span>
 <span class="sd">                           emotion  emotion.confidence</span>
 <span class="sd">        file</span>
 <span class="sd">        wav/03a01Fa.wav  happiness                0.90</span>
 <span class="sd">        wav/03a01Nc.wav    neutral                1.00</span>
 <span class="sd">        wav/03a01Wa.wav      anger                0.95</span>
-<span class="sd">        &gt;&gt;&gt; df = audb.load_table(&quot;emodb&quot;, &quot;files&quot;, version=&quot;1.4.1&quot;, verbose=False)</span>
+<span class="sd">        &gt;&gt;&gt; df = audb.load_table("emodb", "files", version="1.4.1", verbose=False)</span>
 <span class="sd">        &gt;&gt;&gt; df[:3]</span>
 <span class="sd">                                         duration speaker transcription</span>
 <span class="sd">        file</span>
@@ -2033,10 +2033,10 @@
 <span class="sd">        wav/03a01Nc.wav    0 days 00:00:01.611250       3           a01</span>
 <span class="sd">        wav/03a01Wa.wav 0 days 00:00:01.877812500       3           a01</span>
 <span class="sd">        &gt;&gt;&gt; df = audb.load_table(</span>
-<span class="sd">        ...     &quot;emodb&quot;,</span>
-<span class="sd">        ...     &quot;files&quot;,</span>
-<span class="sd">        ...     version=&quot;1.4.1&quot;,</span>
-<span class="sd">        ...     map={&quot;speaker&quot;: &quot;age&quot;},</span>
+<span class="sd">        ...     "emodb",</span>
+<span class="sd">        ...     "files",</span>
+<span class="sd">        ...     version="1.4.1",</span>
+<span class="sd">        ...     map={"speaker": "age"},</span>
 <span class="sd">        ...     verbose=False,</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; df[:3]</span>
@@ -2046,7 +2046,7 @@
 <span class="sd">        wav/03a01Nc.wav    0 days 00:00:01.611250           a01   31</span>
 <span class="sd">        wav/03a01Wa.wav 0 days 00:00:01.877812500           a01   31</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -2054,9 +2054,9 @@
     <span class="n">scan_for_missing_files</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">is_empty</span><span class="p">(</span><span class="n">db_root</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">shimmer</span><span class="p">(</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;Get:   &quot;</span><span class="p">,</span>
-        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Cache: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">"Get:   "</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">next_line</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Cache: </span><span class="si">{</span><span class="n">db_root</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">enabled</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">deps</span> <span class="o">=</span> <span class="n">dependencies</span><span class="p">(</span>
@@ -2067,7 +2067,7 @@
 
         <span class="k">if</span> <span class="n">table</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">table_ids</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">error_message_missing_object</span><span class="p">(</span>
-                <span class="s2">&quot;table&quot;</span><span class="p">,</span>
+                <span class="s2">"table"</span><span class="p">,</span>
                 <span class="p">[</span><span class="n">table</span><span class="p">],</span>
                 <span class="n">name</span><span class="p">,</span>
                 <span class="n">version</span><span class="p">,</span>
@@ -2094,14 +2094,14 @@
             <span class="c1"># Load table</span>
             <span class="n">tables</span> <span class="o">=</span> <span class="n">scheme_misc_tables</span> <span class="o">+</span> <span class="p">[</span><span class="n">table</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">_table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
-                <span class="n">table_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">_table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">table_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">_table</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                 <span class="c1"># `_load_files()` downloads a table</span>
                 <span class="c1"># from the backend,</span>
                 <span class="c1"># if it cannot find its corresponding csv or parquet file</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table_file</span><span class="si">}</span><span class="s2">.pkl&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">table_file</span><span class="si">}</span><span class="s2">.pkl"</span><span class="p">):</span>
                     <span class="n">_load_files</span><span class="p">(</span>
                         <span class="p">[</span><span class="n">_table</span><span class="p">],</span>
-                        <span class="s2">&quot;table&quot;</span><span class="p">,</span>
+                        <span class="s2">"table"</span><span class="p">,</span>
                         <span class="n">backend_interface</span><span class="p">,</span>
                         <span class="n">db_root</span><span class="p">,</span>
                         <span class="n">db</span><span class="p">,</span>
@@ -2139,7 +2139,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/10/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

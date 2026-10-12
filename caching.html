@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.14.0
+                v1.15.0
               </div>
             
           
@@ -169,7 +169,7 @@ A system wide shared cache folder and a user cache folder.</p>
 <h2>Shared cache<a class="headerlink" href="#shared-cache" title="Link to this heading">¶</a></h2>
 <p>By default the shared cache is located at</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">&#39;/data/audb&#39;</span>
+<span class="go">'/data/audb'</span>
 </pre></div>
 </div>
 <p>and is meant to be shared by several users.</p>
@@ -183,6 +183,10 @@ $<span class="w"> </span>chmod<span class="w"> </span>g+s<span class="w"> </span
 $<span class="w"> </span>setfacl<span class="w"> </span>-d<span class="w"> </span>-m<span class="w"> </span>u::rwx,g::rwx,o::rx-<span class="w"> </span>/data/audb<span class="w">  </span><span class="c1"># content inherits rights</span>
 </pre></div>
 </div>
+<p><a class="reference internal" href="api/audb.html#module-audb" title="audb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audb</span></code></a> uses lock files to avoid race conditions
+when trying to access the same file.
+You can only use a shared cache on the same platform
+as the file lock mechanism is not cross-platform compatible.</p>
 </section>
 <section id="user-cache">
 <h2>User cache<a class="headerlink" href="#user-cache" title="Link to this heading">¶</a></h2>
@@ -190,7 +194,7 @@ $<span class="w"> </span>setfacl<span class="w"> </span>-d<span class="w"> </spa
 accessible to you only.
 By default it points to</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="go">&#39;.../audb&#39;</span>
+<span class="go">'.../audb'</span>
 </pre></div>
 </div>
 <p>When you request a database with <a class="reference internal" href="api/audb.load.html#audb.load" title="audb.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audb.load()</span></code></a>,
@@ -203,7 +207,7 @@ and afterwards in your local cache folder.</p>
 <ol class="arabic simple">
 <li><p>By setting the argument <code class="docutils literal notranslate"><span class="pre">cache_root</span></code> during a function call, e.g.</p></li>
 </ol>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">cache_root</span><span class="o">=</span><span class="s2">&quot;/cache/root/audb&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"emodb"</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">cache_root</span><span class="o">=</span><span class="s2">"/cache/root/audb"</span><span class="p">)</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
@@ -216,14 +220,14 @@ and afterwards in your local cache folder.</p>
 <ol class="arabic simple" start="3">
 <li><p>Program-wide by overwriting the default values in <a class="reference internal" href="api/audb.config.html#audb.config" title="audb.config"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.config</span></code></a></p></li>
 </ol>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">SHARED_CACHE_ROOT</span> <span class="o">=</span> <span class="s2">&quot;/new/shared/cache/audb&quot;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">SHARED_CACHE_ROOT</span> <span class="o">=</span> <span class="s2">"/new/shared/cache/audb"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">&#39;/new/shared/cache/audb&#39;</span>
+<span class="go">'/new/shared/cache/audb'</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s2">&quot;/new/local/cache/audb&quot;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s2">"/new/local/cache/audb"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">(</span><span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="go">&#39;/new/local/cache/audb&#39;</span>
+<span class="go">'/new/local/cache/audb'</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="4">
@@ -261,7 +265,7 @@ and so on.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/10/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

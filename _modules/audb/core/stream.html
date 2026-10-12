@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.14.0
+                v1.15.0
               </div>
             
           
@@ -182,7 +182,7 @@
 <div class="viewcode-block" id="DatabaseIterator">
 <a class="viewcode-back" href="../../../api/audb.DatabaseIterator.html#audb.DatabaseIterator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DatabaseIterator</span><span class="p">(</span><span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Database iterator.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Database iterator.</span>
 
 <span class="sd">    This class cannot be created directly,</span>
 <span class="sd">    but only by calling :func:`audb.stream`.</span>
@@ -191,9 +191,9 @@
 <span class="sd">        Create :class:`audb.DatabaseIterator` object.</span>
 
 <span class="sd">        &gt;&gt;&gt; db = audb.stream(</span>
-<span class="sd">        ...     &quot;emodb&quot;,</span>
-<span class="sd">        ...     &quot;files&quot;,</span>
-<span class="sd">        ...     version=&quot;1.4.1&quot;,</span>
+<span class="sd">        ...     "emodb",</span>
+<span class="sd">        ...     "files",</span>
+<span class="sd">        ...     version="1.4.1",</span>
 <span class="sd">        ...     batch_size=4,</span>
 <span class="sd">        ...     only_metadata=True,</span>
 <span class="sd">        ...     full_path=False,</span>
@@ -254,7 +254,7 @@
 <span class="sd">        the :class:`audb.DatabaseIterator` object</span>
 <span class="sd">        provides access to the current batch of data.</span>
 
-<span class="sd">        &gt;&gt;&gt; db[&quot;files&quot;].get(map={&quot;speaker&quot;: &quot;age&quot;})</span>
+<span class="sd">        &gt;&gt;&gt; db["files"].get(map={"speaker": "age"})</span>
 <span class="sd">                                         duration transcription  age</span>
 <span class="sd">        file</span>
 <span class="sd">        wav/03a01Fa.wav    0 days 00:00:01.898250           a01   31</span>
@@ -262,7 +262,7 @@
 <span class="sd">        wav/03a01Wa.wav 0 days 00:00:01.877812500           a01   31</span>
 <span class="sd">        wav/03a02Fc.wav    0 days 00:00:02.006250           a02   31</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+<span class="sd">    """</span>  <span class="c1"># noqa: E501</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -322,14 +322,14 @@
 <div class="viewcode-block" id="DatabaseIterator.__iter__">
 <a class="viewcode-back" href="../../../api/audb.DatabaseIterator.html#audb.DatabaseIterator.__iter__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DatabaseIterator</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterator generator.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Iterator generator."""</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
 <div class="viewcode-block" id="DatabaseIterator.__next__">
 <a class="viewcode-back" href="../../../api/audb.DatabaseIterator.html#audb.DatabaseIterator.__next__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterate database.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Iterate database."""</span>
         <span class="c1"># Load part of table</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_batch</span><span class="p">()</span>
         <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">]</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">df</span>
@@ -357,7 +357,7 @@
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create table iterator object.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Create table iterator object.</span>
 
 <span class="sd">        This method needs to be implemented</span>
 <span class="sd">        for the table file types</span>
@@ -367,18 +367,18 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            table iterator</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span>  <span class="c1"># pragma: nocover</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_database</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove parts of database, not used by table.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Remove parts of database, not used by table.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            db: database object</span>
 <span class="sd">            table: table ID</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="p">[</span><span class="n">table</span><span class="p">]</span>
         <span class="n">misc_tables</span> <span class="o">=</span> <span class="n">_misc_tables_used_in_table</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">table</span><span class="p">])</span>
 
@@ -413,12 +413,12 @@
                 <span class="k">del</span> <span class="n">db</span><span class="o">.</span><span class="n">splits</span><span class="p">[</span><span class="n">split</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read table batch.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Read table batch.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dataframe</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">:</span>
             <span class="n">buffer_read_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span>
             <span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
@@ -445,14 +445,14 @@
         <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_media</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media file for batch.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Load media file for batch.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            df: dataframe of batch</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">audformat</span><span class="o">.</span><span class="n">is_segmented_index</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
-            <span class="n">media</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">))</span>
+            <span class="n">media</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">"file"</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">audformat</span><span class="o">.</span><span class="n">is_filewise_index</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
             <span class="n">media</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -474,7 +474,7 @@
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_postprocess_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Post-process batch data to desired dataframe.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Post-process batch data to desired dataframe.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            batch: input data</span>
@@ -482,11 +482,11 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dataframe</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">batch</span>  <span class="c1"># pragma: nocover</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_postprocess_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Post-process dataframe to have correct index and data types.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Post-process dataframe to have correct index and data types.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            df: dataframe</span>
@@ -494,7 +494,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dataframe</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Adjust dtypes and set index</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">]</span><span class="o">.</span><span class="n">_pyarrow_convert_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">convert_all</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">index_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">]</span><span class="o">.</span><span class="n">_levels_and_dtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -502,12 +502,12 @@
         <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_read_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read dataframe from table.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Read dataframe from table.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dataframe</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_postprocess_dataframe</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_postprocess_batch</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="p">)))</span>
@@ -551,14 +551,14 @@
             <span class="c1"># `pandas.read_csv()` does not support a `chunksize=0`</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="si">}</span><span class="s2">.csv"</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
                 <span class="n">file</span><span class="p">,</span>
                 <span class="n">chunksize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">,</span>
                 <span class="n">usecols</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">columns_and_dtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
                 <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes_wo_converters</span><span class="p">,</span>
                 <span class="n">converters</span><span class="o">=</span><span class="n">converters</span><span class="p">,</span>
-                <span class="n">float_precision</span><span class="o">=</span><span class="s2">&quot;round_trip&quot;</span><span class="p">,</span>
+                <span class="n">float_precision</span><span class="o">=</span><span class="s2">"round_trip"</span><span class="p">,</span>
             <span class="p">)</span>
 
 
@@ -567,7 +567,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># pyarrow &gt;=21.0.0 does not support batch_size=0</span>
             <span class="k">return</span> <span class="p">[]</span>
-        <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">)</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="si">}</span><span class="s2">.parquet"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">parquet</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">iter_batches</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_postprocess_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">RecordBatch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -597,7 +597,7 @@
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">define</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DatabaseIterator</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stream table and media files of a database.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Stream table and media files of a database.</span>
 
 <span class="sd">    Loads only the first ``batch_size`` rows</span>
 <span class="sd">    of a table into memory,</span>
@@ -622,11 +622,11 @@
 <span class="sd">            For example if your table holds a column ``speaker`` with</span>
 <span class="sd">            speaker IDs, which is assigned to a scheme that contains a</span>
 <span class="sd">            dict mapping speaker IDs to age and gender entries,</span>
-<span class="sd">            ``map={&#39;speaker&#39;: [&#39;age&#39;, &#39;gender&#39;]}``</span>
+<span class="sd">            ``map={'speaker': ['age', 'gender']}``</span>
 <span class="sd">            will replace the column with two new columns that map ID</span>
 <span class="sd">            values to age and gender, respectively.</span>
 <span class="sd">            To also keep the original column with speaker IDS, you can do</span>
-<span class="sd">            ``map={&#39;speaker&#39;: [&#39;speaker&#39;, &#39;age&#39;, &#39;gender&#39;]}``</span>
+<span class="sd">            ``map={'speaker': ['speaker', 'age', 'gender']}``</span>
 <span class="sd">        batch_size: number of table rows</span>
 <span class="sd">            to return in one iteration</span>
 <span class="sd">        shuffle: if ``True``,</span>
@@ -644,7 +644,7 @@
 <span class="sd">            and ``channels=[1]`` returns the second channel</span>
 <span class="sd">            of all multi-channel files</span>
 <span class="sd">            and all mono files</span>
-<span class="sd">        format: file format, one of ``&#39;flac&#39;``, ``&#39;wav&#39;``</span>
+<span class="sd">        format: file format, one of ``'flac'``, ``'wav'``</span>
 <span class="sd">        mixdown: apply mono mix-down</span>
 <span class="sd">        sampling_rate: sampling rate in Hz, one of</span>
 <span class="sd">            ``8000``, ``16000``, ``22050``, ``24000``, ``44100``, ``48000``</span>
@@ -674,9 +674,9 @@
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; np.random.seed(1)</span>
 <span class="sd">        &gt;&gt;&gt; db = audb.stream(</span>
-<span class="sd">        ...     &quot;emodb&quot;,</span>
-<span class="sd">        ...     &quot;files&quot;,</span>
-<span class="sd">        ...     version=&quot;1.4.1&quot;,</span>
+<span class="sd">        ...     "emodb",</span>
+<span class="sd">        ...     "files",</span>
+<span class="sd">        ...     version="1.4.1",</span>
 <span class="sd">        ...     batch_size=4,</span>
 <span class="sd">        ...     shuffle=True,</span>
 <span class="sd">        ...     only_metadata=True,</span>
@@ -691,13 +691,13 @@
 <span class="sd">        wav/12a05Nd.wav    0 days 00:00:03.185875       12           a05</span>
 <span class="sd">        wav/13a07Na.wav 0 days 00:00:01.911687500       13           a07</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="c1"># Extract kwargs</span>
     <span class="c1"># to pass on to the DatabaseIterator constructor</span>
-    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;table&quot;</span><span class="p">]}</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"table"</span><span class="p">]}</span>
 
     <span class="n">flavor</span> <span class="o">=</span> <span class="n">Flavor</span><span class="p">(</span>
         <span class="n">bit_depth</span><span class="o">=</span><span class="n">bit_depth</span><span class="p">,</span>
@@ -717,7 +717,7 @@
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">table</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">table_ids</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">error_message_missing_object</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">table</span><span class="p">],</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">error_message_missing_object</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span> <span class="p">[</span><span class="n">table</span><span class="p">],</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">lock_cache</span><span class="p">(</span><span class="n">db_root</span><span class="p">):</span>
@@ -736,7 +736,7 @@
         <span class="c1"># Load table files</span>
         <span class="n">_load_files</span><span class="p">(</span>
             <span class="n">misc_tables</span> <span class="o">+</span> <span class="p">[</span><span class="n">table</span><span class="p">],</span>
-            <span class="s2">&quot;table&quot;</span><span class="p">,</span>
+            <span class="s2">"table"</span><span class="p">,</span>
             <span class="n">backend_interface</span><span class="p">,</span>
             <span class="n">db_root</span><span class="p">,</span>
             <span class="n">db</span><span class="p">,</span>
@@ -753,10 +753,10 @@
 
         <span class="c1"># Load misc tables completely</span>
         <span class="k">for</span> <span class="n">misc_table</span> <span class="ow">in</span> <span class="n">misc_tables</span><span class="p">:</span>
-            <span class="n">table_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">misc_table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">table_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">misc_table</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">db</span><span class="p">[</span><span class="n">misc_table</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">table_file</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet"</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">DatabaseIteratorParquet</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">deps</span><span class="o">=</span><span class="n">deps</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">DatabaseIteratorCsv</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">deps</span><span class="o">=</span><span class="n">deps</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -776,7 +776,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/10/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

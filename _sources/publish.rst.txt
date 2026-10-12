@@ -212,13 +212,16 @@ but this time we have to specify a version where our update should be based on.
 :func:`audb.publish` will then automatically figure out
 which files have changed
 and will only publish those.
+As the new version depends on a previous version,
+we can also omit the ``repository`` argument,
+and :func:`audb.publish` will publish
+to the repository of the previous version.
 
 .. code-block:: python
 
     deps = audb.publish(
         build_dir,
         "1.1.0",
-        repository,
         previous_version="1.0.0",
         verbose=False,
     )

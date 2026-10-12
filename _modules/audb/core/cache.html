@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.14.0
+                v1.15.0
               </div>
             
           
@@ -163,7 +163,7 @@
     <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">flavor</span><span class="p">:</span> <span class="n">Flavor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create and return database cache folder.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Create and return database cache folder.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: name of database</span>
@@ -174,7 +174,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        path to cache folder</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">cache_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">cache_roots</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">default_cache_root</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>  <span class="c1"># check shared cache first</span>
@@ -197,9 +197,9 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">database_tmp_root</span><span class="p">(</span>
     <span class="n">db_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create and return temporary database cache folder.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Create and return temporary database cache folder.</span>
 
-<span class="sd">    The temporary cache folder is created under ``db_root + &#39;~&#39;``.</span>
+<span class="sd">    The temporary cache folder is created under ``db_root + '~'``.</span>
 <span class="sd">    Any existing temporary folder from previous interrupted downloads</span>
 <span class="sd">    is removed before creating a fresh one.</span>
 
@@ -209,8 +209,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        path to temporary cache folder</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tmp_root</span> <span class="o">=</span> <span class="n">db_root</span> <span class="o">+</span> <span class="s2">&quot;~&quot;</span>
+<span class="sd">    """</span>
+    <span class="n">tmp_root</span> <span class="o">=</span> <span class="n">db_root</span> <span class="o">+</span> <span class="s2">"~"</span>
     <span class="c1"># Clean up any leftover tmp folder from previous interrupted downloads</span>
     <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">)</span>
     <span class="n">tmp_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">)</span>
@@ -222,7 +222,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">default_cache_root</span><span class="p">(</span>
     <span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default cache folder.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Default cache folder.</span>
 
 <span class="sd">    If ``shared`` is ``True``,</span>
 <span class="sd">    returns the path specified</span>
@@ -243,11 +243,11 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        path normalized by :func:`audeer.path`</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">shared</span><span class="p">:</span>
-        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUDB_SHARED_CACHE_ROOT&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">SHARED_CACHE_ROOT</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AUDB_SHARED_CACHE_ROOT"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">SHARED_CACHE_ROOT</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUDB_CACHE_ROOT&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AUDB_CACHE_ROOT"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
     <span class="k">return</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">follow_symlink</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 </pre></div>
@@ -265,7 +265,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/22 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/10/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
