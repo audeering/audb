@@ -7,6 +7,20 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.15.0 (2026-10-12)
+---------------------------
+
+* Added: support for Python 3.15
+* Changed: the ``repository`` argument in ``audb.publish()`` is now optional,
+  when ``previous_version`` is not ``None``.
+  The database is then published in the same repository as its previous version
+* Changed: lock cache with ``filelock.FileLock`` instead of ``filelock.SoftFileLock``.
+  This has the advantage that the cache can no longer be blocked by leftover lock files.
+  The downside is that we no longer support shared caches across different platforms
+* Removed: support for Python 3.10
+* Fixed: missing space character in verbose message of ``audb.publish()``
+
+
 Version 1.14.0 (2026-07-22)
 ---------------------------
 
